@@ -141,6 +141,81 @@ npm run preview            # Preview production build
 - `POST /api/insights` - Generate column insights
 - `GET /api/health` - Health check
 
+## Animation Development Guidelines
+
+### Performance Best Practices
+
+1. **Use Transform Properties**: Prefer `transform` and `opacity` for smooth 60fps animations
+2. **Avoid Layout Thrashing**: Don't animate properties that trigger layout recalculation
+3. **Batch Animations**: Group related animations to minimize browser repaints
+4. **Use requestAnimationFrame**: Motion One handles this automatically
+
+### Consistency Guidelines
+
+- **Duration Standards**:
+  - Micro-interactions: 150-200ms
+  - Component transitions: 300-400ms
+  - Page transitions: 500-600ms
+- **Easing Functions**: Use consistent easing curves throughout the app
+- **Animation Naming**: Follow descriptive naming conventions for animation functions
+
+### Accessibility Requirements
+
+```typescript
+// Always check for reduced motion preference
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+// Provide fallbacks or disable animations accordingly
+const animationConfig = {
+  duration: prefersReducedMotion ? 0 : 0.3,
+  easing: prefersReducedMotion ? 'linear' : 'ease-out'
+}
+```
+
+### Debugging Animations
+
+- Use browser dev tools' Animation inspector
+- Enable "Slow animations" in dev tools for detailed inspection
+- Add temporary visual indicators for animation timing
+- Test across different devices and browsers
+
+## Animation Testing
+
+### Development Testing
+
+```bash
+# Test animations with different motion preferences
+npm run dev -- --host  # Test on different devices
+```
+
+### Performance Testing
+
+- Monitor FPS during animations using dev tools
+- Test on lower-end devices to ensure smooth playback
+- Use Lighthouse to check for animation-related performance issues
+- Profile memory usage during complex animation sequences
+
+### Browser Compatibility
+
+Motion One provides excellent browser support:
+- Chrome/Edge: Full support including Web Animations API
+- Firefox: Full support with polyfills where needed
+- Safari: Good support with some fallbacks for older versions
+- Mobile browsers: Optimized for touch interactions and reduced battery usage
+
+### Animation Testing Commands
+
+```bash
+# Build with animation debugging enabled
+npm run build:debug
+
+# Test animations in different environments
+npm run preview -- --mode animation-test
+
+# Run performance benchmarks
+npm run test:performance
+```
+
 ## Security
 
 ### SQL Injection Protection
