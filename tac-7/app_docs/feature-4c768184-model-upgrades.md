@@ -25,7 +25,7 @@ Updated the AI model configurations in the Natural Language SQL Interface applic
 
 - OpenAI model upgraded from `gpt-4.1-mini` to `gpt-4.1-2025-04-14` in SQL generation and random query functions
 - Anthropic model upgraded from `claude-3-haiku-20240307` to `claude-sonnet-4-0` in SQL generation and random query functions
-- Test cases updated to verify correct model names are being used in API calls
+- Test cases updated to verify correct model AI Developer Workflow Kanban Board.mdnames are being used in API calls
 - All function signatures and return types remain unchanged for backward compatibility
 
 ## How to Use
