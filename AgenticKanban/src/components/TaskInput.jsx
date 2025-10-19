@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useKanbanStore, WORK_ITEM_TYPES, QUEUEABLE_STAGES } from '../stores/kanbanStore';
-import { X, Plus, Upload, Bold, Italic, Underline, Image as ImageIcon } from 'lucide-react';
+import { X, Plus, Image as ImageIcon } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
-import MDEditor from '@uiw/react-md-editor';
 
 const TaskInput = () => {
   const {
@@ -17,6 +16,8 @@ const TaskInput = () => {
   const [queuedStages, setQueuedStages] = useState(['plan', 'implement']);
   const [images, setImages] = useState([]);
   const [errors, setErrors] = useState([]);
+  const [annotatingImage, setAnnotatingImage] = useState(null);
+  const [imageAnnotations, setImageAnnotations] = useState({});
 
   // Image upload with react-dropzone
   const onDrop = (acceptedFiles) => {
@@ -48,6 +49,51 @@ const TaskInput = () => {
       }
       return updated;
     });
+    // Remove annotations for this image
+    setImageAnnotations(prev => {
+      const updated = { ...prev };
+      delete updated[imageId];
+      return updated;
+    });
+  };
+
+  const handleImageClick = (imageId, event) => {
+    const rect = event.target.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const relativeX = (x / rect.width) * 100;
+    const relativeY = (y / rect.height) * 100;
+
+    const annotation = {
+      id: Date.now() + Math.random(),
+      x: relativeX,
+      y: relativeY,
+      note: '',
+    };
+
+    setImageAnnotations(prev => ({
+      ...prev,
+      [imageId]: [...(prev[imageId] || []), annotation]
+    }));
+
+    // Open annotation edit mode
+    setAnnotatingImage({ imageId, annotationId: annotation.id });
+  };
+
+  const updateAnnotation = (imageId, annotationId, note) => {
+    setImageAnnotations(prev => ({
+      ...prev,
+      [imageId]: prev[imageId]?.map(ann =>
+        ann.id === annotationId ? { ...ann, note } : ann
+      ) || []
+    }));
+  };
+
+  const removeAnnotation = (imageId, annotationId) => {
+    setImageAnnotations(prev => ({
+      ...prev,
+      [imageId]: prev[imageId]?.filter(ann => ann.id !== annotationId) || []
+    }));
   };
 
   const handleStageToggle = (stageId) => {
@@ -68,7 +114,10 @@ const TaskInput = () => {
       description: description.trim(),
       workItemType,
       queuedStages,
-      images,
+      images: images.map(img => ({
+        ...img,
+        annotations: imageAnnotations[img.id] || []
+      })),
     };
 
     const validation = validateTask(taskData);
@@ -87,6 +136,8 @@ const TaskInput = () => {
     setQueuedStages(['plan', 'implement']);
     setImages([]);
     setErrors([]);
+    setImageAnnotations({});
+    setAnnotatingImage(null);
   };
 
   const workItemTypeOptions = [
@@ -178,7 +229,7 @@ const TaskInput = () => {
             <p className="text-sm text-gray-500 mb-3">
               Select the stages this task should progress through
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="flex flex-wrap gap-3">
               {QUEUEABLE_STAGES.map((stage) => (
                 <label
                   key={stage.id}
@@ -203,27 +254,20 @@ const TaskInput = () => {
             </div>
           </div>
 
-          {/* Rich Text Description */}
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Description *
             </label>
-            <div className="border border-gray-300 rounded-md overflow-hidden">
-              <MDEditor
-                value={description}
-                onChange={setDescription}
-                preview="edit"
-                hideToolbar={false}
-                visibleDragBar={false}
-                textareaProps={{
-                  placeholder: 'Describe what needs to be done... (Supports Markdown formatting)',
-                  style: { fontSize: 14, lineHeight: 1.5 }
-                }}
-                height={150}
-              />
-            </div>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe what needs to be done..."
+              rows={6}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical"
+            />
             <p className="mt-1 text-xs text-gray-500">
-              Use Markdown for formatting (bold, italic, lists, links, etc.)
+              Plain text description of the task requirements
             </p>
           </div>
 
@@ -256,27 +300,150 @@ const TaskInput = () => {
 
             {/* Uploaded Images Preview */}
             {images.length > 0 && (
-              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="mt-4 space-y-4">
                 {images.map((image) => (
-                  <div key={image.id} className="relative group">
-                    <img
-                      src={image.url}
-                      alt={image.name}
-                      className="w-full h-24 object-cover rounded-lg border border-gray-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(image.id)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                    <p className="text-xs text-gray-500 mt-1 truncate">{image.name}</p>
+                  <div key={image.id} className="border border-gray-200 rounded-lg p-4">
+                    <div className="relative inline-block">
+                      <img
+                        src={image.url}
+                        alt={image.name}
+                        className="max-w-full h-48 object-contain rounded border border-gray-100 cursor-crosshair"
+                        onClick={(e) => handleImageClick(image.id, e)}
+                        title="Click to add annotation"
+                      />
+
+                      {/* Annotation markers */}
+                      {imageAnnotations[image.id]?.map((annotation) => (
+                        <div
+                          key={annotation.id}
+                          className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg cursor-pointer transform -translate-x-2 -translate-y-2 hover:bg-red-600"
+                          style={{
+                            left: `${annotation.x}%`,
+                            top: `${annotation.y}%`,
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setAnnotatingImage({ imageId: image.id, annotationId: annotation.id });
+                          }}
+                          title={annotation.note || 'Click to edit annotation'}
+                        >
+                          <span className="absolute top-5 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                            {annotation.note || 'No note'}
+                          </span>
+                        </div>
+                      ))}
+
+                      {/* Remove image button */}
+                      <button
+                        type="button"
+                        onClick={() => removeImage(image.id)}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+
+                    <div className="mt-2 flex items-center justify-between">
+                      <p className="text-sm text-gray-600 truncate">{image.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {imageAnnotations[image.id]?.length || 0} annotation(s)
+                      </p>
+                    </div>
+
+                    {/* Annotations list */}
+                    {imageAnnotations[image.id]?.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        <h4 className="text-sm font-medium text-gray-700">Annotations:</h4>
+                        {imageAnnotations[image.id].map((annotation, index) => (
+                          <div key={annotation.id} className="flex items-start gap-2 text-sm">
+                            <span className="inline-block w-3 h-3 bg-red-500 rounded-full mt-1 flex-shrink-0"></span>
+                            <span className="flex-1 text-gray-600">
+                              {annotation.note || `Annotation ${index + 1}`}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setAnnotatingImage({ imageId: image.id, annotationId: annotation.id })}
+                              className="text-blue-600 hover:text-blue-800 text-xs"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeAnnotation(image.id, annotation.id)}
+                              className="text-red-600 hover:text-red-800 text-xs"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <p className="text-xs text-gray-500 mt-2">
+                      Click on the image to add annotations
+                    </p>
                   </div>
                 ))}
               </div>
             )}
           </div>
+
+          {/* Annotation Edit Modal */}
+          {annotatingImage && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Edit Annotation</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Annotation Note
+                    </label>
+                    <textarea
+                      value={
+                        imageAnnotations[annotatingImage.imageId]?.find(
+                          ann => ann.id === annotatingImage.annotationId
+                        )?.note || ''
+                      }
+                      onChange={(e) => updateAnnotation(
+                        annotatingImage.imageId,
+                        annotatingImage.annotationId,
+                        e.target.value
+                      )}
+                      placeholder="Describe what you want to highlight..."
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        removeAnnotation(annotatingImage.imageId, annotatingImage.annotationId);
+                        setAnnotatingImage(null);
+                      }}
+                      className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md hover:bg-red-100"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAnnotatingImage(null)}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-md hover:bg-gray-100"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAnnotatingImage(null)}
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">

@@ -72,13 +72,24 @@ export const useKanbanStore = create()(
 
         // Task actions
         createTask: (taskData) => {
+          // Generate dynamic pipeline name based on queuedStages
+          const generatePipelineName = (queuedStages) => {
+            if (!queuedStages || queuedStages.length === 0) {
+              return 'adw_unknown';
+            }
+            return `adw_${queuedStages.join('_')}`;
+          };
+
+          const dynamicPipelineId = generatePipelineName(taskData.queuedStages);
+
           const newTask = {
             id: get().taskIdCounter,
             title: taskData.title || '', // Optional title
             description: taskData.description,
             workItemType: taskData.workItemType || WORK_ITEM_TYPES.FEATURE,
             queuedStages: taskData.queuedStages || [],
-            pipelineId: taskData.pipelineId, // Keep for backward compatibility
+            pipelineId: dynamicPipelineId, // Dynamic pipeline name based on stages
+            pipelineIdStatic: taskData.pipelineId, // Keep static pipelineId for backward compatibility
             stage: 'backlog',
             substage: 'initializing',
             progress: 0,

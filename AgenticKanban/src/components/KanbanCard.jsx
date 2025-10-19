@@ -40,6 +40,23 @@ const KanbanCard = ({ task }) => {
   const isSelected = selectedTaskId === task.id;
   const progressionStatus = getTaskProgressionStatus(task.id);
 
+  // Format dynamic pipeline names for display
+  const formatPipelineName = (pipelineId) => {
+    if (!pipelineId) return 'Unknown Pipeline';
+
+    // Handle dynamic pipeline names (e.g., "adw_plan_implement_test")
+    if (pipelineId.startsWith('adw_')) {
+      const stages = pipelineId.replace('adw_', '').split('_');
+      const capitalizedStages = stages.map(stage =>
+        stage.charAt(0).toUpperCase() + stage.slice(1)
+      );
+      return `ADW: ${capitalizedStages.join(' → ')}`;
+    }
+
+    // Fallback to existing pipeline lookup or display the ID itself
+    return pipeline?.name || pipelineId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
+
   const getProgressColor = () => {
     if (task.stage === 'errored') return 'bg-red-500';
     if (task.progress === 100) return 'bg-green-500';
@@ -122,7 +139,7 @@ const KanbanCard = ({ task }) => {
             <div className="mt-1 flex items-center text-xs text-gray-500">
               <span className="truncate">#{task.id}</span>
               <span className="mx-1">•</span>
-              <span>{pipeline?.name || 'Unknown Pipeline'}</span>
+              <span>{formatPipelineName(task.pipelineId)}</span>
             </div>
           </div>
 
@@ -259,7 +276,7 @@ const KanbanCard = ({ task }) => {
                 </div>
                 <div>
                   <span className="text-gray-500">Pipeline:</span>
-                  <div className="font-medium">{pipeline?.name}</div>
+                  <div className="font-medium">{formatPipelineName(task.pipelineId)}</div>
                 </div>
               </div>
 
