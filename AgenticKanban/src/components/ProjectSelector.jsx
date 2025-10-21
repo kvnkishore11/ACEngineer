@@ -5,77 +5,96 @@ import { Folder, FolderOpen, CheckCircle, XCircle, Plus, FileText } from 'lucide
 const ProjectSelector = () => {
   const {
     availableProjects,
-    selectProject,
+    selectProject: selectProjectInStore,
     addProject,
     setError,
     setLoading,
   } = useKanbanStore();
 
   const [showNewProject, setShowNewProject] = useState(false);
-  const [newProjectPath, setNewProjectPath] = useState('');
   const [validationStatus, setValidationStatus] = useState(null);
+  const [isSelectingFolder, setIsSelectingFolder] = useState(false);
 
-  // Simulated project discovery for demo purposes
-  const simulatedProjects = [
-    {
-      id: 'example-project-1',
-      name: 'AgenticKanban',
-      path: '/Users/kvnkishore/WebstormProjects/AgenticEngineer/AgenticKanban',
-      isValid: true,
-      hasAgentics: true,
-      hasClaude: true,
-      description: 'AI-Driven Development Workflow Kanban Board',
-      lastModified: new Date().toISOString(),
-    },
-    {
-      id: 'example-project-2',
-      name: 'React Dashboard',
-      path: '/Users/demo/projects/react-dashboard',
-      isValid: true,
-      hasAgentics: true,
-      hasClaude: true,
-      description: 'Analytics Dashboard with ADW support',
-      lastModified: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    },
-    {
-      id: 'example-project-3',
-      name: 'Node API',
-      path: '/Users/demo/projects/node-api',
-      isValid: false,
-      hasAgentics: false,
-      hasClaude: true,
-      description: 'REST API (missing agentics folder)',
-      lastModified: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-    },
-  ];
+  // Check if File System Access API is supported
+  const isFileSystemAPISupported = 'showDirectoryPicker' in window;
 
-  useEffect(() => {
-    // Initialize with simulated projects if none exist
-    if (availableProjects.length === 0) {
-      simulatedProjects.forEach(project => {
-        addProject(project);
-      });
+  // Project selection using File System Access API
+  const selectProjectFromFileSystem = async () => {
+    try {
+      if (!isFileSystemAPISupported) {
+        setError('File System Access API is not supported in this browser. Please use Chrome, Edge, or another compatible browser.');
+        return;
+      }
+
+      setIsSelectingFolder(true);
+      const projectHandle = await window.showDirectoryPicker();
+
+      // Validate project structure
+      const validation = await validateProjectStructure(projectHandle);
+
+      if (!validation.isValid) {
+        setError('Selected project is missing required structure (agentics/ or .claude/ directories)');
+        return;
+      }
+
+      // Create project object
+      const project = {
+        id: `project-${Date.now()}`,
+        name: projectHandle.name,
+        path: projectHandle.name, // We can't get full path from File API for security
+        handle: projectHandle, // Store the handle for file operations
+        isValid: validation.isValid,
+        hasAgentics: validation.hasAgentics,
+        hasClaude: validation.hasClaude,
+        description: 'Selected project with ADW support',
+        lastModified: new Date().toISOString(),
+      };
+
+      addProject(project);
+      selectProjectInStore(project);
+
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        setError(`Failed to select project: ${error.message}`);
+      }
+    } finally {
+      setIsSelectingFolder(false);
     }
-  }, [availableProjects.length, addProject]);
+  };
 
-  const validateProject = (path) => {
-    // Simulate project validation
-    setLoading(true);
+  // Validate project has required folders
+  const validateProjectStructure = async (projectHandle) => {
+    try {
+      let hasAgentics = false;
+      let hasClaude = false;
 
-    setTimeout(() => {
-      const isValid = Math.random() > 0.3; // 70% chance of being valid
-      const hasAgentics = Math.random() > 0.2; // 80% chance of having agentics
-      const hasClaude = Math.random() > 0.1; // 90% chance of having .claude
+      try {
+        await projectHandle.getDirectoryHandle('agentics');
+        hasAgentics = true;
+      } catch {
+        // agentics folder not found
+      }
 
-      setValidationStatus({
-        isValid: isValid && hasAgentics && hasClaude,
+      try {
+        await projectHandle.getDirectoryHandle('.claude');
+        hasClaude = true;
+      } catch {
+        // .claude folder not found
+      }
+
+      return {
+        isValid: hasAgentics && hasClaude,
         hasAgentics,
         hasClaude,
-        path,
-      });
-
-      setLoading(false);
-    }, 1000);
+      };
+    } catch (error) {
+      console.error('Error validating project structure:', error);
+      return {
+        isValid: false,
+        hasAgentics: false,
+        hasClaude: false,
+      };
+    }
   };
 
   const handleSelectProject = (project) => {
@@ -84,32 +103,7 @@ const ProjectSelector = () => {
       return;
     }
 
-    selectProject(project);
-  };
-
-  const handleAddNewProject = () => {
-    if (!newProjectPath.trim()) {
-      setError('Please enter a valid project path');
-      return;
-    }
-
-    if (validationStatus && validationStatus.isValid) {
-      const newProject = {
-        id: `project-${Date.now()}`,
-        name: newProjectPath.split('/').pop() || 'New Project',
-        path: newProjectPath,
-        isValid: true,
-        hasAgentics: validationStatus.hasAgentics,
-        hasClaude: validationStatus.hasClaude,
-        description: 'Recently added project',
-        lastModified: new Date().toISOString(),
-      };
-
-      addProject(newProject);
-      selectProject(newProject);
-    } else {
-      setError('Please validate the project first');
-    }
+    selectProjectInStore(project);
   };
 
   const formatDate = (dateString) => {
@@ -194,108 +188,34 @@ const ProjectSelector = () => {
         </div>
       </div>
 
-      {/* Add New Project */}
+      {/* Select New Project */}
       <div className="border-t border-gray-200 pt-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">Add New Project</h2>
-          <button
-            onClick={() => setShowNewProject(!showNewProject)}
-            className="btn-secondary flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Browse</span>
-          </button>
-        </div>
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Project</h2>
 
-        {showNewProject && (
-          <div className="card max-w-2xl">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Project Path
-                </label>
-                <input
-                  type="text"
-                  value={newProjectPath}
-                  onChange={(e) => setNewProjectPath(e.target.value)}
-                  placeholder="/path/to/your/project"
-                  className="input-field"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Enter the full path to your project directory
-                </p>
+          {isFileSystemAPISupported ? (
+            <button
+              onClick={selectProjectFromFileSystem}
+              disabled={isSelectingFolder}
+              className="btn-primary flex items-center space-x-2 mx-auto"
+            >
+              <Folder className="h-4 w-4" />
+              <span>{isSelectingFolder ? 'Selecting...' : 'Browse Folders'}</span>
+            </button>
+          ) : (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-2xl mx-auto">
+              <div className="flex items-center space-x-2 mb-2">
+                <XCircle className="h-5 w-5 text-yellow-600" />
+                <span className="font-medium text-yellow-800">
+                  File System Access Not Supported
+                </span>
               </div>
-
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => validateProject(newProjectPath)}
-                  className="btn-secondary"
-                  disabled={!newProjectPath.trim()}
-                >
-                  Validate Project
-                </button>
-
-                {validationStatus && (
-                  <button
-                    onClick={handleAddNewProject}
-                    className="btn-primary"
-                    disabled={!validationStatus.isValid}
-                  >
-                    Add Project
-                  </button>
-                )}
-              </div>
-
-              {validationStatus && (
-                <div className={`p-4 rounded-md ${
-                  validationStatus.isValid
-                    ? 'bg-green-50 border border-green-200'
-                    : 'bg-red-50 border border-red-200'
-                }`}>
-                  <div className="flex items-center space-x-2 mb-2">
-                    {validationStatus.isValid ? (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-500" />
-                    )}
-                    <span className={`font-medium ${
-                      validationStatus.isValid ? 'text-green-800' : 'text-red-800'
-                    }`}>
-                      {validationStatus.isValid
-                        ? 'Project is valid for ADW workflows'
-                        : 'Project validation failed'
-                      }
-                    </span>
-                  </div>
-
-                  <div className="space-y-1 text-sm">
-                    <div className={`flex items-center space-x-2 ${
-                      validationStatus.hasAgentics ? 'text-green-700' : 'text-red-700'
-                    }`}>
-                      <div className={`h-2 w-2 rounded-full ${
-                        validationStatus.hasAgentics ? 'bg-green-500' : 'bg-red-500'
-                      }`}></div>
-                      <span>
-                        agentics/ directory {validationStatus.hasAgentics ? 'found' : 'missing'}
-                      </span>
-                    </div>
-
-                    <div className={`flex items-center space-x-2 ${
-                      validationStatus.hasClaude ? 'text-green-700' : 'text-red-700'
-                    }`}>
-                      <div className={`h-2 w-2 rounded-full ${
-                        validationStatus.hasClaude ? 'bg-green-500' : 'bg-red-500'
-                      }`}></div>
-                      <span>
-                        .claude/ directory {validationStatus.hasClaude ? 'found' : 'missing'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <p className="text-sm text-yellow-700">
+                Your browser doesn't support the File System Access API. Please use Chrome, Edge, or another compatible browser for the best experience.
+              </p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Help Section */}

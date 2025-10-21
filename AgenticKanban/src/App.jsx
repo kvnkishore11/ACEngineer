@@ -4,6 +4,7 @@ import ProjectSelector from './components/ProjectSelector';
 import KanbanBoard from './components/KanbanBoard';
 import TaskInput from './components/TaskInput';
 import CommandsPalette from './components/CommandsPalette';
+import CommandDisplay from './components/CommandDisplay';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Folder, Plus, Settings, HelpCircle, Terminal } from 'lucide-react';
 import './styles/kanban.css';
@@ -16,6 +17,11 @@ function App() {
     error,
     clearError,
     isLoading,
+    showCommandModal,
+    currentCommand,
+    currentTaskData,
+    hideCommandModal,
+    stopAllPolling,
   } = useKanbanStore();
 
   const [showCommandsPalette, setShowCommandsPalette] = useState(false);
@@ -23,7 +29,12 @@ function App() {
   useEffect(() => {
     // Initialize the application
     console.log('AgenticKanban initialized');
-  }, []);
+
+    // Cleanup polling intervals on unmount
+    return () => {
+      stopAllPolling();
+    };
+  }, [stopAllPolling]);
 
   return (
     <ErrorBoundary>
@@ -129,6 +140,15 @@ function App() {
         isOpen={showCommandsPalette}
         onClose={() => setShowCommandsPalette(false)}
       />
+
+      {/* Command Display Modal */}
+      {showCommandModal && currentCommand && currentTaskData && (
+        <CommandDisplay
+          command={currentCommand}
+          taskData={currentTaskData}
+          onClose={hideCommandModal}
+        />
+      )}
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-16">

@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useKanbanStore, WORK_ITEM_TYPES, QUEUEABLE_STAGES } from '../stores/kanbanStore';
-import { X, Plus, Image as ImageIcon } from 'lucide-react';
+import { X, Plus, Image as ImageIcon, Loader, CheckCircle, AlertCircle } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 const TaskInput = () => {
   const {
-    createTask,
+    createTaskWithCommand,
     toggleTaskInput,
-    validateTask,
+    startPolling,
+    getExecutionConfig,
   } = useKanbanStore();
 
   const [title, setTitle] = useState('');
@@ -18,6 +19,11 @@ const TaskInput = () => {
   const [errors, setErrors] = useState([]);
   const [annotatingImage, setAnnotatingImage] = useState(null);
   const [imageAnnotations, setImageAnnotations] = useState({});
+
+  // Loading and execution state
+  const [isCreating, setIsCreating] = useState(false);
+  const [executionStatus, setExecutionStatus] = useState(null); // 'creating', 'executing', 'success', 'error'
+  const [executionMessage, setExecutionMessage] = useState('');
 
   // Image upload with react-dropzone
   const onDrop = (acceptedFiles) => {
@@ -106,30 +112,79 @@ const TaskInput = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const taskData = {
+    // Clear previous status
+    setErrors([]);
+    setExecutionStatus('creating');
+    setExecutionMessage('Creating task...');
+    setIsCreating(true);
+
+    const taskInput = {
       title: title.trim(),
       description: description.trim(),
-      workItemType,
-      queuedStages,
+      type: workItemType,
+      priority: 'medium',
+      stages: queuedStages,
       images: images.map(img => ({
         ...img,
         annotations: imageAnnotations[img.id] || []
       })),
     };
 
-    const validation = validateTask(taskData);
+    try {
+      // Get execution config to show appropriate messages
+      const config = getExecutionConfig();
 
-    if (!validation.isValid) {
-      setErrors(validation.errors);
-      return;
+      setExecutionMessage(
+        config.autoExecute
+          ? 'Creating task and starting automatic execution...'
+          : 'Creating task...'
+      );
+
+      const result = await createTaskWithCommand(taskInput);
+      const { task, adwId, autoExecuted } = result;
+
+      if (autoExecuted) {
+        setExecutionStatus('executing');
+        setExecutionMessage('Task created! Workflow is executing automatically...');
+
+        // Start polling for this task
+        if (adwId && task?.metadata?.projectHandle) {
+          startPolling(adwId, task.metadata.projectHandle);
+        }
+
+        // Show success status briefly, then reset
+        setTimeout(() => {
+          setExecutionStatus('success');
+          setExecutionMessage('Task created and execution started successfully!');
+
+          setTimeout(() => {
+            resetForm();
+          }, 2000);
+        }, 1000);
+      } else {
+        // Manual execution mode
+        setExecutionStatus('success');
+        setExecutionMessage('Task created! Manual execution required.');
+
+        // Reset form after brief delay to show success
+        setTimeout(() => {
+          resetForm();
+        }, 1500);
+      }
+
+    } catch (error) {
+      console.error('Task creation error:', error);
+      setExecutionStatus('error');
+      setExecutionMessage(`Failed to create task: ${error.message}`);
+      setErrors([error.message]);
+      setIsCreating(false);
     }
+  };
 
-    createTask(taskData);
-
-    // Reset form
+  const resetForm = () => {
     setTitle('');
     setDescription('');
     setWorkItemType(WORK_ITEM_TYPES.FEATURE);
@@ -138,6 +193,9 @@ const TaskInput = () => {
     setErrors([]);
     setImageAnnotations({});
     setAnnotatingImage(null);
+    setIsCreating(false);
+    setExecutionStatus(null);
+    setExecutionMessage('');
   };
 
   const workItemTypeOptions = [
@@ -170,6 +228,48 @@ const TaskInput = () => {
                   <li key={index}>{error}</li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {/* Execution Status */}
+          {executionStatus && (
+            <div className={`border rounded-md p-4 ${
+              executionStatus === 'creating' ? 'bg-blue-50 border-blue-200' :
+              executionStatus === 'executing' ? 'bg-yellow-50 border-yellow-200' :
+              executionStatus === 'success' ? 'bg-green-50 border-green-200' :
+              executionStatus === 'error' ? 'bg-red-50 border-red-200' :
+              'bg-gray-50 border-gray-200'
+            }`}>
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0">
+                  {executionStatus === 'creating' && <Loader className="h-5 w-5 text-blue-600 animate-spin" />}
+                  {executionStatus === 'executing' && <Loader className="h-5 w-5 text-yellow-600 animate-spin" />}
+                  {executionStatus === 'success' && <CheckCircle className="h-5 w-5 text-green-600" />}
+                  {executionStatus === 'error' && <AlertCircle className="h-5 w-5 text-red-600" />}
+                </div>
+                <div className="flex-1">
+                  <p className={`text-sm font-medium ${
+                    executionStatus === 'creating' ? 'text-blue-800' :
+                    executionStatus === 'executing' ? 'text-yellow-800' :
+                    executionStatus === 'success' ? 'text-green-800' :
+                    executionStatus === 'error' ? 'text-red-800' :
+                    'text-gray-800'
+                  }`}>
+                    {executionMessage}
+                  </p>
+                  {(executionStatus === 'creating' || executionStatus === 'executing') && (
+                    <div className="mt-2">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className={`h-2 rounded-full transition-all duration-1000 ${
+                          executionStatus === 'creating' ? 'bg-blue-600 w-1/3' :
+                          executionStatus === 'executing' ? 'bg-yellow-600 w-2/3' :
+                          'bg-green-600 w-full'
+                        }`} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -456,11 +556,26 @@ const TaskInput = () => {
             </button>
             <button
               type="submit"
-              className="btn-primary flex items-center space-x-2"
-              disabled={!description.trim() || queuedStages.length === 0}
+              className={`btn-primary flex items-center space-x-2 transition-all ${
+                isCreating ? 'opacity-75 cursor-not-allowed' : ''
+              }`}
+              disabled={!description.trim() || queuedStages.length === 0 || isCreating}
             >
-              <Plus className="h-4 w-4" />
-              <span>Create Task</span>
+              {isCreating ? (
+                <>
+                  <Loader className="h-4 w-4 animate-spin" />
+                  <span>
+                    {executionStatus === 'creating' ? 'Creating...' :
+                     executionStatus === 'executing' ? 'Executing...' :
+                     'Processing...'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4" />
+                  <span>Create Task</span>
+                </>
+              )}
             </button>
           </div>
         </form>

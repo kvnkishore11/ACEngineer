@@ -3,6 +3,21 @@ import { devtools, persist } from 'zustand/middleware';
 import adwService from '../services/adwService';
 import localStorageService from '../services/localStorage';
 import stageProgressionService from '../services/stageProgressionService';
+import apiService, { APIError, NetworkError } from '../services/apiService';
+import webSocketService from '../services/websocketService';
+import {
+  generateAdwId,
+  generateWorkflowCommand,
+  createTaskData,
+  pollWorkflowState,
+  updateTaskFromState
+} from '../utils/commandGenerator';
+import {
+  executeWorkflow,
+  isAutoExecutionSupported,
+  getExecutionConfig,
+  getExecutionStatus
+} from '../utils/workflowExecutor';
 
 // Work item types
 export const WORK_ITEM_TYPES = {
@@ -51,6 +66,22 @@ const initialState = {
   selectedTaskId: null,
   isLoading: false,
   error: null,
+
+  // Automatic execution state
+  executionConfig: null, // Will be loaded from localStorage
+  executingTasks: new Map(), // Track tasks currently executing
+  activePollingIntervals: new Map(), // Track polling intervals by adw_id
+
+  // Modal state (for fallback to manual execution)
+  showCommandModal: false,
+  currentCommand: null,
+  currentTaskData: null,
+
+  // API + WebSocket integration state
+  apiAvailable: null, // null = not checked, true/false = checked
+  webSocketConnections: new Map(), // Track WebSocket connections by adwId
+  globalWebSocketConnected: false,
+  apiMode: true, // true = use API, false = fallback to file-based
 };
 
 export const useKanbanStore = create()(
@@ -307,6 +338,594 @@ export const useKanbanStore = create()(
           set({ error: null }, false, 'clearError');
         },
 
+        // API availability check
+        checkAPIAvailability: async () => {
+          const { apiAvailable } = get();
+
+          // Return cached result if already checked
+          if (apiAvailable !== null) {
+            return apiAvailable;
+          }
+
+          try {
+            const isAvailable = await apiService.utils.isAPIAvailable();
+            set({ apiAvailable: isAvailable }, false, 'checkAPIAvailability');
+            return isAvailable;
+          } catch (error) {
+            set({ apiAvailable: false }, false, 'checkAPIAvailabilityError');
+            return false;
+          }
+        },
+
+        // WebSocket connection management
+        connectToWorkflowWebSocket: (adwId, taskId) => {
+          try {
+            const connection = webSocketService.connectToWorkflow(adwId);
+
+            // Add message handler for this specific workflow
+            connection.addEventListener('message', (message) => {
+              get().handleWebSocketMessage(message, adwId, taskId);
+            });
+
+            // Add error handler
+            connection.addEventListener('error', (error) => {
+              console.error(`WebSocket error for workflow ${adwId}:`, error);
+              get().addTaskLog(taskId, {
+                level: 'error',
+                message: `WebSocket connection error: ${error.message}`
+              });
+            });
+
+            // Store connection reference
+            set((state) => {
+              const newConnections = new Map(state.webSocketConnections);
+              newConnections.set(adwId, { connection, taskId });
+              return { webSocketConnections: newConnections };
+            }, false, 'connectToWorkflowWebSocket');
+
+            return connection;
+          } catch (error) {
+            get().handleError(error, 'connectToWorkflowWebSocket');
+            return null;
+          }
+        },
+
+        // Handle WebSocket messages
+        handleWebSocketMessage: (message, adwId, taskId) => {
+          try {
+            console.log('Received WebSocket message:', message);
+
+            const { type, data } = message;
+
+            switch (type) {
+              case 'task_created':
+                get().addTaskLog(taskId, {
+                  level: 'info',
+                  message: 'Task successfully submitted to orchestrator'
+                });
+                break;
+
+              case 'status_update':
+                get().updateTaskFromAPIResponse(taskId, data);
+                break;
+
+              case 'stage_update':
+                get().updateTask(taskId, {
+                  stage: get().mapAPIStageToKanbanStage(data.current_stage),
+                  substage: data.current_stage,
+                });
+                get().addTaskLog(taskId, {
+                  level: 'info',
+                  message: `Stage updated to: ${data.current_stage}`
+                });
+                break;
+
+              case 'progress_update':
+                get().updateTaskProgress(taskId, data.stage, data.progress || 0);
+                if (data.stage_result) {
+                  get().addTaskLog(taskId, {
+                    level: 'info',
+                    message: `Stage ${data.stage} completed`,
+                    details: data.stage_result
+                  });
+                }
+                break;
+
+              case 'task_cancelled':
+                get().updateTask(taskId, {
+                  status: 'cancelled',
+                  stage: 'errored'
+                });
+                get().addTaskLog(taskId, {
+                  level: 'warning',
+                  message: 'Task was cancelled'
+                });
+                break;
+
+              case 'connection_established':
+                get().addTaskLog(taskId, {
+                  level: 'info',
+                  message: 'Real-time updates connected'
+                });
+                break;
+
+              default:
+                console.log('Unhandled WebSocket message type:', type);
+            }
+          } catch (error) {
+            get().handleError(error, 'handleWebSocketMessage');
+          }
+        },
+
+        // Disconnect from WebSocket
+        disconnectFromWorkflowWebSocket: (adwId) => {
+          const { webSocketConnections } = get();
+          const connectionInfo = webSocketConnections.get(adwId);
+
+          if (connectionInfo) {
+            webSocketService.disconnectFromWorkflow(adwId);
+
+            set((state) => {
+              const newConnections = new Map(state.webSocketConnections);
+              newConnections.delete(adwId);
+              return { webSocketConnections: newConnections };
+            }, false, 'disconnectFromWorkflowWebSocket');
+          }
+        },
+
+        // Map API stage names to Kanban stage names
+        mapAPIStageToKanbanStage: (apiStage) => {
+          const stageMapping = {
+            'plan': 'plan',
+            'implement': 'build',
+            'test': 'test',
+            'deploy': 'pr',
+            'completed': 'pr',
+            'failed': 'errored',
+            'cancelled': 'errored'
+          };
+
+          return stageMapping[apiStage] || 'backlog';
+        },
+
+        // Update task from API response data
+        updateTaskFromAPIResponse: (taskId, apiData) => {
+          const updates = {
+            status: apiData.status,
+            updatedAt: apiData.updated_at || new Date().toISOString()
+          };
+
+          if (apiData.current_stage) {
+            updates.stage = get().mapAPIStageToKanbanStage(apiData.current_stage);
+            updates.substage = apiData.current_stage;
+          }
+
+          if (apiData.result) {
+            updates.metadata = {
+              ...get().tasks.find(t => t.id === taskId)?.metadata,
+              result: apiData.result
+            };
+          }
+
+          if (apiData.error_message) {
+            updates.stage = 'errored';
+            get().addTaskLog(taskId, {
+              level: 'error',
+              message: apiData.error_message
+            });
+          }
+
+          if (apiData.status === 'completed') {
+            updates.stage = 'pr';
+            updates.progress = 100;
+            get().addTaskLog(taskId, {
+              level: 'success',
+              message: 'Task completed successfully!'
+            });
+          }
+
+          get().updateTask(taskId, updates);
+        },
+
+        // API + WebSocket workflow execution
+        createTaskWithCommand: async (taskInput) => {
+          try {
+            // Check if API is available
+            const apiAvailable = await get().checkAPIAvailability();
+
+            if (apiAvailable && get().apiMode) {
+              // Use new API + WebSocket architecture
+              return await get().createTaskWithAPI(taskInput);
+            } else {
+              // Fallback to file-based system
+              return await get().createTaskWithFileSystem(taskInput);
+            }
+          } catch (error) {
+            get().handleError(error, 'createTaskWithCommand');
+            throw error;
+          }
+        },
+
+        // New API-based task creation
+        createTaskWithAPI: async (taskInput) => {
+          try {
+            // Convert taskInput to API format
+            const apiTaskData = {
+              title: taskInput.title || `${taskInput.workItemType} Task`,
+              description: taskInput.description,
+              task_type: taskInput.workItemType || 'feature',
+              stages: taskInput.queuedStages || ['plan', 'implement', 'test']
+            };
+
+            // Create task via API
+            const apiResponse = await apiService.workflow.create(apiTaskData);
+
+            // Create local task based on API response
+            const newTask = {
+              id: get().taskIdCounter,
+              title: apiResponse.title,
+              description: apiResponse.description,
+              workItemType: apiResponse.task_type,
+              queuedStages: apiResponse.stages,
+              pipelineId: `adw_${apiResponse.stages.join('_')}`,
+              stage: 'backlog',
+              status: apiResponse.status,
+              progress: 0,
+              createdAt: apiResponse.created_at,
+              updatedAt: apiResponse.updated_at,
+              logs: [{
+                level: 'info',
+                message: 'Task created via API',
+                timestamp: new Date().toISOString()
+              }],
+              metadata: {
+                adwId: apiResponse.adw_id,
+                apiTaskId: apiResponse.id,
+                executionMode: 'api',
+                apiAvailable: true
+              },
+              images: taskInput.images || []
+            };
+
+            // Add task to store
+            set((state) => ({
+              tasks: [...state.tasks, newTask],
+              taskIdCounter: state.taskIdCounter + 1,
+              showTaskInput: false,
+            }), false, 'createTaskWithAPI');
+
+            // Connect to WebSocket for real-time updates
+            get().connectToWorkflowWebSocket(apiResponse.adw_id, newTask.id);
+
+            return {
+              task: newTask,
+              adwId: apiResponse.adw_id,
+              autoExecuted: true,
+              apiResponse
+            };
+          } catch (error) {
+            if (error instanceof APIError || error instanceof NetworkError) {
+              console.warn('API creation failed, falling back to file system:', error);
+              // Fallback to file-based system
+              set({ apiMode: false }, false, 'apiFailureFallback');
+              return await get().createTaskWithFileSystem(taskInput);
+            }
+            throw error;
+          }
+        },
+
+        // Fallback file-based task creation
+        createTaskWithFileSystem: async (taskInput) => {
+          try {
+            const { selectedProject } = get();
+            if (!selectedProject || !selectedProject.handle) {
+              throw new Error('No project selected or project handle missing');
+            }
+
+            // Generate ADW ID
+            const adwId = generateAdwId();
+
+            // Create task data for ADW workflow
+            const taskData = createTaskData(taskInput, adwId);
+
+            // Create task in Kanban first
+            const newTask = {
+              id: get().taskIdCounter,
+              ...taskData,
+              stage: 'backlog',
+              status: 'initializing',
+              progress: 0,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              logs: [{
+                level: 'info',
+                message: 'Task created via file system (fallback)',
+                timestamp: new Date().toISOString()
+              }],
+              metadata: {
+                adwId,
+                projectHandle: selectedProject.handle,
+                executionMode: 'file_system',
+                apiAvailable: false
+              }
+            };
+
+            set((state) => ({
+              tasks: [...state.tasks, newTask],
+              taskIdCounter: state.taskIdCounter + 1,
+              showTaskInput: false,
+            }), false, 'createTaskWithFileSystem');
+
+            // Check execution configuration
+            const config = get().getExecutionConfig();
+            const autoExecutionSupported = await isAutoExecutionSupported(selectedProject.handle);
+
+            if (config.autoExecute && autoExecutionSupported) {
+              // Execute automatically using file system
+              await get().executeTaskAutomatically(newTask.id, taskData, selectedProject.handle);
+            } else {
+              // Fall back to manual execution
+              const command = generateWorkflowCommand(taskData, selectedProject.handle);
+              get().updateTask(newTask.id, {
+                status: 'waiting_for_manual_execution',
+                metadata: {
+                  ...newTask.metadata,
+                  command: command.full,
+                  executionMode: 'manual',
+                  requiresManualExecution: true
+                }
+              });
+
+              if (config.fallbackToManual) {
+                // Show manual command (will be handled by CommandDisplay component)
+                set({
+                  showCommandModal: true,
+                  currentCommand: command,
+                  currentTaskData: taskData,
+                }, false, 'fallbackToManual');
+              }
+            }
+
+            return { task: newTask, adwId, autoExecuted: config.autoExecute && autoExecutionSupported };
+          } catch (error) {
+            get().handleError(error, 'createTaskWithFileSystem');
+            throw error;
+          }
+        },
+
+        // Execution configuration management
+        getExecutionConfig: () => {
+          const state = get();
+          if (state.executionConfig) {
+            return state.executionConfig;
+          }
+
+          // Load from localStorage and cache
+          const config = getExecutionConfig();
+          set({ executionConfig: config }, false, 'loadExecutionConfig');
+          return config;
+        },
+
+        updateExecutionConfig: (newConfig) => {
+          const mergedConfig = { ...get().getExecutionConfig(), ...newConfig };
+          set({ executionConfig: mergedConfig }, false, 'updateExecutionConfig');
+
+          // Save to localStorage via utility
+          return get().saveExecutionConfig(mergedConfig);
+        },
+
+        saveExecutionConfig: (config) => {
+          try {
+            localStorage.setItem('adw_execution_config', JSON.stringify(config));
+            return true;
+          } catch (error) {
+            get().handleError(error, 'saveExecutionConfig');
+            return false;
+          }
+        },
+
+        // Automatic execution functions
+        executeTaskAutomatically: async (taskId, taskData, projectHandle) => {
+          try {
+            const adwId = taskData.adw_id;
+
+            // Mark task as executing
+            set((state) => {
+              const newExecutingTasks = new Map(state.executingTasks);
+              newExecutingTasks.set(adwId, {
+                taskId,
+                startTime: Date.now(),
+                status: 'executing'
+              });
+              return { executingTasks: newExecutingTasks };
+            }, false, 'markTaskExecuting');
+
+            // Update task status
+            get().updateTask(taskId, {
+              status: 'executing',
+              stage: 'plan', // Move to first stage
+              logs: [{
+                level: 'info',
+                message: 'Starting automatic workflow execution...',
+                timestamp: new Date().toISOString()
+              }]
+            });
+
+            // Execute the workflow
+            const result = await executeWorkflow(taskData, projectHandle);
+
+            if (result.success) {
+              // Update task with success
+              get().updateTask(taskId, {
+                status: 'executing',
+                logs: [...(get().tasks.find(t => t.id === taskId)?.logs || []), {
+                  level: 'success',
+                  message: 'Workflow execution initiated successfully',
+                  timestamp: new Date().toISOString()
+                }]
+              });
+
+              // Start polling for state updates
+              get().startPolling(adwId, projectHandle);
+
+              return { success: true, adwId };
+            } else {
+              // Handle execution failure
+              get().updateTask(taskId, {
+                status: 'execution_failed',
+                stage: 'errored',
+                logs: [...(get().tasks.find(t => t.id === taskId)?.logs || []), {
+                  level: 'error',
+                  message: `Execution failed: ${result.error}`,
+                  timestamp: new Date().toISOString()
+                }]
+              });
+
+              // Remove from executing tasks
+              set((state) => {
+                const newExecutingTasks = new Map(state.executingTasks);
+                newExecutingTasks.delete(adwId);
+                return { executingTasks: newExecutingTasks };
+              }, false, 'removeFailedTask');
+
+              return { success: false, error: result.error };
+            }
+          } catch (error) {
+            get().handleError(error, 'executeTaskAutomatically');
+
+            // Update task with error
+            get().updateTask(taskId, {
+              status: 'execution_failed',
+              stage: 'errored',
+              logs: [...(get().tasks.find(t => t.id === taskId)?.logs || []), {
+                level: 'error',
+                message: `Execution error: ${error.message}`,
+                timestamp: new Date().toISOString()
+              }]
+            });
+
+            throw error;
+          }
+        },
+
+        getExecutionStatus: async (adwId, projectHandle) => {
+          try {
+            return await getExecutionStatus(adwId, projectHandle);
+          } catch (error) {
+            get().handleError(error, 'getExecutionStatus');
+            return { found: false, status: 'error', error: error.message };
+          }
+        },
+
+        isTaskExecuting: (adwId) => {
+          return get().executingTasks.has(adwId);
+        },
+
+        getExecutingTasks: () => {
+          return Array.from(get().executingTasks.entries()).map(([adwId, info]) => ({
+            adwId,
+            ...info
+          }));
+        },
+
+        showCommandModal: (command, taskData) => {
+          set({
+            showCommandModal: true,
+            currentCommand: command,
+            currentTaskData: taskData,
+          }, false, 'showCommandModal');
+        },
+
+        hideCommandModal: () => {
+          set({
+            showCommandModal: false,
+            currentCommand: null,
+            currentTaskData: null,
+          }, false, 'hideCommandModal');
+        },
+
+        startPolling: (adwId, projectHandle) => {
+          try {
+            // Stop any existing polling for this ADW ID
+            get().stopPolling(adwId);
+
+            // Start new polling
+            const pollInterval = pollWorkflowState(
+              adwId,
+              projectHandle,
+              (adwId, state) => get().updateTaskFromAdwState(adwId, state)
+            );
+
+            // Store the interval
+            set((state) => {
+              const newIntervals = new Map(state.activePollingIntervals);
+              newIntervals.set(adwId, pollInterval);
+              return { activePollingIntervals: newIntervals };
+            }, false, 'startPolling');
+
+            return pollInterval;
+          } catch (error) {
+            get().handleError(error, 'startPolling');
+            return null;
+          }
+        },
+
+        stopPolling: (adwId) => {
+          const state = get();
+          const pollInterval = state.activePollingIntervals.get(adwId);
+
+          if (pollInterval) {
+            clearInterval(pollInterval);
+
+            set((state) => {
+              const newIntervals = new Map(state.activePollingIntervals);
+              newIntervals.delete(adwId);
+              return { activePollingIntervals: newIntervals };
+            }, false, 'stopPolling');
+          }
+        },
+
+        stopAllPolling: () => {
+          const { activePollingIntervals } = get();
+
+          // Clear all intervals
+          activePollingIntervals.forEach((interval) => {
+            clearInterval(interval);
+          });
+
+          set({ activePollingIntervals: new Map() }, false, 'stopAllPolling');
+        },
+
+        updateTaskFromAdwState: (adwId, adwState) => {
+          try {
+            const taskUpdate = updateTaskFromState(adwState);
+
+            set((state) => ({
+              tasks: state.tasks.map(task =>
+                task.metadata?.adwId === adwId
+                  ? {
+                      ...task,
+                      ...taskUpdate,
+                      updatedAt: new Date().toISOString()
+                    }
+                  : task
+              ),
+            }), false, 'updateTaskFromAdwState');
+
+            // Stop polling if workflow completed or failed
+            if (adwState.overall_status === 'completed' || adwState.overall_status === 'failed') {
+              get().stopPolling(adwId);
+            }
+          } catch (error) {
+            get().handleError(error, 'updateTaskFromAdwState');
+          }
+        },
+
+        findTaskByAdwId: (adwId) => {
+          const { tasks } = get();
+          return tasks.find(task => task.metadata?.adwId === adwId);
+        },
+
         // Utility actions
         getTasksByStage: (stage) => {
           return get().tasks.filter(task => task.stage === stage);
@@ -510,7 +1129,7 @@ export const useKanbanStore = create()(
 
         // Statistics
         getStatistics: () => {
-          const { tasks, stages } = get();
+          const { tasks } = get();
 
           const stats = {
             totalTasks: tasks.length,
@@ -558,8 +1177,11 @@ export const useKanbanStore = create()(
         name: 'agentic-kanban-storage',
         version: 1,
         partialize: (state) => ({
-          selectedProject: state.selectedProject,
-          availableProjects: state.availableProjects,
+          // Don't persist selectedProject as it contains non-serializable FileSystemDirectoryHandle
+          availableProjects: state.availableProjects.map(project => ({
+            ...project,
+            handle: undefined // Remove non-serializable handle
+          })),
           tasks: state.tasks,
           taskIdCounter: state.taskIdCounter,
         }),
