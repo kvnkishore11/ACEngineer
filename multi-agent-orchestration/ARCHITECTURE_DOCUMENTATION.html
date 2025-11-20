@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Orchestration System - Architecture Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #e5e7eb;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 16px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #94a3b8;
+            font-weight: 300;
+        }
+
+        .toc {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .toc h2 {
+            color: #06b6d4;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .toc ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .toc li a {
+            display: block;
+            padding: 12px 20px;
+            background: rgba(6, 182, 212, 0.1);
+            border-radius: 8px;
+            color: #06b6d4;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .toc li a:hover {
+            background: rgba(6, 182, 212, 0.2);
+            transform: translateX(5px);
+            border-color: #06b6d4;
+        }
+
+        section {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(6, 182, 212, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            color: #06b6d4;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(6, 182, 212, 0.3);
+        }
+
+        h3 {
+            color: #3b82f6;
+            font-size: 1.6em;
+            margin: 30px 0 20px 0;
+        }
+
+        h4 {
+            color: #60a5fa;
+            font-size: 1.3em;
+            margin: 20px 0 15px 0;
+        }
+
+        .diagram-container {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid rgba(6, 182, 212, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .diagram-title {
+            color: #06b6d4;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .mermaid {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .key-points {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 4px solid #06b6d4;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .key-points h4 {
+            margin-top: 0;
+            color: #06b6d4;
+        }
+
+        .key-points ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .key-points li {
+            margin: 8px 0;
+            color: #cbd5e1;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .tech-card {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2);
+            border-color: #06b6d4;
+        }
+
+        .tech-card h4 {
+            margin-top: 0;
+            color: #06b6d4;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .tech-card ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .tech-card li {
+            padding: 5px 0;
+            color: #cbd5e1;
+            font-size: 0.95em;
+        }
+
+        .tech-card li::before {
+            content: "▹ ";
+            color: #06b6d4;
+            font-weight: bold;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3);
+        }
+
+        .feature-card h4 {
+            margin-top: 0;
+            color: #06b6d4;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: #cbd5e1;
+            line-height: 1.8;
+        }
+
+        code {
+            background: rgba(6, 182, 212, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #06b6d4;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            margin: 15px 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #e5e7eb;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+            border-color: #06b6d4;
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #06b6d4;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .warning-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-box h4 {
+            color: #ef4444;
+            margin-top: 0;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-box h4 {
+            color: #3b82f6;
+            margin-top: 0;
+        }
+
+        .success-box {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid #22c55e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .success-box h4 {
+            color: #22c55e;
+            margin-top: 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+            margin-top: 60px;
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1.5em;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 30px rgba(6, 182, 212, 0.6);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(6, 182, 212, 0.2);
+            color: #06b6d4;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(6, 182, 212, 0.3);
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+            color: #cbd5e1;
+        }
+
+        tr:hover {
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            section {
+                padding: 20px;
+            }
+
+            .tech-stack, .feature-grid, .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Multi-Agent Orchestration System</h1>
+            <p class="subtitle">Comprehensive Architecture Documentation & Visual Guide</p>
+        </header>
+
+        <nav class="toc">
+            <h2>📑 Table of Contents</h2>
+            <ul>
+                <li><a href="#overview">System Overview</a></li>
+                <li><a href="#architecture">Overall Architecture</a></li>
+                <li><a href="#database">Database Schema</a></li>
+                <li><a href="#dataflow">Data Flow & Sequences</a></li>
+                <li><a href="#components">Key Components</a></li>
+                <li><a href="#tech-stack">Technology Stack</a></li>
+                <li><a href="#features">Special Features</a></li>
+                <li><a href="#files">Critical Files</a></li>
+            </ul>
+        </nav>
+
+        <section id="overview">
+            <h2>🎯 System Overview</h2>
+
+            <div class="key-points">
+                <h4>What is This System?</h4>
+                <p>A <strong>production-ready web-based orchestration platform</strong> for managing multiple Claude Code agents through a sophisticated meta-agent pattern. It enables natural language control of specialized AI agents with real-time monitoring, persistent state, and comprehensive observability.</p>
+            </div>
+
+            <h3>Core Concept: Meta-Agent Pattern</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🎭 Orchestrator Agent</h4>
+                    <p>Claude Sonnet 4.5 acts as a "conductor" that interprets user commands in natural language and manages other agents through 8 management tools.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>⚙️ Command Agents</h4>
+                    <p>Specialized Claude agents that execute specific tasks delegated by the orchestrator. Each agent maintains its own conversation context and session.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🛠️ Management Tools</h4>
+                    <p>8 MCP tools enable the orchestrator to create, command, monitor, interrupt, and delete agents, providing complete lifecycle management.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">7,486</div>
+                    <div class="stat-label">Lines of Python</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">6</div>
+                    <div class="stat-label">Database Tables</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">36+</div>
+                    <div class="stat-label">Database Indexes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">Slash Commands</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">Agent Templates</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <h2>🏗️ Overall Architecture</h2>
+
+            <div class="diagram-container">
+                <div class="diagram-title">System Architecture - High Level View</div>
+                <div class="mermaid">
+graph TB
+    subgraph "Frontend Layer (Vue 3 + TypeScript)"
+        UI[User Interface<br/>3-Column Layout]
+        AgentList[Agent List<br/>Sidebar]
+        EventStream[Event Stream<br/>Center Panel]
+        Chat[Orchestrator Chat<br/>Right Panel]
+        Store[Pinia Store<br/>State Management]
+        WS_Client[WebSocket Client]
+        HTTP_Client[HTTP Client<br/>Axios]
+    end
+
+    subgraph "Backend Layer (FastAPI + Python)"
+        API[FastAPI Server<br/>REST Endpoints]
+        WS_Server[WebSocket Server<br/>Real-time Streaming]
+        OrchestratorService[Orchestrator Service<br/>Business Logic]
+        AgentManager[Agent Manager<br/>Lifecycle Management]
+        WSManager[WebSocket Manager<br/>Broadcast Hub]
+        Hooks[Hooks System<br/>Event Tracking]
+    end
+
+    subgraph "AI Layer (Claude SDK)"
+        OrchestratorAgent[Orchestrator Agent<br/>Claude Sonnet 4.5]
+        CommandAgent1[Command Agent 1<br/>Specialized Task]
+        CommandAgent2[Command Agent 2<br/>Specialized Task]
+        CommandAgentN[Command Agent N<br/>Specialized Task]
+        MCPServer[MCP Server<br/>8 Management Tools]
+    end
+
+    subgraph "Data Layer (PostgreSQL)"
+        DB[(PostgreSQL Database)]
+        Tables[6 Core Tables<br/>orchestrator_agents<br/>agents<br/>agent_logs<br/>orchestrator_chat<br/>prompts<br/>system_logs]
+        Indexes[36+ Indexes<br/>Performance Optimized]
+    end
+
+    UI --> AgentList
+    UI --> EventStream
+    UI --> Chat
+    UI --> Store
+
+    Store --> WS_Client
+    Store --> HTTP_Client
+
+    WS_Client <--> WS_Server
+    HTTP_Client --> API
+
+    API --> OrchestratorService
+    API --> AgentManager
+    API --> DB
+
+    WS_Server --> WSManager
+    OrchestratorService --> OrchestratorAgent
+    OrchestratorService --> WSManager
+    OrchestratorService --> DB
+
+    AgentManager --> CommandAgent1
+    AgentManager --> CommandAgent2
+    AgentManager --> CommandAgentN
+    AgentManager --> WSManager
+    AgentManager --> DB
+
+    OrchestratorAgent --> MCPServer
+    MCPServer --> AgentManager
+
+    OrchestratorAgent --> Hooks
+    CommandAgent1 --> Hooks
+    CommandAgent2 --> Hooks
+    CommandAgentN --> Hooks
+
+    Hooks --> DB
+    Hooks --> WSManager
+
+    DB --> Tables
+    DB --> Indexes
+
+    WSManager -.Real-time Events.-> WS_Client
+
+    style UI fill:#1e293b,stroke:#06b6d4,stroke-width:2px
+    style OrchestratorAgent fill:#3b82f6,stroke:#06b6d4,stroke-width:3px
+    style DB fill:#334155,stroke:#06b6d4,stroke-width:2px
+    style WSManager fill:#1e293b,stroke:#06b6d4,stroke-width:2px
+                </div>
+            </div>
+
+            <div class="key-points">
+                <h4>Architecture Highlights</h4>
+                <ul>
+                    <li><strong>3-Tier Architecture:</strong> Frontend (Vue) → Backend (FastAPI) → Database (PostgreSQL)</li>
+                    <li><strong>Real-Time Streaming:</strong> WebSocket for sub-second event broadcasting</li>
+                    <li><strong>Meta-Agent Control:</strong> Orchestrator manages command agents via MCP tools</li>
+                    <li><strong>Event-Driven:</strong> Hooks capture every tool use, response, and state change</li>
+                    <li><strong>Persistent State:</strong> All conversations, events, and agent states stored in PostgreSQL</li>
+                    <li><strong>Type Safety:</strong> Pydantic (backend) + TypeScript (frontend) for end-to-end type checking</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="database">
+            <h2>🗄️ Database Schema</h2>
+
+            <div class="diagram-container">
+                <div class="diagram-title">Entity Relationship Diagram</div>
+                <div class="mermaid">
+erDiagram
+    ORCHESTRATOR_AGENTS ||--o{ AGENTS : "manages"
+    ORCHESTRATOR_AGENTS ||--o{ ORCHESTRATOR_CHAT : "participates in"
+    AGENTS ||--o{ AGENT_LOGS : "generates"
+    AGENTS ||--o{ PROMPTS : "receives"
+    AGENTS ||--o{ ORCHESTRATOR_CHAT : "participates in"
+
+    ORCHESTRATOR_AGENTS {
+        uuid id PK
+        text session_id UK "Claude SDK session"
+        text system_prompt
+        text status "idle|executing|waiting|blocked|complete"
+        text working_dir
+        int input_tokens "Cumulative input tokens"
+        int output_tokens "Cumulative output tokens"
+        decimal total_cost "USD cost"
+        jsonb metadata "SystemMessage info, slash commands, templates"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    AGENTS {
+        uuid id PK
+        uuid orchestrator_agent_id FK
+        text name UK "Unique per orchestrator"
+        text model "claude-sonnet-4-5-20250929"
+        text system_prompt
+        text session_id "Claude SDK session"
+        text status "idle|executing|waiting|blocked|complete"
+        text working_dir
+        text git_worktree
+        text adw_id "AI Developer Workflow ID"
+        text adw_step "Current workflow step"
+        int input_tokens "Cumulative input tokens"
+        int output_tokens "Cumulative output tokens"
+        decimal total_cost "USD cost"
+        boolean archived "Soft delete flag"
+        jsonb metadata "template_name, template_color, etc."
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    AGENT_LOGS {
+        uuid id PK
+        uuid agent_id FK
+        text session_id
+        text task_slug "kebab-case + timestamp"
+        int entry_index "Sequence number"
+        text event_category "hook|response"
+        text event_type "PreToolUse, TextBlock, etc."
+        text content "Text content"
+        jsonb payload "Full event data, file changes, diffs"
+        text summary "AI-generated 15-word summary"
+        timestamptz timestamp
+    }
+
+    ORCHESTRATOR_CHAT {
+        uuid id PK
+        uuid orchestrator_agent_id FK
+        text sender_type "user|orchestrator|agent"
+        text receiver_type "user|orchestrator|agent"
+        text message "Chat message content"
+        text summary "AI-generated summary"
+        uuid agent_id FK "Required when sender/receiver is agent"
+        jsonb metadata "tools_used, type: text|thinking|tool_use"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    PROMPTS {
+        uuid id PK
+        uuid agent_id FK
+        text task_slug "kebab-case + timestamp"
+        text author "engineer|orchestrator_agent"
+        text prompt_text "Full prompt text"
+        text summary "AI-generated summary"
+        text session_id
+        timestamptz created_at
+    }
+
+    SYSTEM_LOGS {
+        uuid id PK
+        text level "DEBUG|INFO|WARNING|ERROR"
+        text message "Log message"
+        text summary "AI-generated summary"
+        jsonb metadata "Extensible metadata"
+        text file_path "Source file path"
+        text adw_id "AI Developer Workflow ID"
+        timestamptz timestamp
+    }
+                </div>
+            </div>
+
+            <h3>Table Descriptions</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Table</th>
+                        <th>Purpose</th>
+                        <th>Key Features</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>orchestrator_agents</code></td>
+                        <td>Singleton orchestrator state</td>
+                        <td>UNIQUE session_id, JSONB metadata, cost tracking</td>
+                    </tr>
+                    <tr>
+                        <td><code>agents</code></td>
+                        <td>Command agents registry</td>
+                        <td>UNIQUE (orchestrator_id, name), template metadata, soft delete</td>
+                    </tr>
+                    <tr>
+                        <td><code>agent_logs</code></td>
+                        <td>Unified event log (hooks + responses)</td>
+                        <td>JSONB payload with file changes, append-only, AI summaries</td>
+                    </tr>
+                    <tr>
+                        <td><code>orchestrator_chat</code></td>
+                        <td>3-way conversation log</td>
+                        <td>User ↔ Orchestrator ↔ Agent communication, append-only</td>
+                    </tr>
+                    <tr>
+                        <td><code>prompts</code></td>
+                        <td>Prompt history</td>
+                        <td>Author tracking, task_slug grouping</td>
+                    </tr>
+                    <tr>
+                        <td><code>system_logs</code></td>
+                        <td>Application logs</td>
+                        <td>Log levels, JSONB metadata, AI summaries</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="success-box">
+                <h4>Database Optimization</h4>
+                <ul>
+                    <li><strong>36+ Indexes:</strong> B-tree indexes on foreign keys, timestamps, composite keys</li>
+                    <li><strong>Auto-Update Triggers:</strong> Automatic <code>updated_at</code> timestamp updates</li>
+                    <li><strong>Append-Only Tables:</strong> <code>agent_logs</code>, <code>orchestrator_chat</code>, <code>prompts</code> never updated</li>
+                    <li><strong>Connection Pooling:</strong> 5-20 asyncpg connections with 60s timeout</li>
+                    <li><strong>JSONB Flexibility:</strong> Extensible metadata without schema migrations</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="dataflow">
+            <h2>🔄 Data Flow & Sequences</h2>
+
+            <h3>User Message → Agent Execution Flow</h3>
+            <div class="diagram-container">
+                <div class="diagram-title">User sends "Create an agent called alice for Python development"</div>
+                <div class="mermaid">
+sequenceDiagram
+    actor User
+    participant UI as Frontend UI<br/>(OrchestratorChat.vue)
+    participant Store as Pinia Store
+    participant API as FastAPI Backend<br/>(main.py)
+    participant OrchestratorService as Orchestrator Service
+    participant DB as PostgreSQL Database
+    participant OrchestratorAgent as Orchestrator Agent<br/>(Claude SDK)
+    participant MCPServer as MCP Server<br/>(8 Tools)
+    participant AgentManager as Agent Manager
+    participant WS as WebSocket Manager
+    participant CommandAgent as Command Agent<br/>(Alice)
+
+    User->>UI: Types message in chat
+    UI->>Store: sendUserMessage()
+    Store->>Store: Optimistic UI update
+    Store->>API: POST /send_chat
+
+    API->>DB: INSERT INTO orchestrator_chat
+    API->>WS: broadcast_orchestrator_chat
+    WS-->>Store: WebSocket event
+    Store-->>UI: Update chat display
+
+    API->>OrchestratorService: process_user_message()
+
+    Note over OrchestratorService: Phase 1: Pre-execution
+    OrchestratorService->>DB: Insert user message
+
+    Note over OrchestratorService: Phase 2: Execution
+    OrchestratorService->>OrchestratorAgent: query(message)
+
+    OrchestratorAgent->>OrchestratorAgent: Process with LLM
+    OrchestratorAgent->>WS: TextBlock: "I'll create alice..."
+    WS-->>Store: orchestrator_chat event
+    Store-->>UI: Display orchestrator response
+
+    OrchestratorAgent->>MCPServer: ToolUseBlock: create_agent
+    MCPServer->>AgentManager: create_agent(name="alice")
+
+    AgentManager->>DB: INSERT INTO agents
+    AgentManager->>CommandAgent: Initialize Claude SDK client
+    CommandAgent-->>AgentManager: Ready
+    AgentManager->>CommandAgent: Send greeting
+    CommandAgent->>CommandAgent: Process greeting
+    CommandAgent-->>AgentManager: Response
+    AgentManager->>DB: Update session_id
+    AgentManager->>WS: broadcast_agent_created
+    WS-->>Store: agent_created event
+    Store-->>UI: New agent card appears
+
+    MCPServer-->>OrchestratorAgent: Tool result
+    OrchestratorAgent-->>OrchestratorService: ResultMessage
+
+    Note over OrchestratorService: Phase 3: Post-execution
+    OrchestratorService->>DB: update_orchestrator_costs
+    OrchestratorService->>DB: update_orchestrator_session
+    OrchestratorService->>WS: broadcast_orchestrator_updated
+    WS-->>Store: orchestrator_updated event
+    Store-->>UI: Update stats display
+                </div>
+            </div>
+
+            <h3>Agent Command Execution Flow</h3>
+            <div class="diagram-container">
+                <div class="diagram-title">User sends "Tell alice to create a FastAPI hello world app"</div>
+                <div class="mermaid">
+sequenceDiagram
+    actor User
+    participant UI as Frontend UI
+    participant OrchestratorAgent as Orchestrator Agent
+    participant AgentManager as Agent Manager
+    participant CommandAgent as Alice Agent<br/>(Claude SDK)
+    participant Hooks as Hooks System
+    participant DB as Database
+    participant WS as WebSocket Manager
+    participant FileTracker as File Tracker
+
+    User->>UI: "Tell alice to create FastAPI app"
+    UI->>OrchestratorAgent: User message
+
+    OrchestratorAgent->>OrchestratorAgent: Interpret command
+    OrchestratorAgent->>AgentManager: command_agent(name="alice", command="create FastAPI app")
+
+    AgentManager->>DB: INSERT INTO prompts
+    AgentManager->>DB: UPDATE agents SET status='executing'
+    AgentManager->>WS: broadcast_agent_status_changed
+    WS-->>UI: Status: idle → executing
+
+    AgentManager->>CommandAgent: query(command)
+
+    Note over CommandAgent: Agent processes command
+
+    CommandAgent->>Hooks: PreToolUse: Bash
+    Hooks->>DB: INSERT INTO agent_logs (event_category='hook')
+    Hooks->>WS: broadcast_agent_log
+    WS-->>UI: Pulse animation + event row
+
+    CommandAgent->>CommandAgent: Execute: Bash tool
+
+    CommandAgent->>Hooks: PostToolUse: Bash
+    Hooks->>DB: INSERT INTO agent_logs
+    Hooks->>WS: broadcast_agent_log
+
+    CommandAgent->>Hooks: PreToolUse: Write
+    Hooks->>DB: INSERT INTO agent_logs
+    Hooks->>WS: broadcast_agent_log
+
+    CommandAgent->>CommandAgent: Execute: Write tool
+
+    CommandAgent->>Hooks: PostToolUse: Write
+    Hooks->>FileTracker: Track file change
+    FileTracker->>FileTracker: Generate git diff
+    FileTracker-->>Hooks: File change data
+    Hooks->>DB: INSERT INTO agent_logs (payload.file_changes)
+    Hooks->>WS: broadcast_agent_log (with diff)
+    WS-->>UI: Display file changes with diff
+
+    CommandAgent->>Hooks: TextBlock: "I've created the app"
+    Hooks->>DB: INSERT INTO agent_logs (event_category='response')
+    Hooks->>WS: broadcast_agent_log
+
+    CommandAgent->>Hooks: Stop hook
+    Hooks->>DB: INSERT INTO agent_logs (event_type='Stop')
+    Hooks->>DB: update_agent_costs (tokens, cost)
+    Hooks->>DB: UPDATE agents SET status='idle'
+    Hooks->>WS: broadcast_agent_updated
+    Hooks->>WS: broadcast_agent_status_changed
+    WS-->>UI: Status: executing → idle
+    WS-->>UI: Update tokens/cost display
+                </div>
+            </div>
+
+            <h3>WebSocket Communication Flow</h3>
+            <div class="diagram-container">
+                <div class="diagram-title">Real-Time Event Broadcasting</div>
+                <div class="mermaid">
+graph LR
+    subgraph "Event Sources"
+        OrchestratorService[Orchestrator Service]
+        AgentManager[Agent Manager]
+        Hooks[Hooks System]
+        Database[Database Operations]
+    end
+
+    subgraph "WebSocket Manager"
+        WSManager[WebSocket Manager<br/>Broadcast Hub]
+    end
+
+    subgraph "Event Types"
+        E1[agent_log]
+        E2[orchestrator_chat]
+        E3[agent_created]
+        E4[agent_updated]
+        E5[agent_deleted]
+        E6[agent_status_changed]
+        E7[orchestrator_updated]
+        E8[thinking_block]
+        E9[tool_use_block]
+        E10[system_log]
+        E11[error]
+    end
+
+    subgraph "WebSocket Clients"
+        Client1[Browser Client 1]
+        Client2[Browser Client 2]
+        ClientN[Browser Client N]
+    end
+
+    OrchestratorService --> WSManager
+    AgentManager --> WSManager
+    Hooks --> WSManager
+    Database --> WSManager
+
+    WSManager --> E1
+    WSManager --> E2
+    WSManager --> E3
+    WSManager --> E4
+    WSManager --> E5
+    WSManager --> E6
+    WSManager --> E7
+    WSManager --> E8
+    WSManager --> E9
+    WSManager --> E10
+    WSManager --> E11
+
+    E1 --> Client1
+    E1 --> Client2
+    E1 --> ClientN
+
+    E2 --> Client1
+    E2 --> Client2
+    E2 --> ClientN
+
+    E3 --> Client1
+    E3 --> Client2
+    E3 --> ClientN
+
+    style WSManager fill:#3b82f6,stroke:#06b6d4,stroke-width:3px
+    style E1 fill:#1e293b,stroke:#06b6d4
+    style E2 fill:#1e293b,stroke:#06b6d4
+    style E3 fill:#1e293b,stroke:#06b6d4
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4>WebSocket Event Features</h4>
+                <ul>
+                    <li><strong>15+ Event Types:</strong> Comprehensive coverage of all system activities</li>
+                    <li><strong>Automatic Timestamping:</strong> Every event gets ISO8601 timestamp</li>
+                    <li><strong>Broadcast to All Clients:</strong> Every connected browser receives updates</li>
+                    <li><strong>Sub-Second Latency:</strong> Events appear in UI within milliseconds</li>
+                    <li><strong>Connection Management:</strong> Automatic reconnection on disconnect</li>
+                    <li><strong>Typing Indicators:</strong> Real-time typing status during streaming</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="components">
+            <h2>🧩 Key Components</h2>
+
+            <h3>Backend Services</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>File</th>
+                        <th>Lines</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FastAPI Entry Point</td>
+                        <td><code>backend/main.py</code></td>
+                        <td>645</td>
+                        <td>CLI args, lifespan, REST endpoints, WebSocket</td>
+                    </tr>
+                    <tr>
+                        <td>Orchestrator Service</td>
+                        <td><code>backend/modules/orchestrator_service.py</code></td>
+                        <td>1,009</td>
+                        <td>Business logic, 3-phase logging, hook system</td>
+                    </tr>
+                    <tr>
+                        <td>Agent Manager</td>
+                        <td><code>backend/modules/agent_manager.py</code></td>
+                        <td>1,397</td>
+                        <td>8 management tools, agent lifecycle</td>
+                    </tr>
+                    <tr>
+                        <td>Database Operations</td>
+                        <td><code>backend/modules/database.py</code></td>
+                        <td>1,600</td>
+                        <td>Connection pool, CRUD operations, asyncpg</td>
+                    </tr>
+                    <tr>
+                        <td>WebSocket Manager</td>
+                        <td><code>backend/modules/websocket_manager.py</code></td>
+                        <td>258</td>
+                        <td>Connection management, 15+ broadcast methods</td>
+                    </tr>
+                    <tr>
+                        <td>Command Agent Hooks</td>
+                        <td><code>backend/modules/command_agent_hooks.py</code></td>
+                        <td>629</td>
+                        <td>6 hook types, file tracking, WebSocket broadcast</td>
+                    </tr>
+                    <tr>
+                        <td>File Tracker</td>
+                        <td><code>backend/modules/file_tracker.py</code></td>
+                        <td>285</td>
+                        <td>Track Read/Write/Edit, generate git diffs</td>
+                    </tr>
+                    <tr>
+                        <td>Subagent Loader</td>
+                        <td><code>backend/modules/subagent_loader.py</code></td>
+                        <td>220</td>
+                        <td>Template discovery, frontmatter parsing</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Frontend Components</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>File</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Pinia Store</td>
+                        <td><code>frontend/src/stores/orchestratorStore.ts</code></td>
+                        <td>State management, 15+ WebSocket handlers (1,004 lines)</td>
+                    </tr>
+                    <tr>
+                        <td>Agent List</td>
+                        <td><code>frontend/src/components/AgentList.vue</code></td>
+                        <td>Agent sidebar with pulse animations, status colors</td>
+                    </tr>
+                    <tr>
+                        <td>Event Stream</td>
+                        <td><code>frontend/src/components/EventStream.vue</code></td>
+                        <td>Event log with filtering, auto-scroll</td>
+                    </tr>
+                    <tr>
+                        <td>Orchestrator Chat</td>
+                        <td><code>frontend/src/components/OrchestratorChat.vue</code></td>
+                        <td>Chat interface with markdown, typing indicator (265 lines)</td>
+                    </tr>
+                    <tr>
+                        <td>File Changes Display</td>
+                        <td><code>frontend/src/components/event-rows/FileChangesDisplay.vue</code></td>
+                        <td>Git diff visualization with syntax highlighting</td>
+                    </tr>
+                    <tr>
+                        <td>Global Command Input</td>
+                        <td><code>frontend/src/components/GlobalCommandInput.vue</code></td>
+                        <td>Cmd+K overlay with system info, slash commands, templates</td>
+                    </tr>
+                    <tr>
+                        <td>Chat Service</td>
+                        <td><code>frontend/src/services/chatService.ts</code></td>
+                        <td>HTTP + WebSocket communication (179 lines)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>8 Management Tools (MCP Server)</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>create_agent</h4>
+                    <p>Create new command agent with name, system prompt, model, or template. Returns agent_id and session_id.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>list_agents</h4>
+                    <p>List all active agents with status, model, tokens, and cost information.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>command_agent</h4>
+                    <p>Send command to agent. Executes in background async. Returns confirmation message.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>check_agent_status</h4>
+                    <p>Check agent status with recent activity. Options: tail_count, offset, verbose_logs.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>delete_agent</h4>
+                    <p>Delete agent by name. Cleans up file tracker and broadcasts deletion event.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>interrupt_agent</h4>
+                    <p>Interrupt running agent execution. Useful for stopping long-running tasks.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>read_system_logs</h4>
+                    <p>Read system logs with filtering by offset, limit, message_contains, level.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>report_cost</h4>
+                    <p>Report orchestrator costs, tokens, session_id, and context usage percentage.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="tech-stack">
+            <h2>💻 Technology Stack</h2>
+
+            <div class="diagram-container">
+                <div class="diagram-title">Technology Layers</div>
+                <div class="mermaid">
+graph TB
+    subgraph "Frontend Stack"
+        Vue[Vue 3<br/>Reactive UI Framework]
+        Pinia[Pinia<br/>State Management]
+        TS[TypeScript<br/>Type Safety]
+        Vite[Vite<br/>Build Tool]
+        Axios[Axios<br/>HTTP Client]
+        Marked[Marked<br/>Markdown Rendering]
+        Highlight[Highlight.js<br/>Syntax Highlighting]
+        Bun[Bun<br/>Package Manager]
+    end
+
+    subgraph "Backend Stack"
+        FastAPI[FastAPI<br/>Async Web Framework]
+        Uvicorn[Uvicorn<br/>ASGI Server]
+        Pydantic[Pydantic<br/>Data Validation]
+        AsyncPG[asyncpg<br/>PostgreSQL Driver]
+        ClaudeSDK[Claude Agent SDK<br/>AI Agent Execution]
+        Rich[Rich<br/>Console Logging]
+        UV[Astral UV<br/>Python Package Manager]
+    end
+
+    subgraph "AI Layer"
+        Sonnet[Claude Sonnet 4.5<br/>Orchestrator + Agents]
+        Haiku[Claude Haiku 4.5<br/>Summarization + Fast Agents]
+        AnthropicAPI[Anthropic API<br/>LLM Provider]
+    end
+
+    subgraph "Database Layer"
+        PostgreSQL[(PostgreSQL<br/>Primary Database)]
+        NeonDB[NeonDB<br/>Recommended Host]
+        ConnectionPool[Connection Pool<br/>5-20 Connections]
+    end
+
+    Vue --> Pinia
+    Vue --> TS
+    Vue --> Vite
+    Pinia --> Axios
+    Vue --> Marked
+    Marked --> Highlight
+    Vue --> Bun
+
+    FastAPI --> Uvicorn
+    FastAPI --> Pydantic
+    FastAPI --> AsyncPG
+    FastAPI --> ClaudeSDK
+    FastAPI --> Rich
+    FastAPI --> UV
+
+    ClaudeSDK --> Sonnet
+    ClaudeSDK --> Haiku
+    Sonnet --> AnthropicAPI
+    Haiku --> AnthropicAPI
+
+    AsyncPG --> PostgreSQL
+    PostgreSQL --> NeonDB
+    AsyncPG --> ConnectionPool
+
+    style Vue fill:#3b82f6,stroke:#06b6d4,stroke-width:2px
+    style FastAPI fill:#3b82f6,stroke:#06b6d4,stroke-width:2px
+    style ClaudeSDK fill:#06b6d4,stroke:#3b82f6,stroke-width:3px
+    style PostgreSQL fill:#334155,stroke:#06b6d4,stroke-width:2px
+                </div>
+            </div>
+
+            <h3>Detailed Technology Breakdown</h3>
+            <div class="tech-stack">
+                <div class="tech-card">
+                    <h4>Frontend Technologies</h4>
+                    <ul>
+                        <li>Vue 3 (Composition API)</li>
+                        <li>Pinia (State Management)</li>
+                        <li>TypeScript</li>
+                        <li>Vite (Build Tool)</li>
+                        <li>Axios (HTTP Client)</li>
+                        <li>Marked (Markdown Parser)</li>
+                        <li>Highlight.js (Syntax Highlighting)</li>
+                        <li>DOMPurify (XSS Protection)</li>
+                        <li>Bun (Package Manager)</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h4>Backend Technologies</h4>
+                    <ul>
+                        <li>Python 3.12+</li>
+                        <li>FastAPI (Async Framework)</li>
+                        <li>Uvicorn (ASGI Server)</li>
+                        <li>Pydantic (Validation)</li>
+                        <li>asyncpg (PostgreSQL Driver)</li>
+                        <li>Claude Agent SDK</li>
+                        <li>Rich (Console Output)</li>
+                        <li>python-dotenv (Env Variables)</li>
+                        <li>Astral UV (Package Manager)</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h4>AI/LLM Technologies</h4>
+                    <ul>
+                        <li>Claude Sonnet 4.5 (Orchestrator)</li>
+                        <li>Claude Haiku 4.5 (Fast Tasks)</li>
+                        <li>Claude Agent SDK</li>
+                        <li>Anthropic API</li>
+                        <li>MCP Server (Management Tools)</li>
+                        <li>Hooks System (Event Tracking)</li>
+                        <li>Session Management</li>
+                        <li>Context Window Tracking</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h4>Database Technologies</h4>
+                    <ul>
+                        <li>PostgreSQL</li>
+                        <li>JSONB (Flexible Metadata)</li>
+                        <li>UUID (Primary Keys)</li>
+                        <li>TIMESTAMPTZ (Timestamps)</li>
+                        <li>B-tree Indexes (36+)</li>
+                        <li>Triggers (Auto-update)</li>
+                        <li>Connection Pooling</li>
+                        <li>NeonDB (Recommended)</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h4>Build & Development</h4>
+                    <ul>
+                        <li>Vite (Frontend Build)</li>
+                        <li>Bun (JS Runtime)</li>
+                        <li>Astral UV (Python Manager)</li>
+                        <li>TypeScript Compiler</li>
+                        <li>vue-tsc (Vue + TS)</li>
+                        <li>pytest (Testing)</li>
+                        <li>Git (Version Control)</li>
+                        <li>Shell Scripts (Launchers)</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h4>Communication Protocols</h4>
+                    <ul>
+                        <li>REST API (HTTP)</li>
+                        <li>WebSocket (Real-time)</li>
+                        <li>JSON (Data Format)</li>
+                        <li>CORS (Cross-origin)</li>
+                        <li>ISO8601 (Timestamps)</li>
+                        <li>asyncio (Async I/O)</li>
+                        <li>Broadcast Pattern</li>
+                        <li>Event-driven Architecture</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="features">
+            <h2>✨ Special Features</h2>
+
+            <h3>Unique Architectural Patterns</h3>
+
+            <h4>1. Three-Phase Logging Pattern</h4>
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant Service as Orchestrator Service
+    participant DB as Database
+    participant WS as WebSocket
+    participant Agent as Claude Agent
+
+    Note over Service: Phase 1: Pre-execution
+    Service->>DB: INSERT user message
+    Service->>WS: Broadcast message
+    WS-->>User: Immediate feedback
+
+    Note over Service: Phase 2: Execution (Streaming)
+    Service->>Agent: query(message)
+    loop For each response block
+        Agent->>DB: INSERT block
+        Agent->>WS: Broadcast block
+        WS-->>User: Real-time updates
+    end
+
+    Note over Service: Phase 3: Post-execution
+    Agent-->>Service: ResultMessage with usage stats
+    Service->>DB: UPDATE costs/tokens
+    Service->>DB: UPDATE session_id
+    Service->>WS: Broadcast updated stats
+    WS-->>User: Final state update
+                </div>
+            </div>
+            <div class="key-points">
+                <h4>Benefits of Three-Phase Logging</h4>
+                <ul>
+                    <li><strong>Immediate Feedback:</strong> User sees message immediately (Phase 1)</li>
+                    <li><strong>Real-Time Streaming:</strong> Each response block appears as generated (Phase 2)</li>
+                    <li><strong>Guaranteed Cost Tracking:</strong> Usage stats always captured (Phase 3)</li>
+                    <li><strong>State Consistency:</strong> Database always reflects current state</li>
+                </ul>
+            </div>
+
+            <h4>2. Meta-Agent Pattern</h4>
+            <div class="success-box">
+                <h4>Orchestrator as Meta-Agent</h4>
+                <p>The orchestrator agent has access to 8 management tools via MCP server, enabling it to create, command, monitor, and delete other agents. This enables natural language control of complex multi-agent workflows.</p>
+                <pre><code>User: "Create two agents: alice for Python and bob for JavaScript.
+Tell alice to analyze the codebase structure and tell bob to
+review the frontend code quality."
+
+Orchestrator:
+1. create_agent(name="alice", system_prompt="Python expert...")
+2. create_agent(name="bob", system_prompt="JavaScript expert...")
+3. command_agent(name="alice", command="analyze codebase structure")
+4. command_agent(name="bob", command="review frontend code quality")
+5. Reports back to user with status updates</code></pre>
+            </div>
+
+            <h4>3. Template-Based Agent Creation</h4>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>build-agent</h4>
+                    <p>Implements files from detailed specs in parallel workflows. Specialist for writing single files.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>docs-scraper</h4>
+                    <p>Fetches documentation from URLs and saves as properly formatted markdown files.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>meta-agent</h4>
+                    <p>Generates new Claude Code subagent configuration files from user descriptions.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>playwright-validator</h4>
+                    <p>Browser automation testing with screenshots and UI behavior verification.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>scout-report-suggest</h4>
+                    <p>Comprehensive codebase investigation with problem identification (Sonnet).</p>
+                </div>
+                <div class="feature-card">
+                    <h4>scout-report-suggest-fast</h4>
+                    <p>Fast codebase analysis for quick answers (Haiku).</p>
+                </div>
+                <div class="feature-card">
+                    <h4>review-agent</h4>
+                    <p>Git diff analysis with risk-tiered validation reports.</p>
+                </div>
+            </div>
+
+            <h4>4. Spread Operator Pattern for Vue Reactivity</h4>
+            <div class="warning-box">
+                <h4>Critical Implementation Detail</h4>
+                <p>During rapid WebSocket updates, Vue may batch updates and miss array mutations. The spread operator pattern guarantees reactivity:</p>
+                <pre><code>// ❌ WRONG - May miss updates during rapid events
+eventStreamEntries.value.push(entry)
+
+// ✅ CORRECT - Always reactive (creates new array reference)
+eventStreamEntries.value = [...eventStreamEntries.value, entry]</code></pre>
+                <p><strong>Used in:</strong> addEventStreamEntry(), addChatMessage(), addAgentLogEvent()</p>
+            </div>
+
+            <h4>5. Fire-and-Forget AI Summarization</h4>
+            <div class="info-box">
+                <h4>Non-Blocking Background Summarization</h4>
+                <p>Events appear instantly in UI, while AI summaries are generated asynchronously in the background:</p>
+                <pre><code>// Insert event (blocking)
+log_id = await insert_hook_event(...)
+
+// Broadcast immediately (blocking)
+await ws_manager.broadcast_agent_log(...)
+
+// Summarize in background (non-blocking)
+asyncio.create_task(_summarize_and_update(log_id, ...))</code></pre>
+                <ul>
+                    <li><strong>Instant Events:</strong> UI updates within milliseconds</li>
+                    <li><strong>Async Summaries:</strong> 15-word summaries appear 2-3 seconds later</li>
+                    <li><strong>Cost Efficient:</strong> Uses Haiku model (~$0.001 per event)</li>
+                    <li><strong>No Blocking:</strong> Main execution flow never waits for summarization</li>
+                </ul>
+            </div>
+
+            <h4>6. File Tracking with Git Diffs</h4>
+            <div class="diagram-container">
+                <div class="mermaid">
+graph LR
+    subgraph "Agent Execution"
+        Agent[Command Agent]
+        Write[Write Tool]
+        Edit[Edit Tool]
+        Read[Read Tool]
+    end
+
+    subgraph "Hook System"
+        PostToolHook[PostToolUse Hook]
+        FileTracker[File Tracker]
+    end
+
+    subgraph "Data Storage"
+        DB[(Database)]
+        Payload[JSONB Payload]
+    end
+
+    subgraph "UI Display"
+        EventRow[Event Row]
+        FileChanges[File Changes Display]
+        Diff[Git Diff Viewer]
+    end
+
+    Agent --> Write
+    Agent --> Edit
+    Agent --> Read
+
+    Write --> PostToolHook
+    Edit --> PostToolHook
+    Read --> PostToolHook
+
+    PostToolHook --> FileTracker
+    FileTracker -->|Generate diff| FileTracker
+    FileTracker -->|Store| Payload
+    Payload --> DB
+
+    DB -->|Load| EventRow
+    EventRow --> FileChanges
+    FileChanges --> Diff
+
+    style FileTracker fill:#3b82f6,stroke:#06b6d4,stroke-width:2px
+    style Diff fill:#06b6d4,stroke:#3b82f6,stroke-width:2px
+                </div>
+            </div>
+
+            <h3>Advanced Features</h3>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Session Resumption</h4>
+                    <p>Resume orchestrator or agent sessions with <code>--session &lt;session_id&gt;</code>. Preserves conversation history and context window.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Cost Tracking</h4>
+                    <p>Automatic token and USD cost accumulation per agent. Context window tracking with 200k token limit and 80% warning.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Pulse Animations</h4>
+                    <p>Visual feedback when agents are active. 2-second pulse animation triggered by tool events, hooks, and thinking.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>18 Slash Commands</h4>
+                    <p>Pre-built workflows for common tasks: /plan, /build, /scout, /question, /prime, and more.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>IDE Integration</h4>
+                    <p>Click file paths to open in Cursor or VS Code. Configurable via IDE_COMMAND environment variable.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Event Stream Filtering</h4>
+                    <p>Filter by type (Combined, Errors, Performance), level (DEBUG, INFO, WARNING, ERROR), or search with regex.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Chat Width Customization</h4>
+                    <p>Cycle through Small (418px), Medium (518px), Large (618px) chat widths. Persisted in localStorage.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Append-Only Logging</h4>
+                    <p>Immutable audit trail. agent_logs, orchestrator_chat, prompts tables never updated after insertion.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="files">
+            <h2>📁 Critical Files</h2>
+
+            <h3>Backend Entry Points</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Lines</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>apps/orchestrator_3_stream/backend/main.py</code></td>
+                        <td>645</td>
+                        <td>FastAPI entry point, CLI args, lifespan, REST endpoints, WebSocket</td>
+                    </tr>
+                    <tr>
+                        <td><code>apps/orchestrator_3_stream/start_be.sh</code></td>
+                        <td>-</td>
+                        <td>Backend launcher (runs on port 9403)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Core Backend Modules</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Lines</th>
+                        <th>Key Functions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>backend/modules/orchestrator_service.py</code></td>
+                        <td>1,009</td>
+                        <td>process_user_message(), 3-phase logging, hook system</td>
+                    </tr>
+                    <tr>
+                        <td><code>backend/modules/agent_manager.py</code></td>
+                        <td>1,397</td>
+                        <td>8 management tools, create_agent(), command_agent()</td>
+                    </tr>
+                    <tr>
+                        <td><code>backend/modules/database.py</code></td>
+                        <td>1,600</td>
+                        <td>Connection pool, CRUD operations, asyncpg queries</td>
+                    </tr>
+                    <tr>
+                        <td><code>backend/modules/websocket_manager.py</code></td>
+                        <td>258</td>
+                        <td>Connection management, 15+ broadcast methods</td>
+                    </tr>
+                    <tr>
+                        <td><code>backend/modules/command_agent_hooks.py</code></td>
+                        <td>629</td>
+                        <td>6 hook types, file tracking, WebSocket broadcast</td>
+                    </tr>
+                    <tr>
+                        <td><code>backend/modules/file_tracker.py</code></td>
+                        <td>285</td>
+                        <td>Track Read/Write/Edit tools, generate git diffs</td>
+                    </tr>
+                    <tr>
+                        <td><code>backend/modules/subagent_loader.py</code></td>
+                        <td>220</td>
+                        <td>SubagentRegistry, template discovery, frontmatter parsing</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Database Layer</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Lines</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>apps/orchestrator_db/models.py</code></td>
+                        <td>345</td>
+                        <td>6 Pydantic models with UUID/JSON conversion</td>
+                    </tr>
+                    <tr>
+                        <td><code>apps/orchestrator_db/migrations/0_orchestrator_agents.sql</code></td>
+                        <td>-</td>
+                        <td>Orchestrator table (singleton, UNIQUE session_id)</td>
+                    </tr>
+                    <tr>
+                        <td><code>apps/orchestrator_db/migrations/1_agents.sql</code></td>
+                        <td>-</td>
+                        <td>Agents table (UNIQUE orchestrator_id + name)</td>
+                    </tr>
+                    <tr>
+                        <td><code>apps/orchestrator_db/migrations/3_agent_logs.sql</code></td>
+                        <td>-</td>
+                        <td>Event log (hooks + responses, JSONB payload)</td>
+                    </tr>
+                    <tr>
+                        <td><code>apps/orchestrator_db/migrations/8_orchestrator_chat.sql</code></td>
+                        <td>-</td>
+                        <td>3-way chat log (user ↔ orchestrator ↔ agent)</td>
+                    </tr>
+                    <tr>
+                        <td><code>apps/orchestrator_db/migrations/5_indexes.sql</code></td>
+                        <td>-</td>
+                        <td>36+ performance indexes</td>
+                    </tr>
+                    <tr>
+                        <td><code>apps/orchestrator_db/migrations/7_triggers.sql</code></td>
+                        <td>-</td>
+                        <td>Auto-update triggers for updated_at timestamps</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Frontend Entry Points</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>frontend/src/main.ts</code></td>
+                        <td>Vue app entry point, Pinia initialization</td>
+                    </tr>
+                    <tr>
+                        <td><code>frontend/src/App.vue</code></td>
+                        <td>Root component, 3-column layout</td>
+                    </tr>
+                    <tr>
+                        <td><code>apps/orchestrator_3_stream/start_fe.sh</code></td>
+                        <td>Frontend launcher (runs on port 5175)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Frontend Core Files</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Lines</th>
+                        <th>Key Features</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>frontend/src/stores/orchestratorStore.ts</code></td>
+                        <td>1,004</td>
+                        <td>State, getters, actions, 15+ WebSocket handlers</td>
+                    </tr>
+                    <tr>
+                        <td><code>frontend/src/types.d.ts</code></td>
+                        <td>200+</td>
+                        <td>TypeScript types mirroring database models</td>
+                    </tr>
+                    <tr>
+                        <td><code>frontend/src/services/chatService.ts</code></td>
+                        <td>179</td>
+                        <td>HTTP + WebSocket communication</td>
+                    </tr>
+                    <tr>
+                        <td><code>frontend/src/components/AgentList.vue</code></td>
+                        <td>-</td>
+                        <td>Agent sidebar with pulse animations</td>
+                    </tr>
+                    <tr>
+                        <td><code>frontend/src/components/EventStream.vue</code></td>
+                        <td>-</td>
+                        <td>Event log with filtering and auto-scroll</td>
+                    </tr>
+                    <tr>
+                        <td><code>frontend/src/components/OrchestratorChat.vue</code></td>
+                        <td>265</td>
+                        <td>Chat interface with markdown rendering</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Configuration Files</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>.env.sample</code></td>
+                        <td>Environment variable template</td>
+                    </tr>
+                    <tr>
+                        <td><code>backend/pyproject.toml</code></td>
+                        <td>Python dependencies (FastAPI, asyncpg, Claude SDK, Rich)</td>
+                    </tr>
+                    <tr>
+                        <td><code>frontend/package.json</code></td>
+                        <td>JavaScript dependencies (Vue, Pinia, Axios, Marked)</td>
+                    </tr>
+                    <tr>
+                        <td><code>CLAUDE.md</code></td>
+                        <td>Engineering rules and guidelines</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <footer>
+            <p>Multi-Agent Orchestration System - Comprehensive Architecture Documentation</p>
+            <p>Generated: <script>document.write(new Date().toLocaleDateString())</script></p>
+        </footer>
+
+        <a href="#" class="scroll-to-top">↑</a>
+    </div>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#1e293b',
+                primaryTextColor: '#e5e7eb',
+                primaryBorderColor: '#06b6d4',
+                lineColor: '#06b6d4',
+                secondaryColor: '#334155',
+                tertiaryColor: '#0f172a',
+                background: '#0f172a',
+                mainBkg: '#1e293b',
+                secondBkg: '#334155',
+                tertiaryBkg: '#475569',
+                textColor: '#e5e7eb',
+                border1: '#06b6d4',
+                border2: '#3b82f6',
+                arrowheadColor: '#06b6d4',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: '14px'
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll to top button
+        const scrollToTopBtn = document.querySelector('.scroll-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.style.display = 'flex';
+            } else {
+                scrollToTopBtn.style.display = 'none';
+            }
+        });
+
+        // Hide scroll to top initially
+        scrollToTopBtn.style.display = 'none';
+    </script>
+</body>
+</html>
