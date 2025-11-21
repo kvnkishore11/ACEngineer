@@ -23,30 +23,68 @@ except ImportError:
 
 def get_tts_script_path():
     """
-    Determine which TTS script to use based on available API keys.
-    Priority order: ElevenLabs > OpenAI > pyttsx3
+    Determine which TTS script to use.
+    Priority order: Open-Source (Kokoro > ChatTTS > Piper) > pyttsx3 > Commercial (ElevenLabs > OpenAI)
     """
     # Get current script directory and construct utils/tts path
     script_dir = Path(__file__).parent
     tts_dir = script_dir / "utils" / "tts"
-    
-    # Check for ElevenLabs API key (highest priority)
+
+    # Check for TTS_ENGINE environment variable to force a specific engine
+    forced_engine = os.getenv('TTS_ENGINE', '').lower()
+
+    if forced_engine:
+        engine_map = {
+            'espeak': 'espeak_tts.py',
+            'kokoro': 'kokoro_tts.py',
+            'chattts': 'chattts_tts.py',
+            'piper': 'piper_tts.py',
+            'pyttsx3': 'pyttsx3_tts.py',
+            'elevenlabs': 'elevenlabs_tts.py',
+            'openai': 'openai_tts.py',
+        }
+        if forced_engine in engine_map:
+            script = tts_dir / engine_map[forced_engine]
+            if script.exists():
+                return str(script)
+
+    # Priority 1: eSpeak-ng (open-source, lightweight, fast, no downloads)
+    espeak_script = tts_dir / "espeak_tts.py"
+    if espeak_script.exists():
+        return str(espeak_script)
+
+    # Priority 2: pyttsx3 (offline fallback, always available)
+    pyttsx3_script = tts_dir / "pyttsx3_tts.py"
+    if pyttsx3_script.exists():
+        return str(pyttsx3_script)
+
+    # Priority 3: Kokoro TTS (open-source, CPU-efficient, requires model download)
+    kokoro_script = tts_dir / "kokoro_tts.py"
+    if kokoro_script.exists():
+        return str(kokoro_script)
+
+    # Priority 4: ChatTTS (open-source, great for conversational notifications)
+    chattts_script = tts_dir / "chattts_tts.py"
+    if chattts_script.exists():
+        return str(chattts_script)
+
+    # Priority 5: Piper TTS (open-source, fast and lightweight)
+    piper_script = tts_dir / "piper_tts.py"
+    if piper_script.exists():
+        return str(piper_script)
+
+    # Priority 6: ElevenLabs (commercial, requires API key)
     if os.getenv('ELEVENLABS_API_KEY'):
         elevenlabs_script = tts_dir / "elevenlabs_tts.py"
         if elevenlabs_script.exists():
             return str(elevenlabs_script)
-    
-    # Check for OpenAI API key (second priority)
+
+    # Priority 7: OpenAI (commercial, requires API key)
     if os.getenv('OPENAI_API_KEY'):
         openai_script = tts_dir / "openai_tts.py"
         if openai_script.exists():
             return str(openai_script)
-    
-    # Fall back to pyttsx3 (no API key required)
-    pyttsx3_script = tts_dir / "pyttsx3_tts.py"
-    if pyttsx3_script.exists():
-        return str(pyttsx3_script)
-    
+
     return None
 
 

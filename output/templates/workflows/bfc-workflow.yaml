@@ -1,0 +1,286 @@
+# Bug Fix Commit (BFC) Workflow
+# Complete workflow for fixing bugs from issue to merged PR
+
+name: bug-fix-commit
+version: 1.0.0
+description: Automated workflow for bug fixes with proper testing and review
+
+# Workflow triggers
+triggers:
+  - type: issue_labeled
+    label: bug
+  - type: manual
+    command: /fix-bug [issue-number]
+
+# Input parameters
+parameters:
+  issue_number:
+    type: integer
+    required: true
+    description: GitHub issue number for the bug
+
+  priority:
+    type: string
+    enum: [critical, high, medium, low]
+    default: medium
+    description: Bug priority level
+
+  auto_merge:
+    type: boolean
+    default: false
+    description: Auto-merge PR if all checks pass
+
+# Workflow stages
+stages:
+  # Stage 1: Bug Analysis
+  - name: analyze_bug
+    agent: research-agent
+    tasks:
+      - description: "Analyze bug report from issue #${issue_number}"
+      - description: "Reproduce the bug in development environment"
+      - description: "Identify root cause and affected components"
+      - description: "Document reproduction steps"
+    outputs:
+      - bug_analysis.md
+      - reproduction_steps.md
+      - affected_files.txt
+    validation:
+      - bug_reproducible: true
+      - root_cause_identified: true
+
+  # Stage 2: Solution Planning
+  - name: plan_fix
+    agent: planning-agent
+    depends_on: [analyze_bug]
+    inputs:
+      - bug_analysis.md
+      - affected_files.txt
+    tasks:
+      - description: "Design fix approach"
+      - description: "Identify test scenarios"
+      - description: "Estimate implementation time"
+      - description: "Plan rollback strategy"
+    outputs:
+      - fix_plan.md
+      - test_scenarios.yaml
+    validation:
+      - has_fix_approach: true
+      - has_test_plan: true
+
+  # Stage 3: Implementation
+  - name: implement_fix
+    agent: implementation-agent
+    depends_on: [plan_fix]
+    inputs:
+      - fix_plan.md
+      - affected_files.txt
+    tasks:
+      - description: "Create feature branch: fix/issue-${issue_number}"
+      - description: "Implement the bug fix"
+      - description: "Add regression tests"
+      - description: "Update documentation if needed"
+    outputs:
+      - modified_files: ["src/**/*.ts", "tests/**/*.test.ts"]
+      - branch_name: "fix/issue-${issue_number}"
+    validation:
+      - code_compiles: true
+      - no_linting_errors: true
+
+  # Stage 4: Testing
+  - name: test_fix
+    agent: testing-agent
+    depends_on: [implement_fix]
+    parallel: true
+    tasks:
+      - name: unit_tests
+        command: "npm test"
+        validation:
+          all_tests_pass: true
+          coverage_threshold: 80
+
+      - name: integration_tests
+        command: "npm run test:integration"
+        validation:
+          all_tests_pass: true
+
+      - name: regression_tests
+        command: "npm run test:regression"
+        validation:
+          no_regressions: true
+
+      - name: bug_verification
+        description: "Verify bug is fixed using reproduction steps"
+        validation:
+          bug_resolved: true
+
+  # Stage 5: Code Review
+  - name: review_fix
+    agent: review-agent
+    depends_on: [test_fix]
+    inputs:
+      - modified_files
+      - test_results
+    tasks:
+      - description: "Review code changes for quality"
+      - description: "Verify fix addresses root cause"
+      - description: "Check for potential side effects"
+      - description: "Validate test coverage"
+    outputs:
+      - review_report.md
+      - approved: boolean
+    validation:
+      - no_critical_issues: true
+      - adequate_test_coverage: true
+
+  # Stage 6: Create Pull Request
+  - name: create_pr
+    agent: orchestrator-agent
+    depends_on: [review_fix]
+    condition: "review.approved == true"
+    tasks:
+      - description: "Create pull request"
+        command: |
+          gh pr create \
+            --title "fix: Resolve issue #${issue_number}" \
+            --body "$(cat pr_template.md)" \
+            --base main \
+            --assignee @me \
+            --label bug,fixes-#${issue_number}
+    outputs:
+      - pr_number: integer
+      - pr_url: string
+
+  # Stage 7: Continuous Integration
+  - name: ci_checks
+    depends_on: [create_pr]
+    parallel: true
+    tasks:
+      - name: build
+        command: "npm run build"
+        timeout: 10m
+
+      - name: security_scan
+        command: "npm audit"
+        allow_failure: false
+
+      - name: performance_check
+        command: "npm run perf:check"
+        validation:
+          no_performance_regression: true
+
+  # Stage 8: Deployment and Verification
+  - name: deploy_and_verify
+    depends_on: [ci_checks]
+    tasks:
+      - name: deploy_to_staging
+        command: "npm run deploy:staging"
+        environment: staging
+
+      - name: smoke_tests
+        command: "npm run test:smoke"
+        environment: staging
+
+      - name: user_acceptance
+        description: "Run UAT for bug fix"
+        manual_approval: true
+        timeout: 24h
+
+  # Stage 9: Merge and Deploy
+  - name: merge_and_deploy
+    depends_on: [deploy_and_verify]
+    condition: "auto_merge == true || manual_approval == true"
+    tasks:
+      - name: merge_pr
+        command: "gh pr merge ${pr_number} --merge"
+
+      - name: deploy_production
+        command: "npm run deploy:production"
+        environment: production
+
+      - name: verify_production
+        command: "npm run test:production"
+        validation:
+          deployment_successful: true
+          bug_fixed_in_production: true
+
+      - name: close_issue
+        command: "gh issue close ${issue_number} --comment 'Fixed in PR #${pr_number}'"
+
+# Error handling
+error_handling:
+  on_stage_failure:
+    - action: rollback
+      stages: [deploy_and_verify, merge_and_deploy]
+
+    - action: retry
+      stages: [test_fix, ci_checks]
+      max_attempts: 3
+      backoff: exponential
+
+    - action: alert
+      stages: [ALL]
+      notify:
+        - slack: "#bug-fixes"
+        - email: "oncall@example.com"
+
+  on_validation_failure:
+    - create_issue_comment
+    - update_pr_status
+    - notify_assignee
+
+# Rollback strategy
+rollback:
+  strategy: automatic
+  triggers:
+    - error_rate > 5%
+    - response_time > 2000ms
+    - health_check_fails
+  steps:
+    - revert_pr
+    - deploy_previous_version
+    - verify_rollback
+    - incident_report
+
+# Notifications
+notifications:
+  on_start:
+    slack:
+      channel: "#bug-fixes"
+      message: "Starting fix for issue #${issue_number}"
+
+  on_success:
+    slack:
+      channel: "#bug-fixes"
+      message: "✅ Issue #${issue_number} fixed and deployed"
+    github:
+      issue_comment: "This issue has been fixed in PR #${pr_number} and deployed to production."
+
+  on_failure:
+    slack:
+      channel: "#bug-fixes"
+      message: "❌ Failed to fix issue #${issue_number}: ${error_message}"
+    pagerduty:
+      severity: "high"
+      if: "priority == 'critical'"
+
+# Metrics and reporting
+metrics:
+  track:
+    - time_to_fix: "end_time - start_time"
+    - test_coverage_delta
+    - lines_changed
+    - files_affected
+    - deployment_time
+
+  report_to:
+    - datadog: "bug_fix_metrics"
+    - internal_dashboard: "/metrics/bug-fixes"
+
+# Success criteria
+success_criteria:
+  - bug_verified_fixed: true
+  - all_tests_passing: true
+  - no_performance_regression: true
+  - code_review_approved: true
+  - deployed_to_production: true
+  - issue_closed: true
