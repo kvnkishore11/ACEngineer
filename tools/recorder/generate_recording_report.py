@@ -10,7 +10,7 @@ from pathlib import Path
 
 from recorder_common import ffprobe_json, load_manifest, safe_name, vtt_duration
 
-ROOT = Path('/Users/kvnkishore/WebstormProjects/AgenticEngineer/videos')
+ROOT = Path(__file__).resolve().parents[2] / 'media' / 'raw'
 REPORT = ROOT / 'RECORDING_REPORT.md'
 
 rows = []

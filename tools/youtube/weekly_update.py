@@ -27,9 +27,10 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path("/Users/kvnkishore/WebstormProjects/AgenticEngineer/IndyDevDan/youtube")
+REPO_ROOT = Path(__file__).resolve().parents[2]
+ROOT = REPO_ROOT / "catalog" / "youtube"
 CHANNEL = "https://www.youtube.com/@IndyDevDan/videos"
-PY = "/Users/kvnkishore/anaconda3/bin/python3"
+PY = sys.executable
 YTDLP = "yt-dlp"
 # Look at newest N channel videos each run (cheap; weekly cadence)
 PLAYLIST_END = 30
@@ -142,7 +143,7 @@ def append_inventory(new_videos: list[dict]) -> None:
         inv = json.loads(inv_path.read_text())
     else:
         inv = {
-            "name": "IndyDevDan YouTube catalog (1 year)",
+            "name": "YouTube video catalog (1 year)",
             "channel": "https://www.youtube.com/@IndyDevDan",
             "channel_id": "UC_x36zCEGilGpB1m-V4gmjg",
             "cutoff": "2025-07-13",

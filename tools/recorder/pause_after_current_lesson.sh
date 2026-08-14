@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ROOT="/Users/kvnkishore/WebstormProjects/AgenticEngineer/tools/course-recorder"
-VIDEOS="/Users/kvnkishore/WebstormProjects/AgenticEngineer/videos"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ROOT="$REPO_ROOT/tools/recorder"
+VIDEOS="$REPO_ROOT/media/raw"
 LOG="$VIDEOS/pause-after-current.log"
 cd "$ROOT"
 

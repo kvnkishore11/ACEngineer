@@ -10,7 +10,9 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
+ROOT = REPO_ROOT / "catalog" / "youtube"
+REPOS = REPO_ROOT / "codebases" / "yt"
 
 
 def main():
@@ -90,8 +92,10 @@ def main():
         )
 
     index = {
-        "name": "IndyDevDan YouTube catalog (1 year)",
-        "root": str(ROOT),
+        "name": "YouTube video catalog (1 year)",
+        # Repo-relative on purpose: an absolute path here breaks the index
+        # for everyone whose checkout is not at this machine's path.
+        "root": "catalog/youtube",
         "channel": inv.get("channel"),
         "channel_id": inv.get("channel_id"),
         "cutoff": inv.get("cutoff"),
@@ -108,9 +112,9 @@ def main():
             "folder_naming": "yt-NN-<slug>",
             "notes": (
                 "Public YT mirror of course lesson folders. "
-                "codebase/ is a symlink into _repos/ when the video description lists a GitHub repo/gist."
+                "codebase/ is a symlink into codebases/yt/ when the video description lists a GitHub repo/gist."
             ),
-            "repos_cache": "_repos/",
+            "repos_cache": "codebases/yt/",
         },
         "videos": lessons,
     }
@@ -160,7 +164,7 @@ def main():
     # keep layout blurb accurate
     text = text.replace(
         "No `codebase/` (public YT has no course repo).",
-        "Codebase: `codebase/` → `_repos/<owner>__<repo>` when the YT description lists a GitHub repo/gist "
+        "Codebase: `codebase/` → `codebases/yt/<owner>__<repo>` when the YT description lists a GitHub repo/gist "
         "(see `metadata/repos.json`). 19 videos have no public code link in the description.",
     )
     readme.write_text(text)

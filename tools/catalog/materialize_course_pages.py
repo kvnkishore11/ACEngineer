@@ -10,7 +10,7 @@ import re
 import shutil
 from pathlib import Path
 
-ROOT = Path("/Users/kvnkishore/WebstormProjects/AgenticEngineer")
+ROOT = Path(__file__).resolve().parents[2]
 SRC_PAGES = ROOT / "IndyDevDan" / "_source" / "course-pages"
 ASSETS = ROOT / "IndyDevDan" / "_source" / "assets"
 OUT_OFFLINE = ROOT / "IndyDevDan" / "_source" / "course-pages-offline"

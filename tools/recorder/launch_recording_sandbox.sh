@@ -6,10 +6,11 @@ set -euo pipefail
 # external app link-open events, and accidental clicks/pauses.
 
 PORT="${PORT:-9223}"
-PROFILE_DIR="${PROFILE_DIR:-/Users/kvnkishore/WebstormProjects/AgenticEngineer/.recording-chrome-profile}"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+PROFILE_DIR="${PROFILE_DIR:-$REPO_ROOT/.recording-chrome-profile}"
 START_URL="${1:-about:blank}"
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-LOG="/Users/kvnkishore/WebstormProjects/AgenticEngineer/videos/recording-sandbox-chrome.log"
+LOG="$REPO_ROOT/media/raw/_logs/recording-sandbox-chrome.log"
 
 mkdir -p "$PROFILE_DIR/Default" "$(dirname "$LOG")"
 

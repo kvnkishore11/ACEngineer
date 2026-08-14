@@ -3,10 +3,17 @@
 # requires-python = ">=3.10"
 # dependencies = []
 # ///
-"""Build agent-facing IndyDevDan/ lesson catalog (hardlinks + symlinks; sources untouched).
+"""Build the agent-facing lesson catalog under catalog/courses/.
 
-Folder names match MA style: <course-n>-<slug>
-metadata/course-page.html = real IndyDevDan page dump (outerHTML) when available.
+Hardlinks the finished video from media/final/, symlinks the codebase into
+codebases/, and writes catalog/INDEX.json. Sources are never moved.
+
+This script owns the shape of the 18 course `codebase/` symlinks. If a link is
+wrong, change the path constants here and re-run — do not hand-edit the links,
+because the next run silently overwrites manual fixes.
+
+Folder names are <course>-<n>-<slug>; metadata/course-page.html is the real
+course page dump (outerHTML) when available.
 """
 from __future__ import annotations
 
@@ -16,98 +23,106 @@ import re
 import shutil
 from pathlib import Path
 
-ROOT = Path("/Users/kvnkishore/WebstormProjects/AgenticEngineer")
-OUT = ROOT / "IndyDevDan"
-FINAL = ROOT / "final videos"
-TX_VTT = Path("/Users/kvnkishore/Downloads/tac-transcripts")
+# Every path derives from the repo root so the script runs from anywhere,
+# rather than from whatever the current working directory happens to be.
+REPO_ROOT = Path(__file__).resolve().parents[2]
+ROOT = REPO_ROOT
+CATALOG = REPO_ROOT / "catalog"          # INDEX.json + README.md live here
+OUT = CATALOG / "courses"                # one directory per lesson
+FINAL = REPO_ROOT / "media" / "final"
+VIDEOS = REPO_ROOT / "media" / "raw"
+TX_VTT = REPO_ROOT / "transcripts"
 TX_CLEAN = TX_VTT / "clean"
 TX_NOTES = TX_VTT / "notes"
-MA = ROOT / "member-assets"
-VIDEOS = ROOT / "videos"
-COURSE_HTML = OUT / "_source" / "course-pages"
-COURSE_HTML_OFFLINE = OUT / "_source" / "course-pages-offline" / "for-metadata"
+# member-assets/ was an intermediate staging tree; its assets are now in the
+# catalog itself and its provenance in catalog/_source/ma-download/.
+MA = REPO_ROOT / "catalog" / "_source" / "ma-download"
+COURSE_HTML = REPO_ROOT / "catalog" / "_source" / "course-pages"
+COURSE_HTML_OFFLINE = (
+    REPO_ROOT / "catalog" / "_source" / "course-pages-offline" / "for-metadata"
+)
 
 # short_key: old/video-dir key; key: MA-style folder name
 LESSONS: list[dict] = [
     # TAC
     dict(order=1, short_key="tac-1", key="tac-1-hello-agentic-coding", title="Hello Agentic Coding",
          slug="hello-agentic-coding", course="TAC", video="tac-1-hello-agentic-coding.mp4",
-         tx="hello-agentic-coding", codebase="tac/tac-1",
+         tx="hello-agentic-coding", codebase="codebases/tac/tac-1",
          url="https://agenticengineer.com/tactical-agentic-coding/course/hello-agentic-coding"),
     dict(order=2, short_key="tac-2", key="tac-2-the-12-leverage-points", title="The 12 Leverage Points",
          slug="the-12-leverage-points", course="TAC", video="tac-2-the-12-leverage-points.mp4",
-         tx="the-12-leverage-points", codebase="tac/tac-2",
+         tx="the-12-leverage-points", codebase="codebases/tac/tac-2",
          url="https://agenticengineer.com/tactical-agentic-coding/course/the-12-leverage-points"),
     dict(order=3, short_key="tac-3", key="tac-3-success-is-planned", title="Success is Planned",
          slug="success-is-planned", course="TAC", video="tac-3-success-is-planned.mp4",
-         tx="success-is-planned", codebase="tac/tac-3",
+         tx="success-is-planned", codebase="codebases/tac/tac-3",
          url="https://agenticengineer.com/tactical-agentic-coding/course/success-is-planned"),
     dict(order=4, short_key="tac-4", key="tac-4-afk-agents", title="AFK Agents",
          slug="afk-agents", course="TAC", video="tac-4-afk-agents.mp4",
-         tx="afk-agents", codebase="tac/tac-4",
+         tx="afk-agents", codebase="codebases/tac/tac-4",
          url="https://agenticengineer.com/tactical-agentic-coding/course/afk-agents"),
     dict(order=5, short_key="tac-5", key="tac-5-close-the-loops", title="Close the Loops",
          slug="close-the-loops", course="TAC", video="tac-5-close-the-loops.mp4",
-         tx="close-the-loops", codebase="tac/tac-5",
+         tx="close-the-loops", codebase="codebases/tac/tac-5",
          url="https://agenticengineer.com/tactical-agentic-coding/course/close-the-loops"),
     dict(order=6, short_key="tac-6", key="tac-6-let-your-agents-focus", title="Let Your Agents Focus",
          slug="let-your-agents-focus", course="TAC", video="tac-6-let-your-agents-focus.mp4",
-         tx="let-your-agents-focus", codebase="tac/tac-6",
+         tx="let-your-agents-focus", codebase="codebases/tac/tac-6",
          url="https://agenticengineer.com/tactical-agentic-coding/course/let-your-agents-focus"),
     dict(order=7, short_key="tac-7", key="tac-7-zte-secret-of-agentic-engineering",
          title="ZTE Secret of Agentic Engineering", slug="zte-secret-of-agentic-engineering",
          course="TAC", video="tac-7-zte-secret-of-agentic-engineering.mp4",
-         tx="zte-secret-of-agentic-engineering", codebase="tac/tac-7",
+         tx="zte-secret-of-agentic-engineering", codebase="codebases/tac/tac-7",
          url="https://agenticengineer.com/tactical-agentic-coding/course/zte-secret-of-agentic-engineering"),
     dict(order=8, short_key="tac-8", key="tac-8-the-agentic-layer", title="The Agentic Layer",
          slug="the-agentic-layer", course="TAC", video="tac-8-the-agentic-layer.mp4",
-         tx="the-agentic-layer", codebase="tac/tac-8",
+         tx="the-agentic-layer", codebase="codebases/tac/tac-8",
          url="https://agenticengineer.com/tactical-agentic-coding/course/the-agentic-layer"),
     # AH
     dict(order=9, short_key="ah-1", key="ah-1-rd-framework-context-window-mastery",
          title="Elite Context Engineering", slug="rd-framework-context-window-mastery",
          course="AH", video="ah-1-rd-framework-context-window-mastery.mp4",
-         tx="rd-framework-context-window-mastery", codebase="agentic-horizon/elite-context-engineering",
+         tx="rd-framework-context-window-mastery", codebase="codebases/ah/elite-context-engineering",
          url="https://agenticengineer.com/tactical-agentic-coding/course/rd-framework-context-window-mastery"),
     dict(order=10, short_key="ah-2", key="ah-2-seven-levels-agentic-prompt-formats",
          title="Seven Levels Agentic Prompt Formats", slug="seven-levels-agentic-prompt-formats",
          course="AH", video="ah-2-seven-levels-agentic-prompt-formats.mp4",
-         tx="seven-levels-agentic-prompt-formats", codebase="agentic-horizon/agentic-prompt-engineering",
+         tx="seven-levels-agentic-prompt-formats", codebase="codebases/ah/agentic-prompt-engineering",
          url="https://agenticengineer.com/tactical-agentic-coding/course/seven-levels-agentic-prompt-formats"),
     dict(order=11, short_key="ah-3", key="ah-3-building-domain-specific-agents",
          title="Building Domain-Specific Agents", slug="building-domain-specific-agents",
          course="AH", video="ah-3-building-domain-specific-agents.mp4",
-         tx="building-domain-specific-agents", codebase="agentic-horizon/building-specialized-agents",
+         tx="building-domain-specific-agents", codebase="codebases/ah/building-specialized-agents",
          url="https://agenticengineer.com/tactical-agentic-coding/course/building-domain-specific-agents"),
     dict(order=12, short_key="ah-4", key="ah-4-multi-agent-orchestration-the-o-agent",
          title="Multi-Agent Orchestration: The O-Agent", slug="multi-agent-orchestration-the-o-agent",
          course="AH", video="ah-4-multi-agent-orchestration-the-o-agent.mp4",
-         tx="multi-agent-orchestration-the-o-agent", codebase="agentic-horizon/multi-agent-orchestration",
+         tx="multi-agent-orchestration-the-o-agent", codebase="codebases/ah/multi-agent-orchestration",
          url="https://agenticengineer.com/tactical-agentic-coding/course/multi-agent-orchestration-the-o-agent"),
     dict(order=13, short_key="ah-5", key="ah-5-agent-experts", title="Agent Experts",
          slug="agent-experts", course="AH", video="ah-5-agent-experts.mp4",
-         tx="agent-experts", codebase="agentic-horizon/agent-experts",
+         tx="agent-experts", codebase="codebases/ah/agent-experts",
          url="https://agenticengineer.com/tactical-agentic-coding/course/agent-experts"),
     dict(order=14, short_key="ah-6", key="ah-6-building-agentic-layers", title="Building Agentic Layers",
          slug="building-agentic-layers", course="AH", video="ah-6-building-agentic-layers.mp4",
-         tx="building-agentic-layers", codebase="agentic-horizon/orchestrator-agent-with-adws",
+         tx="building-agentic-layers", codebase="codebases/ah/orchestrator-agent-with-adws",
          url="https://agenticengineer.com/tactical-agentic-coding/course/building-agentic-layers"),
     # MA
     dict(order=15, short_key="ma-1", key="ma-1-ceo-agents", title="CEO Agents", slug="ceo-agents",
          course="MA", video="ma-1-ceo-agents.mp4", tx=None, ma_key="ma-1-ceo-agents",
-         codebase="agentic-horizon-extras/ceo-agents",
+         codebase="codebases/ma/ceo-agents",
          url="https://www.youtube.com/watch?v=TqjmTZRL31E", youtube_id="TqjmTZRL31E"),
     dict(order=16, short_key="ma-2", key="ma-2-lead-agents", title="Multi-Team Agentic Coding / Lead Agents",
          slug="lead-agents", course="MA", video="ma-2-lead-agents.mp4", tx=None, ma_key="ma-2-lead-agents",
-         codebase="agentic-horizon-extras/lead-agents",
+         codebase="codebases/ma/lead-agents",
          url="https://www.youtube.com/watch?v=M30gp1315Y4", youtube_id="M30gp1315Y4"),
     dict(order=17, short_key="ma-3", key="ma-3-ui-agents", title="Infinite UI Agents", slug="ui-agents",
          course="MA", video="ma-3-ui-agents.mp4", tx=None, ma_key="ma-3-ui-agents",
-         codebase="agentic-horizon-extras/ui-agents",
+         codebase="codebases/ma/ui-agents",
          url="https://www.youtube.com/watch?v=RairMJflUSA", youtube_id="RairMJflUSA"),
     dict(order=18, short_key="ma-4", key="ma-4-verifier-agent", title="The Pi Verifier Agent",
          slug="verifier-agent", course="MA", video="ma-4-verifier-agent.mp4", tx=None, ma_key="ma-4-verifier-agent",
-         codebase="agentic-horizon-extras/the-verifier-agent-system",
+         codebase="codebases/ma/the-verifier-agent-system",
          url="https://www.youtube.com/watch?v=EnXKysJNz_8", youtube_id="EnXKysJNz_8"),
 ]
 
@@ -397,40 +412,61 @@ Source: {lesson['url']}
         )
 
     index = {
-        "name": "IndyDevDan catalog",
-        "root": str(OUT),
-        "source_workspace": str(ROOT),
+        "name": "course lesson catalog",
+        # Repo-relative on purpose. An absolute path here breaks the index for
+        # everyone whose checkout is not at this machine's path.
+        "root": "catalog/courses",
         "layout": {
             "per_lesson": ["video/", "transcript/", "metadata/", "codebase/"],
-            "folder_naming": "MA-style: <course-n>-<slug> e.g. tac-1-hello-agentic-coding",
+            "folder_naming": "<course>-<n>-<slug>, e.g. tac-1-hello-agentic-coding",
             "course_html": "metadata/course-page.html is authenticated outerHTML from agenticengineer.com",
-            "notes": "Videos hardlinked from final videos/; codebases symlinked; sources not moved.",
+            "notes": "Videos hardlinked from media/final/; codebase/ symlinks into codebases/.",
         },
         "lessons": catalog,
     }
-    (OUT / "INDEX.json").write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
+    (CATALOG / "INDEX.json").write_text(
+        json.dumps(index, indent=2) + "\n", encoding="utf-8"
+    )
 
     lines = [
-        "# IndyDevDan — agent lesson catalog",
+        "# `catalog/` — the lessons",
         "",
-        "Single place for agents to load IndyDevDan (TAC / AH / MA) materials.",
-        "Sources under `AgenticEngineer/` are **not moved** — this tree hardlinks videos and symlinks codebases.",
+        "**Generated by `uv run tools/catalog/build_catalog.py` (`make catalog`).**",
+        "Edit that script, not this file — the next run overwrites it.",
         "",
-        "## Layout (every lesson)",
+        "The read-only front door to the material. Nothing here is a copy: the",
+        "video is hardlinked from `media/final/` and `codebase/` is a symlink into",
+        "`codebases/`.",
+        "",
+        "## Layout (every course lesson)",
         "```",
-        "IndyDevDan/<course-n>-<slug>/          # e.g. tac-1-hello-agentic-coding",
-        "  video/<...>.mp4",
-        "  transcript/*.{vtt,md,txt}",
-        "  metadata/course-page.html   # REAL AE page HTML + local CSS/fonts/img",
-        "  metadata/lesson.html        # same",
+        "catalog/courses/<course>-<n>-<slug>/   # e.g. tac-1-hello-agentic-coding",
+        "  video/<key>.mp4             # hardlink into media/final/",
+        "  transcript/*.{md,txt,vtt}   # the READABLE stitched transcript",
+        "  metadata/course-page.html   # real course page HTML + local CSS/fonts/img",
+        "  metadata/lesson.html",
         "  metadata/lesson.json",
         "  metadata/course-notes.md    # loot-box notes companion (TAC/AH)",
-        "  codebase/                   # symlink → real repo",
+        "  codebase/                   # symlink into codebases/",
         "  README.md",
-        "assets/                       # shared CSS/fonts/images (offline)",
+        "catalog/youtube/yt-NN-<slug>/          # same shape, transcript/ + metadata/",
+        "catalog/assets/                        # shared CSS/fonts/images (offline)",
         "```",
         "",
         "Raw dumps: `_source/course-pages/`. Offline-styled: `_source/course-pages-offline/`.",
+        "",
+        "> The per-chapter VTT dumps under `transcripts/<key>/` are **not** these",
+        "> files. Read `catalog/courses/<key>/transcript/<key>.md` — the stitched,",
+        "> whole-lesson version. See `transcripts/README.md`.",
+        "",
+        "## Counts",
+        "",
+        "Counts drift, so produce them rather than reading them:",
+        "",
+        "```sh",
+        "ls -d catalog/courses/*/ | wc -l      # course lessons",
+        "ls -d catalog/youtube/yt-*/ | wc -l   # videos",
+        "```",
         "",
         "## Catalog",
         "",
@@ -449,21 +485,24 @@ Source: {lesson['url']}
         "",
         "## Agent quick paths",
         "",
-        "- Index: `INDEX.json`",
-        "- Real course page: `IndyDevDan/<key>/metadata/course-page.html`",
-        "- Plain transcript: prefer `transcript/*.md` then `*.txt` then `*.vtt`",
-        "- Code: `IndyDevDan/<key>/codebase/`",
+        "- Index: `catalog/INDEX.json`, `catalog/youtube/INDEX.json`",
+        "- What he said: `catalog/courses/<key>/transcript/<key>.md`",
+        "- What he built: `catalog/courses/<key>/codebase/` → resolves into `codebases/`",
+        "- Real course page: `catalog/courses/<key>/metadata/course-page.html`",
+        "- Plain transcript: prefer `transcript/*.md`, then `*.txt`, then `*.vtt`",
         "",
         "## Rebuild",
         "",
         "```bash",
-        "# 1) optional: re-dump raw HTML via authenticated CDP → _source/course-pages/",
-        "python3 scripts/materialize_course_pages_offline.py   # CSS/fonts/img + offline HTML",
-        "python3 scripts/build_indydevdan_catalog.py          # wire into lesson folders",
+        "# optional: re-dump raw HTML via authenticated CDP → _source/course-pages/",
+        "uv run tools/catalog/materialize_course_pages.py   # CSS/fonts/img + offline HTML",
+        "uv run tools/catalog/build_catalog.py              # wire into lesson folders",
+        "# or simply:",
+        "make catalog",
         "```",
         "",
     ]
-    (OUT / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (CATALOG / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     if errors:
         print("\nWARNINGS:")

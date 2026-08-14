@@ -3,11 +3,11 @@
 # requires-python = ">=3.10"
 # dependencies = []
 # ///
-"""Attach codebases to IndyDevDan youtube lesson folders.
+"""Attach codebases to catalog/youtube/ video folders.
 
 Primary source: GitHub (etc.) links in metadata/video-info.json description.
 Prefer lines labeled Codebase / Repo / GET THE / Skill.
-Clone unique repos under youtube/_repos/<owner>__<repo>/ and symlink
+Clone unique repos under codebases/yt/<owner>__<repo>/ and symlink
 each video's codebase/ → primary clone (course-catalog shape).
 
 Also writes:
@@ -26,8 +26,9 @@ import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
-ROOT = Path(__file__).resolve().parent
-REPOS = ROOT / "_repos"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+ROOT = REPO_ROOT / "catalog" / "youtube"
+REPOS = REPO_ROOT / "codebases" / "yt"
 URL_RE = re.compile(
     r"https?://(?:www\.)?github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)(?:/[^\s\)\]\"'<>]*)?",
     re.I,
@@ -206,7 +207,7 @@ def link_codebase(folder: Path, target: Path) -> None:
             link.unlink()
         else:
             shutil.rmtree(link)
-    # relative symlink from folder/codebase → _repos/...
+    # relative symlink from folder/codebase -> codebases/yt/...
     rel = os.path.relpath(target, folder)
     link.symlink_to(rel)
 

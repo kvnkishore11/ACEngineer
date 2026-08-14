@@ -11,7 +11,7 @@ import subprocess
 import time
 from pathlib import Path
 
-ROOT = Path('/Users/kvnkishore/WebstormProjects/AgenticEngineer')
+ROOT = Path(__file__).resolve().parents[2]
 VIDEOS = ROOT / 'videos'
 LESSON_DIR = VIDEOS / 'ah-1'
 KEY = 'ah-1'

@@ -22,34 +22,34 @@ import subprocess
 import sys
 from pathlib import Path
 
-YOUTUBE = Path(__file__).resolve().parent
-INDY = YOUTUBE.parent
-AE = INDY.parent  # AgenticEngineer
-REPOS = YOUTUBE / "_repos"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+YOUTUBE = REPO_ROOT / "catalog" / "youtube"
+AE = REPO_ROOT
+REPOS = REPO_ROOT / "codebases" / "yt"
 
 # Exact YouTube video_id → local relative path under AgenticEngineer
 COURSE_YT_ID = {
     "TqjmTZRL31E": {  # yt-37 CEO Agents
-        "rel": "agentic-horizon-extras/ceo-agents",
-        "label": "agentic-horizon-extras/ceo-agents",
+        "rel": "codebases/ma/ceo-agents",
+        "label": "codebases/ma/ceo-agents",
         "via": "course-catalog ma-1 youtube_id",
         "course_key": "ma-1-ceo-agents",
     },
     "M30gp1315Y4": {  # yt-38 One Agent Is NOT ENOUGH / lead agents
-        "rel": "agentic-horizon-extras/lead-agents",
-        "label": "agentic-horizon-extras/lead-agents",
+        "rel": "codebases/ma/lead-agents",
+        "label": "codebases/ma/lead-agents",
         "via": "course-catalog ma-2 youtube_id",
         "course_key": "ma-2-lead-agents",
     },
     "RairMJflUSA": {  # ma-3 already often has github; keep for completeness
-        "rel": "agentic-horizon-extras/ui-agents",
-        "label": "agentic-horizon-extras/ui-agents",
+        "rel": "codebases/ma/ui-agents",
+        "label": "codebases/ma/ui-agents",
         "via": "course-catalog ma-3 youtube_id",
         "course_key": "ma-3-ui-agents",
     },
     "EnXKysJNz_8": {
-        "rel": "agentic-horizon-extras/the-verifier-agent-system",
-        "label": "agentic-horizon-extras/the-verifier-agent-system",
+        "rel": "codebases/ma/the-verifier-agent-system",
+        "label": "codebases/ma/the-verifier-agent-system",
         "via": "course-catalog ma-4 youtube_id",
         "course_key": "ma-4-verifier-agent",
     },

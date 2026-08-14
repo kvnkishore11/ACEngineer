@@ -31,8 +31,9 @@ import textwrap
 from datetime import datetime
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-PY = "/Users/kvnkishore/anaconda3/bin/python3"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+ROOT = REPO_ROOT / "catalog" / "youtube"
+PY = sys.executable
 YTDLP = "yt-dlp"
 
 
