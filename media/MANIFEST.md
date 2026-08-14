@@ -6,7 +6,7 @@ The bytes under `media/` are not tracked by git. This file is the tracked,
 auditable record of what should be there: path, size and SHA-256 for every
 file. Verify a checkout with `uv run tools/media/make_manifest.py --check`.
 
-- Files: 5428
+- Files: 5427
 - Total size: 21.5 GB
 
 | Path | Size | SHA-256 |
@@ -5337,7 +5337,6 @@ file. Verify a checkout with `uv run tools/media/make_manifest.py --check`.
 | `media/raw/ah-6/verify-first.jpg` | 132.1 KB | `eaf3b382d5483504917feeac3268960a528118a9e9ccd967a797f22eaf60ebe3` |
 | `media/raw/ah-6/verify-last.jpg` | 156.3 KB | `a3133510e780bdedcd7d7757bf053443b8cd59690f9cce8552bd6601f8885ef1` |
 | `media/raw/ah-6/verify-middle.jpg` | 229.3 KB | `67c4fe42a40421ac3fdcdc79e06e2899ec7af7b1802393000267e0352512c4fb` |
-| `media/raw/process_media.sh` | 1.9 KB | `47eac19a948eeb919933cfddaee9cdeb4d8cca4d971c42ce15b47f75d997a2a8` |
 | `media/raw/tac-1/tac-1-hello-agentic-coding-cdp-15fps-audio-fixed.mp4` | 219.2 MB | `b9cac0d6f26d432d9265b9aa497c790140ca077d5ce738beb77146bd586c0832` |
 | `media/raw/tac-1/tac-1-hello-agentic-coding-cdp-15fps-audio-synced-sync.json` | 550 B | `844782cbd87c651e574676228b4c7622e83ad8669768ce11fcc659917130097b` |
 | `media/raw/tac-1/tac-1-hello-agentic-coding-mux-audio.m4a` | 30.2 MB | `dde839097b1d4de93b813918378a206b03558b8b5ac3413d22fc24b609fecb45` |
