@@ -1,0 +1,100 @@
+set dotenv-load := true
+set shell := ["zsh", "-il", "-c"]
+
+default:
+  @just --list
+
+# ─── Interactive ───────────────────────────────────────
+
+# Start team chat interactively (no workflow)
+team:
+    teams
+
+# Natural language command — describe what you want
+ui prompt:
+    echo "/ui {{prompt}}" | teams
+
+# ─── Brand + Product Management ───────────────────────
+
+# Create a new brand
+new-brand name prompt:
+    echo "/new-brand {{name}} {{prompt}}" | teams
+
+# Create a new product within a brand
+new-product brand product prompt:
+    echo "/new-product {{brand}} {{product}} {{prompt}}" | teams
+
+# Update brand identity and cascade to all products
+rebrand brand prompt product="":
+    echo "/rebrand {{brand}} {{product}} {{prompt}}" | teams
+
+# ─── Tree Management ──────────────────────────────────
+
+# Create a new tree in a product
+new-tree brand product tree prompt:
+    echo "/new-tree {{brand}} {{product}} {{tree}} {{prompt}}" | teams
+
+# ─── Generation ───────────────────────────────────────
+
+# Generate a single branch
+new-branch brand product tree branch prompt:
+    echo "/new-branch {{brand}} {{product}} {{tree}} {{branch}} {{prompt}}" | teams
+
+# Generate N branches for a tree
+generate brand product tree count prompt:
+    echo "/generate {{brand}} {{product}} {{tree}} {{count}} {{prompt}}" | teams
+
+# Fork an existing leaf N times with variations
+fork-leaf brand product tree branch count prompt:
+    echo "/fork-leaf {{brand}} {{product}} {{tree}} {{branch}} {{count}} {{prompt}}" | teams
+
+# ─── Validation ───────────────────────────────────────
+
+# Validate branches (scoped to product, optionally to tree/branch)
+validate brand product tree="" branch="":
+    echo "/validate {{brand}} {{product}} {{tree}} {{branch}}" | teams
+
+# ─── Utility ──────────────────────────────────────────
+
+# Show product status
+status brand product:
+    echo "/status {{brand}} {{product}}" | teams
+
+# ─── List Commands ────────────────────────────────────
+
+# List all brands
+list-brands:
+    uv run --script scripts/list.py brands
+
+# List all products in a brand
+list-products brand:
+    uv run --script scripts/list.py products {{brand}}
+
+# List all trees in a product
+list-trees brand product:
+    uv run --script scripts/list.py trees {{brand}} {{product}}
+
+# List all branches in a tree
+list-branches brand product tree:
+    uv run --script scripts/list.py branches {{brand}} {{product}} {{tree}}
+
+# List all leaves (optionally scoped to a tree)
+list-leaves brand product tree="":
+    uv run --script scripts/list.py leaves {{brand}} {{product}} {{tree}}
+
+# ─── Dev Server ───────────────────────────────────────
+
+# Start Vite dev server (kills anything on :5173 first)
+dev:
+    lsof -ti:5173 | xargs kill -9 2>/dev/null || true
+    cd apps/infinite-ui && bun run dev
+
+# Alias for dev
+serve:
+    just dev
+
+# ─── Claude Code ──────────────────────────────────────
+
+# Prime Claude Code with project context
+prime:
+    claude --dangerously-skip-permissions --model "opus[1m]" "/prime"

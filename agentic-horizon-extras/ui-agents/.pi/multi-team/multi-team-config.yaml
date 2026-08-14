@@ -1,0 +1,201 @@
+---
+orchestrator:
+  name: Orchestrator
+  path: .pi/multi-team/agents/orchestrator.md
+  color: "#72f1b8"
+
+paths:
+  agents: .pi/multi-team/agents/
+  sessions: .pi/multi-team/sessions/
+
+shared_context:
+  - README.md
+  - CLAUDE.md
+  - apps/infinite-ui/src/brands/_template/brand.yaml
+  - apps/infinite-ui/src/brands/_template/products/_template-product/trees.yaml
+  - apps/infinite-ui/src/schemas/brand.schema.ts
+  - apps/infinite-ui/src/schemas/trees.schema.ts
+
+teams:
+  - team-name: Setup
+    team-color: "#c3e88d"
+    consult-when: >
+      Creating new trees, branches, or leaves. Scaffolding directory structure.
+      Updating trees.yaml manifest. Always called FIRST before generation.
+      Also called LAST to update statuses after validation.
+    lead:
+      name: Setup Lead
+      path: .pi/multi-team/agents/setup-lead.md
+      color: "#c3e88d"
+    members:
+      - name: Scaffold Worker
+        path: .pi/multi-team/agents/scaffold-worker.md
+        color: "#a6da95"
+        consult-when: >
+          Directory creation, stub index.vue generation,
+          trees.yaml updates, route registration
+      - name: Structure Validator
+        path: .pi/multi-team/agents/structure-validator.md
+        color: "#8bd5ca"
+        consult-when: >
+          Zod schema validation of trees.yaml and brand.yaml,
+          filesystem-manifest sync verification,
+          slug format enforcement, status transition rules
+
+  - team-name: Brand
+    team-color: "#fede5d"
+    consult-when: >
+      Brand identity, visual consistency, design tokens, palette decisions,
+      typography standards. Consult before any generation to load brand context.
+      Consult after generation to validate brand compliance.
+    lead:
+      name: Brand Lead
+      path: .pi/multi-team/agents/brand-lead.md
+      color: "#fede5d"
+    members:
+      - name: Brand Analyst
+        path: .pi/multi-team/agents/brand-analyst.md
+        color: "#f0c674"
+        consult-when: >
+          Token compliance checks, brand.yaml interpretation,
+          color contrast validation, typography rule enforcement
+
+  - team-name: UI Generation
+    team-color: "#36f9f6"
+    consult-when: >
+      Building new UI components, creating tree/branch variants,
+      Vue SFC authoring, layout implementation, responsive design,
+      animations, transitions, micro-interactions.
+    lead:
+      name: UI Generation Lead
+      path: .pi/multi-team/agents/ui-generation-lead.md
+      color: "#36f9f6"
+    members:
+      - name: Vue Generator
+        path: .pi/multi-team/agents/vue-generator.md
+        color: "#00d4ff"
+        consult-when: >
+          Vue SFC component authoring, Composition API,
+          layout structure, state management, routing
+      - name: Animation Specialist
+        path: .pi/multi-team/agents/animation-specialist.md
+        color: "#7dcfff"
+        consult-when: >
+          CSS transitions, Vue transition components,
+          micro-interactions, scroll animations, motion design
+
+  - team-name: UI Generation B
+    team-color: "#2ad6d0"
+    consult-when: >
+      Second generation team for parallel workloads. Same capabilities as
+      UI Generation. Orchestrator round-robins branches across generation teams.
+    lead:
+      name: UI Generation Lead (B)
+      path: .pi/multi-team/agents/ui-generation-lead.md
+      color: "#2ad6d0"
+    members:
+      - name: Vue Generator (B)
+        path: .pi/multi-team/agents/vue-generator.md
+        color: "#00b8d4"
+        consult-when: >
+          Vue SFC component authoring, Composition API,
+          layout structure, state management, routing
+      - name: Animation Specialist (B)
+        path: .pi/multi-team/agents/animation-specialist.md
+        color: "#6bb8e8"
+        consult-when: >
+          CSS transitions, Vue transition components,
+          micro-interactions, scroll animations, motion design
+
+  - team-name: UI Generation C
+    team-color: "#1abfa0"
+    consult-when: >
+      Third generation team for parallel workloads. Same capabilities as
+      UI Generation. Orchestrator round-robins branches across generation teams.
+    lead:
+      name: UI Generation Lead (C)
+      path: .pi/multi-team/agents/ui-generation-lead.md
+      color: "#1abfa0"
+    members:
+      - name: Vue Generator (C)
+        path: .pi/multi-team/agents/vue-generator.md
+        color: "#00a0b8"
+        consult-when: >
+          Vue SFC component authoring, Composition API,
+          layout structure, state management, routing
+      - name: Animation Specialist (C)
+        path: .pi/multi-team/agents/animation-specialist.md
+        color: "#5aa0d0"
+        consult-when: >
+          CSS transitions, Vue transition components,
+          micro-interactions, scroll animations, motion design
+
+  - team-name: Validation
+    team-color: "#ff9e64"
+    consult-when: >
+      Quality assurance on generated UIs. Visual validation via screenshots,
+      brand compliance checking, interaction testing, responsive testing,
+      accessibility review.
+    lead:
+      name: Validation Lead
+      path: .pi/multi-team/agents/validation-lead.md
+      color: "#ff9e64"
+    members:
+      - name: Soft Validator
+        path: .pi/multi-team/agents/soft-validator.md
+        color: "#ffb86c"
+        consult-when: >
+          Screenshot capture, visual regression, brand token compliance,
+          layout correctness, typography adherence
+      - name: Hard Validator
+        path: .pi/multi-team/agents/hard-validator.md
+        color: "#f7768e"
+        consult-when: >
+          Interactive testing, click flows, responsive breakpoints,
+          accessibility audit, animation performance
+
+  - team-name: Validation B
+    team-color: "#e8825a"
+    consult-when: >
+      Second validation team for parallel workloads. Same capabilities as
+      Validation. Orchestrator round-robins branches across validation teams.
+    lead:
+      name: Validation Lead (B)
+      path: .pi/multi-team/agents/validation-lead.md
+      color: "#e8825a"
+    members:
+      - name: Soft Validator (B)
+        path: .pi/multi-team/agents/soft-validator.md
+        color: "#e8a06c"
+        consult-when: >
+          Screenshot capture, visual regression, brand token compliance,
+          layout correctness, typography adherence
+      - name: Hard Validator (B)
+        path: .pi/multi-team/agents/hard-validator.md
+        color: "#d4657e"
+        consult-when: >
+          Interactive testing, click flows, responsive breakpoints,
+          accessibility audit, animation performance
+
+  - team-name: Validation C
+    team-color: "#d06a48"
+    consult-when: >
+      Third validation team for parallel workloads. Same capabilities as
+      Validation. Orchestrator round-robins branches across validation teams.
+    lead:
+      name: Validation Lead (C)
+      path: .pi/multi-team/agents/validation-lead.md
+      color: "#d06a48"
+    members:
+      - name: Soft Validator (C)
+        path: .pi/multi-team/agents/soft-validator.md
+        color: "#d08858"
+        consult-when: >
+          Screenshot capture, visual regression, brand token compliance,
+          layout correctness, typography adherence
+      - name: Hard Validator (C)
+        path: .pi/multi-team/agents/hard-validator.md
+        color: "#c05068"
+        consult-when: >
+          Interactive testing, click flows, responsive breakpoints,
+          accessibility audit, animation performance

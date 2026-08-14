@@ -1,0 +1,680 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080"
+     role="img" aria-label="Multi-team agentic engineering orchestration — 4-tier hierarchy including engineer">
+  <title>Multi-Team Agentic Orchestration v2</title>
+  <desc>
+    Left-to-right 4-column flow diagram: You/Engineer dispatches to Orchestrator (Tier 1),
+    which delegates to 3 Team Leads (Tier 2), each coordinating 3 Workers (Tier 3).
+    Monochrome dark theme with tier-specific accent colors. 15s looping animation.
+  </desc>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       DEFS — filters
+       ═══════════════════════════════════════════════════════════════ -->
+  <defs>
+    <!-- You/Engineer glow — warm amber -->
+    <filter id="f-glow-you" x="-45%" y="-45%" width="190%" height="190%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Orchestrator glow — cyan -->
+    <filter id="f-glow-orch" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Lead glow — blue -->
+    <filter id="f-glow-lead" x="-28%" y="-28%" width="156%" height="156%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Worker glow — lavender -->
+    <filter id="f-glow-worker" x="-22%" y="-22%" width="144%" height="144%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Hit bloom — node arrival flash -->
+    <filter id="f-glow-hit" x="-55%" y="-55%" width="210%" height="210%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       STYLES + ANIMATIONS
+       ═══════════════════════════════════════════════════════════════
+
+       THEME: Monochrome charcoal base with tier accent colors
+         You/Engineer: amber  #e8a020
+         Orchestrator: cyan   #38c8c8
+         Team Leads:   blue   #5b8af0
+         Workers:      purple #9070d0
+
+       LAYOUT (direct 1920×1080 coordinates):
+         C0 You/Eng:   cx=330, node 120×60, cx_right=390
+         C1 Orch:      cx=660, node 160×66, cx_right=740
+         C2 Leads:     cx=1070, node 160×66, cx_right=1150
+         C3 Workers:   cx=1540, node 130×56, cx_right=1605
+         Content center ≈ 937px (target 960, ~23px off — imperceptible)
+
+         Lead cy: A=270, B=540, C=810  (spacing 270px)
+         Worker fan: ±85px from lead center
+
+       EDGE MIDPOINTS:
+         You→Orch:  midx=485
+         Orch→Lead: midx=865
+         Lead→Work: midx=1312
+
+       ANIMATION CYCLE: 15s infinite
+         Phase 1 (0–4s):   Cinematic reveal L→R
+         Phase 2 (4–10s):  Dot travel + node highlights
+         Phase 3 (10–15s): Hold + breathe + fade reset
+       ═══════════════════════════════════════════════════════════════ -->
+  <style>
+    /* ── Typography ──────────────────────────────────────────────── */
+    .lbl {
+      font-family: system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      font-weight: 600;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+    .lbl-you    { font-size: 15px; fill: #e8a020; }
+    .lbl-orch   { font-size: 15px; fill: #38c8c8; }
+    .lbl-lead   { font-size: 15px; fill: #5b8af0; }
+    .lbl-worker { font-size: 13px; fill: #9070d0; }
+
+    /* Column header labels */
+    .lbl-col {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      font-size: 12px; font-weight: 700; fill: #ffffff;
+      dominant-baseline: middle; text-anchor: middle;
+      letter-spacing: 2px; text-transform: uppercase;
+      stroke: rgba(0,0,0,0.75); stroke-width: 3px; paint-order: stroke fill;
+      filter: drop-shadow(0 1px 4px rgba(0,0,0,0.8));
+    }
+    /* Tier subtitle — readable with stroke outline */
+    .lbl-tier-sub {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      font-size: 11px; font-weight: 600;
+      fill: #ffffff;
+      dominant-baseline: middle; text-anchor: middle;
+      letter-spacing: 1px; text-transform: uppercase;
+      stroke: rgba(0,0,0,0.6);
+      stroke-width: 2px;
+      paint-order: stroke fill;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.7));
+    }
+
+    /* ── Node fills / borders ────────────────────────────────────── */
+    .node-base   { fill: #0e1118; }
+    .node-you    { stroke: #e8a020; stroke-width: 2;   }
+    .node-orch   { stroke: #38c8c8; stroke-width: 2;   }
+    .node-lead   { stroke: #5b8af0; stroke-width: 1.8; }
+    .node-worker { stroke: #9070d0; stroke-width: 1.5; }
+
+    /* ── Highlight overlay rects ─────────────────────────────────── */
+    .hl { fill: none; opacity: 0; pointer-events: none; }
+    .hl-you    { stroke: #e8a020; stroke-width: 2.5; fill: rgba(232,160,32,0.15);  }
+    .hl-orch   { stroke: #38c8c8; stroke-width: 2.5; fill: rgba(56,200,200,0.13); }
+    .hl-lead   { stroke: #5b8af0; stroke-width: 2;   fill: rgba(91,138,240,0.14); }
+    .hl-worker { stroke: #9070d0; stroke-width: 2;   fill: rgba(144,112,208,0.16);}
+
+    /* ── Connector edges ─────────────────────────────────────────── */
+    .edge { fill: none; stroke: #1e2535; stroke-width: 1.5; stroke-linecap: round; }
+
+    /* ── Pulse dots ──────────────────────────────────────────────── */
+    .pdot { fill: none; stroke-linecap: round; opacity: 0; }
+    .pdot-you  { stroke: #e8a020; stroke-width: 3;   }
+    .pdot-orch { stroke: #38c8c8; stroke-width: 2.5; }
+    .pdot-lead { stroke: #5b8af0; stroke-width: 2;   }
+
+    /* ══════════════════════════════════════════════════════════════
+       15s CYCLE — PHASE 1: CINEMATIC REVEAL (0–4s)
+       All percentages = t/15 * 100
+       ══════════════════════════════════════════════════════════════ */
+
+    /* You/Engineer node: 0s→0.5s = 0%→3.33% */
+    #g-you { opacity:0; animation: cy-you 15s ease-out 0s infinite; }
+    @keyframes cy-you {
+      0%      { opacity:0; }  3.33%  { opacity:1; }
+      98%     { opacity:1; }  100%   { opacity:0; }
+    }
+
+    /* You→Orch edge: 0.5s→1.0s = 3.33%→6.67% */
+    .e-yo {
+      stroke-dasharray: 215; stroke-dashoffset: 215;
+      animation: cy-draw-yo 15s ease-out 0s infinite;
+    }
+    @keyframes cy-draw-yo {
+      0%     { stroke-dashoffset:215; }  3.33%  { stroke-dashoffset:215; }
+      6.67%  { stroke-dashoffset:0;   }  98%    { stroke-dashoffset:0;   }
+      100%   { stroke-dashoffset:215; }
+    }
+
+    /* Orchestrator: 1.0s→1.5s = 6.67%→10% */
+    #g-orch { opacity:0; animation: cy-orch 15s ease-out 0s infinite; }
+    @keyframes cy-orch {
+      0%     { opacity:0; }  6.67%  { opacity:0; }  10%    { opacity:1; }
+      98%    { opacity:1; }  100%   { opacity:0; }
+    }
+
+    /* Orch→Lead edges: 1.5s start, stagger 0.1s, 0.5s draw */
+    .e-oa {
+      stroke-dasharray: 440; stroke-dashoffset: 440;
+      animation: cy-draw-oa 15s ease-out 0s infinite;
+    }
+    @keyframes cy-draw-oa {
+      0%     { stroke-dashoffset:440; }  10%    { stroke-dashoffset:440; }
+      13.33% { stroke-dashoffset:0;   }  98%    { stroke-dashoffset:0;   }
+      100%   { stroke-dashoffset:440; }
+    }
+    .e-ob {
+      stroke-dasharray: 300; stroke-dashoffset: 300;
+      animation: cy-draw-ob 15s ease-out 0s infinite;
+    }
+    @keyframes cy-draw-ob {
+      0%     { stroke-dashoffset:300; }  10.67% { stroke-dashoffset:300; }
+      14%    { stroke-dashoffset:0;   }  98%    { stroke-dashoffset:0;   }
+      100%   { stroke-dashoffset:300; }
+    }
+    .e-oc {
+      stroke-dasharray: 440; stroke-dashoffset: 440;
+      animation: cy-draw-oc 15s ease-out 0s infinite;
+    }
+    @keyframes cy-draw-oc {
+      0%     { stroke-dashoffset:440; }  11.33% { stroke-dashoffset:440; }
+      14.67% { stroke-dashoffset:0;   }  98%    { stroke-dashoffset:0;   }
+      100%   { stroke-dashoffset:440; }
+    }
+
+    /* Lead nodes: A=2.0s, B=2.12s, C=2.24s — 0.4s fade */
+    #g-lead-a { opacity:0; animation: cy-lead-a 15s ease-out 0s infinite; }
+    @keyframes cy-lead-a {
+      0%     { opacity:0; }  13.33% { opacity:0; }  16%    { opacity:1; }
+      98%    { opacity:1; }  100%   { opacity:0; }
+    }
+    #g-lead-b { opacity:0; animation: cy-lead-b 15s ease-out 0s infinite; }
+    @keyframes cy-lead-b {
+      0%     { opacity:0; }  14.13% { opacity:0; }  16.8%  { opacity:1; }
+      98%    { opacity:1; }  100%   { opacity:0; }
+    }
+    #g-lead-c { opacity:0; animation: cy-lead-c 15s ease-out 0s infinite; }
+    @keyframes cy-lead-c {
+      0%     { opacity:0; }  14.93% { opacity:0; }  17.6%  { opacity:1; }
+      98%    { opacity:1; }  100%   { opacity:0; }
+    }
+
+    /* Lead→Worker edges: start 2.5s, stagger 0.06s, 0.4s draw */
+    .e-a1 { stroke-dasharray:365; stroke-dashoffset:365; animation: cy-ea1 15s ease-out 0s infinite; }
+    @keyframes cy-ea1 { 0%{stroke-dashoffset:365;} 16.67%{stroke-dashoffset:365;} 19.33%{stroke-dashoffset:0;} 98%{stroke-dashoffset:0;} 100%{stroke-dashoffset:365;} }
+    .e-a2 { stroke-dasharray:350; stroke-dashoffset:350; animation: cy-ea2 15s ease-out 0s infinite; }
+    @keyframes cy-ea2 { 0%{stroke-dashoffset:350;} 17.07%{stroke-dashoffset:350;} 19.73%{stroke-dashoffset:0;} 98%{stroke-dashoffset:0;} 100%{stroke-dashoffset:350;} }
+    .e-a3 { stroke-dasharray:365; stroke-dashoffset:365; animation: cy-ea3 15s ease-out 0s infinite; }
+    @keyframes cy-ea3 { 0%{stroke-dashoffset:365;} 17.47%{stroke-dashoffset:365;} 20.13%{stroke-dashoffset:0;} 98%{stroke-dashoffset:0;} 100%{stroke-dashoffset:365;} }
+    .e-b1 { stroke-dasharray:365; stroke-dashoffset:365; animation: cy-eb1 15s ease-out 0s infinite; }
+    @keyframes cy-eb1 { 0%{stroke-dashoffset:365;} 17.87%{stroke-dashoffset:365;} 20.53%{stroke-dashoffset:0;} 98%{stroke-dashoffset:0;} 100%{stroke-dashoffset:365;} }
+    .e-b2 { stroke-dasharray:350; stroke-dashoffset:350; animation: cy-eb2 15s ease-out 0s infinite; }
+    @keyframes cy-eb2 { 0%{stroke-dashoffset:350;} 18.27%{stroke-dashoffset:350;} 20.93%{stroke-dashoffset:0;} 98%{stroke-dashoffset:0;} 100%{stroke-dashoffset:350;} }
+    .e-b3 { stroke-dasharray:365; stroke-dashoffset:365; animation: cy-eb3 15s ease-out 0s infinite; }
+    @keyframes cy-eb3 { 0%{stroke-dashoffset:365;} 18.67%{stroke-dashoffset:365;} 21.33%{stroke-dashoffset:0;} 98%{stroke-dashoffset:0;} 100%{stroke-dashoffset:365;} }
+    .e-c1 { stroke-dasharray:365; stroke-dashoffset:365; animation: cy-ec1 15s ease-out 0s infinite; }
+    @keyframes cy-ec1 { 0%{stroke-dashoffset:365;} 19.07%{stroke-dashoffset:365;} 21.73%{stroke-dashoffset:0;} 98%{stroke-dashoffset:0;} 100%{stroke-dashoffset:365;} }
+    .e-c2 { stroke-dasharray:350; stroke-dashoffset:350; animation: cy-ec2 15s ease-out 0s infinite; }
+    @keyframes cy-ec2 { 0%{stroke-dashoffset:350;} 19.47%{stroke-dashoffset:350;} 22.13%{stroke-dashoffset:0;} 98%{stroke-dashoffset:0;} 100%{stroke-dashoffset:350;} }
+    .e-c3 { stroke-dasharray:365; stroke-dashoffset:365; animation: cy-ec3 15s ease-out 0s infinite; }
+    @keyframes cy-ec3 { 0%{stroke-dashoffset:365;} 19.87%{stroke-dashoffset:365;} 22.53%{stroke-dashoffset:0;} 98%{stroke-dashoffset:0;} 100%{stroke-dashoffset:365;} }
+
+    /* Worker nodes: start 3.0s, stagger 0.07s, 0.35s fade */
+    #w-a1 { opacity:0; animation: cy-wa1 15s ease-out 0s infinite; }
+    @keyframes cy-wa1 { 0%{opacity:0;} 20%{opacity:0;} 22.33%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #w-a2 { opacity:0; animation: cy-wa2 15s ease-out 0s infinite; }
+    @keyframes cy-wa2 { 0%{opacity:0;} 20.47%{opacity:0;} 22.8%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #w-a3 { opacity:0; animation: cy-wa3 15s ease-out 0s infinite; }
+    @keyframes cy-wa3 { 0%{opacity:0;} 20.93%{opacity:0;} 23.27%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #w-b1 { opacity:0; animation: cy-wb1 15s ease-out 0s infinite; }
+    @keyframes cy-wb1 { 0%{opacity:0;} 21.4%{opacity:0;} 23.73%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #w-b2 { opacity:0; animation: cy-wb2 15s ease-out 0s infinite; }
+    @keyframes cy-wb2 { 0%{opacity:0;} 21.87%{opacity:0;} 24.2%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #w-b3 { opacity:0; animation: cy-wb3 15s ease-out 0s infinite; }
+    @keyframes cy-wb3 { 0%{opacity:0;} 22.33%{opacity:0;} 24.67%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #w-c1 { opacity:0; animation: cy-wc1 15s ease-out 0s infinite; }
+    @keyframes cy-wc1 { 0%{opacity:0;} 22.8%{opacity:0;} 25.13%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #w-c2 { opacity:0; animation: cy-wc2 15s ease-out 0s infinite; }
+    @keyframes cy-wc2 { 0%{opacity:0;} 23.27%{opacity:0;} 25.6%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #w-c3 { opacity:0; animation: cy-wc3 15s ease-out 0s infinite; }
+    @keyframes cy-wc3 { 0%{opacity:0;} 23.73%{opacity:0;} 26.07%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+
+    /* Tier labels: 3.5s→4.0s */
+    #tier-labels { opacity:0; animation: cy-labels 15s ease-out 0s infinite; }
+    @keyframes cy-labels {
+      0%     { opacity:0; }  23.33% { opacity:0; }  26.67% { opacity:1; }
+      98%    { opacity:1; }  100%   { opacity:0; }
+    }
+
+    /* Orchestrator border breathe (Phase 3) */
+    #orch-border { animation: cy-breathe 15s ease-in-out 0s infinite; }
+    @keyframes cy-breathe {
+      0%,66.67%   { stroke-width:2;   stroke-opacity:1;   }
+      73.33%      { stroke-width:3;   stroke-opacity:0.65; }
+      80%         { stroke-width:2;   stroke-opacity:1;   }
+      86.67%      { stroke-width:3;   stroke-opacity:0.65; }
+      93.33%      { stroke-width:2;   stroke-opacity:1;   }
+      98%         { stroke-width:2;   stroke-opacity:1;   }
+      100%        { stroke-width:2;   stroke-opacity:1;   }
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       15s CYCLE — PHASE 2: PULSE DOTS (4–10s)
+       stroke-dashoffset: MAX → 0 during visible window, opacity gates
+       ══════════════════════════════════════════════════════════════ */
+
+    /* You→Orch: begin=4.0s (26.67%), arrive=5.2s (34.67%), max=230 */
+    #p-yo { stroke-dasharray:20 210; stroke-dashoffset:230; animation: p-yo 15s linear 0s infinite; }
+    @keyframes p-yo {
+      0%      { stroke-dashoffset:230; opacity:0; }
+      26.67%  { stroke-dashoffset:230; opacity:1; }
+      34.67%  { stroke-dashoffset:0;   opacity:1; }
+      36.67%  { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:230; opacity:0; }
+      100%    { stroke-dashoffset:230; opacity:0; }
+    }
+
+    /* Orch→LeadA: begin=5.2s (34.67%), arrive=7.4s (49.33%), max=437 */
+    #p-oa { stroke-dasharray:28 409; stroke-dashoffset:437; animation: p-oa 15s linear 0s infinite; }
+    @keyframes p-oa {
+      0%      { stroke-dashoffset:437; opacity:0; }
+      34.67%  { stroke-dashoffset:437; opacity:1; }
+      49.33%  { stroke-dashoffset:0;   opacity:1; }
+      51.33%  { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:437; opacity:0; }
+      100%    { stroke-dashoffset:437; opacity:0; }
+    }
+
+    /* Orch→LeadB: begin=5.4s (36%), arrive=7.2s (48%), max=298 */
+    #p-ob { stroke-dasharray:28 270; stroke-dashoffset:298; animation: p-ob 15s linear 0s infinite; }
+    @keyframes p-ob {
+      0%      { stroke-dashoffset:298; opacity:0; }
+      36%     { stroke-dashoffset:298; opacity:1; }
+      48%     { stroke-dashoffset:0;   opacity:1; }
+      50%     { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:298; opacity:0; }
+      100%    { stroke-dashoffset:298; opacity:0; }
+    }
+
+    /* Orch→LeadC: begin=5.6s (37.33%), arrive=7.8s (52%), max=437 */
+    #p-oc { stroke-dasharray:28 409; stroke-dashoffset:437; animation: p-oc 15s linear 0s infinite; }
+    @keyframes p-oc {
+      0%      { stroke-dashoffset:437; opacity:0; }
+      37.33%  { stroke-dashoffset:437; opacity:1; }
+      52%     { stroke-dashoffset:0;   opacity:1; }
+      54%     { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:437; opacity:0; }
+      100%    { stroke-dashoffset:437; opacity:0; }
+    }
+
+    /* LeadB→W1: begin=7.3s (48.67%), arrive=9.1s (60.67%), max=382 */
+    #p-b1 { stroke-dasharray:22 360; stroke-dashoffset:382; animation: p-b1 15s linear 0s infinite; }
+    @keyframes p-b1 {
+      0%      { stroke-dashoffset:382; opacity:0; }
+      48.67%  { stroke-dashoffset:382; opacity:1; }
+      60.67%  { stroke-dashoffset:0;   opacity:1; }
+      62.67%  { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:382; opacity:0; }
+      100%    { stroke-dashoffset:382; opacity:0; }
+    }
+
+    /* LeadB→W2: begin=7.4s (49.33%), arrive=9.2s (61.33%), max=367 */
+    #p-b2 { stroke-dasharray:22 345; stroke-dashoffset:367; animation: p-b2 15s linear 0s infinite; }
+    @keyframes p-b2 {
+      0%      { stroke-dashoffset:367; opacity:0; }
+      49.33%  { stroke-dashoffset:367; opacity:1; }
+      61.33%  { stroke-dashoffset:0;   opacity:1; }
+      63.33%  { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:367; opacity:0; }
+      100%    { stroke-dashoffset:367; opacity:0; }
+    }
+
+    /* LeadB→W3: begin=7.5s (50%), arrive=9.3s (62%), max=382 */
+    #p-b3 { stroke-dasharray:22 360; stroke-dashoffset:382; animation: p-b3 15s linear 0s infinite; }
+    @keyframes p-b3 {
+      0%      { stroke-dashoffset:382; opacity:0; }
+      50%     { stroke-dashoffset:382; opacity:1; }
+      62%     { stroke-dashoffset:0;   opacity:1; }
+      64%     { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:382; opacity:0; }
+      100%    { stroke-dashoffset:382; opacity:0; }
+    }
+
+    /* LeadA→W1: begin=7.5s (50%), arrive=9.3s (62%), max=382 */
+    #p-a1 { stroke-dasharray:22 360; stroke-dashoffset:382; animation: p-a1 15s linear 0s infinite; }
+    @keyframes p-a1 {
+      0%      { stroke-dashoffset:382; opacity:0; }
+      50%     { stroke-dashoffset:382; opacity:1; }
+      62%     { stroke-dashoffset:0;   opacity:1; }
+      64%     { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:382; opacity:0; }
+      100%    { stroke-dashoffset:382; opacity:0; }
+    }
+
+    /* LeadA→W2: begin=7.6s (50.67%), arrive=9.4s (62.67%), max=367 */
+    #p-a2 { stroke-dasharray:22 345; stroke-dashoffset:367; animation: p-a2 15s linear 0s infinite; }
+    @keyframes p-a2 {
+      0%      { stroke-dashoffset:367; opacity:0; }
+      50.67%  { stroke-dashoffset:367; opacity:1; }
+      62.67%  { stroke-dashoffset:0;   opacity:1; }
+      64.67%  { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:367; opacity:0; }
+      100%    { stroke-dashoffset:367; opacity:0; }
+    }
+
+    /* LeadA→W3: begin=7.7s (51.33%), arrive=9.5s (63.33%), max=382 */
+    #p-a3 { stroke-dasharray:22 360; stroke-dashoffset:382; animation: p-a3 15s linear 0s infinite; }
+    @keyframes p-a3 {
+      0%      { stroke-dashoffset:382; opacity:0; }
+      51.33%  { stroke-dashoffset:382; opacity:1; }
+      63.33%  { stroke-dashoffset:0;   opacity:1; }
+      65.33%  { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:382; opacity:0; }
+      100%    { stroke-dashoffset:382; opacity:0; }
+    }
+
+    /* LeadC→W1: begin=7.9s (52.67%), arrive=9.7s (64.67%), max=382 */
+    #p-c1 { stroke-dasharray:22 360; stroke-dashoffset:382; animation: p-c1 15s linear 0s infinite; }
+    @keyframes p-c1 {
+      0%      { stroke-dashoffset:382; opacity:0; }
+      52.67%  { stroke-dashoffset:382; opacity:1; }
+      64.67%  { stroke-dashoffset:0;   opacity:1; }
+      66.67%  { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:382; opacity:0; }
+      100%    { stroke-dashoffset:382; opacity:0; }
+    }
+
+    /* LeadC→W2: begin=8.0s (53.33%), arrive=9.8s (65.33%), max=367 */
+    #p-c2 { stroke-dasharray:22 345; stroke-dashoffset:367; animation: p-c2 15s linear 0s infinite; }
+    @keyframes p-c2 {
+      0%      { stroke-dashoffset:367; opacity:0; }
+      53.33%  { stroke-dashoffset:367; opacity:1; }
+      65.33%  { stroke-dashoffset:0;   opacity:1; }
+      67.33%  { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:367; opacity:0; }
+      100%    { stroke-dashoffset:367; opacity:0; }
+    }
+
+    /* LeadC→W3: begin=8.1s (54%), arrive=9.9s (66%), max=382 */
+    #p-c3 { stroke-dasharray:22 360; stroke-dashoffset:382; animation: p-c3 15s linear 0s infinite; }
+    @keyframes p-c3 {
+      0%      { stroke-dashoffset:382; opacity:0; }
+      54%     { stroke-dashoffset:382; opacity:1; }
+      66%     { stroke-dashoffset:0;   opacity:1; }
+      68%     { stroke-dashoffset:0;   opacity:0; }
+      99%     { stroke-dashoffset:382; opacity:0; }
+      100%    { stroke-dashoffset:382; opacity:0; }
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       NODE HIGHLIGHT FLASHES
+       Flash: opacity 0→1 in 0.5%, hold 0.7%, decay to 0 in 1.3%
+       
+       You/Eng departure: t=4.0s → 26.67%
+       Orch arrival+departure: t=5.2s → 34.67%
+       LeadB arrival: t=7.2s → 48%
+       LeadA arrival: t=7.4s → 49.33%
+       LeadB departure: t=7.3s → 48.67%
+       LeadA departure: t=7.5s → 50%
+       LeadC arrival: t=7.8s → 52%
+       LeadC departure: t=7.9s → 52.67%
+       Workers: 60.67%–66%
+       ══════════════════════════════════════════════════════════════ */
+
+    /* You/Eng: departure at 26.67% */
+    #hl-you { opacity:0; animation: hl-you 15s linear 0s infinite; }
+    @keyframes hl-you {
+      0%,26%  { opacity:0; }  26.67% { opacity:1; }  27.33% { opacity:1; }
+      29%     { opacity:0; }  100%   { opacity:0; }
+    }
+
+    /* Orch: arrival at 34.67% + departure at 34.67% (same moment — Orch receives and fires) */
+    #hl-orch { opacity:0; animation: hl-orch 15s linear 0s infinite; }
+    @keyframes hl-orch {
+      0%,34%   { opacity:0; }  34.67% { opacity:1; }  35.33% { opacity:1; }
+      37%      { opacity:0; }  100%   { opacity:0; }
+    }
+
+    /* LeadA: arrival 49.33% + departure 50% */
+    #hl-lead-a { opacity:0; animation: hl-lead-a 15s linear 0s infinite; }
+    @keyframes hl-lead-a {
+      0%,48.67%  { opacity:0; }  49.33% { opacity:1; }  50%    { opacity:1; }
+      50.67%     { opacity:1; }  51.33% { opacity:1; }  53%    { opacity:0; }
+      100%       { opacity:0; }
+    }
+
+    /* LeadB: arrival 48% + departure 48.67% */
+    #hl-lead-b { opacity:0; animation: hl-lead-b 15s linear 0s infinite; }
+    @keyframes hl-lead-b {
+      0%,47.33%  { opacity:0; }  48%    { opacity:1; }  48.67% { opacity:1; }
+      49.33%     { opacity:1; }  50%    { opacity:1; }  51.67% { opacity:0; }
+      100%       { opacity:0; }
+    }
+
+    /* LeadC: arrival 52% + departure 52.67% */
+    #hl-lead-c { opacity:0; animation: hl-lead-c 15s linear 0s infinite; }
+    @keyframes hl-lead-c {
+      0%,51.33%  { opacity:0; }  52%    { opacity:1; }  52.67% { opacity:1; }
+      53.33%     { opacity:1; }  54%    { opacity:1; }  55.67% { opacity:0; }
+      100%       { opacity:0; }
+    }
+
+    /* Workers — arrival flashes */
+    #hl-wb1 { opacity:0; animation: hl-wb1 15s linear 0s infinite; }
+    @keyframes hl-wb1 { 0%,60%{opacity:0;} 60.67%{opacity:1;} 61.33%{opacity:1;} 63%{opacity:0;} 100%{opacity:0;} }
+    #hl-wb2 { opacity:0; animation: hl-wb2 15s linear 0s infinite; }
+    @keyframes hl-wb2 { 0%,60.67%{opacity:0;} 61.33%{opacity:1;} 62%{opacity:1;} 63.67%{opacity:0;} 100%{opacity:0;} }
+    #hl-wb3 { opacity:0; animation: hl-wb3 15s linear 0s infinite; }
+    @keyframes hl-wb3 { 0%,61.33%{opacity:0;} 62%{opacity:1;} 62.67%{opacity:1;} 64.33%{opacity:0;} 100%{opacity:0;} }
+    #hl-wa1 { opacity:0; animation: hl-wa1 15s linear 0s infinite; }
+    @keyframes hl-wa1 { 0%,61.33%{opacity:0;} 62%{opacity:1;} 62.67%{opacity:1;} 64.33%{opacity:0;} 100%{opacity:0;} }
+    #hl-wa2 { opacity:0; animation: hl-wa2 15s linear 0s infinite; }
+    @keyframes hl-wa2 { 0%,62%{opacity:0;} 62.67%{opacity:1;} 63.33%{opacity:1;} 65%{opacity:0;} 100%{opacity:0;} }
+    #hl-wa3 { opacity:0; animation: hl-wa3 15s linear 0s infinite; }
+    @keyframes hl-wa3 { 0%,62.67%{opacity:0;} 63.33%{opacity:1;} 64%{opacity:1;} 65.67%{opacity:0;} 100%{opacity:0;} }
+    #hl-wc1 { opacity:0; animation: hl-wc1 15s linear 0s infinite; }
+    @keyframes hl-wc1 { 0%,64%{opacity:0;} 64.67%{opacity:1;} 65.33%{opacity:1;} 67%{opacity:0;} 100%{opacity:0;} }
+    #hl-wc2 { opacity:0; animation: hl-wc2 15s linear 0s infinite; }
+    @keyframes hl-wc2 { 0%,64.67%{opacity:0;} 65.33%{opacity:1;} 66%{opacity:1;} 67.67%{opacity:0;} 100%{opacity:0;} }
+    #hl-wc3 { opacity:0; animation: hl-wc3 15s linear 0s infinite; }
+    @keyframes hl-wc3 { 0%,65.33%{opacity:0;} 66%{opacity:1;} 66.67%{opacity:1;} 68.33%{opacity:0;} 100%{opacity:0;} }
+  </style>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       LAYOUT REFERENCE (comment)
+       C0 You/Eng:   cx=330, node x=270–390,  cy=540
+       C1 Orch:      cx=660, node x=580–740,  cy=540
+       C2 Leads:     cx=1070, node x=990–1150, cy=270/540/810
+       C3 Workers:   cx=1540, node x=1475–1605, cy per group
+       You→Orch midx=485   |  Orch→Lead midx=865  |  Lead→Work midx=1312
+       ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       EDGES — You/Eng → Orchestrator
+       ═══════════════════════════════════════════════════════════════ -->
+  <g id="edges-you-orch" aria-hidden="true">
+    <path class="edge e-yo" d="M 412,540 C 507,540 507,540 602,540"/>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       EDGES — Orchestrator → Leads
+       ═══════════════════════════════════════════════════════════════ -->
+  <g id="edges-orch-leads" aria-hidden="true">
+    <path class="edge e-oa" d="M 762,540 C 887,540 887,270 1012,270"/>
+    <path class="edge e-ob" d="M 762,540 C 887,540 887,540 1012,540"/>
+    <path class="edge e-oc" d="M 762,540 C 887,540 887,810 1012,810"/>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       EDGES — Leads → Workers
+       ═══════════════════════════════════════════════════════════════ -->
+  <g id="edges-leads-workers" aria-hidden="true">
+    <!-- Lead A (cy=270) → Workers 185, 270, 355 -->
+    <path class="edge e-a1" d="M 1172,270 C 1334,270 1334,185 1497,185"/>
+    <path class="edge e-a2" d="M 1172,270 C 1334,270 1334,270 1497,270"/>
+    <path class="edge e-a3" d="M 1172,270 C 1334,270 1334,355 1497,355"/>
+    <!-- Lead B (cy=540) → Workers 455, 540, 625 -->
+    <path class="edge e-b1" d="M 1172,540 C 1334,540 1334,455 1497,455"/>
+    <path class="edge e-b2" d="M 1172,540 C 1334,540 1334,540 1497,540"/>
+    <path class="edge e-b3" d="M 1172,540 C 1334,540 1334,625 1497,625"/>
+    <!-- Lead C (cy=810) → Workers 725, 810, 895 -->
+    <path class="edge e-c1" d="M 1172,810 C 1334,810 1334,725 1497,725"/>
+    <path class="edge e-c2" d="M 1172,810 C 1334,810 1334,810 1497,810"/>
+    <path class="edge e-c3" d="M 1172,810 C 1334,810 1334,895 1497,895"/>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       PULSE DOTS — CSS-only, no SMIL
+       ═══════════════════════════════════════════════════════════════ -->
+  <g id="pulse-overlays" aria-hidden="true">
+    <!-- You→Orch -->
+    <path id="p-yo" class="pdot pdot-you"  d="M 412,540 C 507,540 507,540 602,540"/>
+    <!-- Orch→Leads -->
+    <path id="p-oa" class="pdot pdot-orch" d="M 762,540 C 887,540 887,270 1012,270"/>
+    <path id="p-ob" class="pdot pdot-orch" d="M 762,540 C 887,540 887,540 1012,540"/>
+    <path id="p-oc" class="pdot pdot-orch" d="M 762,540 C 887,540 887,810 1012,810"/>
+    <!-- Lead A→Workers -->
+    <path id="p-a1" class="pdot pdot-lead" d="M 1172,270 C 1334,270 1334,185 1497,185"/>
+    <path id="p-a2" class="pdot pdot-lead" d="M 1172,270 C 1334,270 1334,270 1497,270"/>
+    <path id="p-a3" class="pdot pdot-lead" d="M 1172,270 C 1334,270 1334,355 1497,355"/>
+    <!-- Lead B→Workers -->
+    <path id="p-b1" class="pdot pdot-lead" d="M 1172,540 C 1334,540 1334,455 1497,455"/>
+    <path id="p-b2" class="pdot pdot-lead" d="M 1172,540 C 1334,540 1334,540 1497,540"/>
+    <path id="p-b3" class="pdot pdot-lead" d="M 1172,540 C 1334,540 1334,625 1497,625"/>
+    <!-- Lead C→Workers -->
+    <path id="p-c1" class="pdot pdot-lead" d="M 1172,810 C 1334,810 1334,725 1497,725"/>
+    <path id="p-c2" class="pdot pdot-lead" d="M 1172,810 C 1334,810 1334,810 1497,810"/>
+    <path id="p-c3" class="pdot pdot-lead" d="M 1172,810 C 1334,810 1334,895 1497,895"/>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       COLUMN 0 — YOU / ENGINEER  (cx=330, cy=540)
+       ═══════════════════════════════════════════════════════════════ -->
+  <g id="g-you" filter="url(#f-glow-you)">
+    <rect x="292" y="510" width="120" height="60" rx="12" class="node-base node-you"/>
+    <text x="352" y="540" class="lbl lbl-you">You</text>
+  </g>
+  <rect id="hl-you" x="289" y="507" width="126" height="66" rx="14"
+        class="hl hl-you" filter="url(#f-glow-hit)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       COLUMN 1 — ORCHESTRATOR  (cx=660, cy=540)
+       ═══════════════════════════════════════════════════════════════ -->
+  <g id="g-orch" filter="url(#f-glow-orch)">
+    <rect id="orch-border" x="602" y="507" width="160" height="66" rx="12"
+          class="node-base node-orch"/>
+    <text x="682" y="540" class="lbl lbl-orch">Orchestrator</text>
+  </g>
+  <rect id="hl-orch" x="599" y="504" width="166" height="72" rx="14"
+        class="hl hl-orch" filter="url(#f-glow-hit)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       COLUMN 2 — TEAM LEADS  (cx=1070)
+       ═══════════════════════════════════════════════════════════════ -->
+  <g id="g-leads">
+    <!-- Lead A  cy=270 -->
+    <g id="g-lead-a" filter="url(#f-glow-lead)">
+      <rect x="1012" y="237" width="160" height="66" rx="12" class="node-base node-lead"/>
+      <text x="1092" y="270" class="lbl lbl-lead">Team Lead A</text>
+    </g>
+    <!-- Lead B  cy=540 -->
+    <g id="g-lead-b" filter="url(#f-glow-lead)">
+      <rect x="1012" y="507" width="160" height="66" rx="12" class="node-base node-lead"/>
+      <text x="1092" y="540" class="lbl lbl-lead">Team Lead B</text>
+    </g>
+    <!-- Lead C  cy=810 -->
+    <g id="g-lead-c" filter="url(#f-glow-lead)">
+      <rect x="1012" y="777" width="160" height="66" rx="12" class="node-base node-lead"/>
+      <text x="1092" y="810" class="lbl lbl-lead">Team Lead C</text>
+    </g>
+  </g>
+  <!-- Lead highlight overlays -->
+  <rect id="hl-lead-a" x="1009" y="234" width="166" height="72" rx="14"
+        class="hl hl-lead" filter="url(#f-glow-hit)"/>
+  <rect id="hl-lead-b" x="1009" y="504" width="166" height="72" rx="14"
+        class="hl hl-lead" filter="url(#f-glow-hit)"/>
+  <rect id="hl-lead-c" x="1009" y="774" width="166" height="72" rx="14"
+        class="hl hl-lead" filter="url(#f-glow-hit)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       COLUMN 3 — WORKERS  (cx=1540, node w=130, h=56, rx=10)
+       ═══════════════════════════════════════════════════════════════ -->
+  <g id="g-workers">
+    <!-- Lead A workers: cy=185, 270, 355 -->
+    <g id="w-a1" filter="url(#f-glow-worker)">
+      <rect x="1497" y="157" width="130" height="56" rx="10" class="node-base node-worker"/>
+      <text x="1562" y="185" class="lbl lbl-worker">Worker 1</text>
+    </g>
+    <g id="w-a2" filter="url(#f-glow-worker)">
+      <rect x="1497" y="242" width="130" height="56" rx="10" class="node-base node-worker"/>
+      <text x="1562" y="270" class="lbl lbl-worker">Worker 2</text>
+    </g>
+    <g id="w-a3" filter="url(#f-glow-worker)">
+      <rect x="1497" y="327" width="130" height="56" rx="10" class="node-base node-worker"/>
+      <text x="1562" y="355" class="lbl lbl-worker">Worker 3</text>
+    </g>
+    <!-- Lead B workers: cy=455, 540, 625 -->
+    <g id="w-b1" filter="url(#f-glow-worker)">
+      <rect x="1497" y="427" width="130" height="56" rx="10" class="node-base node-worker"/>
+      <text x="1562" y="455" class="lbl lbl-worker">Worker 1</text>
+    </g>
+    <g id="w-b2" filter="url(#f-glow-worker)">
+      <rect x="1497" y="512" width="130" height="56" rx="10" class="node-base node-worker"/>
+      <text x="1562" y="540" class="lbl lbl-worker">Worker 2</text>
+    </g>
+    <g id="w-b3" filter="url(#f-glow-worker)">
+      <rect x="1497" y="597" width="130" height="56" rx="10" class="node-base node-worker"/>
+      <text x="1562" y="625" class="lbl lbl-worker">Worker 3</text>
+    </g>
+    <!-- Lead C workers: cy=725, 810, 895 -->
+    <g id="w-c1" filter="url(#f-glow-worker)">
+      <rect x="1497" y="697" width="130" height="56" rx="10" class="node-base node-worker"/>
+      <text x="1562" y="725" class="lbl lbl-worker">Worker 1</text>
+    </g>
+    <g id="w-c2" filter="url(#f-glow-worker)">
+      <rect x="1497" y="782" width="130" height="56" rx="10" class="node-base node-worker"/>
+      <text x="1562" y="810" class="lbl lbl-worker">Worker 2</text>
+    </g>
+    <g id="w-c3" filter="url(#f-glow-worker)">
+      <rect x="1497" y="867" width="130" height="56" rx="10" class="node-base node-worker"/>
+      <text x="1562" y="895" class="lbl lbl-worker">Worker 3</text>
+    </g>
+  </g>
+
+  <!-- Worker highlight overlays -->
+  <rect id="hl-wa1" x="1494" y="154" width="136" height="62" rx="11" class="hl hl-worker" filter="url(#f-glow-hit)"/>
+  <rect id="hl-wa2" x="1494" y="239" width="136" height="62" rx="11" class="hl hl-worker" filter="url(#f-glow-hit)"/>
+  <rect id="hl-wa3" x="1494" y="324" width="136" height="62" rx="11" class="hl hl-worker" filter="url(#f-glow-hit)"/>
+  <rect id="hl-wb1" x="1494" y="424" width="136" height="62" rx="11" class="hl hl-worker" filter="url(#f-glow-hit)"/>
+  <rect id="hl-wb2" x="1494" y="509" width="136" height="62" rx="11" class="hl hl-worker" filter="url(#f-glow-hit)"/>
+  <rect id="hl-wb3" x="1494" y="594" width="136" height="62" rx="11" class="hl hl-worker" filter="url(#f-glow-hit)"/>
+  <rect id="hl-wc1" x="1494" y="694" width="136" height="62" rx="11" class="hl hl-worker" filter="url(#f-glow-hit)"/>
+  <rect id="hl-wc2" x="1494" y="779" width="136" height="62" rx="11" class="hl hl-worker" filter="url(#f-glow-hit)"/>
+  <rect id="hl-wc3" x="1494" y="864" width="136" height="62" rx="11" class="hl hl-worker" filter="url(#f-glow-hit)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       COLUMN HEADERS + TIER SUBTITLES
+       Main label y=40, subtitle y=58
+       Divider lines y=70
+       ═══════════════════════════════════════════════════════════════ -->
+  <g id="tier-labels" aria-hidden="true">
+    <!-- Divider lines -->
+    <line x1="292"  y1="72" x2="412"  y2="72" stroke="#1e2535" stroke-width="1.5"/>
+    <line x1="602"  y1="72" x2="762"  y2="72" stroke="#1e2535" stroke-width="1.5"/>
+    <line x1="1012" y1="72" x2="1172" y2="72" stroke="#1e2535" stroke-width="1.5"/>
+    <line x1="1497" y1="72" x2="1627" y2="72" stroke="#1e2535" stroke-width="1.5"/>
+    <!-- Column header labels -->
+    <text x="352"  y="40" class="lbl-col">You / Engineer</text>
+    <text x="682"  y="40" class="lbl-col">Orchestrator</text>
+    <text x="1092" y="40" class="lbl-col">Team Leads</text>
+    <text x="1562" y="40" class="lbl-col">Workers</text>
+    <!-- Tier subtitles (Tier N) — not shown for You/Engineer column -->
+    <text x="682"  y="58" class="lbl-tier-sub">Tier 1</text>
+    <text x="1092" y="58" class="lbl-tier-sub">Tier 2</text>
+    <text x="1562" y="58" class="lbl-tier-sub">Tier 3</text>
+  </g>
+
+</svg>

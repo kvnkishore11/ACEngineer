@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  local-visual-plan SAMPLE  ·  rendered by skill ~/.claude/skills/local-visual-plan
+  ============================================================================
+  This is a SAMPLE plan rendered for the slice-04 full-mode smoke test. It
+  exercises all three modes in one self-contained file: the plan body, a static
+  WIREFRAME, and a click-through PROTOTYPE. The <head> (fonts + CSS) and the
+  trailing feedback <script> are kept VERBATIM from assets/template.html so the
+  interactive contract (window.LVP) behaves identically.
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Workspace onboarding flow · Plan</title>
+<!-- Fonts via CDN with a system-font fallback stack baked into every rule below.
+     If the CDN is unreachable (offline), typography falls back; content does not. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  :root {
+    --paper:#FAF8F4; --paper-2:#F4EEE5; --ink:#2A2520; --ink-soft:#4A4239;
+    --muted:#6E655A; --faint:#938878; --line:#E4DCD0; --line-strong:#D3C7B6;
+    --clay:#9A5B3F; --clay-soft:#F1E4D9; --teal:#3C6E63; --teal-soft:#E1ECE8;
+    --gold:#B5821F; --gold-soft:#F4E9CF; --code-bg:#2C2722; --code-ink:#EAE2D4;
+    --serif:"Fraunces", Georgia, "Times New Roman", serif;
+    --sans:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono:"JetBrains Mono", "SF Mono", "Menlo", "Consolas", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper); color: var(--ink); font-family: var(--sans);
+    line-height: 1.68; margin: 0; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 50rem; margin: 0 auto; padding: 3.2rem 1.5rem 4rem; }
+
+  /* --- header --- */
+  .kicker { font-family: var(--mono); font-size: .7rem; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--clay); margin: 0 0 .7rem; }
+  h1 { font-family: var(--serif); font-weight: 600; font-size: 2.55rem; line-height: 1.08;
+    letter-spacing: -.015em; margin: 0 0 .8rem; }
+  .lede { font-size: 1.12rem; color: var(--ink-soft); max-width: 62ch; line-height: 1.6; margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.4rem 0 0; }
+  .chip { font-family: var(--mono); font-size: .66rem; letter-spacing: .06em; text-transform: uppercase;
+    padding: .28rem .6rem; border-radius: 100px; border: 1px solid var(--line-strong); color: var(--muted); }
+  .chip.on { background: var(--clay); border-color: var(--clay); color: #fff; }
+
+  /* --- table of contents --- */
+  nav.toc { margin: 2.4rem 0; padding: 1.2rem 1.4rem; border: 1px solid var(--line);
+    border-radius: 10px; background: #fff7ee; }
+  nav.toc .lab { font-family: var(--mono); font-size: .64rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: .7rem; }
+  nav.toc ol { list-style: none; counter-reset: t; margin: 0; padding: 0;
+    columns: 2; column-gap: 2rem; }
+  nav.toc li { counter-increment: t; margin: .25rem 0; break-inside: avoid; }
+  nav.toc li::before { content: counter(t, decimal-leading-zero); font-family: var(--mono);
+    font-size: .72rem; color: var(--clay); margin-right: .7rem; }
+  nav.toc a { color: var(--ink); text-decoration: none; }
+  nav.toc a:hover { color: var(--clay); }
+
+  /* --- sections --- */
+  section { margin: 2.8rem 0; scroll-margin-top: 1.5rem; }
+  .secnum { font-family: var(--mono); font-size: .74rem; color: var(--clay); letter-spacing: .1em; }
+  h2 { font-family: var(--serif); font-weight: 600; font-size: 1.72rem; line-height: 1.15;
+    margin: .25rem 0 1rem; letter-spacing: -.01em; }
+  h3 { font-family: var(--serif); font-weight: 600; font-size: 1.18rem; margin: 1.8rem 0 .6rem; }
+  p { margin: 0 0 1rem; }
+  .ink-soft { color: var(--ink-soft); }
+  em { font-style: italic; color: var(--ink-soft); }
+  a.ref { color: var(--clay); text-decoration: none; border-bottom: 1px solid #E2CDBE; }
+  a.ref:hover { border-color: var(--clay); }
+  strong { font-weight: 600; }
+
+  /* --- code --- */
+  pre { background: var(--code-bg); color: var(--code-ink); border-radius: 9px;
+    padding: 1rem 1.15rem; overflow-x: auto; margin: 1.1rem 0;
+    font-family: var(--mono); font-size: .82rem; line-height: 1.62; }
+  pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+  code { font-family: var(--mono); font-size: .86em; background: var(--paper-2);
+    padding: .1em .38em; border-radius: 4px; color: var(--ink); }
+
+  /* --- diagram figure --- */
+  figure.diagram { margin: 1.6rem 0; border: 1px solid var(--line); border-radius: 12px;
+    overflow: hidden; background: #fff8ef; }
+  figure.diagram svg { display: block; width: 100%; height: auto; }
+  figcaption { font-size: .8rem; color: var(--muted); padding: .7rem 1rem;
+    border-top: 1px solid var(--line); font-family: var(--mono); letter-spacing: .02em; }
+
+  /* --- callout notes --- */
+  .note { margin: 1.2rem 0; padding: .9rem 1.1rem; border: 1px solid var(--line-strong);
+    border-radius: 9px; background: var(--paper-2); font-size: .95rem; }
+  .note .t { font-family: var(--mono); font-size: .64rem; letter-spacing: .12em;
+    text-transform: uppercase; margin-bottom: .3rem; font-weight: 500; }
+  .note.warn { background: var(--gold-soft); border-color: var(--gold); }
+  .note.warn .t { color: #8A6310; }
+  .note.key { background: var(--teal-soft); border-color: var(--teal); }
+  .note.key .t { color: var(--teal); }
+
+  /* --- ordered steps --- */
+  ol.steps { list-style: none; counter-reset: s; margin: 1rem 0; padding: 0; }
+  ol.steps > li { counter-increment: s; position: relative; padding: .15rem 0 1.1rem 2.7rem;
+    border-bottom: 1px solid var(--line); margin-bottom: 1.1rem; }
+  ol.steps > li:last-child { border-bottom: none; }
+  ol.steps > li::before { content: counter(s); position: absolute; left: 0; top: .1rem;
+    width: 1.75rem; height: 1.75rem; display: grid; place-items: center;
+    background: var(--clay); color: #fff; border-radius: 50%;
+    font-family: var(--mono); font-size: .78rem; }
+  ol.steps .step-title { font-weight: 600; }
+  ol.steps .reuse { font-family: var(--mono); font-size: .66rem; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--teal); }
+
+  /* --- tick list (scope / non-goals) --- */
+  ul.tick { list-style: none; margin: 1rem 0; padding: 0; }
+  ul.tick li { position: relative; padding-left: 1.5rem; margin: .4rem 0; }
+  ul.tick li::before { content: '→'; position: absolute; left: 0; color: var(--clay); }
+  ul.tick.no li::before { content: '×'; color: var(--faint); }
+
+  /* --- tables --- */
+  table { width: 100%; border-collapse: collapse; margin: 1.1rem 0; font-size: .92rem; }
+  th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--mono); font-size: .66rem; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--faint); border-bottom: 1px solid var(--line-strong); }
+
+  /* --- footer --- */
+  footer { margin-top: 3.5rem; padding-top: 1.4rem; border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: .76rem; color: var(--faint);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
+
+  /* --- feedback affordances (slice 02) — zero-server, persisted to localStorage --- */
+  .fb { margin-top: .9rem; padding-top: .7rem; border-top: 1px dashed var(--line);
+    display: flex; flex-direction: column; gap: .5rem; }
+  .fb-toggle { display: inline-flex; align-items: center; gap: .5rem; cursor: pointer;
+    align-self: flex-start; user-select: none; font-family: var(--mono); font-size: .66rem;
+    letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .fb-check { width: 1.05rem; height: 1.05rem; margin: 0; accent-color: var(--clay); cursor: pointer; }
+  .fb-note { width: 100%; min-height: 2.4rem; resize: vertical; font-family: var(--sans);
+    font-size: .9rem; line-height: 1.5; color: var(--ink); background: #fffdf9;
+    border: 1px solid var(--line-strong); border-radius: 7px; padding: .5rem .65rem; }
+  .fb-note::placeholder { color: var(--faint); }
+  .fb-note:focus { outline: none; border-color: var(--clay); box-shadow: 0 0 0 3px var(--clay-soft); }
+  ol.steps > li.done .step-title, ul.tick > li.done strong { text-decoration: line-through; color: var(--muted); }
+
+  /* --- feedback toolbar (fixed, no server) --- */
+  .fb-toolbar { position: fixed; right: 1.1rem; bottom: 1.1rem; z-index: 50; display: flex; gap: .5rem; }
+  .fb-btn { font-family: var(--mono); font-size: .72rem; letter-spacing: .03em; cursor: pointer;
+    border: 1px solid var(--line-strong); background: #fffdf9; color: var(--ink-soft);
+    padding: .55rem .85rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(42,37,32,.08); }
+  .fb-btn:hover { border-color: var(--clay); color: var(--clay); }
+  .fb-btn.primary { background: var(--clay); border-color: var(--clay); color: #fff; }
+  .fb-btn.primary:hover { background: #864c33; color: #fff; }
+  .fb-btn .ok { display: none; }
+  .fb-btn.copied .lbl { display: none; }
+  .fb-btn.copied .ok { display: inline; }
+
+  /* --- wireframe: static annotated screen mocks (slice 03) ---
+     Plain static HTML, palette-matched. No renderer, no roughening, no
+     interactivity — that is the prototype's job. The agent composes real layout
+     with these helpers and explains each region with numbered annotations. -->*/
+  .wf-frame { border: 1px solid var(--line-strong); border-radius: 12px; background: #fff8ef;
+    overflow: hidden; margin: 1.4rem 0; }
+  .wf-chrome { display: flex; align-items: center; gap: .4rem; padding: .5rem .8rem;
+    border-bottom: 1px solid var(--line); background: var(--paper-2); }
+  .wf-dot { width: .58rem; height: .58rem; border-radius: 50%; background: var(--line-strong); }
+  .wf-url { font-family: var(--mono); font-size: .68rem; color: var(--faint); margin-left: .5rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wf-screen { padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: .7rem; }
+  .wf-bar { display: flex; align-items: center; gap: .6rem; width: 100%; }
+  .wf-bar .spacer { flex: 1; }
+  .wf-card2 { border: 1px solid var(--line-strong); border-radius: 8px; padding: .8rem .9rem;
+    background: #fff; display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
+  .wf-h { font-family: var(--serif); font-weight: 600; font-size: 1.1rem; }
+  .wf-muted { color: var(--muted); font-size: .85rem; }
+  .wf-field { border: 1px solid var(--line-strong); border-radius: 6px; padding: .45rem .6rem;
+    font-family: var(--sans); font-size: .85rem; color: var(--muted); background: #fffdf9; }
+  .wf-btn2 { align-self: flex-start; font-family: var(--mono); font-size: .7rem; letter-spacing: .03em;
+    padding: .45rem .8rem; border-radius: 6px; border: 1px solid var(--clay); background: var(--clay); color: #fff; }
+  .wf-btn2.ghost { background: #fffdf9; color: var(--ink-soft); border-color: var(--line-strong); }
+  .wf-pill2 { font-family: var(--mono); font-size: .6rem; letter-spacing: .06em; text-transform: uppercase;
+    border: 1px solid var(--line-strong); border-radius: 100px; padding: .2rem .55rem; color: var(--muted); white-space: nowrap; }
+  /* inline numbered marker dropped into the mock, paired with a callout below */
+  .wf-mark { display: inline-grid; place-items: center; width: 1.2rem; height: 1.2rem; border-radius: 50%;
+    background: var(--gold); color: #fff; font-family: var(--mono); font-size: .62rem; vertical-align: middle; }
+  ol.wf-annos { list-style: none; counter-reset: a; margin: .9rem 0 0; padding: 0; display: grid; gap: .45rem; }
+  ol.wf-annos li { counter-increment: a; position: relative; padding-left: 1.9rem; font-size: .88rem; color: var(--ink-soft); }
+  ol.wf-annos li::before { content: counter(a); position: absolute; left: 0; top: .02rem;
+    width: 1.25rem; height: 1.25rem; display: grid; place-items: center; border-radius: 50%;
+    background: var(--gold-soft); border: 1px solid var(--gold); color: #8A6310; font-family: var(--mono); font-size: .64rem; }
+
+  /* --- click-through prototype: show/hide screens, back button, counter (slice 03) ---
+     Honest zero-server: screens are divs, navigation is show/hide only. No faked
+     backend, no simulated data flow. showScreen()/goBack() drive it (window.LVP). -->*/
+  .proto { border: 1px solid var(--line-strong); border-radius: 12px; overflow: hidden;
+    background: #fff8ef; margin: 1.4rem 0; }
+  .proto-bar { display: flex; align-items: center; justify-content: space-between; gap: .6rem;
+    padding: .5rem .8rem; border-bottom: 1px solid var(--line); background: var(--paper-2); }
+  .proto-back { font-family: var(--mono); font-size: .7rem; letter-spacing: .04em; cursor: pointer;
+    border: 1px solid var(--line-strong); background: #fffdf9; color: var(--ink-soft);
+    padding: .35rem .7rem; border-radius: 7px; }
+  .proto-back:hover:not(:disabled) { border-color: var(--clay); color: var(--clay); }
+  .proto-back:disabled { opacity: .4; cursor: not-allowed; }
+  .proto-counter { font-family: var(--mono); font-size: .66rem; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--faint); }
+  .proto-stage { padding: 1.3rem 1.2rem; }
+  .screen { display: flex; flex-direction: column; gap: .7rem; }
+  .screen[hidden] { display: none; }
+  .screen-title { font-family: var(--serif); font-weight: 600; font-size: 1.15rem; }
+  .proto-hotspot { align-self: flex-start; font-family: var(--mono); font-size: .7rem; letter-spacing: .03em;
+    cursor: pointer; border: 1px solid var(--clay); background: var(--clay); color: #fff;
+    padding: .45rem .8rem; border-radius: 7px; }
+  .proto-hotspot.ghost { background: #fffdf9; color: var(--ink-soft); border-color: var(--line-strong); }
+  .proto-hotspot:hover { filter: brightness(.96); }
+
+  @media print { .fb-toolbar, .proto-bar { display: none; } }
+</style>
+</head>
+<body data-plan-slug="workspace-onboarding">
+<main class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <header>
+    <p class="kicker">Plan · Local Visual Plan</p>
+    <h1>Workspace onboarding flow</h1>
+    <p class="lede">New users land in an empty workspace, see no obvious next move, and leave. This adds a guided three-step onboarding — welcome, connect a repo, generate a first plan — so a new account reaches its first useful artifact in one sitting. "Done" means a fresh signup can go from empty state to a saved plan without reading docs.</p>
+    <div class="chips">
+      <span class="chip on">draft</span>
+      <span class="chip">4 steps · 3 files</span>
+      <span class="chip">2026-06-17</span>
+    </div>
+  </header>
+
+  <!-- ============ TABLE OF CONTENTS ============ -->
+  <nav class="toc" aria-label="Contents">
+    <div class="lab">Contents</div>
+    <ol>
+      <li><a href="#objective">Objective</a></li>
+      <li><a href="#scope">Scope &amp; non-goals</a></li>
+      <li><a href="#approach">Approach</a></li>
+      <li><a href="#steps">Steps</a></li>
+      <li><a href="#risks">Risks</a></li>
+      <li><a href="#verification">Verification</a></li>
+      <li><a href="#open-questions">Open questions</a></li>
+      <li><a href="#wireframe">Wireframe</a></li>
+      <li><a href="#prototype">Prototype</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ OBJECTIVE ============ -->
+  <section id="objective" data-fb data-fb-title="Objective">
+    <p class="secnum">01</p>
+    <h2>Objective</h2>
+    <p>
+      Turn the empty-workspace dead end into a guided path. After this work, a
+      brand-new account is met by a three-step onboarding that walks them from
+      <em>welcome</em> → <em>connect a repo</em> → <em>generate a first plan</em>,
+      and the flow only counts as complete once a plan is actually saved to the
+      workspace. The outcome we are buying is <strong>activation</strong>: a first
+      useful artifact exists before the user has to figure the product out on
+      their own.
+    </p>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this section…"></textarea></div>
+  </section>
+
+  <!-- ============ SCOPE & NON-GOALS ============ -->
+  <section id="scope" data-fb data-fb-title="Scope &amp; non-goals">
+    <p class="secnum">02</p>
+    <h2>Scope &amp; non-goals</h2>
+    <h3>In scope</h3>
+    <ul class="tick">
+      <li>A three-step onboarding surface shown on first load of an empty workspace.</li>
+      <li>Persisting onboarding progress so a refresh or re-login resumes where the user left off.</li>
+      <li>Completion gated on a real saved plan — not on a "Got it" dismissal.</li>
+    </ul>
+    <h3>Non-goals</h3>
+    <ul class="tick no">
+      <li>Multi-user / team invite flows — single user activating their own workspace only.</li>
+      <li>A/B testing the copy or step order — ship one path first, instrument later.</li>
+      <li>Re-onboarding existing accounts — this targets fresh signups with zero plans.</li>
+    </ul>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this section…"></textarea></div>
+  </section>
+
+  <!-- ============ APPROACH (with at least one inline-SVG diagram) ============ -->
+  <section id="approach" data-fb data-fb-title="Approach">
+    <p class="secnum">03</p>
+    <h2>Approach</h2>
+    <p>
+      <strong>Reuse first.</strong> The workspace already mounts a route guard at
+      <code>src/workspace/WorkspaceShell.tsx</code> and persists per-user flags
+      through <code>src/state/userPrefs.ts</code>. Onboarding is a new
+      <em>state machine</em> layered on top of those, not a new subsystem: the
+      shell asks "is this workspace activated?" and, when not, renders the
+      onboarding overlay instead of the empty dashboard. The genuinely new delta
+      is one small machine — <code>OnboardingStep = "welcome" | "connect" |
+      "first-plan" | "done"</code> — and the rule that <code>done</code> is
+      reached only when <code>workspace.plans.length &gt; 0</code>.
+    </p>
+    <p>
+      <strong>Hard-to-reverse bet:</strong> the completion signal. We make
+      activation a <em>derived</em> fact (a plan exists), persisted as
+      <code>onboarding.completedAt</code> the first time the derivation flips
+      true. Deriving from real data instead of a manual "dismiss" flag means we
+      can never strand a user in a "complete but empty" workspace, and the flag is
+      forward-compatible if step order later changes.
+    </p>
+
+    <!-- Inline SVG diagram: onboarding state machine. A left-to-right chain is
+         honest here — this IS a sequence — with the completion guard called out. -->
+    <figure class="diagram">
+      <svg viewBox="0 0 720 220" role="img" aria-label="Onboarding state machine: empty workspace to activated">
+        <!-- entry -->
+        <rect x="16" y="86" width="120" height="48" rx="8" fill="#fff8ef" stroke="var(--line-strong)" />
+        <text x="76" y="115" text-anchor="middle" font-family="var(--sans)" font-size="13" fill="var(--muted)">Empty workspace</text>
+        <line x1="136" y1="110" x2="172" y2="110" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#arrow-muted)" />
+
+        <!-- step 1 -->
+        <rect x="172" y="86" width="104" height="48" rx="8" fill="var(--clay-soft)" stroke="var(--clay)" />
+        <text x="224" y="108" text-anchor="middle" font-family="var(--sans)" font-size="13" fill="var(--ink)">Welcome</text>
+        <text x="224" y="124" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--clay)" letter-spacing="1">STEP 1</text>
+        <line x1="276" y1="110" x2="312" y2="110" stroke="var(--clay)" stroke-width="1.5" marker-end="url(#arrow-clay)" />
+
+        <!-- step 2 -->
+        <rect x="312" y="86" width="104" height="48" rx="8" fill="var(--clay-soft)" stroke="var(--clay)" />
+        <text x="364" y="108" text-anchor="middle" font-family="var(--sans)" font-size="13" fill="var(--ink)">Connect repo</text>
+        <text x="364" y="124" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--clay)" letter-spacing="1">STEP 2</text>
+        <line x1="416" y1="110" x2="452" y2="110" stroke="var(--clay)" stroke-width="1.5" marker-end="url(#arrow-clay)" />
+
+        <!-- step 3 -->
+        <rect x="452" y="86" width="104" height="48" rx="8" fill="var(--clay-soft)" stroke="var(--clay)" />
+        <text x="504" y="108" text-anchor="middle" font-family="var(--sans)" font-size="13" fill="var(--ink)">First plan</text>
+        <text x="504" y="124" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--clay)" letter-spacing="1">STEP 3</text>
+
+        <!-- guard, dropping below into done -->
+        <line x1="504" y1="134" x2="504" y2="166" stroke="var(--teal)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow-teal)" />
+        <text x="516" y="156" font-family="var(--mono)" font-size="10" fill="var(--teal)">plans.length &gt; 0</text>
+
+        <!-- done -->
+        <rect x="592" y="86" width="112" height="48" rx="8" fill="var(--teal-soft)" stroke="var(--teal)" />
+        <text x="648" y="108" text-anchor="middle" font-family="var(--sans)" font-size="13" fill="var(--ink)">Activated</text>
+        <text x="648" y="124" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--teal)" letter-spacing="1">DONE</text>
+        <line x1="556" y1="110" x2="588" y2="110" stroke="var(--teal)" stroke-width="1.5" marker-end="url(#arrow-teal)" />
+
+        <defs>
+          <marker id="arrow-muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--line-strong)" />
+          </marker>
+          <marker id="arrow-clay" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--clay)" />
+          </marker>
+          <marker id="arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--teal)" />
+          </marker>
+        </defs>
+      </svg>
+      <figcaption>The onboarding machine. Completion is a guard on real data (a saved plan), not a manual dismissal.</figcaption>
+    </figure>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this section…"></textarea></div>
+  </section>
+
+  <!-- ============ STEPS ============ -->
+  <section id="steps" data-fb data-fb-title="Steps">
+    <p class="secnum">04</p>
+    <h2>Steps</h2>
+    <ol class="steps">
+      <li id="step-1" data-fb data-fb-title="Add the onboarding state machine">
+        <span class="step-title">Add the onboarding state machine.</span>
+        <p class="ink-soft">
+          <span class="reuse">reuses</span> <code>src/state/userPrefs.ts</code> —
+          add <code>src/state/onboarding.ts</code> exporting <code>OnboardingStep</code>
+          and a selector <code>isActivated(workspace)</code> that derives
+          completion from <code>workspace.plans.length &gt; 0</code>. No new store;
+          it reads existing workspace state.
+        </p>
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Reviewed / done</label>
+          <textarea class="fb-note" placeholder="Note on this step…"></textarea>
+        </div>
+      </li>
+      <li id="step-2" data-fb data-fb-title="Gate the shell on activation">
+        <span class="step-title">Gate the shell on activation.</span>
+        <p class="ink-soft">
+          <span class="reuse">reuses</span> <code>WorkspaceShell.tsx</code>'s
+          existing empty-state branch — when <code>!isActivated</code>, render the
+          new <code>&lt;OnboardingOverlay /&gt;</code> instead of the empty
+          dashboard. One conditional, no route changes.
+        </p>
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Reviewed / done</label>
+          <textarea class="fb-note" placeholder="Note on this step…"></textarea>
+        </div>
+      </li>
+      <li id="step-3" data-fb data-fb-title="Build the three-step overlay">
+        <span class="step-title">Build the three-step overlay.</span>
+        <p class="ink-soft">
+          New <code>src/onboarding/OnboardingOverlay.tsx</code>: welcome →
+          connect-repo (reuses the existing <code>&lt;RepoPicker /&gt;</code>) →
+          first-plan (reuses the <code>/local-visual-plan</code> entry). A
+          progress rail shows <code>Step N of 3</code> and is the user-visible
+          face of persisted <code>onboarding.step</code>: advancing writes the
+          step immediately, so a refresh or re-login resumes on the same screen
+          rather than restarting at welcome.
+        </p>
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Reviewed / done</label>
+          <textarea class="fb-note" placeholder="Note on this step…"></textarea>
+        </div>
+      </li>
+      <li id="step-4" data-fb data-fb-title="Persist completion + dismiss">
+        <span class="step-title">Persist completion and dismiss the overlay.</span>
+        <p class="ink-soft">
+          When <code>isActivated</code> first flips true, stamp
+          <code>onboarding.completedAt</code> and unmount the overlay, revealing
+          the real dashboard with the just-saved plan in view. Idempotent — never
+          re-shows for an activated workspace.
+        </p>
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Reviewed / done</label>
+          <textarea class="fb-note" placeholder="Note on this step…"></textarea>
+        </div>
+      </li>
+    </ol>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on the plan as a whole…"></textarea></div>
+  </section>
+
+  <!-- ============ RISKS ============ -->
+  <section id="risks" data-fb data-fb-title="Risks">
+    <p class="secnum">05</p>
+    <h2>Risks</h2>
+    <ul class="tick">
+      <li id="risk-1" data-fb data-fb-title="Overlay traps power users">
+        <strong>Overlay traps power users.</strong> — Someone who wants to poke
+        around before connecting a repo can feel boxed in. Mitigation: a "Skip for
+        now" ghost link parks onboarding at <code>step</code> without marking it
+        done, so it resumes later rather than blocking.
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Accepted</label>
+          <textarea class="fb-note" placeholder="Note on this risk…"></textarea>
+        </div>
+      </li>
+      <li id="risk-2" data-fb data-fb-title="Derived completion flickers">
+        <strong>Derived completion could flicker.</strong> — If plan creation is
+        optimistic, <code>plans.length</code> may briefly read 0 again on a failed
+        save. Mitigation: stamp <code>completedAt</code> once and treat it as
+        sticky — derivation only ever flips the flag on, never off.
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Accepted</label>
+          <textarea class="fb-note" placeholder="Note on this risk…"></textarea>
+        </div>
+      </li>
+    </ul>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this section…"></textarea></div>
+  </section>
+
+  <!-- ============ VERIFICATION ============ -->
+  <section id="verification" data-fb data-fb-title="Verification">
+    <p class="secnum">06</p>
+    <h2>Verification</h2>
+    <p>Beyond unit tests on <code>isActivated</code> and the step reducer, run the real user journey end to end.</p>
+    <div class="note key">
+      <div class="t">Smoke test</div>
+      Create a fresh account → land on the workspace → confirm the welcome step
+      shows → connect a repo → generate one plan → confirm the overlay dismisses
+      and the saved plan is visible. Reload: the overlay does not reappear
+      (<code>completedAt</code> is set). Create a second fresh account and bail at
+      step 2: reload resumes at step 2, not step 1.
+    </div>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this section…"></textarea></div>
+  </section>
+
+  <!-- ============ OPEN QUESTIONS ============ -->
+  <section id="open-questions" data-fb data-fb-title="Open questions">
+    <p class="secnum">07</p>
+    <h2>Open questions</h2>
+    <p class="ink-soft">Two decisions would change the build if answered differently. Each has a recommended default so the plan can proceed without blocking.</p>
+    <table>
+      <thead><tr><th>Question</th><th>Recommended default</th></tr></thead>
+      <tbody>
+        <tr><td>Can a user skip connecting a repo and still reach a first plan?</td><td><strong>No.</strong> A plan needs a repo for context — keep the connect step required, offer "Skip for now" only to defer, not bypass.</td></tr>
+        <tr><td>Where does the connected-repo selection live?</td><td><strong>Reuse <code>userPrefs.ts</code></strong> under <code>workspace.activeRepo</code> — no new persistence layer.</td></tr>
+      </tbody>
+    </table>
+    <div class="fb"><textarea class="fb-note" placeholder="Answer or note on an open question…"></textarea></div>
+  </section>
+
+  <!-- ============ WIREFRAME — the "Connect repo" step ============ -->
+  <section id="wireframe" data-fb data-fb-title="Wireframe">
+    <p class="secnum">08</p>
+    <h2>Wireframe</h2>
+    <p class="ink-soft">Step 2 of the overlay — "Connect a repo" — shown over the empty workspace. The mock makes the progress rail and the required-vs-defer affordance legible.</p>
+
+    <figure class="wf-frame">
+      <div class="wf-chrome">
+        <span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span>
+        <span class="wf-url">app.agenticengineer.dev/workspace</span>
+      </div>
+      <div class="wf-screen">
+        <div class="wf-bar">
+          <span class="wf-h">Connect a repo</span>
+          <span class="spacer"></span>
+          <span class="wf-pill2">Step 2 of 3 <span class="wf-mark">1</span></span>
+        </div>
+        <div class="wf-card2">
+          <span class="wf-muted">Repository <span class="wf-mark">2</span></span>
+          <span class="wf-field">kvnkishore/AgenticEngineer</span>
+          <span class="wf-muted">Default branch</span>
+          <span class="wf-field">main</span>
+          <button class="wf-btn2">Connect &amp; continue</button>
+        </div>
+        <div class="wf-bar">
+          <button class="wf-btn2 ghost">Skip for now <span class="wf-mark">3</span></button>
+          <span class="spacer"></span>
+          <span class="wf-muted">Back</span>
+        </div>
+      </div>
+    </figure>
+
+    <ol class="wf-annos">
+      <li><strong>Progress rail</strong> — "Step 2 of 3" is the persisted <code>onboarding.step</code>; a reload returns the user here, not to welcome.</li>
+      <li><strong>Repo picker</strong> — reuses the existing <code>&lt;RepoPicker /&gt;</code>; the selection persists to <code>workspace.activeRepo</code>.</li>
+      <li><strong>Skip for now</strong> — defers without marking onboarding done, so the overlay resumes later (mitigation for the "traps power users" risk).</li>
+    </ol>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this wireframe…"></textarea></div>
+  </section>
+
+  <!-- ============ PROTOTYPE — Welcome → Connect → First plan ============ -->
+  <section id="prototype" data-fb data-fb-title="Prototype">
+    <p class="secnum">09</p>
+    <h2>Prototype</h2>
+    <p class="ink-soft">Walk the flow: Welcome → Connect repo → First plan. Click-through only — these screens show/hide; there is no real repo connection or plan generation behind them.</p>
+
+    <div class="proto" data-proto>
+      <div class="proto-bar">
+        <button type="button" class="proto-back" data-proto-back>← Back</button>
+        <span class="proto-counter" data-proto-counter>Screen 1 / 3</span>
+      </div>
+      <div class="proto-stage">
+
+        <!-- screen 1: welcome -->
+        <div class="screen" id="screen-welcome" data-screen>
+          <span class="screen-title">Welcome to your workspace</span>
+          <p class="wf-muted">Three quick steps to your first plan. Connect a repo, generate a plan, and you're set.</p>
+          <div class="wf-card2">
+            <span class="wf-muted">What you'll do</span>
+            <span class="wf-field">1 · Connect a repo &nbsp; 2 · Generate a plan &nbsp; 3 · Review it</span>
+          </div>
+          <button type="button" class="proto-hotspot" data-goto="screen-connect">Get started →</button>
+        </div>
+
+        <!-- screen 2: connect repo -->
+        <div class="screen" id="screen-connect" data-screen hidden>
+          <span class="screen-title">Connect a repo</span>
+          <p class="wf-muted">Pick the repository this workspace plans against.</p>
+          <div class="wf-card2">
+            <span class="wf-muted">Repository</span>
+            <span class="wf-field">kvnkishore/AgenticEngineer</span>
+            <span class="wf-muted">Default branch</span>
+            <span class="wf-field">main</span>
+          </div>
+          <button type="button" class="proto-hotspot" data-goto="screen-first-plan">Connect &amp; continue →</button>
+        </div>
+
+        <!-- screen 3: first plan -->
+        <div class="screen" id="screen-first-plan" data-screen hidden>
+          <span class="screen-title">Generate your first plan</span>
+          <p class="wf-muted">Describe a task and we'll draft a visual plan you can review and approve.</p>
+          <div class="wf-card2">
+            <span class="wf-muted">Task</span>
+            <span class="wf-field">Add a settings page for notification preferences</span>
+            <span class="wf-pill2">Saved → workspace activated</span>
+          </div>
+          <button type="button" class="proto-hotspot ghost" data-goto="screen-welcome">Restart walk-through</button>
+        </div>
+
+      </div>
+    </div>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this prototype…"></textarea></div>
+  </section>
+
+  <footer>
+    <span>plans/workspace-onboarding.html</span>
+    <span>local-visual-plan · zero-server</span>
+  </footer>
+
+</main>
+
+<!-- ============ FEEDBACK TOOLBAR (fixed, zero-server) ============ -->
+<div class="fb-toolbar" role="group" aria-label="Plan feedback">
+  <button type="button" id="fb-reset" class="fb-btn">Reset state</button>
+  <button type="button" id="fb-copy" class="fb-btn primary">
+    <span class="lbl">Copy feedback</span><span class="ok">Copied ✓</span>
+  </button>
+</div>
+
+<!-- ============================================================================
+     INTERACTIVE LAYER (slices 02 + 03)  ·  keep verbatim
+     Zero network. Feedback state in localStorage, namespaced per plan via
+     stateKey so two plans never collide. Testable seams exposed on window.LVP:
+       stateKey(slug, sectionId) -> "lvp:<slug>:<sectionId>"
+       serializeFeedback(doc)    -> anchored-markdown the agent parses back
+       resetState(doc)           -> clears THIS plan's persisted state only
+       showScreen(id)            -> click-through prototype: show one screen,
+                                    record prior for Back, update the counter
+       goBack()                  -> restore the prior prototype screen
+     ============================================================================ -->
+<script>
+(function () {
+  "use strict";
+
+  // Per-plan namespace. The agent sets data-plan-slug on <body> to the filename.
+  var PLAN_SLUG = (document.body && document.body.dataset.planSlug) || "plan";
+
+  // stateKey(slug, sectionId) -> "lvp:<slug>:<sectionId>"
+  // The single namespacing rule for every localStorage read/write. Guarantees
+  // per-plan isolation; ids are stable across edits so state survives re-authoring.
+  function stateKey(slug, sectionId) { return "lvp:" + slug + ":" + sectionId; }
+
+  function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) {} }
+
+  // Every feedback target carries [data-fb]; its affordances live in a DIRECT-child
+  // `.fb` block so a target never reads a nested target's note.
+  function targets(doc) {
+    return Array.prototype.slice.call((doc || document).querySelectorAll("[data-fb]"));
+  }
+  function ownFb(el) { return el.querySelector(":scope > .fb"); }
+  function checkOf(el) { var fb = ownFb(el); return fb ? fb.querySelector(".fb-check") : null; }
+  function noteOf(el) { var fb = ownFb(el); return fb ? fb.querySelector(".fb-note") : null; }
+
+  // Persist one target; remove the key entirely when back at the default state.
+  function saveTarget(el) {
+    var c = checkOf(el), n = noteOf(el);
+    var checked = c ? !!c.checked : false;
+    var note = n ? n.value : "";
+    var key = stateKey(PLAN_SLUG, el.id);
+    if (!checked && !note.trim()) { lsDel(key); }
+    else { lsSet(key, JSON.stringify({ checked: checked, note: note })); }
+    el.classList.toggle("done", checked);
+  }
+
+  function restoreTarget(el) {
+    var raw = lsGet(stateKey(PLAN_SLUG, el.id));
+    var c = checkOf(el), n = noteOf(el);
+    var data = {};
+    if (raw) { try { data = JSON.parse(raw) || {}; } catch (e) { data = {}; } }
+    if (c) c.checked = !!data.checked;
+    if (n) n.value = data.note || "";
+    el.classList.toggle("done", !!data.checked);
+  }
+
+  function restoreState(doc) { targets(doc).forEach(restoreTarget); }
+
+  // serializeFeedback(doc) -> anchored-markdown string.
+  // Walks targets in document order. A target is included only if it has a note
+  // OR a changed (checked) checkbox; untouched targets are omitted. The checkbox
+  // line is emitted only for targets that actually have a checkbox. This exact
+  // shape is the contract the agent parses back to edit the right spots.
+  function serializeFeedback(doc) {
+    var d = doc || document;
+    var slug = (d.body && d.body.dataset.planSlug) || PLAN_SLUG;
+    var blocks = [];
+    targets(d).forEach(function (el) {
+      var c = checkOf(el), n = noteOf(el);
+      var checked = c ? !!c.checked : false;
+      var note = n ? n.value.trim() : "";
+      if (!checked && !note) return;
+      var title = el.getAttribute("data-fb-title") || "";
+      var block = "[§" + el.id + " \"" + title + "\"]";
+      if (c) block += "\n  " + (checked ? "☑ checked" : "☐ unchecked");
+      if (note) block += "\n  ✎ " + note;
+      blocks.push(block);
+    });
+    var header = "## Feedback · plans/" + slug + ".html";
+    if (!blocks.length) return header + "\n\n_No feedback yet — check a step or add a note._";
+    return header + "\n\n" + blocks.join("\n\n");
+  }
+
+  // Clear THIS plan's persisted state and reset the affordances. No other plan
+  // touched, because every key is namespaced by PLAN_SLUG.
+  function resetState(doc) {
+    targets(doc).forEach(function (el) {
+      lsDel(stateKey(PLAN_SLUG, el.id));
+      var c = checkOf(el), n = noteOf(el);
+      if (c) c.checked = false;
+      if (n) n.value = "";
+      el.classList.remove("done");
+    });
+  }
+
+  function flashCopied() {
+    var btn = document.getElementById("fb-copy");
+    if (!btn) return;
+    btn.classList.add("copied");
+    setTimeout(function () { btn.classList.remove("copied"); }, 1500);
+  }
+
+  function copyFeedback() {
+    var text = serializeFeedback(document);
+    if (window.navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(flashCopied, function () { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      flashCopied();
+    } catch (e) {
+      window.prompt("Copy this feedback, then paste it back to the agent:", text);
+    }
+  }
+
+  // ---- CLICK-THROUGH PROTOTYPE (slice 03) -------------------------------------
+  // Zero-server: navigation is show/hide of [data-screen] divs inside the single
+  // [data-proto] container. No fake backend, no simulated data. A back stack
+  // restores the prior screen; the counter shows the current screen's ordinal.
+  var protoHistory = [];
+
+  function protoContainer(doc) { return (doc || document).querySelector("[data-proto]"); }
+  function screensOf(c) { return Array.prototype.slice.call(c.querySelectorAll("[data-screen]")); }
+  function visibleScreen(c) {
+    return screensOf(c).filter(function (s) { return !s.hidden; })[0] || null;
+  }
+
+  // Show exactly one screen; update the counter to its 1-based ordinal and the
+  // back button's enabled state. Returns the shown screen's index (or -1).
+  function applyScreen(c, id) {
+    var screens = screensOf(c), idx = -1;
+    screens.forEach(function (s, i) {
+      var on = s.id === id;
+      s.hidden = !on;
+      s.classList.toggle("on", on);
+      if (on) idx = i;
+    });
+    var counter = c.querySelector("[data-proto-counter]");
+    if (counter && idx >= 0) counter.textContent = "Screen " + (idx + 1) + " / " + screens.length;
+    var back = c.querySelector("[data-proto-back]");
+    if (back) back.disabled = protoHistory.length === 0;
+    return idx;
+  }
+
+  // showScreen(id) — navigate forward to a screen, recording the current one so
+  // Back can restore it. opts.back / opts.init suppress the history push.
+  function showScreen(id, opts) {
+    var c = protoContainer(document);
+    if (!c) return;
+    var back = opts && opts.back, init = opts && opts.init;
+    var cur = visibleScreen(c);
+    if (!back && !init && cur && cur.id !== id) protoHistory.push(cur.id);
+    applyScreen(c, id);
+  }
+
+  // goBack() — restore the prior screen without recording it.
+  function goBack() {
+    if (!protoHistory.length) return;
+    showScreen(protoHistory.pop(), { back: true });
+  }
+
+  function wireProto() {
+    var c = protoContainer(document);
+    if (!c) return;
+    var screens = screensOf(c);
+    if (!screens.length) return;
+    Array.prototype.slice.call(c.querySelectorAll("[data-goto]")).forEach(function (b) {
+      b.addEventListener("click", function () { showScreen(b.getAttribute("data-goto")); });
+    });
+    var back = c.querySelector("[data-proto-back]");
+    if (back) back.addEventListener("click", goBack);
+    // Initialise: clear history, show the first screen (or whichever the author
+    // left visible) so load state is deterministic regardless of `hidden` markup.
+    protoHistory = [];
+    showScreen((visibleScreen(c) || screens[0]).id, { init: true });
+  }
+
+  function wire() {
+    restoreState(document);
+    targets(document).forEach(function (el) {
+      var c = checkOf(el), n = noteOf(el);
+      if (c) c.addEventListener("change", function () { saveTarget(el); });
+      if (n) n.addEventListener("input", function () { saveTarget(el); });
+    });
+    var copyBtn = document.getElementById("fb-copy");
+    if (copyBtn) copyBtn.addEventListener("click", copyFeedback);
+    var resetBtn = document.getElementById("fb-reset");
+    if (resetBtn) resetBtn.addEventListener("click", function () {
+      if (window.confirm("Clear all notes and checkboxes for this plan?")) resetState(document);
+    });
+    wireProto();
+  }
+
+  // Testable seams — callable headlessly (jsdom), no real browser required.
+  window.LVP = {
+    stateKey: stateKey,
+    serializeFeedback: serializeFeedback,
+    restoreState: restoreState,
+    resetState: resetState,
+    saveTarget: saveTarget,
+    showScreen: showScreen,
+    goBack: goBack,
+    PLAN_SLUG: PLAN_SLUG
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wire);
+  } else {
+    wire();
+  }
+})();
+</script>
+</body>
+</html>

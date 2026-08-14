@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first companion to MA-1: CEO Agents. Build an adversarial multi-agent board that turns structured uncertainty into an observable decision memo.">
+  <title>MA-1 · CEO Agents — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="15-ceo-agents.assets.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to chapter</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL III · MA · LESSON 15</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume III · Multi-Agent Systems</p>
+      <h2>CEO Agents</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation</span></a></li>
+          <li><a href="#innovations"><span class="chapter-nav__n">01</span><span>Three unlocks</span></a></li>
+          <li><a href="#constraints"><span class="chapter-nav__n">02</span><span>Bound the meeting</span></a></li>
+          <li><a href="#prompts"><span class="chapter-nav__n">03</span><span>Template the input</span></a></li>
+          <li><a href="#decision"><span class="chapter-nav__n">04</span><span>Decisions, not code</span></a></li>
+          <li><a href="#board"><span class="chapter-nav__n">05</span><span>Adversarial board</span></a></li>
+          <li><a href="#observability"><span class="chapter-nav__n">06</span><span>Trust code and logs</span></a></li>
+          <li><a href="#specialize"><span class="chapter-nav__n">07</span><span>Specialize the system</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">08</span><span>Graded lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">09</span><span>Cumulative mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">10</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--board">
+        <span class="hero__chapter">MA-1 · Agents That Decide</span>
+        <h1>CEO Agents</h1>
+        <p class="hero__dek">Promote agents from coding worker bees to a CEO and board: specialized, disagreeing perspectives that turn a structured brief into a ranked, dissent-aware decision.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 40:03</li>
+          <li>Lab · 60–90 min</li>
+          <li>Course repo · IndyDevDan/ma-1-ceo-agents/codebase</li>
+          <li>Level · operator → system designer</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to state this system as <em>brief → deliberation → memo</em>, explain why disagreement is the board’s product, trace one round through the real Pi extension, author and validate a brief in the course codebase, verify two documentation-versus-code gaps, and defend how much time and budget a decision deserves.</p>
+
+        <div class="decision-pipe" role="img" aria-label="A structured brief flows into an adversarial board deliberation and produces a decision memo">
+          <div class="decision-pipe__node"><b>Brief</b><span>Situation · Stakes · Constraints · Key Question · context files</span></div>
+          <span class="decision-pipe__arrow" aria-hidden="true">→</span>
+          <div class="decision-pipe__node decision-pipe__node--middle"><b>Deliberation</b><span>CEO orchestrates biased specialists inside time and budget limits</span></div>
+          <span class="decision-pipe__arrow" aria-hidden="true">→</span>
+          <div class="decision-pipe__node"><b>Memo</b><span>Ranked recommendation · stances · dissent · risks · next actions</span></div>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation</a></li>
+            <li><a href="#innovations">The three unlocks</a></li>
+            <li><a href="#constraints">Bound the meeting</a></li>
+            <li><a href="#prompts">Template the input</a></li>
+            <li><a href="#decision">Decisions, not code</a></li>
+            <li><a href="#board">The adversarial board</a></li>
+            <li><a href="#observability">Trust code and logs</a></li>
+            <li><a href="#specialize">Specialize the system</a></li>
+            <li><a href="#lab">Graded lab</a></li>
+            <li><a href="#mastery">Cumulative mastery</a></li>
+            <li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">Begin with the promotion</h2>
+        <p class="section-lead">A coding agent answers, “What should this function do?” A CEO agent answers, “Which path should we take, why, what are we ignoring, and what do we do next?” The model may be related. The job is not.</p>
+
+        <p>Most agent workflows begin at the lowest-hanging fruit: generate code, write tests, update a document, or execute a plan. Those uses matter, but they keep agents downstream of the hard choice. A human decides what to build, what to stop, which risk to accept, and how much evidence is enough. The agent receives the residue of that judgment as a task.</p>
+
+        <p>CEO Agents moves the boundary upstream. You package a strategic uncertainty as a validated brief. One orchestrator agent frames the problem and calls a configurable board of eight specialist agents. Each specialist carries a controlled bias, a different objective function, and a different time horizon. They argue under real time and budget constraints. The CEO then synthesizes a memo with ranked recommendations, explicit dissent, trade-offs, and next actions. Nothing in the demonstration is application code. The system’s product is a decision.</p>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The sentence to carry</p>
+          <p><strong>Uncertainty in, decision out.</strong> The input is a structured brief; the workflow is an adversarial deliberation; the output is a decision memo.</p>
+        </aside>
+
+        <h3>What you are training</h3>
+        <ul class="learning-objectives">
+          <li><strong>System framing</strong>Specify a decision system from its input and output before discussing models or orchestration.</li>
+          <li><strong>Productive disagreement</strong>Design specialists whose biases expose blind spots instead of producing eight versions of the same answer.</li>
+          <li><strong>Constraint literacy</strong>Use minimums and maximums to force enough depth without allowing an unbounded meeting.</li>
+          <li><strong>Technical precision</strong>Distinguish what prompts promise from what the v1 extension actually executes.</li>
+        </ul>
+
+        <h3>The source discipline for this chapter</h3>
+        <p>The chapter follows the 40:03 lesson, its transcript, and the complete member course codebase at <code>agentic-horizon-extras/ceo-agents</code>. Exact model strings are recording-era details, not claims about the latest models. The lesson’s competitive claim about true one-million-token context is date-stamped. Three discrepancies between explanatory surfaces and implementation are audited explicitly because the extension code is authoritative for runtime behavior.</p>
+
+        <div class="callout callout--warning">
+          <p class="callout__label">Decision support, not authority laundering</p>
+          <p>A polished memo does not make a decision correct. The system broadens the model you can inspect: evidence, conflicts, assumptions, dissent, and next actions. You still own the decision, especially when the stakes include legal, regulatory, financial, health, or employment consequences.</p>
+        </div>
+
+        <h3>How to study a dense chapter</h3>
+        <p>Each major idea repeats ten moves. Read the hook, study the picture, and inspect the source frame. Then close the answer panels and retrieve the idea. The “You try” prompts are deliberately small; do them before the graded lab. A concept you can recognize is fluent. A concept you can recover, apply, repair, and teach back has storage strength.</p>
+
+        <p class="source-note">Primary source: <a href="https://www.youtube.com/watch?v=TqjmTZRL31E">Pi CEO Agents. Claude 1M Context. Multi-Agent Teams.</a> The chapter is offline-first; the link is optional and the teaching content does not depend on network access.</p>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="innovations">
+        <span class="section-number">01</span>
+        <h2 class="section-title">Stack three unlocks, not one trick</h2>
+        <p class="section-lead">Long context makes the information fit. A customizable harness makes the meeting possible. Persistent expertise makes the next meeting begin from a stronger position.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>A brilliant prompt in a machine that cannot sustain it</h3>
+          <p>You write eight excellent specialist prompts. Then the system loses the product overview halfway through the discussion, compresses earlier arguments into a bland summary, forgets which assumptions were unresolved, and starts every new decision with an empty head. The prompts were not the bottleneck. Capacity, orchestration, and persistence were.</p>
+          <p>CEO Agents is not explained by “models got smarter.” The lesson names three changes that reinforce one another. Remove long context and the board cannot hold the whole business plus a multi-round debate. Remove the custom harness and you cannot define the meeting tools, subprocesses, constraints, or locked interaction. Remove expertise and every deliberation pays to relearn the same domain.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the enabling stack</p>
+          <h3>Capacity · control · compounding</h3>
+          <div class="innovation-stack" aria-label="Three innovations enabling the CEO and board system">
+            <article class="innovation-card" data-n="1"><p class="eyebrow">Capacity</p><h3>Useful long context</h3><p>Hold the brief, context files, system prompt, debate, and accumulated expertise without a sharp retrieval cliff.</p></article>
+            <article class="innovation-card" data-n="2"><p class="eyebrow">Control</p><h3>Custom agent harness</h3><p>Register meeting tools, replace the coding persona, spawn persistent board sessions, lock input, render the TUI, and enforce constraints.</p></article>
+            <article class="innovation-card" data-n="3"><p class="eyebrow">Compounding</p><h3>Domain expertise</h3><p>Give each seat a persistent, updatable scratch pad focused on the patterns and tensions that matter to its role.</p></article>
+          </div>
+          <p>The order matters. Dan calls long context the enabler because the other two innovations create more information worth retaining. A custom board produces long discussions. Expertise grows across discussions. A large window is valuable because the system has a reason to fill it.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — from benchmark to agent front matter</p>
+          <h3>The context claim is about retrieval, not the advertised number</h3>
+          <p>The lesson opens with a long-context retrieval chart. The point is not simply that a model accepts one million tokens. The point is how gracefully useful retrieval degrades as the input grows. Dan highlights the region around 250,000 tokens, then follows the lines toward one million. For this system, graceful degradation matters more than a marketing maximum because a forgotten constraint or lost dissent can change the decision.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t0076-1m-context-retrieval-chart.jpg" alt="Long context retrieval chart comparing recording-era models across input sizes from 128 thousand to one million tokens" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">1:16</span>The recording-era exhibit motivates “true” long context: not merely accepting a large input, but retaining the important ideas as the window fills. Model labels and competitive ranking are period detail.</figcaption>
+          </figure>
+          <p>The CEO prompt then shows what the capacity is for. YAML front matter selects a recording-era model and declares an updatable CEO expertise file. It also declares two skills: one for a decision-framework SVG and one for an ElevenLabs summary. The extension parses those paths and “use when” descriptions into the system prompt. It does not inline the expertise file’s contents; the agent reads and updates the file with tools when the prompt tells it to.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t1122-ceo-agent-frontmatter.png" alt="Visual Studio Code showing CEO agent front matter with expertise, SVG and text-to-speech skills, model, and domain fields" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">18:42</span>Specialization is declared as inspectable configuration: expertise path and permission, skills with use conditions, model, and domain.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan terms + plain English</p>
+          <h3>True long context · customizable harness · expertise</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">The three innovations</p>
+            <p><strong>True long context</strong> keeps the important ideas usable across a very large window. A <strong>customizable agent harness</strong> exposes the primitives needed to redesign the agent. <strong>Expertise</strong> is persistent memory and patterns around a specific problem domain.</p>
+          </aside>
+          <p>The distinctions prevent three common confusions. A large window is not automatically good retrieval. A new agent prompt is not the same as a new harness. A transcript dump is not expertise. The system becomes different when capacity, control, and domain-specific persistence are designed together.</p>
+          <p>Pi is the demonstrated vehicle, not the universal definition. In this codebase, Pi exposes hooks, custom tool registration, subprocess control, persistent sessions, model selection, and TUI primitives. The portable requirement is a harness that lets you intercept the system prompt, own the tool surface, and control member sessions. A stock chat surface does not.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — what each unlock contributes</p>
+          <h3>Follow the acquisition meeting through the stack</h3>
+          <p><strong>Context:</strong> each board member receives the acquisition brief plus <code>business-metrics.md</code> and <code>product-overview.md</code> on first contact. Its persistent session carries the discussion forward. The model has room for facts, system instructions, multiple rounds, and its role expertise.</p>
+          <p><strong>Harness:</strong> the extension turns the primary Pi agent into the CEO, registers <code>converse</code> and <code>end_deliberation</code>, launches board members as subprocesses, records cost and time, streams responses into one interface, blocks normal chat input, and opens the memo path after synthesis.</p>
+          <p><strong>Expertise:</strong> the CEO scratch pad can retain vote tallies, key insights, unresolved tensions, and an evolving thesis across meetings. Each board seat owns a separate scratch pad. Revenue can accumulate patterns about where its cash-now view conflicts with Compounder; Moonshot can remember which asymmetric bets survived scrutiny. The next meeting need not begin at zero.</p>
+          <p>No single item creates the behavior. Long context without a custom workflow is unused capacity. A harness without expertise repeats itself. Expertise without adequate context competes with the current decision for scarce attention.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — sort the requirements</p>
+          <h3>Assign each behavior to its enabling layer</h3>
+          <p>For each behavior, write <em>context</em>, <em>harness</em>, <em>expertise</em>, or a combination:</p>
+          <ol>
+            <li>Every board member begins with the same product overview.</li>
+            <li>The CEO cannot keep chatting after the meeting reaches a maximum.</li>
+            <li>Revenue remembers which arguments from prior meetings were repeatedly wrong.</li>
+            <li>A board member resumes its own discussion state on round three.</li>
+            <li>The memo gains a decision diagram and a spoken summary.</li>
+          </ol>
+          <p>Check yourself: shared information depends on context loading; meeting rules and sessions depend on the harness; cross-meeting patterns depend on expertise; several behaviors require more than one layer.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: calling accumulated text “learning”</h3>
+          <p><strong>Symptom:</strong> you append every transcript to one giant memory file. It grows, but the agent does not know what to retrieve, what to update, or which domain the notes serve. More tokens create noise rather than compounding judgment.</p>
+          <p><strong>Fix:</strong> give each expert a narrow scratch pad, a clear “use when,” and explicit update permission. Record recurring patterns, resolved and unresolved tensions, failed predictions, and decision-relevant heuristics. Treat raw logs as observability; treat curated domain patterns as expertise.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Recheck capacity claims; keep the architecture</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · book build 2026</p>
+            <p>The recording presents one-million-token context and its pricing as a fresh competitive unlock. By the book build, long context is a broader capability and the exact model names have moved. Do not repeat exclusivity or leaderboard claims without new evidence. Keep the durable design question: can the chosen model maintain the business facts, current debate, and accumulated expertise at the quality and cost this decision requires?</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Recover the stack from memory</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for the three innovations">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Why is long context the enabling innovation?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The system needs to retain a whole brief, supporting context, a multi-round debate, persistent session state, and growing expertise. The other innovations create the information load.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. How is expertise different from a raw memory dump?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Expertise is persistent memory and patterns scoped to a specific role and problem domain, with an explicit use condition and update behavior.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What must another harness expose to carry this pattern?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>At minimum, control over the system prompt, custom tool registration, subprocess or subagent execution, persistent member sessions, context loading, and enough lifecycle hooks to enforce the meeting workflow.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Explain why “a bigger model” is incomplete</h3>
+            <p>Draw a three-layer stack on paper and teach how capacity, control, and compounding reinforce one another. Include one failure caused by removing each layer. Your explanation passes only if Pi appears as an example of the harness requirement, not as the definition of the tactic.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="constraints">
+        <span class="section-number">02</span>
+        <h2 class="section-title">Bound the meeting like it matters</h2>
+        <p class="section-lead">Minimums protect depth. Maximums protect discipline. The system turns time and compute from invisible side effects into explicit design inputs.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The board that can always think one more thought</h3>
+          <p>A long-context system can keep asking follow-ups, generating counterarguments, and revisiting positions. Without a floor, the CEO may rush to the first coherent answer. Without a ceiling, it may deliberate until cost and latency outweigh the value of one more round. “Use your judgment” is not a meeting design.</p>
+          <p>Human meetings have clocks, agendas, and budgets even when the limits are informal. CEO Agents makes the boundaries visible to the orchestrator after every board call. The decision maker can see whether the meeting has earned the right to close and when it has lost the right to continue.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — floor, warning, ceiling</p>
+          <h3>Two gauges, four boundaries</h3>
+          <div class="constraint-board" aria-label="Time and budget gauges with minimum markers and maximum ceilings">
+            <div><p class="constraint-board__label"><span>TIME</span><span>2 min floor · 5 min ceiling</span></p><div class="constraint-board__track"><span class="constraint-board__fill"></span><span class="constraint-board__min" aria-hidden="true"></span></div></div>
+            <div><p class="constraint-board__label"><span>BUDGET</span><span>$1 floor · $5 ceiling</span></p><div class="constraint-board__track"><span class="constraint-board__fill"></span><span class="constraint-board__min" aria-hidden="true"></span></div></div>
+          </div>
+          <p>The demonstration configuration uses a two-minute minimum, a five-minute maximum, a one-dollar minimum, and a five-dollar maximum. At 80% of a maximum the returned constraint state flags the approaching limit. When elapsed time or spending reaches a maximum, the next state says the meeting must end.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — boot, debate, forced wrap</p>
+          <h3>The constraints stay visible from the first screen</h3>
+          <p>The boot view confirms the operating contract before a decision begins: time range, budget range, editor, CEO, and all eight active board members. The recording-era model strings and “1M” badges are useful historical cues, but the success signal is the system shape and the visible constraints.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t0585-boot-roster-models-1m.jpg" alt="CEO and board boot screen showing the time and budget constraints and the complete recording-era roster" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">9:45</span>Step-zero success: the harness loads one CEO, eight active specialist seats, and the meeting’s time, budget, and editor settings.</figcaption>
+          </figure>
+          <p>During the meeting, <code>converse("all", ...)</code> launches the selected board members concurrently. Their live status cards, per-member costs, time gauge, and budget gauge remain visible while the CEO frames another round. This is not cosmetic telemetry. It changes what the CEO should do next.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t0760-parallel-deliberation-vote-tally.jpg" alt="CEO and board terminal showing several board members responding concurrently, a vote tally, and live time and budget gauges" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">12:40</span>The meeting is a bounded process, not an endless chat. Responses stream concurrently while the harness tracks elapsed time and accumulated spend.</figcaption>
+          </figure>
+          <p>At the recorded limit, the tool response contains <strong>[MAX REACHED]</strong>. The extension does not kill a member in the middle of its response or independently write the memo. The state blocks another <code>converse</code> and instructs the CEO to call <code>end_deliberation</code>, collect final statements, and synthesize.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t0900-constraint-max-reached.jpg" alt="CEO and board terminal with the time gauge full and a MAX REACHED message forcing deliberation to end" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">15:00</span>The ceiling changes the allowed action: stop opening rounds, collect final positions, and move to the memo.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — constraint engine</p>
+          <h3>Make “enough” and “too much” executable</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">System term</p>
+            <p>The <strong>constraint engine</strong> calculates elapsed time and accumulated cost, returns floor/warning/ceiling state after each <code>converse</code>, prevents an early close before the enforced floor, and blocks further debate after a ceiling.</p>
+          </aside>
+          <p>The code counts board-member costs and the CEO’s own message cost. This matters because orchestration has overhead outside the visible specialist calls. The state distinguishes minimum thresholds, approaching maximum thresholds, and a maximum hit caused by time, budget, or both.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — size the meeting to the decision</p>
+          <h3>A $5 demonstration is not a $5 philosophy</h3>
+          <p>For a reversible content-format choice, a short, low-budget deliberation may be rational. For a non-negotiable acquisition offer that redirects the company, using the same limits by habit would confuse demo convenience with decision value. Dan’s framing question is the right one: how much is a high-leverage decision worth?</p>
+          <p>A useful budget rationale has three parts. First, estimate the magnitude and reversibility of the decision. Second, identify what extra rounds could buy: a missing perspective, a targeted tension pair, or validation of a fragile assumption. Third, set a maximum beyond which more language is unlikely to change action. The purpose is not to spend more. It is to make the spend proportional and falsifiable.</p>
+          <p>Do not claim that raising <code>max_budget</code> caused a better debate after one stochastic run. Record the rounds, cost, positions, and memo changes. A comparison can suggest a hypothesis; repeated evidence is needed for a causal claim.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — value-to-budget ladder</p>
+          <h3>Set three envelopes before touching the config</h3>
+          <ol>
+            <li>Choose a reversible, low-impact decision and set a time/budget floor and ceiling.</li>
+            <li>Choose a meaningful but reversible decision and justify a larger or equal envelope.</li>
+            <li>Choose a hard-to-reverse strategic decision and name the evidence an extra round must produce to earn its cost.</li>
+            <li>For each, write the exact condition that should force synthesis.</li>
+          </ol>
+          <p>If your three envelopes are identical, explain why. Consistency can be rational; unexamined defaults are not.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating the ceiling as a timer interrupt</h3>
+          <p><strong>Symptom:</strong> you expect the harness to terminate an in-flight board member at exactly five minutes, synthesize automatically, or guarantee the final cost stays below the configured number.</p>
+          <p><strong>Fix:</strong> understand the checkpoint. Limits are evaluated around tool calls. A concurrent round can finish beyond the nominal threshold before the CEO receives the state. A hit blocks more <code>converse</code> calls and requires <code>end_deliberation</code>. Design the envelope with round granularity and overhead in mind.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Constraint design travels across harnesses</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · book build 2026</p>
+            <p>Provider pricing, latency, and context economics will change. The durable practice is to expose resource use to the orchestrator and convert thresholds into allowed and forbidden actions. Whether the resource is dollars, tokens, wall time, tool calls, or human-review capacity, make the boundary part of the workflow rather than an after-the-fact bill.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the state machine</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for meeting constraints">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What does the 80% threshold do?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It flags that a time or budget maximum is approaching so the CEO should begin wrapping rather than opening broad new lines of debate.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What changes when a maximum is hit?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Further <code>converse</code> calls are blocked and the CEO is instructed to call <code>end_deliberation</code>, collect final statements, and write the memo.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why have a minimum at all?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A floor protects the decision from premature synthesis. In the v1 implementation, minimum time is the programmatically enforced early-close guard; the minimum-budget claim needs technical scrutiny later in the chapter.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Explain floors and ceilings to a finance partner</h3>
+            <p>Use a real decision to justify a minimum and a maximum. Explain why “cheapest possible” can underfund judgment, why “keep thinking” can waste compute, and why the harness reacts at tool boundaries rather than behaving like a hard real-time cutoff.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="prompts">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Template the question before scaling the answer</h2>
+        <p class="section-lead">Prompt engineering survives by becoming system design: required sections, shared context files, role prompts, configuration, validation, and a deliberately narrow interaction surface.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>“What should I do?” is not a strategic brief</h3>
+          <p>A weak prompt hides the facts inside opinion, leaves the downside unnamed, treats preferences as hard constraints, and asks several questions at once. A board can produce articulate output anyway. That is the danger: fluency can conceal an under-specified decision.</p>
+          <p>The course codebase refuses to reward that behavior. A brief must contain four configured headings. Remove one and the meeting does not start. The blocking notice tells you what is missing and what belongs under it. Quality becomes a gate, not a suggestion in documentation.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — four compartments</p>
+          <h3>Separate fact, consequence, boundary, and question</h3>
+          <div class="brief-anatomy" aria-label="The four required sections of a CEO and board brief">
+            <div><b>Situation</b><span>What is true now? Key numbers, current state, timeline, and trigger—without spin.</span></div>
+            <div><b>Stakes</b><span>What is the upside, downside, and cost of doing nothing?</span></div>
+            <div><b>Constraints</b><span>Which financial, temporal, staffing, technical, legal, or personal boundaries are real?</span></div>
+            <div><b>Key Question</b><span>What single specific choice must the board answer?</span></div>
+          </div>
+          <p>The template reduces ambiguity without pretending the decision is simple. It gives every specialist the same structure, then lets their objective functions interpret it differently.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the YAML control plane</p>
+          <h3>One readable file defines the meeting’s outer shape</h3>
+          <p>The configuration file declares meeting constraints, editor, required brief sections, directory paths, and the active board roster. It is small enough to audit before a run. That matters: the visible TUI is generated behavior, but the YAML is where a learner can predict the system’s operating envelope.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t0990-config-yaml-constraints.png" alt="Visual Studio Code showing the CEO and board YAML configuration with meeting constraints, required brief sections, paths, and board configuration" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">16:30</span>The control plane is intentionally legible: constraints, validation schema, paths, editor, and roster live in one YAML file.</figcaption>
+          </figure>
+          <p>Brief validation is a case-insensitive substring check against the configured section names, not a full Markdown parser. Brief discovery looks for subdirectories containing <code>brief.md</code>. Any other <code>.md</code> file beside it becomes a context file; files with other extensions are ignored by this path. On first contact, each board subprocess receives those context files using Pi’s <code>@file</code> syntax.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — forced prompt engineering</p>
+          <h3>Template your engineering</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s principle</p>
+            <p><strong>Template your engineering:</strong> encode the structure of your best work so an agent can validate and repeat it. Prompt engineering is a maintained interface, not a clever sentence.</p>
+          </aside>
+          <p>The template operates at several levels. The brief template shapes the problem. Agent prompt front matter shapes expertise, skills, and model. Agent bodies shape objective functions and evidence standards. YAML shapes the meeting. The extension shapes allowed actions. Together they turn “prompting” into an executable protocol.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — improve a vague acquisition prompt</p>
+          <h3>From one sentence to an inspectable decision</h3>
+          <p><strong>Weak:</strong> “Should we sell the company for $12 million?” This hides the buyer, the deadline, the multiple, the growth trajectory, the non-negotiable terms, and the alternative future.</p>
+          <p><strong>Structured:</strong> Situation records BlendStack, NutraHoldings, the cash offer, 11× on $1.08 million ARR, the 30-day expiry, and slowing month-over-month growth. Stakes records certainty now versus potential platform upside later. Constraints record the offer’s terms and the window for action. Key Question asks whether to accept the offer given those facts. The sibling business and product files give each role enough detail to test the claim from its own horizon.</p>
+          <p>Notice what the structure does not do: it does not tell the board which answer to prefer. It increases factual precision while preserving the uncertainty the board exists to resolve.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — validation rehearsal</p>
+          <h3>Write the failure before the success</h3>
+          <ol>
+            <li>Draft all four headings for your real decision.</li>
+            <li>Under Situation, remove adjectives that already imply the answer.</li>
+            <li>Under Constraints, mark each item as hard, negotiable, or assumed.</li>
+            <li>Create a list of facts too detailed for the brief; each list becomes a candidate context file.</li>
+            <li>Temporarily rename one required heading. Predict the exact class of failure the validator should report.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: a valid shell with empty substance</h3>
+          <p><strong>Symptom:</strong> all four headings exist, so validation passes, but Situation says “things are changing,” Stakes says “this is important,” Constraints says “limited time,” and Key Question says “what should we do?” Mechanical validity masks informational poverty.</p>
+          <p><strong>Fix:</strong> require quantities, dates, alternatives, and sources where the decision depends on them. Add focused Markdown context files. Then trace at least one statement in the final memo back to an exact brief or context fact. Validation guarantees structure; you must still supply evidence.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Prefer schemas you can test</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · book build 2026</p>
+            <p>The v1 substring validator is intentionally simple and sufficient for the course. In a higher-stakes system, evolve the interface only when evidence demands it: typed metadata, source requirements, decision-owner fields, or machine-checkable constraints. Keep the learner’s lesson intact—make input quality observable and block execution when the required contract is absent.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Rebuild the brief from a blank page</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for brief validation">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Name the four required headings in order.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Situation, Stakes, Constraints, and Key Question.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What happens to sibling Markdown files?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Every <code>.md</code> file in the brief directory other than <code>brief.md</code> is treated as context and passed to each board member on first contact.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What does passing validation not prove?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It does not prove the facts are specific, accurate, sufficient, unbiased, or sourced. The v1 check establishes that required section strings are present.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Teach prompt engineering without mentioning clever wording</h3>
+            <p>Explain how the brief template, context directory, agent front matter, YAML configuration, and extension together form a prompt-engineering system. Show where each layer fails and why a blocking validator is a teaching mechanism as well as a runtime guard.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="decision">
+        <span class="section-number">04</span>
+        <h2 class="section-title">Promote agents from production to judgment</h2>
+        <p class="section-lead">The first design decision is not which model sits in the CEO chair. It is what the system accepts, what it returns, and whether the middle turns uncertainty into a more inspectable choice.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>A fast team building the wrong thing</h3>
+          <p>Imagine a team that can turn any ticket into code in minutes. Tests appear, branches stay clean, and release notes write themselves. Yet the product still fails because nobody slowed down to ask whether the ticket represented the best use of the next quarter. Automation accelerated the work after the decision while leaving the decision itself as an unstructured conversation in one person’s head.</p>
+          <p>This is the leverage mismatch. A poor implementation costs days. A poor acquisition, pricing, platform, or career decision can redirect years. If agents can hold context, specialize, use tools, and sustain a workflow, confining them to code leaves their highest-leverage use untouched.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the three-node function</p>
+          <h3>Brief → deliberation → memo</h3>
+          <div class="decision-pipe" aria-label="Input workflow and output nodes of the CEO and board system">
+            <div class="decision-pipe__node"><b>Input</b><span>A brief describes current facts, stakes, constraints, and one key question. Sibling Markdown files provide shared context.</span></div>
+            <span class="decision-pipe__arrow" aria-hidden="true">→</span>
+            <div class="decision-pipe__node decision-pipe__node--middle"><b>Workflow</b><span>The CEO frames rounds, asks the board, presses tension pairs, watches limits, and closes with final statements.</span></div>
+            <span class="decision-pipe__arrow" aria-hidden="true">→</span>
+            <div class="decision-pipe__node"><b>Output</b><span>A memo records the recommendation, board stances, dissent, risks, trade-offs, and assignable next actions.</span></div>
+          </div>
+          <p>If you cannot name these three nodes, you are not ready to tune the board. Model selection, prompt personality, and TUI polish are implementation choices. Input and output define the job.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — watch uncertainty enter and leave</p>
+          <h3>The acquisition question arrives as a real artifact</h3>
+          <p>In the course repository, the acquisition decision is not typed into a chat box. It lives at <code>.pi/ceo-agents/briefs/2026-03-18-acquisition-offer/brief.md</code>. The brief asks whether BlendStack should accept a non-negotiable $12 million cash offer from NutraHoldings. It includes the 30-day expiry, the 11× multiple on $1.08 million ARR, the slowing month-over-month growth, and the boundaries around what can be changed. The sibling files <code>business-metrics.md</code> and <code>product-overview.md</code> travel with the brief so every agent begins from the same factual base.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t1235-brief-and-brief-library.png" alt="Visual Studio Code showing the acquisition brief with Situation, Stakes, Constraints, and Key Question beside the library of shipped briefs" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">20:35</span>The input is a reusable brief directory, not an ephemeral prompt. The visible library includes acquisition, platform, career, regulatory, and product-bet decisions.</figcaption>
+          </figure>
+          <p>The system produces more than an answer sentence. The memo contains structured front matter plus ranked recommendations, a table of each board member’s position, unresolved tension, risks, and next actions. The recorded shorts-platform memo makes the transformation visible: it names a final decision and draws a decision map rather than returning a floating paragraph.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t0468-memo-output-decision-map.jpg" alt="Board memo in Visual Studio Code showing a decided status, final decision, and decision map for a shorts platform choice" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">7:48</span>“Decision out” is concrete: a durable memo with a named result and a decision map. It can be inspected after the terminal session ends.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan term + plain English</p>
+          <h3>Agentic engineering</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s framing</p>
+            <p><strong>Agentic engineering</strong> uses agents to solve problems and make decisions, not only to produce code. Coding is the beginning of the surface area, not its boundary.</p>
+          </aside>
+          <p>In plain language: move the agent toward the choice that creates the downstream work. A CEO agent is not “more autonomous” because it sounds executive. It is specialized around a different unit of value. Its completion criterion is not a passing test suite; it is a decision artifact that exposes the reasoning needed to act.</p>
+          <p>The phrase <em>uncertainty in, decision out</em> is a design test. A fuzzy question without evidence is not a brief. A long debate without closure is not a decision system. A memo that hides dissent is not a faithful output. The three nodes keep the design honest.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — evaluate the acquisition flow</p>
+          <h3>Trace one fact from input to decision</h3>
+          <p>Take the offer expiry. It enters under the brief’s situation and constraints. Revenue can interpret the certainty and immediacy of cash. Compounder can compare that deadline against long-term retention value. Moonshot can argue that the platform upside is being priced as a direct-to-consumer business. The CEO can turn the disagreement into a conditional next action, such as the 30-day investor test that appeared in the recorded decision. The original deadline is no longer a loose fact; it becomes pressure on a concrete recommendation.</p>
+          <p>Now take the dissent. Different runs do not produce identical vote counts: the recording’s spoken summary said five to one, the saved <code>k8wlei</code> memo says seven to one, and another CEO scratch pad recorded six to two. Moonshot’s rejection remains the stable signal. The memo’s job is not to pretend the stochastic board is deterministic. Its job is to preserve the strongest disagreement so the human can decide whether the majority missed an asymmetric path.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — five-minute framing drill</p>
+          <h3>Turn one worry into a three-node system</h3>
+          <ol>
+            <li>Choose a decision you genuinely face. Write it as “Should I X or Y given Z?”</li>
+            <li>List three facts that belong in <strong>Situation</strong> and two consequences that belong in <strong>Stakes</strong>.</li>
+            <li>Name one hard boundary. If it can be negotiated, it is not yet a constraint.</li>
+            <li>Sketch the memo headings you would need before trusting the output.</li>
+          </ol>
+          <p>You have succeeded when a second person could tell what enters the system and what “done” looks like without knowing which model or harness you will use.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: an executive-flavored chat</h3>
+          <p><strong>Symptom:</strong> you rename a general assistant “CEO,” ask “What should I do?”, and accept a persuasive paragraph. There is no validated input, shared evidence, adversarial workflow, persistent log, or stable output schema.</p>
+          <p><strong>Fix:</strong> freeze the interface first. Require the four brief sections. Decide which context files every specialist receives. Define the memo schema. Only then design the deliberation. Executive vocabulary does not create executive work; a constrained transformation does.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>The pattern is more durable than the model roster</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · book build 2026</p>
+            <p>The recording’s exact model names are period details. Preserve the interface and the behavior: a model capable of maintaining the required context, a harness that can register tools and manage sessions, and specialists whose differences are intentional. Re-evaluate model choice, context economics, and provider mix when you reproduce the system; do not rewrite the tactic every time a model label changes.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Answer before opening</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for decisions not code">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. State the whole system in three nodes.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Brief → deliberation → memo: structured uncertainty enters, an adversarial workflow tests it, and a decision artifact leaves.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why is a saved memo better than a persuasive chat answer?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The memo has a stable schema that preserves ranked recommendations, individual stances, dissent, trade-offs, risks, and next actions for later inspection.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why can different vote totals be acceptable?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The agents are nondeterministic. The system should preserve the reasoning and recurring dissent rather than claim an identical vote is guaranteed on every run.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Explain the promotion in ninety seconds</h3>
+            <p>Without using the phrase “multi-agent” until the end, explain how a structured uncertainty becomes an actionable decision. Your listener should hear the input, the transformation, the output, and why the output retains dissent. End by naming this move <em>agentic engineering</em>.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="board">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Design the board to disagree</h2>
+        <p class="section-lead">Eight copies of the same helpful assistant are not a board. The system earns its cost when controlled biases pull the decision in different directions and the CEO makes those tensions legible.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The expensive echo chamber</h3>
+          <p>You fan one question to eight agents. Every one produces a balanced list of pros and cons, recommends a cautious pilot, and congratulates you on thinking strategically. The output is longer than a single answer but not richer. Parallelism multiplied tokens, not perspective.</p>
+          <p>The failure comes from optimizing agents for general helpfulness. Helpful generalists converge toward the same safe center. A real board is valuable because members are accountable to different truths. Revenue cannot ignore the next 90 days. Compounder cannot pretend a quick sale is the same as durable trust. Moonshot must name the 10× path. Contrarian must find the assumption everyone else wants to leave untested.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — controlled tension</p>
+          <h3>Eight objective functions around one decision</h3>
+          <div class="board-grid" aria-label="The eight specialist board members and their controlled biases">
+            <div class="board-seat board-seat--revenue"><b>Revenue</b><span>Speed and monetization · 30–90 days · what customers will pay for now</span></div>
+            <div class="board-seat board-seat--product"><b>Product Strategist</b><span>Problem selection · this quarter · the narrowest wedge with strategic pull</span></div>
+            <div class="board-seat board-seat--technical"><b>Technical Architect</b><span>System durability · 6–18 months · contact with production reality</span></div>
+            <div class="board-seat board-seat--contrarian"><b>Contrarian</b><span>Truth-seeking · variable horizon · prove the room is not fooling itself</span></div>
+            <div class="board-seat board-seat--compounder"><b>Compounder</b><span>Trust and retention · 6–24 months · what customers still trust later</span></div>
+            <div class="board-seat board-seat--customer"><b>Customer Oracle</b><span>User behavior · next session · what people adopt in their real workflow</span></div>
+            <div class="board-seat board-seat--market"><b>Market Strategist</b><span>Positioning and timing · this quarter · what the market can understand and buy</span></div>
+            <div class="board-seat board-seat--moonshot"><b>Moonshot</b><span>Asymmetric upside · 1–3 years · avoid cowardly incrementalism</span></div>
+          </div>
+          <p>Each role is incomplete on purpose. The CEO is not asking any one seat to be fair to every horizon. The CEO is asking the room, taken together, to expose a wider decision surface.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — one node fans out</p>
+          <h3>The CEO does not contain the board; it orchestrates it</h3>
+          <p>The architecture begins with you, passes through a Pi extension, and arrives at the CEO—the primary Pi agent. The CEO calls <code>converse()</code> to fan one message to the active board members. Those members run as separate Pi subprocesses with their own prompts, models, expertise files, and persistent sessions. Their responses return to the CEO for another round or final synthesis.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t1672-ceo-board-architecture-diagram.jpg" alt="CEO and board architecture diagram showing the engineer, Pi extension, CEO agent, converse tool, and eight specialist board members" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">27:52</span>The visual signature of orchestration: one CEO node fans out through <code>converse()</code> to several specialized agents.</figcaption>
+          </figure>
+          <p>The Moonshot prompt shows how the disagreement is engineered. Its purpose is to expand the aperture of possibility and challenge incrementalism. Its variables declare asymmetric upside, very high risk tolerance, and a default stance against cowardly incrementalism. Those declarations are not decoration. They prevent the agent from smoothing itself back into the generic middle.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t1905-moonshot-personality-prompt.png" alt="Visual Studio Code showing the Moonshot agent purpose and variables including asymmetric upside, very high risk tolerance, and its default stance" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">31:45</span>A specialist is built from an explicit purpose, objective function, time horizon, bias, risk tolerance, reasoning patterns, evidence standard, and tension partners.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan term + plain English</p>
+          <h3>Multi-agent adversarial pattern</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s term</p>
+            <p><strong>Multi-agent adversarial pattern:</strong> multiple perspectives that do not agree, deliberately combined so the system can flesh out the mental model.</p>
+          </aside>
+          <p>Adversarial does not mean hostile. It means every seat has a duty to surface a different class of error. Revenue attacks plans that cannot monetize soon. Technical Architect attacks plans that collapse in production. Customer Oracle attacks plans that require imaginary user behavior. Contrarian attacks collective self-deception. Moonshot attacks plans that optimize into irrelevance.</p>
+          <p>The CEO’s responsibility is coherence, not consensus. It uses tension pairs—Revenue versus Compounder, Product versus Technical, Customer Oracle versus Moonshot, Revenue versus Moonshot—to make trade-offs explicit. The result can be a majority recommendation with a strong dissent. That is healthier than an average that nobody actually believes.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — what Moonshot adds</p>
+          <h3>From seven votes to one better condition</h3>
+          <p>In the saved acquisition memo, seven members support selling. A naïve voting system could stop there. Moonshot argues that BlendStack’s engine may be platform infrastructure priced as a direct-to-consumer company. That dissent introduces a different loss function: accepting a strong offer might still destroy asymmetric upside.</p>
+          <p>The useful move is not to let Moonshot veto the board. It is to translate the dissent into a bounded test. The memo can retain the sell recommendation while requiring a short investor-validation path before the offer expires. One biased seat has improved the majority decision by naming what the majority’s objective functions systematically underweight.</p>
+          <p>This is the board’s product: not “more opinions,” but pressure on hidden assumptions. If removing a seat never changes a question, risk, condition, or next action, that seat is not specialized enough.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — design one tension pair</p>
+          <h3>Make two agents unable to give the same answer</h3>
+          <ol>
+            <li>Choose one decision from the previous drill.</li>
+            <li>Write one seat that optimizes the next 90 days and one that optimizes the next two years.</li>
+            <li>Give each seat a default stance and an evidence standard.</li>
+            <li>Write the question the CEO should ask when their recommendations conflict.</li>
+          </ol>
+          <p>Test the prompts by reading them side by side. If both could honestly return the same generic “balanced” answer, sharpen the objective functions until each one is accountable to a different failure.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: persona theater</h3>
+          <p><strong>Symptom:</strong> one agent speaks like a CFO and another uses visionary language, but both optimize for “the best outcome” and cite the same evidence. The prose sounds different while the decision function stays identical.</p>
+          <p><strong>Fix:</strong> encode objective function, time horizon, risk tolerance, default stance, evidence standard, red lines, and natural tension partners. A useful persona changes what the agent notices, discounts, and refuses—not merely its tone.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Model diversity can sharpen role diversity</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · book build 2026</p>
+            <p>The recorded demo uses one vendor: an Opus-era CEO and Sonnet-era board. Dan still argues that model diversity improves conflict. The course ships <code>ceo-and-board-configuration-multimodel.yaml</code> and <code>agents-multimodel/</code> as an upgrade path. Treat cross-vendor diversity as another source of perspective only after the roles themselves are crisp; different models cannot rescue eight vague prompts.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the board, not just the names</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for adversarial boards">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Why is disagreement a feature rather than a coordination failure?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Specialists are designed to expose different blind spots. Their conflict makes trade-offs visible and can improve the majority recommendation with conditions or tests.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Name two natural tension pairs and the trade-off each embodies.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Revenue versus Compounder pits near-term cash against durable trust. Customer Oracle versus Moonshot pits immediate adoption reality against asymmetric long-term upside. Product versus Technical pits strategic wedge selection against production durability.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What makes a role more than a costume?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>An explicit objective function, time horizon, risk tolerance, default stance, evidence standard, red lines, reasoning patterns, and tension partners change how the agent decides.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Defend the dissenter</h3>
+            <p>Teach a skeptical engineering manager why a lone dissent should appear in a memo even when it does not change the final vote. Use the acquisition example, distinguish productive conflict from persona theater, and name one test that proves a board seat adds decision value.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="observability">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Trust the code and keep the evidence</h2>
+        <p class="section-lead">A terminal animation can suggest how a meeting works. Prompts can describe how it should work. Logs and implementation reveal what actually happened.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The beautiful memo with no inspectable path</h3>
+          <p>A board returns a decisive memo. You like the recommendation, so you keep the PDF and discard everything else. Later, the result goes wrong. You cannot reconstruct which agent introduced a false premise, whether the CEO challenged it, which tools ran, which context was available, or whether a dissent disappeared during synthesis. The system produced an artifact but no learning loop.</p>
+          <p>There is a second failure hiding nearby: documentation drift. A prompt says members answer sequentially. A README says the Contrarian always closes last. The UI does not prove either claim. If the system matters, the engineer must be able to move from statement to implementation to runtime evidence.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — one round at implementation resolution</p>
+          <h3>Primary agent → custom tool → persistent subprocesses → log</h3>
+          <div class="architecture" aria-label="Runtime architecture of the CEO and board deliberation system">
+            <div class="architecture__node"><b>Primary Pi agent</b><span>CEO prompt injected at boot</span><code>converse()</code></div>
+            <div class="architecture__node architecture__node--ceo"><b>Extension</b><span>targets · sessions · costs · constraints · live feed</span><code>Promise.allSettled</code></div>
+            <div class="architecture__fan" aria-label="Board member subprocesses"><span>Revenue session</span><span>Product session</span><span>Technical session</span><span>Contrarian session</span><span>Compounder session</span><span>Customer session</span><span>Market session</span><span>Moonshot session</span></div>
+          </div>
+          <p>The CEO is not another subprocess. It is the primary Pi agent running a replaced system prompt. Each board member is a separate <code>pi</code> subprocess. On the first call, the subprocess receives its model, resolved system prompt, context files, and session path. Later calls reuse the session so the member retains its own conversation state.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the reasoning survives the meeting</p>
+          <h3>Logs turn a performance into a system you can audit</h3>
+          <p>Every deliberation directory contains <code>conversation.jsonl</code> and <code>tool-use.jsonl</code>. Conversational records carry <code>from</code>, <code>to</code>, and <code>message</code>. The log also contains bookend records such as <code>meeting_start</code> and <code>meeting_end</code>, which do not use the same conversational fields. Argument SVGs and agent sessions add further evidence. The memo is one output in a larger reasoning trace.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t1420-conversation-jsonl-observability.png" alt="Visual Studio Code showing conversation JSONL records alongside deliberation artifacts including tool logs and argument SVG files" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">23:40</span>The audit surface includes the conversation, tool use, generated argument diagrams, agent sessions, expertise changes, and the final memo. Keep the middle, not only the answer.</figcaption>
+          </figure>
+          <p>The frame shows why observability is a teaching tool. You can find the moment Moonshot takes a reject position, see what the CEO asked, and compare that exchange with the memo. You can ask whether a role’s system prompt produced its intended bias, whether a context fact traveled into the debate, and whether the constraint envelope allowed enough challenge before synthesis.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — observability + runtime truth</p>
+          <h3>Measure the deliberation you want to improve</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s principle</p>
+            <p><strong>Observability:</strong> retain the conversation, tool activity, costs, artifacts, and state needed to explain and improve the system. If you do not measure it, you cannot improve it.</p>
+          </aside>
+          <p>Observability is not a promise that the reasoning is correct. It is the ability to ask a precise question after the run. Which agent made this claim? What source context was available? Which round changed the vote? How much did another challenge cost? Did the memo preserve the dissent? A system that answers those questions can be debugged.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — resolve documentation against code</p>
+          <h3>Three checks a careful operator should make</h3>
+          <table class="truth-table">
+            <thead><tr><th>Question</th><th>Surface claim</th><th>What v1 code enforces</th></tr></thead>
+            <tbody>
+              <tr><td>How does a round fan out?</td><td>The CEO prompt describes calls as sequential, with later members seeing earlier responses.</td><td><code>converse</code> launches selected members concurrently with <code>Promise.allSettled</code>. The extension does not sequentially feed returned answers from one target into the next.</td></tr>
+              <tr><td>Does Contrarian close last?</td><td>README, prompt, and tool description say last is enforced.</td><td><code>end_deliberation</code> copies active members in configuration order and launches all final statements concurrently. Contrarian is fourth in the shipped roster, not a serialized final speaker.</td></tr>
+              <tr><td>Are both minimums hard floors?</td><td>Configuration and explanatory copy present minimum time and budget as meeting floors.</td><td>The early-close guard programmatically checks minimum time. The v1 <code>end_deliberation</code> guard does not enforce <code>min_budget</code>.</td></tr>
+            </tbody>
+          </table>
+          <p>The first check needs careful wording. Members are launched concurrently, so same-round answers are not deliberately piped into later members. Cross-round sharing is reliable because prompts tell members to reread the shared <code>conversation.jsonl</code>. Because that file is live, do not claim same-round cross-pollination is mechanically impossible; claim that it is not ordered or guaranteed. The portable mental model is <strong>concurrent within a round, reliably informed across rounds</strong>.</p>
+          <p>The third check is an additional code audit beyond the two gaps emphasized in the lesson extract. It does not make the minimum-budget field useless; it means the prompt can reason about it while the v1 early-close guard only enforces time. Document the distinction before relying on it as a guarantee.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — evidence chain</p>
+          <h3>Prove one claim at three levels</h3>
+          <ol>
+            <li>Choose the claim “board calls are parallel.”</li>
+            <li>Find the prompt or README sentence that describes the intended behavior.</li>
+            <li>Find <code>Promise.allSettled</code> in <code>apps/ceo/extensions/ceo-and-board.ts</code>.</li>
+            <li>After a lab run, find the CEO prompt and member responses in <code>conversation.jsonl</code>.</li>
+            <li>Write one sentence separating what the source promises, what code schedules, and what the log demonstrates.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: overclaiming from log order</h3>
+          <p><strong>Symptom:</strong> two responses appear in a particular JSONL order, so you infer they were launched sequentially or that the later record necessarily read the earlier one.</p>
+          <p><strong>Fix:</strong> use code for scheduling semantics and logs for observed events. Concurrent tasks still complete in an order. A completion order is not a launch dependency. To prove information flow, inspect the message content and the context mechanism, not only timestamps or line order.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Recheck the shipping implementation</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · book build 2026</p>
+            <p>Harness APIs and this extension can change. Treat the three v1 checks as dated implementation facts, not permanent properties of “CEO agents.” Before publishing, upgrading, or relying on order guarantees, read the current code and run a small audit. Preserve the habit: prompts specify intent; implementation determines scheduling; logs show observed execution.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Separate promise, implementation, and evidence</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for observability and runtime truth">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. How is the CEO run differently from a board member?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The CEO is the primary Pi agent with a system prompt injected by the extension. Board members run as separate <code>pi</code> subprocesses with their own prompts, models, and persistent session files.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. State the safest round-sharing model.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Selected members launch concurrently within a round, so ordered same-round cross-pollination is not guaranteed. Across rounds, members can reliably reread the shared conversation log.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Name the three v1 gaps audited here.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Converse is concurrent rather than sequentially fed; Contrarian is not serialized last; and the early-close guard enforces minimum time but not minimum budget.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Which two files form the minimum audit trail?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>conversation.jsonl</code> for meeting exchanges and <code>tool-use.jsonl</code> for recorded tool activity. The memo, sessions, expertise diffs, and generated assets add context.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Narrate a round like an implementer</h3>
+            <p>Starting with the CEO’s <code>converse("all", message)</code>, explain target resolution, concurrent subprocess calls, persistent sessions, context loading on first contact, response logging, cost accumulation, returned constraint state, and how a later round can use the shared history. End with the Contrarian-order caveat.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="specialize">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Specialize the whole system</h2>
+        <p class="section-lead">A distinctive prompt helps. A distinctive context, model, tool surface, harness, expertise loop, and completion artifact move the system outside the general-purpose average.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The average agent with a grand title</h3>
+          <p>You select the same general-purpose agent everyone uses, provide a short system prompt, and ask it to act like a strategic board. The output is competent and familiar because almost nothing in the computation changed. The model has been optimized toward a broad center; the title “CEO” does not move it out of that distribution.</p>
+          <p>Specialization is cumulative. The course system changes the question format, the surrounding evidence, the system prompt, the available tools, the execution harness, the member sessions, the persistent expertise, the UI, and the output contract. It is a micro-application that does one thing unusually well.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the core four plus the harness</p>
+          <h3>Change more than context</h3>
+          <div class="concept-strip" aria-label="The core four dimensions of an agentic system">
+            <div class="concept-strip__item"><b>Context</b><span>Brief, product facts, financials, conversation history, expertise</span></div>
+            <div class="concept-strip__item"><b>Model</b><span>Chosen per role and decision requirements; recording-era labels are replaceable</span></div>
+            <div class="concept-strip__item"><b>Prompt</b><span>Objective function, horizon, bias, evidence standard, red lines, report shape</span></div>
+            <div class="concept-strip__item concept-strip__item--new"><b>Tools</b><span><code>converse</code>, <code>end_deliberation</code>, file access, SVG, TTS</span></div>
+          </div>
+          <p>The harness sits around the core four and decides how they combine: which prompt becomes the primary agent, how members launch, what users may type, how state persists, when the meeting stops, and what artifacts count as completion.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — close the loop with a skill</p>
+          <h3>The memo becomes a decision package</h3>
+          <p>After synthesis, the CEO can use the declared SVG skill to produce a decision framework and the ElevenLabs skill to create a one-to-four-sentence audio summary. The recording shows the text-to-speech command running, <code>summary.mp3</code> being saved beside the memo, and the summary being played. The output moves from “a file exists” to “the decision is packaged for consumption.”</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-1-ceo-agents/t1052-tts-audio-summary-skill.jpg" alt="CEO and board terminal showing the text-to-speech skill synthesizing and saving a short decision summary as an MP3" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">17:32</span>A skill extends the specialized agent at the moment of use: the CEO turns the completed memo into a short spoken summary and saves it with the decision artifacts.</figcaption>
+          </figure>
+          <p>The point is not that every decision needs audio. The point is that skills are capabilities with explicit use conditions. The system can select a closing behavior suited to the artifact. This is more precise than stuffing every possible script into the main prompt or asking a human to perform the last mile manually.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — specialization beats the normal distribution</p>
+          <h3>Micro-applications, agentically</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s frame</p>
+            <p><strong>Specialization:</strong> change multiple parts of the core four and, when necessary, the harness itself so the agent is optimized for one bounded job rather than a generic average.</p>
+          </aside>
+          <p>The one-shot interaction is part of that specialization. The input hook blocks normal typed text and shadows many built-in slash commands. Only <code>/ceo-begin</code>, <code>stop</code>, and <code>wrap</code> belong to the workflow. The system is deliberately not a chat. Its narrow surface protects the state machine from improvisational inputs that do not map to a meeting action.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — audit where behavior lives</p>
+          <h3>Five changes, five ownership layers</h3>
+          <div class="file-map">
+            <div class="file-map__item"><code>briefs/&lt;decision&gt;/</code><p>Owns the specific uncertainty and the evidence every board member should receive.</p></div>
+            <div class="file-map__item"><code>agents/*.md</code><p>Owns each seat’s purpose, variables, expertise, skills, reasoning patterns, and response contract.</p></div>
+            <div class="file-map__item"><code>ceo-and-board-configuration.yaml</code><p>Owns limits, required sections, paths, editor, active seats, prompt paths, and TUI colors.</p></div>
+            <div class="file-map__item"><code>ceo-and-board.ts</code><p>Owns lifecycle, tools, state, input lockdown, orchestration, cost tracking, logging, and memo handoff.</p></div>
+            <div class="file-map__item"><code>expertise/*-scratch-pad.md</code><p>Owns persistent, role-specific learning across decisions.</p></div>
+            <div class="file-map__item"><code>.claude/skills/</code><p>Owns optional reusable capabilities such as SVG generation and the ElevenLabs summary.</p></div>
+          </div>
+          <p>This map prevents cargo-cult edits. If the board asks weak questions, fix the CEO or seat prompts. If a required heading is wrong, fix configuration. If members launch in the wrong order, prompts cannot guarantee the schedule; change the extension. If the final decision is hard to consume, add or adjust a skill.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — core-four audit</p>
+          <h3>Diagnose a proposed “expert agent”</h3>
+          <ol>
+            <li>Write the context, model, prompt, and tools it changes from a stock agent.</li>
+            <li>Circle any dimension that still says “default.”</li>
+            <li>Name the one job the agent must do extraordinarily well.</li>
+            <li>Name the inputs it should reject and the commands it should not expose.</li>
+            <li>Decide whether the change belongs in context, prompt, config, skill, expertise, or harness code.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: adding capability without narrowing purpose</h3>
+          <p><strong>Symptom:</strong> you keep adding tools, models, memory, and commands until the agent can do everything. It becomes difficult to test, easy to derail, and unclear when it is finished.</p>
+          <p><strong>Fix:</strong> write the one-shot contract first. Give the agent only the capabilities needed to transform that input into that output. Treat blocked inputs as a feature. A deep module and a specialized agent share the same virtue: a small interface can hide powerful internal machinery.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Portable primitives outlast product churn</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · book build 2026</p>
+            <p>Pi, Claude Code, model providers, and agent SDKs evolve quickly. Keep a portable specification of the system: input contract, role contracts, tool contracts, session semantics, resource limits, logs, and output schema. Reimplement those primitives on another harness when necessary. Do not confuse an API version with the architecture.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the specialization levers</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for specialization">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Name the core four.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Context, model, prompt, and tools.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why is richer context alone not enough?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The model, objective function, action surface, session behavior, and completion contract can still remain generic. Specialization changes multiple dimensions.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What inputs does the one-shot interface accept?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>/ceo-begin</code> starts a meeting, <code>stop</code> hard-stops it, and <code>wrap</code> requests early synthesis. Other typed input is intercepted.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Why declare a skill with “use when”?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It keeps a reusable capability available without forcing it into every turn. The agent can read and run the skill when the decision artifact needs it.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Explain why this is not “eight chatbots”</h3>
+            <p>Use the core four, the one-shot interface, the extension, persistent expertise, constraint engine, observability, and decision-package skills. Your explanation should make clear which parts are portable and which are specific to the course’s Pi implementation.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Graded lab · run a board you can audit</h2>
+        <p class="section-lead">The lab stays inside the member course codebase. You will inspect before spending, reproduce a shipped decision, author and invalidate a real brief, make one deterministic roster change, and prove runtime behavior from code and logs.</p>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Scope, cost, and prerequisites</p>
+          <p>Work only in <code>IndyDevDan/ma-1-ceo-agents/codebase</code>, the course-provided link to the member repository. Do not clone or substitute a public project. A live standard run requires Pi, Bun, <code>just</code>, a project-root <code>.env</code> containing <code>ANTHROPIC_API_KEY</code>, and an available configured editor. Never print or submit the key. Expect three to six paid deliberations if you complete every core and comparison step.</p>
+        </aside>
+
+        <div class="lab-box">
+          <h3 class="lab-box__title">Lab 0 · Preflight without spending</h3>
+          <ul class="lab-box__meta"><li>10–15 min</li><li>15 points</li><li>Read-only</li></ul>
+          <p>Start at the linked course root and inspect the machine before launching it.</p>
+          <pre><code>cd /Users/kvnkishore/WebstormProjects/AgenticEngineer/IndyDevDan/ma-1-ceo-agents/codebase
+
+command -v pi
+command -v bun
+command -v just
+test -f .env &amp;&amp; echo ".env present" || echo ".env missing"
+
+sed -n '1,80p' .pi/ceo-agents/ceo-and-board-configuration.yaml
+sed -n '20,40p' .pi/ceo-agents/agents/moonshot.md
+sed -n '1,80p' justfile</code></pre>
+          <ol class="lab-box__steps">
+            <li>Record the minimum and maximum time, minimum and maximum budget, editor, four required headings, and eight active board names.</li>
+            <li>Record Moonshot’s <code>CORE_BIAS</code>, <code>RISK_TOLERANCE</code>, and <code>DEFAULT_STANCE</code>.</li>
+            <li>Read the <code>ceo</code> recipe in <code>justfile</code>. Explain the conditional dependency install and the final Pi extension command.</li>
+            <li>If a prerequisite or key is absent, stop before the paid run and repair the local course setup using its README. The rest of this lab does not award points for bypassing missing prerequisites.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 0 · 15 points.</strong> Without notes, state brief → deliberation → memo; name the two maximum conditions that can block further conversation; list the required headings; and explain what Moonshot is designed to protect.</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>5 points: exact four headings and 2–5 minute / $1–$5 shipped envelope.</li><li>4 points: eight active board names and the CEO-versus-board role distinction.</li><li>3 points: exact Moonshot variables.</li><li>3 points: accurate launcher explanation without exposing credentials.</li></ul></div>
+        </div>
+
+        <div class="lab-box">
+          <h3 class="lab-box__title">Lab 1 · Reproduce the shipped acquisition decision</h3>
+          <ul class="lab-box__meta"><li>15–20 min</li><li>20 points</li><li>Paid run</li></ul>
+          <pre><code>just ceo</code></pre>
+          <ol class="lab-box__steps">
+            <li>Inside the TUI, enter <code>/ceo-begin</code>. Select <code>2026-03-18-acquisition-offer</code>.</li>
+            <li>Record the session ID displayed when the meeting starts. Watch the first broad <code>converse</code>, the concurrent member activity, and the time/budget gauges.</li>
+            <li>When a maximum is reached, distinguish the state signal from the subsequent CEO action. The state tells the CEO to call <code>end_deliberation</code>; it does not synthesize the memo by itself.</li>
+            <li>After completion, locate the newly generated memo under <code>.pi/ceo-agents/memos/2026-03-18-acquisition-offer-&lt;session-id&gt;/memo.md</code>.</li>
+            <li>Find a ranked recommendation, the board-stances table, dissent or unresolved tension, and next actions. Record the actual vote, elapsed time, and cost from your run.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 1 · 20 points.</strong> Submit the session ID, actual tally, elapsed time, cost, memo path, and a two-sentence explanation of what the strongest dissent added. There is no prescribed vote count; stochastic variation is expected.</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>5 points: identifies the exact run and its memo.</li><li>5 points: records observed tally, duration, and cost without substituting a video value.</li><li>6 points: locates all four memo structures.</li><li>4 points: distinguishes a source-backed brief fact from a new claim produced during deliberation.</li></ul></div>
+        </div>
+
+        <div class="lab-box">
+          <h3 class="lab-box__title">Lab 2 · Author, break, repair, and run a real brief</h3>
+          <ul class="lab-box__meta"><li>20–30 min</li><li>25 points</li><li>Mandatory</li></ul>
+          <p>Create a learner-owned brief directory in the course’s existing <code>.pi/ceo-agents/briefs</code> tree.</p>
+          <pre><code>TODAY=$(date +%F)
+SLUG="$TODAY-my-decision"
+mkdir -p ".pi/ceo-agents/briefs/$SLUG"
+cp .pi/ceo-agents/briefs/brief-template.md \
+  ".pi/ceo-agents/briefs/$SLUG/brief.md"
+
+code ".pi/ceo-agents/briefs/$SLUG/brief.md"
+code ".pi/ceo-agents/briefs/$SLUG/constraints-and-evidence.md"</code></pre>
+          <ol class="lab-box__steps">
+            <li>Fill all four required sections with a decision you actually face. Include dates, quantities, alternatives, and the cost of doing nothing where they matter.</li>
+            <li>Add at least one sibling <code>.md</code> context file. Put a distinctive, decision-relevant fact in it that can be traced later.</li>
+            <li>Temporarily rename or remove <code>## Constraints</code>. Launch <code>just ceo</code>, run <code>/ceo-begin</code>, select your brief, and capture the missing-section notice. Do not “fix” the validator in code.</li>
+            <li>Restore the heading and start the brief successfully.</li>
+            <li>If you change <code>max_budget</code>, write the rationale before the run. Afterward, report observed rounds and cost. Do not claim one run proves a larger budget caused deeper reasoning.</li>
+            <li>Trace one memo or conversation statement to the exact line in your context file.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 2 · 25 points.</strong> Submit the brief path, context-file path, evidence of validation failing then passing, the traced fact, and your resource-envelope rationale.</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>7 points: all four sections contain specific, learner-owned facts.</li><li>5 points: at least one relevant sibling Markdown context file.</li><li>5 points: demonstrated missing-section failure and repaired success.</li><li>5 points: trace from a generated statement to exact source context.</li><li>3 points: budget rationale and observed data stated without unsupported causality.</li></ul></div>
+        </div>
+
+        <div class="lab-box">
+          <h3 class="lab-box__title">Lab 3 · Make a deterministic roster change</h3>
+          <ul class="lab-box__meta"><li>10–15 min</li><li>15 points</li><li>Course config only</li></ul>
+          <p>A prompt-bias edit can produce stochastic prose that is hard to grade. For the core lab, change something the runtime must reflect: remove one active board seat, run again, then restore it.</p>
+          <pre><code>cp .pi/ceo-agents/ceo-and-board-configuration.yaml \
+  .pi/ceo-agents/ceo-and-board-configuration.lab-backup.yaml
+
+code .pi/ceo-agents/ceo-and-board-configuration.yaml
+git diff -- .pi/ceo-agents/ceo-and-board-configuration.yaml</code></pre>
+          <ol class="lab-box__steps">
+            <li>Choose one board member and comment out all three YAML lines for that entry: <code>name</code>, <code>path</code>, and <code>color</code>. Commenting only <code>name</code> can confuse the simple parser by leaving fields attached to another entry.</li>
+            <li>Run a brief. Confirm the boot roster or <code>meeting_start.board_members</code> contains exactly seven names.</li>
+            <li>Confirm the new memo front matter names the seven-member roster.</li>
+            <li>Restore the canonical file from the lab backup and inspect the diff again.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 3 · 15 points.</strong> Submit the exact removed seat, the config diff, evidence of the seven-member runtime roster, and evidence that the original eight-member config was restored.</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>5 points: valid three-line YAML edit.</li><li>5 points: runtime or log shows exactly seven expected names.</li><li>3 points: memo front matter reflects the change.</li><li>2 points: canonical config restored.</li></ul></div>
+        </div>
+
+        <div class="lab-box">
+          <h3 class="lab-box__title">Lab 4 · Audit logs and implementation</h3>
+          <ul class="lab-box__meta"><li>15–20 min</li><li>25 points</li><li>Mandatory</li></ul>
+          <p>Use the session ID and brief slug from a completed run.</p>
+          <pre><code>SESSION=&lt;session-id&gt;
+SLUG=&lt;brief-slug&gt;
+DELIB=".pi/ceo-agents/deliberations/$SLUG-$SESSION"
+MEMO=".pi/ceo-agents/memos/$SLUG-$SESSION/memo.md"
+
+test -f "$DELIB/conversation.jsonl"
+test -f "$DELIB/tool-use.jsonl"
+test -f "$MEMO"
+
+jq -s -e '
+  .[0].type == "meeting_start" and
+  .[-1].type == "meeting_end" and
+  all(.[];
+    if (.type == "prompt" or
+        .type == "response" or
+        .type == "final_statement" or
+        .type == "end_deliberation")
+    then has("from") and has("to") and has("message")
+    else true
+    end
+  )
+' "$DELIB/conversation.jsonl"
+
+jq -s -e '
+  length &gt; 0 and
+  all(.[]; has("agent") and has("timestamp") and
+           has("tool_name") and has("args"))
+' "$DELIB/tool-use.jsonl"</code></pre>
+          <p>Now inspect the implementation with line-numbered windows. Line numbers can drift, so use <code>rg</code> first if a range no longer contains the target.</p>
+          <pre><code>rg -n 'Promise\.allSettled|Min time constraint|allMembers' \
+  apps/ceo/extensions/ceo-and-board.ts
+
+nl -ba apps/ceo/extensions/ceo-and-board.ts | sed -n '250,310p'
+nl -ba apps/ceo/extensions/ceo-and-board.ts | sed -n '462,590p'
+nl -ba apps/ceo/extensions/modules/helpers.ts | sed -n '47,85p'</code></pre>
+          <ol class="lab-box__steps">
+            <li>Find the <code>Promise.allSettled</code> used by <code>converse</code>. Explain why this disproves a sequentially fed round.</li>
+            <li>Find <code>allMembers = [...meetingState.activeMembers]</code> and the concurrent final-statement call. Explain why the shipped order does not enforce Contrarian last.</li>
+            <li>Find the <code>end_deliberation</code> guard. Identify the minimum it enforces and the configured minimum it does not enforce programmatically.</li>
+            <li>Explain why <code>meeting_start</code> and <code>meeting_end</code> are exempt from the <code>from</code>/<code>to</code>/<code>message</code> assertion.</li>
+            <li>Find at least one CEO tool-use record. A board member’s Read or SVG call is bonus evidence, not a required result because tool use varies by run.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 4 · 25 points.</strong> Submit the two passing <code>jq</code> checks and a one-paragraph technical explanation covering concurrent rounds, reliable cross-round sharing, final-statement order, the minimum-time-only guard, and log schemas.</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>6 points: correct log shape and bookend distinction.</li><li>6 points: concurrent launch explained from code without inferring dependency from completion order.</li><li>5 points: Contrarian-last discrepancy proven.</li><li>5 points: minimum-time versus minimum-budget enforcement proven.</li><li>3 points: CEO tool-use record located.</li></ul></div>
+        </div>
+
+        <h3>Stretch work · ungraded</h3>
+        <ul>
+          <li><strong>Expertise persistence:</strong> run the same brief twice and diff one <code>expertise/*-scratch-pad.md</code>. Identify a curated pattern rather than raw transcript growth.</li>
+          <li><strong>Sharpen a seat:</strong> edit one agent’s default stance or reasoning patterns, state the expected change before running, then compare several pieces of evidence rather than one phrase.</li>
+          <li><strong>Close the loop:</strong> if <code>ELEVENLABS_API_KEY</code>, Python/<code>uv</code>, and the playback environment are configured, verify <code>summary.mp3</code> is created. Grade the file, not whether the editor or audio player visibly opens.</li>
+          <li><strong>Model diversity:</strong> inspect the multimodel configuration and prompts. The repository does not ship a simple selector flag; using it requires a deliberate canonical-config swap and provider credentials. The CEO lookup also remains tied to <code>agents/ceo.md</code> unless you change the implementation.</li>
+        </ul>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Final score</p>
+          <p><strong>Pass: 80/100</strong>, with Labs 2 and 4 mandatory. Do not award points for matching a predetermined vote, forcing a board-member tool call, visibly opening VS Code, or claiming a budget increase caused a better result from one comparison.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Cumulative mastery</h2>
+        <p class="section-lead">Mastery means you can reconstruct the system, diagnose a flawed design, verify the runtime, and teach the leverage claim without the chapter open.</p>
+
+        <h3>Round A · rapid retrieval</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative CEO agents retrieval questions">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. State the system’s mission in five words, then name its three nodes.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Uncertainty in, decision out. Brief → deliberation → memo.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Name the three innovations and explain which one enables the other two.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Useful long context, a customizable harness, and compounding domain expertise. Long context is the enabler because the meeting and accumulated expertise create a large information load that must remain usable.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Name four board seats, each seat’s bias, and two tension pairs.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Examples: Revenue—speed and monetization; Compounder—trust and retention; Technical Architect—durability; Moonshot—asymmetric upside. Revenue↔Compounder and Technical↔Product are two tension pairs.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. What are the four brief headings and what makes a context file load?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Situation, Stakes, Constraints, Key Question. A sibling file with the <code>.md</code> extension, other than <code>brief.md</code>, is treated as context.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">5. How are the CEO and board members run differently?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The CEO is the primary Pi agent with an injected prompt. Board members are separate Pi subprocesses with role prompts and persistent session files.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">6. What do <code>converse</code> and <code>end_deliberation</code> each do?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>converse</code> targets one, several, or all board members and returns responses plus constraint state. <code>end_deliberation</code> collects final positions and hands the CEO the memo-writing step, subject to the early-close guard.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">7. State the concurrent-round model precisely.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Targets launch concurrently, not as a sequential pipeline of returned answers. Same-round cross-pollination is not ordered or guaranteed; across rounds, members can reliably reread the shared log.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">8. Name three runtime discrepancies a careful engineer should remember.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Converse is concurrent rather than sequentially fed; Contrarian is not serialized last; and minimum time is enforced by the close guard while minimum budget is not.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">9. Why can the same brief produce a different vote?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Agent outputs are nondeterministic. The system should preserve evidence and dissent rather than promise a canonical tally.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">10. Name the core four and one harness-level behavior outside them.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Context, model, prompt, and tools. Harness-level examples include input lockdown, subprocess/session orchestration, lifecycle hooks, constraint state, or the TUI.</p></details></div>
+        </section>
+
+        <h3>Round B · diagnose the broken system</h3>
+        <ol class="mastery-ladder">
+          <li><div><strong>All seats recommend a cautious pilot.</strong><p>Diagnose likely persona theater. Compare objective functions, time horizons, evidence standards, red lines, and prompts. Add real tension before adding more agents.</p></div></li>
+          <li><div><strong>The brief validates but the memo invents basic facts.</strong><p>Passing headings prove structure, not evidence. Add specific context files, source critical numbers, and trace memo claims to input or label them as generated hypotheses.</p></div></li>
+          <li><div><strong>A learner says the fifth log line read the fourth.</strong><p>Completion order is not an information dependency. Read the scheduling code and inspect message content; use “concurrent within a round, reliably shared across rounds.”</p></div></li>
+          <li><div><strong>The meeting crosses five minutes.</strong><p>Do not assume the limit failed. Check whether a round was in flight, when constraint state was evaluated, whether another <code>converse</code> was blocked, and whether the CEO moved to <code>end_deliberation</code>.</p></div></li>
+          <li><div><strong>The memo is useful, so the team deletes the logs.</strong><p>Protect the full audit trail. Without conversation and tool logs, the team cannot explain claims, inspect dissent, calibrate roles, or improve the system.</p></div></li>
+        </ol>
+
+        <h3>Round C · oral board exam</h3>
+        <div class="teach-back">
+          <p><strong>Five-minute prompt:</strong> “Design a CEO-and-board system for one high-leverage decision. Start with the brief and memo schemas. Choose four seats with conflicting objective functions. Explain the orchestration, context loading, session behavior, constraints, logs, expertise loop, and one skill. State which guarantees live in prompts and which must live in code. End with how you will know the board improved the decision.”</p>
+          <p>Pass when a listener can draw the architecture, predict the artifacts, name the failure modes, and identify the evidence required to audit your claims.</p>
+        </div>
+
+        <h3>Mastery rubric</h3>
+        <table class="rubric-table">
+          <thead><tr><th>Dimension</th><th>Beginning</th><th>Operational</th><th>Mastery</th></tr></thead>
+          <tbody>
+            <tr><td>Contract</td><td>Describes “a board chat”</td><td>Names brief, debate, memo</td><td>Defines validated inputs, reasoning artifacts, and decision schema</td></tr>
+            <tr><td>Specialists</td><td>Uses personas</td><td>Uses different roles</td><td>Engineers objective functions, horizons, evidence, and tension pairs</td></tr>
+            <tr><td>Runtime</td><td>Trusts UI or docs</td><td>Reads code or logs</td><td>Triangulates prompt intent, code semantics, and runtime evidence</td></tr>
+            <tr><td>Constraints</td><td>Uses defaults</td><td>Sets floors and ceilings</td><td>Sizes them to decision value and understands tool-boundary behavior</td></tr>
+            <tr><td>Learning</td><td>Keeps the memo</td><td>Keeps logs</td><td>Uses logs to improve roles, prompts, limits, and curated expertise</td></tr>
+            <tr><td>Transfer</td><td>Copies Pi details</td><td>Can modify the course system</td><td>Can port the contracts and primitives to another harness</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Glossary</h2>
+        <p class="section-lead">Use these terms precisely. A shared vocabulary keeps architecture, prompts, and runtime claims from collapsing into “the agents talked.”</p>
+        <dl class="glossary">
+          <div><dt>CEO &amp; Board</dt><dd>One orchestrator agent plus a configurable set of biased specialist agents that deliberate on a decision.</dd></div>
+          <div><dt>Brief</dt><dd>The validated input directory: <code>brief.md</code> with Situation, Stakes, Constraints, and Key Question, plus optional sibling Markdown context.</dd></div>
+          <div><dt>Deliberation</dt><dd>The bounded multi-round workflow in which the CEO frames, broadcasts, targets tensions, watches constraints, and closes.</dd></div>
+          <div><dt>Memo</dt><dd>The durable decision output containing recommendation, stances, dissent, risks, trade-offs, and next actions.</dd></div>
+          <div><dt>Multi-agent orchestration</dt><dd>One control node coordinating several agent executions, their state, messages, tools, and outputs.</dd></div>
+          <div><dt>Adversarial pattern</dt><dd>Controlled disagreement among specialists whose objective functions expose different classes of error.</dd></div>
+          <div><dt>Tension pair</dt><dd>Two roles whose biases illuminate a recurring trade-off, such as near-term revenue versus long-term trust.</dd></div>
+          <div><dt><code>converse</code></dt><dd>The CEO tool that calls named, multiple, or all active board members and returns responses plus constraint state.</dd></div>
+          <div><dt><code>end_deliberation</code></dt><dd>The closing tool that gathers final statements and moves the CEO to memo synthesis.</dd></div>
+          <div><dt>Constraint engine</dt><dd>The logic that calculates elapsed time, cost, warning thresholds, and maximum-hit state around board calls.</dd></div>
+          <div><dt>Agent harness</dt><dd>The runtime layer exposing system-prompt control, tools, lifecycle hooks, sessions, subprocesses or subagents, and UI behavior.</dd></div>
+          <div><dt>Persistent session</dt><dd>A per-board-member Pi session file reused during one deliberation so later calls retain that member’s context.</dd></div>
+          <div><dt>Expertise</dt><dd>Persistent, role-scoped memory and patterns around a specific domain, curated across deliberations.</dd></div>
+          <div><dt>Observability</dt><dd>The logs, costs, messages, tool records, sessions, and artifacts needed to explain and improve a run.</dd></div>
+          <div><dt>Core four</dt><dd>Context, model, prompt, and tools—the four primary levers of an agentic system.</dd></div>
+          <div><dt>One-shot system</dt><dd>A workflow with a deliberately narrow interaction surface: start, stop, or wrap rather than arbitrary chat.</dd></div>
+          <div><dt>Agent model diversity</dt><dd>Assigning different model families to seats to add another source of perspective, after role diversity is well designed.</dd></div>
+          <div><dt>Agentic engineering</dt><dd>Building agent systems that solve problems and make decisions, not only generate code.</dd></div>
+        </dl>
+      </section>
+
+      <footer class="chapter-footer">
+        <nav class="chapter-footer__nav" aria-label="Chapter navigation">
+          <a href="../index.html">← Book hub</a>
+          <span>Next · Lead Agents (pending)</span>
+        </nav>
+      </footer>
+    
+      <p class="code-deep-link"><a href="../code/ma-1-ceo-agents.html">Code deep-dive · how Dan built this repo →</a></p>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+
+      const updateProgress = () => {
+        if (!topBar || !railBar || !label) return;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          progressFramePending = false;
+        });
+      };
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+          const visible = entries
+            .filter(entry => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+          links.forEach(link => {
+            const active = link.getAttribute('href') === `#${visible.target.id}`;
+            if (active) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          });
+        }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+        sections.forEach(section => observer.observe(section));
+      }
+
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+</body>
+</html>

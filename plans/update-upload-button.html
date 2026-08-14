@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rename “Upload Data” button to “Upload” · Plan</title>
+<!-- Fonts via CDN with a system-font fallback stack baked into every rule below.
+     If the CDN is unreachable (offline), typography falls back; content does not. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  :root {
+    --paper:#FAF8F4; --paper-2:#F4EEE5; --ink:#2A2520; --ink-soft:#4A4239;
+    --muted:#6E655A; --faint:#938878; --line:#E4DCD0; --line-strong:#D3C7B6;
+    --clay:#9A5B3F; --clay-soft:#F1E4D9; --teal:#3C6E63; --teal-soft:#E1ECE8;
+    --gold:#B5821F; --gold-soft:#F4E9CF; --code-bg:#2C2722; --code-ink:#EAE2D4;
+    --serif:"Fraunces", Georgia, "Times New Roman", serif;
+    --sans:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono:"JetBrains Mono", "SF Mono", "Menlo", "Consolas", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper); color: var(--ink); font-family: var(--sans);
+    line-height: 1.68; margin: 0; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 50rem; margin: 0 auto; padding: 3.2rem 1.5rem 4rem; }
+
+  /* --- header --- */
+  .kicker { font-family: var(--mono); font-size: .7rem; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--clay); margin: 0 0 .7rem; }
+  h1 { font-family: var(--serif); font-weight: 600; font-size: 2.55rem; line-height: 1.08;
+    letter-spacing: -.015em; margin: 0 0 .8rem; }
+  .lede { font-size: 1.12rem; color: var(--ink-soft); max-width: 62ch; line-height: 1.6; margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.4rem 0 0; }
+  .chip { font-family: var(--mono); font-size: .66rem; letter-spacing: .06em; text-transform: uppercase;
+    padding: .28rem .6rem; border-radius: 100px; border: 1px solid var(--line-strong); color: var(--muted); }
+  .chip.on { background: var(--clay); border-color: var(--clay); color: #fff; }
+
+  /* --- table of contents --- */
+  nav.toc { margin: 2.4rem 0; padding: 1.2rem 1.4rem; border: 1px solid var(--line);
+    border-radius: 10px; background: #fff7ee; }
+  nav.toc .lab { font-family: var(--mono); font-size: .64rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: .7rem; }
+  nav.toc ol { list-style: none; counter-reset: t; margin: 0; padding: 0;
+    columns: 2; column-gap: 2rem; }
+  nav.toc li { counter-increment: t; margin: .25rem 0; break-inside: avoid; }
+  nav.toc li::before { content: counter(t, decimal-leading-zero); font-family: var(--mono);
+    font-size: .72rem; color: var(--clay); margin-right: .7rem; }
+  nav.toc a { color: var(--ink); text-decoration: none; }
+  nav.toc a:hover { color: var(--clay); }
+
+  /* --- sections --- */
+  section { margin: 2.8rem 0; scroll-margin-top: 1.5rem; }
+  .secnum { font-family: var(--mono); font-size: .74rem; color: var(--clay); letter-spacing: .1em; }
+  h2 { font-family: var(--serif); font-weight: 600; font-size: 1.72rem; line-height: 1.15;
+    margin: .25rem 0 1rem; letter-spacing: -.01em; }
+  h3 { font-family: var(--serif); font-weight: 600; font-size: 1.18rem; margin: 1.8rem 0 .6rem; }
+  p { margin: 0 0 1rem; }
+  .ink-soft { color: var(--ink-soft); }
+  em { font-style: italic; color: var(--ink-soft); }
+  a.ref { color: var(--clay); text-decoration: none; border-bottom: 1px solid #E2CDBE; }
+  a.ref:hover { border-color: var(--clay); }
+  strong { font-weight: 600; }
+
+  /* --- code --- */
+  pre { background: var(--code-bg); color: var(--code-ink); border-radius: 9px;
+    padding: 1rem 1.15rem; overflow-x: auto; margin: 1.1rem 0;
+    font-family: var(--mono); font-size: .82rem; line-height: 1.62; }
+  pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+  code { font-family: var(--mono); font-size: .86em; background: var(--paper-2);
+    padding: .1em .38em; border-radius: 4px; color: var(--ink); }
+
+  /* --- diagram figure --- */
+  figure.diagram { margin: 1.6rem 0; border: 1px solid var(--line); border-radius: 12px;
+    overflow: hidden; background: #fff8ef; }
+  figure.diagram svg { display: block; width: 100%; height: auto; }
+  figcaption { font-size: .8rem; color: var(--muted); padding: .7rem 1rem;
+    border-top: 1px solid var(--line); font-family: var(--mono); letter-spacing: .02em; }
+
+  /* --- callout notes --- */
+  .note { margin: 1.2rem 0; padding: .9rem 1.1rem; border: 1px solid var(--line-strong);
+    border-radius: 9px; background: var(--paper-2); font-size: .95rem; }
+  .note .t { font-family: var(--mono); font-size: .64rem; letter-spacing: .12em;
+    text-transform: uppercase; margin-bottom: .3rem; font-weight: 500; }
+  .note.warn { background: var(--gold-soft); border-color: var(--gold); }
+  .note.warn .t { color: #8A6310; }
+  .note.key { background: var(--teal-soft); border-color: var(--teal); }
+  .note.key .t { color: var(--teal); }
+
+  /* --- ordered steps --- */
+  ol.steps { list-style: none; counter-reset: s; margin: 1rem 0; padding: 0; }
+  ol.steps > li { counter-increment: s; position: relative; padding: .15rem 0 1.1rem 2.7rem;
+    border-bottom: 1px solid var(--line); margin-bottom: 1.1rem; }
+  ol.steps > li:last-child { border-bottom: none; }
+  ol.steps > li::before { content: counter(s); position: absolute; left: 0; top: .1rem;
+    width: 1.75rem; height: 1.75rem; display: grid; place-items: center;
+    background: var(--clay); color: #fff; border-radius: 50%;
+    font-family: var(--mono); font-size: .78rem; }
+  ol.steps .step-title { font-weight: 600; }
+  ol.steps .reuse { font-family: var(--mono); font-size: .66rem; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--teal); }
+
+  /* --- tick list (scope / non-goals) --- */
+  ul.tick { list-style: none; margin: 1rem 0; padding: 0; }
+  ul.tick li { position: relative; padding-left: 1.5rem; margin: .4rem 0; }
+  ul.tick li::before { content: '→'; position: absolute; left: 0; color: var(--clay); }
+  ul.tick.no li::before { content: '×'; color: var(--faint); }
+
+  /* --- tables --- */
+  table { width: 100%; border-collapse: collapse; margin: 1.1rem 0; font-size: .92rem; }
+  th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--mono); font-size: .66rem; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--faint); border-bottom: 1px solid var(--line-strong); }
+
+  /* --- footer --- */
+  footer { margin-top: 3.5rem; padding-top: 1.4rem; border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: .76rem; color: var(--faint);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
+
+  /* --- feedback affordances (slice 02) — zero-server, persisted to localStorage --- */
+  .fb { margin-top: .9rem; padding-top: .7rem; border-top: 1px dashed var(--line);
+    display: flex; flex-direction: column; gap: .5rem; }
+  .fb-toggle { display: inline-flex; align-items: center; gap: .5rem; cursor: pointer;
+    align-self: flex-start; user-select: none; font-family: var(--mono); font-size: .66rem;
+    letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .fb-check { width: 1.05rem; height: 1.05rem; margin: 0; accent-color: var(--clay); cursor: pointer; }
+  .fb-note { width: 100%; min-height: 2.4rem; resize: vertical; font-family: var(--sans);
+    font-size: .9rem; line-height: 1.5; color: var(--ink); background: #fffdf9;
+    border: 1px solid var(--line-strong); border-radius: 7px; padding: .5rem .65rem; }
+  .fb-note::placeholder { color: var(--faint); }
+  .fb-note:focus { outline: none; border-color: var(--clay); box-shadow: 0 0 0 3px var(--clay-soft); }
+  ol.steps > li.done .step-title, ul.tick > li.done strong { text-decoration: line-through; color: var(--muted); }
+
+  /* --- feedback toolbar (fixed, no server) --- */
+  .fb-toolbar { position: fixed; right: 1.1rem; bottom: 1.1rem; z-index: 50; display: flex; gap: .5rem; }
+  .fb-btn { font-family: var(--mono); font-size: .72rem; letter-spacing: .03em; cursor: pointer;
+    border: 1px solid var(--line-strong); background: #fffdf9; color: var(--ink-soft);
+    padding: .55rem .85rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(42,37,32,.08); }
+  .fb-btn:hover { border-color: var(--clay); color: var(--clay); }
+  .fb-btn.primary { background: var(--clay); border-color: var(--clay); color: #fff; }
+  .fb-btn.primary:hover { background: #864c33; color: #fff; }
+  .fb-btn .ok { display: none; }
+  .fb-btn.copied .lbl { display: none; }
+  .fb-btn.copied .ok { display: inline; }
+
+  /* --- wireframe: static annotated screen mocks (slice 03) ---
+     Plain static HTML, palette-matched. No renderer, no roughening, no
+     interactivity — that is the prototype's job. The agent composes real layout
+     with these helpers and explains each region with numbered annotations. -->*/
+  .wf-frame { border: 1px solid var(--line-strong); border-radius: 12px; background: #fff8ef;
+    overflow: hidden; margin: 1.4rem 0; }
+  .wf-chrome { display: flex; align-items: center; gap: .4rem; padding: .5rem .8rem;
+    border-bottom: 1px solid var(--line); background: var(--paper-2); }
+  .wf-dot { width: .58rem; height: .58rem; border-radius: 50%; background: var(--line-strong); }
+  .wf-url { font-family: var(--mono); font-size: .68rem; color: var(--faint); margin-left: .5rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wf-screen { padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: .7rem; }
+  .wf-bar { display: flex; align-items: center; gap: .6rem; width: 100%; }
+  .wf-bar .spacer { flex: 1; }
+  .wf-card2 { border: 1px solid var(--line-strong); border-radius: 8px; padding: .8rem .9rem;
+    background: #fff; display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
+  .wf-h { font-family: var(--serif); font-weight: 600; font-size: 1.1rem; }
+  .wf-muted { color: var(--muted); font-size: .85rem; }
+  .wf-field { border: 1px solid var(--line-strong); border-radius: 6px; padding: .45rem .6rem;
+    font-family: var(--sans); font-size: .85rem; color: var(--muted); background: #fffdf9; }
+  .wf-btn2 { align-self: flex-start; font-family: var(--mono); font-size: .7rem; letter-spacing: .03em;
+    padding: .45rem .8rem; border-radius: 6px; border: 1px solid var(--clay); background: var(--clay); color: #fff; }
+  .wf-btn2.ghost { background: #fffdf9; color: var(--ink-soft); border-color: var(--line-strong); }
+  .wf-pill2 { font-family: var(--mono); font-size: .6rem; letter-spacing: .06em; text-transform: uppercase;
+    border: 1px solid var(--line-strong); border-radius: 100px; padding: .2rem .55rem; color: var(--muted); white-space: nowrap; }
+  /* inline numbered marker dropped into the mock, paired with a callout below */
+  .wf-mark { display: inline-grid; place-items: center; width: 1.2rem; height: 1.2rem; border-radius: 50%;
+    background: var(--gold); color: #fff; font-family: var(--mono); font-size: .62rem; vertical-align: middle; }
+  ol.wf-annos { list-style: none; counter-reset: a; margin: .9rem 0 0; padding: 0; display: grid; gap: .45rem; }
+  ol.wf-annos li { counter-increment: a; position: relative; padding-left: 1.9rem; font-size: .88rem; color: var(--ink-soft); }
+  ol.wf-annos li::before { content: counter(a); position: absolute; left: 0; top: .02rem;
+    width: 1.25rem; height: 1.25rem; display: grid; place-items: center; border-radius: 50%;
+    background: var(--gold-soft); border: 1px solid var(--gold); color: #8A6310; font-family: var(--mono); font-size: .64rem; }
+
+  /* --- click-through prototype: show/hide screens, back button, counter (slice 03) ---
+     Honest zero-server: screens are divs, navigation is show/hide only. No faked
+     backend, no simulated data flow. showScreen()/goBack() drive it (window.LVP). -->*/
+  .proto { border: 1px solid var(--line-strong); border-radius: 12px; overflow: hidden;
+    background: #fff8ef; margin: 1.4rem 0; }
+  .proto-bar { display: flex; align-items: center; justify-content: space-between; gap: .6rem;
+    padding: .5rem .8rem; border-bottom: 1px solid var(--line); background: var(--paper-2); }
+  .proto-back { font-family: var(--mono); font-size: .7rem; letter-spacing: .04em; cursor: pointer;
+    border: 1px solid var(--line-strong); background: #fffdf9; color: var(--ink-soft);
+    padding: .35rem .7rem; border-radius: 7px; }
+  .proto-back:hover:not(:disabled) { border-color: var(--clay); color: var(--clay); }
+  .proto-back:disabled { opacity: .4; cursor: not-allowed; }
+  .proto-counter { font-family: var(--mono); font-size: .66rem; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--faint); }
+  .proto-stage { padding: 1.3rem 1.2rem; }
+  .screen { display: flex; flex-direction: column; gap: .7rem; }
+  .screen[hidden] { display: none; }
+  .screen-title { font-family: var(--serif); font-weight: 600; font-size: 1.15rem; }
+  .proto-hotspot { align-self: flex-start; font-family: var(--mono); font-size: .7rem; letter-spacing: .03em;
+    cursor: pointer; border: 1px solid var(--clay); background: var(--clay); color: #fff;
+    padding: .45rem .8rem; border-radius: 7px; }
+  .proto-hotspot.ghost { background: #fffdf9; color: var(--ink-soft); border-color: var(--line-strong); }
+  .proto-hotspot:hover { filter: brightness(.96); }
+
+  @media print { .fb-toolbar, .proto-bar { display: none; } }
+</style>
+</head>
+<body data-plan-slug="update-upload-button">
+<main class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <header>
+    <p class="kicker">Plan · Local Visual Plan</p>
+    <h1>Rename the “Upload Data” button to “Upload”</h1>
+    <p class="lede">Chore #47: make the data-upload trigger in the natural-language SQL client read the single word <strong>Upload</strong>, while the modal it opens keeps its descriptive <strong>Upload Data</strong> header. Done means the UI, the README, the test suite, and the client build all agree — with the button’s wiring untouched.</p>
+    <div class="chips">
+      <span class="chip on">draft</span>
+      <span class="chip">3 steps · 2 files</span>
+      <span class="chip">chore · adw cc73faf1</span>
+      <span class="chip">2026-06-17</span>
+    </div>
+  </header>
+
+  <!-- ============ TABLE OF CONTENTS ============ -->
+  <nav class="toc" aria-label="Contents">
+    <div class="lab">Contents</div>
+    <ol>
+      <li><a href="#objective">Objective</a></li>
+      <li><a href="#scope">Scope &amp; non-goals</a></li>
+      <li><a href="#approach">Approach</a></li>
+      <li><a href="#steps">Steps</a></li>
+      <li><a href="#risks">Risks</a></li>
+      <li><a href="#verification">Verification</a></li>
+      <li><a href="#open-questions">Open questions</a></li>
+      <li><a href="#wireframe">Wireframe</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ OBJECTIVE ============ -->
+  <section id="objective" data-fb data-fb-title="Objective">
+    <p class="secnum">01</p>
+    <h2>Objective</h2>
+    <p>
+      The query toolbar in <code>tac/tac-7/app/client</code> currently exposes a
+      <strong>secondary button</strong> that opens the data-upload modal. Chore
+      #47 wants that button’s label shortened from <strong>“Upload Data”</strong>
+      to <strong>“Upload”</strong> for a tighter toolbar, with no change to what
+      it does. After this work the rendered button reads <em>Upload</em>, the
+      modal it opens still reads <em>Upload Data</em> as its header, the README
+      usage section matches the UI, and <code>pytest</code> + the client build
+      pass clean.
+    </p>
+    <div class="note warn">
+      <div class="t">Working-tree note</div>
+      The on-disk button text at <code>app/client/index.html:25</code> already
+      reads <code>&lt;button id="upload-data-button" …&gt;Upload&lt;/button&gt;</code>,
+      and the README click instruction already says “Upload”. The real remaining
+      work is to <strong>confirm consistency</strong>, settle one wording
+      decision in the README (see Open Questions), and <strong>validate with
+      zero regressions</strong> — not to re-type a change that is partly present.
+    </div>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this section…"></textarea></div>
+  </section>
+
+  <!-- ============ SCOPE & NON-GOALS ============ -->
+  <section id="scope" data-fb data-fb-title="Scope &amp; non-goals">
+    <p class="secnum">02</p>
+    <h2>Scope &amp; non-goals</h2>
+    <h3>In scope</h3>
+    <ul class="tick">
+      <li>The visible text of the toolbar button at <code>app/client/index.html:25</code> reads <strong>Upload</strong>.</li>
+      <li>The README usage section reflects the shorter label so docs match the UI.</li>
+      <li>Server tests (<code>uv run pytest</code>) and the client build (<code>bun run build</code>) pass after the change.</li>
+    </ul>
+    <h3>Non-goals</h3>
+    <ul class="tick no">
+      <li>The modal header <code>&lt;h2&gt;Upload Data&lt;/h2&gt;</code> (line 53) — it stays; it’s the modal’s context title, not the button.</li>
+      <li>The button’s <code>id="upload-data-button"</code> and <code>class="secondary-button"</code> — unchanged, so the modal-open handler keeps working.</li>
+      <li>Any behaviour, styling, layout, endpoint, or upload logic.</li>
+      <li>The empty-state sentence “No tables loaded. Upload data or use sample data…” (line 45) — generic prose, not the button label.</li>
+    </ul>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this section…"></textarea></div>
+  </section>
+
+  <!-- ============ APPROACH (with at least one inline-SVG diagram) ============ -->
+  <section id="approach" data-fb data-fb-title="Approach">
+    <p class="secnum">03</p>
+    <h2>Approach</h2>
+    <p>
+      This reuses the existing markup and wiring entirely — there is no new
+      component, handler, or style. The only edit that matters is the <em>text
+      node</em> inside one button. The trap is the word “Upload Data” appearing
+      in <strong>three</strong> distinct places that must not move as one:
+    </p>
+    <ul class="tick">
+      <li><strong>The button</strong> (<code>index.html:25</code>) — the one thing that becomes “Upload”.</li>
+      <li><strong>The modal header</strong> (<code>index.html:53</code>) — stays “Upload Data”; it labels the dialog the button opens.</li>
+      <li><strong>The README</strong> (usage step, ~line 84) — docs the button; the click instruction already says “Upload”, leaving one wording call on the bold step label.</li>
+    </ul>
+    <p>
+      The hard-to-get-wrong part isn’t the rename — it’s the <em>identity</em>
+      that must survive it. <code>app/client/src/main.ts:434</code> calls
+      <code>getElementById('upload-data-button')</code> to bind the click that
+      opens the modal. So the edit changes only the text between the tags; the
+      <code>id</code> and <code>class</code> are load-bearing and untouched.
+    </p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 720 300" role="img" aria-label="What changes vs what is load-bearing">
+        <!-- panel frames -->
+        <rect x="16" y="16" width="688" height="268" rx="10" fill="none" stroke="var(--line-strong)" />
+        <text x="32" y="42" font-family="var(--mono)" font-size="12" fill="var(--faint)" letter-spacing="1.5">ONE EDIT · TEXT NODE ONLY</text>
+
+        <!-- the button anatomy -->
+        <rect x="40" y="60" width="640" height="70" rx="9" fill="#fff8ef" stroke="var(--clay)" />
+        <text x="58" y="86" font-family="var(--mono)" font-size="12" fill="var(--muted)">&lt;button</text>
+        <rect x="138" y="70" width="220" height="30" rx="6" fill="var(--teal-soft)" stroke="var(--teal)" />
+        <text x="248" y="90" text-anchor="middle" font-family="var(--mono)" font-size="11.5" fill="var(--teal)">id="upload-data-button"</text>
+        <rect x="368" y="70" width="200" height="30" rx="6" fill="var(--teal-soft)" stroke="var(--teal)" />
+        <text x="468" y="90" text-anchor="middle" font-family="var(--mono)" font-size="11.5" fill="var(--teal)">class="secondary-button"</text>
+        <text x="578" y="90" font-family="var(--mono)" font-size="12" fill="var(--muted)">&gt;</text>
+        <rect x="138" y="104" width="430" height="20" rx="4" fill="none" stroke="none" />
+        <text x="58" y="120" font-family="var(--mono)" font-size="11" fill="var(--teal)">keep — wired in main.ts:434 (modal open)</text>
+
+        <!-- the changing text node -->
+        <rect x="40" y="150" width="310" height="56" rx="9" fill="var(--clay-soft)" stroke="var(--clay)" />
+        <text x="195" y="174" text-anchor="middle" font-family="var(--mono)" font-size="13" fill="var(--ink)">Upload Data  →  Upload</text>
+        <text x="195" y="194" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--clay)">text node — the only change</text>
+
+        <!-- the things that must NOT move with it -->
+        <rect x="370" y="150" width="310" height="56" rx="9" fill="#fff8ef" stroke="var(--gold)" />
+        <text x="525" y="174" text-anchor="middle" font-family="var(--sans)" font-size="13" fill="var(--ink)">Modal header &lt;h2&gt;Upload Data&lt;/h2&gt;</text>
+        <text x="525" y="194" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="#8A6310">stays — line 53, dialog context</text>
+
+        <rect x="40" y="222" width="640" height="44" rx="9" fill="var(--paper-2)" stroke="var(--line-strong)" />
+        <text x="360" y="249" text-anchor="middle" font-family="var(--sans)" font-size="12.5" fill="var(--muted)">README usage step (~line 84) — align docs; one wording call on the bold label (see Open Questions)</text>
+      </svg>
+      <figcaption>One text-node edit; the id/class stay (they wire the modal); the modal header and README are the surrounding context to leave or align deliberately.</figcaption>
+    </figure>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this section…"></textarea></div>
+  </section>
+
+  <!-- ============ STEPS ============ -->
+  <section id="steps" data-fb data-fb-title="Steps">
+    <p class="secnum">04</p>
+    <h2>Steps</h2>
+    <ol class="steps">
+      <li id="step-1" data-fb data-fb-title="Finalize the button label in index.html">
+        <span class="step-title">Finalize the button label in the client HTML.</span>
+        <p class="ink-soft">
+          <span class="reuse">reuses</span> <code>app/client/index.html</code> line 25 —
+          confirm the button text node reads <code>Upload</code> and that
+          <code>id="upload-data-button"</code> + <code>class="secondary-button"</code>
+          are intact. If the working tree already shows “Upload”, no edit is
+          needed; this step is the confirmation gate, not a re-type.
+        </p>
+        <pre><code>&lt;!-- app/client/index.html:25 --&gt;
+&lt;button id="upload-data-button" class="secondary-button"&gt;Upload&lt;/button&gt;</code></pre>
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Reviewed / done</label>
+          <textarea class="fb-note" placeholder="Note on this step…"></textarea>
+        </div>
+      </li>
+      <li id="step-2" data-fb data-fb-title="Align the README usage docs">
+        <span class="step-title">Align the README usage section.</span>
+        <p class="ink-soft">
+          <span class="reuse">reuses</span> <code>README.md</code> usage step (~line 84) —
+          the click instruction already reads <code>Click "Upload"</code>. Decide
+          the bold step label <code>**Upload Data**:</code> per the Open Question
+          (recommended: leave it as the step name). Leave the
+          <code>POST /api/upload</code> reference and other prose untouched.
+        </p>
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Reviewed / done</label>
+          <textarea class="fb-note" placeholder="Note on this step…"></textarea>
+        </div>
+      </li>
+      <li id="step-3" data-fb data-fb-title="Validate with zero regressions">
+        <span class="step-title">Validate — tests, build, and a manual smoke.</span>
+        <p class="ink-soft">
+          <span class="reuse">reuses</span> the spec’s validation commands —
+          run <code>cd app/server &amp;&amp; uv run pytest</code> and
+          <code>cd app/client &amp;&amp; bun run build</code> from
+          <code>tac/tac-7</code>, then open the client and confirm the toolbar
+          button reads <strong>Upload</strong> and the opened modal still reads
+          <strong>Upload Data</strong>.
+        </p>
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Reviewed / done</label>
+          <textarea class="fb-note" placeholder="Note on this step…"></textarea>
+        </div>
+      </li>
+    </ol>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on the plan as a whole…"></textarea></div>
+  </section>
+
+  <!-- ============ RISKS ============ -->
+  <section id="risks" data-fb data-fb-title="Risks">
+    <p class="secnum">05</p>
+    <h2>Risks</h2>
+    <ul class="tick">
+      <li id="risk-1" data-fb data-fb-title="Modal header renamed by accident">
+        <strong>Renaming the modal header too.</strong> — A blind find-replace of
+        “Upload Data” would also hit <code>&lt;h2&gt;Upload Data&lt;/h2&gt;</code>
+        at line 53 and strip the dialog’s context. Mitigation: edit only the
+        line-25 text node; the spec Notes explicitly require the header to stay.
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Accepted</label>
+          <textarea class="fb-note" placeholder="Note on this risk…"></textarea>
+        </div>
+      </li>
+      <li id="risk-2" data-fb data-fb-title="Button id or class changed, breaking modal">
+        <strong>Touching the button’s id/class.</strong> — Changing
+        <code>id="upload-data-button"</code> breaks
+        <code>main.ts:434</code>’s <code>getElementById</code> lookup, so the
+        button stops opening the modal. Mitigation: change only the text between
+        the tags; leave id and class byte-for-byte.
+        <div class="fb">
+          <label class="fb-toggle"><input type="checkbox" class="fb-check" /> Accepted</label>
+          <textarea class="fb-note" placeholder="Note on this risk…"></textarea>
+        </div>
+      </li>
+    </ul>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this section…"></textarea></div>
+  </section>
+
+  <!-- ============ VERIFICATION ============ -->
+  <section id="verification" data-fb data-fb-title="Verification">
+    <p class="secnum">06</p>
+    <h2>Verification</h2>
+    <p>The spec ships two validation commands; both run from <code>tac/tac-7</code>. Add one manual browser smoke that proves the rename landed without moving the header.</p>
+    <pre><code>cd tac/tac-7/app/server &amp;&amp; uv run pytest      # server tests, zero regressions
+cd tac/tac-7/app/client &amp;&amp; bun run build      # tsc + vite build, no errors</code></pre>
+    <div class="note key">
+      <div class="t">Manual smoke</div>
+      Run the client, look at the query toolbar: the secondary button reads
+      <strong>Upload</strong> (next to <em>Query</em>). Click it — the modal
+      opens (proving the <code>id</code> wiring survived) and its header still
+      reads <strong>Upload Data</strong>.
+    </div>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this section…"></textarea></div>
+  </section>
+
+  <!-- ============ OPEN QUESTIONS ============ -->
+  <section id="open-questions" data-fb data-fb-title="Open questions">
+    <p class="secnum">07</p>
+    <h2>Open questions</h2>
+    <p class="ink-soft">One wording decision in the README would change what Step 2 edits; everything else is settled.</p>
+    <table>
+      <thead><tr><th>Question</th><th>Recommended default</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>The README usage step bold label is <code>**Upload Data**:</code> — rename it to <code>**Upload**:</code> to match the button, or keep it as the step name?</td>
+          <td><strong>Keep “Upload Data”.</strong> It names the usage step (“the upload-data flow”), not the button — same rationale as keeping the modal header. The click instruction already says “Upload”, so docs and UI agree where it counts.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="fb"><textarea class="fb-note" placeholder="Answer or note on an open question…"></textarea></div>
+  </section>
+
+  <!-- ============ WIREFRAME ============ -->
+  <section id="wireframe" data-fb data-fb-title="Wireframe">
+    <p class="secnum">08</p>
+    <h2>Wireframe</h2>
+    <p class="ink-soft">The query toolbar before and after the rename, plus the modal it opens — showing the one label that changes and the one that deliberately doesn’t.</p>
+
+    <div style="display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-start;">
+      <div style="flex:1; min-width:18rem;">
+        <p class="wf-muted" style="margin:0 0 .4rem; font-family:var(--mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase;">Before</p>
+        <figure class="wf-frame" style="margin:0;">
+          <div class="wf-chrome">
+            <span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span>
+            <span class="wf-url">localhost:5173 · NL → SQL</span>
+          </div>
+          <div class="wf-screen">
+            <span class="wf-field">Ask a question about your data…</span>
+            <div class="wf-bar">
+              <button class="wf-btn2">Query</button>
+              <button class="wf-btn2 ghost">Upload Data <span class="wf-mark">1</span></button>
+              <span class="spacer"></span>
+              <button class="wf-btn2 ghost">Generate Random Query</button>
+            </div>
+          </div>
+        </figure>
+      </div>
+
+      <div style="flex:1; min-width:18rem;">
+        <p class="wf-muted" style="margin:0 0 .4rem; font-family:var(--mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase;">After</p>
+        <figure class="wf-frame" style="margin:0;">
+          <div class="wf-chrome">
+            <span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span>
+            <span class="wf-url">localhost:5173 · NL → SQL</span>
+          </div>
+          <div class="wf-screen">
+            <span class="wf-field">Ask a question about your data…</span>
+            <div class="wf-bar">
+              <button class="wf-btn2">Query</button>
+              <button class="wf-btn2 ghost">Upload <span class="wf-mark">2</span></button>
+              <span class="spacer"></span>
+              <button class="wf-btn2 ghost">Generate Random Query</button>
+            </div>
+          </div>
+        </figure>
+      </div>
+    </div>
+
+    <figure class="wf-frame">
+      <div class="wf-chrome">
+        <span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span>
+        <span class="wf-url">Modal opened by the button — unchanged</span>
+      </div>
+      <div class="wf-screen">
+        <div class="wf-bar">
+          <span class="wf-h">Upload Data <span class="wf-mark">3</span></span>
+          <span class="spacer"></span>
+          <button class="wf-btn2 ghost">×</button>
+        </div>
+        <div class="wf-card2">
+          <span class="wf-muted">Quick Start with Sample Data</span>
+          <div class="wf-bar" style="gap:.4rem;">
+            <span class="wf-pill2">users</span>
+            <span class="wf-pill2">orders</span>
+            <span class="wf-pill2">products</span>
+          </div>
+          <span class="wf-muted">Or drag &amp; drop a .csv / .json file</span>
+        </div>
+      </div>
+    </figure>
+
+    <ol class="wf-annos">
+      <li><strong>Before:</strong> the secondary button reads “Upload Data”, sitting right of the primary “Query” button.</li>
+      <li><strong>After:</strong> same button, same position, same id/class — text node trimmed to “Upload”. This is the entire visible change.</li>
+      <li><strong>Modal header stays “Upload Data.”</strong> The button opens this dialog; its <code>&lt;h2&gt;</code> keeps the descriptive title for context. Do not rename it.</li>
+    </ol>
+    <div class="fb"><textarea class="fb-note" placeholder="Note on this wireframe…"></textarea></div>
+  </section>
+
+  <footer>
+    <span>plans/update-upload-button.html</span>
+    <span>local-visual-plan · zero-server</span>
+  </footer>
+
+</main>
+
+<!-- ============ FEEDBACK TOOLBAR (fixed, zero-server) ============ -->
+<div class="fb-toolbar" role="group" aria-label="Plan feedback">
+  <button type="button" id="fb-reset" class="fb-btn">Reset state</button>
+  <button type="button" id="fb-copy" class="fb-btn primary">
+    <span class="lbl">Copy feedback</span><span class="ok">Copied ✓</span>
+  </button>
+</div>
+
+<!-- ============================================================================
+     INTERACTIVE LAYER (slices 02 + 03)  ·  keep verbatim
+     ============================================================================ -->
+<script>
+(function () {
+  "use strict";
+
+  var PLAN_SLUG = (document.body && document.body.dataset.planSlug) || "plan";
+
+  function stateKey(slug, sectionId) { return "lvp:" + slug + ":" + sectionId; }
+
+  function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) {} }
+
+  function targets(doc) {
+    return Array.prototype.slice.call((doc || document).querySelectorAll("[data-fb]"));
+  }
+  function ownFb(el) { return el.querySelector(":scope > .fb"); }
+  function checkOf(el) { var fb = ownFb(el); return fb ? fb.querySelector(".fb-check") : null; }
+  function noteOf(el) { var fb = ownFb(el); return fb ? fb.querySelector(".fb-note") : null; }
+
+  function saveTarget(el) {
+    var c = checkOf(el), n = noteOf(el);
+    var checked = c ? !!c.checked : false;
+    var note = n ? n.value : "";
+    var key = stateKey(PLAN_SLUG, el.id);
+    if (!checked && !note.trim()) { lsDel(key); }
+    else { lsSet(key, JSON.stringify({ checked: checked, note: note })); }
+    el.classList.toggle("done", checked);
+  }
+
+  function restoreTarget(el) {
+    var raw = lsGet(stateKey(PLAN_SLUG, el.id));
+    var c = checkOf(el), n = noteOf(el);
+    var data = {};
+    if (raw) { try { data = JSON.parse(raw) || {}; } catch (e) { data = {}; } }
+    if (c) c.checked = !!data.checked;
+    if (n) n.value = data.note || "";
+    el.classList.toggle("done", !!data.checked);
+  }
+
+  function restoreState(doc) { targets(doc).forEach(restoreTarget); }
+
+  function serializeFeedback(doc) {
+    var d = doc || document;
+    var slug = (d.body && d.body.dataset.planSlug) || PLAN_SLUG;
+    var blocks = [];
+    targets(d).forEach(function (el) {
+      var c = checkOf(el), n = noteOf(el);
+      var checked = c ? !!c.checked : false;
+      var note = n ? n.value.trim() : "";
+      if (!checked && !note) return;
+      var title = el.getAttribute("data-fb-title") || "";
+      var block = "[§" + el.id + " \"" + title + "\"]";
+      if (c) block += "\n  " + (checked ? "☑ checked" : "☐ unchecked");
+      if (note) block += "\n  ✎ " + note;
+      blocks.push(block);
+    });
+    var header = "## Feedback · plans/" + slug + ".html";
+    if (!blocks.length) return header + "\n\n_No feedback yet — check a step or add a note._";
+    return header + "\n\n" + blocks.join("\n\n");
+  }
+
+  function resetState(doc) {
+    targets(doc).forEach(function (el) {
+      lsDel(stateKey(PLAN_SLUG, el.id));
+      var c = checkOf(el), n = noteOf(el);
+      if (c) c.checked = false;
+      if (n) n.value = "";
+      el.classList.remove("done");
+    });
+  }
+
+  function flashCopied() {
+    var btn = document.getElementById("fb-copy");
+    if (!btn) return;
+    btn.classList.add("copied");
+    setTimeout(function () { btn.classList.remove("copied"); }, 1500);
+  }
+
+  function copyFeedback() {
+    var text = serializeFeedback(document);
+    if (window.navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(flashCopied, function () { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      flashCopied();
+    } catch (e) {
+      window.prompt("Copy this feedback, then paste it back to the agent:", text);
+    }
+  }
+
+  var protoHistory = [];
+
+  function protoContainer(doc) { return (doc || document).querySelector("[data-proto]"); }
+  function screensOf(c) { return Array.prototype.slice.call(c.querySelectorAll("[data-screen]")); }
+  function visibleScreen(c) {
+    return screensOf(c).filter(function (s) { return !s.hidden; })[0] || null;
+  }
+
+  function applyScreen(c, id) {
+    var screens = screensOf(c), idx = -1;
+    screens.forEach(function (s, i) {
+      var on = s.id === id;
+      s.hidden = !on;
+      s.classList.toggle("on", on);
+      if (on) idx = i;
+    });
+    var counter = c.querySelector("[data-proto-counter]");
+    if (counter && idx >= 0) counter.textContent = "Screen " + (idx + 1) + " / " + screens.length;
+    var back = c.querySelector("[data-proto-back]");
+    if (back) back.disabled = protoHistory.length === 0;
+    return idx;
+  }
+
+  function showScreen(id, opts) {
+    var c = protoContainer(document);
+    if (!c) return;
+    var back = opts && opts.back, init = opts && opts.init;
+    var cur = visibleScreen(c);
+    if (!back && !init && cur && cur.id !== id) protoHistory.push(cur.id);
+    applyScreen(c, id);
+  }
+
+  function goBack() {
+    if (!protoHistory.length) return;
+    showScreen(protoHistory.pop(), { back: true });
+  }
+
+  function wireProto() {
+    var c = protoContainer(document);
+    if (!c) return;
+    var screens = screensOf(c);
+    if (!screens.length) return;
+    Array.prototype.slice.call(c.querySelectorAll("[data-goto]")).forEach(function (b) {
+      b.addEventListener("click", function () { showScreen(b.getAttribute("data-goto")); });
+    });
+    var back = c.querySelector("[data-proto-back]");
+    if (back) back.addEventListener("click", goBack);
+    protoHistory = [];
+    showScreen((visibleScreen(c) || screens[0]).id, { init: true });
+  }
+
+  function wire() {
+    restoreState(document);
+    targets(document).forEach(function (el) {
+      var c = checkOf(el), n = noteOf(el);
+      if (c) c.addEventListener("change", function () { saveTarget(el); });
+      if (n) n.addEventListener("input", function () { saveTarget(el); });
+    });
+    var copyBtn = document.getElementById("fb-copy");
+    if (copyBtn) copyBtn.addEventListener("click", copyFeedback);
+    var resetBtn = document.getElementById("fb-reset");
+    if (resetBtn) resetBtn.addEventListener("click", function () {
+      if (window.confirm("Clear all notes and checkboxes for this plan?")) resetState(document);
+    });
+    wireProto();
+  }
+
+  window.LVP = {
+    stateKey: stateKey,
+    serializeFeedback: serializeFeedback,
+    restoreState: restoreState,
+    resetState: resetState,
+    saveTarget: saveTarget,
+    showScreen: showScreen,
+    goBack: goBack,
+    PLAN_SLUG: PLAN_SLUG
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wire);
+  } else {
+    wire();
+  }
+})();
+</script>
+</body>
+</html>

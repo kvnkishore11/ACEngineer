@@ -1,0 +1,4049 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.800
+What's up engineers? Indie Dev Dan here.
+
+2
+00:00:02.360 --> 00:00:09.960
+I have a simple question for you. What's
+
+3
+00:00:04.800 --> 00:00:13.640
+better than one GPT 5.5 Pi coding agent?
+
+4
+00:00:09.960 --> 00:00:15.480
+You guessed it, two GPT 5.5 Pi coding
+
+5
+00:00:13.640 --> 00:00:17.960
+agents. Let's push it further. What's
+
+6
+00:00:15.480 --> 00:00:20.680
+better than two isolated side-by-side
+
+7
+00:00:17.960 --> 00:00:22.320
+GPT 5.5 agents? Sure, you could add
+
+8
+00:00:20.680 --> 00:00:24.680
+another agent. Sure, you could change
+
+9
+00:00:22.320 --> 00:00:28.520
+the model, but we can do much better
+
+10
+00:00:24.680 --> 00:00:31.560
+than this. What about two GPT 5.5 agents
+
+11
+00:00:28.520 --> 00:00:33.240
+that actually work together?
+
+12
+00:00:31.560 --> 00:00:36.200
+What about three agents that work
+
+13
+00:00:33.240 --> 00:00:39.240
+together with unique models? What about
+
+14
+00:00:36.200 --> 00:00:41.720
+four models? So, here we have four Pi
+
+15
+00:00:39.240 --> 00:00:44.360
+coding agents and none of them is the
+
+16
+00:00:41.720 --> 00:00:47.840
+orchestrator. Instead, they're equals.
+
+17
+00:00:44.360 --> 00:00:50.320
+They're co-workers pinging every agent.
+
+18
+00:00:47.840 --> 00:00:52.120
+In this video, we'll understand what
+
+19
+00:00:50.320 --> 00:00:55.560
+type of agentic engineering we can
+
+20
+00:00:52.120 --> 00:00:58.440
+achieve if we gave our agents a true
+
+21
+00:00:55.560 --> 00:01:00.400
+two-way communication channel. By the
+
+22
+00:00:58.440 --> 00:01:03.080
+end of this video, you'll have a simple
+
+23
+00:01:00.400 --> 00:01:05.920
+yet powerful way to coordinate your
+
+24
+00:01:03.080 --> 00:01:09.200
+multi-agent systems. This gives us a
+
+25
+00:01:05.920 --> 00:01:11.360
+powerful flat agent hierarchy where the
+
+26
+00:01:09.200 --> 00:01:13.120
+best information wins, where the best
+
+27
+00:01:11.360 --> 00:01:16.520
+ideas win, and where your agents can
+
+28
+00:01:13.120 --> 00:01:18.400
+truly coordinate together to outperform
+
+29
+00:01:16.520 --> 00:01:23.840
+each other alone. Let's talk about
+
+30
+00:01:18.400 --> 00:01:23.840
+Pi-to-Pi two-way agent communication.
+
+31
+00:01:27.240 --> 00:01:31.360
+So, let's go ahead and reset here. Let's
+
+32
+00:01:29.480 --> 00:01:33.200
+de-hype this a little bit. Let's close
+
+33
+00:01:31.360 --> 00:01:35.680
+our agents. As you can see, one by one
+
+34
+00:01:33.200 --> 00:01:38.200
+as we close them, they leave the chat
+
+35
+00:01:35.680 --> 00:01:40.120
+room. They leave the communication pool.
+
+36
+00:01:38.200 --> 00:01:42.640
+We've got a production database on my
+
+37
+00:01:40.120 --> 00:01:44.680
+Mac mini. And this production database
+
+38
+00:01:42.640 --> 00:01:47.240
+has an issue. Some ProTier users are
+
+39
+00:01:44.680 --> 00:01:48.640
+getting locked out of pro features. So,
+
+40
+00:01:47.240 --> 00:01:50.920
+in order to fix this issue, I need to
+
+41
+00:01:48.640 --> 00:01:52.480
+reproduce it on my local developer
+
+42
+00:01:50.920 --> 00:01:54.240
+environment. This is a common
+
+43
+00:01:52.480 --> 00:01:55.880
+engineering workflow. You don't fix
+
+44
+00:01:54.240 --> 00:01:57.200
+things in production, and fix things on
+
+45
+00:01:55.880 --> 00:01:59.120
+your developer environment, and then you
+
+46
+00:01:57.200 --> 00:02:01.000
+deploy through staging, and then
+
+47
+00:01:59.120 --> 00:02:03.720
+eventually it hits production. The trick
+
+48
+00:02:01.000 --> 00:02:06.240
+here is there is sensitive information
+
+49
+00:02:03.720 --> 00:02:10.039
+on my Mac mini production environment
+
+50
+00:02:06.240 --> 00:02:11.959
+here, and I can't leak any PII while I'm
+
+51
+00:02:10.039 --> 00:02:13.720
+fixing this issue. We're not live coding
+
+52
+00:02:11.959 --> 00:02:16.400
+here, we're doing real engineering work
+
+53
+00:02:13.720 --> 00:02:18.600
+in production systems. Our pie-to-pie
+
+54
+00:02:16.400 --> 00:02:20.280
+agent-to-agent communication system is
+
+55
+00:02:18.600 --> 00:02:22.200
+perfect for this. So, I'll boot up two
+
+56
+00:02:20.280 --> 00:02:24.280
+agents here, one on my Mac mini, the
+
+57
+00:02:22.200 --> 00:02:26.440
+production server, and one on my M5
+
+58
+00:02:24.280 --> 00:02:28.240
+MacBook Pro, my dev machine. We'll do J
+
+59
+00:02:26.440 --> 00:02:30.280
+coms two, and we'll give this a name.
+
+60
+00:02:28.240 --> 00:02:32.800
+This is going to be production. J coms
+
+61
+00:02:30.280 --> 00:02:34.480
+one, name dev. We'll run some basic
+
+62
+00:02:32.800 --> 00:02:35.640
+pings to make sure both agents are up
+
+63
+00:02:34.480 --> 00:02:38.040
+and online. And then we're going to
+
+64
+00:02:35.640 --> 00:02:40.840
+paste in a production prompt here. This
+
+65
+00:02:38.040 --> 00:02:42.760
+is a prod gatekeeper agent. It has a
+
+66
+00:02:40.840 --> 00:02:43.920
+production database it's working with
+
+67
+00:02:42.760 --> 00:02:46.080
+that's been seeded. We're not going to
+
+68
+00:02:43.920 --> 00:02:48.120
+recreate it or anything. And you have a
+
+69
+00:02:46.080 --> 00:02:51.040
+team name. And then key piece here, we
+
+70
+00:02:48.120 --> 00:02:52.720
+have PII inside of this production code
+
+71
+00:02:51.040 --> 00:02:56.120
+base that we're not going to break. This
+
+72
+00:02:52.720 --> 00:02:57.840
+is personal identifiable information.
+
+73
+00:02:56.120 --> 00:02:59.800
+So, our production agent understands the
+
+74
+00:02:57.840 --> 00:03:01.400
+system, it understands what's available,
+
+75
+00:02:59.800 --> 00:03:04.560
+and it knows that it's not going to
+
+76
+00:03:01.400 --> 00:03:07.000
+expose any information to any other
+
+77
+00:03:04.560 --> 00:03:08.600
+agent on the network, okay? And now our
+
+78
+00:03:07.000 --> 00:03:11.040
+developer agent is going to get to work.
+
+79
+00:03:08.600 --> 00:03:12.680
+We need to reproduce this issue locally.
+
+80
+00:03:11.040 --> 00:03:15.120
+Here's our developer prompt. The key
+
+81
+00:03:12.680 --> 00:03:17.760
+here is this. Bring the affected slice
+
+82
+00:03:15.120 --> 00:03:20.120
+from production over with PII stripped
+
+83
+00:03:17.760 --> 00:03:22.800
+into your local dev DB so an engineer
+
+84
+00:03:20.120 --> 00:03:24.440
+can reproduce the issue locally. First,
+
+85
+00:03:22.800 --> 00:03:26.400
+in order to reproduce a production
+
+86
+00:03:24.440 --> 00:03:28.640
+database issue, you need the production
+
+87
+00:03:26.400 --> 00:03:31.200
+data. Here's where the magic happens.
+
+88
+00:03:28.640 --> 00:03:32.480
+Our agent sees the peer on the network,
+
+89
+00:03:31.200 --> 00:03:34.200
+right? It knows that it has connection
+
+90
+00:03:32.480 --> 00:03:36.239
+to a prod agent, and now it's going to
+
+91
+00:03:34.200 --> 00:03:37.320
+start working through things. So, it's
+
+92
+00:03:36.239 --> 00:03:38.760
+going to send a message, it's going to
+
+93
+00:03:37.320 --> 00:03:41.680
+send a prompt, and it's going to get
+
+94
+00:03:38.760 --> 00:03:43.840
+returned an ID, a message ID. Our agent
+
+95
+00:03:41.680 --> 00:03:46.120
+can now await this message, and our
+
+96
+00:03:43.840 --> 00:03:48.440
+production agent, as you can see here,
+
+97
+00:03:46.120 --> 00:03:50.640
+is getting to work on the production
+
+98
+00:03:48.440 --> 00:03:52.960
+side. But it's getting to work with all
+
+99
+00:03:50.640 --> 00:03:54.680
+redactions applied, right? It's not
+
+100
+00:03:52.960 --> 00:03:56.960
+going to expose any personal
+
+101
+00:03:54.680 --> 00:03:58.560
+identifiable information. Our agent is
+
+102
+00:03:56.960 --> 00:04:01.000
+going to work back and forth here, not
+
+103
+00:03:58.560 --> 00:04:03.200
+as individual agents, not as a sub
+
+104
+00:04:01.000 --> 00:04:06.280
+agent, not as workers, right? They're
+
+105
+00:04:03.200 --> 00:04:08.680
+going to work together as a team. It's a
+
+106
+00:04:06.280 --> 00:04:11.720
+simple, beautiful pattern, and it really
+
+107
+00:04:08.680 --> 00:04:13.600
+reflects how great work is done. And so,
+
+108
+00:04:11.720 --> 00:04:15.800
+our agent is learning about the local
+
+109
+00:04:13.600 --> 00:04:17.959
+DB. It's making sure that it's clean,
+
+110
+00:04:15.800 --> 00:04:20.280
+and it's starting to sync things while
+
+111
+00:04:17.959 --> 00:04:22.880
+keeping everything PII safe, right? So,
+
+112
+00:04:20.280 --> 00:04:25.320
+this is yet another place where if you
+
+113
+00:04:22.880 --> 00:04:26.520
+engineer things properly, if you prompt
+
+114
+00:04:25.320 --> 00:04:29.200
+things properly, you can do
+
+115
+00:04:26.520 --> 00:04:32.040
+extraordinary things in your agentic
+
+116
+00:04:29.200 --> 00:04:34.320
+systems. There are endless use cases for
+
+117
+00:04:32.040 --> 00:04:35.840
+agents that actually communicate and
+
+118
+00:04:34.320 --> 00:04:38.560
+work together. You can see there we got
+
+119
+00:04:35.840 --> 00:04:40.480
+another message back, and this process
+
+120
+00:04:38.560 --> 00:04:42.040
+is going to continue. So, we're going to
+
+121
+00:04:40.480 --> 00:04:44.200
+let our agents cook here. I want to take
+
+122
+00:04:42.040 --> 00:04:45.680
+the time to like highlight why
+
+123
+00:04:44.200 --> 00:04:47.400
+agent-to-agent communication is so
+
+124
+00:04:45.680 --> 00:04:49.760
+important, and highlight, of course,
+
+125
+00:04:47.400 --> 00:04:51.520
+once again, why the Pi Coding Agent is
+
+126
+00:04:49.760 --> 00:04:53.760
+really the only way that you get this
+
+127
+00:04:51.520 --> 00:04:56.160
+level of control out of your agents
+
+128
+00:04:53.760 --> 00:04:56.160
+here.
+
+129
+00:04:59.280 --> 00:05:02.600
+I think the most important thing to
+
+130
+00:05:00.400 --> 00:05:04.720
+start with here is understanding the
+
+131
+00:05:02.600 --> 00:05:06.240
+current problem, right? Agents can't
+
+132
+00:05:04.720 --> 00:05:09.200
+talk to each other. We know that there
+
+133
+00:05:06.240 --> 00:05:10.840
+is sub agent delegation and sub agent
+
+134
+00:05:09.200 --> 00:05:12.919
+prompting, right? And this is a great
+
+135
+00:05:10.840 --> 00:05:14.440
+pattern. It's a great start. Like if you
+
+136
+00:05:12.919 --> 00:05:17.040
+agree with this statement, we are just
+
+137
+00:05:14.440 --> 00:05:19.600
+scratching the surface of what the true
+
+138
+00:05:17.040 --> 00:05:22.000
+developer experience looks like for
+
+139
+00:05:19.600 --> 00:05:23.680
+agentic engineering, right? We don't
+
+140
+00:05:22.000 --> 00:05:27.440
+really even know what that form factor
+
+141
+00:05:23.680 --> 00:05:29.280
+is. I think very clearly in terminal
+
+142
+00:05:27.440 --> 00:05:31.320
+agents
+
+143
+00:05:29.280 --> 00:05:33.440
+the center point, but everything around
+
+144
+00:05:31.320 --> 00:05:35.919
+that from the agent harness to how we
+
+145
+00:05:33.440 --> 00:05:38.280
+manage contexts, models, agent scale,
+
+146
+00:05:35.919 --> 00:05:39.840
+tools, this is all a work in progress.
+
+147
+00:05:38.280 --> 00:05:41.919
+So, if we're not exploring the state
+
+148
+00:05:39.840 --> 00:05:44.680
+space of what's possible with our agent
+
+149
+00:05:41.919 --> 00:05:46.480
+communication and other agentic
+
+150
+00:05:44.680 --> 00:05:48.360
+workflows and patterns, uh we're going
+
+151
+00:05:46.480 --> 00:05:50.320
+to be stuck in the normal distribution,
+
+152
+00:05:48.360 --> 00:05:52.200
+the very beginning of what's possible.
+
+153
+00:05:50.320 --> 00:05:53.800
+So, sub agents, very important, very
+
+154
+00:05:52.200 --> 00:05:55.280
+cool, but this is just the beginning,
+
+155
+00:05:53.800 --> 00:05:57.520
+right? When you push further, you can
+
+156
+00:05:55.280 --> 00:05:59.720
+find a message queue, and this is what
+
+157
+00:05:57.520 --> 00:06:01.360
+the Cloud Code agent teams uses. So, you
+
+158
+00:05:59.720 --> 00:06:03.080
+have one agent that kind of sets up all
+
+159
+00:06:01.360 --> 00:06:05.520
+the message queue, and then it serves as
+
+160
+00:06:03.080 --> 00:06:07.080
+a message broker between agents. Another
+
+161
+00:06:05.520 --> 00:06:08.960
+great powerful pattern. You then have
+
+162
+00:06:07.080 --> 00:06:11.160
+things like agent chains, where you have
+
+163
+00:06:08.960 --> 00:06:13.400
+a deterministic set up workflow that
+
+164
+00:06:11.160 --> 00:06:14.800
+have individual nodes of agents. When
+
+165
+00:06:13.400 --> 00:06:17.080
+you combine this with code, you get
+
+166
+00:06:14.800 --> 00:06:20.440
+powerful AI developer workflows or
+
+167
+00:06:17.080 --> 00:06:22.600
+blueprints or representations of agents
+
+168
+00:06:20.440 --> 00:06:25.000
+plus code. This is a very, very powerful
+
+169
+00:06:22.600 --> 00:06:26.680
+framework, because it adds determinism
+
+170
+00:06:25.000 --> 00:06:28.440
+into the process, right? At any one of
+
+171
+00:06:26.680 --> 00:06:30.080
+these steps, you can insert code, and
+
+172
+00:06:28.440 --> 00:06:31.520
+it'll enhance what your agents can do.
+
+173
+00:06:30.080 --> 00:06:33.280
+So, very powerful stuff here, right?
+
+174
+00:06:31.520 --> 00:06:34.520
+But, um there's a problem with this. As
+
+175
+00:06:33.280 --> 00:06:37.160
+you can see, in every one of these
+
+176
+00:06:34.520 --> 00:06:39.360
+workflows, it is traveling information
+
+177
+00:06:37.160 --> 00:06:41.240
+in basically one direction, and it's
+
+178
+00:06:39.360 --> 00:06:43.480
+always a top-down way. Even if the
+
+179
+00:06:41.240 --> 00:06:45.640
+information comes back, it's a one-way
+
+180
+00:06:43.480 --> 00:06:47.800
+stream, right? It's never bidirectional.
+
+181
+00:06:45.640 --> 00:06:50.240
+So, what's the solution?
+
+182
+00:06:47.800 --> 00:06:52.720
+It's quite simple. Let your agents talk
+
+183
+00:06:50.240 --> 00:06:55.680
+to each other, right? Prompt response,
+
+184
+00:06:52.720 --> 00:06:57.440
+and then prompt response, okay?
+
+185
+00:06:55.680 --> 00:06:59.120
+Peer-to-peer, not
+
+186
+00:06:57.440 --> 00:07:02.400
+orchestrator-to-worker,
+
+187
+00:06:59.120 --> 00:07:04.040
+changes things. Here, agents are equals.
+
+188
+00:07:02.400 --> 00:07:06.520
+They're not parent and child, and this
+
+189
+00:07:04.040 --> 00:07:08.640
+unlocks, of course, bidirectional flows
+
+190
+00:07:06.520 --> 00:07:10.040
+of information, okay? Just two agents
+
+191
+00:07:08.640 --> 00:07:12.000
+communicating to each other. As you can
+
+192
+00:07:10.040 --> 00:07:14.520
+see here, our agents are still working
+
+193
+00:07:12.000 --> 00:07:16.880
+together to figure out these issues, to
+
+194
+00:07:14.520 --> 00:07:19.680
+really work through how to perfectly
+
+195
+00:07:16.880 --> 00:07:22.200
+reproduce the production slice. But, you
+
+196
+00:07:19.680 --> 00:07:23.919
+can push this across devices and across
+
+197
+00:07:22.200 --> 00:07:25.640
+multiple agents, right? And this looks
+
+198
+00:07:23.919 --> 00:07:27.320
+like exactly what you'd imagine, right?
+
+199
+00:07:25.640 --> 00:07:28.800
+Now, we have three agents in the
+
+200
+00:07:27.320 --> 00:07:30.880
+network. You might have a researcher,
+
+201
+00:07:28.800 --> 00:07:33.120
+coder, planner. These can be anything
+
+202
+00:07:30.880 --> 00:07:35.680
+under the sun. In our case, we have a
+
+203
+00:07:33.120 --> 00:07:38.120
+prod agent, and we have a developer
+
+204
+00:07:35.680 --> 00:07:39.919
+agent talking to each other across the
+
+205
+00:07:38.120 --> 00:07:41.600
+network, okay? But, you can just keep
+
+206
+00:07:39.919 --> 00:07:44.080
+scaling this up, right? And at some
+
+207
+00:07:41.600 --> 00:07:45.400
+point, it's going to be uh harmful,
+
+208
+00:07:44.080 --> 00:07:47.680
+right? Like there is a limit to how
+
+209
+00:07:45.400 --> 00:07:49.080
+useful this is. Um I'm not just trying
+
+210
+00:07:47.680 --> 00:07:50.920
+to sell you the upside here. There's
+
+211
+00:07:49.080 --> 00:07:52.480
+downsides to every approach. Great
+
+212
+00:07:50.920 --> 00:07:54.400
+engineering is all about managing
+
+213
+00:07:52.480 --> 00:07:55.520
+tradeoffs. At some level, you're not
+
+214
+00:07:54.400 --> 00:07:57.440
+going to want to use this pattern
+
+215
+00:07:55.520 --> 00:08:00.040
+anymore. And at some level, adding
+
+216
+00:07:57.440 --> 00:08:02.680
+agents doesn't help anything. But, there
+
+217
+00:08:00.040 --> 00:08:04.880
+is certainly a useful level to this
+
+218
+00:08:02.680 --> 00:08:06.840
+where you want to have bidirectional
+
+219
+00:08:04.880 --> 00:08:08.920
+agent-to-agent communication, where it's
+
+220
+00:08:06.840 --> 00:08:11.440
+very, very useful to have every agent
+
+221
+00:08:08.920 --> 00:08:13.919
+have access to every other agent, okay?
+
+222
+00:08:11.440 --> 00:08:15.919
+And so, why is this useful, right? Let's
+
+223
+00:08:13.919 --> 00:08:18.200
+let's really hit on this. Like I think
+
+224
+00:08:15.919 --> 00:08:20.080
+at the core of this, it comes down to
+
+225
+00:08:18.200 --> 00:08:21.480
+information hierarchies. If you have a
+
+226
+00:08:20.080 --> 00:08:23.520
+traditional software engineering job,
+
+227
+00:08:21.480 --> 00:08:25.840
+you work at a company that has a
+
+228
+00:08:23.520 --> 00:08:27.600
+hierarchy, right? For one reason or
+
+229
+00:08:25.840 --> 00:08:29.720
+another, there is someone at the top,
+
+230
+00:08:27.600 --> 00:08:31.680
+okay? And information usually travels
+
+231
+00:08:29.720 --> 00:08:34.120
+downstream, commands travel downstream,
+
+232
+00:08:31.680 --> 00:08:36.000
+objectives travel downstream, and then
+
+233
+00:08:34.120 --> 00:08:37.599
+it hits the person, usually the
+
+234
+00:08:36.000 --> 00:08:40.000
+engineers, who are actually building the
+
+235
+00:08:37.599 --> 00:08:42.159
+thing, right? And oftentimes, the best
+
+236
+00:08:40.000 --> 00:08:44.600
+information, the best decisions, the
+
+237
+00:08:42.159 --> 00:08:46.440
+best awareness about the system is all
+
+238
+00:08:44.600 --> 00:08:48.320
+the way down here, right? It's on the
+
+239
+00:08:46.440 --> 00:08:49.680
+worker level, right? It's It's you and
+
+240
+00:08:48.320 --> 00:08:51.240
+I, the engineers with their boots on the
+
+241
+00:08:49.680 --> 00:08:52.400
+ground every single day, putting in the
+
+242
+00:08:51.240 --> 00:08:53.600
+work to understand the system,
+
+243
+00:08:52.400 --> 00:08:55.600
+understand the objectives, and then
+
+244
+00:08:53.600 --> 00:08:58.040
+actually building it, right? The best
+
+245
+00:08:55.600 --> 00:08:59.760
+information is often times down here.
+
+246
+00:08:58.040 --> 00:09:02.040
+When you have these hierarchical
+
+247
+00:08:59.760 --> 00:09:03.560
+information systems, and I'm speaking in
+
+248
+00:09:02.040 --> 00:09:05.120
+a generic way, it doesn't just need to
+
+249
+00:09:03.560 --> 00:09:07.400
+be about the job. It doesn't just need
+
+250
+00:09:05.120 --> 00:09:09.400
+to be in a career setting. But, just
+
+251
+00:09:07.400 --> 00:09:11.040
+information structures like this, often
+
+252
+00:09:09.400 --> 00:09:12.560
+times the best ideas are down here. They
+
+253
+00:09:11.040 --> 00:09:14.400
+get stuck down here because they don't
+
+254
+00:09:12.560 --> 00:09:16.360
+have the right title, they don't have
+
+255
+00:09:14.400 --> 00:09:18.400
+the right authority, they don't have the
+
+256
+00:09:16.360 --> 00:09:19.640
+right say, right? And you've, you know,
+
+257
+00:09:18.400 --> 00:09:21.640
+you've probably heard this, right? But,
+
+258
+00:09:19.640 --> 00:09:24.160
+the best companies, the best structures
+
+259
+00:09:21.640 --> 00:09:26.200
+are flat, where there's communication
+
+260
+00:09:24.160 --> 00:09:28.280
+happening on every single level, where
+
+261
+00:09:26.200 --> 00:09:30.200
+everyone can just talk to the other to
+
+262
+00:09:28.280 --> 00:09:31.960
+get the job done, right? Nvidia is
+
+263
+00:09:30.200 --> 00:09:33.600
+really famous for this, very flat
+
+264
+00:09:31.960 --> 00:09:36.640
+reporting structures. Of course, Jensen
+
+265
+00:09:33.600 --> 00:09:38.280
+at the top, commanding that insane
+
+266
+00:09:36.640 --> 00:09:40.360
+company. But, then he has uh very few
+
+267
+00:09:38.280 --> 00:09:41.920
+direct reports, and then it spans from
+
+268
+00:09:40.360 --> 00:09:43.280
+there, right? But, startups are famous
+
+269
+00:09:41.920 --> 00:09:45.520
+for this, right? You have very, very
+
+270
+00:09:43.280 --> 00:09:48.200
+flat structures. All the best
+
+271
+00:09:45.520 --> 00:09:50.160
+information systems are flat. Why is
+
+272
+00:09:48.200 --> 00:09:53.480
+that? It's because you get valuable
+
+273
+00:09:50.160 --> 00:09:55.800
+information wins always over titles and
+
+274
+00:09:53.480 --> 00:09:58.360
+politics, okay? Ideas die in
+
+275
+00:09:55.800 --> 00:10:00.280
+hierarchies. So, that's why this is so
+
+276
+00:09:58.360 --> 00:10:01.720
+important. And And, you know, maybe you
+
+277
+00:10:00.280 --> 00:10:03.400
+think I'm anthropomorphizing this too
+
+278
+00:10:01.720 --> 00:10:05.320
+much. Maybe you think I am trying to
+
+279
+00:10:03.400 --> 00:10:07.120
+apply something where it doesn't belong.
+
+280
+00:10:05.320 --> 00:10:08.920
+I completely disagree. I think when you
+
+281
+00:10:07.120 --> 00:10:11.840
+really boil things down, everything is a
+
+282
+00:10:08.920 --> 00:10:14.000
+system. And a key part about every
+
+283
+00:10:11.840 --> 00:10:16.720
+system is that there is flows of
+
+284
+00:10:14.000 --> 00:10:19.040
+information inside of systems, and how
+
+285
+00:10:16.720 --> 00:10:21.320
+things flow, how the structures, the
+
+286
+00:10:19.040 --> 00:10:23.800
+nodes, and the actors in the system
+
+287
+00:10:21.320 --> 00:10:26.440
+communicate information matters, right?
+
+288
+00:10:23.800 --> 00:10:28.880
+This matters because oftentimes the best
+
+289
+00:10:26.440 --> 00:10:30.960
+ideas are down here. They're at the
+
+290
+00:10:28.880 --> 00:10:32.680
+bottom level. And so, this means that as
+
+291
+00:10:30.960 --> 00:10:34.640
+much as you can, you want to have flat
+
+292
+00:10:32.680 --> 00:10:36.680
+hierarchy structures, okay? But, on a
+
+293
+00:10:34.640 --> 00:10:39.120
+functional level, we can see that this
+
+294
+00:10:36.680 --> 00:10:41.280
+is uh useful for other reasons as well.
+
+295
+00:10:39.120 --> 00:10:42.800
+We have cross-device agent-to-agent
+
+296
+00:10:41.280 --> 00:10:45.120
+communication, right? We have a
+
+297
+00:10:42.800 --> 00:10:46.440
+production service. Say this is in the
+
+298
+00:10:45.120 --> 00:10:47.839
+EU,
+
+299
+00:10:46.440 --> 00:10:50.160
+right? Where everything has to be
+
+300
+00:10:47.839 --> 00:10:51.760
+redacted, everything has to be perfect,
+
+301
+00:10:50.160 --> 00:10:53.360
+and nothing can escape the device. But,
+
+302
+00:10:51.760 --> 00:10:55.040
+you still need to fix things, right? We
+
+303
+00:10:53.360 --> 00:10:56.960
+still need to do real engineering work.
+
+304
+00:10:55.040 --> 00:10:58.640
+So, this is a great system. We have
+
+305
+00:10:56.960 --> 00:11:00.920
+redacted information properly,
+
+306
+00:10:58.640 --> 00:11:02.760
+transferred it to our developer machine.
+
+307
+00:11:00.920 --> 00:11:04.920
+And as you can see here, the repro is
+
+308
+00:11:02.760 --> 00:11:07.600
+ready, the bug has been imported, okay?
+
+309
+00:11:04.920 --> 00:11:09.320
+PII is clean, okay? So, legitimate
+
+310
+00:11:07.600 --> 00:11:11.600
+engineering work happening here.
+
+311
+00:11:09.320 --> 00:11:13.600
+Obviously, this is not a real production
+
+312
+00:11:11.600 --> 00:11:15.520
+server. I'm using this as an example.
+
+313
+00:11:13.600 --> 00:11:18.200
+And now I can go ahead, debug, look at
+
+314
+00:11:15.520 --> 00:11:19.480
+my code, look at this slice of the
+
+315
+00:11:18.200 --> 00:11:21.280
+production database that has been
+
+316
+00:11:19.480 --> 00:11:23.200
+reproduced from production. And now I
+
+317
+00:11:21.280 --> 00:11:25.240
+can actually resolve the bug. And our
+
+318
+00:11:23.200 --> 00:11:26.520
+agents are really great at communicating
+
+319
+00:11:25.240 --> 00:11:27.880
+information like this. And that's
+
+320
+00:11:26.520 --> 00:11:31.240
+exactly what they've done, okay? So, we
+
+321
+00:11:27.880 --> 00:11:32.720
+have very simple two-way bidirectional
+
+322
+00:11:31.240 --> 00:11:35.000
+agent-to-agent communication. If I
+
+323
+00:11:32.720 --> 00:11:36.960
+needed to, I could come in here and
+
+324
+00:11:35.000 --> 00:11:39.880
+validate that everything looks good on
+
+325
+00:11:36.960 --> 00:11:43.240
+the production agent side, right? Do one
+
+326
+00:11:39.880 --> 00:11:45.840
+final check with the dev agent PRI safe.
+
+327
+00:11:43.240 --> 00:11:48.040
+The issue has been repro'd. We can talk
+
+328
+00:11:45.840 --> 00:11:50.160
+to any side that we need to, and they
+
+329
+00:11:48.040 --> 00:11:51.440
+can then communicate together to get the
+
+330
+00:11:50.160 --> 00:11:52.800
+job done. So, I hope you can see the
+
+331
+00:11:51.440 --> 00:11:54.360
+value proposition of this. I hope you
+
+332
+00:11:52.800 --> 00:11:55.880
+can see why agent-to-agent communication
+
+333
+00:11:54.360 --> 00:11:57.920
+is useful, even if you don't think that
+
+334
+00:11:55.880 --> 00:11:59.680
+the flat information hierarchies are
+
+335
+00:11:57.920 --> 00:12:02.080
+more performant for making sure that the
+
+336
+00:11:59.680 --> 00:12:04.560
+best ideas are the ones that always win.
+
+337
+00:12:02.080 --> 00:12:06.800
+This is great because now we have simple
+
+338
+00:12:04.560 --> 00:12:08.880
+multi-agent communication on different
+
+339
+00:12:06.800 --> 00:12:09.880
+devices, okay? And whenever we need to,
+
+340
+00:12:08.880 --> 00:12:11.320
+you know, let me just be clear about
+
+341
+00:12:09.880 --> 00:12:12.880
+this. Whenever we need to, I can add an
+
+342
+00:12:11.320 --> 00:12:15.120
+agent to the pool. So, if I type J
+
+343
+00:12:12.880 --> 00:12:17.240
+Comms, let's use four, I think that's
+
+344
+00:12:15.120 --> 00:12:19.640
+the GLM agent. You can see GLM added
+
+345
+00:12:17.240 --> 00:12:21.520
+here, and now it is part of the pool,
+
+346
+00:12:19.640 --> 00:12:23.200
+right? So, fantastic. How else can we
+
+347
+00:12:21.520 --> 00:12:24.840
+use this? Agent-to-agent communication,
+
+348
+00:12:23.200 --> 00:12:26.600
+it seems very powerful. We're not just
+
+349
+00:12:24.840 --> 00:12:28.640
+delegating work, which is in its own
+
+350
+00:12:26.600 --> 00:12:29.600
+right a very powerful communication
+
+351
+00:12:28.640 --> 00:12:31.880
+pattern, right? This isn't a
+
+352
+00:12:29.600 --> 00:12:33.800
+replacement. This is another option for
+
+353
+00:12:31.880 --> 00:12:35.040
+your agentic engineering. We can solve
+
+354
+00:12:33.800 --> 00:12:38.400
+other problems with it, right? Let let
+
+355
+00:12:35.040 --> 00:12:38.400
+let's walk through another example.
+
+356
+00:12:41.440 --> 00:12:47.800
+So, let's fire up a E2B agent. And in
+
+357
+00:12:45.120 --> 00:12:51.720
+fact, let's open up a new project here,
+
+358
+00:12:47.800 --> 00:12:55.320
+sandbox. Same deal, J Comms 2, and name
+
+359
+00:12:51.720 --> 00:12:57.120
+EXC dev agent project sandbox. So, we're
+
+360
+00:12:55.320 --> 00:12:59.160
+just getting our agents off this
+
+361
+00:12:57.120 --> 00:13:00.320
+network. This is a different pool to
+
+362
+00:12:59.160 --> 00:13:01.839
+communicate in, right? So, we still
+
+363
+00:13:00.320 --> 00:13:03.720
+still have our previous set there. And
+
+364
+00:13:01.839 --> 00:13:06.040
+you can actually see that this work here
+
+365
+00:13:03.720 --> 00:13:08.120
+was done. PII is safe. All the findings
+
+366
+00:13:06.040 --> 00:13:10.000
+are there. So, we verified by having our
+
+367
+00:13:08.120 --> 00:13:11.880
+production agent prompt our developer
+
+368
+00:13:10.000 --> 00:13:13.440
+agent. Fantastic. There we got the pass.
+
+369
+00:13:11.880 --> 00:13:15.839
+Everything looks great. Both context
+
+370
+00:13:13.440 --> 00:13:18.480
+windows are sharp and focused. There's
+
+371
+00:13:15.839 --> 00:13:20.600
+no spillover between issues. This system
+
+372
+00:13:18.480 --> 00:13:23.520
+has completed successfully. So, I've
+
+373
+00:13:20.600 --> 00:13:24.680
+been using the E2B agent sandbox tool
+
+374
+00:13:23.520 --> 00:13:26.720
+for quite some time now. It's been a
+
+375
+00:13:24.680 --> 00:13:28.840
+great tool. It's also expensive, and it
+
+376
+00:13:26.720 --> 00:13:30.920
+has some downsides like there's a limit
+
+377
+00:13:28.840 --> 00:13:32.840
+to the total duration that you can have
+
+378
+00:13:30.920 --> 00:13:34.720
+your agents up in a sandbox. You have to
+
+379
+00:13:32.840 --> 00:13:37.600
+pause them to manage that. So, I've been
+
+380
+00:13:34.720 --> 00:13:40.560
+looking at exe.dev as a new agent
+
+381
+00:13:37.600 --> 00:13:43.080
+sandbox tool to replace or use
+
+382
+00:13:40.560 --> 00:13:44.920
+additionally right next to e2b. And so,
+
+383
+00:13:43.080 --> 00:13:46.560
+this is another agent sandbox tool. It's
+
+384
+00:13:44.920 --> 00:13:48.120
+got a couple of different benefits. I'll
+
+385
+00:13:46.560 --> 00:13:50.360
+link both of these in the description
+
+386
+00:13:48.120 --> 00:13:53.200
+for you. But, the idea here is I already
+
+387
+00:13:50.360 --> 00:13:54.960
+have my e2b agent in this sandbox skill,
+
+388
+00:13:53.200 --> 00:13:56.880
+right? So, I have agent sandboxes and
+
+389
+00:13:54.960 --> 00:13:59.200
+this is my e2b skill where I can just
+
+390
+00:13:56.880 --> 00:14:01.080
+quickly spin up an agent sandbox that my
+
+391
+00:13:59.200 --> 00:14:02.480
+agent can fully own and operate on my
+
+392
+00:14:01.080 --> 00:14:04.200
+behalf. We've talked about agent
+
+393
+00:14:02.480 --> 00:14:05.640
+sandboxes on the channel in the past.
+
+394
+00:14:04.200 --> 00:14:07.120
+I'll link those in the description for
+
+395
+00:14:05.640 --> 00:14:11.360
+you as well. But, what I want to do here
+
+396
+00:14:07.120 --> 00:14:14.200
+is spin up a brand new skill for exe.dev
+
+397
+00:14:11.360 --> 00:14:16.640
+that mirrors and matches and has feature
+
+398
+00:14:14.200 --> 00:14:18.800
+parity to my e2b agent skill. And
+
+399
+00:14:16.640 --> 00:14:20.320
+anything that doesn't match, I want to
+
+400
+00:14:18.800 --> 00:14:22.120
+know about it, right? I want to
+
+401
+00:14:20.320 --> 00:14:24.680
+understand the feature differences, but
+
+402
+00:14:22.120 --> 00:14:26.040
+I want my agent to fail forward. the
+
+403
+00:14:24.680 --> 00:14:27.880
+skill to be built so that I can
+
+404
+00:14:26.040 --> 00:14:29.280
+prototype and experiment with it right
+
+405
+00:14:27.880 --> 00:14:31.240
+away, okay? So, I don't just want a
+
+406
+00:14:29.280 --> 00:14:34.000
+simple research comparison. I want a new
+
+407
+00:14:31.240 --> 00:14:35.640
+skill I can use that has feature parity
+
+408
+00:14:34.000 --> 00:14:37.240
+with my existing skill. That's exactly
+
+409
+00:14:35.640 --> 00:14:38.520
+what I'm going to prompt here. In my e2b
+
+410
+00:14:37.240 --> 00:14:41.200
+agent, I'm going to fire this off.
+
+411
+00:14:38.520 --> 00:14:44.600
+You're the e2b agent. Your teammate is
+
+412
+00:14:41.200 --> 00:14:47.240
+exe.dev. They'll be building this skill
+
+413
+00:14:44.600 --> 00:14:48.960
+against exe.dev's persistent VM
+
+414
+00:14:47.240 --> 00:14:51.000
+platform. Your job is to answer their
+
+415
+00:14:48.960 --> 00:14:53.280
+questions, okay? So, we have a teammate
+
+416
+00:14:51.000 --> 00:14:55.200
+set up specifically to understand this
+
+417
+00:14:53.280 --> 00:14:56.839
+feature set. It's putting up a sandbox.
+
+418
+00:14:55.200 --> 00:14:58.480
+It's reminding itself of all the
+
+419
+00:14:56.839 --> 00:15:01.440
+features. And when this completes, I'm
+
+420
+00:14:58.480 --> 00:15:04.120
+going to kick off the exe.dev agent to
+
+421
+00:15:01.440 --> 00:15:06.120
+communicate, work with, and sync up a
+
+422
+00:15:04.120 --> 00:15:07.320
+brand new skill. You know, a lot of the
+
+423
+00:15:06.120 --> 00:15:09.880
+agent-to-agent communication and
+
+424
+00:15:07.320 --> 00:15:11.960
+multi-agent orchestration comes down to
+
+425
+00:15:09.880 --> 00:15:14.400
+expanding your context window in a
+
+426
+00:15:11.960 --> 00:15:16.400
+useful way such that your agents can
+
+427
+00:15:14.400 --> 00:15:18.320
+specialize what they're focused on,
+
+428
+00:15:16.400 --> 00:15:19.760
+okay? A lot of engineers do think that
+
+429
+00:15:18.320 --> 00:15:21.160
+you just throw everything in one agent,
+
+430
+00:15:19.760 --> 00:15:23.280
+wait for for models to get better, wait
+
+431
+00:15:21.160 --> 00:15:25.040
+for that 5 million contacts window, and
+
+432
+00:15:23.280 --> 00:15:27.640
+then all your problems will be solved. I
+
+433
+00:15:25.040 --> 00:15:29.200
+don't agree with this approach at all. I
+
+434
+00:15:27.640 --> 00:15:30.560
+think you should lean on the models, you
+
+435
+00:15:29.200 --> 00:15:32.200
+should expect them to get better, you
+
+436
+00:15:30.560 --> 00:15:33.760
+should plan for that in your products
+
+437
+00:15:32.200 --> 00:15:35.520
+and services, but at the same time you
+
+438
+00:15:33.760 --> 00:15:38.560
+should be learning how to focus your
+
+439
+00:15:35.520 --> 00:15:39.800
+agents on one problem so that the chance
+
+440
+00:15:38.560 --> 00:15:42.200
+that they cause an issue, so that the
+
+441
+00:15:39.800 --> 00:15:44.400
+chance something goes wrong drops down
+
+442
+00:15:42.200 --> 00:15:46.120
+to near zero. And how can you do that?
+
+443
+00:15:44.400 --> 00:15:48.360
+You can do that by having focused
+
+444
+00:15:46.120 --> 00:15:50.680
+context windows, okay? And by
+
+445
+00:15:48.360 --> 00:15:53.360
+effectively specializing your agent to
+
+446
+00:15:50.680 --> 00:15:55.360
+focus on one problem and one problem
+
+447
+00:15:53.360 --> 00:15:57.640
+only. Spinning up and comparing two
+
+448
+00:15:55.360 --> 00:15:59.840
+different tools with likely very similar
+
+449
+00:15:57.640 --> 00:16:01.320
+APIs is going to get the context window
+
+450
+00:15:59.840 --> 00:16:04.080
+pretty big. You can see here this agent
+
+451
+00:16:01.320 --> 00:16:06.880
+is loading, refreshing itself on all of
+
+452
+00:16:04.080 --> 00:16:08.560
+the E2B agent skill functionality,
+
+453
+00:16:06.880 --> 00:16:10.040
+right? You can see sandbox remove,
+
+454
+00:16:08.560 --> 00:16:11.720
+download dir, so on and so forth. We're
+
+455
+00:16:10.040 --> 00:16:14.080
+almost at 10% context already. That's
+
+456
+00:16:11.720 --> 00:16:16.240
+100k tokens, okay? If you're using
+
+457
+00:16:14.080 --> 00:16:18.800
+agents on a daily basis, you understand
+
+458
+00:16:16.240 --> 00:16:20.840
+this fact, right? A focused agent is a
+
+459
+00:16:18.800 --> 00:16:23.200
+performant agent. you add to that
+
+460
+00:16:20.840 --> 00:16:25.800
+context window, the higher the chance
+
+461
+00:16:23.200 --> 00:16:27.960
+something goes wrong is. Specifically,
+
+462
+00:16:25.800 --> 00:16:30.839
+when you start muddying unrelated
+
+463
+00:16:27.960 --> 00:16:32.320
+context together, okay? This is the art
+
+464
+00:16:30.839 --> 00:16:33.760
+of context engineering. It's not just
+
+465
+00:16:32.320 --> 00:16:36.200
+getting all the right things, it's
+
+466
+00:16:33.760 --> 00:16:37.160
+getting just the right things. This
+
+467
+00:16:36.200 --> 00:16:39.040
+agent's booting up, it should be
+
+468
+00:16:37.160 --> 00:16:42.680
+complete pretty soon here, and then we
+
+469
+00:16:39.040 --> 00:16:45.240
+can prompt our exe.dev to create this
+
+470
+00:16:42.680 --> 00:16:48.280
+new skill so that we can boot up brand
+
+471
+00:16:45.240 --> 00:16:50.000
+new sandboxes for exe.dev, and we can
+
+472
+00:16:48.280 --> 00:16:51.400
+really see what this is all about.
+
+473
+00:16:50.000 --> 00:16:52.960
+Moving forward, it's not just about
+
+474
+00:16:51.400 --> 00:16:55.120
+these two sandbox tools, right? It's
+
+475
+00:16:52.960 --> 00:16:57.640
+about every sandbox tool moving forward
+
+476
+00:16:55.120 --> 00:16:59.120
+and our ability to deploy agents to
+
+477
+00:16:57.640 --> 00:17:01.240
+understand the tools, to understand the
+
+478
+00:16:59.120 --> 00:17:04.199
+technology, and then deploy them into
+
+479
+00:17:01.240 --> 00:17:05.760
+valuable use cases on our behalf. So, we
+
+480
+00:17:04.199 --> 00:17:07.160
+can use this system over and over and
+
+481
+00:17:05.760 --> 00:17:09.600
+over, we can compare the features
+
+482
+00:17:07.160 --> 00:17:11.079
+between every specialized agent. I hope
+
+483
+00:17:09.600 --> 00:17:12.160
+you get the point, right? If this is all
+
+484
+00:17:11.079 --> 00:17:13.920
+making sense, you know, make sure you
+
+485
+00:17:12.160 --> 00:17:15.800
+drop a like. This is like really our
+
+486
+00:17:13.920 --> 00:17:18.360
+bread and butter on the channel. We're
+
+487
+00:17:15.800 --> 00:17:20.199
+scaling our compute to scale our impact.
+
+488
+00:17:18.360 --> 00:17:22.560
+It's all about scaling up what our
+
+489
+00:17:20.199 --> 00:17:24.880
+agents can do and focusing our agents to
+
+490
+00:17:22.560 --> 00:17:27.920
+solve real business problems on our
+
+491
+00:17:24.880 --> 00:17:29.720
+behalf via agentic engineering, not vibe
+
+492
+00:17:27.920 --> 00:17:31.680
+coding. We're not shooting prompts and
+
+493
+00:17:29.720 --> 00:17:34.720
+not looking. We know what our agents are
+
+494
+00:17:31.680 --> 00:17:36.440
+doing, okay? And this just stacks up on
+
+495
+00:17:34.720 --> 00:17:38.520
+previous videos we've had on the channel
+
+496
+00:17:36.440 --> 00:17:40.600
+where we're making our agents secure.
+
+497
+00:17:38.520 --> 00:17:42.680
+We're not letting them crush production
+
+498
+00:17:40.600 --> 00:17:44.800
+assets when they should not be able to.
+
+499
+00:17:42.680 --> 00:17:47.080
+We're adding security to our bash tool
+
+500
+00:17:44.800 --> 00:17:48.400
+when they need it. Just like in last
+
+501
+00:17:47.080 --> 00:17:50.560
+week's video, we're preventing
+
+502
+00:17:48.400 --> 00:17:52.320
+catastrophic commands from running. And
+
+503
+00:17:50.560 --> 00:17:54.600
+then, you know, we're letting our agents
+
+504
+00:17:52.320 --> 00:17:56.200
+rip on all the tools, all the skills,
+
+505
+00:17:54.600 --> 00:17:58.200
+all the commands that we actually want
+
+506
+00:17:56.200 --> 00:18:00.040
+our agents to execute, right? As you can
+
+507
+00:17:58.200 --> 00:18:02.320
+see here, a lot of that sandbox tool
+
+508
+00:18:00.040 --> 00:18:03.840
+running, our agent is understanding what
+
+509
+00:18:02.320 --> 00:18:06.240
+it can do here. And soon it's going to
+
+510
+00:18:03.840 --> 00:18:07.680
+write this uh presentation file for us.
+
+511
+00:18:06.240 --> 00:18:09.400
+And this is one of the great things and
+
+512
+00:18:07.680 --> 00:18:12.000
+one of the annoying things about GPT
+
+513
+00:18:09.400 --> 00:18:13.720
+5.5. This model really chews up tokens
+
+514
+00:18:12.000 --> 00:18:16.200
+and it just goes and goes and goes to
+
+515
+00:18:13.720 --> 00:18:18.560
+really get you the most comprehensive
+
+516
+00:18:16.200 --> 00:18:20.920
+result possible. Whereas, I found that
+
+517
+00:18:18.560 --> 00:18:23.920
+Opus 4.7 will do that as well, but it
+
+518
+00:18:20.920 --> 00:18:25.040
+also will really just focus on the goal,
+
+519
+00:18:23.920 --> 00:18:27.200
+right? I think Opus is more
+
+520
+00:18:25.040 --> 00:18:29.040
+goal-oriented and really focuses on
+
+521
+00:18:27.200 --> 00:18:31.040
+accomplishing the goal. If you prompt it
+
+522
+00:18:29.040 --> 00:18:32.160
+wide enough to capture more of that
+
+523
+00:18:31.040 --> 00:18:34.040
+state, more of that scope, it'll
+
+524
+00:18:32.160 --> 00:18:35.080
+certainly capture that as well, okay?
+
+525
+00:18:34.040 --> 00:18:37.200
+But here we go. We're getting that
+
+526
+00:18:35.080 --> 00:18:39.160
+inventory file that really compresses
+
+527
+00:18:37.200 --> 00:18:41.480
+all the observations. Now, we should be
+
+528
+00:18:39.160 --> 00:18:43.840
+able to kick off our exe.dev agent
+
+529
+00:18:41.480 --> 00:18:45.200
+pretty soon here. There we go. Nice
+
+530
+00:18:43.840 --> 00:18:47.200
+write-up. Look at that detailed write-up
+
+531
+00:18:45.200 --> 00:18:49.640
+of all the features, inputs, and
+
+532
+00:18:47.200 --> 00:18:50.880
+outputs, the commands, E2B quirks,
+
+533
+00:18:49.640 --> 00:18:52.400
+right? This is great. And this was part
+
+534
+00:18:50.880 --> 00:18:54.480
+of the prompt, right? We wanted at the
+
+535
+00:18:52.400 --> 00:18:57.000
+end a feature inventory. And this is
+
+536
+00:18:54.480 --> 00:18:59.280
+going to allow our exe.dev agent to
+
+537
+00:18:57.000 --> 00:19:01.600
+really map everything out one-to-one.
+
+538
+00:18:59.280 --> 00:19:03.400
+And again, like focus context is so
+
+539
+00:19:01.600 --> 00:19:05.040
+important here, right? In tactically
+
+540
+00:19:03.400 --> 00:19:06.720
+agentic coding, it's so important. This
+
+541
+00:19:05.040 --> 00:19:09.280
+is an entire tactic. We talk about this
+
+542
+00:19:06.720 --> 00:19:12.320
+for an entire lesson. A focused agent is
+
+543
+00:19:09.280 --> 00:19:15.440
+a performant agent. We have 20% context
+
+544
+00:19:12.320 --> 00:19:17.800
+of the 1 million context window GPT 5.5
+
+545
+00:19:15.440 --> 00:19:19.680
+focus on just understanding this tool
+
+546
+00:19:17.800 --> 00:19:22.120
+and understanding this skill and this
+
+547
+00:19:19.680 --> 00:19:23.560
+whole sandbox system. Okay, so there you
+
+548
+00:19:22.120 --> 00:19:25.800
+go. Validating its work, making sure
+
+549
+00:19:23.560 --> 00:19:27.400
+that that file exists and now we're
+
+550
+00:19:25.800 --> 00:19:29.200
+going to boot up our exe.dev agent.
+
+551
+00:19:27.400 --> 00:19:30.920
+There we go, perfect. So, it's all
+
+552
+00:19:29.200 --> 00:19:32.760
+primed, it's all good to go. Now we're
+
+553
+00:19:30.920 --> 00:19:34.520
+going to fire off this prompt inside of
+
+554
+00:19:32.760 --> 00:19:36.040
+our exe.dev agent. I actually haven't
+
+555
+00:19:34.520 --> 00:19:38.000
+run this before so I'm really curious to
+
+556
+00:19:36.040 --> 00:19:40.040
+see how how this executes and how well
+
+557
+00:19:38.000 --> 00:19:42.480
+this mirrors. So, you're the exe.dev
+
+558
+00:19:40.040 --> 00:19:44.520
+agent. There is no agent sandbox exe.dev
+
+559
+00:19:42.480 --> 00:19:46.040
+skill yet. Your job is to build one.
+
+560
+00:19:44.520 --> 00:19:48.320
+Okay, so there's the purpose and then
+
+561
+00:19:46.040 --> 00:19:50.080
+your reference target is this existing
+
+562
+00:19:48.320 --> 00:19:52.200
+skill here which your teammate
+
+563
+00:19:50.080 --> 00:19:53.480
+understands is already standing by to
+
+564
+00:19:52.200 --> 00:19:55.360
+answer questions about. You're the
+
+565
+00:19:53.480 --> 00:19:57.040
+driver of this collaboration. E2B will
+
+566
+00:19:55.360 --> 00:19:58.720
+not initiate, you reach out. So, I'm
+
+567
+00:19:57.040 --> 00:20:01.000
+setting this up so that in this specific
+
+568
+00:19:58.720 --> 00:20:02.480
+scenario, I want my exe.dev agent to be
+
+569
+00:20:01.000 --> 00:20:04.920
+the one driving this. I'm giving it a
+
+570
+00:20:02.480 --> 00:20:06.560
+couple skills, fire crawl, meta skill to
+
+571
+00:20:04.920 --> 00:20:09.240
+really build on this and then we have
+
+572
+00:20:06.560 --> 00:20:10.680
+our clear deliverable. So, I want that
+
+573
+00:20:09.240 --> 00:20:12.440
+new skill, right? And I'm making it
+
+574
+00:20:10.680 --> 00:20:14.400
+super clear here, a new working skill
+
+575
+00:20:12.440 --> 00:20:17.080
+that mirrors the {slash} agent sandbox
+
+576
+00:20:14.400 --> 00:20:20.000
+is against exe.dev primitives and I also
+
+577
+00:20:17.080 --> 00:20:22.480
+want a feature parity document just like
+
+578
+00:20:20.000 --> 00:20:23.520
+the E2B agent has as well for us, okay?
+
+579
+00:20:22.480 --> 00:20:25.040
+And so, it's starting to get to work
+
+580
+00:20:23.520 --> 00:20:26.320
+here. Grabbing all the docs, it's going
+
+581
+00:20:25.040 --> 00:20:28.400
+to start building this skill and this is
+
+582
+00:20:26.320 --> 00:20:30.200
+the Opus 4.7 running in the Pi agent
+
+583
+00:20:28.400 --> 00:20:32.480
+harness. This is going to be some pretty
+
+584
+00:20:30.200 --> 00:20:34.560
+fantastic results as this gets to work
+
+585
+00:20:32.480 --> 00:20:36.600
+here. So, right now it's gobbling up all
+
+586
+00:20:34.560 --> 00:20:38.880
+the documentation, starting to stack up
+
+587
+00:20:36.600 --> 00:20:40.560
+that proper context and at some point
+
+588
+00:20:38.880 --> 00:20:43.600
+here it's going to begin again, it's
+
+589
+00:20:40.560 --> 00:20:44.920
+communicating with our exe.dev agent
+
+590
+00:20:43.600 --> 00:20:48.160
+here. So, there it is, we have live
+
+591
+00:20:44.920 --> 00:20:50.720
+access confirmed, SSH exe.dev. It's now
+
+592
+00:20:48.160 --> 00:20:52.600
+checking out all my VMs, no current VMs
+
+593
+00:20:50.720 --> 00:20:54.200
+set up yet but my agent is going to go
+
+594
+00:20:52.600 --> 00:20:56.560
+through this process, figure everything
+
+595
+00:20:54.200 --> 00:20:58.040
+out and it has all the documentation and
+
+596
+00:20:56.560 --> 00:21:00.200
+it has the feature parity it's trying to
+
+597
+00:20:58.040 --> 00:21:02.040
+get equal to, okay? So, this is a really
+
+598
+00:21:00.200 --> 00:21:03.240
+great way to in general, you know, it
+
+599
+00:21:02.040 --> 00:21:05.120
+doesn't really matter what agent agent
+
+600
+00:21:03.240 --> 00:21:07.480
+communication system you're using, this
+
+601
+00:21:05.120 --> 00:21:09.320
+is a great way to mirror systems
+
+602
+00:21:07.480 --> 00:21:10.520
+together, right? In the age of agents,
+
+603
+00:21:09.320 --> 00:21:12.440
+we're going to have a hundred different
+
+604
+00:21:10.520 --> 00:21:14.280
+services available to us for agent
+
+605
+00:21:12.440 --> 00:21:16.080
+sandboxing and frankly, you know, for
+
+606
+00:21:14.280 --> 00:21:18.560
+agent harnessing, cloud databases,
+
+607
+00:21:16.080 --> 00:21:20.560
+Turso, things like Neon DB, and a lot of
+
+608
+00:21:18.560 --> 00:21:22.280
+them are going to be swappable, right?
+
+609
+00:21:20.560 --> 00:21:24.520
+Composable. And so, this is a great
+
+610
+00:21:22.280 --> 00:21:26.680
+pattern. Once you have one skill against
+
+611
+00:21:24.520 --> 00:21:28.680
+one specific service, you can quickly
+
+612
+00:21:26.680 --> 00:21:30.680
+create a feature parity document and
+
+613
+00:21:28.680 --> 00:21:32.800
+then build directly against another
+
+614
+00:21:30.680 --> 00:21:33.920
+service. Asian agent communication is a
+
+615
+00:21:32.800 --> 00:21:35.920
+great way to do that because you get
+
+616
+00:21:33.920 --> 00:21:37.000
+that focused agent context window and
+
+617
+00:21:35.920 --> 00:21:38.720
+then your agent can just quickly
+
+618
+00:21:37.000 --> 00:21:40.280
+communicate when they need to. But let's
+
+619
+00:21:38.720 --> 00:21:41.560
+go ahead and dig a little bit deeper
+
+620
+00:21:40.280 --> 00:21:42.960
+into this system, right? Like how does
+
+621
+00:21:41.560 --> 00:21:44.840
+this system really work? There's four
+
+622
+00:21:42.960 --> 00:21:47.960
+tools here. There's basically no magic.
+
+623
+00:21:44.840 --> 00:21:47.960
+It's really simple.
+
+624
+00:21:50.960 --> 00:21:55.680
+You list all the agents on the network,
+
+625
+00:21:53.440 --> 00:21:58.000
+send command, or you send the prompt,
+
+626
+00:21:55.680 --> 00:22:00.080
+and then optionally, you can await a
+
+627
+00:21:58.000 --> 00:22:02.080
+response, right? Sometimes you send off
+
+628
+00:22:00.080 --> 00:22:03.880
+a Slack message and you're just sending
+
+629
+00:22:02.080 --> 00:22:05.720
+useful information to someone or a
+
+630
+00:22:03.880 --> 00:22:07.320
+confirmation or something, and that's
+
+631
+00:22:05.720 --> 00:22:09.280
+it. But if you need to, you can await
+
+632
+00:22:07.320 --> 00:22:11.120
+the response. You can check in on the
+
+633
+00:22:09.280 --> 00:22:13.200
+message. You can do a block wait or you
+
+634
+00:22:11.120 --> 00:22:14.640
+can do a non-blocking poll. I have two
+
+635
+00:22:13.200 --> 00:22:16.160
+versions of this. It's going to be
+
+636
+00:22:14.640 --> 00:22:18.240
+available to you. You can see our agents
+
+637
+00:22:16.160 --> 00:22:19.680
+are starting to chat together here. I'll
+
+638
+00:22:18.240 --> 00:22:21.440
+have two versions of this available to
+
+639
+00:22:19.680 --> 00:22:25.520
+you. Both are going to be available in
+
+640
+00:22:21.440 --> 00:22:27.800
+the Pi versus Cloud Code code base.
+
+641
+00:22:25.520 --> 00:22:29.400
+This is a code base that has been live
+
+642
+00:22:27.800 --> 00:22:32.000
+for quite some time and it's where I
+
+643
+00:22:29.400 --> 00:22:34.680
+posted and shared a lot of extensions
+
+644
+00:22:32.000 --> 00:22:36.880
+from simple to complex cross multiple
+
+645
+00:22:34.680 --> 00:22:39.040
+different agent harness use cases for
+
+646
+00:22:36.880 --> 00:22:40.720
+the Pi agent harness, all right? And so,
+
+647
+00:22:39.040 --> 00:22:43.000
+the whole idea here is just to hedge
+
+648
+00:22:40.720 --> 00:22:45.120
+against Cloud Code, the agentic coding
+
+649
+00:22:43.000 --> 00:22:47.320
+market leader, and get control of the
+
+650
+00:22:45.120 --> 00:22:49.000
+agent harness. This code base builds on
+
+651
+00:22:47.320 --> 00:22:52.080
+that very idea and I'm going to add
+
+652
+00:22:49.000 --> 00:22:53.240
+these two extensions for you into this
+
+653
+00:22:52.080 --> 00:22:54.480
+code base. And so, you know, what are
+
+654
+00:22:53.240 --> 00:22:56.640
+these two extensions? We can just go
+
+655
+00:22:54.480 --> 00:22:58.280
+ahead and crack these open here. Coms
+
+656
+00:22:56.640 --> 00:23:00.000
+version, so this is the non-network
+
+657
+00:22:58.280 --> 00:23:01.880
+version. This operates on a single
+
+658
+00:23:00.000 --> 00:23:04.520
+device. But then we have a coms net
+
+659
+00:23:01.880 --> 00:23:06.440
+where we basically boot up a simple
+
+660
+00:23:04.520 --> 00:23:09.240
+simple simple lightweight bun server
+
+661
+00:23:06.440 --> 00:23:10.400
+here that accepts requests over the
+
+662
+00:23:09.240 --> 00:23:13.720
+network. And you can imagine we have a
+
+663
+00:23:10.400 --> 00:23:16.160
+simple set that let the agent connect,
+
+664
+00:23:13.720 --> 00:23:17.960
+get messages, list agents, process
+
+665
+00:23:16.160 --> 00:23:19.680
+events, so on and so forth here, right?
+
+666
+00:23:17.960 --> 00:23:21.480
+This is a very simple implementation.
+
+667
+00:23:19.680 --> 00:23:23.400
+Secure it, make it more legitimate for
+
+668
+00:23:21.480 --> 00:23:25.400
+your specific use case. Every piece of
+
+669
+00:23:23.400 --> 00:23:27.560
+code you see now, I really think it's
+
+670
+00:23:25.400 --> 00:23:29.160
+really about read and adapt, right?
+
+671
+00:23:27.560 --> 00:23:31.680
+Through your agents add it and have them
+
+672
+00:23:29.160 --> 00:23:34.600
+transform it for your specific use case.
+
+673
+00:23:31.680 --> 00:23:37.000
+And always understand the code. 25% here
+
+674
+00:23:34.600 --> 00:23:39.280
+on our E2B agent. See, it just responded
+
+675
+00:23:37.000 --> 00:23:42.560
+directly here. Kind of looks good.
+
+676
+00:23:39.280 --> 00:23:44.800
+Browser. Okay, SBX tool. Nice. So, it
+
+677
+00:23:42.560 --> 00:23:46.640
+looks like exi.dev agent was asking
+
+678
+00:23:44.800 --> 00:23:49.400
+about the browser tool. All three
+
+679
+00:23:46.640 --> 00:23:51.800
+questions cleanly answered. Quick recap.
+
+680
+00:23:49.400 --> 00:23:53.840
+Templates versus images. Okay, so
+
+681
+00:23:51.800 --> 00:23:56.240
+confirm partial support. Let's see.
+
+682
+00:23:53.840 --> 00:23:58.560
+Captured artifacts, arbitrary container
+
+683
+00:23:56.240 --> 00:24:01.600
+images. Okay. Browser, two primary
+
+684
+00:23:58.560 --> 00:24:03.760
+files, zero E2B import fix, drop in
+
+685
+00:24:01.600 --> 00:24:07.440
+portability. Great. Snapshot, no E2B
+
+686
+00:24:03.760 --> 00:24:09.120
+equivalent. CP is unique to exi.dev.
+
+687
+00:24:07.440 --> 00:24:11.080
+Okay. So, there we go. Here he's writing
+
+688
+00:24:09.120 --> 00:24:12.600
+that feature parity doc. This is looking
+
+689
+00:24:11.080 --> 00:24:15.280
+great. Yeah, nice. Looks like we had a
+
+690
+00:24:12.600 --> 00:24:17.640
+couple chats here to showcase
+
+691
+00:24:15.280 --> 00:24:20.080
+everything. Sent this to E2B. Why now?
+
+692
+00:24:17.640 --> 00:24:21.880
+The parity has their claims is to flag
+
+693
+00:24:20.080 --> 00:24:23.600
+as many E2B claims that's wrong before I
+
+694
+00:24:21.880 --> 00:24:25.600
+bake them into the new skill. Very cool.
+
+695
+00:24:23.600 --> 00:24:28.200
+Okay. Very nice. So, our agents here are
+
+696
+00:24:25.600 --> 00:24:31.000
+doing the work that I would do myself,
+
+697
+00:24:28.200 --> 00:24:32.320
+which is validate the claims, right?
+
+698
+00:24:31.000 --> 00:24:33.880
+This is something we talked about in the
+
+699
+00:24:32.320 --> 00:24:35.840
+verifier agent video we did a couple
+
+700
+00:24:33.880 --> 00:24:38.200
+weeks ago where you have an agent
+
+701
+00:24:35.840 --> 00:24:40.440
+basically double-checking all the claims
+
+702
+00:24:38.200 --> 00:24:42.120
+and all the statements that the primary
+
+703
+00:24:40.440 --> 00:24:43.400
+agent is making to make sure that
+
+704
+00:24:42.120 --> 00:24:45.480
+they're right. This is a really powerful
+
+705
+00:24:43.400 --> 00:24:48.240
+pattern. I like to run my Pi agents, my
+
+706
+00:24:45.480 --> 00:24:49.520
+primary Pi agent with a validator on top
+
+707
+00:24:48.240 --> 00:24:51.280
+of it, which basically, you know,
+
+708
+00:24:49.520 --> 00:24:53.560
+increases the tokens used, but in
+
+709
+00:24:51.280 --> 00:24:55.680
+exchange it saves me time because the
+
+710
+00:24:53.560 --> 00:24:57.200
+validator is validating everything my
+
+711
+00:24:55.680 --> 00:24:59.000
+agent just said, right? It makes sure
+
+712
+00:24:57.200 --> 00:25:00.600
+that everything it said is actually
+
+713
+00:24:59.000 --> 00:25:02.760
+true. And then it also makes sure that
+
+714
+00:25:00.600 --> 00:25:03.880
+the work it said it did is exactly what
+
+715
+00:25:02.760 --> 00:25:05.280
+was done. I'll link that in the
+
+716
+00:25:03.880 --> 00:25:07.760
+description as well. There we go.
+
+717
+00:25:05.280 --> 00:25:09.440
+There's a nice write back to our
+
+718
+00:25:07.760 --> 00:25:12.160
+eexi.dev agent. It's like it's asking
+
+719
+00:25:09.440 --> 00:25:14.200
+for a recursive flag there, too. Wow, so
+
+720
+00:25:12.160 --> 00:25:15.600
+much detail here. Like in the side here,
+
+721
+00:25:14.200 --> 00:25:18.200
+this is a great way to just watch these
+
+722
+00:25:15.600 --> 00:25:20.720
+models work together, right? GPT-5.5,
+
+723
+00:25:18.200 --> 00:25:23.440
+Claude 4.7, gave them a decent size
+
+724
+00:25:20.720 --> 00:25:25.680
+prompt, maybe 80 lines each, and a
+
+725
+00:25:23.440 --> 00:25:28.360
+skill, and now they're just like hashing
+
+726
+00:25:25.680 --> 00:25:30.920
+it out, recreating this new skill. And
+
+727
+00:25:28.360 --> 00:25:33.600
+this is again just one of millions and
+
+728
+00:25:30.920 --> 00:25:36.040
+millions of different ways to coordinate
+
+729
+00:25:33.600 --> 00:25:37.600
+agents to work toward a goal, to work
+
+730
+00:25:36.040 --> 00:25:39.640
+toward something, right? So, okay, so we
+
+731
+00:25:37.600 --> 00:25:41.280
+got 10 corrections from that exchange,
+
+732
+00:25:39.640 --> 00:25:43.160
+right? This is a valuable exchange of
+
+733
+00:25:41.280 --> 00:25:44.960
+information. 10 corrections. There's a
+
+734
+00:25:43.160 --> 00:25:46.320
+couple comments in my videos recently,
+
+735
+00:25:44.960 --> 00:25:48.280
+especially when I talk about multi-agent
+
+736
+00:25:46.320 --> 00:25:49.960
+orchestration, some engineers, probably
+
+737
+00:25:48.280 --> 00:25:51.440
+a decent amount of vibe coders as well,
+
+738
+00:25:49.960 --> 00:25:54.160
+asking, "Why can't you just do all this
+
+739
+00:25:51.440 --> 00:25:56.040
+in one agent?" You certainly can. You
+
+740
+00:25:54.160 --> 00:25:57.600
+certainly can. But you have to remember
+
+741
+00:25:56.040 --> 00:25:59.760
+that couple things. There is a limit to
+
+742
+00:25:57.600 --> 00:26:02.080
+the context window. The more problems,
+
+743
+00:25:59.760 --> 00:26:03.600
+the more different problems, APIs,
+
+744
+00:26:02.080 --> 00:26:05.720
+systems you put into that context
+
+745
+00:26:03.600 --> 00:26:07.360
+window, your error rate will go up.
+
+746
+00:26:05.720 --> 00:26:08.800
+Okay, this is just a fact. If you don't
+
+747
+00:26:07.360 --> 00:26:10.320
+believe that, you don't understand that,
+
+748
+00:26:08.800 --> 00:26:13.120
+do more research on the context window,
+
+749
+00:26:10.320 --> 00:26:15.280
+okay? And then second, with every unique
+
+750
+00:26:13.120 --> 00:26:17.160
+model that you add to your system,
+
+751
+00:26:15.280 --> 00:26:19.280
+right? I'm running Claude right next to
+
+752
+00:26:17.160 --> 00:26:20.520
+GPT-5.5. These models are trained in a
+
+753
+00:26:19.280 --> 00:26:22.760
+completely different way. They have
+
+754
+00:26:20.520 --> 00:26:24.400
+different RL loops running on top of
+
+755
+00:26:22.760 --> 00:26:26.960
+them. Putting these agents together
+
+756
+00:26:24.400 --> 00:26:29.400
+creates something greater. It creates a
+
+757
+00:26:26.960 --> 00:26:31.720
+system that outperforms either of them
+
+758
+00:26:29.400 --> 00:26:33.520
+alone. Just like code plus agent beats
+
+759
+00:26:31.720 --> 00:26:35.960
+either alone, unique agent one plus
+
+760
+00:26:33.520 --> 00:26:39.000
+unique agent two communicating beats
+
+761
+00:26:35.960 --> 00:26:40.800
+either alone, right? And and that's like
+
+762
+00:26:39.000 --> 00:26:42.360
+really the gift and really the value
+
+763
+00:26:40.800 --> 00:26:44.800
+proposition of multi-agent
+
+764
+00:26:42.360 --> 00:26:46.600
+orchestration. It's not just the 10
+
+765
+00:26:44.800 --> 00:26:48.520
+parallel agents you boot up to like
+
+766
+00:26:46.600 --> 00:26:50.080
+write all those files or generate all
+
+767
+00:26:48.520 --> 00:26:51.720
+those images at the same time. It's
+
+768
+00:26:50.080 --> 00:26:53.200
+doing serious engineering work where
+
+769
+00:26:51.720 --> 00:26:54.200
+your agents are checking in on each
+
+770
+00:26:53.200 --> 00:26:56.720
+other, double checking the work,
+
+771
+00:26:54.200 --> 00:26:58.440
+coordinating on a solution, so on and so
+
+772
+00:26:56.720 --> 00:26:59.840
+forth, okay? So, that's the idea. And
+
+773
+00:26:58.440 --> 00:27:01.840
+so, we got one more message coming back
+
+774
+00:26:59.840 --> 00:27:03.360
+here. Hopefully, this wraps it up. And
+
+775
+00:27:01.840 --> 00:27:05.160
+yeah, look at this like Opus is just
+
+776
+00:27:03.360 --> 00:27:07.720
+being really, really great here with the
+
+777
+00:27:05.160 --> 00:27:10.200
+verification. So, please reread the doc
+
+778
+00:27:07.720 --> 00:27:11.880
+and either send review complete or flag
+
+779
+00:27:10.200 --> 00:27:14.240
+remaining issues. All right, so this is
+
+780
+00:27:11.880 --> 00:27:16.560
+just like, you know, it's teamwork,
+
+781
+00:27:14.240 --> 00:27:19.520
+right? This is teamwork, okay? Sign off
+
+782
+00:27:16.560 --> 00:27:21.640
+one non-blocking knit, okay? And then
+
+783
+00:27:19.520 --> 00:27:23.320
+after this, we can proceed with uh
+
+784
+00:27:21.640 --> 00:27:25.400
+scaffolding. So, there we go. So, yeah,
+
+785
+00:27:23.320 --> 00:27:27.400
+it's loading that meta skill. This is my
+
+786
+00:27:25.400 --> 00:27:28.960
+skill that helps me create skills. I'm
+
+787
+00:27:27.400 --> 00:27:31.360
+going to let this cook. Comment down
+
+788
+00:27:28.960 --> 00:27:33.520
+below if you're interested in my agent
+
+789
+00:27:31.360 --> 00:27:35.960
+sandbox skills, the E2B skill, or this
+
+790
+00:27:33.520 --> 00:27:38.040
+new exa.dev skill, and I'll add it to
+
+791
+00:27:35.960 --> 00:27:40.080
+this codebase. But, that's the idea,
+
+792
+00:27:38.040 --> 00:27:42.760
+right? It's it's it's simple, yet it's
+
+793
+00:27:40.080 --> 00:27:44.440
+very, very important, okay? Now, you
+
+794
+00:27:42.760 --> 00:27:46.080
+know, quickly just talking about pros
+
+795
+00:27:44.440 --> 00:27:48.040
+and cons of this system. Every system
+
+796
+00:27:46.080 --> 00:27:52.520
+has pros and cons. If you don't address
+
+797
+00:27:48.040 --> 00:27:52.520
+them, you'll be exposed to them.
+
+798
+00:27:55.640 --> 00:27:59.840
+What are the pros here? It's just an
+
+799
+00:27:57.360 --> 00:28:02.120
+agent, right? I just can at any time now
+
+800
+00:27:59.840 --> 00:28:05.480
+boot up two agents, three agents, five
+
+801
+00:28:02.120 --> 00:28:07.920
+agents on my device, my Mac mini, my M4,
+
+802
+00:28:05.480 --> 00:28:09.760
+right? My cloud VMs, all my services,
+
+803
+00:28:07.920 --> 00:28:11.600
+all my servers. I can just boot up an
+
+804
+00:28:09.760 --> 00:28:13.640
+agent now with the extension, have them
+
+805
+00:28:11.600 --> 00:28:15.480
+connect, have them talk to each other.
+
+806
+00:28:13.640 --> 00:28:17.040
+It's just an agent. It's that simple. As
+
+807
+00:28:15.480 --> 00:28:19.480
+you say, it's just an agent and
+
+808
+00:28:17.040 --> 00:28:22.000
+extension. It's permanent, okay? There's
+
+809
+00:28:19.480 --> 00:28:25.640
+no you know, no subagent delegation, no
+
+810
+00:28:22.000 --> 00:28:27.120
+spin-up or spin-down, no resume. Claude
+
+811
+00:28:25.640 --> 00:28:29.160
+has this resume flag where you can
+
+812
+00:28:27.120 --> 00:28:30.840
+reboot the agent. These are just agents
+
+813
+00:28:29.160 --> 00:28:32.400
+in the terminal. That's it, right? Uh
+
+814
+00:28:30.840 --> 00:28:34.560
+customizable, right? End-to-end.
+
+815
+00:28:32.400 --> 00:28:36.360
+Obviously, this is like a key value prop
+
+816
+00:28:34.560 --> 00:28:38.040
+of why I keep talking about the Python
+
+817
+00:28:36.360 --> 00:28:40.280
+coding agent and why I keep bringing it
+
+818
+00:28:38.040 --> 00:28:42.440
+up. The the state space of agentic
+
+819
+00:28:40.280 --> 00:28:45.720
+engineering is unknown. You know, the
+
+820
+00:28:42.440 --> 00:28:47.800
+way I see this is only uh 1% of it has
+
+821
+00:28:45.720 --> 00:28:49.320
+been discovered and understood and
+
+822
+00:28:47.800 --> 00:28:50.760
+deployed into production, right? I
+
+823
+00:28:49.320 --> 00:28:52.960
+talking like really, really low numbers
+
+824
+00:28:50.760 --> 00:28:56.040
+here. Customization and extensibility is
+
+825
+00:28:52.960 --> 00:28:58.120
+core to the future of agentic engineers.
+
+826
+00:28:56.040 --> 00:28:59.560
+And so, this tool becomes more and more
+
+827
+00:28:58.120 --> 00:29:01.760
+important to me every single day. The
+
+828
+00:28:59.560 --> 00:29:03.840
+tool you use limits what you believe is
+
+829
+00:29:01.760 --> 00:29:07.480
+possible. And with the pie agent
+
+830
+00:29:03.840 --> 00:29:10.480
+harness, I see no limits. You know, all
+
+831
+00:29:07.480 --> 00:29:12.120
+the limitations of of how things work,
+
+832
+00:29:10.480 --> 00:29:14.280
+they're just falling away. I don't see
+
+833
+00:29:12.120 --> 00:29:16.080
+the same workflows. I don't see the same
+
+834
+00:29:14.280 --> 00:29:17.760
+implementations anymore. And I think if
+
+835
+00:29:16.080 --> 00:29:19.280
+you're stuck using one agentic coding
+
+836
+00:29:17.760 --> 00:29:21.160
+tool, especially one that tells you how
+
+837
+00:29:19.280 --> 00:29:22.760
+to do everything, hint hint Claude code,
+
+838
+00:29:21.160 --> 00:29:24.480
+hint hint Codex, hint hint, you know,
+
+839
+00:29:22.760 --> 00:29:26.040
+Gemini C alive if anyone's using that,
+
+840
+00:29:24.480 --> 00:29:27.760
+open code, like whatever it is, right?
+
+841
+00:29:26.040 --> 00:29:30.320
+You are not getting, you know, you're
+
+842
+00:29:27.760 --> 00:29:32.400
+not pushing into that 99% the rest of
+
+843
+00:29:30.320 --> 00:29:34.080
+the value that we can unlock with
+
+844
+00:29:32.400 --> 00:29:36.320
+agents, with the right agentic
+
+845
+00:29:34.080 --> 00:29:38.680
+technology, okay? So, um that's a big
+
+846
+00:29:36.320 --> 00:29:41.600
+one, obviously, right? Uh bidirectional
+
+847
+00:29:38.680 --> 00:29:45.120
+comms are flat. No hierarchy, right? No
+
+848
+00:29:41.600 --> 00:29:48.800
+information loss. No one agent to rule
+
+849
+00:29:45.120 --> 00:29:49.960
+them all, which is a con in another way,
+
+850
+00:29:48.800 --> 00:29:51.680
+right? We've talked about the one agent
+
+851
+00:29:49.960 --> 00:29:52.800
+to rule them all, the orchestrator.
+
+852
+00:29:51.680 --> 00:29:54.400
+Let's be super clear about this. This is
+
+853
+00:29:52.800 --> 00:29:56.280
+the orchestrator. Um
+
+854
+00:29:54.400 --> 00:29:57.720
+and this is like the current wave of
+
+855
+00:29:56.280 --> 00:29:59.640
+multi-agent orchestration. This is super
+
+856
+00:29:57.720 --> 00:30:01.240
+powerful. It's a great pattern. I'm
+
+857
+00:29:59.640 --> 00:30:03.160
+going to continue to use it, but um
+
+858
+00:30:01.240 --> 00:30:05.720
+bidirectional is great cuz it's flat,
+
+859
+00:30:03.160 --> 00:30:07.200
+it's two-way, no information gets lost,
+
+860
+00:30:05.720 --> 00:30:09.320
+right? Um another great part about this
+
+861
+00:30:07.200 --> 00:30:11.400
+is that uh this is a primitive over
+
+862
+00:30:09.320 --> 00:30:12.800
+composition approach, right? Once again,
+
+863
+00:30:11.400 --> 00:30:15.600
+this kind of ties back into that first
+
+864
+00:30:12.800 --> 00:30:17.480
+idea. This is just an agent. It's just a
+
+865
+00:30:15.600 --> 00:30:19.120
+pie coding agent, right? Or just
+
+866
+00:30:17.480 --> 00:30:21.080
+simplify it, right? Let's not hyper
+
+867
+00:30:19.120 --> 00:30:22.880
+fixate on pie, right? This is just an
+
+868
+00:30:21.080 --> 00:30:25.000
+agent. I just open up an agent, and then
+
+869
+00:30:22.880 --> 00:30:26.480
+I can compose as many agents as I want
+
+870
+00:30:25.000 --> 00:30:28.440
+to, okay? So, once again, we're
+
+871
+00:30:26.480 --> 00:30:29.920
+engineering. Composition is an
+
+872
+00:30:28.440 --> 00:30:32.040
+engineering pattern. We're creating
+
+873
+00:30:29.920 --> 00:30:34.000
+slices of things we can combine to make
+
+874
+00:30:32.040 --> 00:30:35.960
+something bigger, right? Primitives into
+
+875
+00:30:34.000 --> 00:30:38.160
+compositions. But you want the primitive
+
+876
+00:30:35.960 --> 00:30:40.720
+first so that you can compose it. That's
+
+877
+00:30:38.160 --> 00:30:42.480
+enough glaze. Uh let's go to cons. Uh
+
+878
+00:30:40.720 --> 00:30:45.280
+you have to build this yourself or get
+
+879
+00:30:42.480 --> 00:30:47.320
+it from any dev Dan for free. Link in
+
+880
+00:30:45.280 --> 00:30:48.280
+the description.
+
+881
+00:30:47.320 --> 00:30:49.440
+But, you know, you know what I mean,
+
+882
+00:30:48.280 --> 00:30:51.840
+right? You have to build this, you have
+
+883
+00:30:49.440 --> 00:30:52.920
+to vet this, you have to control the way
+
+884
+00:30:51.840 --> 00:30:54.440
+your agents communicate. You need to
+
+885
+00:30:52.920 --> 00:30:55.960
+prompt engineer everything, contact
+
+886
+00:30:54.440 --> 00:30:57.840
+engineer thing everything, and you need
+
+887
+00:30:55.960 --> 00:31:00.160
+to deal with the the cases, right? The
+
+888
+00:30:57.840 --> 00:31:02.200
+edge cases is where really where great
+
+889
+00:31:00.160 --> 00:31:03.960
+agentic engineering patterns are made,
+
+890
+00:31:02.200 --> 00:31:06.520
+and great products in general, right?
+
+891
+00:31:03.960 --> 00:31:08.480
+Another con here, loops are possible if
+
+892
+00:31:06.520 --> 00:31:10.440
+prompts are sloppy, right? So, you can
+
+893
+00:31:08.480 --> 00:31:11.680
+you can really generate some bad loops
+
+894
+00:31:10.440 --> 00:31:13.440
+that that are going to really chew up
+
+895
+00:31:11.680 --> 00:31:14.960
+your token usage if your prompts are
+
+896
+00:31:13.440 --> 00:31:16.120
+sloppy, right? You need an end state,
+
+897
+00:31:14.960 --> 00:31:17.480
+right? Let's see if our agents have hit
+
+898
+00:31:16.120 --> 00:31:19.040
+their end state yet. Okay, great. So,
+
+899
+00:31:17.480 --> 00:31:21.000
+yeah, so we are approaching the end
+
+900
+00:31:19.040 --> 00:31:23.520
+state, right? My agent is making
+
+901
+00:31:21.000 --> 00:31:25.720
+progress. It is creating this agent
+
+902
+00:31:23.520 --> 00:31:27.600
+sandbox EXE dev skill. Okay, so that's
+
+903
+00:31:25.720 --> 00:31:29.480
+great. So, this prompt obviously was not
+
+904
+00:31:27.600 --> 00:31:31.080
+sloppy. I don't write very a ton of
+
+905
+00:31:29.480 --> 00:31:32.760
+sloppy prompts anymore, but this is a
+
+906
+00:31:31.080 --> 00:31:34.280
+risk of this strategy, right? And then
+
+907
+00:31:32.760 --> 00:31:37.200
+there's just like general costs, right?
+
+908
+00:31:34.280 --> 00:31:40.200
+Cost scales linearly with agent count
+
+909
+00:31:37.200 --> 00:31:42.120
+plus communication bounce. And so, there
+
+910
+00:31:40.200 --> 00:31:44.560
+a bunch of laws around the perfect
+
+911
+00:31:42.120 --> 00:31:45.720
+number of actors to have in a team,
+
+912
+00:31:44.560 --> 00:31:46.960
+right? Inside of your communication
+
+913
+00:31:45.720 --> 00:31:48.680
+channel. That's kind of what this, you
+
+914
+00:31:46.960 --> 00:31:50.480
+know, showcases, right? There's some
+
+915
+00:31:48.680 --> 00:31:51.800
+magical number, Dunbar's number, or
+
+916
+00:31:50.480 --> 00:31:53.200
+something. I wouldn't worry about that
+
+917
+00:31:51.800 --> 00:31:54.800
+too much. I would just worry about like,
+
+918
+00:31:53.200 --> 00:31:56.840
+what's useful? How can I deploy
+
+919
+00:31:54.800 --> 00:31:58.560
+bidirectional agents, bidirectional
+
+920
+00:31:56.840 --> 00:32:01.200
+peer-to-peer agents that it's actually
+
+921
+00:31:58.560 --> 00:32:02.520
+useful across devices, or on the same
+
+922
+00:32:01.200 --> 00:32:04.080
+device, right? The key here is
+
+923
+00:32:02.520 --> 00:32:05.800
+peer-to-peer. And just make it as useful
+
+924
+00:32:04.080 --> 00:32:07.760
+as possible. If you find that three
+
+925
+00:32:05.800 --> 00:32:09.160
+agents, 10 agents, whatever is too much,
+
+926
+00:32:07.760 --> 00:32:11.160
+then just trim them. So, it's not a huge
+
+927
+00:32:09.160 --> 00:32:13.280
+con, but it's important to uh take into
+
+928
+00:32:11.160 --> 00:32:16.400
+account, right? And I think the last con
+
+929
+00:32:13.280 --> 00:32:18.400
+is, be careful not to just fall back
+
+930
+00:32:16.400 --> 00:32:19.400
+into the orchestration pattern. Unless
+
+931
+00:32:18.400 --> 00:32:20.920
+you need it, right? If you need
+
+932
+00:32:19.400 --> 00:32:22.960
+orchestration pattern, just build that.
+
+933
+00:32:20.920 --> 00:32:24.840
+This is kind of nice though still cuz
+
+934
+00:32:22.960 --> 00:32:27.520
+you can compose peer-to-peer agent
+
+935
+00:32:24.840 --> 00:32:28.440
+communication back into a orchestration
+
+936
+00:32:27.520 --> 00:32:30.200
+pattern where you have more of a
+
+937
+00:32:28.440 --> 00:32:32.320
+top-down format where one agent's
+
+938
+00:32:30.200 --> 00:32:34.000
+leading the rest. That's fine, too,
+
+939
+00:32:32.320 --> 00:32:35.480
+right? As I mentioned, you know, we're
+
+940
+00:32:34.000 --> 00:32:37.880
+exploring the state space of what's
+
+941
+00:32:35.480 --> 00:32:40.800
+possible. This is equally as valuable,
+
+942
+00:32:37.880 --> 00:32:43.280
+but peer-to-peer's advantage is that it
+
+943
+00:32:40.800 --> 00:32:44.920
+is flat and there's no hierarchy, right?
+
+944
+00:32:43.280 --> 00:32:46.240
+That's the advantage, right? Your agents
+
+945
+00:32:44.920 --> 00:32:48.080
+are working together. It's not a
+
+946
+00:32:46.240 --> 00:32:49.400
+delegation stream. So, these are some of
+
+947
+00:32:48.080 --> 00:32:50.680
+the pros and the cons of this system. I
+
+948
+00:32:49.400 --> 00:32:52.120
+think it's important to address the
+
+949
+00:32:50.680 --> 00:32:53.200
+upside and the downside, right? Again,
+
+950
+00:32:52.120 --> 00:32:54.920
+if you're doing engineering, you need to
+
+951
+00:32:53.200 --> 00:32:57.280
+address both of them. So, this is yet
+
+952
+00:32:54.920 --> 00:32:59.760
+another multi-agent orchestration system
+
+953
+00:32:57.280 --> 00:33:01.600
+that you can use to push what you can do
+
+954
+00:32:59.760 --> 00:33:02.960
+with your agents in the age of agents,
+
+955
+00:33:01.600 --> 00:33:04.320
+right? And the goal is the same. We're
+
+956
+00:33:02.960 --> 00:33:06.200
+not really changing We're not doing
+
+957
+00:33:04.320 --> 00:33:07.680
+anything new here on the channel. What
+
+958
+00:33:06.200 --> 00:33:10.680
+we are doing week after week is we're
+
+959
+00:33:07.680 --> 00:33:12.920
+increasing trust and scale of our
+
+960
+00:33:10.680 --> 00:33:14.680
+agentic systems. All right? You can see
+
+961
+00:33:12.920 --> 00:33:16.520
+this final reviews coming in. This is
+
+962
+00:33:14.680 --> 00:33:17.840
+coordinated agents working together,
+
+963
+00:33:16.520 --> 00:33:19.680
+double-checking their work. And you can
+
+964
+00:33:17.840 --> 00:33:22.400
+see here our tokens are starting to
+
+965
+00:33:19.680 --> 00:33:24.640
+stack up. We have 2 million available,
+
+966
+00:33:22.400 --> 00:33:27.600
+but it's split in half. One is focused
+
+967
+00:33:24.640 --> 00:33:29.600
+on exe.dev, one is focused on e2b, but
+
+968
+00:33:27.600 --> 00:33:31.120
+our agents are still coordinating on the
+
+969
+00:33:29.600 --> 00:33:32.200
+same information. We're making sure that
+
+970
+00:33:31.120 --> 00:33:33.720
+we're hitting feature parity. We're
+
+971
+00:33:32.200 --> 00:33:35.360
+making sure that everything looks good.
+
+972
+00:33:33.720 --> 00:33:36.400
+Of course, I'm going to run more tests
+
+973
+00:33:35.360 --> 00:33:37.880
+on this and make sure that this looks
+
+974
+00:33:36.400 --> 00:33:39.240
+good, but I can almost guarantee you
+
+975
+00:33:37.880 --> 00:33:40.800
+this is going to work out of the box
+
+976
+00:33:39.240 --> 00:33:42.560
+because I had two agents two
+
+977
+00:33:40.800 --> 00:33:44.360
+state-of-the-art agents working together
+
+978
+00:33:42.560 --> 00:33:46.440
+to get this shipped out. Enabling
+
+979
+00:33:44.360 --> 00:33:48.680
+specialized agents that chat together on
+
+980
+00:33:46.440 --> 00:33:51.440
+device and across devices is a unique
+
+981
+00:33:48.680 --> 00:33:53.400
+advantage you can add to your agentic
+
+982
+00:33:51.440 --> 00:33:55.520
+systems, specifically to your agent
+
+983
+00:33:53.400 --> 00:33:56.920
+harness. This pattern and patterns like
+
+984
+00:33:55.520 --> 00:33:59.400
+this more and more of these patterns are
+
+985
+00:33:56.920 --> 00:34:00.880
+going to emerge. They're impossible if
+
+986
+00:33:59.400 --> 00:34:03.040
+you're using, you know, the
+
+987
+00:34:00.880 --> 00:34:04.560
+out-of-the-box agents from Anthropic,
+
+988
+00:34:03.040 --> 00:34:06.520
+from OpenAI, from Google. It's
+
+989
+00:34:04.560 --> 00:34:08.600
+impossible when you're renting your
+
+990
+00:34:06.520 --> 00:34:10.159
+agent harness, okay? To be clear, I
+
+991
+00:34:08.600 --> 00:34:11.560
+still use Claude Code all the time. It's
+
+992
+00:34:10.159 --> 00:34:13.120
+a great tool. I'm going to continue to
+
+993
+00:34:11.560 --> 00:34:14.879
+use it, but more and more I'm reaching
+
+994
+00:34:13.120 --> 00:34:17.480
+for the Pi agent harness to build the
+
+995
+00:34:14.879 --> 00:34:19.159
+exact experience and products that I'm
+
+996
+00:34:17.480 --> 00:34:21.600
+looking for, right? And this pattern
+
+997
+00:34:19.159 --> 00:34:24.440
+adds to that bag of tricks that you and
+
+998
+00:34:21.600 --> 00:34:26.159
+I can now deploy in our agent harness if
+
+999
+00:34:24.440 --> 00:34:28.879
+you own your agent harness. I'm going to
+
+1000
+00:34:26.159 --> 00:34:30.679
+be adding these two extensions to the Pi
+
+1001
+00:34:28.879 --> 00:34:32.200
+versus Claude Code codebase here
+
+1002
+00:34:30.679 --> 00:34:34.080
+available to you, link in the
+
+1003
+00:34:32.200 --> 00:34:35.399
+description. I'm really excited for some
+
+1004
+00:34:34.080 --> 00:34:37.440
+of the big ideas I have to share with
+
+1005
+00:34:35.399 --> 00:34:39.040
+you here on the channel coming up. I'm
+
+1006
+00:34:37.440 --> 00:34:40.800
+waiting for that next Gemini model
+
+1007
+00:34:39.040 --> 00:34:42.280
+launch to really showcase one of these
+
+1008
+00:34:40.800 --> 00:34:43.560
+next-gen patterns. So, make sure you
+
+1009
+00:34:42.280 --> 00:34:45.440
+like, make sure you subscribe, join the
+
+1010
+00:34:43.560 --> 00:34:47.399
+journey so you don't miss that. You know
+
+1011
+00:34:45.440 --> 00:34:52.280
+where to find me every single Monday.
+
+1012
+00:34:47.399 --> 00:34:52.280
+Stay focused and keep building.

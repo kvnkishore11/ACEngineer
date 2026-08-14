@@ -1,0 +1,3021 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:05.480
+For the past week, I've been working
+
+2
+00:00:01.680 --> 00:00:08.680
+through agent skill issues. Now you have
+
+3
+00:00:05.480 --> 00:00:12.280
+agent skills, sub-agents, custom {slash}
+
+4
+00:00:08.680 --> 00:00:16.080
+commands, output styles, plugins, hooks,
+
+5
+00:00:12.280 --> 00:00:19.360
+memory files, and MCP servers.
+
+6
+00:00:16.080 --> 00:00:21.960
+What is this all for? I've been using
+
+7
+00:00:19.360 --> 00:00:24.240
+Claude Code since it was first available
+
+8
+00:00:21.960 --> 00:00:27.000
+in February. Since its release, I've
+
+9
+00:00:24.240 --> 00:00:30.320
+generated more code than in my previous
+
+10
+00:00:27.000 --> 00:00:32.800
+15 years as an engineer. This tool has
+
+11
+00:00:30.320 --> 00:00:35.400
+changed engineering. But this once
+
+12
+00:00:32.800 --> 00:00:38.600
+simple tool has gotten complex over the
+
+13
+00:00:35.400 --> 00:00:41.640
+year. So let's simplify it. Skills are
+
+14
+00:00:38.600 --> 00:00:44.040
+simple, but they're so similar to MCP,
+
+15
+00:00:41.640 --> 00:00:46.720
+sub-agents, and custom {slash} commands,
+
+16
+00:00:44.040 --> 00:00:47.760
+it's hard to know when to use a skill.
+
+17
+00:00:46.720 --> 00:00:49.640
+There's a right way to think about
+
+18
+00:00:47.760 --> 00:00:51.720
+skills, and there's a wrong way. I want
+
+19
+00:00:49.640 --> 00:00:54.320
+to show you both to make it absolutely
+
+20
+00:00:51.720 --> 00:00:56.320
+clear what this feature can do for your
+
+21
+00:00:54.320 --> 00:00:59.120
+engineering. Skills are powerful, but
+
+22
+00:00:56.320 --> 00:01:01.240
+you should not always build a skill.
+
+23
+00:00:59.120 --> 00:01:06.120
+Let's make sense of all of these
+
+24
+00:01:01.240 --> 00:01:06.120
+powerful Claude Code capabilities.
+
+25
+00:01:08.080 --> 00:01:12.680
+Let's first look at the wrong way to use
+
+26
+00:01:10.280 --> 00:01:15.360
+skills to solve an engineering problem.
+
+27
+00:01:12.680 --> 00:01:17.440
+Here we have a skill on the left, a
+
+28
+00:01:15.360 --> 00:01:20.480
+sub-agent in the middle, and a custom
+
+29
+00:01:17.440 --> 00:01:22.960
+{slash} command on the right. Bam, bam,
+
+30
+00:01:20.480 --> 00:01:24.840
+bam. If you're parallel agent decoding,
+
+31
+00:01:22.960 --> 00:01:27.440
+generating multiple solutions at the
+
+32
+00:01:24.840 --> 00:01:30.000
+same time, you've likely created Git
+
+33
+00:01:27.440 --> 00:01:32.560
+work trees. Here's a question for you.
+
+34
+00:01:30.000 --> 00:01:35.480
+Which one of these three ways is the
+
+35
+00:01:32.560 --> 00:01:38.440
+right way to create your Git work trees
+
+36
+00:01:35.480 --> 00:01:41.280
+or manage your Git work trees? To answer
+
+37
+00:01:38.440 --> 00:01:44.320
+this, we need to understand how these
+
+38
+00:01:41.280 --> 00:01:46.920
+features really differ. On the top here,
+
+39
+00:01:44.320 --> 00:01:49.000
+we have four key features we're going to
+
+40
+00:01:46.920 --> 00:01:51.280
+compare side-by-side. Now on the left,
+
+41
+00:01:49.000 --> 00:01:53.160
+we have capabilities. So let's start
+
+42
+00:01:51.280 --> 00:01:55.640
+with the three most important
+
+43
+00:01:53.160 --> 00:01:58.080
+capabilities. Skills stand out here
+
+44
+00:01:55.640 --> 00:02:00.280
+right away because they're triggered by
+
+45
+00:01:58.080 --> 00:02:02.400
+your agents. If you give your agent some
+
+46
+00:02:00.280 --> 00:02:04.520
+direction, they will trigger the right
+
+47
+00:02:02.400 --> 00:02:07.040
+skill. Sub-agents are very similar in
+
+48
+00:02:04.520 --> 00:02:09.039
+this way. Unlike {slash} commands where
+
+49
+00:02:07.040 --> 00:02:11.160
+you're explicitly kicking this off. We
+
+50
+00:02:09.039 --> 00:02:13.920
+then have context efficiency. Now this
+
+51
+00:02:11.160 --> 00:02:16.520
+is a huge selling point of skills.
+
+52
+00:02:13.920 --> 00:02:19.160
+Unlike MCP servers, which explode your
+
+53
+00:02:16.520 --> 00:02:21.080
+context window on boot up, skills are
+
+54
+00:02:19.160 --> 00:02:22.520
+very context efficient. This is
+
+55
+00:02:21.080 --> 00:02:24.120
+something that they talk about a lot,
+
+56
+00:02:22.520 --> 00:02:25.760
+which I think is super, super important.
+
+57
+00:02:24.120 --> 00:02:27.920
+I'm glad that they're going into detail.
+
+58
+00:02:25.760 --> 00:02:30.560
+There are three levels of progressive
+
+59
+00:02:27.920 --> 00:02:33.280
+disclosure. You have the metadata level,
+
+60
+00:02:30.560 --> 00:02:34.960
+the actual instructions of your skill.md
+
+61
+00:02:33.280 --> 00:02:37.320
+file, and then you have all of the
+
+62
+00:02:34.960 --> 00:02:40.000
+resources that your agent pulls in from
+
+63
+00:02:37.320 --> 00:02:41.920
+your skill when it needs. All right. The
+
+64
+00:02:40.000 --> 00:02:44.040
+last thing here is context persistence.
+
+65
+00:02:41.920 --> 00:02:45.840
+The only loser here is sub-agents. But
+
+66
+00:02:44.040 --> 00:02:48.080
+of course, this is what makes sub-agents
+
+67
+00:02:45.840 --> 00:02:49.920
+great. Sub-agents isolate and protect
+
+68
+00:02:48.080 --> 00:02:51.520
+your context window. Shareability is not
+
+69
+00:02:49.920 --> 00:02:53.640
+that important. You can use Git, you can
+
+70
+00:02:51.520 --> 00:02:55.200
+use plugins, you can share these.
+
+71
+00:02:53.640 --> 00:02:58.240
+>> Dan, your entry work tree is live on
+
+72
+00:02:55.200 --> 00:02:58.920
+ports 4020 and 5193, ready for parallel
+
+73
+00:02:58.240 --> 00:02:59.960
+development.
+
+74
+00:02:58.920 --> 00:03:02.000
+>> Nice. All right, so we got one of our
+
+75
+00:02:59.960 --> 00:03:04.160
+trees there. Sub-agents are the big
+
+76
+00:03:02.000 --> 00:03:06.440
+winner if you're looking to parallelize
+
+77
+00:03:04.160 --> 00:03:08.120
+your workflows. Dan, I've successfully
+
+78
+00:03:06.440 --> 00:03:10.480
+created and started your yellow tree
+
+79
+00:03:08.120 --> 00:03:11.200
+work tree on ports 4010, and it's
+
+80
+00:03:10.480 --> 00:03:13.840
+running now.
+
+81
+00:03:11.200 --> 00:03:15.720
+>> so we have our red tree, blue tree,
+
+82
+00:03:13.840 --> 00:03:17.680
+yellow tree. Fantastic. Okay. You would
+
+83
+00:03:15.720 --> 00:03:20.160
+think that specialized ability is unique
+
+84
+00:03:17.680 --> 00:03:22.360
+to skills. It's not. You can specialize
+
+85
+00:03:20.160 --> 00:03:24.440
+any one of these features. And of
+
+86
+00:03:22.360 --> 00:03:26.680
+course, you can share all of these any
+
+87
+00:03:24.440 --> 00:03:29.960
+way you want. Now what is important is
+
+88
+00:03:26.680 --> 00:03:32.960
+modularity. This truly differentiates
+
+89
+00:03:29.960 --> 00:03:35.680
+skills. Skills are just like MCP servers
+
+90
+00:03:32.960 --> 00:03:37.920
+in that you have a dedicated solution.
+
+91
+00:03:35.680 --> 00:03:40.640
+It's even more modular than MCP servers,
+
+92
+00:03:37.920 --> 00:03:42.720
+frankly, because skills have a dedicated
+
+93
+00:03:40.640 --> 00:03:44.600
+directory structure, right? If we look
+
+94
+00:03:42.720 --> 00:03:45.760
+at this skill, create work tree skill,
+
+95
+00:03:44.600 --> 00:03:48.080
+the most important thing here is that we
+
+96
+00:03:45.760 --> 00:03:51.080
+have a dedicated structure for building
+
+97
+00:03:48.080 --> 00:03:53.360
+out repeat solutions that our agent can
+
+98
+00:03:51.080 --> 00:03:55.600
+invoke, right? That is the primary
+
+99
+00:03:53.360 --> 00:03:57.600
+benefit of skills. The modularity here
+
+100
+00:03:55.600 --> 00:03:59.200
+is really important. It is high, all
+
+101
+00:03:57.600 --> 00:04:01.520
+right? Unlike sub-agents and {slash}
+
+102
+00:03:59.200 --> 00:04:03.360
+commands, where you kind of had to roll
+
+103
+00:04:01.520 --> 00:04:05.240
+this capability out yourself, which we
+
+104
+00:04:03.360 --> 00:04:07.120
+have done in previous videos. And then
+
+105
+00:04:05.240 --> 00:04:08.960
+things get interesting here at the last
+
+106
+00:04:07.120 --> 00:04:11.800
+level, where we start thinking about
+
+107
+00:04:08.960 --> 00:04:13.680
+composition. Now this is where uh I
+
+108
+00:04:11.800 --> 00:04:16.000
+think a lot of the confusion comes when
+
+109
+00:04:13.680 --> 00:04:17.480
+we talk about skills, MCP servers,
+
+110
+00:04:16.000 --> 00:04:19.239
+sub-agents, and {slash} commands.
+
+111
+00:04:17.480 --> 00:04:22.200
+Specifically, skills and {slash}
+
+112
+00:04:19.239 --> 00:04:25.640
+commands are very, very composable. In
+
+113
+00:04:22.200 --> 00:04:27.600
+fact, you can circularly compose all of
+
+114
+00:04:25.640 --> 00:04:29.560
+these items together, minus sub-agents,
+
+115
+00:04:27.600 --> 00:04:31.360
+right? Because sub-agent cannot use a
+
+116
+00:04:29.560 --> 00:04:33.360
+sub-agent. But when it comes to skills,
+
+117
+00:04:31.360 --> 00:04:35.280
+skills can use prompts, skills can use
+
+118
+00:04:33.360 --> 00:04:37.400
+other skills, skills can use MCP
+
+119
+00:04:35.280 --> 00:04:39.360
+servers, and of course, skills can use
+
+120
+00:04:37.400 --> 00:04:41.160
+sub-agents. So this is the feature
+
+121
+00:04:39.360 --> 00:04:43.600
+breakdown. As you can see here, there's
+
+122
+00:04:41.160 --> 00:04:46.320
+a ton of overlap. This is important to
+
+123
+00:04:43.600 --> 00:04:48.720
+call out. It's the approach that's new,
+
+124
+00:04:46.320 --> 00:04:51.120
+right? We get a dedicated modular
+
+125
+00:04:48.720 --> 00:04:52.520
+directory structure, efficient context,
+
+126
+00:04:51.120 --> 00:04:54.400
+right? Which again, we had with
+
+127
+00:04:52.520 --> 00:04:56.160
+sub-agents, but these are triggered by
+
+128
+00:04:54.400 --> 00:04:58.760
+our agents. So this is the
+
+129
+00:04:56.160 --> 00:05:01.600
+distinguishing pattern of when you would
+
+130
+00:04:58.760 --> 00:05:03.400
+use a skill over MCP, sub-agent, and
+
+131
+00:05:01.600 --> 00:05:05.640
+{slash} command. Now I know this isn't
+
+132
+00:05:03.400 --> 00:05:09.080
+super clear right away, so let's look at
+
+133
+00:05:05.640 --> 00:05:12.120
+some dedicated, specific use cases on
+
+134
+00:05:09.080 --> 00:05:12.880
+when you would use these four features.
+
+135
+00:05:12.120 --> 00:05:15.760
+So skills
+
+136
+00:05:12.880 --> 00:05:18.080
+are truly for automatic behavior. MCP is
+
+137
+00:05:15.760 --> 00:05:20.960
+built for external integrations. We have
+
+138
+00:05:18.080 --> 00:05:22.960
+sub-agents for isolated workflows that
+
+139
+00:05:20.960 --> 00:05:25.080
+you can also parallelize. And then
+
+140
+00:05:22.960 --> 00:05:27.400
+{slash} commands are manual triggers,
+
+141
+00:05:25.080 --> 00:05:29.680
+right? Manual units of compute that you
+
+142
+00:05:27.400 --> 00:05:32.640
+can deploy when you need them. The big
+
+143
+00:05:29.680 --> 00:05:34.360
+battle here I see is between skills and
+
+144
+00:05:32.640 --> 00:05:35.800
+{slash} commands. To be specific here,
+
+145
+00:05:34.360 --> 00:05:37.000
+these are custom {slash} commands, all
+
+146
+00:05:35.800 --> 00:05:39.600
+right? So let's look through some use
+
+147
+00:05:37.000 --> 00:05:42.520
+cases. Automatically extract text and
+
+148
+00:05:39.600 --> 00:05:44.680
+data from PDFs. So which of these four
+
+149
+00:05:42.520 --> 00:05:45.880
+do you think this belongs in? As we work
+
+150
+00:05:44.680 --> 00:05:47.880
+through this, make a good guess, and
+
+151
+00:05:45.880 --> 00:05:49.280
+then comment down below how many you
+
+152
+00:05:47.880 --> 00:05:51.480
+roughly got right, and if you were
+
+153
+00:05:49.280 --> 00:05:53.320
+aligned with where I'm going to place
+
+154
+00:05:51.480 --> 00:05:55.160
+these use cases, all right? So I think
+
+155
+00:05:53.320 --> 00:05:57.600
+automatically, right? There's that
+
+156
+00:05:55.160 --> 00:05:59.400
+keyword automatic. I think you want this
+
+157
+00:05:57.600 --> 00:06:02.280
+to be a skill if you always want to
+
+158
+00:05:59.400 --> 00:06:04.280
+extract text and data from PDFs. This is
+
+159
+00:06:02.280 --> 00:06:08.280
+a skill. What if you want to connect to
+
+160
+00:06:04.280 --> 00:06:10.640
+Jira? This is an external source, right?
+
+161
+00:06:08.280 --> 00:06:12.080
+So we want of course an MCP server, all
+
+162
+00:06:10.640 --> 00:06:13.120
+right? What next, right? Let's keep
+
+163
+00:06:12.080 --> 00:06:15.760
+breaking these down. What if you want to
+
+164
+00:06:13.120 --> 00:06:17.680
+run a comprehensive security audit? Now
+
+165
+00:06:15.760 --> 00:06:19.560
+this one is tricky. This one is tricky,
+
+166
+00:06:17.680 --> 00:06:21.520
+but I think because you want this to be
+
+167
+00:06:19.560 --> 00:06:24.280
+able to scale, and because you don't
+
+168
+00:06:21.520 --> 00:06:25.560
+really need this in your context window,
+
+169
+00:06:24.280 --> 00:06:27.200
+and you don't want this to be automatic.
+
+170
+00:06:25.560 --> 00:06:29.280
+You want this to occur at a specific
+
+171
+00:06:27.200 --> 00:06:31.640
+point in time that you kick off, I think
+
+172
+00:06:29.280 --> 00:06:34.200
+we want this to be a sub-agent. Okay?
+
+173
+00:06:31.640 --> 00:06:36.080
+And so what about generalized, you know,
+
+174
+00:06:34.200 --> 00:06:38.360
+Git commit messages? Now we have a
+
+175
+00:06:36.080 --> 00:06:39.920
+simple one-step task here. Here's the
+
+176
+00:06:38.360 --> 00:06:41.920
+tricky part about these, right? You
+
+177
+00:06:39.920 --> 00:06:43.120
+could easily make this a skill, you can
+
+178
+00:06:41.920 --> 00:06:45.480
+make it a {slash} command, you can make
+
+179
+00:06:43.120 --> 00:06:47.840
+it a sub-agent. But which is best? I
+
+180
+00:06:45.480 --> 00:06:49.800
+think this is best as a simple {slash}
+
+181
+00:06:47.840 --> 00:06:51.880
+command, okay? What about querying your
+
+182
+00:06:49.800 --> 00:06:54.560
+database? This is a classic one. You of
+
+183
+00:06:51.880 --> 00:06:56.400
+course want an MCP server, all right?
+
+184
+00:06:54.560 --> 00:06:57.960
+You at least want to start with an MCP
+
+185
+00:06:56.400 --> 00:06:59.080
+server. We'll talk about composability
+
+186
+00:06:57.960 --> 00:07:01.240
+in just a second here. So what if you
+
+187
+00:06:59.080 --> 00:07:03.120
+want to fix any bugs and failing tests,
+
+188
+00:07:01.240 --> 00:07:05.560
+and you want to do this at scale? Okay,
+
+189
+00:07:03.120 --> 00:07:07.440
+you of course want to throw this inside
+
+190
+00:07:05.560 --> 00:07:09.240
+of a sub-agent, right? You can scale
+
+191
+00:07:07.440 --> 00:07:11.560
+this up. Just get the job done. I don't
+
+192
+00:07:09.240 --> 00:07:13.160
+care what the errors are, just fix them
+
+193
+00:07:11.560 --> 00:07:14.880
+and do it at scale, all right? What if
+
+194
+00:07:13.160 --> 00:07:17.040
+you want to detect style guide
+
+195
+00:07:14.880 --> 00:07:18.960
+violations? This is an interesting one.
+
+196
+00:07:17.040 --> 00:07:21.920
+I think when you want to encode some
+
+197
+00:07:18.960 --> 00:07:23.760
+behavior, some repeat behavior, I do
+
+198
+00:07:21.920 --> 00:07:26.320
+think that you want this to be a
+
+199
+00:07:23.760 --> 00:07:28.200
+dedicated skill, all right? Fetch
+
+200
+00:07:26.320 --> 00:07:30.800
+real-time weather data from APIs. This
+
+201
+00:07:28.200 --> 00:07:32.360
+is a stupid one. Uh it's MCP, right?
+
+202
+00:07:30.800 --> 00:07:33.520
+This is a third-party service that
+
+203
+00:07:32.360 --> 00:07:35.280
+you're integrating with. So here's a
+
+204
+00:07:33.520 --> 00:07:37.360
+cool one. What if you want to create a
+
+205
+00:07:35.280 --> 00:07:39.240
+component, right? Insert whatever UI
+
+206
+00:07:37.360 --> 00:07:41.280
+framework you use. No one cares anymore,
+
+207
+00:07:39.240 --> 00:07:43.080
+and it doesn't matter. This is a simple
+
+208
+00:07:41.280 --> 00:07:45.560
+one-off task that you likely want to
+
+209
+00:07:43.080 --> 00:07:48.000
+encode in a custom {slash} command, all
+
+210
+00:07:45.560 --> 00:07:50.240
+right? Fantastic. So here is a keyword.
+
+211
+00:07:48.000 --> 00:07:52.720
+Whenever you see parallel, you should
+
+212
+00:07:50.240 --> 00:07:55.520
+always just think, just jump to
+
+213
+00:07:52.720 --> 00:07:57.320
+sub-agents, right? Nothing else supports
+
+214
+00:07:55.520 --> 00:07:58.800
+parallel calling, right? It's just
+
+215
+00:07:57.320 --> 00:08:00.320
+sub-agents. So whenever you see that
+
+216
+00:07:58.800 --> 00:08:01.400
+parallel keyword, and whenever you want
+
+217
+00:08:00.320 --> 00:08:03.920
+to think about something you want to
+
+218
+00:08:01.400 --> 00:08:05.480
+parallelize and isolate the context
+
+219
+00:08:03.920 --> 00:08:07.520
+window, and again, you have to be okay
+
+220
+00:08:05.480 --> 00:08:08.960
+with losing that context afterward, cuz
+
+221
+00:08:07.520 --> 00:08:11.320
+it will be lost, you'll just want to
+
+222
+00:08:08.960 --> 00:08:13.760
+throw that into a sub-agent, right? So
+
+223
+00:08:11.320 --> 00:08:16.040
+this is for sub-agents, okay? So here
+
+224
+00:08:13.760 --> 00:08:18.040
+are some use cases with the appropriate
+
+225
+00:08:16.040 --> 00:08:19.960
+feature I think you should set them next
+
+226
+00:08:18.040 --> 00:08:22.800
+to. I think it's clear that MCP is all
+
+227
+00:08:19.960 --> 00:08:24.960
+about external integrations. And also,
+
+228
+00:08:22.800 --> 00:08:26.360
+if you want to bundle multiple services
+
+229
+00:08:24.960 --> 00:08:28.880
+together and then expose them to your
+
+230
+00:08:26.360 --> 00:08:30.960
+agent with specific capabilities, it's
+
+231
+00:08:28.880 --> 00:08:33.680
+pretty clear here you want MCP. If you
+
+232
+00:08:30.960 --> 00:08:35.719
+want isolated context windows that
+
+233
+00:08:33.680 --> 00:08:38.039
+you're okay losing the context of, and
+
+234
+00:08:35.719 --> 00:08:39.760
+you want parallelization, it's clear you
+
+235
+00:08:38.039 --> 00:08:42.800
+want a sub-agent. Now what's more
+
+236
+00:08:39.760 --> 00:08:45.880
+confusing is skills versus {slash}
+
+237
+00:08:42.800 --> 00:08:48.440
+commands. I think skills versus MCP is
+
+238
+00:08:45.880 --> 00:08:51.040
+very distinct. Skills can of course use
+
+239
+00:08:48.440 --> 00:08:53.480
+MCP servers, you can compose everything
+
+240
+00:08:51.040 --> 00:08:56.000
+into a skill, but you can also compose
+
+241
+00:08:53.480 --> 00:08:57.200
+everything into a {slash} command. And
+
+242
+00:08:56.000 --> 00:08:58.840
+then this is where things get
+
+243
+00:08:57.200 --> 00:09:01.040
+interesting. If you look at this feature
+
+244
+00:08:58.840 --> 00:09:03.880
+set here, {slash} commands and skills
+
+245
+00:09:01.040 --> 00:09:06.720
+are very similar. The only exception
+
+246
+00:09:03.880 --> 00:09:08.440
+here is the modularity and who is
+
+247
+00:09:06.720 --> 00:09:09.560
+triggering it. So this is actually
+
+248
+00:09:08.440 --> 00:09:11.600
+really interesting. There are a lot of
+
+249
+00:09:09.560 --> 00:09:13.440
+engineers right now that are going all
+
+250
+00:09:11.600 --> 00:09:15.160
+in on skills. They're converting all
+
+251
+00:09:13.440 --> 00:09:17.560
+their {slash} commands to skills. I
+
+252
+00:09:15.160 --> 00:09:20.120
+think that's a huge mistake. I see
+
+253
+00:09:17.560 --> 00:09:22.400
+{slash} commands as the primitive of
+
+254
+00:09:20.120 --> 00:09:23.800
+agent coding, of AI coding, and really
+
+255
+00:09:22.400 --> 00:09:26.560
+of language models. So you want to be
+
+256
+00:09:23.800 --> 00:09:28.480
+very, very careful to get rid of your
+
+257
+00:09:26.560 --> 00:09:30.280
+prompts. And let me show you exactly
+
+258
+00:09:28.480 --> 00:09:32.440
+what I mean. Let me show you how I'm
+
+259
+00:09:30.280 --> 00:09:34.440
+thinking about approaching skills as a
+
+260
+00:09:32.440 --> 00:09:37.280
+compositional unit, and not a replace
+
+261
+00:09:34.440 --> 00:09:38.440
+all for MCP, {slash} commands, or
+
+262
+00:09:37.280 --> 00:09:40.240
+sub-agents. Because these are all
+
+263
+00:09:38.440 --> 00:09:42.400
+distinct. I think if you're using just
+
+264
+00:09:40.240 --> 00:09:43.560
+one of these, you're not using these
+
+265
+00:09:42.400 --> 00:09:45.560
+features properly. You're not using
+
+266
+00:09:43.560 --> 00:09:47.360
+Claude Code properly. We have our work
+
+267
+00:09:45.560 --> 00:09:49.240
+trees, and we can just you know, verify
+
+268
+00:09:47.360 --> 00:09:51.240
+this very quickly. If we go to trees,
+
+269
+00:09:49.240 --> 00:09:53.600
+you can see we have three brand new
+
+270
+00:09:51.240 --> 00:09:54.880
+versions of this code base, fully built
+
+271
+00:09:53.600 --> 00:09:57.000
+out. There's the environment variable
+
+272
+00:09:54.880 --> 00:09:59.640
+file. If you go into apps, you can see
+
+273
+00:09:57.000 --> 00:10:02.080
+client server, everything is there. Our
+
+274
+00:09:59.640 --> 00:10:04.920
+agents use the prompt, sub agent, and
+
+275
+00:10:02.080 --> 00:10:08.120
+skill to do the exact same work. This is
+
+276
+00:10:04.920 --> 00:10:10.160
+the wrong way to think about skills. If
+
+277
+00:10:08.120 --> 00:10:11.960
+you can do the job with a sub agent or a
+
+278
+00:10:10.160 --> 00:10:13.920
+custom slash command, and it's a one-off
+
+279
+00:10:11.960 --> 00:10:16.480
+job, do not use a skill. This is not
+
+280
+00:10:13.920 --> 00:10:19.040
+what skills are for. How should we think
+
+281
+00:10:16.480 --> 00:10:21.680
+about skills? So, here's our skill sub
+
+282
+00:10:19.040 --> 00:10:23.480
+agent, and here's our prompt. The three
+
+283
+00:10:21.680 --> 00:10:26.120
+agentic units of work that we kicked
+
+284
+00:10:23.480 --> 00:10:27.880
+off. We accomplished the same job with
+
+285
+00:10:26.120 --> 00:10:29.160
+three different capabilities. Okay, now
+
+286
+00:10:27.880 --> 00:10:30.960
+this is where things get tricky, and
+
+287
+00:10:29.160 --> 00:10:33.160
+this is where there's a lot of confusion
+
+288
+00:10:30.960 --> 00:10:35.160
+around this tool, right? In engineering,
+
+289
+00:10:33.160 --> 00:10:37.600
+you don't want many ways to do the same
+
+290
+00:10:35.160 --> 00:10:39.680
+thing. You want one dedicated way to get
+
+291
+00:10:37.600 --> 00:10:41.440
+the job done. So, this is getting
+
+292
+00:10:39.680 --> 00:10:43.520
+confusing. Claude code is becoming a
+
+293
+00:10:41.440 --> 00:10:46.160
+larger and larger tool. Successful
+
+294
+00:10:43.520 --> 00:10:48.800
+things tend to grow, and at some point,
+
+295
+00:10:46.160 --> 00:10:50.520
+it loses its originality. It loses what
+
+296
+00:10:48.800 --> 00:10:52.120
+made it distinct. Now, I don't think
+
+297
+00:10:50.520 --> 00:10:54.640
+Claude code is there. I like this
+
+298
+00:10:52.120 --> 00:10:56.320
+feature. I think it's a net positive for
+
+299
+00:10:54.640 --> 00:10:59.120
+the ecosystem, for the tool, and for
+
+300
+00:10:56.320 --> 00:11:00.800
+engineers. Now, how do we properly use
+
+301
+00:10:59.120 --> 00:11:02.360
+skills? Remember in the beginning, I
+
+302
+00:11:00.800 --> 00:11:04.400
+mentioned that, you know, I asked,
+
+303
+00:11:02.360 --> 00:11:06.680
+"What's the right way to create a Git
+
+304
+00:11:04.400 --> 00:11:09.120
+work tree?" Very clearly, you can do
+
+305
+00:11:06.680 --> 00:11:11.240
+this in three distinct ways. I think in
+
+306
+00:11:09.120 --> 00:11:13.600
+the end, you can build up any one of
+
+307
+00:11:11.240 --> 00:11:17.000
+these, but the true answer here is you
+
+308
+00:11:13.600 --> 00:11:18.560
+probably want a prompt to create a Git
+
+309
+00:11:17.000 --> 00:11:20.800
+work tree. You want to be able to see
+
+310
+00:11:18.560 --> 00:11:22.839
+what happened, and unless you need to
+
+311
+00:11:20.800 --> 00:11:24.560
+create many of these, we don't need to
+
+312
+00:11:22.839 --> 00:11:26.480
+parallelize this, right? But if you do
+
+313
+00:11:24.560 --> 00:11:27.920
+need to parallelize, use a sub agent,
+
+314
+00:11:26.480 --> 00:11:30.360
+right? That's a perfect, you know,
+
+315
+00:11:27.920 --> 00:11:32.080
+branching point to go from custom slash
+
+316
+00:11:30.360 --> 00:11:34.240
+commands to sub agents. If you need to
+
+317
+00:11:32.080 --> 00:11:36.120
+parallelize, you can take your existing
+
+318
+00:11:34.240 --> 00:11:38.880
+custom slash command and throw it in a
+
+319
+00:11:36.120 --> 00:11:40.440
+sub agent. In fact, that's exactly what
+
+320
+00:11:38.880 --> 00:11:42.960
+we've done here. If you actually dial
+
+321
+00:11:40.440 --> 00:11:45.640
+into this sub agent prompt, you can see
+
+322
+00:11:42.960 --> 00:11:48.240
+I'm having the sub agent compose a
+
+323
+00:11:45.640 --> 00:11:50.480
+prompt with the slash command tool. It
+
+324
+00:11:48.240 --> 00:11:52.600
+is calling our prompt. So, we're
+
+325
+00:11:50.480 --> 00:11:54.760
+starting to get into a composability
+
+326
+00:11:52.600 --> 00:11:57.960
+chain, right? Where we have the base
+
+327
+00:11:54.760 --> 00:12:00.040
+level unit being a prompt, aka a custom
+
+328
+00:11:57.960 --> 00:12:02.400
+slash command. How you compose these
+
+329
+00:12:00.040 --> 00:12:04.320
+features is very important, all right?
+
+330
+00:12:02.400 --> 00:12:05.880
+And you can push this even further. In
+
+331
+00:12:04.320 --> 00:12:08.560
+our skill, guess what we're doing?
+
+332
+00:12:05.880 --> 00:12:10.839
+Instructions, use the slash command
+
+333
+00:12:08.560 --> 00:12:14.160
+tool, okay? So, here we are looking at
+
+334
+00:12:10.839 --> 00:12:16.040
+the prompt as the primitive for all the
+
+335
+00:12:14.160 --> 00:12:17.680
+existing features. I've been saying this
+
+336
+00:12:16.040 --> 00:12:19.640
+for years, frankly, ever since the
+
+337
+00:12:17.680 --> 00:12:22.600
+generative AI revolution kicked off. Do
+
+338
+00:12:19.640 --> 00:12:25.200
+not give away the prompt, okay? The
+
+339
+00:12:22.600 --> 00:12:27.160
+prompt is the fundamental unit of
+
+340
+00:12:25.200 --> 00:12:28.920
+knowledge work and of programming. If
+
+341
+00:12:27.160 --> 00:12:31.640
+you don't know how to build and manage
+
+342
+00:12:28.920 --> 00:12:33.760
+prompts, you will lose. Why is that?
+
+343
+00:12:31.640 --> 00:12:36.480
+It's because everything comes down to
+
+344
+00:12:33.760 --> 00:12:38.240
+just four pieces now. There are four
+
+345
+00:12:36.480 --> 00:12:41.200
+pieces of agentic coding. You have
+
+346
+00:12:38.240 --> 00:12:43.120
+context, model, prompt, and tools. If
+
+347
+00:12:41.200 --> 00:12:45.839
+you understand these, if you can build
+
+348
+00:12:43.120 --> 00:12:48.520
+and manage these, you will win. Why is
+
+349
+00:12:45.839 --> 00:12:51.320
+that? It's because every agent is the
+
+350
+00:12:48.520 --> 00:12:52.640
+core four, and every feature that every
+
+351
+00:12:51.320 --> 00:12:54.080
+one of these agentic coding tools is
+
+352
+00:12:52.640 --> 00:12:57.040
+going to build is going to build
+
+353
+00:12:54.080 --> 00:12:58.960
+directly on the core four. This is the
+
+354
+00:12:57.040 --> 00:12:59.880
+foundation. This is the ground level,
+
+355
+00:12:58.960 --> 00:13:02.000
+all right? If you master the
+
+356
+00:12:59.880 --> 00:13:03.560
+fundamentals, you'll master the
+
+357
+00:13:02.000 --> 00:13:05.240
+compositional units, you'll master the
+
+358
+00:13:03.560 --> 00:13:08.240
+features, and then you'll master the
+
+359
+00:13:05.240 --> 00:13:11.240
+tools. This is why it's so important to
+
+360
+00:13:08.240 --> 00:13:12.440
+always lead with a custom slash command.
+
+361
+00:13:11.240 --> 00:13:15.160
+When you're starting out, I always
+
+362
+00:13:12.440 --> 00:13:16.839
+recommend you just build a prompt. Don't
+
+363
+00:13:15.160 --> 00:13:19.240
+build a skill. Don't build an sub agent.
+
+364
+00:13:16.839 --> 00:13:21.600
+Don't build out an MCP server. Keep it
+
+365
+00:13:19.240 --> 00:13:24.200
+simple, all right? Build a prompt.
+
+366
+00:13:21.600 --> 00:13:26.040
+Everything is a prompt in the end. It's
+
+367
+00:13:24.200 --> 00:13:27.960
+tokens in, tokens out. So, if we want to
+
+368
+00:13:26.040 --> 00:13:30.120
+parallelize, though, we can go to sub
+
+369
+00:13:27.960 --> 00:13:31.720
+agent. Now, when do we go to a skill,
+
+370
+00:13:30.120 --> 00:13:33.320
+right? This is the critical question.
+
+371
+00:13:31.720 --> 00:13:35.880
+When do we move from a prompt to a
+
+372
+00:13:33.320 --> 00:13:38.440
+skill? For creating Git work trees, we
+
+373
+00:13:35.880 --> 00:13:40.200
+can easily use just a prompt, right? One
+
+374
+00:13:38.440 --> 00:13:43.160
+prompt solves the problem. But if we
+
+375
+00:13:40.200 --> 00:13:45.520
+want to solve the problem of managing
+
+376
+00:13:43.160 --> 00:13:47.120
+our Git work trees, right? Because, you
+
+377
+00:13:45.520 --> 00:13:48.800
+know, dealing with Git work trees isn't
+
+378
+00:13:47.120 --> 00:13:50.720
+just about creating them, right? If we
+
+379
+00:13:48.800 --> 00:13:53.240
+open up trees here, I now have three Git
+
+380
+00:13:50.720 --> 00:13:56.280
+work trees to manage, to read from, to
+
+381
+00:13:53.240 --> 00:13:59.920
+merge, to remove, right? We need a
+
+382
+00:13:56.280 --> 00:14:01.920
+skill, okay? We need a skill to manage
+
+383
+00:13:59.920 --> 00:14:03.960
+our Git work trees, right? So, this is
+
+384
+00:14:01.920 --> 00:14:07.000
+where one prompt is not enough. You want
+
+385
+00:14:03.960 --> 00:14:09.480
+to scale it into a reusable solution. We
+
+386
+00:14:07.000 --> 00:14:12.760
+need, of course, a skill. This is what
+
+387
+00:14:09.480 --> 00:14:15.200
+skills were built for, okay? Reusable
+
+388
+00:14:12.760 --> 00:14:17.640
+file system-based resources, Claude
+
+389
+00:14:15.200 --> 00:14:19.959
+domain-specific expertise, workflow
+
+390
+00:14:17.640 --> 00:14:22.040
+context, best practices into
+
+391
+00:14:19.959 --> 00:14:23.640
+specialists, okay? I just kind of
+
+392
+00:14:22.040 --> 00:14:24.920
+glossed over that. I didn't really read
+
+393
+00:14:23.640 --> 00:14:26.800
+that properly, but you get the point,
+
+394
+00:14:24.920 --> 00:14:29.400
+okay? This is This is what skills are
+
+395
+00:14:26.800 --> 00:14:31.440
+all about. Skills offer a dedicated
+
+396
+00:14:29.400 --> 00:14:33.400
+solution, right? An opinionated
+
+397
+00:14:31.440 --> 00:14:36.360
+structure on how to solve repeat
+
+398
+00:14:33.400 --> 00:14:37.839
+problems in an agent-first way, okay?
+
+399
+00:14:36.360 --> 00:14:39.040
+Let's Let Let me show you exactly what I
+
+400
+00:14:37.839 --> 00:14:41.560
+mean here. So, we're going to boot up a
+
+401
+00:14:39.040 --> 00:14:43.280
+new instance, and if we go to our skills
+
+402
+00:14:41.560 --> 00:14:45.760
+here, right? If we collapse, collapse,
+
+403
+00:14:43.280 --> 00:14:48.360
+and look at skills, we have a work tree
+
+404
+00:14:45.760 --> 00:14:49.560
+manager skill. This is a lot more built
+
+405
+00:14:48.360 --> 00:14:52.160
+out, right? And so, we can do something
+
+406
+00:14:49.560 --> 00:14:54.200
+like this. List skills. You can see here
+
+407
+00:14:52.160 --> 00:14:56.640
+I have a meta skill and a video
+
+408
+00:14:54.200 --> 00:14:58.320
+processor skill. Dan, I've listed the
+
+409
+00:14:56.640 --> 00:15:00.320
+four available skills you can use in
+
+410
+00:14:58.320 --> 00:15:01.400
+your Claude code environment. So, this
+
+411
+00:15:00.320 --> 00:15:04.000
+is the right way to think about skills.
+
+412
+00:15:01.400 --> 00:15:07.360
+We have a skill that is a manager of a
+
+413
+00:15:04.000 --> 00:15:10.000
+specific problem set. Repeat solution
+
+414
+00:15:07.360 --> 00:15:12.760
+for a specific problem. If we actually
+
+415
+00:15:10.000 --> 00:15:15.400
+just needed to create work trees, slash
+
+416
+00:15:12.760 --> 00:15:17.240
+create work tree, and we're done, right?
+
+417
+00:15:15.400 --> 00:15:19.600
+Give the branch, give the, you know,
+
+418
+00:15:17.240 --> 00:15:21.040
+additional details to make the branch
+
+419
+00:15:19.600 --> 00:15:22.360
+unique, right? Set up environment
+
+420
+00:15:21.040 --> 00:15:24.560
+variables, set up the right client
+
+421
+00:15:22.360 --> 00:15:26.480
+server ports, whatever, and you're done,
+
+422
+00:15:24.560 --> 00:15:28.160
+right? One-off. But if we need to
+
+423
+00:15:26.480 --> 00:15:29.920
+manage, and you saw those prompts just
+
+424
+00:15:28.160 --> 00:15:31.839
+then, right? If you need to manage
+
+425
+00:15:29.920 --> 00:15:33.680
+multiple elements, you know, stop
+
+426
+00:15:31.839 --> 00:15:35.040
+manually prompting this, stop firing off
+
+427
+00:15:33.680 --> 00:15:37.600
+these custom slash commands by yourself.
+
+428
+00:15:35.040 --> 00:15:39.000
+Really dial in and build a skill. So,
+
+429
+00:15:37.600 --> 00:15:40.360
+let's run this, right? Let's actually
+
+430
+00:15:39.000 --> 00:15:42.040
+run the skill. So, I'm going to say pull
+
+431
+00:15:40.360 --> 00:15:43.839
+back up our trees, and let's manage
+
+432
+00:15:42.040 --> 00:15:46.320
+these now, right? So, manage Git work
+
+433
+00:15:43.839 --> 00:15:49.360
+trees, remove red tree, create purple
+
+434
+00:15:46.320 --> 00:15:52.680
+tree with offset four, so that we offset
+
+435
+00:15:49.360 --> 00:15:55.040
+our ports, list our trees, okay? So,
+
+436
+00:15:52.680 --> 00:15:57.920
+this is a skill set. We have solved the
+
+437
+00:15:55.040 --> 00:16:00.480
+problem of managing our Git work trees
+
+438
+00:15:57.920 --> 00:16:02.040
+with a dedicated skill. This is what
+
+439
+00:16:00.480 --> 00:16:03.600
+skills are about, all right? I'm going
+
+440
+00:16:02.040 --> 00:16:05.520
+to fire that off, and our agent is going
+
+441
+00:16:03.600 --> 00:16:07.240
+to get to work on this. You know, this
+
+442
+00:16:05.520 --> 00:16:08.520
+leads us to a great point here. Let's go
+
+443
+00:16:07.240 --> 00:16:10.240
+ahead and look at some definitions while
+
+444
+00:16:08.520 --> 00:16:12.240
+our agent works through this piece by
+
+445
+00:16:10.240 --> 00:16:14.280
+piece. When we come back, we should see
+
+446
+00:16:12.240 --> 00:16:16.880
+red tree removed, and we want to see an
+
+447
+00:16:14.280 --> 00:16:19.400
+added purple tree, and then we want to
+
+448
+00:16:16.880 --> 00:16:20.480
+see just a summary of our current trees,
+
+449
+00:16:19.400 --> 00:16:22.000
+right? Let's look at some just
+
+450
+00:16:20.480 --> 00:16:24.040
+definitions at a high level, right?
+
+451
+00:16:22.000 --> 00:16:25.680
+Where do all these capabilities fit, and
+
+452
+00:16:24.040 --> 00:16:28.160
+when do we use each, right? So, agent
+
+453
+00:16:25.680 --> 00:16:30.520
+skills. You use this to package custom
+
+454
+00:16:28.160 --> 00:16:33.200
+expertise that your agent autonomously
+
+455
+00:16:30.520 --> 00:16:35.480
+applies to your recurring workflows.
+
+456
+00:16:33.200 --> 00:16:37.600
+Super important, very distinguished. MCP
+
+457
+00:16:35.480 --> 00:16:40.760
+servers is about connecting your agent
+
+458
+00:16:37.600 --> 00:16:42.760
+to external tools and data sources. To
+
+459
+00:16:40.760 --> 00:16:45.400
+me, there is very, very little overlap
+
+460
+00:16:42.760 --> 00:16:47.320
+here between agent skills and MCP
+
+461
+00:16:45.400 --> 00:16:49.000
+servers. These are fully distinct. And
+
+462
+00:16:47.320 --> 00:16:50.760
+to be super clear here, I like to think
+
+463
+00:16:49.000 --> 00:16:53.320
+about things at composition levels,
+
+464
+00:16:50.760 --> 00:16:55.040
+right? What should be using what? Skills
+
+465
+00:16:53.320 --> 00:16:57.040
+can have many MCP servers. Skills can
+
+466
+00:16:55.040 --> 00:16:59.800
+have many sub agents. Skills can have
+
+467
+00:16:57.040 --> 00:17:02.880
+many custom slash commands, right? But
+
+468
+00:16:59.800 --> 00:17:04.560
+an MCP server is a lower-level unit,
+
+469
+00:17:02.880 --> 00:17:06.400
+right? You wouldn't have an MCP server
+
+470
+00:17:04.560 --> 00:17:09.079
+use a skill. So, there's a chain of
+
+471
+00:17:06.400 --> 00:17:11.600
+command here. And very interestingly, um
+
+472
+00:17:09.079 --> 00:17:13.880
+I would consider a slash command a super
+
+473
+00:17:11.600 --> 00:17:16.120
+primitive, where it acts as both a
+
+474
+00:17:13.880 --> 00:17:17.600
+primitive and a composition. Because, of
+
+475
+00:17:16.120 --> 00:17:19.480
+course, you can take a custom slash
+
+476
+00:17:17.600 --> 00:17:21.839
+command, and you can run a set of
+
+477
+00:17:19.480 --> 00:17:23.959
+skills, you can run MCP servers, and you
+
+478
+00:17:21.839 --> 00:17:25.240
+can run sub agents. So, it's very
+
+479
+00:17:23.959 --> 00:17:27.400
+interesting how these things compose.
+
+480
+00:17:25.240 --> 00:17:29.040
+There's a lot of circular composition
+
+481
+00:17:27.400 --> 00:17:32.120
+that you can build up here, but I would
+
+482
+00:17:29.040 --> 00:17:34.120
+definitely place your skills at the top
+
+483
+00:17:32.120 --> 00:17:35.560
+of the composition hierarchy, all right?
+
+484
+00:17:34.120 --> 00:17:37.480
+So, let's continue here. We have agent
+
+485
+00:17:35.560 --> 00:17:39.800
+skills. We have MCP servers, right?
+
+486
+00:17:37.480 --> 00:17:41.840
+External data sources. We have sub
+
+487
+00:17:39.800 --> 00:17:45.120
+agents, and we use sub agents to
+
+488
+00:17:41.840 --> 00:17:47.160
+delegate isolatable specialized tasks
+
+489
+00:17:45.120 --> 00:17:49.000
+with separate contexts that can work in
+
+490
+00:17:47.160 --> 00:17:50.560
+parallel. Sub agents are very
+
+491
+00:17:49.000 --> 00:17:52.679
+distinguished, right? I think it's very
+
+492
+00:17:50.560 --> 00:17:54.200
+clear when you'd use a sub agent versus
+
+493
+00:17:52.679 --> 00:17:55.920
+when you wouldn't. When you want work
+
+494
+00:17:54.200 --> 00:17:58.120
+out of your primary agent's context
+
+495
+00:17:55.920 --> 00:18:00.000
+window, and you can delegate it, and you
+
+496
+00:17:58.120 --> 00:18:02.000
+don't care that you're going to lose the
+
+497
+00:18:00.000 --> 00:18:03.320
+context at the end. We also have custom
+
+498
+00:18:02.000 --> 00:18:04.960
+slash commands, all right? This is for
+
+499
+00:18:03.320 --> 00:18:07.040
+reusable prompt shortcuts that you
+
+500
+00:18:04.960 --> 00:18:09.400
+invoke manually. Now, I am definitely
+
+501
+00:18:07.040 --> 00:18:11.120
+underselling custom slash commands here.
+
+502
+00:18:09.400 --> 00:18:12.200
+I I would say if you had to pick one,
+
+503
+00:18:11.120 --> 00:18:14.200
+and you just kind of forget about
+
+504
+00:18:12.200 --> 00:18:16.600
+everything else, you definitely want to
+
+505
+00:18:14.200 --> 00:18:18.360
+prioritize your mastery of custom slash
+
+506
+00:18:16.600 --> 00:18:20.640
+commands. Why? Because this is the
+
+507
+00:18:18.360 --> 00:18:23.760
+closest compositional unit to just
+
+508
+00:18:20.640 --> 00:18:26.720
+bare-metal agent plus LLM, right? You're
+
+509
+00:18:23.760 --> 00:18:28.400
+passing in a user prompt. You must
+
+510
+00:18:26.720 --> 00:18:30.560
+master the prompt. There are no
+
+511
+00:18:28.400 --> 00:18:32.159
+exceptions here. If you avoid
+
+512
+00:18:30.560 --> 00:18:34.800
+understanding how to write great
+
+513
+00:18:32.159 --> 00:18:37.400
+prompts, how to really build these out
+
+514
+00:18:34.800 --> 00:18:39.280
+in a repeatable way, uh you will not
+
+515
+00:18:37.400 --> 00:18:41.679
+progress as an agentic engineer. You
+
+516
+00:18:39.280 --> 00:18:44.000
+will not progress as an engineer in 2025
+
+517
+00:18:41.679 --> 00:18:46.640
+and 2026 and beyond, okay? The prompt is
+
+518
+00:18:44.000 --> 00:18:49.040
+the fundamental unit of knowledge work
+
+519
+00:18:46.640 --> 00:18:51.600
+now. There are no exceptions to this. If
+
+520
+00:18:49.040 --> 00:18:52.840
+you understand this, you will win, all
+
+521
+00:18:51.600 --> 00:18:54.360
+right? And this is something that comes
+
+522
+00:18:52.840 --> 00:18:57.000
+up over and over and over. This is a big
+
+523
+00:18:54.360 --> 00:18:59.280
+topic inside of tactical agentic coding
+
+524
+00:18:57.000 --> 00:19:00.600
+and agentic horizon. I'll leave those
+
+525
+00:18:59.280 --> 00:19:02.400
+linked in the description. If you want
+
+526
+00:19:00.600 --> 00:19:05.440
+to push further and really master how
+
+527
+00:19:02.400 --> 00:19:07.280
+you can use prompts at scale in agents
+
+528
+00:19:05.440 --> 00:19:08.560
+with multiple agents, all right? That's
+
+529
+00:19:07.280 --> 00:19:11.040
+the custom slash command. This is the
+
+530
+00:19:08.560 --> 00:19:12.760
+primitive, all right? This is There's
+
+531
+00:19:11.040 --> 00:19:13.840
+This is ultra important, all right? So,
+
+532
+00:19:12.760 --> 00:19:14.919
+what's next, right? Let's continue
+
+533
+00:19:13.840 --> 00:19:16.800
+breaking down all these features. We of
+
+534
+00:19:14.919 --> 00:19:18.720
+course have hooks. Hooks are great. This
+
+535
+00:19:16.800 --> 00:19:21.040
+is deterministic automation that
+
+536
+00:19:18.720 --> 00:19:22.560
+executes commands at specific life cycle
+
+537
+00:19:21.040 --> 00:19:24.800
+events, right? This is where we kind of
+
+538
+00:19:22.560 --> 00:19:26.760
+add determinism rather than always
+
+539
+00:19:24.800 --> 00:19:28.840
+relying on the agent to decide. So, we
+
+540
+00:19:26.760 --> 00:19:30.960
+need to balance these things, right? And
+
+541
+00:19:28.840 --> 00:19:33.960
+this is why, again, in tactical agentic
+
+542
+00:19:30.960 --> 00:19:36.720
+coding, we push outside of the agents to
+
+543
+00:19:33.960 --> 00:19:38.960
+ADWs, AI developer workflows, where you
+
+544
+00:19:36.720 --> 00:19:40.720
+combine the old world of code with the
+
+545
+00:19:38.960 --> 00:19:43.640
+new world of agents. If you really want
+
+546
+00:19:40.720 --> 00:19:46.200
+to scale, you need both. And hooks lets
+
+547
+00:19:43.640 --> 00:19:47.280
+us tap into deterministic automation,
+
+548
+00:19:46.200 --> 00:19:49.520
+all right? So, what else we have here?
+
+549
+00:19:47.280 --> 00:19:51.640
+We have plugins. This is simple. There's
+
+550
+00:19:49.520 --> 00:19:53.560
+no overlap here between any of these
+
+551
+00:19:51.640 --> 00:19:56.120
+other features, plugins that you package
+
+552
+00:19:53.560 --> 00:19:58.000
+and distribute these sets of work,
+
+553
+00:19:56.120 --> 00:20:00.560
+right? This isn't super interesting.
+
+554
+00:19:58.000 --> 00:20:02.200
+It's just a way to share and reuse cloud
+
+555
+00:20:00.560 --> 00:20:04.600
+code extensions, all right? Last but not
+
+556
+00:20:02.200 --> 00:20:05.720
+least here, we have our output styles.
+
+557
+00:20:04.600 --> 00:20:08.320
+And so, you saw this here, right? I'm
+
+558
+00:20:05.720 --> 00:20:09.640
+using output styles 24/7. When our agent
+
+559
+00:20:08.320 --> 00:20:11.840
+finishes this work, it's going to
+
+560
+00:20:09.640 --> 00:20:13.640
+actually summarize the work using a
+
+561
+00:20:11.840 --> 00:20:15.760
+text-to-speech output style. If we
+
+562
+00:20:13.640 --> 00:20:17.840
+scroll down here, you can see I have a
+
+563
+00:20:15.760 --> 00:20:19.400
+whole slew of output styles. We've
+
+564
+00:20:17.840 --> 00:20:22.120
+talked about this before on the channel.
+
+565
+00:20:19.400 --> 00:20:23.680
+I'm using the observable tools diff
+
+566
+00:20:22.120 --> 00:20:25.720
+text-to-speech summary, and you can see
+
+567
+00:20:23.680 --> 00:20:27.960
+here we're onto that last step, list
+
+568
+00:20:25.720 --> 00:20:31.160
+work trees prompt. And very importantly
+
+569
+00:20:27.960 --> 00:20:33.120
+here, you can see my skill is using a
+
+570
+00:20:31.160 --> 00:20:35.120
+compositional prompt, right? It's using
+
+571
+00:20:33.120 --> 00:20:36.800
+a prompt to do the work. Great stuff
+
+572
+00:20:35.120 --> 00:20:38.440
+there. That's the output styles. You
+
+573
+00:20:36.800 --> 00:20:40.200
+know, I hope this helps you distinguish
+
+574
+00:20:38.440 --> 00:20:41.600
+some of these features and when you
+
+575
+00:20:40.200 --> 00:20:44.680
+should be using each. At the end of the
+
+576
+00:20:41.600 --> 00:20:46.680
+day, use whatever works for you,
+
+577
+00:20:44.680 --> 00:20:49.160
+right? Don't let these features, don't
+
+578
+00:20:46.680 --> 00:20:51.280
+let these, you know, cloud code buzzy
+
+579
+00:20:49.160 --> 00:20:53.080
+kind of features stop you from just
+
+580
+00:20:51.280 --> 00:20:54.800
+shipping work, all right? Use what works
+
+581
+00:20:53.080 --> 00:20:56.960
+for you. But, I would say have a strong
+
+582
+00:20:54.800 --> 00:20:58.920
+bias towards slash commands. And then,
+
+583
+00:20:56.960 --> 00:21:00.440
+when you're thinking about composing
+
+584
+00:20:58.920 --> 00:21:02.400
+many slash commands, sub agents, or
+
+585
+00:21:00.440 --> 00:21:04.960
+MCPs, think about putting them in a
+
+586
+00:21:02.400 --> 00:21:07.760
+skill, all right? But, your skills again
+
+587
+00:21:04.960 --> 00:21:10.880
+should have a slew of slash commands.
+
+588
+00:21:07.760 --> 00:21:12.880
+Now, that leads me to um some opinions
+
+589
+00:21:10.880 --> 00:21:15.160
+that I have about this feature. I like
+
+590
+00:21:12.880 --> 00:21:16.680
+it, but there are also some problems
+
+591
+00:21:15.160 --> 00:21:18.480
+with this feature. So, let me just
+
+592
+00:21:16.680 --> 00:21:20.640
+quickly just work through this pros and
+
+593
+00:21:18.480 --> 00:21:21.880
+cons list. So, this is agent skills. And
+
+594
+00:21:20.640 --> 00:21:23.360
+let me just kind of walk through this
+
+595
+00:21:21.880 --> 00:21:24.920
+with you. I want to tell you what I like
+
+596
+00:21:23.360 --> 00:21:26.560
+and what I don't like. And comment down
+
+597
+00:21:24.920 --> 00:21:28.960
+below if you agree with me on my pros
+
+598
+00:21:26.560 --> 00:21:32.640
+and cons here. I like that this is agent
+
+599
+00:21:28.960 --> 00:21:34.640
+invoked, right? We want to lean into the
+
+600
+00:21:32.640 --> 00:21:36.520
+autonomy, right? Dial up the autonomy
+
+601
+00:21:34.640 --> 00:21:38.120
+knob to 11, all right? And this is how
+
+602
+00:21:36.520 --> 00:21:40.640
+we do it. We delegate more work to our
+
+603
+00:21:38.120 --> 00:21:42.440
+agents. I like the context protection,
+
+604
+00:21:40.640 --> 00:21:44.840
+right? This is incremental context
+
+605
+00:21:42.440 --> 00:21:46.520
+window adoption. Progressive disclosure
+
+606
+00:21:44.840 --> 00:21:48.560
+is what they call it. Unlike MCP
+
+607
+00:21:46.520 --> 00:21:51.080
+servers, which just straight-up tortures
+
+608
+00:21:48.560 --> 00:21:54.880
+context window, I like that this is a
+
+609
+00:21:51.080 --> 00:21:58.360
+dedicated isolated file system pattern,
+
+610
+00:21:54.880 --> 00:22:00.480
+right? We can now logically compose and
+
+611
+00:21:58.360 --> 00:22:02.679
+group our skills together. This makes it
+
+612
+00:22:00.480 --> 00:22:05.240
+really easy to write, update, create,
+
+613
+00:22:02.679 --> 00:22:06.840
+modify, and then distribute what your
+
+614
+00:22:05.240 --> 00:22:09.560
+agents can do. So, this is great. This
+
+615
+00:22:06.840 --> 00:22:12.640
+is honestly the biggest value prop right
+
+616
+00:22:09.560 --> 00:22:14.800
+next to agent invoked for agent skills.
+
+617
+00:22:12.640 --> 00:22:16.679
+Can compose other elements, or we should
+
+618
+00:22:14.800 --> 00:22:17.840
+say other features. And then lastly, you
+
+619
+00:22:16.679 --> 00:22:19.280
+know, again, I think it's really
+
+620
+00:22:17.840 --> 00:22:20.880
+important to highlight, this is the
+
+621
+00:22:19.280 --> 00:22:23.880
+agentic approach. This is what you want
+
+622
+00:22:20.880 --> 00:22:25.200
+to see. Agent just does the right thing.
+
+623
+00:22:23.880 --> 00:22:27.800
+Lots to like here, but there are some
+
+624
+00:22:25.200 --> 00:22:30.080
+things that I don't like. So, it doesn't
+
+625
+00:22:27.800 --> 00:22:33.040
+go all the way. What do I mean by that?
+
+626
+00:22:30.080 --> 00:22:36.400
+I can't nest sub agents, and I can't
+
+627
+00:22:33.040 --> 00:22:38.200
+nest my prompts, right? Why not? Why do
+
+628
+00:22:36.400 --> 00:22:40.000
+we not have the capability to inside of
+
+629
+00:22:38.200 --> 00:22:42.760
+our bundle here, right? Inside of our
+
+630
+00:22:40.000 --> 00:22:45.200
+like file system VM for my skill, where
+
+631
+00:22:42.760 --> 00:22:47.880
+is my slash commands directory? Where is
+
+632
+00:22:45.200 --> 00:22:49.679
+my agents directory, right? Why didn't
+
+633
+00:22:47.880 --> 00:22:51.400
+the cloud code team go all the way here?
+
+634
+00:22:49.679 --> 00:22:54.400
+If you're making this the bundle for
+
+635
+00:22:51.400 --> 00:22:57.400
+repeatable solutions, why can't I embed
+
+636
+00:22:54.400 --> 00:22:59.960
+prompts, the most important feature out
+
+637
+00:22:57.400 --> 00:23:02.240
+of any one of these these agents? It's
+
+638
+00:22:59.960 --> 00:23:03.800
+just prompts, right? This is Don't let
+
+639
+00:23:02.240 --> 00:23:06.560
+anyone confuse you with these feature
+
+640
+00:23:03.800 --> 00:23:09.080
+releases. Prompts are the most important
+
+641
+00:23:06.560 --> 00:23:11.200
+thing of all. Dan, I have successfully
+
+642
+00:23:09.080 --> 00:23:13.679
+managed your Git work trees. Nice.
+
+643
+00:23:11.200 --> 00:23:16.920
+>> Removed red tree. Created purple tree on
+
+644
+00:23:13.679 --> 00:23:19.240
+ports 4240 and 5213.
+
+645
+00:23:16.920 --> 00:23:21.040
+And listed all three running work trees.
+
+646
+00:23:19.240 --> 00:23:23.520
+Okay. So, that work's been completed,
+
+647
+00:23:21.040 --> 00:23:25.560
+but let me just finish my rant here.
+
+648
+00:23:23.520 --> 00:23:28.160
+You know, why can't I put the most
+
+649
+00:23:25.560 --> 00:23:31.000
+important primitive of all inside of
+
+650
+00:23:28.160 --> 00:23:33.120
+skills in a dedicated way? I know, I
+
+651
+00:23:31.000 --> 00:23:35.120
+know, I can just engineer this in, but
+
+652
+00:23:33.120 --> 00:23:36.440
+they're creating this pattern, so just
+
+653
+00:23:35.120 --> 00:23:39.000
+go all the way. That's my biggest
+
+654
+00:23:36.440 --> 00:23:41.360
+complaint and my like one request for
+
+655
+00:23:39.000 --> 00:23:42.840
+this feature. I think that reliability
+
+656
+00:23:41.360 --> 00:23:45.880
+is going to be an interesting one. So,
+
+657
+00:23:42.840 --> 00:23:48.280
+will the agent actually use the right
+
+658
+00:23:45.880 --> 00:23:50.120
+skills when chained? I think
+
+659
+00:23:48.280 --> 00:23:51.960
+individually it's less concerning, but
+
+660
+00:23:50.120 --> 00:23:53.360
+when you, you know, stack these up, and
+
+661
+00:23:51.960 --> 00:23:55.000
+this is one of the key features that
+
+662
+00:23:53.360 --> 00:23:57.120
+they mentioned,
+
+663
+00:23:55.000 --> 00:23:59.360
+you know, compose capabilities, combine
+
+664
+00:23:57.120 --> 00:24:01.480
+skills, how reliable is that? Can I
+
+665
+00:23:59.360 --> 00:24:03.280
+actually deploy that into production?
+
+666
+00:24:01.480 --> 00:24:05.080
+Can I actually chain together five
+
+667
+00:24:03.280 --> 00:24:06.600
+skills and expect them to be called
+
+668
+00:24:05.080 --> 00:24:09.120
+back-to-back-to-back-to-back-to-back? Or
+
+669
+00:24:06.600 --> 00:24:11.280
+should I again just use a prompt?
+
+670
+00:24:09.120 --> 00:24:14.400
+Because I can guarantee you if you run,
+
+671
+00:24:11.280 --> 00:24:18.520
+you know, call {slash} XYZ, then call
+
+672
+00:24:14.400 --> 00:24:20.480
+{slash} ZYX, this will run in the right
+
+673
+00:24:18.520 --> 00:24:23.360
+order. So, I'm I'm It's not clear to me
+
+674
+00:24:20.480 --> 00:24:24.840
+how reliable skills are yet. Of course,
+
+675
+00:24:23.360 --> 00:24:26.280
+more testing, make sure you subscribe,
+
+676
+00:24:24.840 --> 00:24:27.320
+make sure you like and comment so the
+
+677
+00:24:26.280 --> 00:24:28.440
+YouTube algorithm knows you're
+
+678
+00:24:27.320 --> 00:24:30.080
+interested. We're going to be pushing
+
+679
+00:24:28.440 --> 00:24:32.120
+skills hard and seeing what we can
+
+680
+00:24:30.080 --> 00:24:34.120
+really do on the channel. So, the last
+
+681
+00:24:32.120 --> 00:24:36.560
+kind of issue I have with this is that
+
+682
+00:24:34.120 --> 00:24:39.040
+we could do all this with prompt
+
+683
+00:24:36.560 --> 00:24:41.640
+engineering plus custom slash commands
+
+684
+00:24:39.040 --> 00:24:44.960
+plus slash command tool. Problem here is
+
+685
+00:24:41.640 --> 00:24:46.440
+that skills are effectively opinionated
+
+686
+00:24:44.960 --> 00:24:48.400
+prompt engineering
+
+687
+00:24:46.440 --> 00:24:51.520
+plus modularity. The real question here
+
+688
+00:24:48.400 --> 00:24:53.400
+is is what's the actual innovation?
+
+689
+00:24:51.520 --> 00:24:56.240
+Right? What's actually new here? I think
+
+690
+00:24:53.400 --> 00:25:00.000
+the answer is not that much. And at the
+
+691
+00:24:56.240 --> 00:25:02.120
+same time, having a dedicated specific
+
+692
+00:25:00.000 --> 00:25:04.200
+way to operate your agents in an
+
+693
+00:25:02.120 --> 00:25:05.600
+agent-first way is still powerful, all
+
+694
+00:25:04.200 --> 00:25:07.760
+right? So, it's very interesting, right?
+
+695
+00:25:05.600 --> 00:25:10.600
+This is quite a simple feature. It's a
+
+696
+00:25:07.760 --> 00:25:12.360
+kind of thin opinionated file structure,
+
+697
+00:25:10.600 --> 00:25:13.960
+but we could do that before, you know?
+
+698
+00:25:12.360 --> 00:25:15.720
+So, I don't know. I'm I'm I'm still kind
+
+699
+00:25:13.960 --> 00:25:17.760
+of working through this. There's nothing
+
+700
+00:25:15.720 --> 00:25:19.360
+actually new here. I think this is, you
+
+701
+00:25:17.760 --> 00:25:22.080
+know, the cloud code team making it
+
+702
+00:25:19.360 --> 00:25:24.560
+easier to bundle together repeat
+
+703
+00:25:22.080 --> 00:25:26.360
+solutions in an agent-first way. So,
+
+704
+00:25:24.560 --> 00:25:29.679
+that's my pros and cons list. I've built
+
+705
+00:25:26.360 --> 00:25:32.240
+out several skills for repeat workflows.
+
+706
+00:25:29.679 --> 00:25:34.480
+Right now, I'm really stacking up my
+
+707
+00:25:32.240 --> 00:25:36.520
+user directory with a bunch of concrete
+
+708
+00:25:34.480 --> 00:25:38.800
+skills. It's very clear that this
+
+709
+00:25:36.520 --> 00:25:40.640
+release is important, right? We have
+
+710
+00:25:38.800 --> 00:25:42.400
+this like huge banner here at the top.
+
+711
+00:25:40.640 --> 00:25:43.480
+The cloud code team, the Anthropic
+
+712
+00:25:42.400 --> 00:25:45.240
+engineers, they're really pushing this
+
+713
+00:25:43.480 --> 00:25:47.080
+feature. And I think for good reason.
+
+714
+00:25:45.240 --> 00:25:49.800
+This is powerful, and it's a dedicated
+
+715
+00:25:47.080 --> 00:25:52.360
+way to across their entire platform
+
+716
+00:25:49.800 --> 00:25:55.280
+enable engineers and just general users
+
+717
+00:25:52.360 --> 00:25:57.160
+to create repeat agent-first solutions,
+
+718
+00:25:55.280 --> 00:26:00.000
+right? We're creating domain-specific
+
+719
+00:25:57.160 --> 00:26:02.080
+expertise in an agent-first way. So, I
+
+720
+00:26:00.000 --> 00:26:03.600
+like this feature. I am using it. You
+
+721
+00:26:02.080 --> 00:26:06.160
+know, I give this a solid eight out of
+
+722
+00:26:03.600 --> 00:26:08.240
+10. It is very clear this does not
+
+723
+00:26:06.160 --> 00:26:09.400
+replace any existing feature or
+
+724
+00:26:08.240 --> 00:26:11.560
+capability. Like this is not a
+
+725
+00:26:09.400 --> 00:26:14.160
+replacement for MCP, slash command, or
+
+726
+00:26:11.560 --> 00:26:16.560
+sub agent. It is a higher compositional
+
+727
+00:26:14.160 --> 00:26:18.800
+level that you can use to group these
+
+728
+00:26:16.560 --> 00:26:21.320
+features together to solve a specific
+
+729
+00:26:18.800 --> 00:26:23.040
+problem in a repeat way. This code base
+
+730
+00:26:21.320 --> 00:26:24.160
+is going to be available to you, link in
+
+731
+00:26:23.040 --> 00:26:26.200
+the description. You're going to get
+
+732
+00:26:24.160 --> 00:26:28.120
+access to all four of these skills. And
+
+733
+00:26:26.200 --> 00:26:29.920
+I also have the meta skill for you. You
+
+734
+00:26:28.120 --> 00:26:31.720
+can use this skill to build other
+
+735
+00:26:29.920 --> 00:26:33.760
+skills. This is a very, very, very
+
+736
+00:26:31.720 --> 00:26:35.840
+powerful agentic abstraction you can
+
+737
+00:26:33.760 --> 00:26:37.800
+always use. Build the thing that builds
+
+738
+00:26:35.840 --> 00:26:39.800
+the thing. This is a big theme in
+
+739
+00:26:37.800 --> 00:26:41.760
+tactical agentic coding. Again, link in
+
+740
+00:26:39.800 --> 00:26:43.480
+the description for that. Then we have
+
+741
+00:26:41.760 --> 00:26:45.760
+the video processor, where we actually
+
+742
+00:26:43.480 --> 00:26:48.120
+have a dedicated script. And this skill
+
+743
+00:26:45.760 --> 00:26:50.160
+is dedicated around processing and
+
+744
+00:26:48.120 --> 00:26:51.560
+managing different video files, create
+
+745
+00:26:50.160 --> 00:26:52.760
+transcriptions, so on and so forth,
+
+746
+00:26:51.560 --> 00:26:55.240
+right? So, I just wanted to give you a
+
+747
+00:26:52.760 --> 00:26:56.760
+few ideas of how you can use skills to
+
+748
+00:26:55.240 --> 00:26:59.320
+push your engineering forward. Take
+
+749
+00:26:56.760 --> 00:27:00.800
+these, understand skills, make them your
+
+750
+00:26:59.320 --> 00:27:02.880
+own. If you made it to the end,
+
+751
+00:27:00.800 --> 00:27:04.600
+definitely like and comment to let the
+
+752
+00:27:02.880 --> 00:27:06.960
+algorithm know you're interested. I'll
+
+753
+00:27:04.600 --> 00:27:09.760
+see you next Monday with a big idea for
+
+754
+00:27:06.960 --> 00:27:13.040
+your agentic coding. Stay focused and
+
+755
+00:27:09.760 --> 00:27:13.040
+keep building.

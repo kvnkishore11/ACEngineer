@@ -1,0 +1,450 @@
+{
+  "lesson_key": "ma-2-lead-agents",
+  "short_key": "ma-2",
+  "title": "Multi-Team Agentic Coding / Lead Agents",
+  "course": "MA",
+  "order": 16,
+  "volume_dir": "vol-3-ma",
+  "chapter_stem": "16-lead-agents",
+  "lesson_url": "https://www.youtube.com/watch?v=M30gp1315Y4",
+  "course_page": "https://agenticengineer.com/tactical-agentic-coding?y=M30gp1315Y4",
+  "access_note": "Members-only codebase, shared exclusively with Tactical Agentic Coding + Agentic Horizon members. This is the 2nd of 3 next-generation multi-agent codebases Dan ships to Agentic Horizon. A public video cut exists at youtu.be/M30gp1315Y4 titled 'One Agent Is NOT ENOUGH: Agentic Coding BEYOND Claude Code'.",
+  "video": {
+    "file": "ma-2-lead-agents/video/ma-2-lead-agents.mp4",
+    "duration_seconds": 2096,
+    "duration_display": "34:56",
+    "native_resolution": "3840x2160 (4K)",
+    "codec": "av1",
+    "fps": "29.97"
+  },
+  "chapters_from_dan": [
+    { "t": "00:00", "title": "One Agent is NOT ENOUGH" },
+    { "t": "01:30", "title": "Your Teams Of Agents" },
+    { "t": "11:05", "title": "Managing Teams of Agents" },
+    { "t": "17:01", "title": "Agents That Work Together" },
+    { "t": "31:10", "title": "Tactical Agentic Coding" }
+  ],
+  "tactic": {
+    "name": "One Agent Is Not Enough — Build Teams of Agent Experts",
+    "one_liner": "Stop being the orchestrator. Replace the single re-prompted agent with a config-driven hierarchy of specialized, domain-locked, memory-compounding agent experts that you command through one chat interface.",
+    "why_uncomfortable": "It asks you to spend real money and real tokens on coordination that looks wasteful in the moment. A single 'ping each team' fans out to 7+ API calls; a full plan-engineer-validate cycle can cost ~$8 and touch Opus leads plus Sonnet workers across three teams. Cost-min-maxers watch the footer tick up and conclude it is waste. Dan's counter is that you are not thinking far enough into the future: intelligence per token is rising while token cost falls, so the engineer who learns to SPEND those tokens on specialized teams now gets the asymmetric advantage. It also demands you 'let go' — hand whole domains to agents that maintain their own memory files you never touch."
+  },
+  "mission": "Move up the stack from single-agent operator to commander of agent TEAMS. By the end of 2026 the engineer still re-prompting one agent in a terminal is the bottleneck (they ARE the orchestrator). You become irreplaceable by building a multi-team system where you type one message and 9 specialized agents across 3 teams decompose, build, and validate the work while you watch — no babysitting, no manual coordination. The endgame of TAC/Agentic Horizon: systems that build systems, so your codebase increasingly runs itself.",
+  "six_pillars": {
+    "note": "Dan's own canonical framing from the lesson description — 'the 6 pillars driving this multi-agent architecture'. Every core concept maps to one of these.",
+    "1_team_leads_and_workers": "A 3-tier hierarchy (orchestrator -> team leads -> workers) that removes YOU as the bottleneck. Depth-2 delegation.",
+    "2_expertise_and_specialization": "Specialized agents make expert decisions while generalist agents make mediocre ones. Agent experts always outperform a generic agent.",
+    "3_agent_memory": "Persistent per-agent mental models (expertise files) that compound intelligence session over session.",
+    "4_domain_ownership": "Per-path read/upsert/delete boundary enforcement that makes full agent autonomy safe — blast radius near zero.",
+    "5_chat_room_interface": "The coordination primitive: agent teams communicate, delegate, and report back inside one chat room. You talk only to the orchestrator.",
+    "6_configuration_driven_harness": "The entire multi-agent setup defined in a single YAML config, running on the customizable Pi agent harness (not just prompts/subagents — the whole harness)."
+  },
+  "architecture": {
+    "summary": "Depth-2 delegation: User -> Orchestrator -> Team Leads -> Members(Workers). One unified response bubbles back up. You converse only with the Orchestrator.",
+    "tiers": {
+      "orchestrator": "Single interface. Model anthropic/claude-opus-4-6. Classifies the request, creates a tilldone task list, delegates to ONE team by default (multiple only when the request spans domains), synthesizes team output into your answer. Tools: write, edit, read, grep, find, ls, delegate, tilldone. Skills: conversational-response, mental-model, active-listener, zero-micro-management, high-autonomy. Domain: read-all, write only its own expertise.",
+      "team_leads": "Planning Lead, Engineering Lead, Validation Lead. Model anthropic/claude-opus-4-6. delegate(member, question) to their own workers; synthesize; NEVER execute raw file work. Same tool set as the orchestrator (incl. delegate + tilldone) but domain-scoped to read everything and write ONLY their own mental-model file. Skills: conversational-response, mental-model, active-listener, zero-micro-management (no high-autonomy).",
+      "workers": "6 specialists: Product Manager, UX Researcher (Planning); Frontend Dev, Backend Dev (Engineering); QA Engineer, Security Reviewer (Validation). Model anthropic/claude-sonnet-4-6. Tools: read, write, edit, bash, grep, find, ls (NO delegate, NO tilldone) — they are the only tier that runs bash and mutates code. Skills: mental-model, active-listener, precise-worker (no conversational-response -> stay verbose/detailed; no zero-micro-management). Domain: each scoped to what it may touch."
+    },
+    "default_roster": "3 teams x (1 lead + 2 workers) = 9 specialized agents + 1 orchestrator = 10 agents total. NOTE: Dan's video description says '2 teams, 3 members each, 9 agents' in one place — that is inconsistent with the shipped 3-team default; the footer visibly renders 10 rows (Orch + 3 leads + 6 workers). Trust the code: 3 teams, 10 agents.",
+    "delegation_flow": [
+      "You type a message -> goes to the Orchestrator.",
+      "Orchestrator classifies the domain and calls delegate(team, question).",
+      "Team Lead receives the question, decides whether to handle it or consult members.",
+      "Members execute (read files, write code, run commands) within their domain.",
+      "Lead synthesizes member responses into a team position.",
+      "Orchestrator synthesizes team output into your answer.",
+      "For multi-team work the Orchestrator chains delegation SEQUENTIALLY (plan -> engineer -> validate), not in parallel."
+    ],
+    "opus_reflection": "In OPUS.md (a captured conversation with the model that helped build it), the single most important thing is 'the orchestrator's ability to classify and route correctly — everything downstream only matters if the right team gets the right question,' and the next direction is 'parallel delegation' (Promise.allSettled already wraps the loop; the hard part is teaching the orchestrator when work is parallel-safe vs dependent)."
+  },
+  "core_concepts": [
+    {
+      "id": "multi-team-agentic-coding",
+      "name": "Multi-Team Agentic Coding (one agent is not enough)",
+      "plain_english": "The frontier past single-agent and even flat multi-agent work: specialized TEAMS of agents, coordinated by one interface, that outperform the normal distribution of results. If you are still re-prompting one agent over and over, YOU are the orchestrator — and that is the bottleneck this system removes.",
+      "dan_words": "\"One agent is not enough... today I want to show you a system that pushes beyond Claude Code. This is multi-team agentic coding. Here we use specialized teams of agents to outperform the normal distribution of results.\"",
+      "misconception": "That this is just 'more sub-agents.' Anyone can specialize individual agents via Claude Code subagents. The unit here is the specialized TEAM (lead + domain-locked workers) plus a single orchestrator interface, so your cognitive input does not grow as you add specialists.",
+      "frame_ref": "t0093 / t0232 (the 10-agent team tree)"
+    },
+    {
+      "id": "three-tier-depth-2",
+      "name": "Three-tier hierarchy / depth-2 delegation",
+      "plain_english": "User -> Orchestrator -> Team Leads -> Workers. Two layers of delegation. The orchestrator classifies and routes; leads coordinate and synthesize; workers do the actual reading, writing, and bash. Results bubble back up into one answer.",
+      "dan_words": "\"Notice here we have a two-layer architecture where we have an orchestrator talking to our team leads... what we have here is three tiers of agents. We have our orchestrator, we have our leads, and we have our workers.\"",
+      "misconception": "That deeper is better (agents calling agents calling agents). OPUS.md: most systems 'either go flat or go too deep — two levels hits the sweet spot,' mapping directly to how real engineering orgs operate. Depth is hard-capped by the code (leads' delegate tool self-disables in workers).",
+      "frame_ref": "t0185 (eng lead -> backend dev cascade)"
+    },
+    {
+      "id": "chat-room-single-interface",
+      "name": "The chat-room interface / single orchestrator interface",
+      "plain_english": "You always and only talk to the Orchestrator, inside a chat room where every agent's messages are visible. This is the coordination primitive: it keeps YOUR cognitive load flat no matter how many specialists exist behind the orchestrator.",
+      "dan_words": "\"we're having a single interface orchestrator so that our cognitive input into the system... doesn't need to increase as you increase the total number of specialized agents. This is a huge problem with customization unless you build it right.\"",
+      "misconception": "That more specialists = more for you to manage. The chat-room + orchestrator inverts that: adding a team is a config edit, and you never address workers directly.",
+      "frame_ref": "t0118 (ping -> orchestrator pong; you only talk to Orch)"
+    },
+    {
+      "id": "leads-delegate-never-execute",
+      "name": "Zero micro-management (leads delegate, never execute)",
+      "plain_english": "Leads and the orchestrator are thinkers/coordinators, not builders. They read for context and delegate the doing to workers who have the right tools and domain access. When a lead catches itself about to write/edit/bash, it delegates instead.",
+      "dan_words": "\"the lead cannot do work. It is a thinker. It's a planner. It's a coordinator... You're a leader, delegate, never execute.\"",
+      "misconception": "That the lead being blocked from files is an annoyance / token waste. It is the point: the block forces the work to the specialist with the right tools and the compounding domain memory. (In the demo the Engineering Lead literally tries file tools, gets domain-blocked with red X's, and delegates to Backend Dev.)",
+      "frame_ref": "t0185 (lead blocked -> delegates)"
+    },
+    {
+      "id": "domain-ownership-locking",
+      "name": "Domain ownership / domain locking",
+      "plain_english": "Every agent declares explicit per-path permissions — read / upsert (create+update) / delete — in its system-prompt frontmatter. A structural enforcer blocks any tool call outside the agent's domain. This is what makes full autonomy SAFE on mid-to-large codebases: blast radius near zero.",
+      "dan_words": "\"We have domain. So this specifies what the agents can and cannot do and where they can and cannot go... No one should be touching the DevOps files and folders except the DevOps agent. This is like the holy grail of operating mid to large-size codebases.\"",
+      "misconception": "That domain locking is just a prompt instruction the model might ignore. It is enforced by a Pi extension (domain-enforcer.ts) that hard-blocks read/write/delete tools AND heuristically blocks bash write/delete commands — the prompt (zero-micro-management skill) is the soft layer, the domain rules are the hard gate.",
+      "frame_ref": "t1290 (frontend-dev domain scoped to apps/frontend/)"
+    },
+    {
+      "id": "agent-experts-vs-generalists",
+      "name": "Agent experts beat generalist agents",
+      "plain_english": "Specialization is the whole advantage. A billing agent, a migrations agent, a DevOps agent — each with its own tools, domain, and accumulated experience — makes expert decisions where a generic agent makes mediocre ones, exactly like trusting a specialist teammate who has done the job many times.",
+      "dan_words": "\"why agent experts will always outperform a generic agent... You don't want a generic agent doing this stuff. You want an agent that has experience, that has expertise doing this over and over, just like you would trust someone on your team who you know has done it.\"",
+      "misconception": "That 'expertise' means a bigger system prompt. Expertise here is a package: role prompt + scoped domain + specific tools + a compounding memory file + read-only playbooks for critical knowledge (billing/migrations/deploys) that nobody can corrupt.",
+      "frame_ref": "t0232 (specialized 10-agent roster)"
+    },
+    {
+      "id": "compounding-mental-models",
+      "name": "Compounding mental models (agents that remember)",
+      "plain_english": "Every agent maintains its own expertise YAML — a mental model of the system it works on. It reads it on boot and updates it after work. Session over session, that knowledge compounds, so your team gets smarter every time you run it. You do NOT touch these files.",
+      "dan_words": "\"every time I boot this up, my agent teams, down to the individual workers, is going to have a stacking, compounding set of memory that's allowing them to specialize further and further... You have to let go. You have to teach your agents to operate as you would.\"",
+      "misconception": "Two: (1) that it is Claude-style 'remember everything I ever said' global memory — no, these are narrow, domain-specific, per-agent files (backend dev remembers backend patterns; QA remembers failure modes). (2) That you should micro-curate them — Dan warns 'don't be over rigid'; the mental-model skill is only ~76 lines of guidance and the agents self-maintain within a max-lines cap.",
+      "frame_ref": "t1420 (session log + head-to-head-results artifact written by the team)",
+      "shipped_state_note": "In the shipped repo ALL 10 expertise files are EMPTY (0 lines). /install-into-codebase creates blank mental models; agents build them per-codebase from scratch. Dan's on-screen ~5,000-token backend model was his working copy from a PREVIOUS codebase (he even says 'I actually need to get rid of this')."
+    },
+    {
+      "id": "composable-skills",
+      "name": "Composable skills (shared behavioral rules)",
+      "plain_english": "Behavior is assembled from small markdown skill files declared in each agent's frontmatter. Share a skill across agents to change many at once; remove one line to change one agent. Six skills ship: conversational-response, zero-micro-management, active-listener, mental-model, high-autonomy, precise-worker.",
+      "dan_words": "\"by composing skills like this, we're able to control and quickly modify the capabilities of every single agent because often times there's shared capability you want... There could be an agent somewhere that we don't want to always active listen.\"",
+      "misconception": "That skills are just prompt snippets with no leverage. They are the control surface: e.g. active-listener (read the conversation log before every response) is shared by all 10 agents; conversational-response is given to leads/orchestrator (stay Slack-concise) but withheld from workers (stay verbose); zero-micro-management is given only to leads/orchestrator.",
+      "frame_ref": "t1180 (search: active-listener = 10 results in 10 files)"
+    },
+    {
+      "id": "config-driven-teams",
+      "name": "Configuration-driven teams (one YAML)",
+      "plain_english": "The entire team structure — orchestrator, teams, leads, members, colors, consult-when routing hints — lives in one YAML file. Add a team, prune a team, swap a member: one file change, picked up on next launch. Reusable, copyable, specializable.",
+      "dan_words": "\"I really like this configuration-based approach because it means at any point in time, we can just copy our config, change up the teams, and specialize how we need... Really is as simple as updating the configuration file.\"",
+      "misconception": "That domain/skills/expertise live in the config too. They do NOT — the YAML holds the roster + routing; each agent's model, tools, skills, expertise, and domain live in that agent's .md frontmatter. The repo ships 5 preset configs (default 3-team, engineering-only, planning+engineering, plan+3x-scaled-engineering, and an open-source multi-provider config).",
+      "frame_ref": "t0768 (orchestrator.md frontmatter) + config file tree"
+    },
+    {
+      "id": "model-tiering-spend-to-win",
+      "name": "Model tiering + spend to win",
+      "plain_english": "Put your best intelligence where coordination happens (Opus for orchestrator + leads) and cheaper models where you just need execution (Sonnet for workers) — or make everything the best model if you are going all out. Give agents ALL the context they need (1M-token windows); do not be afraid to spend to get the advantage.",
+      "dan_words": "\"I have all of my leads as a more powerful Opus model, and the workers are Sonic [Sonnet] models... We are not afraid to spend to win here. We're not afraid to give our agents all the relevant context they need.\"",
+      "misconception": "That coordination tokens are waste ('$8 for this agent team?!'). Dan: 'You're thinking about right now. You're not thinking far enough into the future. Models will improve, costs are going down... I am not spending enough tokens, you are not spending enough tokens.' The model tier is config-overridable per agent (config model: beats frontmatter model:).",
+      "frame_ref": "t1610 (full tree: Opus leads / Sonnet workers, Orch $8.280 total)"
+    },
+    {
+      "id": "conversation-awareness-sessions",
+      "name": "Conversation awareness + session workspace",
+      "plain_english": "One shared append-only JSONL conversation log records every message from every tier (user, orchestrator, leads, members) with tool calls. Via the active-listener skill, every agent reads recent history before responding, so nobody repeats work or contradicts a decision silently. A per-session directory is the shared scratch space where agents write specs, plans, and results.",
+      "dan_words": "\"every agent is aware of the conversation happening... This session directory is really important so that there's just a shared space for agents to operate on whatever work they're doing.\"",
+      "misconception": "That each agent is a black box with its own private history. The JSONL log makes the whole team observable and coordinated; you can literally open conversation.jsonl and read the entire multi-agent exchange.",
+      "frame_ref": "t1420 (conversation.jsonl + session dir with per-team folders and artifacts)"
+    },
+    {
+      "id": "customizable-pi-harness",
+      "name": "The customizable Pi harness (beyond Claude Code)",
+      "plain_english": "This is built on the Pi coding agent, whose entire harness is customizable — down to folders and files, tools, hooks, and even the UI. That is what lets Dan replace the whole chat experience with a multi-team chat room. It starts with a .pi directory (vs .claude), and Pi exposes the same hooks system Claude Code has, plus full-harness control.",
+      "dan_words": "\"We are using the Pi agent harness to customize this entire experience... not just agents, not just teams of agents, but the entire agent harness can be customized when you're using a tool like Pi.\"",
+      "misconception": "That you must use Pi, or that Claude Code can't do any of this. Dan: you CAN build a version with Claude Code (subagents + hooks) but 'you'll be a lot more limited.' The IDEAS (teams, leads, domain, memory) transfer; the harness-level control is what Pi adds. 'More tools like this will emerge, but the ideas will be there.'",
+      "frame_ref": "t0768 (the .pi/multi-team/agents/orchestrator.md config)"
+    },
+    {
+      "id": "trust-and-scale-2026",
+      "name": "Trust and scale (the 2026 game)",
+      "plain_english": "Two moves win agentic engineering: raise TRUST in your agents until you know they will ship the result when you hit enter, then SCALE it — how big, how surgical can you go. Specialized agents whose expertise compounds are the engine of both. Think about where the ball is going, not where it is.",
+      "dan_words": "\"The name of the game in 2026 is trust and scale... increase the trust you have in your agents to such a high level that you know they will ship the result when you hit enter on the prompt. After you do that, you scale it. How big can you go? How surgical can your agents be?\"",
+      "misconception": "That trust comes from watching more closely. It comes from building specialized, domain-locked, memory-compounding experiences and then letting go — the opposite of babysitting.",
+      "frame_ref": "t0955 (validation team autonomously reviews and reports 'ship it')"
+    }
+  ],
+  "core_four_reprise": {
+    "note": "This lesson explicitly reaches back to the TAC core four (context, model, prompt, tools) and reframes multi-team coding as controlling the core four at the system-prompt level, then orchestrating/scaling it.",
+    "dan_words": "\"A great way to do that is to really know how to control the core four — context, model, prompt, tools — and then orchestrate. Scale it... We are really detailing and controlling the core four down to the system prompt level.\"",
+    "context": "Per-agent: injected {{SESSION_DIR}} + {{CONVERSATION_LOG}} + {{TEAMS_BLOCK}}/{{MEMBERS_BLOCK}} + loaded expertise + skills + shared_context (README.md, CLAUDE.md). Leads pull ALL relevant context first ('spend to win'); 1M-token windows make deep specialization + memory viable.",
+    "model": "Tiered: Opus (orchestrator + leads), Sonnet (workers). Overridable per agent via config model:. opensource-config demonstrates 9 different provider models via OpenRouter.",
+    "prompt": "Each agent is a system prompt with injected runtime variables; the orchestrator writes the SAME consistent question to every team when fanning out (multi-perspective).",
+    "tools": "Tiered capability: leads/orchestrator get delegate + tilldone (coordination); workers get bash + write/edit (execution). The delegate tool is where 'all the power' is built."
+  },
+  "the_demo": {
+    "target_codebase": "A separate 'prompt-routing' / prompt-complexity-classifier codebase (data-science / scikit-learn) that Dan operates ON in the demo. It is NOT included in the shipped lead-agents repo — Dan deploys the multi-team tool INTO it via the `teams` alias.",
+    "problem": "'Every LLM application pays for intelligence it doesn't need.' A prompt-complexity classifier (TF-IDF + Logistic Regression, 325 labeled examples, 3 classes low/mid/high, ~85% holdout accuracy) predicts which model tier a prompt needs, so simple prompts route to cheap models instead of Opus-high.",
+    "worked_thread": [
+      "`just predict \"summarize this codebase\"` -> Label: MID, confidences {high:0.35, low:0.19, mid:0.45}, Routes to claude-sonnet-4-6 (frame t0337).",
+      "Ask all teams: 'two additional scikit-learn classifiers to benchmark against' -> orchestrator fans the SAME domain-tailored prompt to Planning/Engineering/Validation -> consensus picks (LinearSVC, CalibratedClassifierCV; engineering adds SGDClassifier; ComplementNB / 'Claude man and B' as challenger) (frame t0408).",
+      "'plan, engineer, then validate' -> full lifecycle: Planning drafts, Engineering (Backend Dev) implements benchmark, Validation (QA + Security) reviews -> Security 'ship it, no blocking issues', QA finds extra items (frame t0955).",
+      "`run head-to-head` eval on holdout -> LR owns LOW (80% vs 67%), ComplementNB owns MID (86% vs 76%), both perfect on HIGH; 'LR stays as default, CNB is a credible challenger'; results written to sessions/<id>/head-to-head-results.md (frame t1610)."
+    ],
+    "design_bias": "The classifier is deliberately biased toward predicting HIGH as a safe default — mispredicting LOW/MID when you truly needed HIGH is the costly error (bad user experience). Tune toward mid based on business financials, hopefully not low."
+  },
+  "step_by_step_demo": [
+    "(0:00-1:28) Cold open: 'one agent is not enough.' Vision — evolve from single agent -> multiple agents -> agent TEAMS that learn (agent experts), some outperforming your co-workers. Not for cost-min-maxers; for engineers on mid-to-large production codebases.",
+    "(1:29-2:20) The customized Pi chat room. `ping` -> Orchestrator pong. `ping each team lead` -> two-layer orchestrator->leads fan-out; footer sums Orchestrator/Leads/contacts/total cost (orchestrator cost = whole-system cost).",
+    "(2:26-3:37) 'Have engineering present a tree of the most important files.' Engineering Lead tries file tools, is DOMAIN-BLOCKED (steps out of its domain), and delegates to Frontend + Backend Dev -> three tiers visible working in a chat-like interface.",
+    "(3:45-4:20) `/toggle workers` reveals the full team breakdown; agents load memory files + expertise on boot (many read/book tool calls at the start).",
+    "(4:23-5:47) The demo problem: prompt-routing classifier ('don't pay for intelligence you don't need'). `just predict \"summarize this codebase\"` -> Label MID with confidences -> routes to Sonnet.",
+    "(5:50-8:12) 'Ask all teams: two more scikit-learn classifiers to benchmark.' Orchestrator writes the identical, domain-tailored prompt to all 3 teams -> multi-perspective consensus. Copy session ID -> open conversation.jsonl to prove every agent sees the conversation.",
+    "(8:16-11:05) 'plan, engineer, then validate.' Plan Lead gathers ALL context first ('spend to win'; callback to CEO-agents / 1M context). Converging trends: rising intelligence + big context windows + agents that learn + the customizable Pi harness = far from the normal distribution of results.",
+    "(11:11-13:14) 'It all starts with the .pi file.' Walk the multi-team-config.yaml (orchestrator + teams + leads + members; paths). Open orchestrator.md: name, model, expertise (updatable, max-lines 10000), skills, tools.",
+    "(13:16-15:40) Skills sharing: zero-micro-management shared by orchestrator + all leads; conversational-response shared by leads/orchestrator but NOT workers. delegate tool = the three-tier engine. DOMAIN block: planning lead reads everything, writes nothing but its own memory ('you're a leader, delegate, never execute'). Ties into Pi hooks (same as Claude Code hooks, more capable).",
+    "(15:41-17:00) Validation runs: QA Engineer + Security Reviewer weigh in independently, find DIFFERENT things (different context windows / perspectives, could run different models). Orchestrator composes a concise summary (conversational-response skill). ~18 minutes, lots of work done.",
+    "(17:01-18:00) `just predict both` / `run head-to-head`. Domain lock in action again: orchestrator can't do the work -> delegates to Engineering -> lead can't execute -> passes to Backend Dev to run head-to-head.",
+    "(18:00-20:00) Orchestrator system prompt: runtime-injected variables (SESSION_DIR, CONVERSATION_LOG, TEAMS from YAML), plus the expertise + skills blocks lifted from frontmatter into the prompt. active-listener skill present in all 10 agents (read the conversation log before every response).",
+    "(20:00-23:10) Skills directory tour + mental-model skill (when to read/update, how to structure, ~76 lines — guidance not rigidity). Compounding memory: every boot stacks more domain memory. Front-end vs back-end DOMAIN split shown side-by-side (both can READ the other, only write their own dir). Back-end mental model example (~5,000 tokens, from a previous codebase). 'You can't have your fingers on everything.'",
+    "(23:10-25:20) Sessions: open conversation.jsonl + per-agent session file + the templated back-end-dev system prompt (full control of the core four at the system-prompt level). head-to-head results: LR vs ComplementNB accuracy; classifier biased to HIGH as safe default.",
+    "(25:25-27:07) Why teams beat solo subagents: specialized TEAMS + single orchestrator interface keeps your cognitive input flat. Leads=Opus, workers=Sonnet, tunable. Prune/add a team = edit config. Kill + relaunch (`teams`) with planning+engineering only (no validation).",
+    "(27:08-31:10) Next-gen directions: build a meta agent / meta team to fine-tune your teams; team-based slash commands / skills (plan-build-validate); fine-tune the mental-model skill; read-only expertise (updatable:false) for billing/migrations/DevOps. Recap of skills + tools + domain locking. Pre-empt the '$8 is waste' objection: spend MORE tokens; the old way (one agent in a terminal prompting back and forth) is finished.",
+    "(31:10-34:56) Course pitch (TAC + Agentic Horizon; phase 3 coming). Close: '2026 is trust and scale' — build agent experts whose expertise compounds; can you build teams of experts that operate autonomously on your behalf? Stay focused and keep building."
+  ],
+  "quotes": [
+    { "text": "One agent is not enough.", "approx_timestamp": "0:06" },
+    { "text": "Multi-agent orchestration and tools like Claude Code are the current frontier, but today I want to show you a system that pushes beyond Claude Code. This is multi-team agentic coding.", "approx_timestamp": "0:48" },
+    { "text": "Here we use specialized teams of agents to outperform the normal distribution of results.", "approx_timestamp": "1:02" },
+    { "text": "Notice here we have a two-layer architecture where we have an orchestrator talking to our team leads.", "approx_timestamp": "2:03" },
+    { "text": "It stepped out of its domain. And so it realized this and it delegated to its team members who have the right tools.", "approx_timestamp": "2:53" },
+    { "text": "What we have here is three tiers of agents. We have our orchestrator, we have our leads, and we have our workers.", "approx_timestamp": "3:16" },
+    { "text": "Our agents are loading memory files. They're loading their agent expertise.", "approx_timestamp": "4:06" },
+    { "text": "It wrote the exact same prompt to every single team. It's very important, it's very consistent.", "approx_timestamp": "6:45" },
+    { "text": "We are not afraid to spend to win here. We're not afraid to give our agents all the relevant context they need.", "approx_timestamp": "8:56" },
+    { "text": "You always want to be thinking about where the ball is going, not where it is.", "approx_timestamp": "9:27" },
+    { "text": "We are using the Pi agent harness to customize this entire experience.", "approx_timestamp": "9:58" },
+    { "text": "Every one of these agents, they have a working mental model about how things work, and this grows over time.", "approx_timestamp": "10:08" },
+    { "text": "It all starts with the dot Pi file.", "approx_timestamp": "11:11" },
+    { "text": "The whole idea is don't micromanage, delegate the right work at the right time to the workers.", "approx_timestamp": "13:30" },
+    { "text": "We have domain. So this specifies what the agents can and cannot do and where they can and cannot go.", "approx_timestamp": "14:16" },
+    { "text": "You're a leader, delegate, never execute.", "approx_timestamp": "14:49" },
+    { "text": "By composing skills like this, we're able to control and quickly modify the capabilities of every single agent.", "approx_timestamp": "19:37" },
+    { "text": "Every time I boot this up, my agent teams, down to the individual workers, is going to have a stacking, compounding set of memory.", "approx_timestamp": "20:53" },
+    { "text": "You can't have your fingers on everything... You have to let go. You have to teach your agents to operate as you would.", "approx_timestamp": "22:55" },
+    { "text": "We are really detailing and controlling the core four down to the system prompt level. This is complete customization.", "approx_timestamp": "24:04" },
+    { "text": "Our cognitive input into the system, your effort, doesn't need to increase as you increase the total number of specialized agents.", "approx_timestamp": "25:43" },
+    { "text": "I have all of my leads as a more powerful Opus model, and the workers are Sonic [Sonnet] models.", "approx_timestamp": "26:11" },
+    { "text": "The next thing to do is build a meta agent or meta team that helps you quickly fine-tune and improve the team.", "approx_timestamp": "27:30" },
+    { "text": "Agent experts will always outperform a generic agent.", "approx_timestamp": "29:27" },
+    { "text": "No one should be touching the DevOps files and folders except the DevOps agent. This is like the holy grail of operating mid to large-size codebases.", "approx_timestamp": "29:49" },
+    { "text": "Oh my god, $8 for this agent team? ... You're thinking about right now. You're not thinking far enough into the future.", "approx_timestamp": "30:11" },
+    { "text": "I am not spending enough tokens, you are not spending enough tokens, and you are wasting time doing things the old way.", "approx_timestamp": "30:30" },
+    { "text": "The name of the game in 2026 is trust and scale.", "approx_timestamp": "33:53" },
+    { "text": "Do you know how to build agent experts? And then, can you build teams of experts that operate autonomously on your behalf?", "approx_timestamp": "34:40" }
+  ],
+  "prerequisites_tools": [
+    "The lead-agents codebase (members-only: Tactical Agentic Coding + Agentic Horizon)",
+    "Claude Code (or any agent that can read/execute .claude/commands/) — the bootloader for install/deploy",
+    "Pi coding agent (`pi`, or `ipi`) — the runtime harness the teams run on (https://pi.dev)",
+    "Bun (preferred over npm; runs the TypeScript extensions)",
+    "Node.js",
+    "just (justfile task runner; `j` alias common)",
+    "A .env with ANTHROPIC_API_KEY (required); optional OPENAI/GEMINI/OPENROUTER/GROQ/DEEPSEEK/ELEVENLABS/FIRECRAWL keys for multi-provider configs",
+    "Budget/tokens for millions of tokens — a single plan-engineer-validate cycle can cost several dollars"
+  ],
+  "what_student_must_internalize": [
+    "One agent is a ceiling; if you re-prompt a single agent, YOU are the orchestrator — the bottleneck. The upgrade is teams of agent experts behind one interface.",
+    "The architecture is depth-2: User -> Orchestrator -> Leads -> Workers. You talk only to the orchestrator; it classifies and routes; leads coordinate and synthesize; workers execute.",
+    "Leads delegate, never execute — enforced twice: the zero-micro-management skill (soft) and the domain rules (hard).",
+    "Domain ownership (per-path read/upsert/delete) is what makes autonomy safe at scale — blast radius near zero. Enforced structurally by the domain-enforcer extension, not just by prompt.",
+    "Expertise is a package (role + domain + tools + compounding memory + read-only playbooks). Agent experts beat generalists; the memory compounds session over session and you don't touch it.",
+    "Skills are the control surface: compose small markdown behaviors; share to change many agents, remove a line to change one.",
+    "The whole team is one YAML config; add/prune/swap teams in one file. Model tier and agent internals (skills/domain/expertise) live in the agent .md frontmatter.",
+    "Tier your models (Opus leads, Sonnet workers) and spend to win — coordination tokens are an investment, not waste, because intelligence/token is rising and cost is falling.",
+    "Conversation awareness (shared JSONL log + active-listener skill) keeps the team coordinated and observable; the session dir is the shared workspace.",
+    "This runs on the customizable Pi harness (beyond Claude Code): the IDEAS transfer to any capable tool; harness-level control (UI/hooks/tools) is what Pi adds.",
+    "2026 is trust and scale: build trust until you know the team ships on enter, then scale how big and how surgical."
+  ],
+  "common_weak_student_failures": [
+    "Seeing the lead get blocked from files and reading it as a bug or waste, instead of the designed behavior that routes work to the specialist with the right tools and memory.",
+    "Believing this is 'just Claude Code subagents renamed' — missing that the unit is a specialized TEAM plus a single orchestrator interface, and that domain locking is structurally enforced.",
+    "Fixating on the $8 cost and concluding it's wasteful, instead of hearing the thesis: spend more tokens now; cost/intelligence is moving in your favor.",
+    "Hand-curating the mental-model files or over-specifying their structure, when Dan explicitly says let go and let agents self-maintain within a max-lines cap.",
+    "Assuming domain/skills/expertise are in the YAML config — they are in each agent's .md frontmatter; the YAML only holds the roster + routing hints.",
+    "Trying to reproduce the scikit-learn classifier benchmark — that target codebase is NOT shipped; the lab exercises the multi-team TOOL against its own source repo.",
+    "Expecting parallel team execution — the orchestrator delegates SEQUENTIALLY by default (plan -> engineer -> validate); parallel delegation is the roadmap, not the current default.",
+    "Confusing the two orchestration models in the repo: the Pi runtime uses delegate/tilldone tools + pi subprocesses; the .claude commands/specs (plan-w-team, meta-pi-agent) use the Claude Code Task* tools to BUILD the system. Different layers.",
+    "Marrying the tool (Pi) instead of the ideas — Dan: 'more tools like this will emerge, but the ideas will be there.'"
+  ],
+  "teach_back_prompt": "Without notes, teach a colleague the multi-team system: (1) draw the depth-2 hierarchy and explain what each tier may and may not do, using the moment the Engineering Lead gets domain-blocked and delegates to Backend Dev as your evidence; (2) explain the difference between the SOFT enforcement (zero-micro-management skill) and the HARD enforcement (domain rules + the domain-enforcer extension), and why both exist; (3) explain how expertise + skills + config + model-tier combine to make an 'agent expert,' and why a team of experts behind one orchestrator keeps YOUR cognitive load flat; (4) resolve the cost objection — why is spending $8 on a plan-engineer-validate cycle a good trade in Dan's framing? Finish with the 2026 thesis: what are 'trust' and 'scale,' and how do compounding mental models serve both?",
+  "retrieval_questions": [
+    { "q": "What are the three tiers, and what is each tier's job?", "a": "Orchestrator (classify + route + synthesize; the only interface you talk to), Team Leads (coordinate + delegate to members + synthesize; never execute), Workers (read/write/bash within their domain). Depth-2 delegation: User -> Orchestrator -> Leads -> Workers." },
+    { "q": "Which tier can run bash and mutate code, and which cannot?", "a": "Only workers have bash + write/edit and mutate code. Orchestrator and leads have delegate + tilldone (and write/edit scoped to their own memory) — they coordinate, they don't execute." },
+    { "q": "What does domain locking control, and is it just a prompt instruction?", "a": "Per-path read / upsert / delete permissions per agent. It is NOT just a prompt — the domain-enforcer Pi extension hard-blocks out-of-domain read/write/delete tool calls and heuristically blocks bash write/delete commands. The zero-micro-management skill is the soft layer on top." },
+    { "q": "Where does an agent's model, tools, skills, and domain live — the YAML config or the agent file?", "a": "In the agent's .md frontmatter. The multi-team-config.yaml only holds the roster (orchestrator, teams, leads, members, colors, consult-when routing)." },
+    { "q": "What model tier runs the orchestrator + leads vs the workers?", "a": "Orchestrator + leads = anthropic/claude-opus-4-6 (best intelligence for coordination). Workers = anthropic/claude-sonnet-4-6 (follow instructions + execute). Overridable per agent via config model:." },
+    { "q": "What is a mental model / expertise file, who maintains it, and what's its shipped state?", "a": "A per-agent YAML mental model the agent reads on boot and updates after work, compounding session over session (max-lines capped). The agent self-maintains it; you don't touch it. In the shipped repo all 10 are EMPTY — agents build them per-codebase." },
+    { "q": "Name three shared skills and who gets them.", "a": "active-listener (all 10 agents — read the conversation log before every response); zero-micro-management (orchestrator + leads only); conversational-response (orchestrator + leads, withheld from workers so workers stay verbose). Also mental-model (all), high-autonomy (orchestrator), precise-worker (workers)." },
+    { "q": "How do you add or remove a team?", "a": "Edit the single multi-team-config.yaml (add/delete a team block or swap a member path); the orchestrator picks it up on next launch. Preset configs and `just` recipes exist for common shapes (team-eng, team-pe, team-scale, team-oss)." },
+    { "q": "Why does the Engineering Lead delegate instead of reading the files itself?", "a": "Leads are domain-scoped to read/write only their own memory and are told 'delegate, never execute.' When it tries file tools it is domain-blocked (visible red X's), so it routes the work to Backend/Frontend Dev who have the tools and the compounding domain memory." },
+    { "q": "What keeps your cognitive load flat as you add more specialists?", "a": "The single orchestrator interface + chat room. You only ever talk to the orchestrator; adding specialists is a config edit, and workers are never addressed directly." },
+    { "q": "What is the conversation.jsonl file and why does it matter?", "a": "A shared append-only log of every message from every tier (with tool calls). Combined with the active-listener skill it makes the team coordinated and fully observable — you can open it and read the entire multi-agent exchange." },
+    { "q": "What's Dan's answer to 'this is expensive'?", "a": "You're thinking about now, not the future. Models improve, token cost falls, tokens will be available at insane volumes — you (and he) are NOT spending enough tokens. Spend to win; the old single-agent-in-a-terminal way is finished." },
+    { "q": "What is 'trust and scale'?", "a": "The 2026 game: raise trust in your agents until you know they'll ship the result on enter, then scale how big and how surgical you can go. Compounding, domain-locked agent experts drive both." },
+    { "q": "Does this only work in Pi? Do you need Claude Code?", "a": "It runs on the customizable Pi harness (beyond Claude Code). You could build a more limited version in Claude Code (subagents + hooks). The ideas transfer to any capable tool; Pi adds harness-level control (UI/hooks/tools). Claude Code is the bootloader that installs/deploys it." }
+  ],
+  "codebase_map": {
+    "scope_note": "The shipped lead-agents repo IS the multi-team-chat TOOL (a Pi extension + the .pi/multi-team team definitions). The prompt-routing/scikit-learn classifier codebase Dan operates on in the demo is a SEPARATE repo he deploys the tool INTO; it is NOT included here.",
+    "root": {
+      "README.md": "The definitive written companion: why multi-team, the 3 converging trends, setup (/install, /install-into-codebase), architecture (depth-2 tree), agent memory, domain locking, skills, config-driven teams, preset configs table, delegation flow, tilldone, conversation awareness, directory structure, tool-call emoji table. License: personal/educational use only.",
+      "CLAUDE.md": "Repo rules: prefer bun over npm; when testing via /drive, fully kill+recreate the tmux session between runs and wait for the orchestrator to finish before sending the next prompt.",
+      "OPUS.md": "A captured conversation with the model that helped build the system — quotable architecture reflections (nuclear UI pattern, depth-2 as the right abstraction, domain locking as the scaling unlock, compounding mental models) and roadmap (the #1 thing = correct orchestrator routing; the next direction = parallel delegation).",
+      "justfile": "Task recipes: metacc/metapi (kick off CC/Pi meta agents), install, install-into-codebase, team (default config), teamc <path> (custom), team-eng / team-pe / team-scale / team-oss (preset configs), team-list. Launch pattern: `pi -e extensions/multi-team-chat.ts [--team <config>]`.",
+      ".env.sample": "ANTHROPIC_API_KEY required; optional OPENAI/GEMINI/OPENROUTER/GROQ/DEEPSEEK/ELEVENLABS/FIRECRAWL. NOTE: comments are CEO-agents-flavored ('powers the CEO (Opus) and board members (Sonnet)') — shared scaffolding with the ma-1 lesson.",
+      ".gitignore": "Ignores node_modules, .env, generated outputs, and the runtime session dirs (.pi/multi-team/sessions/, .pi/ceo-agents/deliberations/, .pi/agent-sessions/).",
+      "LICENSE": "Copyright 2026 IndyDevDan; personal/educational use only; no redistribution."
+    },
+    "pi_multi_team": {
+      "multi-team-config.yaml": "Default roster: orchestrator (opus-4-6) + 3 teams (Planning: Product Manager, UX Researcher; Engineering: Frontend Dev, Backend Dev; Validation: QA Engineer, Security Reviewer), team colors, consult-when routing hints, paths (agents, sessions), shared_context (README.md, CLAUDE.md). Domain/skills/expertise are NOT here — they live in each agent .md.",
+      "engineering-config.yaml": "Engineering team only (1 team).",
+      "planning-and-engineering-config.yaml": "Planning + Engineering (2 teams).",
+      "plan-and-scale-engineering-config.yaml": "Planning + THREE parallel Engineering teams (Engineering1/2/3, each its own lead + FE + BE with distinct colors) — horizontal team scaling / 'plan + 3x scaled engineering'.",
+      "opensource-team-config.yaml": "3 teams but each agent overridden to a DIFFERENT provider model via OpenRouter (qwen3.5-397b/122b, kimi-k2.5, gemini-3-flash-preview, gpt-5.4 / gpt-5.4-mini, minimax-m2.7, mimo-v2-pro) — 'multi-provider / diverse models', for testing context-window detection. Header comment: 'The model: field in YAML takes precedence over the frontmatter model in the .md file.'",
+      "agents/orchestrator.md": "113 lines. opus-4-6; tools write/edit/read/grep/find/ls/delegate/tilldone; skills conversational-response/mental-model/active-listener/zero-micro-management/high-autonomy; domain: expertise/(r+upsert), .pi/multi-team/(r), .(r). Body: classify -> delegate(team,question) -> synthesize; sequential not parallel; injected {{TEAMS_BLOCK}}/{{SESSION_DIR}}/{{CONVERSATION_LOG}}/{{EXPERTISE_BLOCK}}/{{SKILLS_BLOCK}}.",
+      "agents/planning-lead.md": "106 lines. opus-4-6; delegate(member,question); domain: own mental-model(r+upsert), .pi/multi-team/(r), .(r). Cuts scope, writes specs to specs/<slug>.md, keeps chat concise. Skills: conversational-response/mental-model/active-listener/zero-micro-management (no high-autonomy).",
+      "agents/engineering-lead.md": "107 lines. opus-4-6; same lead pattern; owns architecture/implementation coordination; domain: own memory(r+upsert), .pi/multi-team/(r), .(r).",
+      "agents/validation-lead.md": "106 lines. opus-4-6; same lead pattern; owns testing/QA/security-review coordination; domain like the other leads.",
+      "agents/product-manager.md": "72 lines. sonnet-4-6 worker; skills mental-model/active-listener/precise-worker; tools read/write/edit/bash/grep/find/ls; domain: .pi/multi-team/(r+upsert), specs/(r+upsert), .(r) — can write specs.",
+      "agents/ux-researcher.md": "73 lines. sonnet-4-6 worker; domain: .pi/multi-team/(r+upsert), specs/(r), .(r) — reads specs only.",
+      "agents/frontend-dev.md": "73 lines. sonnet-4-6 worker; tools include bash; SHIPPED domain: .pi/multi-team/(r+upsert), apps/(r+upsert+delete), .(r). (In the video Dan LIVE-EDITS this to scope writes to apps/frontend/ only — the front/back split is a demo edit, not the shipped default.)",
+      "agents/backend-dev.md": "73 lines. sonnet-4-6 worker; tools include bash; domain: .pi/multi-team/(r+upsert), apps/(r+upsert+delete), .(r+upsert). Ships IDENTICAL app-domain to frontend-dev.",
+      "agents/qa-engineer.md": "73 lines. sonnet-4-6 worker; domain: .pi/multi-team/(r+upsert), apps/(r only), .(r) — validators READ code, don't mutate it.",
+      "agents/security-reviewer.md": "68 lines. sonnet-4-6 worker; domain: .pi/multi-team/(r+upsert), .(r) — read-only reviewer.",
+      "skills/active-listener.md": "26 lines. Read the last MESSAGE_COUNT(=10) conversation-log entries before any work; don't repeat, flag conflicts. Shared by all 10 agents.",
+      "skills/conversational-response.md": "39 lines. Slack-style concise chat (3-8 sentences); push detail to session files. Given to orchestrator + leads; withheld from workers.",
+      "skills/zero-micro-management.md": "51 lines. Leaders route/coordinate/synthesize, never write/edit/bash — delegate instead. Given to orchestrator + leads.",
+      "skills/mental-model.md": "76 lines. When to read/update the expertise YAML, how to structure it, line-limit enforcement (wc -l, trim), YAML validation. Given to all agents.",
+      "skills/high-autonomy.md": "40 lines. Act, don't ask; chain delegations; only stop if every path is blocked or credentials are missing. Given to the orchestrator.",
+      "skills/precise-worker.md": "42 lines. Do exactly what the lead assigned, stay in scope/format, cannot delegate. Given to workers.",
+      "expertise/*.yaml": "10 per-agent mental-model files (orchestrator + 3 leads + 6 workers). ALL EMPTY (0 lines) in the shipped repo — built at runtime per codebase.",
+      "sessions/": "Runtime only (gitignored). Per-session dir holds conversation.jsonl + per-team subdirs + agent session .jsonl files + system-prompts/ + artifacts (e.g. head-to-head-results.md)."
+    },
+    "apps_multi_team_chat": {
+      "extensions/multi-team-chat.ts": "1432 lines. The orchestrator entrypoint + 'nuclear' custom TUI (replaces Pi's chat container: tui.children[1]=chatView, [2]/[3]=EMPTY). Registers flags team/list; hooks session_start, before_agent_start (injects orchestrator system prompt), tool_call (x2: enforcement + UI bubbles), input (intercepts -> 'You' bubble -> sendUserMessage), agent_start/agent_end (tilldone nudge loop), message_update/end. Defines the delegate tool (teams: string|string[], accepts 'all'; Promise.allSettled over teams -> callAgent(lead, ...)) and the orchestrator tilldone tool (full actions). CTX_DEFAULT=200_000; TOOL_EMOJI (delegate 🔀, tilldone 📋, read 📖, ...). Dynamically registers .claude/commands/*.md and .claude/skills/*/SKILL.md; built-ins /toggle-workers and /tilldone.",
+      "extensions/lead-delegate.ts": "197 lines. The lead-tier delegate tool. Self-exits if LEAD_MEMBERS_JSON is unset (so members never delegate). delegate(member,question): builds the transcript + question, callAgent(member,...), streams member output up to the parent via onUpdate({type: streaming|done|tool|stats}). Deletes LEAD_MEMBERS_JSON from the child env -> depth cap. MEMBER_TIMEOUT_MS = 10 min.",
+      "extensions/domain-enforcer.ts": "190 lines. Self-exits if AGENT_DOMAIN_RULES is unset. Blocking pi.on('tool_call'): tool allowlist (AGENT_ALLOWED_TOOLS) + isAllowed(path, read|upsert) per DomainRule (expertise-first; '.' root special; no matching rule = deny) + bash write/delete regex heuristics. pi.on('tool_result'): re-reads expertise files and appends a warning if over max-lines.",
+      "extensions/tilldone-lead.ts": "123 lines. Self-exits if TILLDONE_TASKS is unset. Lead tilldone tool (reduced actions start|done|list); emits TillDoneMutation to the parent via onUpdate. Deletes TILLDONE_* env before members spawn.",
+      "extensions/modules/config.ts": "446 lines. findProjectRoot (walks up to .pi/); parseConfig (hand-rolled regex YAML reader for orchestrator/paths/shared_context/teams); loadOrchestrator/loadAgentConfig/loadTeams (parse agent .md frontmatter -> model (config > frontmatter > default 'anthropic/claude-sonnet-4-6'), domain, expertise (max-lines default 10000)); resolveTemplates ({{EXPERTISE_BLOCK}}/{{SKILLS_BLOCK}}/{{SESSION_DIR}}/{{CONVERSATION_LOG}}/{{MEMBERS_BLOCK}}); loadDotEnv (requires .env). Missing agent .md is FATAL.",
+      "extensions/modules/domain.ts": "78 lines. buildDomainBlock (renders the restriction markdown); isDomainAllowed (relative-path prefix match; '.' matches all; empty=allow-all; no match=deny); exports BASH_WRITE_PATTERNS / BASH_DELETE_PATTERNS (the canonical bash heuristics).",
+      "extensions/modules/prompt.ts": "61 lines. buildTeamsBlock (YAML the orchestrator reads to know delegate() team names) + buildOrchestratorPrompt (fills TEAMS/SESSION_DIR/CONVERSATION_LOG + domain + shared-context).",
+      "extensions/modules/subprocess.ts": "157 lines. callAgent(): spawn('pi', ['--mode','json','-p','--no-extensions','-e',enforcer,'-e',leadDelegate,'-e',tilldoneLead,'--no-skills','--no-prompt-templates','--no-themes','--session',sessionFile, (first run only) '--system-prompt', '--model', message]). Persistent JSONL sessions (system prompt set once, resumed after). Injects AGENT_DOMAIN_RULES/AGENT_EXPERTISE/AGENT_ALLOWED_TOOLS/AGENT_PROJECT_ROOT. Parses Pi JSON events -> onText/onToolCall/onToolUpdate/onToolEnd/onUsage. Abort SIGTERM->SIGKILL after 5s.",
+      "extensions/modules/tilldone.ts": "182 lines. TillDone state model (createState, addTask(s), startTask/doneTask (idempotent), applyMutation) + footer rendering (STATUS_ICON {idle ○, inprogress ●, done ✓}, renderTillDoneColumn, mergeColumns).",
+      "extensions/modules/types.ts": "185 lines. All shared types: DomainRule, SkillRef, ExpertiseRef, ResolvedExpertise, AgentRef, AgentConfig, TeamConfig, MultiTeamConfig, OrchestratorConfig, LogEntry (type: user|orchestrator|delegate|lead|member|synthesis|system), SubprocessResult, AgentStats, TillDone types.",
+      "extensions/modules/log.ts": "53 lines. appendToLog / readLog / formatTranscript (renders the last 40 entries as [User]:/[Orchestrator]:/[<name> [team] Lead]:/[<name> [team]]: lines) — the shared conversation.jsonl layer.",
+      "extensions/modules/theme.ts": "32 lines. ANSI truecolor helpers (hexFg, nameTag, dim, bold) + re-exports truncateToWidth/visibleWidth/wrapTextWithAnsi from pi-tui.",
+      "package.json": "name multi-team-chat v1.0.0, private, single dependency dotenv ^17.3.1.",
+      ".pi/themes/multi-team-chat.json": "Blanks Pi's native tool-result backgrounds (toolPendingBg/toolSuccessBg/toolErrorBg = '') since the custom chat view renders tools itself.",
+      "bun.lock": "Bun lockfile."
+    },
+    "claude_tooling": {
+      ".claude/commands/build.md": "'Implement the plan': reads a plan path from $ARGUMENTS, executes it, prints the plan's Report.",
+      ".claude/commands/install.md": "Interactive installer: checks Claude Code/pi/bun/node/just, verifies .env + ANTHROPIC_API_KEY, bun install, validates config + agent files, writes a shell alias function (default `teams`) so you can launch from any directory.",
+      ".claude/commands/install-into-codebase.md": "Deploys .pi/multi-team/ scaffolding (agents, skills, multi-team-config.yaml, EMPTY expertise + sessions dirs) into a target repo; gitignores sessions/.",
+      ".claude/commands/plan-w-team.md": "Planning command (model opus) that writes a spec to specs/<slug>.md. NOTE: documents the Claude Code Task* team model (TaskCreate/TaskUpdate/Task/TaskOutput) — a DIFFERENT layer from the Pi delegate/tilldone runtime.",
+      ".claude/commands/prime.md": "Context-priming walkthrough of the whole system (nuclear UI, config, subprocess.ts, delegation flow).",
+      ".claude/agents/meta-pi-agent.md": "A Claude subagent (opus) expert at building Pi agents; reads ai_docs/pi-agent/* and models multi-agent patterns on agent-chain.ts / agent-team.ts / pi-pi.ts. Used to BUILD/extend the system (not part of the runtime).",
+      ".claude/skills/drive/": "The /drive skill: a Python click CLI (uv run) that gives an agent programmatic tmux control to drive/test TUI agents like Pi. Commands: session (create/list/kill/resize), run (execute+wait via __START/__DONE sentinel), send (keystrokes), logs (capture-pane), poll (regex wait), fanout (same cmd across sessions), proc (process mgmt), screenshot (macOS screencapture). All emit --json. Referenced by CLAUDE.md for testing.",
+      ".claude/skills/svg-generate/SKILL.md": "Hand-crafts static/CSS-animated SVGs from prompts (used to produce the images/*.svg architecture diagrams).",
+      ".claude/skills/tts-eleven/SKILL.md": "ElevenLabs TTS (scripts text_to_speech.py / text_to_file.py; default voice Emma; afplay/save/both)."
+    },
+    "images": [
+      "images/multi-team-orchestration.svg — Orchestrator -> 3 Team Leads -> Workers.",
+      "images/multi-team-orchestration-v2.svg — depth-2 dispatch diagram (used in README hero).",
+      "images/multi-team-memory-compounding-3.svg — domain-locked expert memory (each agent builds knowledge only within its boundary).",
+      "images/multi-team-memory-compounding-4.svg — the session lifecycle (boot, load mental model, read context, do work, update model).",
+      "images/conversation-awareness.svg — every agent reads/writes the shared JSONL conversation log.",
+      "images/setup-flow.svg — Install -> Test Locally -> Deploy Into a Codebase -> Customize."
+    ],
+    "specs": {
+      "specs/tilldone-multi-team-integration.md": "A real implementation plan: how the single-agent TillDone was adapted into the multi-team system (parent canonical state in multi-team-chat.ts; leads mutate via tilldone-lead.ts + onToolUpdate; two-column footer; agent_end nudge; env TILLDONE_TASKS/TEAM_NAME/TEAM_COLOR). Confirms extension internals independently. Its 'Team Orchestration / Task*' section is the Claude Code meta-agent execution harness (distinct from the Pi runtime).",
+      "specs/fix-worker-cost-tracking.md": "A real bug artifact: worker subprocess costs were silently dropped (footer showed $8.79 vs real $34.28 — ~25% of spend) because stats were gated behind a memberBubbles.get(toolCallId) lookup. Three-layer fix (decouple stats from bubble; guaranteed final onUpdate; cost in tool details). Confirms totalCost()/teamCost()/agentStats/onToolUpdate/onToolEnd/SubprocessResult. Great 'spend-to-win-but-track-your-spend' teaching material."
+    },
+    "ai_docs": "ai_docs/pi-agent/* — extensive Pi framework reference docs (CHANGELOG, README, compaction, custom-provider, development, examples-extensions/*, examples-sdk/*). Reference material for building Pi extensions; not lesson-specific."
+  },
+  "current_practice_gaps": [
+    {
+      "gap": "Course-era model names (opus-4-6, sonnet-4-6) predate the shipping models",
+      "why": "Agent frontmatter pins anthropic/claude-opus-4-6 (orchestrator + leads) and anthropic/claude-sonnet-4-6 (workers); the transcript also names 'Opus 4.6', 'Sonnet 4.6', 'Claude Haiku'. As of mid-2026 the current families have moved on. Dan repeatedly future-proofs ('models will improve', 'newer models... that's great'). Treat model strings as period detail; the tiering PRINCIPLE (best model where coordination happens, cheaper where execution happens) is current. Update model ids to the current tier equivalents when running.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "The on-screen orchestrator.md predates the tilldone integration",
+      "why": "In the video (frame t0768) orchestrator.md shows tools: read/grep/find/ls/delegate and only 2 domain entries — NO tilldone, write, edit, or the expertise/ domain rule. The SHIPPED file adds all of those. The tilldone-multi-team-integration.md spec documents that later addition. So the recording captures a mid-development state; the shipped repo is newer. Teach from the shipped files; note the drift.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Sequential delegation only; parallel delegation is the roadmap",
+      "why": "The orchestrator delegates one team at a time (plan -> engineer -> validate). OPUS.md names parallel delegation as the next direction — 'Promise.allSettled already wraps the delegation loop; the hard part is teaching the orchestrator when work is parallel-safe vs dependent.' A modern reader should know independent cross-team requests ('review this PR' -> Engineering + Validation) are a near-term unlock, not the current default.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Two orchestration models coexist in the repo",
+      "why": "The Pi RUNTIME uses delegate/tilldone tools + pi subprocesses (the lesson's subject). The .claude tooling (plan-w-team.md, meta-pi-agent.md, and the specs' 'Team Orchestration' sections) uses the Claude Code Task* tools to BUILD the system. Current Claude Code has since grown richer subagent/Task and background-task capabilities, so a reader may conflate the build-harness with the runtime. Keep them distinct.",
+      "yt_candidates": ["f8cfH5XX-XU"]
+    },
+    {
+      "gap": "Harness-level customization is easier and more standardized now",
+      "why": "The lesson's whole premise — customize the agent harness down to files/folders/UI/hooks — is what Pi enables 'beyond Claude Code.' Since recording, Claude Code and other tools have expanded their own customization (Agent Skills, hooks, output styles, plugins). The IDEAS (teams, leads, domain, memory, chat-room interface) now have more than one viable home. Dan pre-handles this: 'more tools like this will emerge, but the ideas will be there.'",
+      "yt_candidates": ["f8cfH5XX-XU"]
+    }
+  ],
+  "yt_overlay_candidates": [
+    {
+      "video_id": "f8cfH5XX-XU",
+      "title": "Pi vs Claude Code",
+      "maps_to": "named hole",
+      "include_in_phase1": true,
+      "rationale": "Dan explicitly references this in-lesson ('we detailed this in our pi versus Claude code video') when explaining hooks and harness customization. It is the direct expansion of the 'beyond Claude Code / customizable Pi harness' pillar — what Pi's harness gives you that a stock tool does not. ID sourced from the lesson's own description (RESOURCES). Oembed-verify before publishing."
+    },
+    {
+      "video_id": "TqjmTZRL31E",
+      "title": "CEO Agents",
+      "maps_to": "operationalizes prerequisite",
+      "include_in_phase1": true,
+      "rationale": "The immediately-prior lesson (ma-1) that this one builds on. Dan calls back to it twice for the 'give your agents more context / use the 1M context window' idea that underpins spend-to-win and compounding expertise, and frames this lesson as the 2nd of 3 Agentic Horizon multi-agent codebases. ID sourced from the lesson description. Best placed near the model-tiering / spend-to-win section as the foundation, with a note that the book covers it as its own chapter."
+    },
+    {
+      "video_id": "M30gp1315Y4",
+      "title": "One Agent Is NOT ENOUGH: Agentic Coding BEYOND Claude Code",
+      "maps_to": "this lesson (public cut)",
+      "include_in_phase1": false,
+      "rationale": "The public YouTube cut of THIS members-only lesson. Listed for reference / link-verification only, not as an overlay (it is the lesson itself)."
+    },
+    {
+      "video_id": "2TIXl2rlA6Q",
+      "title": "AI Coding is NOT ENOUGH",
+      "maps_to": "thesis echo",
+      "include_in_phase1": false,
+      "rationale": "Free-channel statement of the recurring 'X is NOT ENOUGH' thesis that this lesson's title ('One Agent is NOT ENOUGH') and closing ('AI coding is not enough. You want to be building systems that build systems') echo. Thematic rather than mechanism-specific — hold for phase 2 unless a tighter multi-agent overlay is found. ID from the TAC-1 gold extract; oembed-verify."
+    }
+  ],
+  "frame_plan": [
+    { "t_seconds": 118, "label": "ping-orchestrator-leads-cost", "file": "media/frames/ma-2-lead-agents/t0118-ping-orchestrator-leads-cost.jpg", "why_for_weak_student": "The hook: you type `ping` and only the Orchestrator answers ('Pong. Teams are online — Planning, Engineering, Validation standing by'), then `ping each team lead` fans out. Footer shows Orch cost/context. Shows the single-interface chat room before any complexity.", "diagram_instead": false },
+    { "t_seconds": 185, "label": "lead-domain-block-delegate", "file": "media/frames/ma-2-lead-agents/t0185-lead-domain-block-delegate.jpg", "why_for_weak_student": "The three-tier money shot: the Engineering Lead's file tool calls show red X's (domain-blocked), it says 'I have restricted tool access as a lead — let me delegate this to my team members who have the right tools,' then @Backend Dev takes over. Proves leads delegate, never execute.", "diagram_instead": false },
+    { "t_seconds": 232, "label": "toggle-workers-team-tree", "file": "media/frames/ma-2-lead-agents/t0232-toggle-workers-team-tree.jpg", "why_for_weak_student": "`/toggle-workers` reveals all 10 agents with per-agent cost AND model: Orch/leads on claude-opus-4-6, workers on claude-sonnet-4-6. One image proves the roster, the model tiering, and that cost is tracked per agent.", "diagram_instead": false },
+    { "t_seconds": 337, "label": "classifier-predict-route", "file": "media/frames/ma-2-lead-agents/t0337-classifier-predict-route.png", "why_for_weak_student": "The demo PROBLEM made concrete: `just predict \"summarize this codebase\"` -> Label: MID (circled), confidences, Routes to: claude-sonnet-4-6. Shows why the target codebase exists ('don't pay for intelligence you don't need') before the teams work on it. PNG for the small terminal text.", "diagram_instead": false },
+    { "t_seconds": 408, "label": "ask-all-teams-fanout", "file": "media/frames/ma-2-lead-agents/t0408-ask-all-teams-fanout.jpg", "why_for_weak_student": "Multi-perspective in one frame: the Orchestrator writes the SAME question to @Planning, @Engineering, @Validation, each domain-tailored (product goals / training speed / testability). Shows consistent fan-out and why three teams beat one answer.", "diagram_instead": false },
+    { "t_seconds": 768, "label": "orchestrator-agent-config", "file": "media/frames/ma-2-lead-agents/t0768-orchestrator-agent-config.png", "why_for_weak_student": "How an agent expert is DEFINED, in one screen: orchestrator.md frontmatter — model, expertise (updatable, max-lines 10000), the 5 skills with use-when, tools, and domain (read/upsert/delete). The single best 'anatomy of an agent' frame. PNG for legibility. (Note: this on-screen version predates tilldone — see outdated-vs-current.)", "diagram_instead": false },
+    { "t_seconds": 955, "label": "validation-security-review", "file": "media/frames/ma-2-lead-agents/t0955-validation-security-review.jpg", "why_for_weak_student": "The validation team working autonomously: Validation Lead delegates to Security Reviewer, who returns a structured review and 'Ship it. No blocking issues.' Footer shows the whole team's costs mid-run. Shows different specialists finding different things + trust in autonomous review.", "diagram_instead": false },
+    { "t_seconds": 1180, "label": "active-listener-10-files", "file": "media/frames/ma-2-lead-agents/t1180-active-listener-10-files.png", "why_for_weak_student": "Skills composition made visible: a search for active-listener.md returns '10 results in 10 files' — every one of the 10 agents shares that one skill. Proves 'change one line, change many agents.' PNG for the search-panel text.", "diagram_instead": false },
+    { "t_seconds": 1290, "label": "frontend-domain-lock", "file": "media/frames/ma-2-lead-agents/t1290-frontend-domain-lock.png", "why_for_weak_student": "Domain locking made concrete: frontend-dev.md with tools (incl. bash) and a domain scoped so it can write to apps/frontend/ but only READ the rest of apps — the exact 'read the back-end, never touch it' rule Dan types live. PNG for the small YAML. (This live edit differs from the shipped file — see outdated-vs-current.)", "diagram_instead": false },
+    { "t_seconds": 1420, "label": "conversation-jsonl-log", "file": "media/frames/ma-2-lead-agents/t1420-conversation-jsonl-log.png", "why_for_weak_student": "Conversation awareness made real: the actual conversation.jsonl with from/message/to/type/timestamp rows for user, orchestrator, and every lead/member — plus the session dir tree (per-team folders + head-to-head-results.md the team wrote). Shows the shared log + session workspace. PNG for the dense JSON.", "diagram_instead": false },
+    { "t_seconds": 1610, "label": "head-to-head-cost-tiering", "file": "media/frames/ma-2-lead-agents/t1610-head-to-head-cost-tiering.jpg", "why_for_weak_student": "The payoff + the cost: real ML eval results delivered by the team ('LR owns LOW, ComplementNB owns MID... LR stays as default'), and the footer showing Orch $8.280 total with Opus leads / Sonnet workers. This is the '$8 agent team' Dan defends — value delivered vs tokens spent.", "diagram_instead": false }
+  ],
+  "lab_ref": "See lab-spec.md for the full gradable lab (course codebase only: operate the multi-team tool against its own source repo).",
+  "estimated_print_pages_when_expanded": 46,
+  "confidence_notes": [
+    "Transcript is auto-generated: 'Pi'/'pie' = the Pi coding agent; 'Sonic' = Sonnet; 'contacts'/'contact' in the footer = context (tokens); 'Claude man and B' = ComplementNB; 'H entity coding' = agentic coding; 'dot pi/.pi' correct. Quotes cross-checked against the .md transcript; timestamps accurate to within a few seconds.",
+    "All agent model/tool/skill/domain facts were read directly from the shipped .pi/multi-team/agents/*.md frontmatter (10 files) — orchestrator + 3 leads on anthropic/claude-opus-4-6; 6 workers on anthropic/claude-sonnet-4-6.",
+    "ALL 10 expertise files are empty (0 lines) in the shipped repo (verified by wc -l). The on-screen ~5,000-token backend mental model was Dan's working copy from a previous codebase; he says on camera he needs to delete it.",
+    "The shipped frontend-dev.md and backend-dev.md have IDENTICAL app-domain (apps/ r+u+delete). The front/back domain SPLIT (scoping frontend to apps/frontend/) is a live demo edit in the video (frame t1290), not the checked-in default — flagged in outdated-vs-current.md.",
+    "Frame t0768's on-screen orchestrator.md predates the tilldone integration (no tilldone/write/edit in tools; only 2 domain entries). The shipped file adds tilldone, write, edit, and an expertise/ domain rule. Teach from the shipped files.",
+    "Extension internals (multi-team-chat.ts 1432 lines, lead-delegate.ts 197, domain-enforcer.ts 190, tilldone-lead.ts 123, config.ts 446, subprocess.ts 157, etc.) were read in full; line counts and the env-var handshake / nuclear-UI / Promise.allSettled / callAgent spawn args are quoted from source. Independently corroborated by specs/tilldone-multi-team-integration.md and specs/fix-worker-cost-tracking.md.",
+    "The prompt-routing / scikit-learn classifier codebase Dan demos ON is NOT in the shipped repo; the lab therefore exercises the tool against its own source repo (README Step 2 'Test Locally'), which is a legitimate course-codebase-only lab.",
+    "Roster count: 3 teams, 10 agents (1 orchestrator + 3 leads + 6 workers). Dan's video description says '2 teams, 3 members each, 9 agents' in one line — inconsistent with the shipped 3-team default and the 10-row footer; trust the code.",
+    "YouTube overlay IDs f8cfH5XX-XU (Pi vs Claude Code) and TqjmTZRL31E (CEO Agents) are taken verbatim from the lesson's own description RESOURCES block; M30gp1315Y4 is this lesson's public cut (metadata). 2TIXl2rlA6Q is from the TAC-1 gold extract. Oembed-verify all IDs before publishing overlay links.",
+    "current_practice_gaps written against models/tools as of mid-2026; the model-name and harness-capability axes move fast — re-verify at publish time. Dan future-proofs model/UI drift explicitly in-lesson."
+  ]
+}

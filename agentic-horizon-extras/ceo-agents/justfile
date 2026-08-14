@@ -1,0 +1,17 @@
+set dotenv-load := true
+set shell := ["bash", "-lc"]
+
+default:
+    @just --list
+
+# Kick off CC meta agent
+metacc:
+    claude --dangerously-skip-permissions --model "opus[1m]" --system-prompt "$(cat .claude/agents/meta-pi-agent.md)" "/prime"
+
+# Kick off Pi meta agent
+metapi:
+    $(command -v ipi || echo pi) --model "anthropic/claude-sonnet-4-6" --system-prompt "$(cat .claude/agents/meta-pi-agent.md)" "/prime"
+
+# Launch the CEO & Board strategic decision agent
+ceo:
+    cd apps/ceo && [ -d node_modules ] || bun install && pi -e extensions/ceo-and-board.ts

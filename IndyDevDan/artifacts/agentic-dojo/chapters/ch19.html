@@ -1,0 +1,221 @@
+<section class="chapter" id="ch19">
+  <div class="wrap wide">
+    <span class="chapnum reveal">19 — Vol III · Lesson 4</span>
+    <div class="kicker reveal">multi-agent · ma-4 · the verifier agent</div>
+    <h2 class="title reveal d1" style="max-width:26ch">Builder plus verifier: every claim becomes an <em>atomic claim</em>.</h2>
+    <p class="lede reveal d2">Every benchmark tests one model in isolation — but the real capability is combinations. The simplest, highest-value multi-agent system is a two-agent builder + verifier pair: an un-promptable observer that decomposes every builder turn into atomic claims, proves each against actual state, and prompts the builder back. It attacks the review constraint head on.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">builder + verifier</span><span class="pill blue">atomic claims</span><span class="pill olive">stop hook · unix socket</span><span class="pill plum">AND, not OR</span><span class="pill amber">un-promptable</span></div>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch19-s1"><b>1</b>The Idea</a>
+      <a href="#ch19-s2"><b>2</b>The Nuggets</a>
+      <a href="#ch19-s3"><b>3</b>What Dan Did</a>
+      <a href="#ch19-s4"><b>4</b>The Workout</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch19-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Idea</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">"If you're doing things right, you're spending your time planning and reviewing. With the verifier agent, we can improve our review constraint."</p>
+        <p>The <strong>verifier agent</strong> is a second Pi agent — auto-spawned, input-locked — that "validates the individual claims the builder agent has made" and "makes sure that what we asked for is what it built." Your normal primary agent is the <strong>builder, the verifiable</strong>: "the verifier is independent of the verifiable" — it layers on top of whatever your primary agent is. It's a <strong>top-down observer</strong>: "the builder doesn't know the verifier exists." Only lifecycle ticks (start/stop/error) cross the Unix socket, and the verifier can touch the builder through exactly one tool: <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">verifier_prompt</span>. The loop caps at <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">max_loops: 3</span>, then escalates to the human.</p>
+        <p>And it holds a special seat in the 2026 theme: "Most agents increase trust <em>or</em> scale, not both. The verifier does both."</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 920 320" role="img" aria-label="You prompt the builder; a stop hook over a unix socket wakes the input-locked verifier, which reads the session log, verifies claims, and prompts the builder back">
+          <rect x="20" y="130" width="110" height="56" rx="10" class="s-card"/>
+          <text x="75" y="153" text-anchor="middle" class="s-title">YOU</text>
+          <text x="75" y="171" text-anchor="middle" class="s-label-sm">prompt the builder</text>
+          <path d="M130 158 H 180" class="s-flow"/><path d="M188 158 l-8 -6 0 12 z" class="s-clay"/>
+          <rect x="190" y="120" width="190" height="76" rx="10" class="s-clay-f"/>
+          <text x="285" y="146" text-anchor="middle" class="s-title">BUILDER</text>
+          <text x="285" y="164" text-anchor="middle" class="s-label-sm">Opus 4.7 · the verifiable</text>
+          <text x="285" y="182" text-anchor="middle" class="s-label-sm">writes, edits, runs</text>
+          <path d="M285 196 V 232" class="s-line"/>
+          <rect x="190" y="236" width="190" height="44" rx="10" class="s-card"/>
+          <text x="285" y="254" text-anchor="middle" class="s-label-sm">session JSONL</text>
+          <text x="285" y="270" text-anchor="middle" class="s-label-sm">every turn logged</text>
+          <path d="M380 158 H 420" class="s-flow"/><path d="M428 158 l-8 -6 0 12 z" class="s-clay"/>
+          <rect x="430" y="140" width="128" height="40" rx="9" class="s-amber-f"/>
+          <text x="494" y="157" text-anchor="middle" class="s-label-sm">stop hook</text>
+          <text x="494" y="172" text-anchor="middle" class="s-label-sm">unix socket</text>
+          <path d="M558 160 H 592" class="s-flow"/><path d="M600 160 l-8 -6 0 12 z" class="s-clay"/>
+          <text x="705" y="100" text-anchor="middle" class="s-label-sm">"the builder doesn't know the verifier exists"</text>
+          <rect x="600" y="112" width="210" height="96" rx="10" class="s-blue-f"/>
+          <text x="705" y="140" text-anchor="middle" class="s-title">VERIFIER</text>
+          <text x="705" y="160" text-anchor="middle" class="s-label-sm">GPT 5.5 · input locked</text>
+          <text x="705" y="178" text-anchor="middle" class="s-label-sm">read-only tools</text>
+          <text x="705" y="194" text-anchor="middle" class="s-label-sm">bash = one allowed script</text>
+          <path d="M640 208 C 560 262 470 262 388 260" class="s-line" style="fill:none"/>
+          <path d="M382 260 l10 -6 1 11 z" class="s-dim"/>
+          <text x="520" y="242" text-anchor="middle" class="s-label-sm">reads the turn slice</text>
+          <path d="M705 112 C 705 32 285 32 285 112" class="s-flow" style="fill:none"/>
+          <path d="M285 118 l-6 -9 12 0 z" class="s-clay"/>
+          <text x="495" y="44" text-anchor="middle" class="s-label-sm">verifier_prompt — corrective feedback, unprompted</text>
+          <text x="495" y="60" text-anchor="middle" class="s-label-sm">max_loops: 3</text>
+          <path d="M760 208 C 760 306 120 306 80 196" class="s-line" style="stroke-dasharray:6 5;fill:none"/>
+          <path d="M78 190 l-2 11 10 -4 z" class="s-dim"/>
+          <text x="470" y="298" text-anchor="middle" class="s-label-sm">loop cap hit → escalate to the human</text>
+        </svg>
+        <div class="fcap"><b>The two-agent system.</b> Builder builds; the verifier observes the session JSONL, fires on the stop hook, proves claims, and — when needed — prompts the builder itself.</div>
+      </div>
+    </div>
+
+    <div class="spread rev reveal d1" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 880 260" role="img" aria-label="A builder's final message is decomposed into atomic claims graded on a confidence ladder">
+          <rect x="20" y="30" width="240" height="64" rx="10" class="s-clay-f"/>
+          <text x="140" y="56" text-anchor="middle" class="s-label">builder's final message</text>
+          <text x="140" y="76" text-anchor="middle" class="s-label-sm">"a CLAIM, never proof"</text>
+          <text x="140" y="126" text-anchor="middle" class="s-label-sm">one PASS hiding three unverified</text>
+          <text x="140" y="142" text-anchor="middle" class="s-label-sm">sub-claims is worse than</text>
+          <text x="140" y="158" text-anchor="middle" class="s-label-sm">three explicit FAILs</text>
+          <path d="M260 62 H 316" class="s-flow"/><path d="M324 62 l-8 -6 0 12 z" class="s-clay"/>
+          <text x="292" y="48" text-anchor="middle" class="s-label-sm">decompose</text>
+          <rect x="326" y="20" width="290" height="222" rx="10" class="s-card"/>
+          <text x="471" y="46" text-anchor="middle" class="s-label">ATOMIC CLAIMS</text>
+          <text x="346" y="76" class="s-label-sm">PASS — the script ran</text>
+          <text x="346" y="102" class="s-label-sm">PASS — arch.jpg exists</text>
+          <text x="346" y="128" class="s-label-sm">PASS — right size</text>
+          <text x="346" y="154" class="s-label-sm">PASS — is a valid JPG</text>
+          <text x="346" y="180" class="s-label-sm">PASS — depicts the two-agent system</text>
+          <text x="346" y="206" class="s-label-sm">FAIL — over 10 distinct text blocks</text>
+          <text x="346" y="230" class="s-label-sm">proven with read-only tools, not vibes</text>
+          <path d="M616 130 H 652" class="s-flow"/><path d="M660 130 l-8 -6 0 12 z" class="s-clay"/>
+          <text x="637" y="116" text-anchor="middle" class="s-label-sm">grade</text>
+          <text x="765" y="34" text-anchor="middle" class="s-label">CONFIDENCE LADDER</text>
+          <rect x="665" y="46" width="200" height="34" rx="7" class="s-olive-f"/>
+          <text x="765" y="68" text-anchor="middle" class="s-label-sm">PERFECT</text>
+          <rect x="665" y="86" width="200" height="34" rx="7" class="s-olive-f"/>
+          <text x="765" y="108" text-anchor="middle" class="s-label-sm">VERIFIED</text>
+          <rect x="665" y="126" width="200" height="34" rx="7" class="s-amber-f"/>
+          <text x="765" y="148" text-anchor="middle" class="s-label-sm">PARTIAL</text>
+          <rect x="665" y="166" width="200" height="34" rx="7" class="s-amber-f"/>
+          <text x="765" y="188" text-anchor="middle" class="s-label-sm">FEEDBACK</text>
+          <rect x="665" y="206" width="200" height="34" rx="7" class="s-clay-f"/>
+          <text x="765" y="228" text-anchor="middle" class="s-label-sm">FAILED</text>
+        </svg>
+        <div class="fcap"><b>The art of verification is decomposition.</b> Claims proven one by one; the grade drives a green/orange/red status bar on the verifier's tmux window.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">"Everything you prompt into your agents — they're all small axioms… units of information that can be proven true or proven false."</p>
+        <p><strong>Atomic claims</strong> are the unit of trust: evidence beats assertion, and the builder's final message "is a CLAIM, never proof." The verifier proves each claim <strong>non-deterministically and deterministically</strong> — LLM judgment on top of read-only script ground truth. Its bash is restricted to exactly one read-only script, because "the bash tool is the most dangerous tool you can give your agents… a ticking time bomb." Anything else is "blocked, fully blocked" — "the highest level of control you can give."</p>
+        <p>And it's <strong>un-promptable by design</strong>: "I can't prompt this… If something goes wrong, I don't just fire off another prompt. I'm effectively forced to improve one or more of the core four: context, model, prompt, or tools." Every report ends with "What could you not verify?" and "What do you need from me to verify this next time?" — the gap becomes the next thing you template. "This is a compounding system." Finally, run different models on each side: "It's not GPT 5.5 <em>or</em> Opus 4.7. It's GPT 5.5 <em>and</em> Opus 4.7… Stack intelligence. Orchestrate intelligence."</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch19-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Nuggets</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big"><p>"Quite literally spending 5x tokens to make sure that I spend less of my time… Tokens are cheap. Your time is not."</p><span class="cite" style="display:block;margin-top:10px">— the quote of the lesson</span></div>
+      <div class="prose">
+        <p class="lead-in">"Model performance is no longer the bottleneck. It's you and I. It's our ability to extract value out of agentic systems at scale, safely."</p>
+        <p>Dan sees two sets of engineers with a widening gap: those "stuck in the loop prompting back and forth" vs those "stacking up code plus agents to outperform either alone." And the antidote to hype: "The winning formula is often much more simple and less hype-filled than you realize. All the top performers do two or three things over and over."</p>
+      </div>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal"><span class="cnum">01</span><p class="ctitle">Density per action</p><p class="cbody">"One of the highest-leverage things you and I can do is increase the information density per action for agents."</p></div>
+      <div class="card blue reveal d1"><span class="cnum">02</span><p class="ctitle">Hands off the keyboard</p><p class="cbody">"Our verifier agent has kicked off unprompted… My hands are off the keyboard."</p></div>
+      <div class="card olive reveal d2"><span class="cnum">03</span><p class="ctitle">Agent prompts agent</p><p class="cbody">"My verifier agent just prompted my builder agent" — feedback mode writes the corrective prompts you'd have written yourself.</p></div>
+      <div class="card plum reveal d1"><span class="cnum">04</span><p class="ctitle">Verify even the cracked</p><p class="cbody">"There is no harm in having an agent validate that that is true" — even for a cracked model's output.</p></div>
+      <div class="card amber reveal d2"><span class="cnum">05</span><p class="ctitle">One, one, one</p><p class="cbody">"One agent, one prompt, one purpose. A focused agent is a performant agent."</p></div>
+      <div class="card accent reveal d3"><span class="cnum">06</span><p class="ctitle">Stack verifiers</p><p class="cbody">"You can stack more than one of these verifier agents" — an image verifier, a SQLite verifier, a Postgres/Mongo/whatever verifier. Specialize and stack.</p></div>
+      <div class="card blue reveal d2"><span class="cnum">07</span><p class="ctitle">Both kinds of proof</p><p class="cbody">Verifications run "non-deterministically, and… deterministically as well" — LLM judgment on top of read-only script ground truth.</p></div>
+      <div class="card olive reveal d3"><span class="cnum">08</span><p class="ctitle">Trust, atomically</p><p class="cbody">"I am increasing the trust I have in my agent system by having this verifier agent validate the atomic claims."</p></div>
+      <div class="card plum reveal d4"><span class="cnum">09</span><p class="ctitle">A flywheel</p><p class="cbody">"This is a positive feedback loop. It's a flywheel." Each report's unverifiable gap becomes the next thing you template.</p></div>
+      <div class="card amber reveal d3"><span class="cnum">10</span><p class="ctitle">Benchmarks miss it</p><p class="cbody">"Every benchmark is missing the true capability of what you can really do with these models" — they run a single model in isolation.</p></div>
+      <div class="card accent reveal d4"><span class="cnum">11</span><p class="ctitle">Orchestration, not delegation</p><p class="cbody">"I'm not talking about delegation. I'm talking about multi-agent orchestration… teams of agents that operate better together than alone."</p></div>
+      <div class="card blue reveal d5"><span class="cnum">12</span><p class="ctitle">Yours, and stable</p><p class="cbody">"There are many coding agents, there are many agent harnesses, but this one is yours… it doesn't change underneath your feet as soon as a new update rolls out."</p></div>
+    </div>
+
+    <div class="spread reveal d1" style="align-items:start;margin-top:26px">
+      <div>
+        <div class="callout"><span class="ci">THE RULE THAT FIRED</span><span class="cc">No more than <strong>10 distinct text blocks</strong> per generated image — "An image should be worth a thousand words. It shouldn't force you to… read a ton of text. That's what text is for."</span></div>
+        <div class="callout warn reveal d1"><span class="ci">NEXT ON THE HORIZON</span><span class="cc">"There is a big hole in everyone's agent right now, and that hole is the bash tool."</span></div>
+      </div>
+      <div>
+        <div class="quote"><p>"Vibe coding is the floor. Agentic engineering is the ceiling that no one has even imagined the capabilities of yet."</p><span class="cite">— MA-4</span></div>
+        <div class="prose reveal d1"><p>"There's no vibe coding this stuff. I cannot just fire a one-off prompt… There's no one-offs. I am forced to template my engineering into my verifier agent." That's the point: "You don't want to be working on your application anymore… you work on the agentic system, the system that builds the system." Because "2026 is the year of trust. Do you trust your agents to do what you ask them to? And then, how much? At what scale?"</p></div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch19-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What Dan Did</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">Two side-by-side specialized Pi agents: a builder on Opus 4.7 and a verifier on GPT 5.5 — and the verifier harness "takes no input."</p>
+        <p>The persona's custom front matter carries the whole design: read-only tools plus the one special <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">verifier_prompt</span>, a pinned model from a <em>different provider</em>, a <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">domain</span>, a loop cap, and a <strong>bash policy</strong> locked to a single read-only script. The report contract closes the flywheel.</p>
+      </div>
+      <div>
+        <div class="codecap">.pi/verifier/agents/verifier.md — front matter</div>
+        <div class="code"><pre><span class="cm">---</span>
+<span class="k">tools:</span> read, grep, find, ls, bash, verifier_prompt  <span class="cm"># no write, no edit</span>
+<span class="k">model:</span> gpt-5.5        <span class="cm"># AND, not OR — a different provider than the builder</span>
+<span class="k">max_loops:</span> 3          <span class="cm"># then escalate to the human</span>
+<span class="k">domain:</span> …             <span class="cm"># bash policy: exactly one read-only script</span>
+<span class="cm">---</span></pre></div>
+        <div class="codecap" style="margin-top:14px">the report contract</div>
+        <div class="code reveal d1"><pre><span class="cm">## Report</span>
+STATUS · CONFIDENCE (PERFECT | VERIFIED | PARTIAL | FEEDBACK | FAILED)
+What did you verify?
+Claims: verified / failed / unverified
+What could you not verify?
+What do you need from me to verify this next time?</pre></div>
+      </div>
+    </div>
+
+    <ol class="steps reveal d1">
+      <li><h4>Demo 1 — the image verifier</h4><p>In the builder: <span class="mono">run prime</span>, then a GPT-Image-2 skill to generate <span class="mono">arch.jpg</span> describing the verifier system's architecture. On builder completion (stop hook → Unix socket), the verifier fired unprompted, decomposed the work into claims — script ran, file exists, right size, is a JPG, visually depicts the two-agent system — found a violation of the max-10-text-blocks readability contract, and <strong>prompted the builder itself</strong>. The builder regenerated; second cycle: 7/7 atomic claims verified, clean green status.</p></li>
+      <li><h4>Demo 2 — the human in the diagram</h4><p>Asked for a human figure added ("we are the ones prompting the verifiable, also known as the builder"). Costs on screen: ~4% Opus vs ~23% GPT 5.5 — "spending 5x tokens" to save review time.</p></li>
+      <li><h4>Demo 3 — the SQLite verifier</h4><p><span class="mono">j sql</span> boots a builder plus a verify-SQLite persona on GLM 5.1. Prompt: "find all SQLite DBs in this repo, break down tables, columns, and relationships." The verifier re-proved every claim through its <strong>single allowed script</strong> (any other bash call hard-blocked), spent ~2x the builder's tokens, and reported: all claims verified, nothing unverifiable, no feedback needed.</p></li>
+      <li><h4>Released it two ways</h4><p>A free public repo — <span class="mono">disler/the-verifier-agent</span> — and a souped-up members version with all the domain verifier specialists plus the GPT-Image-2 skill.</p></li>
+    </ol>
+
+    <div class="spread reveal d2" style="align-items:center">
+      <div class="filetree"><span class="d">disler/the-verifier-agent/</span>
+  <span class="d">apps/verifier/</span>
+    <span class="f">verifiable.ts</span>    <span class="c"># the builder-side extension</span>
+    <span class="f">verifier.ts</span>      <span class="c"># the top-down observer</span>
+    <span class="f">cross-agent.ts</span>   <span class="c"># the unix-socket bridge</span>
+  <span class="d">.pi/verifier/agents/</span>
+    <span class="hl">verifier.md</span>      <span class="c"># the persona — tools, model, max_loops</span>
+  <span class="f">verify_on_stop.md</span>  <span class="c"># prompt template fired on the stop hook</span>
+  <span class="f">justfile</span>           <span class="c"># just v — builder + tmux verifier, locked input</span></div>
+      <div class="prose">
+        <p><span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">just v</span> boots the builder in your terminal and auto-spawns the verifier in a sibling tmux window — input locked, with a status bar colored green/orange/red off the confidence ladder. The persona, the on-stop prompt template, and the three extensions are the entire system: the simplest multi-agent architecture in the whole course, and the one that pays back on every single turn.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch19-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Workout</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="callout"><span class="ci">GOAL</span><span class="cc">Run and then extend the real two-agent builder + verifier system so every builder turn is automatically decomposed into atomic claims and verified — including writing your own domain verifier.</span></div>
+      <div class="callout"><span class="ci">PREREQUISITES</span><span class="cc">The public repo (local copy at <span class="mono">youtube/_repos/disler__the-verifier-agent</span>), the Pi coding agent installed, tmux, API keys for two <em>different</em> model providers, and <span class="mono">just</span>.</span></div>
+    </div>
+
+    <ol class="steps reveal d1">
+      <li><h4>Read the contract first</h4><p><span class="mono">README.md</span> and the persona at <span class="mono">.pi/verifier/agents/verifier.md</span> — note the front matter (<span class="mono">tools: read, grep, find, ls, bash, verifier_prompt</span>; <span class="mono">model:</span>; <span class="mono">max_loops: 3</span>) and the confidence ladder (PERFECT / VERIFIED / PARTIAL / FEEDBACK / FAILED).</p></li>
+      <li><h4>Boot it</h4><p>Copy <span class="mono">.env.sample</span> → <span class="mono">.env</span>; run <span class="mono">/install</span> in Claude Code (or the manual install), then <span class="mono">just v</span> — builder opens in your terminal, verifier auto-spawns in a sibling tmux window with a locked input bar.</p></li>
+      <li><h4>Feed it claims</h4><p>Give the builder a claim-heavy prompt (e.g. "create a SQLite db with users and orders tables, FK between them, seed 5 rows each, report what you did"). Watch the verifier fire on the stop event, read the session-JSONL slice, and emit a <span class="mono">## Report</span> with per-claim verdicts.</p></li>
+      <li><h4>Force the loop</h4><p>Prompt the builder to do something that violates a verifiable expectation (or manually break its output between turns); confirm the verifier calls <span class="mono">verifier_prompt</span> and the builder receives corrective feedback as a follow-up message — up to 3 loops, then human escalation.</p></li>
+      <li><h4>Work the flywheel</h4><p>Try to type into the verifier window — you can't. Instead, take one item from its "What could you not verify?" section and template it: edit the persona or <span class="mono">verify_on_stop.md</span> so the next run <em>can</em> verify it.</p></li>
+      <li><h4>Build your own domain verifier</h4><p>Copy <span class="mono">verifier.md</span> → <span class="mono">verify-&lt;yourdomain&gt;.md</span> (e.g. <span class="mono">verify-pytest.md</span> or <span class="mono">verify-postgres.md</span>); write one read-only script that is its <em>only</em> allowed bash command; pin a <em>different</em> model than the builder's in front matter — AND, not OR.</p></li>
+      <li><h4>Clean up</h4><p><span class="mono">just clean</span> tears down stale sockets and tmux sessions.</p></li>
+    </ol>
+
+    <div class="callout ok reveal d2"><span class="ci">DONE WHEN</span><span class="cc">The verifier runs unprompted after every builder turn; a deliberately false builder claim produces a FEEDBACK-grade report <em>and</em> an automatic corrective prompt to the builder; a bash call outside the allowed script is blocked; and after templating one gap, the previously unverifiable claim verifies on the next run.</span></div>
+    <div class="callout idea reveal d3"><span class="ci">LEVEL UP</span><span class="cc">Stack a second verifier persona for a different domain; port the pattern to Claude Code with a Stop hook plus a headless <span class="mono">claude -p</span> verifier reading the session transcript; add a rule contract of your own (like the 10-text-block image rule) and watch it get enforced; instrument token spend to see your own tokens-for-time ratio.</span></div>
+
+    <a class="jump reveal" href="#ch20">Next · Videos 01–09 · Foundations &nbsp;&rarr;</a>
+  </div>
+</section>

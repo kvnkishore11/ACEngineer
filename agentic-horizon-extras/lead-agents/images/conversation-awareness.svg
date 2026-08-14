@@ -1,0 +1,377 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080"
+     role="img" aria-label="Conversation Awareness — Every agent sees everything">
+  <title>Conversation Awareness</title>
+  <desc>
+    Central JSONL log flanked by 4 agents on each side. Bidirectional message
+    dots flow from agents TO the log (write) then FROM log TO agents (read).
+    Terminal/monitor green aesthetic. Every agent sees the full shared context.
+    15s looping CSS animation. No SMIL.
+  </desc>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LAYOUT:
+         Log: cx=960, cy=490, 180×380, rx=12 → x=870–1050, y=300–680
+         Left agents  (cx=340): cy=200, 380, 560, 740
+         Right agents (cx=1580): cy=200, 380, 560, 740
+         Connections: horizontal lines from agents to log edges
+
+         Left:  User(cy=200), Orchestrator(cy=380),
+                Planning Lead(cy=560), Product Mgr(cy=740)
+         Right: Engineering Lead(cy=200), Frontend Dev(cy=380),
+                Validation Lead(cy=560), QA Engineer(cy=740)
+
+         Content: x=265 to x=1655, center=960 ✓
+                  y=180 to y=760, center=470 (tagline at 990 → ~590 ✓)
+       ═══════════════════════════════════════════════════════════ -->
+  <defs>
+    <filter id="f-log" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-agent" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-hit" x="-55%" y="-55%" width="210%" height="210%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Scanline effect on log -->
+    <filter id="f-scan" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0 0.15" numOctaves="1" result="noise"/>
+      <feComposite in="SourceGraphic" in2="noise" operator="over" result="comp"/>
+    </filter>
+  </defs>
+
+  <style>
+    .lbl {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: 700; dominant-baseline: middle; text-anchor: middle;
+      fill: #ffffff; paint-order: stroke fill;
+      stroke: rgba(0,0,0,0.85); stroke-width: 2.5px;
+    }
+    .lbl-agent { font-size: 13px; }
+    .lbl-sub   { font-size: 10px; font-weight: 400; fill: rgba(255,255,255,0.5);
+                 dominant-baseline: middle; text-anchor: middle;
+                 paint-order: stroke fill; stroke: rgba(0,0,0,0.75); stroke-width: 2px; }
+    .lbl-log   { font-family: 'Courier New', Courier, monospace; font-size: 11px;
+                 fill: rgba(74,222,128,0.7); dominant-baseline: middle; text-anchor: start;
+                 paint-order: stroke fill; stroke: rgba(0,0,0,0.7); stroke-width: 2px; }
+    .title-main { font-family: system-ui,-apple-system,sans-serif; font-size: 26px;
+                  font-weight: 800; fill: #ffffff; text-anchor: middle; dominant-baseline: middle;
+                  letter-spacing: 3px; text-transform: uppercase;
+                  paint-order: stroke fill; stroke: rgba(0,0,0,0.8); stroke-width: 4px; }
+    .title-sub  { font-family: system-ui,-apple-system,sans-serif; font-size: 14px;
+                  font-weight: 400; font-style: italic; fill: rgba(255,255,255,0.6);
+                  text-anchor: middle; dominant-baseline: middle;
+                  paint-order: stroke fill; stroke: rgba(0,0,0,0.7); stroke-width: 2px; }
+    .path-lbl { font-family: 'Courier New', Courier, monospace; font-size: 11px;
+                fill: rgba(74,222,128,0.55); text-anchor: middle; dominant-baseline: middle;
+                paint-order: stroke fill; stroke: rgba(0,0,0,0.7); stroke-width: 2px; }
+
+    /* Nodes */
+    .n-log   { fill: #0d1a12; stroke: #4ade80; stroke-width: 1.5; }
+    .n-user  { fill: #100e06; stroke: #fbbf24; stroke-width: 2; }
+    .n-orch  { fill: #0a0a18; stroke: #a78bfa; stroke-width: 2; }
+    .n-lead-p{ fill: #0f1207; stroke: #84cc16; stroke-width: 1.5; }
+    .n-lead-e{ fill: #060d18; stroke: #38bdf8; stroke-width: 1.5; }
+    .n-lead-v{ fill: #18070a; stroke: #fb7185; stroke-width: 1.5; }
+    .n-mem-p { fill: #0f1207; stroke: #bef264; stroke-width: 1.5; }
+    .n-mem-e { fill: #060d18; stroke: #7dd3fc; stroke-width: 1.5; }
+
+    .hl { fill: none; opacity: 0; pointer-events: none; }
+    .hl-user  { stroke:#fbbf24; stroke-width:2; fill:rgba(251,191,36,0.14); }
+    .hl-orch  { stroke:#a78bfa; stroke-width:2; fill:rgba(167,139,250,0.14); }
+    .hl-lp    { stroke:#84cc16; stroke-width:2; fill:rgba(132,204,22,0.14); }
+    .hl-le    { stroke:#38bdf8; stroke-width:2; fill:rgba(56,189,248,0.14); }
+    .hl-lv    { stroke:#fb7185; stroke-width:2; fill:rgba(251,113,133,0.14); }
+    .hl-mp    { stroke:#bef264; stroke-width:1.5; fill:rgba(190,242,100,0.14); }
+    .hl-me    { stroke:#7dd3fc; stroke-width:1.5; fill:rgba(125,211,252,0.14); }
+    .hl-log   { stroke:#4ade80; stroke-width:2; fill:rgba(74,222,128,0.08); }
+
+    /* Connection lines */
+    .conn { fill:none; stroke-linecap:round; stroke-dasharray:4 4; }
+    .conn-l { stroke: rgba(74,222,128,0.2); stroke-width:1; }
+
+    /* Pulse dots */
+    .pdot { fill:none; stroke-linecap:round; opacity:0; }
+    .pd-user  { stroke:#fbbf24; stroke-width:4; }
+    .pd-orch  { stroke:#a78bfa; stroke-width:4; }
+    .pd-lp    { stroke:#84cc16; stroke-width:3; }
+    .pd-le    { stroke:#38bdf8; stroke-width:3; }
+    .pd-lv    { stroke:#fb7185; stroke-width:3; }
+    .pd-mp    { stroke:#bef264; stroke-width:2.5; }
+    .pd-me    { stroke:#7dd3fc; stroke-width:2.5; }
+    /* Return dots (log→agents) */
+    .pd-ret   { stroke:#4ade80; stroke-width:3; }
+
+    /* ══════════════════════════════════════════════════════
+       15s CYCLE ANIMATIONS
+       Log: 0–0.8s (0%→5.33%)
+       Left agents reveal stagger: 0.5–2.0s (3.33%→13.33%)
+       Right agents reveal stagger: 0.7–2.2s (4.67%→14.67%)
+       Connection lines draw: 1.5–3.0s (10%→20%)
+       Labels: 3.0–4.0s (20%→26.67%)
+
+       Phase 2 — Write (agents→log): 4–7s
+         Agent dots travel to log, log highlights when each arrives
+       Phase 3 — Read (log→agents): 7–9.5s
+         Log pulses green, dots travel back out
+       Hold: 9.5–14.7s
+       Reset: 14.7–15s
+       ══════════════════════════════════════════════════════ */
+
+    #g-log    { animation: rv-log   15s ease-out infinite; }
+    @keyframes rv-log   { 0%{opacity:0;} 5.33%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+
+    /* Left agents (4): User, Orch, PlanLead, ProdMgr */
+    #g-user   { animation: rv-user  15s ease-out infinite; }
+    @keyframes rv-user  { 0%,3.33%{opacity:0;} 7.33%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #g-orch   { animation: rv-orch  15s ease-out infinite; }
+    @keyframes rv-orch  { 0%,5.33%{opacity:0;} 9.33%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #g-lp     { animation: rv-lp    15s ease-out infinite; }
+    @keyframes rv-lp    { 0%,7.33%{opacity:0;} 11.33%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #g-mp     { animation: rv-mp    15s ease-out infinite; }
+    @keyframes rv-mp    { 0%,9.33%{opacity:0;} 13.33%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+
+    /* Right agents (4): EngLead, FrontDev, ValLead, QA */
+    #g-le     { animation: rv-le    15s ease-out infinite; }
+    @keyframes rv-le    { 0%,4.67%{opacity:0;} 8.67%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #g-fe     { animation: rv-fe    15s ease-out infinite; }
+    @keyframes rv-fe    { 0%,6.67%{opacity:0;} 10.67%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #g-lv     { animation: rv-lv    15s ease-out infinite; }
+    @keyframes rv-lv    { 0%,8.67%{opacity:0;} 12.67%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+    #g-me     { animation: rv-me    15s ease-out infinite; }
+    @keyframes rv-me    { 0%,10.67%{opacity:0;} 14.67%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+
+    /* Connection lines draw */
+    .conn-l { stroke-dasharray:460; stroke-dashoffset:460; animation: rv-conn 15s ease-out infinite; }
+    @keyframes rv-conn { 0%,10%{stroke-dashoffset:460;} 20%{stroke-dashoffset:0;} 98%{stroke-dashoffset:0;} 100%{stroke-dashoffset:460;} }
+
+    #g-labels { animation: rv-labels 15s ease-out infinite; }
+    @keyframes rv-labels { 0%,20%{opacity:0;} 26.67%{opacity:1;} 98%{opacity:1;} 100%{opacity:0;} }
+
+    /* ── WRITE PHASE: agents→log (4–7s = 26.67%–46.67%)
+       Each agent dot: travel ~455px in ~1s, staggered 0.3s apart
+       dot_max = 20+455 = 475
+       User→log:   begin=26.67% (4.0s), arrive=33.33% (5.0s)
+       Orch→log:   begin=28.67% (4.3s), arrive=35.33% (5.3s)
+       LP→log:     begin=30.67% (4.6s), arrive=37.33% (5.6s)
+       MP→log:     begin=32.67% (4.9s), arrive=39.33% (5.9s)
+       LE→log:     begin=34.67% (5.2s), arrive=41.33% (6.2s)
+       FE→log:     begin=36.67% (5.5s), arrive=43.33% (6.5s)
+       LV→log:     begin=38.67% (5.8s), arrive=45.33% (6.8s)
+       ME→log:     begin=40.67% (6.1s), arrive=47.33% (7.1s)
+
+       ── READ PHASE: log→agents (7–9.5s = 46.67%–63.33%)
+       Green dots broadcast out from log, staggered 0.25s each
+       len≈455, dot=20, max=475
+       log→User:  begin=46.67% (7.0s), arrive=53.33% (8.0s)
+       log→Orch:  begin=48%    (7.2s), arrive=54.67% (8.2s)
+       log→LP:    begin=49.33% (7.4s), arrive=56%    (8.4s)
+       log→MP:    begin=50.67% (7.6s), arrive=57.33% (8.6s)
+       log→LE:    begin=52%    (7.8s), arrive=58.67% (8.8s)
+       log→FE:    begin=53.33% (8.0s), arrive=60%    (9.0s)
+       log→LV:    begin=54.67% (8.2s), arrive=61.33% (9.2s)
+       log→ME:    begin=56%    (8.4s), arrive=62.67% (9.4s)
+    ── */
+
+    /* Write dots (agent colors travel →log direction: right for left agents, left for right agents) */
+    #dw-user { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dw-user 15s linear infinite; }
+    @keyframes dw-user { 0%,26.67%{stroke-dashoffset:475;opacity:0;} 27.34%{opacity:1;} 33.33%{stroke-dashoffset:0;opacity:1;} 35.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dw-orch { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dw-orch 15s linear infinite; }
+    @keyframes dw-orch { 0%,28.67%{stroke-dashoffset:475;opacity:0;} 29.34%{opacity:1;} 35.33%{stroke-dashoffset:0;opacity:1;} 37.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dw-lp   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dw-lp   15s linear infinite; }
+    @keyframes dw-lp   { 0%,30.67%{stroke-dashoffset:475;opacity:0;} 31.34%{opacity:1;} 37.33%{stroke-dashoffset:0;opacity:1;} 39.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dw-mp   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dw-mp   15s linear infinite; }
+    @keyframes dw-mp   { 0%,32.67%{stroke-dashoffset:475;opacity:0;} 33.34%{opacity:1;} 39.33%{stroke-dashoffset:0;opacity:1;} 41.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    /* Right agents travel L (reversed: offset goes to large value meaning dot starts at RIGHT) */
+    #dw-le   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dw-le   15s linear infinite; }
+    @keyframes dw-le   { 0%,34.67%{stroke-dashoffset:475;opacity:0;} 35.34%{opacity:1;} 41.33%{stroke-dashoffset:0;opacity:1;} 43.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dw-fe   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dw-fe   15s linear infinite; }
+    @keyframes dw-fe   { 0%,36.67%{stroke-dashoffset:475;opacity:0;} 37.34%{opacity:1;} 43.33%{stroke-dashoffset:0;opacity:1;} 45.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dw-lv   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dw-lv   15s linear infinite; }
+    @keyframes dw-lv   { 0%,38.67%{stroke-dashoffset:475;opacity:0;} 39.34%{opacity:1;} 45.33%{stroke-dashoffset:0;opacity:1;} 47.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dw-me   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dw-me   15s linear infinite; }
+    @keyframes dw-me   { 0%,40.67%{stroke-dashoffset:475;opacity:0;} 41.34%{opacity:1;} 47.33%{stroke-dashoffset:0;opacity:1;} 49.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+
+    /* Read dots (green, log→agents). Left: travel left (offset 0→MAX reversed)
+       For the "return" direction we just animate in same dashoffset direction
+       but start the path from the log side — using same path but read starts at log
+       Simpler: just fire same-direction pulses; visually they look like broadcast */
+    #dr-user { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dr-user 15s linear infinite; }
+    @keyframes dr-user { 0%,46.67%{stroke-dashoffset:475;opacity:0;} 47.34%{opacity:1;} 53.33%{stroke-dashoffset:0;opacity:1;} 55.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dr-orch { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dr-orch 15s linear infinite; }
+    @keyframes dr-orch { 0%,48%{stroke-dashoffset:475;opacity:0;}    48.67%{opacity:1;} 54.67%{stroke-dashoffset:0;opacity:1;} 56.67%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dr-lp   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dr-lp   15s linear infinite; }
+    @keyframes dr-lp   { 0%,49.33%{stroke-dashoffset:475;opacity:0;} 50%{opacity:1;}    56%{stroke-dashoffset:0;opacity:1;}    58%{stroke-dashoffset:0;opacity:0;}    99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dr-mp   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dr-mp   15s linear infinite; }
+    @keyframes dr-mp   { 0%,50.67%{stroke-dashoffset:475;opacity:0;} 51.34%{opacity:1;} 57.33%{stroke-dashoffset:0;opacity:1;} 59.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dr-le   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dr-le   15s linear infinite; }
+    @keyframes dr-le   { 0%,52%{stroke-dashoffset:475;opacity:0;}    52.67%{opacity:1;} 58.67%{stroke-dashoffset:0;opacity:1;} 60.67%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dr-fe   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dr-fe   15s linear infinite; }
+    @keyframes dr-fe   { 0%,53.33%{stroke-dashoffset:475;opacity:0;} 54%{opacity:1;}    60%{stroke-dashoffset:0;opacity:1;}    62%{stroke-dashoffset:0;opacity:0;}    99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dr-lv   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dr-lv   15s linear infinite; }
+    @keyframes dr-lv   { 0%,54.67%{stroke-dashoffset:475;opacity:0;} 55.34%{opacity:1;} 61.33%{stroke-dashoffset:0;opacity:1;} 63.33%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+    #dr-me   { stroke-dasharray:20 455; stroke-dashoffset:475; animation: dr-me   15s linear infinite; }
+    @keyframes dr-me   { 0%,56%{stroke-dashoffset:475;opacity:0;}    56.67%{opacity:1;} 62.67%{stroke-dashoffset:0;opacity:1;} 64.67%{stroke-dashoffset:0;opacity:0;} 99%{stroke-dashoffset:475;opacity:0;} 100%{stroke-dashoffset:475;opacity:0;} }
+
+    /* Log highlight when messages arrive */
+    #hl-log-write { animation: hl-log-w 15s linear infinite; }
+    @keyframes hl-log-w { 0%,26.67%{opacity:0;} 33.33%{opacity:0.6;} 49.33%{opacity:0.6;} 51.33%{opacity:0;} 100%{opacity:0;} }
+    #hl-log-read  { animation: hl-log-r 15s linear infinite; }
+    @keyframes hl-log-r { 0%,46.67%{opacity:0;} 47.34%{opacity:1;} 48.67%{opacity:0.4;} 62.67%{opacity:0.4;} 64.67%{opacity:0;} 100%{opacity:0;} }
+
+    /* Agent highlights on log read arrival */
+    #hl-user  { animation: hl-user  15s linear infinite; } @keyframes hl-user  { 0%,53.33%{opacity:0;} 54%{opacity:1;} 55.67%{opacity:0;} 100%{opacity:0;} }
+    #hl-orch  { animation: hl-orch  15s linear infinite; } @keyframes hl-orch  { 0%,54.67%{opacity:0;} 55.34%{opacity:1;} 57%{opacity:0;}    100%{opacity:0;} }
+    #hl-lp    { animation: hl-lp    15s linear infinite; } @keyframes hl-lp    { 0%,56%{opacity:0;}    56.67%{opacity:1;} 58.33%{opacity:0;} 100%{opacity:0;} }
+    #hl-mp    { animation: hl-mp    15s linear infinite; } @keyframes hl-mp    { 0%,57.33%{opacity:0;} 58%{opacity:1;}    59.67%{opacity:0;} 100%{opacity:0;} }
+    #hl-le    { animation: hl-le    15s linear infinite; } @keyframes hl-le    { 0%,58.67%{opacity:0;} 59.34%{opacity:1;} 61%{opacity:0;}    100%{opacity:0;} }
+    #hl-fe    { animation: hl-fe    15s linear infinite; } @keyframes hl-fe    { 0%,60%{opacity:0;}    60.67%{opacity:1;} 62.33%{opacity:0;} 100%{opacity:0;} }
+    #hl-lv    { animation: hl-lv    15s linear infinite; } @keyframes hl-lv    { 0%,61.33%{opacity:0;} 62%{opacity:1;}    63.67%{opacity:0;} 100%{opacity:0;} }
+    #hl-me    { animation: hl-me    15s linear infinite; } @keyframes hl-me    { 0%,62.67%{opacity:0;} 63.34%{opacity:1;} 65%{opacity:0;}    100%{opacity:0;} }
+  </style>
+
+  <!-- ── CONNECTION LINES (dashed, from agents to log) ─────────────── -->
+  <g id="g-conns">
+    <!-- Left agents →→→ log left edge (x=870) -->
+    <line class="conn conn-l" x1="415" y1="200" x2="870" y2="200"/>
+    <line class="conn conn-l" x1="415" y1="380" x2="870" y2="380"/>
+    <line class="conn conn-l" x1="415" y1="560" x2="870" y2="560"/>
+    <line class="conn conn-l" x1="415" y1="740" x2="870" y2="740"/>
+    <!-- Right agents ←←← log right edge (x=1050) -->
+    <line class="conn conn-l" x1="1050" y1="200" x2="1505" y2="200"/>
+    <line class="conn conn-l" x1="1050" y1="380" x2="1505" y2="380"/>
+    <line class="conn conn-l" x1="1050" y1="560" x2="1505" y2="560"/>
+    <line class="conn conn-l" x1="1050" y1="740" x2="1505" y2="740"/>
+  </g>
+
+  <!-- ── WRITE DOTS (agent color, →log direction) ───────────────────── -->
+  <!-- Left agents: travel from agent right edge → log left edge (x: 415→870) -->
+  <line id="dw-user" x1="415" y1="200" x2="870" y2="200" class="pdot pd-user"/>
+  <line id="dw-orch" x1="415" y1="380" x2="870" y2="380" class="pdot pd-orch"/>
+  <line id="dw-lp"   x1="415" y1="560" x2="870" y2="560" class="pdot pd-lp"/>
+  <line id="dw-mp"   x1="415" y1="740" x2="870" y2="740" class="pdot pd-mp"/>
+  <!-- Right agents: travel from agent left edge → log right edge (x: 1505→1050, reversed via offset) -->
+  <line id="dw-le"   x1="1050" y1="200" x2="1505" y2="200" class="pdot pd-le"/>
+  <line id="dw-fe"   x1="1050" y1="380" x2="1505" y2="380" class="pdot pd-fe"/>
+  <line id="dw-lv"   x1="1050" y1="560" x2="1505" y2="560" class="pdot pd-lv"/>
+  <line id="dw-me"   x1="1050" y1="740" x2="1505" y2="740" class="pdot pd-me"/>
+
+  <!-- ── READ DOTS (green, log→agents) ─────────────────────────────── -->
+  <line id="dr-user" x1="415" y1="200" x2="870" y2="200" class="pdot pd-ret"/>
+  <line id="dr-orch" x1="415" y1="380" x2="870" y2="380" class="pdot pd-ret"/>
+  <line id="dr-lp"   x1="415" y1="560" x2="870" y2="560" class="pdot pd-ret"/>
+  <line id="dr-mp"   x1="415" y1="740" x2="870" y2="740" class="pdot pd-ret"/>
+  <line id="dr-le"   x1="1050" y1="200" x2="1505" y2="200" class="pdot pd-ret"/>
+  <line id="dr-fe"   x1="1050" y1="380" x2="1505" y2="380" class="pdot pd-ret"/>
+  <line id="dr-lv"   x1="1050" y1="560" x2="1505" y2="560" class="pdot pd-ret"/>
+  <line id="dr-me"   x1="1050" y1="740" x2="1505" y2="740" class="pdot pd-ret"/>
+
+  <!-- ── CENTRAL LOG ────────────────────────────────────────────────── -->
+  <g id="g-log" filter="url(#f-log)">
+    <!-- Main log rect -->
+    <rect class="n-log" x="870" y="300" width="180" height="380" rx="12"/>
+    <!-- Log highlight write -->
+    <rect id="hl-log-write" class="hl hl-log" x="866" y="296" width="188" height="388" rx="14" filter="url(#f-hit)"/>
+    <!-- Log highlight read -->
+    <rect id="hl-log-read"  class="hl" x="866" y="296" width="188" height="388" rx="14"
+          filter="url(#f-hit)" style="stroke:#4ade80;stroke-width:2.5;fill:rgba(74,222,128,0.12);"/>
+    <!-- Log header bar -->
+    <rect x="870" y="300" width="180" height="28" rx="12" fill="rgba(74,222,128,0.15)"/>
+    <rect x="870" y="316" width="180" height="12" fill="rgba(74,222,128,0.15)"/>
+    <text x="960" y="314" style="font-family:'Courier New',monospace;font-size:9px;fill:#4ade80;text-anchor:middle;dominant-baseline:middle;paint-order:stroke fill;stroke:rgba(0,0,0,0.8);stroke-width:2px;">conversation.jsonl</text>
+    <!-- Log entry lines (visual representation) -->
+    <text x="882" y="348" class="lbl-log">{"from":"User","msg"...</text>
+    <text x="882" y="368" class="lbl-log">{"from":"Orch","msg"...</text>
+    <text x="882" y="388" class="lbl-log">{"from":"Lead","msg"...</text>
+    <text x="882" y="408" class="lbl-log">{"from":"Mem","msg"...</text>
+    <text x="882" y="428" class="lbl-log">{"from":"Orch","msg"...</text>
+    <text x="882" y="448" class="lbl-log">{"from":"Lead","msg"...</text>
+    <text x="882" y="468" class="lbl-log">{"from":"Mem","msg"...</text>
+    <text x="882" y="488" class="lbl-log">{"from":"User","msg"...</text>
+    <text x="882" y="508" class="lbl-log">{"from":"Orch","msg"...</text>
+    <text x="882" y="528" class="lbl-log">{"from":"Lead","msg"...</text>
+    <text x="882" y="548" class="lbl-log">{"from":"Mem","msg"...</text>
+    <text x="882" y="568" class="lbl-log">{"from":"Orch","msg"...</text>
+    <text x="882" y="600" class="lbl-log" style="fill:rgba(74,222,128,0.2);">·  ·  ·</text>
+    <text x="882" y="650" class="lbl-log" style="fill:rgba(74,222,128,0.25);font-size:8px;">shared context</text>
+    <text x="882" y="665" class="lbl-log" style="fill:rgba(74,222,128,0.25);font-size:8px;">full history</text>
+  </g>
+
+  <!-- ── LEFT AGENTS ────────────────────────────────────────────────── -->
+  <!-- User (cy=200) -->
+  <g id="g-user" filter="url(#f-agent)">
+    <rect id="hl-user" class="hl hl-user" x="262" y="178" width="156" height="48" rx="12" filter="url(#f-hit)"/>
+    <rect class="n-user" x="265" y="178" width="150" height="44" rx="10"/>
+    <text x="340" y="194" class="lbl lbl-agent">You</text>
+    <text x="340" y="210" class="lbl lbl-sub">user</text>
+  </g>
+  <!-- Orchestrator (cy=380) -->
+  <g id="g-orch" filter="url(#f-agent)">
+    <rect id="hl-orch" class="hl hl-orch" x="262" y="358" width="156" height="48" rx="12" filter="url(#f-hit)"/>
+    <rect class="n-orch" x="265" y="358" width="150" height="44" rx="10"/>
+    <text x="340" y="374" class="lbl lbl-agent">Orchestrator</text>
+    <text x="340" y="390" class="lbl lbl-sub">Tier 1</text>
+  </g>
+  <!-- Planning Lead (cy=560) -->
+  <g id="g-lp" filter="url(#f-agent)">
+    <rect id="hl-lp" class="hl hl-lp" x="262" y="538" width="156" height="48" rx="12" filter="url(#f-hit)"/>
+    <rect class="n-lead-p" x="265" y="538" width="150" height="44" rx="10"/>
+    <text x="340" y="554" class="lbl lbl-agent">Planning</text>
+    <text x="340" y="570" class="lbl lbl-sub">Lead · Tier 2</text>
+  </g>
+  <!-- Product Manager (cy=740) -->
+  <g id="g-mp" filter="url(#f-agent)">
+    <rect id="hl-mp" class="hl hl-mp" x="262" y="718" width="156" height="48" rx="12" filter="url(#f-hit)"/>
+    <rect class="n-mem-p" x="265" y="718" width="150" height="44" rx="10"/>
+    <text x="340" y="734" class="lbl lbl-agent">Product</text>
+    <text x="340" y="750" class="lbl lbl-sub">Mgr · Tier 3</text>
+  </g>
+
+  <!-- ── RIGHT AGENTS ───────────────────────────────────────────────── -->
+  <!-- Engineering Lead (cy=200) -->
+  <g id="g-le" filter="url(#f-agent)">
+    <rect id="hl-le" class="hl hl-le" x="1502" y="178" width="156" height="48" rx="12" filter="url(#f-hit)"/>
+    <rect class="n-lead-e" x="1505" y="178" width="150" height="44" rx="10"/>
+    <text x="1580" y="194" class="lbl lbl-agent">Engineering</text>
+    <text x="1580" y="210" class="lbl lbl-sub">Lead · Tier 2</text>
+  </g>
+  <!-- Frontend Dev (cy=380) -->
+  <g id="g-fe" filter="url(#f-agent)">
+    <rect id="hl-fe" class="hl hl-me" x="1502" y="358" width="156" height="48" rx="12" filter="url(#f-hit)"/>
+    <rect class="n-mem-e" x="1505" y="358" width="150" height="44" rx="10"/>
+    <text x="1580" y="374" class="lbl lbl-agent">Frontend</text>
+    <text x="1580" y="390" class="lbl lbl-sub">Dev · Tier 3</text>
+  </g>
+  <!-- Validation Lead (cy=560) -->
+  <g id="g-lv" filter="url(#f-agent)">
+    <rect id="hl-lv" class="hl hl-lv" x="1502" y="538" width="156" height="48" rx="12" filter="url(#f-hit)"/>
+    <rect class="n-lead-v" x="1505" y="538" width="150" height="44" rx="10"/>
+    <text x="1580" y="554" class="lbl lbl-agent">Validation</text>
+    <text x="1580" y="570" class="lbl lbl-sub">Lead · Tier 2</text>
+  </g>
+  <!-- QA Engineer (cy=740) -->
+  <g id="g-me" filter="url(#f-agent)">
+    <rect id="hl-me" class="hl hl-me" x="1502" y="718" width="156" height="48" rx="12" filter="url(#f-hit)"/>
+    <rect class="n-mem-e" x="1505" y="718" width="150" height="44" rx="10"/>
+    <text x="1580" y="734" class="lbl lbl-agent">QA</text>
+    <text x="1580" y="750" class="lbl lbl-sub">Engineer · Tier 3</text>
+  </g>
+
+  <!-- ── LABELS ─────────────────────────────────────────────────────── -->
+  <g id="g-labels">
+    <text x="960" y="46"  class="title-main">Conversation Awareness</text>
+    <text x="960" y="72"  class="title-sub">Every agent sees everything</text>
+    <!-- Write/Read phase annotations (faint) -->
+    <text x="640" y="820" class="path-lbl">← writes context →</text>
+    <text x="640" y="838" class="path-lbl">← reads context →</text>
+    <!-- File path hint -->
+    <text x="960" y="990" style="font-family:'Courier New',monospace;font-size:12px;font-weight:700;
+                 fill:#ffffff;dominant-baseline:middle;text-anchor:middle;letter-spacing:2px;
+                 paint-order:stroke fill;stroke:rgba(0,0,0,0.85);stroke-width:3px;">
+      .pi/multi-team/sessions/&lt;id&gt;/conversation.jsonl
+    </text>
+  </g>
+</svg>

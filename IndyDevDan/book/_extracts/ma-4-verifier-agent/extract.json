@@ -1,0 +1,464 @@
+{
+  "lesson_key": "ma-4-verifier-agent",
+  "short_key": "ma-4",
+  "title": "The Pi Verifier Agent",
+  "course": "MA",
+  "order": 18,
+  "volume_dir": "vol-3-ma",
+  "chapter_stem": "18-verifier-agent",
+  "lesson_url": "https://www.youtube.com/watch?v=EnXKysJNz_8",
+  "youtube_id": "EnXKysJNz_8",
+  "youtube_title": "GPT-5.5 VERIFIED Opus 4.7: A Pi Coding Agent That REVIEWS Like YOU",
+  "channel": "IndyDevDan",
+  "video": {
+    "file": "ma-4-verifier-agent/video/ma-4-verifier-agent.mp4",
+    "duration_seconds": 1971,
+    "duration_display": "32:51",
+    "native_resolution": "3840x2160",
+    "fps": "29.97"
+  },
+  "codebase": {
+    "catalog_symlink": "IndyDevDan/ma-4-verifier-agent/codebase",
+    "resolves_to": "agentic-horizon-extras/the-verifier-agent-system",
+    "public_free_repo": "https://github.com/disler/the-verifier-agent",
+    "note": "The free public repo (disler/the-verifier-agent) is the basic version; the members-only 'souped-up' version adds specialized verifier experts and the gpt-image-2 skill. The local codebase (the-verifier-agent-system) is the fuller build: it ships four verifier personas (generic, sqlite, image, python), two read-only scripts, and the gpt-image-2 skill."
+  },
+  "tactic": {
+    "name": "The Verifier Agent — spend tokens to save time; attack the review constraint with an agent that verifies agents",
+    "one_liner": "Stop hand-checking every '✅ done.' Put a second, read-only agent behind your builder that decomposes its work into atomic claims, proves each one deterministically, and re-prompts the builder — unprompted — when a claim fails. You trade 2–5× the tokens for the one thing tokens can't buy back: your time.",
+    "why_uncomfortable": "By the token-optimizer's math it looks pure waste — you double or 5× your spend on an agent that writes no code and often just says 'looks good.' Worse, you deliberately lock yourself OUT of your own verifier: its input bar is disabled, you cannot type at it, you cannot vibe-code a one-off fix. When it misses something, the only available move is to edit the persona, the script, or the prompt template — you are forced to template your engineering every single time. It removes the lowest-hanging fruit of the generative-AI age (fire a one-off prompt and move on) from the menu, and it pushes you out of the interactive back-and-forth loop most engineers are comfortable living in. Dan's framing: the discomfort is the mechanism."
+  },
+  "mission": "Cross the widening gap between the two camps of 2026 engineers. Camp A is stuck prompting back and forth with a single agent — in 2026 that will feel like hand-typing code did in 2025, and they will be far behind. Camp B builds multi-agent systems that scale: agents coordinating with agents, code stacked with agents to run longer threads of work. The verifier agent is the simplest, highest-leverage entry into Camp B — a brutally simple two-agent system that is the rare pattern which compounds on BOTH trust and scale at once. You are not building your application anymore; you are building the agentic system that builds and checks the application. '2026 is the year of trust': do you trust your agents to do what you ask — and at what scale?",
+  "phase_model": {
+    "single_agent_prompting": "Camp A — an engineer in the loop, prompting one agent back and forth, babysitting output, re-prompting by hand. The lowest-hanging fruit of the generative-AI age. Fast to start, but it does not scale and it does not compound.",
+    "multi_agent_orchestration": "Camp B — coordinated systems of specialized agents that operate better together than alone. NOT sub-agent delegation; orchestration. The verifier agent is the first, most important multi-agent system Dan says most engineers can build: one builder + one read-only verifier that watches, decomposes, proves, and corrects.",
+    "the_delta": "The delta from Camp A to Camp B is a second agent with a hard architectural separation between writing and checking, plus a harness you own so the separation is enforced (not merely prompted). One agent reviewing its own output is one perspective at one moment of compute; two coordinated agents give a second perspective, doubled compute, and specialization (the verifier has a domain script + read-only persona the builder lacks; the builder has write/edit/generate the verifier lacks)."
+  },
+  "core_concepts": [
+    {
+      "id": "the-verifier-agent",
+      "name": "The Verifier Agent (two-agent observer pattern)",
+      "plain_english": "A normal interactive builder agent runs in your terminal; a sibling verifier agent runs in its own window with input disabled. After every builder turn, the verifier independently re-runs the work with read-only tools and, only if a check fails, prompts the builder back with a concrete correction. It closes the review-constraint feedback loop so you stop hand-checking every claim of success.",
+      "dan_words": "\"We have this very simple two-agent system where on completion of any prompt that executes, the verifier is kicking off and doing work.\"",
+      "misconception": "That it's just sub-agent delegation or a fancier chat. It is not delegation — the builder doesn't even know the verifier exists. It's a top-down observer with a hard write/check separation, and the verifier only speaks up when a proof fails."
+    },
+    {
+      "id": "two-constraints-of-agentic-coding",
+      "name": "The two constraints: planning and reviewing",
+      "plain_english": "If you're doing agentic engineering right, your time goes to exactly two things: how much you can plan, and how much you can review. Most engineers stall on review — half the day spent re-checking 'I created the table / added the FK / applied the migration.' The verifier collapses the review side into a parallel agent, and compounds the planning side too (every gap it can't verify becomes an explicit ask you template next time).",
+      "dan_words": "\"In agentic coding, there are two constraints... Planning and reviewing. If you're doing things right, you're spending your time planning and reviewing. With the verifier agent, we can improve our review constraint.\"",
+      "misconception": "That 'reviewing' means reading the agent's prose summary. Review here is proving claims against actual state with deterministic tools — the agent's final message is a CLAIM, never proof."
+    },
+    {
+      "id": "spend-tokens-to-save-time",
+      "name": "Spend tokens to save time",
+      "plain_english": "The verifier often burns 2–5× the builder's tokens per turn. If you optimize for tokens that's wasteful; if you optimize for TIME it's the highest-leverage trade there is. Tokens are cheap and getting cheaper; your time is not. You scale compute to scale impact.",
+      "dan_words": "\"Quite literally spending 5x tokens to make sure that I spend less of my time... How much is your time worth? If you ask me, your time is worth a ton.\"",
+      "misconception": "That more tokens = more cost you should minimize. The equation is tokens-for-time: pay tokens to reclaim hours of review, and take that trade every time you can."
+    },
+    {
+      "id": "atomic-claims",
+      "name": "Atomic claims — the art of verification is decomposition",
+      "plain_english": "Everything you prompt is a bundle of small axioms — units of information that can be proven true or false. 'I created the users table' is really five claims (table exists, columns/types, primary key, FK constraints, defaults). The verifier's persona forces it to pull each apart and prove each independently. A single PASS that hides three unchecked sub-claims is worse than three explicit FAILs.",
+      "dan_words": "\"Everything you prompt into your agents, they're all small axioms. They're small claims. They're units of information that can be proven true or proven false.\"",
+      "misconception": "That checking 'did it work?' at the bundle level is verification. Granularity IS the value — the verdict is only trustworthy at the atomic level, each atom tied to a deterministic tool output."
+    },
+    {
+      "id": "trust-and-scale-both",
+      "name": "Trust AND scale — the rare pattern that does both",
+      "plain_english": "Most agentic moves trade one for the other: review more deeply and you slow down (scale down); push more compute and you erode trust in any single output. The verifier doesn't trade — it scales the work (more compute, more turns) AND increases trust (every atomic claim now has a deterministic check behind it before you ever read 'done'). More work + more proof, both axes at once.",
+      "dan_words": "\"The verifier sits at a very important middle ground between trust and scale. Most agents increase trust or scale, not both. The verifier does both.\"",
+      "misconception": "That adding agents automatically raises the error rate. Only if you don't engineer them — with the right core four and a harness you control, the math flips: you open the same tool everyone opens, but your results are verified."
+    },
+    {
+      "id": "templated-engineering-by-force",
+      "name": "Template your engineering — by force",
+      "plain_english": "The verifier is structurally un-promptable: its input bar is locked, so you cannot drop a one-off instruction into it. The only thing that drives it is the on-stop prompt template rendered against the builder's stop event. So when it misses something, you can't type a fix — you must improve the persona, the script, or the template. That solves the whole problem class, not the one instance you hit. The lock isn't friction for its own sake; it's the mechanism that makes templating a habit.",
+      "dan_words": "\"I cannot fall to the lowest-hanging fruit of the generative AI age. There's no vibe coding this stuff. I cannot just fire a one-off prompt... I am forced to template my engineering into my verifier agent.\"",
+      "misconception": "That the input lock is a limitation to work around. It's the point — remove one-off prompting from the menu and the only action left is the one that compounds."
+    },
+    {
+      "id": "positive-feedback-loop",
+      "name": "Built-in positive feedback loop (the flywheel)",
+      "plain_english": "Every verifier Report ends with two engineered questions: 'What could you not verify?' and 'What do you need from me to verify this next time?' Whatever it couldn't prove becomes the exact next thing you encode into the script or persona. Verifier accuracy compounds with every prompt you write — a flywheel, not a one-off check.",
+      "dan_words": "\"This is a positive feedback loop. It's a flywheel. I can then take the information given me here on what it could not verify... and I can template this into the agent's system prompt.\"",
+      "misconception": "That a verifier that says 'I couldn't check X' has failed. That gap is the highest-value output — it names precisely what to template next."
+    },
+    {
+      "id": "top-down-observer",
+      "name": "Top-down observer — builder doesn't know the verifier exists",
+      "plain_english": "The builder just runs. On every turn it emits lifecycle ticks (start / stop / error) over a private unix socket — never transcript content. The verifier pulls what it needs from the builder's session JSONL on disk and does its own verification. The only thing the verifier can push back is a corrective prompt via one tool.",
+      "dan_words": "\"On every prompt on the stop hook, the builder agent sends an event through a Unix socket... the verifier takes in the session file. Thanks to the Pi agent harness, we have full access to everything our builder agent has done.\"",
+      "misconception": "That the two agents chat over the wire. They don't — the socket carries only lifecycle events + one corrective channel; the substance comes from reading the builder's session file slice for that turn."
+    },
+    {
+      "id": "own-your-agent-harness",
+      "name": "Own your agent harness",
+      "plain_english": "The verifier lives inside a custom Pi agent harness you fully control. That's what makes the input lock, the read-only persona, the bash policy, and the auto-spawn possible. Claude Code / Codex / Gemini / open-code all change underneath your feet on every update; a harness you own doesn't. Owning the harness is how you control the core four — context, model, prompt, tools.",
+      "dan_words": "\"There are many coding agents, there are many agent harnesses, but this one is yours. Fully customizable, adaptable, and it doesn't change underneath your feet as soon as a new update rolls out.\"",
+      "misconception": "That this is a Pi advertisement. The transferable claim is: to build systems like this you need control over the harness's tool surface and lifecycle — whatever tool gives you that."
+    },
+    {
+      "id": "bash-is-the-ticking-time-bomb",
+      "name": "The bash tool is the most dangerous tool — lock it down",
+      "plain_english": "Security vulnerabilities and agents-off-the-rails are both going parabolic. Bash is the single most dangerous tool you hand an agent. The verifier restricts bash to exactly one allowed script — the highest level of control — and layers read-only enforcement on top. If the model tries anything with bash other than the one script, it's fully blocked.",
+      "dan_words": "\"The bash tool is the most dangerous tool you can give your agents... this tool is a ticking time bomb. And so what I've done here in my verifier agent is I've restricted it to using just one script. This is the highest level of control you can give.\"",
+      "misconception": "That prompting 'please be read-only' is enough. Enforcement is OUTSIDE the model — three independent layers (persona tools allowlist, tool-call bash override, read-only script/connection) all must be defeated before any state mutates."
+    },
+    {
+      "id": "stack-intelligence-and-not-or",
+      "name": "Stack intelligence — it's AND, not OR",
+      "plain_english": "Every model benchmark tests one model in isolation. From an engineer's view that's the missing piece: maximum intelligence isn't picking Opus 4.7 OR GPT-5.5 — it's Opus 4.7 AND GPT-5.5, coordinated and specialized. Real intelligence is combinations of models orchestrated together, which no benchmark measures but you can build.",
+      "dan_words": "\"It's not about GPT 5.5 or Opus 4.7. It's GPT 5.5 and Opus 4.7. It's an and, not an or... Stack intelligence. Orchestrate intelligence.\"",
+      "misconception": "That you must chase the single 'best' model. The frontier is combinations — a builder model that writes and a different verifier model that checks each catch the other's misses."
+    },
+    {
+      "id": "one-agent-one-prompt-one-purpose",
+      "name": "One agent, one prompt, one purpose — and stack them",
+      "plain_english": "A focused agent is a performant agent. Each verifier does exactly one job (image readability, or SQLite integrity, or Python types/tests) and does it well. Because the verifier is independent of the builder, you can stack more than one specialized verifier behind the same builder — an extension layer of specialized validation on top of whatever your primary agent is.",
+      "dan_words": "\"One agent, one prompt, one purpose. A focused agent is a performant agent... I can just continue to stack up these verifier agents to focus on one specific thing.\"",
+      "misconception": "That one giant do-everything verifier is better. Specialization beats breadth here; the SQLite verifier stays silent on image work and vice versa (each domain persona has a relevance gate)."
+    }
+  ],
+  "core_four": {
+    "context": "What the verifier can see: the builder's session JSONL on disk (read only the [start..end] slice for the turn, passed as line offsets so it never scans a multi-MB file), the original user prompt (forwarded on the start/stop event so the verifier grounds its checks in what you actually ASKED for, not just what the builder claimed), and the repo files via read/grep/find/ls.",
+    "model": "A DIFFERENT model from the builder, on purpose — stacked intelligence. In the video the builder is Opus 4.7; the image verifier ran GPT-5.5 and the SQLite verifier ran GLM 5.1. The persona's `model:` field pins the verifier model regardless of the user's global default. (On disk today all four personas declare `openai/gpt-5.5`; the video's verify_sqlite.md showed `z-ai/glm-5.1` — the model is a one-line swap, which is the whole point.)",
+    "prompt": "Two templated layers: the persona system prompt (rendered once at spawn with BUILDER_SESSION_ID / SOCKET_PATH / etc.) and the per-cycle verify_on_stop.md user prompt (rendered on every stop event with TURN_INDEX, the line-offset slice, and the original user prompt). You improve behavior by editing these templates — never by typing at the verifier.",
+    "tools": "Deliberately narrowed: read, grep, find, ls, bash, plus the extension-provided verifier_prompt (the ONLY outbound channel to the builder). No write, no edit — the model can't call what isn't registered. For domain personas, bash is further locked to a single allowed script.",
+    "why_it_matters": "When something goes wrong, you can't fire a one-off prompt — you're forced to improve one or more of the core four. Dan: 'I'm effectively forced to improve one or more of the core four, context, model, prompt, or tools.' Owning the harness is what lets you engineer all four axes precisely enough that adding a second agent lowers your error rate instead of raising it."
+  },
+  "the_two_worked_examples": {
+    "example_a_image": {
+      "domain": "image (gpt-image-2 skill + verify_image persona)",
+      "recipe": "just vimg  (≡ pi -e verifiable.ts -e cross-agent.ts --verifiable --verifier-agent verify_image)",
+      "builder_model": "Opus 4.7",
+      "verifier_model": "GPT-5.5",
+      "flow": [
+        "Prompt the builder: 'run prime, then run skill gpt-image-2, generate arch.jpg to concisely describe the architecture of the verifier two-agent system.' /prime loads essential codebase context.",
+        "Builder (Opus 4.7) reads the gpt-image-2 SKILL, then writes a highly detailed image prompt and runs generate_gpt_image.py (~75s). One agent prompting another model — Opus templating a prompt for GPT Image 2.",
+        "On the builder's stop event, the verifier (GPT-5.5) kicks off UNPROMPTED. Hands off the keyboard.",
+        "The verifier reads arch.jpg, decomposes the request into atomic visual claims (exists, depicts the two-agent system, correct format/location, and ≤ MAX_TEXT_ELEMENTS=10 distinct text blocks), and checks each.",
+        "It finds the diagram violates the readability contract — too many distinct text blocks (bullet-list-heavy 'top-down observer' draft). It calls verifier_prompt with a concrete fix ('regenerate with fewer than 10 contiguous text blocks; combine labels; use icons instead of internal bullet lists').",
+        "The builder receives the correction as a follow-up user message and regenerates a simplified icon-based diagram (exactly 7 text blocks).",
+        "Next cycle: STATUS VERIFIED, CONFIDENCE PERFECT, 7/7 atomic claims, green bar. The human never touched the keyboard for the correction. The ≤ 10-block rule lives in the persona and is enforced on every image forever.",
+        "Dan then pushes a second round ('add us — the ones prompting the builder — into the picture') to show the loop runs again on an edit."
+      ]
+    },
+    "example_b_sqlite": {
+      "domain": "sqlite (verify_sqlite persona + verify_sqlite.py script)",
+      "recipe": "just vsql  (≡ ... --verifier-agent verify_sqlite)",
+      "builder_model": "Opus 4.7",
+      "verifier_model": "GLM 5.1 (video) / openai/gpt-5.5 (persona default on disk)",
+      "flow": [
+        "just shows the recipe list; just vsql boots the builder + auto-spawns the SQLite verifier in a sibling window.",
+        "Prompt the builder: 'find all SQLite DBs in this repo, breakdown tables, columns, and relationships.' Opus 4.7 finds tmp/mock_shop.db and tmp/mock_shop_backup.db and reports tables/columns/FKs.",
+        "The verifier (GLM 5.1) decomposes the work into 16 atomic claims and proves each via the ONE allowed script: PRAGMA index_list(...), SELECT count(*) per table, PRAGMA integrity_check → 'ok', FK reference checks.",
+        "Result: 16/16 verified, STATUS VERIFIED, CONFIDENCE PERFECT, green bar. No feedback needed — the verifier stays silent when nothing fails.",
+        "The verifier is restricted: bash is locked to `uv run --script .pi/verifier/scripts/verify_sqlite.py` only — anything else is blocked at the tool-call layer, and the script opens the DB `mode=ro&immutable=1`.",
+        "Token point: the Opus builder spent ~1% of context; the GLM verifier spent ~2× the builder's tokens (spend tokens to save time). Dan: this SQLite agent could be your Postgres / MySQL / MongoDB agent — swap the script + persona."
+      ]
+    }
+  },
+  "the_report_contract": {
+    "status_line": "STATUS: verified | failed | unsure — parsed by the verifier extension out of the '## Report' block of the verifier's last assistant message.",
+    "confidence_ladder": [
+      {"level": "PERFECT", "meaning": "Every atomic claim verified with deterministic output; zero gaps; no verifier_prompt called.", "bar": "green"},
+      {"level": "VERIFIED", "meaning": "All checked passed; 1–2 minor non-blocking unverifiable gaps.", "bar": "green"},
+      {"level": "PARTIAL", "meaning": "No failures, but significant unverifiable gaps.", "bar": "orange"},
+      {"level": "FEEDBACK", "meaning": "≥1 claim failed AND verifier_prompt was called — the system working as designed.", "bar": "orange"},
+      {"level": "FAILED", "meaning": "Could not verify at all (no oracle/fixture/ambiguous) — escalating to human.", "bar": "red"}
+    ],
+    "report_sections": [
+      "What did you verify? (each atomic claim + exact tool output + PASS/FAIL)",
+      "What could you not verify? (why — missing oracle/harness/fixture/ambiguous)",
+      "What feedback did you give? (paraphrase of the verifier_prompt message, or 'none')",
+      "What do you need from me to verify this next time? (the flywheel input)",
+      "Verification metadata (turn_index, atomic_claims_total / verified / failed / unverified, duration)"
+    ],
+    "escalation": "Loop repeats up to max_loops (default 3, per persona). On the 4th attempt the builder surfaces a 'verifier failed N times — escalating to human' message instead of auto-injecting another correction."
+  },
+  "three_read_only_layers": {
+    "layer_1_persona_tools": "The persona's `tools:` field is exactly `read, grep, find, ls, bash, verifier_prompt`. The launcher passes it to `pi --tools`, so Pi's runtime never registers write/edit for the verifier process. The model can't call what isn't there.",
+    "layer_2_bash_policy": "For domain personas that declare `bash_policy: {mode: script-only, allowed_script, runner}`, a pi.on('tool_call') hook blocks any bash command that doesn't start with `<runner> <allowed_script>`. The block reason is a structured teaching message ('the error message is the documentation') so the agent self-corrects.",
+    "layer_3_script_readonly": "verify_sqlite.py opens the DB with `mode=ro&immutable=1` and enforces a PRAGMA allowlist (only introspective PRAGMAs); dot-commands route through `sqlite3 -readonly`. verify_python.py only runs check-only tools (uvx ty / ruff check / ruff format --check / pytest). Every refusal is structured JSON `{error, received, reason, allowed, hint}` with a non-zero exit.",
+    "socket_auth": "The /tmp/pi-verifier/ directory is chmod 0700 — only the owning UID can connect. That is the authentication (no token to leak in ps).",
+    "not_a_sandbox": "Threat model caveat: the verifier still runs as your user. This locks down the VERIFIER as a source of mutation; a malicious builder-side prompt that gets the BUILDER to run rm -rf is a separate (builder) permission concern. Don't load untrusted personas — layers 1 and 2 are configured by the persona file."
+  },
+  "step_by_step_demo": [
+    "(0:00–1:35) Framing: April 2026's record model-release velocity (Opus 4.7, GPT-5.5, DeepSeek V4, GLM 5.1, Kimi K2.6, Qwen). Model performance is no longer the bottleneck — you are. Two Pi agents sit side by side (builder Opus 4.7 right, verifier GPT-5.5 left) and 'this harness takes no input' — something's weird.",
+    "(1:35–2:07) Image example begins. Prompt the builder: run /prime, then run skill gpt-image-2, generate arch.jpg to describe the verifier two-agent architecture.",
+    "(2:07–3:05) Builder (Opus 4.7) primes, reads the gpt-image-2 skill, and fires generate_gpt_image.py with a highly detailed prompt. ~75s. One agent prompting another model.",
+    "(3:05–3:35) On the builder's stop, the verifier (GPT-5.5) kicks off UNPROMPTED. Hands off the keyboard. It reads the generated image and starts validating claims.",
+    "(3:35–4:10) The verifier finds a problem and calls verifier_prompt — 'my verifier agent just prompted my builder agent.' Feedback mode: the correction fires a new builder turn, completely unprompted by the human.",
+    "(4:10–5:10) In VS Code, look at the first (text-dense 'top-down observer') arch.jpg before it's overwritten — Dan clones it as arch copy.jpg. The Report: STATUS failed, CONFIDENCE feedback — the image is legible but violates the readability contract (> 10 distinct text blocks; MAX_TEXT_ELEMENTS=10).",
+    "(5:10–6:10) Break down the failed Report: every atomic claim listed, the readability rule that fired, and the corrective feedback the verifier sent (regenerate with fewer than 10 blocks; combine labels; use icons).",
+    "(6:10–7:10) The builder regenerated a simplified diagram. Now a clean green bar: VERIFY_IMAGE VERIFIED / PERFECT, 7/7 atomic claims. The verifier did NOT need to re-prompt.",
+    "(7:10–9:00) Value props written out: spend tokens to save time; the review constraint; the positive feedback loop ('what could you not verify / what do you need from me'); template your engineering by force (un-promptable harness). Second round: 'add us into the picture' runs the loop again on an edit.",
+    "(9:40–12:15) The two constraints of agentic coding — planning and reviewing. The verifier attacks review by teaching an agent exactly how you verify. One agent, one prompt, one purpose. You can stack specialized verifiers.",
+    "(12:15–14:05) The customized system prompt: a persona with rules (search 'max text elements') and a fixed Report format including 'what could you not verify' and 'what do you need from me.' This is what owning the harness lets you do.",
+    "(14:05–16:35) Template your engineering as a habit — by force. The input is locked; you can't vibe-code the verifier; the only fix is improving one of the core four. The widening gap between Camp A (stuck prompting) and Camp B (building systems).",
+    "(16:55–17:35) SQLite example. `just` shows recipes; `just vsql` boots builder + SQLite verifier (GLM 5.1). Prompt: find all SQLite DBs, break down tables, columns, relationships.",
+    "(17:35–19:35) The verifier is independent of the builder — an extension layer of specialized validation. It decomposes the work into atomic claims (find all DBs; break down tables; columns; relationships) and proves each.",
+    "(19:35–21:05) Restricted bash: this verifier can run only one script. Bash is the most dangerous tool — lock it down. SQLite agent → could be your Postgres/MySQL/MongoDB agent.",
+    "(21:05–22:40) 16/16 atomic claims verified, PERFECT. Token point: Opus ~1%, GLM ~2× the builder — spending 2× compute to increase trust by validating atomic claims. This system compounds with every prompt.",
+    "(23:00–25:38) What's missing from every benchmark: they test one model in isolation. Real intelligence is combinations — GPT-5.5 AND Opus 4.7, not OR. Stack intelligence; own your agent harness.",
+    "(25:38–30:25) TAC / Agentic Horizon pitch: vibe coding is the floor, agentic engineering is the ceiling; operate on the agentic layer, not the application. Two versions of the verifier shipped (free GitHub basic; members souped-up with experts + gpt-image-2 skill).",
+    "(30:25–32:51) Channel focus: trust and scale. 2026 is the year of trust. The verifier sits at the middle ground and does both. Next up: agentic security — damage from within, the bash tool as the biggest hole in everyone's agent."
+  ],
+  "quotes": [
+    { "text": "For us engineers, model performance is no longer the bottleneck. It's you and I. It's our ability to extract value out of agentic systems at scale safely.", "approx_timestamp": "0:23" },
+    { "text": "Our verifier agent has kicked off unprompted. We did not prompt this. I'm not doing anything here. My hands are off the keyboard.", "approx_timestamp": "3:11" },
+    { "text": "My verifier agent just prompted my builder agent.", "approx_timestamp": "4:05" },
+    { "text": "Whenever you can, you should be spending tokens to save time.", "approx_timestamp": "9:52" },
+    { "text": "Quite literally spending 5x tokens to make sure that I spend less of my time.", "approx_timestamp": "10:19" },
+    { "text": "In agentic coding, there are two constraints... Planning and reviewing.", "approx_timestamp": "11:13" },
+    { "text": "One agent, one prompt, one purpose. A focused agent is a performant agent.", "approx_timestamp": "11:58" },
+    { "text": "Everything you prompt into your agents, they're all small axioms. They're small claims. They're units of information that can be proven true or proven false.", "approx_timestamp": "18:44" },
+    { "text": "I cannot fall to the lowest-hanging fruit of the generative AI age. There's no vibe coding this stuff. I cannot just fire a one-off prompt.", "approx_timestamp": "14:56" },
+    { "text": "I am forced to template my engineering into my verifier agent.", "approx_timestamp": "15:14" },
+    { "text": "I'm effectively forced to improve one or more of the core four, context, model, prompt, or tools.", "approx_timestamp": "16:27" },
+    { "text": "The bash tool is the most dangerous tool you can give your agents... this tool is a ticking time bomb.", "approx_timestamp": "20:41" },
+    { "text": "I've restricted it to using just one script. This is the highest level of control you can give.", "approx_timestamp": "20:51" },
+    { "text": "I am increasing the trust I have in my agent system by having this verifier agent validate the atomic claims that the builder agent has performed.", "approx_timestamp": "22:02" },
+    { "text": "It's not about GPT 5.5 or Opus 4.7. It's GPT 5.5 and Opus 4.7. It's an and, not an or.", "approx_timestamp": "24:34" },
+    { "text": "Stack intelligence. Orchestrate intelligence.", "approx_timestamp": "24:47" },
+    { "text": "Vibe coding is the floor. Agentic engineering is the ceiling that no one has even imagined the capabilities of yet.", "approx_timestamp": "28:11" },
+    { "text": "2026 is the year of trust. Do you trust your agents to do what you ask them to? And then, how much? At what scale?", "approx_timestamp": "30:54" },
+    { "text": "The verifier sits at a very important middle ground between trust and scale. Most agents increase trust or scale, not both. The verifier does both.", "approx_timestamp": "31:16" }
+  ],
+  "prerequisites_tools": [
+    "Node 20+ and npm",
+    "Python 3.11+ (verifier scripts use inline PEP 723 headers)",
+    "astral uv (curl -LsSf https://astral.sh/uv/install.sh | sh)",
+    "tmux (the verifier runs in a sibling tmux window)",
+    "sqlite3 CLI on PATH (for the SQLite verifier's dot-commands)",
+    "Pi Coding Agent (`pi`) authenticated against an LLM provider",
+    "just (every workflow recipe runs through the justfile)",
+    "An LLM provider API key in a project-local .env (OPENAI_API_KEY is canonical for the default gpt-5.5 verifier; OPENAI_API_KEY also powers the gpt-image-2 skill)",
+    "macOS or Linux (Windows-native untested — use WSL)"
+  ],
+  "what_student_must_internalize": [
+    "The verifier attacks the REVIEW constraint — one of the only two constraints (planning + reviewing) that bind agentic engineering. That's why it's high-leverage.",
+    "Verification = decomposition. Break the builder's claims into atomic propositions and prove each against actual state with a deterministic tool. The agent's prose is a claim, never proof.",
+    "You spend tokens to save time. 2–5× the tokens per turn is the correct trade when your time is the scarce resource.",
+    "The verifier is the rare pattern that compounds trust AND scale simultaneously — most agentic moves trade one for the other.",
+    "The un-promptable harness forces you to template your engineering: fixes go into the persona / script / prompt, never a one-off. That solves the whole class, not the instance.",
+    "Read-only is enforced by architecture (three independent layers), not by asking the model nicely. Bash is the most dangerous tool — lock it to one script.",
+    "It's AND, not OR: a builder model + a different verifier model beats either alone. Stack and orchestrate intelligence; benchmarks that test one model miss this.",
+    "The builder never knows the verifier exists (top-down observer): lifecycle ticks over a socket, substance pulled from the session JSONL slice.",
+    "Own your harness — that control is what makes the input lock, tool narrowing, bash policy, and auto-spawn possible; other tools change under your feet.",
+    "The Report's 'what could you not verify / what do you need from me' is a flywheel: every gap is the next thing you template. Verifier accuracy compounds."
+  ],
+  "common_weak_student_failures": [
+    "Reading the verifier as sub-agent delegation. It's an observer with a hard write/check separation — the builder doesn't know it exists, and it only speaks when a proof fails.",
+    "Optimizing for tokens and concluding the verifier is 'wasteful.' The trade is tokens-for-time; the whole point is spending 2–5× tokens to reclaim hours of review.",
+    "Trying to 'just tell the verifier' to fix a miss. Its input is locked by design — the only fix is editing the persona/script/template. Fighting the lock misses the lesson.",
+    "Accepting a single top-level PASS as verification. Without atomic decomposition a PASS can hide three unchecked sub-claims; granularity is the value.",
+    "Assuming 'read-only persona' means the prompt says be careful. Enforcement is outside the model — three layers — and 'please be read-only' alone is not security.",
+    "Chasing the single best model. The frontier is combinations — builder model AND a different verifier model — which no single-model benchmark can show.",
+    "Treating 'what could you not verify' as failure noise instead of the flywheel input that tells you exactly what to template next.",
+    "Confusing the video's models with the shipped defaults: the video ran GLM 5.1 / GPT-5.5 verifiers; the on-disk personas declare openai/gpt-5.5. The model is a one-line swap — don't hard-code your mental model to either.",
+    "Expecting the free GitHub repo to include every domain verifier. v1's README says only SQLite ships; the members/local build adds image + python + generic. Check what your clone actually contains."
+  ],
+  "teach_back_prompt": "Explain to a colleague, without notes: (1) which of the two constraints of agentic coding the verifier attacks, and why decomposing the builder's work into atomic claims — each tied to a deterministic tool output — is what makes 'review' trustworthy; (2) why the verifier is the rare pattern that raises BOTH trust and scale, when most agentic moves trade one for the other; (3) how the un-promptable, input-locked harness forces you to template your engineering, and why 'the error message is the documentation' matters for the bash policy. Finish by resolving the apparent paradox: how does spending 2–5× the tokens on an agent that writes no code make you FASTER — and why is it AND (builder + verifier model), not OR?",
+  "retrieval_questions": [
+    { "q": "What are the two constraints of agentic coding, and which one does the verifier attack?", "a": "Planning and reviewing. The verifier attacks the review constraint by teaching an agent exactly how you verify and re-checking every turn deterministically." },
+    { "q": "What is an 'atomic claim' and why decompose?", "a": "The smallest proposition with an unambiguous truth value (e.g. 'the users table has a PRIMARY KEY on id'). Decomposition is the art of verification — a single PASS that hides three unchecked sub-claims is worse than three explicit FAILs; each atom must cite a deterministic tool output." },
+    { "q": "State the core trade the verifier makes.", "a": "Spend tokens to save time. The verifier burns ~2–5× the builder's tokens per turn; if you optimize for time (your scarce resource) rather than tokens (cheap), it's the highest-leverage trade there is." },
+    { "q": "Why is the verifier called the rare 'trust AND scale' pattern?", "a": "Most agentic moves trade one for the other (review deeper → slower; more compute → less trust in any single output). The verifier scales the work AND increases trust — every atomic claim now has a deterministic check before you read 'done.'" },
+    { "q": "Why is the verifier's input bar locked, and what does that force?", "a": "So you cannot fire a one-off prompt at it. The only way to fix a miss is to edit the persona, script, or prompt template — which solves the whole problem class, not the instance. It makes templated engineering a habit by force." },
+    { "q": "Name the three independent read-only layers.", "a": "(1) Persona tools allowlist — no write/edit registered; (2) tool-call bash policy — bash must start with `<runner> <allowed_script>` or it's blocked with a teaching message; (3) the script itself — SQLite opened mode=ro&immutable=1 + PRAGMA allowlist, Python tools run check-only." },
+    { "q": "How does the builder communicate with the verifier, and what crosses the wire?", "a": "The builder emits lifecycle ticks (start/stop/error) over a private unix socket at /tmp/pi-verifier/<sid>.sock — NO transcript content. The verifier pulls the turn's slice from the builder's session JSONL on disk; the only thing it can push back is a corrective prompt via the verifier_prompt tool." },
+    { "q": "What is the readability rule in the image example, and what happened when it fired?", "a": "MAX_TEXT_ELEMENTS = 10 distinct text blocks per image. The first (bullet-heavy) diagram exceeded it, so the verifier failed the readability claim, called verifier_prompt with a concrete fix, the builder regenerated a 7-block icon diagram, and the next cycle came back VERIFIED / PERFECT — no human keystroke." },
+    { "q": "Why 'AND, not OR' when picking models?", "a": "Every benchmark tests one model in isolation; maximum intelligence comes from combinations — a builder model plus a DIFFERENT verifier model (e.g. Opus 4.7 builds, GPT-5.5 or GLM 5.1 verifies), each catching the other's misses. Stack and orchestrate intelligence." },
+    { "q": "What two questions end every Report, and why do they matter?", "a": "'What could you not verify?' and 'What do you need from me to verify this next time?' They are the flywheel — each gap names exactly what to template into the script/persona next, so verifier accuracy compounds with every prompt." },
+    { "q": "Which tool does Dan call the 'most dangerous,' and how is it controlled?", "a": "The bash tool ('a ticking time bomb'). The verifier restricts it to exactly one allowed script via a tool-call hook — the highest level of control — and blocks anything else, feeding the block reason back as a teaching message." },
+    { "q": "What does 'own your agent harness' unlock that a stock coding tool doesn't?", "a": "The input lock, the tool-surface narrowing (no write/edit), the bash policy, custom personas, and auto-spawn — all require harness control. Stock tools (Claude Code / Codex / Gemini / open-code) change under your feet; a harness you own doesn't." }
+  ],
+  "codebase_map": {
+    "root": "agentic-horizon-extras/the-verifier-agent-system",
+    "files": [
+      "README.md",
+      "justfile",
+      ".env.sample",
+      ".gitignore",
+      "LICENSE",
+      "images/arch-loop.svg",
+      "images/verifier.png",
+      "images/07-two-camps.svg",
+      ".pi/settings.json",
+      ".pi/verifier/agents/verifier.md",
+      ".pi/verifier/agents/verify_sqlite.md",
+      ".pi/verifier/agents/verify_image.md",
+      ".pi/verifier/agents/verify_python.md",
+      ".pi/verifier/scripts/verify_sqlite.py",
+      ".pi/verifier/scripts/verify_python.py",
+      ".pi/verifier/prompts/verify_on_stop.md",
+      ".pi/verifier/prompts/builder_error.md",
+      ".claude/settings.json",
+      ".claude/commands/install.md",
+      ".claude/commands/prime.md",
+      ".claude/commands/plan-w-team.md",
+      ".claude/skills/gpt-image-2/SKILL.md",
+      ".claude/skills/gpt-image-2/scripts/generate_gpt_image.py",
+      ".claude/skills/gpt-image-2/scripts/edit_gpt_image.py",
+      ".claude/status_lines/status_line.py",
+      ".claude/status_lines/status_line_v6.py",
+      "apps/verifier/verifiable.ts",
+      "apps/verifier/verifier.ts",
+      "apps/verifier/verifiable-footer.ts",
+      "apps/verifier/cross-agent.ts",
+      "apps/verifier/package.json",
+      "apps/verifier/package-lock.json",
+      "apps/verifier/tsconfig.json",
+      "apps/verifier/_shared/launcher.ts",
+      "apps/verifier/_shared/socket-path.ts",
+      "apps/verifier/_shared/ipc.ts",
+      "apps/verifier/_shared/env.ts",
+      "apps/verifier/_shared/frontmatter.ts",
+      "ai_docs/pi/README.md",
+      "ai_docs/pi/CHANGELOG.md",
+      "ai_docs/pi/docs/*.md (pi harness reference: settings, extensions, sdk, skills, rpc, etc.)"
+    ],
+    "what_each_does": {
+      "README.md": "The system's own teaching doc: how-it-works, quick start (just v / vsql / vpy / vimg), direction matrix, verifier state machine, the review-constraint framing, the CONFIDENCE ladder, the three-layer security model, and known v1 limitations.",
+      "justfile": "Every workflow recipe. `v` (generic verifier), `vsql` (SQLite), `vpy` (Python), `vimg` (image) each boot a builder Pi and auto-spawn the matching verifier. Also `clean` (kill stale tmux/sockets/breadcrumbs) and `prime`/`primepi`. Each recipe loads verifiable.ts + cross-agent.ts and passes --verifiable [--verifier-agent <name>].",
+      "apps/verifier/verifiable.ts": "BUILDER-side extension. Owns the unix-socket SERVER, spawns the verifier child (via launcher), forwards lifecycle ticks (before_agent_start→start, agent_end→stop, crashes→error), captures per-turn session-file line offsets + the original user prompt, receives prompt/report envelopes, injects corrections via pi.sendUserMessage(deliverAs:'followUp'), and enforces max_loops escalation. Registers the /verify command.",
+      "apps/verifier/verifier.ts": "VERIFIER-side extension (runs in the --child Pi). Replaces the editor with a locked, color-coded status bar; connects to the parent socket; on each stop event templates verify_on_stop.md and injects it; exposes the verifier_prompt tool (the only outbound channel); enforces the script-only bash policy via a tool_call hook; parses the '## Report' block (STATUS + CONFIDENCE + sections) on its own agent_end and ships a report envelope back.",
+      "apps/verifier/verifiable-footer.ts": "BuilderInputEditor — embeds verifier-connection status, model id, and context-usage % into the builder input box's borders (top-right: verifier connected/spawning/disconnected; bottom-left: model; bottom-right: ctx %).",
+      "apps/verifier/cross-agent.ts": "Loads commands/skills/agents from .claude/ .gemini/ .codex/ (project + global) into the BUILDER only — so the builder can invoke /prime, the gpt-image-2 skill, etc. Explicitly NOT loaded into the verifier (read-only by architecture must not gain arbitrary slash commands).",
+      "apps/verifier/_shared/ipc.ts": "The wire protocol: discriminated-union envelope types (hello/hello_ack/prompt/prompt_ack/report/event/ping/pong/bye), JSONL framing that splits on \\n ONLY (never Node readline — it would split on U+2028/U+2029 inside JSON strings), and assertDirection() enforcing the asymmetric direction matrix.",
+      "apps/verifier/_shared/launcher.ts": "$TMUX-aware spawn. In-tmux → sibling window; native terminal → detached tmux session + a new OS window (per-emulator dispatch: Ghostty/iTerm/Terminal.app/WezTerm/gnome-terminal/konsole/kitty/alacritty/xterm, else osascript Terminal.app). Renders the persona system prompt, writes a wrapper script (sidesteps macOS ARG_MAX), passes --tools (persona allowlist + verifier_prompt) and --model (persona model).",
+      "apps/verifier/_shared/socket-path.ts": "Resolves the socket to /tmp/pi-verifier/<sid>.sock (short path to stay under macOS's 104-byte sun_path limit), ensures the dir is mode 0700 (the authentication), and writes/reads the .pi/state/verifier-<sid>.sock.ref breadcrumb.",
+      "apps/verifier/_shared/frontmatter.ts": "Parses + validates verifier persona frontmatter (required: name/description/tools/model/domain; optional: bash_policy{mode,allowed_script,runner}, max_loops, verification_focus) and does the dumb <UPPER_SNAKE> template substitution for persona/prompt bodies.",
+      "apps/verifier/_shared/env.ts": "loadDotEnv — both agents load .env from cwd on session_start; existing process.env wins, .env fills gaps (defensive because tmux env inheritance is unreliable).",
+      ".pi/verifier/agents/verifier.md": "GENERIC persona (model openai/gpt-5.5, no bash_policy). Decomposes any request into atomic claims and verifies with read/grep/find/ls/bash (read-only by prompt only). NOT a non-functional stub — it is a full working persona on disk (the README's 'v1 limitations' text is out of date here).",
+      ".pi/verifier/agents/verify_sqlite.md": "SQLite persona. bash_policy script-only → verify_sqlite.py; verification_focus: schemas/FKs/indexes/integrity/migrations. On disk model=openai/gpt-5.5; the video showed model=z-ai/glm-5.1.",
+      ".pi/verifier/agents/verify_image.md": "Image persona. Vision-capable, no bash_policy (vision is the oracle). Encodes the readability contract: MAX_TEXT_ELEMENTS=10 distinct text blocks; illegible/overloaded text is a readability FAIL with a concrete fix. Has a relevance gate (no image work → no-op PERFECT).",
+      ".pi/verifier/agents/verify_python.md": "Python persona. bash_policy script-only → verify_python.py. Runs uvx ty / uvx ruff check / ruff format --check / pytest / coverage; tests are conditional on the project's existing test posture; always uv/uvx, never bare python/pip. Relevance gate for non-Python turns.",
+      ".pi/verifier/scripts/verify_sqlite.py": "The ONLY bash command the SQLite verifier may run. Opens the DB mode=ro&immutable=1, routes dot-commands through sqlite3 -readonly, allows SELECT/WITH/EXPLAIN, enforces a PRAGMA allowlist (introspective only). Every refusal is structured JSON {error,received,reason,allowed,hint} — 'the error message is the documentation.'",
+      ".pi/verifier/scripts/verify_python.py": "The Python verifier's single allowed script. Subcommands type/lint/format/test/coverage shell out to check-only Astral tools + pytest and return JSON {command,exit_code,stdout,stderr}.",
+      ".pi/verifier/prompts/verify_on_stop.md": "The per-cycle user prompt template, rendered on every builder stop event with TURN_INDEX, TIMESTAMP, the [start..end] line slice, and the ORIGINAL user prompt. Tells the verifier to read only the slice, verify each claim, prompt back on failure, and end on exactly one ## Report block. Same template across all domains.",
+      ".pi/verifier/prompts/builder_error.md": "Rendered when the builder emits an error event — surfaces the detail; no verification action (verifier stays idle until the next stop).",
+      ".claude/skills/gpt-image-2/SKILL.md": "The image-authoring skill the BUILDER invokes in the vimg demo. Wraps OpenAI gpt-image-2 (generate + edit/inpaint/compose). Uses OPENAI_API_KEY; --quality is the effective effort dial; documents sizes/formats/pricing. Also used to author the repo's own arch diagrams.",
+      ".claude/commands/prime.md": "The /prime context primer — walks an agent through the README, the runtime TypeScript, the SQLite domain contract, and the justfile in one shot.",
+      ".claude/commands/install.md": "The /install readiness check — verifies CLIs (node/pi/tmux/uv/python3/sqlite3/just), npm install, persona/script validity, provider key presence, and npx tsc --noEmit. Never starts a Pi session.",
+      "images/arch-loop.svg": "The animated two-agent observer architecture embedded at the top of the README (engineer → builder → session.jsonl → verifier → correction back to builder).",
+      "images/07-two-camps.svg": "The 'two camps' diagram — Camp A (stuck in prompt→babysit→re-prompt) vs Camp B (builder + verifier coordinated: build·verify·feedback·repeat).",
+      "images/verifier.png": "The two-agent runtime screenshot (builder Pi left, verifier Pi right, communicating over a unix socket)."
+    },
+    "generated_not_committed": {
+      "arch.jpg / arch copy.jpg": "The architecture diagram the builder generates via the gpt-image-2 skill in the vimg demo (and the backup Dan clones before it's overwritten). Runtime artifacts, not part of the shipped source.",
+      "tmp/mock_shop.db / tmp/mock_shop_backup.db": "The fixture SQLite databases used in the vsql demo (users/products/orders[/discounts]). Created at demo time.",
+      "/tmp/pi-verifier/<sid>.sock": "The unix domain socket the builder binds (dir chmod 0700). Unlinked on shutdown.",
+      ".pi/state/verifier-<sid>.sock.ref": "Breadcrumb pointing at the socket so `ls .pi/state/` shows running verifier sessions and the child resolves the socket by session id alone.",
+      "~/.pi/agent/sessions/<sid>.jsonl": "The builder's session transcript on disk. The verifier reads only the [start..end] slice for the turn being verified."
+    }
+  },
+  "current_practice_gaps": [
+    {
+      "gap": "Verifier model drift: video vs shipped codebase",
+      "why": "In the recorded lesson the image verifier ran GPT-5.5 and the SQLite verifier ran GLM 5.1 (frame t1200 shows verify_sqlite.md with `model: z-ai/glm-5.1`). The codebase on disk today declares `model: openai/gpt-5.5` in all four personas. Nothing is broken — the model is a single frontmatter line and swapping it is the whole 'stack intelligence' point — but a reader reproducing the lab should expect gpt-5.5 by default and set it to whatever cracked model they prefer. Treat specific model names as period detail; the pattern is current.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "README 'v1 limitations' lag behind the shipped tree",
+      "why": "README.md's 'Known limitations (v1)' says 'One domain ships: SQLite' and calls verifier.md 'a non-functional placeholder,' and prose in a couple of places says the default persona is verify_sqlite. On disk the generic verifier.md is a full working persona, verify_image.md and verify_python.md ship with their scripts, and the code default (verifiable.ts attach()) is the GENERIC `verifier`, not verify_sqlite. Trust the files, not the limitations paragraph. install.md also has one stale line (DEFAULT_MODEL: anthropic/claude-sonnet-4-6) contradicted by its own Step 6 (openai/gpt-5.5) — the personas are the source of truth.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "The pattern is harness-agnostic; encode it wherever you can control the tool surface",
+      "why": "Dan builds this on a custom Pi harness because Pi lets him lock input, narrow tools, override bash at the tool-call layer, and auto-spawn. The concept — a read-only observer agent that decomposes into atomic claims and re-prompts on failure — transfers to any tool that gives you (a) lifecycle hooks (a 'stop' event), (b) a way to read the builder's transcript, (c) a tool allowlist, and (d) a tool-call gate. Claude Code offers hooks (PreToolUse/PostToolUse/Stop), a permission allowlist, and the Agent SDK for programmatic multi-agent control — the current idiom for building the same shape outside Pi.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Multi-agent orchestration is the broader arc; the verifier is the simplest entry",
+      "why": "Dan explicitly contrasts this two-agent system with the three-layer orchestrator/leads/workers architecture covered elsewhere on the channel, and cites Stripe's blueprint 'code + agents' pattern. A modern reader should know the verifier is the starter multi-agent system; the ceiling (teams, orchestration, the codebase singularity) is far higher and is developed across AH/MA.",
+      "yt_candidates": ["RairMJflUSA", "V5A1IU8VVp4"]
+    },
+    {
+      "gap": "Agentic security (the bash tool) is teased, not yet delivered",
+      "why": "The lesson locks bash to one script and names the bash tool the biggest hole in everyone's agent, then teases a dedicated 'agentic security — damage from within' video (not prompt injection). At capture time that video wasn't published, so there's no ID to overlay. Flag for a later refresh: pair the three-layer read-only model here with that security deep-dive when it lands.",
+      "yt_candidates": []
+    }
+  ],
+  "yt_overlay_candidates": [
+    {
+      "video_id": "RairMJflUSA",
+      "title": "Multi-Agent Teams",
+      "maps_to": "named hole",
+      "include_in_phase1": true,
+      "rationale": "Dan explicitly references the channel's teams-of-agents / three-layer (orchestrator, leads, workers) architecture as the more complex sibling of this simplified two-agent system. This overlay gives the reader the 'where does the verifier sit in the bigger multi-agent picture' context Dan gestures at but doesn't develop in-lesson. Named directly in the lesson's own resources."
+    },
+    {
+      "video_id": "V5A1IU8VVp4",
+      "title": "Stripe Blueprint Agents",
+      "maps_to": "operationalizes tactic",
+      "include_in_phase1": true,
+      "rationale": "Dan cites 'Stripe's blueprint system, which we covered in a previous video' as a concrete example of Camp B — stacking code + agents to run longer threads of work. It operationalizes the same 'systems that scale beyond single-agent prompting' thesis the verifier embodies. Named directly in the lesson."
+    },
+    {
+      "video_id": null,
+      "title": "Agentic Security — damage from within / the bash tool (teased, unpublished at capture)",
+      "maps_to": "named hole",
+      "include_in_phase1": false,
+      "rationale": "The lesson names the bash tool as the biggest hole in everyone's agent and teases a dedicated security video. No ID exists yet; reserve as a refresh candidate to pair with the three-layer read-only model. Do not overlay until the ID resolves."
+    }
+  ],
+  "frame_plan": [
+    { "t_seconds": 80, "label": "two-agent-split-intro", "file": "media/frames/ma-4-verifier-agent/t0080-two-agent-split-intro.jpg", "why_for_weak_student": "The whole system in one glance: builder Pi (right, claude-opus-4-7, 'verifier connected') beside the verifier Pi (left, VERIFY_IMAGE, gpt-5.5, 'connected to builder') whose input box is visibly locked (green cursor ring). Even shows the exact launch command. The 'something WEIRD here' caption sets up the hook: a harness that takes no input.", "diagram_instead": false },
+    { "t_seconds": 178, "label": "builder-gpt-image-skill", "file": "media/frames/ma-4-verifier-agent/t0178-builder-gpt-image-skill.png", "why_for_weak_student": "Makes 'one agent prompts another model' concrete: the builder (Opus 4.7) is writing a long, precise gpt-image-2 prompt and running generate_gpt_image.py (Elapsed 75.1s). The GPT IMAGE 2.0 overlay names the model being driven. Shows a skill invocation end-to-end.", "diagram_instead": false },
+    { "t_seconds": 196, "label": "verifier-kicks-off-unprompted", "file": "media/frames/ma-4-verifier-agent/t0196-verifier-kicks-off-unprompted.jpg", "why_for_weak_student": "The signature moment, dramatized with a full-screen 'UNPROMPTED' word: the verifier (right) has auto-started, 'read arch.jpg', and is explaining the builder/verifier/unix-socket/defense-in-depth architecture — all with the human's hands off the keyboard. This is the concept students must feel, not just read.", "diagram_instead": false },
+    { "t_seconds": 246, "label": "verifier-prompts-builder", "file": "media/frames/ma-4-verifier-agent/t0246-verifier-prompts-builder.png", "why_for_weak_student": "The agent-to-agent feedback loop in one frame: LEFT, the verifier reasons 'there seem to be too many text elements... I'll need to prompt the builder to simplify' and shows 'verifier_prompt ✓ ack: prompt delivered to builder'; RIGHT, the builder receives the concrete correction and re-runs the gpt-image-2 skill for a 7-block diagram. This is exactly how verifier_prompt closes the loop.", "diagram_instead": false },
+    { "t_seconds": 298, "label": "first-arch-diagram-overloaded", "file": "media/frames/ma-4-verifier-agent/t0298-first-arch-diagram-overloaded.jpg", "why_for_weak_student": "The 'before' image: a detailed 'top-down observer pattern' diagram with bullet lists inside each node. It reads fine to a human, but it exceeds the ≤10-text-block readability contract — so it FAILS. Seeing the exact diagram that got rejected makes the abstract rule tangible.", "diagram_instead": false },
+    { "t_seconds": 360, "label": "failed-report-readability", "file": "media/frames/ma-4-verifier-agent/t0360-failed-report-readability.png", "why_for_weak_student": "The Report structure made real: LEFT names the failure ('contains more than MAX_TEXT_ELEMENTS=10 distinct text blocks... FAIL', atomic_claims_total 6 / verified 5 / failed 1) and the concrete corrective feedback the verifier sent; RIGHT is the builder's rebuild to 'exactly 7 contiguous text blocks.' Shows fail → concrete fix → rebuild.", "diagram_instead": false },
+    { "t_seconds": 420, "label": "verified-report-7of7", "file": "media/frames/ma-4-verifier-agent/t0420-verified-report-7of7.png", "why_for_weak_student": "The 'after': a green 'VERIFY_IMAGE ✓ verified · PERFECT' bar with 7/7 atomic claims and 'What feedback did you give? none.' The complete before/after of the readability contract, closed with no human keystroke. The numbered 7-block list (right) shows what 'passing' looks like.", "diagram_instead": false },
+    { "t_seconds": 478, "label": "clean-arch-diagram", "file": "media/frames/ma-4-verifier-agent/t0478-clean-arch-diagram.jpg", "why_for_weak_student": "The hero architecture picture and the single best mental model for the whole lesson: BUILDER ←unix socket · JSONL→ VERIFIER (input locked), session.jsonl feeding the verifier, an 'only bash: uv run verify_sqlite.py' box, and a 'defense in depth — read-only persona + bash policy + sqlite ro' footer. Crystal clear, ≤ the readability rule it teaches.", "diagram_instead": false },
+    { "t_seconds": 835, "label": "customized-system-prompt", "file": "media/frames/ma-4-verifier-agent/t0835-customized-system-prompt.png", "why_for_weak_student": "'Owning the harness' made concrete: verify_image.md open in VS Code showing the verification heuristics, the tool policy, and 'There is no bash_policy script-only enforcement on this persona,' with the .pi/verifier/agents tree (verifier / verify_image / verify_python / verify_sqlite). Shows that the rules live in an editable persona file.", "diagram_instead": false },
+    { "t_seconds": 1052, "label": "just-recipes-vsql-boot", "file": "media/frames/ma-4-verifier-agent/t1052-just-recipes-vsql-boot.png", "why_for_weak_student": "The operator surface: `just` listing every recipe — v/verifier (generic), sqlite, image, python, plus vimg/vpy/vsql aliases and clean/prime. Shows exactly which command boots which specialized verifier, so a student can map 'pick your verifier' to a real keystroke.", "diagram_instead": false },
+    { "t_seconds": 1180, "label": "sqlite-verify-16-claims", "file": "media/frames/ma-4-verifier-agent/t1180-sqlite-verify-16-claims.png", "why_for_weak_student": "The second worked example, entire, in one frame: two agents (builder claude-opus-4-7 at 1% vs verifier z-ai/glm-5.1 at 9% — the token disparity you pay for), the verifier's PRAGMA/SELECT/integrity-check proofs, 16/16 atomic_claims verified, and a green 'VERIFY_SQLITE ✓ verified · PERFECT' bar. Different domain, same mechanic — reinforces atomic claims + spend-tokens-to-save-time.", "diagram_instead": false },
+    { "t_seconds": 1200, "label": "bash-policy-lockdown", "file": "media/frames/ma-4-verifier-agent/t1200-bash-policy-lockdown.png", "why_for_weak_student": "The security layer in the raw frontmatter: verify_sqlite.md showing tools (read/grep/find/ls/bash/verifier_prompt), model (z-ai/glm-5.1 in the video), and bash_policy { mode: script-only, allowed_script: verify_sqlite.py, runner: uv run --script }. Shows precisely how 'restricted to one script' is declared — and reveals the video's model choice vs the on-disk default.", "diagram_instead": false }
+  ],
+  "lab": {
+    "codebase": "agentic-horizon-extras/the-verifier-agent-system (the course codebase only — not PiCanvas)",
+    "setup": [
+      "Open the repo in your agentic coding tool and run /install (or the Manual install steps): verify node≥20, pi, tmux, uv, python3≥3.11, sqlite3, just are on PATH.",
+      "cd apps/verifier && npm install && npx tsc --noEmit (must exit 0) && cd ../..",
+      "chmod +x .pi/verifier/scripts/verify_sqlite.py .pi/verifier/scripts/verify_python.py",
+      "Drop a provider key into a project-local .env (OPENAI_API_KEY for the default gpt-5.5 verifier AND for the gpt-image-2 skill). Confirm presence without printing the value.",
+      "Read README.md's 'three read-only layers' section and .pi/verifier/agents/verify_sqlite.md; say out loud what the verifier may and may NOT do before you run it."
+    ],
+    "reproduce_dan": [
+      "SQLite loop: create a fixture DB (e.g. tmp/mock_shop.db) with a DELIBERATE flaw — a table missing its PRIMARY KEY, or an FK that references a mistyped table name. Run `just vsql`. Prompt the builder to 'create/inspect the schema and confirm the foreign keys are valid.'",
+      "Watch the verifier auto-start on the builder's stop event (hands off the keyboard). Confirm it decomposes into atomic claims and runs the allowed script (PRAGMA foreign_key_list, PRAGMA integrity_check, .schema).",
+      "Confirm the verifier FAILS the flawed claim, calls verifier_prompt with a concrete fix, and that the builder receives it as a follow-up and repairs the schema — without you typing anything.",
+      "Confirm the next cycle returns STATUS: verified / CONFIDENCE: PERFECT with a green bar and the atomic_claims_failed count back to 0.",
+      "Image loop (optional, needs OPENAI_API_KEY): run `just vimg`, prompt the builder to generate a diagram deliberately dense with labels (> 10 text blocks). Confirm the verifier flags the MAX_TEXT_ELEMENTS=10 readability violation, prompts a fix, and the rebuilt image passes."
+    ],
+    "stretch": [
+      "Author a NEW domain verifier by cloning the two-file pattern: copy verify_sqlite.py → verify_<domain>.py (keep the emit()/reject() JSON contract + argparse) and verify_sqlite.md → verify_<domain>.md (keep the 6-section body, the Report block, and a bash_policy pointing at your script). Boot it with `--verifier-agent verify_<domain>`.",
+      "Prove the bash lockdown: inside a running SQLite verifier, get the model to attempt a mutating or off-policy bash command (e.g. an INSERT, or `cat /etc/passwd`). Confirm it is blocked at the tool-call layer with the structured teaching message, and that even a raw INSERT reaching the script is refused by mode=ro&immutable=1.",
+      "Feed the flywheel: find something the verifier reports under 'What could you not verify? / What do you need from me?', then TEMPLATE that check into the persona or script so the same gap is covered on the next run. Re-run and confirm the gap closes.",
+      "Swap the verifier model (frontmatter `model:`) between two providers (e.g. openai/gpt-5.5 and z-ai/glm-5.1) and observe that the pattern is model-agnostic — the 'AND, not OR' point in practice.",
+      "Try to break the input lock: attempt to type into the verifier window and confirm the CustomEditor swallows it AND pi.on('input') rejects non-extension input (defense-in-depth). Explain why this forces templated engineering."
+    ],
+    "pass_criteria": [
+      "The verifier spawned automatically in its own window and ran on the builder's stop event with NO prompt from you.",
+      "You never typed a single instruction into the verifier — all corrections came from verifier_prompt, all your changes went into the persona / script / prompt template.",
+      "A real, deliberately-introduced defect was caught, the verifier sent a concrete corrective prompt, and the builder auto-corrected within max_loops (verify by watching the atomic_claims_failed count go to 0).",
+      "You produced a Report with STATUS + CONFIDENCE + all five sections, including at least one honest 'what could you not verify / what do you need from me' entry that you then templated.",
+      "You can state, without notes: the two constraints and which one the verifier attacks; the three independent read-only layers; and why it's AND (builder + verifier model), not OR."
+    ]
+  },
+  "estimated_print_pages_when_expanded": 44,
+  "confidence_notes": [
+    "Transcript is auto-generated; ASR errors were corrected against the codebase and on-screen frames. Known ASR substitutions in this lesson: 'JLM 5.1' / 'JLM' = GLM 5.1; 'pie coding' / 'py coding' = Pi coding agent; 'Andy Dev Dan' = IndyDevDan; 'GBT image' = GPT Image; 'agenda coding' / 'agent decoding' / 'AGC' = agentic coding; 'verifiable' is sometimes Dan's word for the builder ('the verifiable, also known as the builder'); 'Kimmy Cat 2.6' = Kimi K2.6; 'Quinn' = Qwen. Quote timestamps accurate to within ~3 seconds.",
+    "Frames extracted at native 3840x2160 from the source mp4 with ffmpeg -q:v 2 (photographic/UI) or lossless PNG (text-heavy slides). All 12 files on disk were visually verified this session; each label was checked against the on-screen content. Frames t0080 ('something WEIRD here'), t0196 ('UNPROMPTED'), t0178 ('GPT IMAGE 2.0') carry Dan's produced overlay graphics — kept because the overlay reinforces the exact concept.",
+    "MODEL DISCREPANCY (documented): frame t1200 shows verify_sqlite.md with `model: z-ai/glm-5.1`, matching the transcript's GLM-5.1 SQLite verifier; the file on disk today declares `model: openai/gpt-5.5` (as do all four personas). The video's image verifier ran GPT-5.5. The model is a single frontmatter line; treat specific names as period detail. Builder is Opus 4.7 throughout the video.",
+    "DOC-vs-DISK DISCREPANCY (documented): README's 'Known limitations (v1)' says only SQLite ships and verifier.md is a non-functional stub; on disk all four personas (generic/sqlite/image/python) are full and functional and two scripts (sqlite/python) ship. The code default persona (verifiable.ts) is the GENERIC `verifier`, though README prose says verify_sqlite. install.md line 19 ('DEFAULT_MODEL: anthropic/claude-sonnet-4-6') is stale and contradicted by its own Step 6 (openai/gpt-5.5). Files are the source of truth in all three cases.",
+    "codebase_map covers the real files under the-verifier-agent-system that were read this session (README, justfile, both settings.json, all 4 personas, both scripts, both prompts, the 5 core TS files + verifiable-footer + cross-agent, the gpt-image-2 SKILL, prime.md + install.md). ai_docs/pi/* (the Pi harness reference docs) were enumerated but not each read; they are vendor docs, not verifier source. arch.jpg/arch copy.jpg, the tmp/*.db fixtures, the socket, the breadcrumb, and the session JSONL are runtime artifacts documented under generated_not_committed.",
+    "YouTube overlay IDs (RairMJflUSA 'Multi-Agent Teams', V5A1IU8VVp4 'Stripe Blueprint Agents') are taken verbatim from this lesson's own description/resources and are the strictest possible mapping (Dan names both in-lesson). Verify the IDs resolve before publishing overlay links. The teased agentic-security/bash video had no ID at capture time.",
+    "The '2–5× tokens' figure comes from README; the video shows concrete instances: image example ~4% Opus vs ~23% GPT-5.5 (~5×), SQLite example ~1% Opus vs ~2× the builder for GLM-5.1. The '≤10 text blocks' readability rule is literal (MAX_TEXT_ELEMENTS: 10 in verify_image.md); on-screen instances show a rejected >10-block draft and accepted 7-block and 9-block rebuilds across the two rounds.",
+    "This lesson is a public YouTube video (not a gated course lesson), so the codebase, quotes, and frames are all first-party. The free GitHub repo is the basic build; the local the-verifier-agent-system is the fuller (members-style) build with image/python/generic verifiers + the gpt-image-2 skill."
+  ]
+}

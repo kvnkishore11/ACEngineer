@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first companion to TAC-4: AFK Agents. Learn PITER, AI Developer Workflows, programmable micro-agents, observability, and system-level improvement.">
+  <title>TAC-4 · AFK Agents — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="04-afk-agents.assets.css">
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL I · TAC · CHAPTER 04</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume I · Chapter 4</p>
+      <h2>AFK Agents</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation</span></a></li>
+          <li><a href="#two-loops"><span class="chapter-nav__n">01</span><span>Two loops</span></a></li>
+          <li><a href="#own-pipeline"><span class="chapter-nav__n">02</span><span>Own the pipeline</span></a></li>
+          <li><a href="#piter"><span class="chapter-nav__n">03</span><span>PITER</span></a></li>
+          <li><a href="#adw"><span class="chapter-nav__n">04</span><span>The ADW</span></a></li>
+          <li><a href="#agentic-layer"><span class="chapter-nav__n">05</span><span>Agentic layer</span></a></li>
+          <li><a href="#micro-agents"><span class="chapter-nav__n">06</span><span>Micro-agents</span></a></li>
+          <li><a href="#programmable"><span class="chapter-nav__n">07</span><span>Programmable mode</span></a></li>
+          <li><a href="#contracts"><span class="chapter-nav__n">08</span><span>Contracts</span></a></li>
+          <li><a href="#observability"><span class="chapter-nav__n">09</span><span>Observe &amp; improve</span></a></li>
+          <li><a href="#adoption"><span class="chapter-nav__n">10</span><span>Adoption path</span></a></li>
+          <li><a href="#current-practice"><span class="chapter-nav__n">11</span><span>Current practice</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">12</span><span>Graded lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">13</span><span>Mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">14</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--afk">
+        <span class="hero__chapter">Tactic #4 · Stay Out The Loop</span>
+        <h1>AFK Agents</h1>
+        <p class="hero__dek">Stop being the courier between prompts. Assemble prompt input, trigger, environment, and review around reusable workflows so chores, bugs, and features can become pull requests while you are away.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 46:25</li>
+          <li>Lab · 90–150 min</li>
+          <li>Course repo · tac/tac-4</li>
+          <li>Level · operator → system builder</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to map any AFK system with PITER, trace a real ADW from issue to pull request, explain how deterministic code safely chains non-deterministic agents, diagnose a run from its artifacts, and improve the system that produced a bad result.</p>
+        <figure class="frame-card generated-plate generated-plate--hero">
+          <img src="../media/generated/plate-afk-agents.png" alt="AFK Agents concept plate showing a person walking away while a system moves through plan, tool, memory, action, and result" width="1536" height="1024" fetchpriority="high">
+          <figcaption>The central shift: the engineer supplies the request and reviews the result; the workflow carries the transitions in between.</figcaption>
+        </figure>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation</a></li><li><a href="#two-loops">Two loops</a></li><li><a href="#own-pipeline">Own the pipeline</a></li><li><a href="#piter">PITER</a></li><li><a href="#adw">The ADW</a></li><li><a href="#agentic-layer">Agentic layer</a></li><li><a href="#micro-agents">Micro-agents</a></li><li><a href="#programmable">Programmable mode</a></li><li><a href="#contracts">Contracts</a></li><li><a href="#observability">Observe and improve</a></li><li><a href="#adoption">Adoption path</a></li><li><a href="#current-practice">Current practice</a></li><li><a href="#lab">Graded lab</a></li><li><a href="#mastery">Mastery</a></li><li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">The remaining bottleneck is your presence</h2>
+        <p class="section-lead">TAC-1 asked you to stop hand-typing application code. TAC-3 taught you to turn repeatable judgment into templates. TAC-4 composes those gains: if the template is reusable and the agent can be called from code, why must you sit at the keyboard and carry every prompt into the next prompt?</p>
+
+        <p>An in-loop agent can already feel miraculous. You state a task, watch it read files, answer a question, intervene, redirect, approve a command, and ask for a final repair. But notice the hidden job: you are still the scheduler, router, state carrier, and status page. Your attention is the process manager. The system may type and reason, yet it waits for your presence at every transition.</p>
+        <p>This chapter changes the unit of delegation. A GitHub issue becomes the prompt input. A webhook, cron process, or manual command becomes the trigger. A dedicated checkout becomes the environment. A pull request and issue feed become the review surface. Between them, an AI Developer Workflow fetches, classifies, branches, plans, commits, implements, commits again, and opens the pull request. You are not removed from engineering. You move to the two places where your judgment is most valuable: defining the work and reviewing the evidence.</p>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The chapter’s one-sentence thesis</p>
+          <p>Most engineering work does not require continuous human presence, so wrap reusable templates in PITER and let an ADW turn a high-level issue into a reviewable pull request while you stay out of the execution loop.</p>
+        </aside>
+
+        <h3>What you are training</h3>
+        <ul class="learning-objectives">
+          <li><strong>Routing</strong>Decide which work belongs in-loop and which work can safely run out-loop.</li>
+          <li><strong>Decomposition</strong>Map prompt input, trigger, environment, and review without becoming attached to Dan’s exact tools.</li>
+          <li><strong>Tracing</strong>Follow one ADW ID through comments, branch, per-agent artifacts, commits, and pull request.</li>
+          <li><strong>Improvement</strong>Turn a bad artifact into a durable template or workflow change instead of a one-off patch.</li>
+        </ul>
+
+        <h3>The course system you will study</h3>
+        <p>The source of truth is the course repository at <code>tac/tac-4</code>. The central file is <code>adws/adw_plan_build.py</code>, a 536-line uv script. It surrounds an untouched application with an agentic layer: nine ADW files, thirteen command templates, five hook events, scripts, specifications, logs, and run artifacts. The video demonstrates two real runs. Issue #31 becomes PR #32, a documentation chore completed in roughly five minutes. Issue #33 becomes PR #34, a JSONL-upload feature completed in roughly seventeen minutes. Those durations are observations from this codebase, not promises.</p>
+        <p>The demo is intentionally imperfect. The documentation pull request expands ADW incorrectly as “Agentic Developer Workflow” and describes plausible files that do not exist. The shipped <code>adws/README.md</code> contains more agent-flavored inaccuracies. The feature run begins with a wrong-path <code>Failed to spawn</code>. These are not blemishes to hide. They teach the two disciplines an AFK system needs most: visible evidence and system-level repair.</p>
+
+        <div class="callout callout--warning">
+          <p class="callout__label">Safety boundary</p>
+          <p>The course’s template runner uses <code>--dangerously-skip-permissions</code>. Its safety argument depends on the environment being a checkout you can afford to lose, without production credentials. The flag is not made safe by model intelligence. The environment is the permission boundary.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="two-loops">
+        <span class="section-number">01</span>
+        <h2 class="section-title">Route work between two loops</h2>
+        <p class="section-lead">AFK does not mean “autonomy everywhere.” It means that a growing class of engineering work can move from prompt to review without consuming your continuous presence.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The agent works; you still cannot leave</h3>
+          <p>You give an agent a chore. It asks where the file lives. You answer. It drafts a plan. You say continue. It edits. You remind it to run tests. It finds a failure and asks what to do. You point at the obvious fix. It commits only after you request a commit. At the end, the agent has performed most keystrokes, but your attention has been fragmented for thirty minutes. The workflow is intelligent and still tethered.</p>
+          <p>Presence is a real cost even when each intervention is brief. A three-second approval prevents you from trusting the next thirty minutes to the system. The result is a peculiar form of automation: faster execution wrapped in constant supervision.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the routing rule</p>
+          <h3>Keep both loops; assign them different work</h3>
+          <div class="loop-router" aria-label="In-loop and out-loop work compared">
+            <article><h4>In-loop</h4><p>You are at the device, exploring and steering. Keep experimentation, unfamiliar territory, and very hard specific problems here.</p><p><code>human ↔ agent ↔ tools</code></p></article>
+            <article><h4>Out-loop</h4><p>You provide the request, leave the execution loop, then review a concrete result. Route increasingly repeatable chores, bugs, and features here.</p><p><code>prompt → workflow → pull request</code></p></article>
+          </div>
+          
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — one feature without the courier</p>
+          <h3>Issue #33 carries the request; PR #34 carries the evidence</h3><figure class="frame-card">
+            <img src="../media/frames/tac-4-afk-agents/t0240-agentic-coding-kpis.jpg" alt="Agentic Coding KPIs slide showing size and streak should increase while attempts and presence should decrease" loading="lazy">
+            <figcaption><span class="frame-card__t">4:00</span>The tactic’s scoreboard: presence down, size up, streak up, attempts down. AFK is valuable because one architectural move can influence all four.</figcaption>
+          </figure>
+          <p>Dan creates a feature issue asking for JSONL upload support. It includes constraints: scan the entire file for possible fields, use only the standard library, create one table per file, flatten nested values with <code>__</code>, use <code>_0</code> for list indexes, store the delimiter in a constants file, update the interface, and add fixtures. Then the ADW runs. Dan does not translate the issue into a plan or relay the plan into an implementer. The system does.</p>
+          <p>Roughly seventeen minutes later the pull request exists. The committed plan is about 170 lines. The app accepts a JSONL fixture and produces columns such as <code>profile__location</code> and <code>profile__skills_0</code>. The significant fact is not that a model wrote a parser. It is that no engineer needed to carry the feature between the issue, planner, implementer, commits, and review surface.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>In-loop and Outloop agentic coding</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s term</p><p><strong>Outloop agentic coding</strong> is off-device agentic coding: the prompt goes in, the system works while you are away from the keyboard, and a reviewable result comes back.</p></aside>
+          <p>“Out-loop” describes the position of the human during execution, not the absence of human judgment. The engineer still defines constraints, owns the pipeline, and reviews the result. Staying out of the execution loop is compatible with a strong review gate.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — make a routing decision</p>
+          <h3>Classify by uncertainty and repeatability</h3>
+          <p>A documentation chore in a known directory is a strong first out-loop candidate: the desired artifact is legible, the repository supplies evidence, and a pull request makes mistakes reversible. An architectural experiment in a new domain stays in-loop because the goal is discovery. A JSONL feature can move out-loop after its constraints and verification path are explicit. A subtle production incident remains in-loop because the blast radius and unknowns dominate.</p>
+          <p>The rule is not “small equals out-loop.” It is “clear problem class, bounded environment, inspectable evidence, and tolerable failure cost.” Issue #33 is larger than issue #31, but its constraints and tests make it routable.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — five-minute routing drill</p>
+          <h3>Build a two-column work queue</h3>
+          <ol><li>List six engineering tasks from the last week.</li><li>Mark each as repeatable or exploratory.</li><li>For repeatable tasks, name the evidence a reviewer would need.</li><li>Place only tasks with a clear request, bounded environment, and visible review surface in the out-loop column.</li><li>Circle the smallest chore. That is your first candidate, not the most impressive feature.</li></ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: autonomy as an identity test</h3>
+          <p><strong>Everything out-loop:</strong> one genuinely hard problem produces a poor pull request, and the team concludes the system cannot be trusted. <strong>Nothing out-loop:</strong> the team waits for perfect autonomy and never collects the runs needed to improve templates.</p>
+          <p><strong>Fix:</strong> use the trust ladder. Start with chores, record evidence, upgrade the system after failures, then move to bugs and constrained features. Keep exploration in-loop without apologizing for it.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The routing principle survives newer tools</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Hosted coding agents and background-task surfaces make out-loop execution easier to launch. They do not eliminate the routing decision. The durable question remains: which class of work has sufficient context, isolation, and evidence to leave unattended?</p><p class="current-practice__source">Course-era tool details may move; the in-loop/out-loop distinction does not.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <h3>Close the section before revealing</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Define out-loop agentic coding in one phrase.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Off-device agentic coding: request in, you leave the execution loop, reviewable result back.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which three kinds of work does Dan keep in-loop?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Experimentation, exploration of new territory, and very hard, very specific problems.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Explain the boundary without saying “full autonomy”</h3>
+          <div class="teach-back"><p>Teach a colleague why AFK moves presence down without removing review. Use issue #33 as evidence and name one task that should remain in-loop.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="own-pipeline">
+        <span class="section-number">02</span>
+        <h2 class="section-title">Own the pipeline, even when tools are rented</h2>
+        <p class="section-lead">Generic agents can be excellent. The system that encodes how your codebase plans, validates, commits, and reports is still too valuable to leave generic.</p>
+
+        <div class="move move--hook"><p class="move-label">1 · Hook</p><h3>The convenient agent that does not know your house rules</h3><p>A hosted agent can read the repository and produce a plausible change. But it cannot infer a rule that exists only in your team’s habits: standard library only, nested keys joined by <code>__</code>, list elements written with <code>_0</code>, delimiter stored centrally, fixtures in a particular test directory, a specific test command, and a pull-request body that links the plan and tracking ID. If those rules are not encoded, every reviewer becomes a translator.</p></div>
+
+        <div class="move move--picture"><p class="move-label">2 · Picture</p><h3>The asset is the path, not the host</h3><div class="workflow workflow--stacked"><div class="workflow__step"><strong>Your problem classes</strong><code>chore · bug · feature</code></div><div class="workflow__step"><strong>Your templates</strong><code>plan · implement · commit · PR</code></div><div class="workflow__step"><strong>Your deterministic workflow</strong><code>sequence · validate · report · stop</code></div><div class="workflow__step"><strong>Any capable execution surface</strong><code>local · dedicated device · hosted agent</code></div></div></div>
+
+        <div class="move move--story"><p class="move-label">3 · Story</p><h3>The JSONL prompt is codebase-specific by construction</h3><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t1355-feature-issue-jsonl-prompt.png" alt="GitHub issue form for Jsonl Support containing detailed feature constraints" loading="lazy"><figcaption><span class="frame-card__t">22:35</span>Issue #33 contains the “what” and the constraints. The planner supplies the “how” using the codebase’s feature template.</figcaption></figure><p>The issue is neither a vague wish nor a hand-written implementation plan. It states desired behavior and non-negotiable constraints. The pipeline contributes the repository reading, plan format, implementation method, tests, commit contract, and PR structure. That division is why the same high-level prompt can produce work shaped for this codebase rather than a generic patch.</p></div>
+
+        <div class="move move--name"><p class="move-label">4 · Name it</p><h3>Own your agentic pipeline</h3><aside class="callout callout--term"><p class="callout__label">Dan’s argument</p><p>One size does not fit all as a product becomes differentiated. Your templates, workflows, standards, and review expectations are the pipeline; the execution tool can change underneath them.</p></aside><p>This is not a command to avoid cloud tools. It is a command to preserve control over the encoded work path. You can run your pipeline on a local CLI today and another surface later without surrendering the system design.</p></div>
+
+        <div class="move move--example"><p class="move-label">5 · Worked example</p><h3>Separate the issue’s job from the template’s job</h3><div class="comparison"><article class="comparison__card"><div class="comparison__head"><h3>Issue input</h3><p>What outcome and constraints matter?</p></div><div class="comparison__body"><p>Support JSONL; scan all fields; standard library only; flatten nested values; update UI; add fixtures.</p></div></article><article class="comparison__card comparison__card--agentic"><div class="comparison__head"><h3>Owned pipeline</h3><p>How does this repo deliver work?</p></div><div class="comparison__body"><p>Classify; create a branch; write a plan in <code>specs/</code>; commit; implement; test; commit; open a structured PR.</p></div></article></div><p>If a future agent host changes, the left and right responsibilities should still be legible. That is portability at the workflow level.</p></div>
+
+        <div class="move move--try"><p class="move-label">6 · You try</p><h3>Find three rules a generic agent would miss</h3><ol><li>Read <code>tac/tac-4/.claude/commands/feature.md</code>.</li><li>Write down three instructions that are not obvious from the issue alone.</li><li>For each, decide whether it belongs in a planning template, implementation template, or validation step.</li><li>Explain how the rule would survive a change of agent vendor.</li></ol></div>
+
+        <div class="move move--fail"><p class="move-label">7 · Common fail + fix</p><h3>Failure: confusing ownership with infrastructure</h3><p><strong>Symptom:</strong> you believe owning the pipeline means operating every server yourself, or you reject useful hosted agents on principle. <strong>Fix:</strong> own the specifications, contracts, artifacts, and evaluation path. Hosting is one PITER choice. Pipeline semantics are the durable asset.</p></div>
+
+        <div class="move move--current"><p class="move-label">8 · Current practice</p><h3>Native agents can execute your layer</h3><aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Vendor-native coding agents increasingly provide their own triggers, sandboxes, and pull-request surfaces. Treat them as implementations of PITER, not replacements for your templates and standards. The most portable organizations keep the codebase’s operating instructions in the repository.</p><p class="current-practice__source">Source: TAC-4 current-practice extract; re-check at publication.</p></aside></div>
+
+        <div class="move move--check"><p class="move-label">9 · Retrieval</p><h3>Test the argument</h3><section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why do generic coding agents have natural limits for a differentiated codebase?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They are designed for many codebases and do not automatically carry your templates, standards, problem classes, and review practices.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What can be rented without surrendering the pipeline?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The execution surface or hosting. You still own the workflow semantics, prompts, contracts, evidence, and review policy.</p></details></div></section></div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><h3>Defend the nuanced claim</h3><div class="teach-back"><p>Explain in two minutes why “own your pipeline” does not mean “never use a hosted agent.” Use one JSONL constraint and one repository template as evidence.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="piter">
+        <span class="section-number">03</span>
+        <h2 class="section-title">PITER: the four elements of an AFK system</h2>
+        <p class="section-lead">Tools are replaceable. The four roles are not. PITER is the map that lets you recognize the same architecture behind a GitHub webhook, a cron job, a phone-created issue, or a manual launch.</p>
+
+        <div class="move move--hook"><p class="move-label">1 · Hook</p><h3>Remove one element and AFK collapses</h3><p>No prompt input means the system has no work. No trigger means a human must start every run. No isolated environment means the agent competes with your active checkout and credentials. No review means output can exist without trust. A tool demo can look autonomous while quietly missing one of these roles.</p></div>
+
+        <div class="move move--picture"><p class="move-label">2 · Picture</p><h3>Memorize the roles before the products</h3><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t0521-piter-four-elements.jpg" alt="Four colored letter cards spelling P I T E R for Prompt input, Trigger, Environment, and Review" loading="lazy"><figcaption><span class="frame-card__t">8:41</span>PITER compresses the architecture into four roles: Prompt input, Trigger, Environment, Review.</figcaption></figure><div class="piter-map" aria-label="PITER mapped to course tools"><article data-letter="PI"><h4>Prompt input</h4><p>The request, outcome, and constraints.</p><code>GitHub issue</code></article><article data-letter="T"><h4>Trigger</h4><p>The event that starts the run.</p><code>webhook · cron · manual</code></article><article data-letter="E"><h4>Environment</h4><p>The bounded place with tools and credentials.</p><code>dedicated Mac mini / checkout</code></article><article data-letter="R"><h4>Review</h4><p>The evidence and decision surface.</p><code>issue feed · plan · PR</code></article></div></div>
+
+        <div class="move move--story"><p class="move-label">3 · Story</p><h3>Demo 1 instantiates all four</h3><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t0605-webhook-environment-ready.png" alt="Screen-shared Mac mini terminal running the ADW webhook trigger beside a GitHub issue form" loading="lazy"><figcaption><span class="frame-card__t">10:05</span>Trigger and environment made concrete: <code>trigger_webhook.py</code> listens on port 8001 in the dedicated Mac mini while GitHub supplies the request surface.</figcaption></figure><p>Prompt input is issue #31. The webhook fires when an issue opens or when an issue comment is exactly <code>adw</code>. To answer GitHub quickly, the webhook launches the workflow in a background process rather than holding the request open. The environment is Dan’s dedicated Mac mini, reached through a tunnel. Review is PR #32 plus the issue-comment live feed. Demo 2 later swaps the trigger to a manual command and the environment to the local device while leaving prompt input and review intact.</p></div>
+
+        <div class="move move--name"><p class="move-label">4 · Name it</p><h3>Prompt input · Trigger · Environment · Review</h3><aside class="callout callout--term"><p class="callout__label">PITER</p><p>The four elements can be implemented by different tools. Focus on the composable roles: the input arrives, an event starts the workflow, a bounded environment executes it, and evidence reaches a reviewer.</p></aside></div>
+
+        <div class="move move--example"><p class="move-label">5 · Worked example</p><h3>Prove the map by swapping only T and E</h3><table class="contract-table"><thead><tr><th>Element</th><th>Webhook demo</th><th>Manual demo</th><th>Changed?</th></tr></thead><tbody><tr><td>Prompt input</td><td>GitHub issue #31</td><td>GitHub issue #33</td><td>Same kind of surface</td></tr><tr><td>Trigger</td><td>GitHub webhook</td><td><code>uv run adws/adw_plan_build.py 33</code></td><td>Yes</td></tr><tr><td>Environment</td><td>Dedicated Mac mini</td><td>Local course checkout</td><td>Yes</td></tr><tr><td>Review</td><td>Issue feed + PR #32</td><td>Issue feed + PR #34</td><td>Same kind of surface</td></tr></tbody></table><p>If your architecture cannot survive this substitution, you probably encoded product names instead of system roles.</p></div>
+
+        <div class="move move--try"><p class="move-label">6 · You try</p><h3>Map your own stack in sixty seconds</h3><ol><li>Write P, T, E, R vertically.</li><li>Beside P, name your work tracker or request surface.</li><li>Beside T, name the event that could start a run.</li><li>Beside E, name a checkout or machine you can afford to lose.</li><li>Beside R, name the artifact a human can inspect before merging.</li></ol><p>If any line is blank, you found the missing system role—not a reason to buy Dan’s hardware.</p></div>
+
+        <div class="move move--fail"><p class="move-label">7 · Common fail + fix</p><h3>Failure: configuration cosplay</h3><p><strong>Symptom:</strong> the student copies a Mac mini, Cloudflare tunnel, and GitHub webhook without being able to explain why each exists. Or they stall because their team uses Jira. <strong>Fix:</strong> state the role first, then choose the cheapest tool that satisfies it. Also shut down listeners when the drill ends: every qualifying issue can start a token-consuming run.</p></div>
+
+        <div class="move move--current"><p class="move-label">8 · Current practice</p><h3>Today’s hosted systems are still PITER</h3><aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>GitHub-native and vendor-hosted coding agents often bundle the trigger, sandboxed environment, and pull-request review surface. PITER remains useful precisely because it lets you audit the bundle. Ask what event launches work, what the sandbox can reach, and what evidence appears before merge.</p><p class="current-practice__source">Source: TAC-4 current-practice extract; re-check at publication.</p></aside></div>
+
+        <div class="move move--check"><p class="move-label">9 · Retrieval</p><h3>Rebuild the acronym</h3><section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Expand PITER and give the course tool for each element.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Prompt input—GitHub issue; Trigger—webhook, cron, or manual command; Environment—dedicated Mac mini or bounded checkout; Review—issue feed, plan, and pull request.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which two elements change between Dan’s first and second demos?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Trigger and environment.</p></details></div></section></div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><h3>Teach roles without brand names</h3><div class="teach-back"><p>Explain PITER to someone using no product names. Then map it once to the course and once to your own stack.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="adw">
+        <span class="section-number">04</span>
+        <h2 class="section-title">The ADW is the unit of autonomous delivery</h2>
+        <p class="section-lead">PITER explains the perimeter. The AI Developer Workflow is the machinery inside it: deterministic code sequencing reusable templates and fresh agents until one issue becomes a pull request.</p>
+
+        <div class="move move--hook"><p class="move-label">1 · Hook</p><h3>A mega-prompt cannot carry operational responsibility</h3><p>You could paste the entire request into one enormous prompt: classify this issue, create a branch, plan the change, implement it, test it, commit everything, and open a pull request. The model might succeed once. But when it fails halfway, which phase failed? Which prompt should improve? Which expensive reasoning step deserved a stronger model? Where should deterministic code stop the run? A single conversation hides the workflow inside one stochastic event.</p></div>
+
+        <div class="move move--picture"><p class="move-label">2 · Picture</p><h3>Five stable stages, several replaceable agents</h3><div class="workflow adw-flow" aria-label="Five stages of the ADW"><div class="workflow__step"><strong>1 · Fetch</strong><code>GitHub issue</code></div><div class="workflow__step"><strong>2 · Branch</strong><code>class + id + slug</code></div><div class="workflow__step"><strong>3 · Plan</strong><code>specs/*.md + commit</code></div><div class="workflow__step"><strong>4 · Build</strong><code>implement + test + commit</code></div><div class="workflow__step"><strong>5 · Review</strong><code>structured PR</code></div></div></div>
+
+        <div class="move move--story"><p class="move-label">3 · Story</p><h3>One issue number enters a 536-line workflow</h3><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t1630-adw-plan-build-workflow.png" alt="Top of adw_plan_build.py showing the five-step workflow in its docstring" loading="lazy"><figcaption><span class="frame-card__t">27:10</span>The source code itself is the clearest anatomy slide. Note that its branch example has drifted from the actual branch-name template—documentation is reviewable output too.</figcaption></figure><p><code>adws/adw_plan_build.py</code> accepts an issue number and optionally an existing ADW ID. It creates a logger, posts a start message, fetches issue details, asks a classifier which planning template applies, asks another agent to create a branch, runs the planner, finds the created plan, commits it, runs the implementer with the plan path, commits the implementation, and creates the pull request. After each meaningful step, deterministic code checks the response and reports progress to the issue.</p><p>The script is a uv single-file program. Dan’s point is not Python. It could be shell, Bun, or another host language. The point is that ordinary code now contains calls to non-deterministic judgment as normal workflow steps.</p></div>
+
+        <div class="move move--name"><p class="move-label">4 · Name it</p><h3>AI Developer Workflow</h3><aside class="callout callout--term"><p class="callout__label">ADW</p><p>A reusable agentic workflow that combines code, agentic prompts, and agents to deliver results autonomously.</p></aside><p>The name preserves the hybrid nature of the unit. Deterministic code handles ordering, validation, error exits, logging, and status. Prompts define the job interface. Agents perform the steps that require interpretation and judgment. The composition is stronger than either part alone.</p></div>
+
+        <div class="move move--example"><p class="move-label">5 · Worked example</p><h3>Trace issue #31 through the five stages</h3><ol><li><strong>Fetch:</strong> title <em>ADW Documentation</em> and the two-line chore body become structured issue data.</li><li><strong>Branch:</strong> the classifier chooses <code>/chore</code>; the branch becomes <code>chore-31-5615f7c8-document-adw-directory</code>.</li><li><strong>Plan:</strong> the chore template writes <code>specs/adw-documentation-plan.md</code>; a committer creates the planner commit.</li><li><strong>Build:</strong> the implementer receives the plan path, edits documentation, and a second committer preserves the result.</li><li><strong>Review:</strong> PR #32 links the plan, lists changes, carries ADW ID <code>5615f7c8</code>, and closes issue #31.</li></ol><p>The workflow finished in roughly five minutes in the recording. The bad claims in its PR do not negate the architecture; they identify which templates and review checks need improvement.</p></div>
+
+        <div class="move move--try"><p class="move-label">6 · You try</p><h3>Read the orchestrator before reading the agents</h3><ol><li>Open <code>tac/tac-4/adws/adw_plan_build.py</code>.</li><li>Find the top-level <code>main</code> flow.</li><li>Write the five stages from memory beside the corresponding function calls.</li><li>Mark each call D for deterministic code or A for an agent invocation.</li><li>Circle every point that can terminate the run.</li></ol><p>You pass when the script reads like a workflow rather than a wall of Python.</p></div>
+
+        <div class="move move--fail"><p class="move-label">7 · Common fail + fix</p><h3>Failure: too monolithic or too meta</h3><p><strong>Too monolithic:</strong> one giant prompt erases contracts and observability. <strong>Too meta:</strong> the team builds an orchestration framework before proving one workflow. <strong>Fix:</strong> keep one legible script with explicit steps. Extract a framework only after several real ADWs reveal the same repeated shape.</p></div>
+
+        <div class="move move--current"><p class="move-label">8 · Current practice</p><h3>The ADW concept outlives the wrapper</h3><aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>The course uses Claude Code programmable mode as the agent wrapper. Newer headless and SDK surfaces can provide structured events, sessions, and programmatic controls directly. Treat <code>agent.py</code> as a period implementation. Preserve the ADW’s step boundaries, contracts, artifacts, and reporting when the wrapper changes.</p><p class="current-practice__source">Source: TAC-4 current-practice extract; re-check at publication.</p></aside></div>
+
+        <div class="move move--check"><p class="move-label">9 · Retrieval</p><h3>Recite the unit and sequence</h3><section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Define an ADW.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A reusable agentic workflow combining code, agentic prompts, and agents to deliver results autonomously.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What are the five stages of <code>adw_plan_build.py</code>?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Fetch issue, create branch, plan and commit, implement and commit, create pull request.</p></details></div></section></div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><h3>Explain why this is not “a script that calls an API”</h3><div class="teach-back"><p>Use the five stages to explain where deterministic code, prompts, and agents each contribute. Name one failure a mega-prompt would hide.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="agentic-layer">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Wrap the app in an agentic layer</h2>
+        <p class="section-lead">The out-loop machinery belongs around the application, not inside it. That separation keeps the delivery system improvable and the product unaware of its operator.</p>
+
+        <div class="move move--hook"><p class="move-label">1 · Hook</p><h3>The product that depends on its own coding agent</h3><p>Imagine application code importing the workflow that edits it, or an ADW calling internal application functions directly because they are convenient. Now the agentic system and the product share runtime assumptions. You cannot ship the app without orchestration baggage, and you cannot move the workflow to another repository without untangling product dependencies. The operator has leaked into the operated system.</p></div>
+
+        <div class="move move--picture"><p class="move-label">2 · Picture</p><h3>Surface outside, workflow around, app at the center</h3><figure class="diagram"><div class="diagram__canvas layer-map"><div class="layer-map__surface">GitHub issues · comments · pull requests<div class="layer-map__agentic"><span><code>.claude/commands/</code> + <code>adws/</code><small>templates, sequencing, agents, telemetry</small></span><div class="layer-map__app">app/<small>product remains unaware</small></div></div></div></div><figcaption>The agentic layer operates on the repository through tools. The application does not import or depend on it.</figcaption></figure></div>
+
+        <div class="move move--story"><p class="move-label">3 · Story</p><h3>The repository tree shows the boundary</h3><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t1460-health-check-healthy.png" alt="VS Code showing the TAC-4 repository tree and a healthy ADW system health check" loading="lazy"><figcaption><span class="frame-card__t">24:20</span>The left rail makes the layer visible: <code>adws/</code>, <code>.claude/</code>, <code>specs/</code>, <code>ai_docs/</code>, <code>scripts/</code>, and logs surround <code>app/</code>.</figcaption></figure><p>Dan calls out that <code>app/</code> is untouched by the infrastructure around it. The two essential directories are <code>.claude/commands/</code>, where reusable prompt templates live, and <code>adws/</code>, where compositional workflows live. Supporting directories supply concrete assets: <code>specs/</code> holds plan artifacts, <code>ai_docs/</code> holds documentation agents can read, <code>scripts/</code> supplies operational commands, and runtime directories hold run evidence.</p></div>
+
+        <div class="move move--name"><p class="move-label">4 · Name it</p><h3>The agentic layer</h3><aside class="callout callout--term"><p class="callout__label">Dan’s term</p><p>The agentic layer is the collection of prompts and compositional workflows wrapped around a codebase so agents can operate it without the app depending on the operator.</p></aside></div>
+
+        <div class="move move--example"><p class="move-label">5 · Worked example</p><h3>Assign each directory one responsibility</h3><div class="file-map"><div class="file-map__item"><code>.claude/commands/</code><p>Thirteen reusable prompt interfaces: classify, branch, plan by issue class, find plan, implement, commit, pull request, install, and related operations.</p></div><div class="file-map__item"><code>adws/</code><p>Nine committed workflow files for the plan/build pipeline, agent wrapper, GitHub operations, triggers, health checks, types, and utilities.</p></div><div class="file-map__item"><code>specs/</code><p>Committed plans. A plan becomes both the implementer’s prompt and an improvable record of planner behavior.</p></div><div class="file-map__item"><code>ai_docs/</code><p>Pinned reference material for tools and providers so the agent can consult repository-local documentation.</p></div><div class="file-map__item"><code>scripts/</code><p>Start, stop, reset, tunnel, comment cleanup, and PR cleanup operations used in demos and labs.</p></div><div class="file-map__item"><code>app/</code><p>The product. It can be built and shipped without knowing the agentic layer exists.</p></div></div></div>
+
+        <div class="move move--try"><p class="move-label">6 · You try</p><h3>Draw import arrows, then remove the wrong ones</h3><ol><li>Sketch the six directories above.</li><li>Draw arrows for runtime dependencies you find in the course repo.</li><li>Confirm that app code does not import ADW code.</li><li>Write one sentence explaining why the workflow may inspect and edit <code>app/</code> while <code>app/</code> must not depend on the workflow.</li></ol></div>
+
+        <div class="move move--fail"><p class="move-label">7 · Common fail + fix</p><h3>Failure: conflating the wrapper with the product</h3><p><strong>Symptom:</strong> ADW utilities become an application library, or the app gains endpoints solely to satisfy the coding agent. <strong>Fix:</strong> let the layer act through the same repository and operational surfaces a human engineer uses: files, tests, Git, and review. Keep product behavior independently deployable.</p></div>
+
+        <div class="move move--current"><p class="move-label">8 · Current practice</p><h3>Repository-native instructions make the layer portable</h3><aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Skills and repository-native agent instructions can package reusable behavior more directly than course-era slash commands. The architectural rule stays the same: operational knowledge belongs in the agentic layer, close enough to version with the codebase but separate from application runtime dependencies.</p><p class="current-practice__source">Source: TAC-4 current-practice extract; re-check at publication.</p></aside></div>
+
+        <div class="move move--check"><p class="move-label">9 · Retrieval</p><h3>Name the boundary</h3><section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which two directories form the essential agentic layer in this lesson?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>.claude/commands/</code> for prompt templates and <code>adws/</code> for workflows.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the rule about <code>app/</code>?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The layer may operate on the app, but the app remains untouched by and independent from the agentic layer.</p></details></div></section></div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><h3>Explain “around, not inside”</h3><div class="teach-back"><p>Point at three directories in the course tree and explain how each supports out-loop work without becoming product runtime code.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="micro-agents">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Use micro-agents to isolate context, model, and prompt</h2>
+        <p class="section-lead">The workflow does not ask one agent to remember everything. It gives each step a fresh context window, one template, one job, and an appropriate model.</p>
+
+        <div class="move move--hook"><p class="move-label">1 · Hook</p><h3>The long-running agent that forgets which problem it is solving</h3><p>A single agent classifies the issue, debates a branch name, explores implementation options, writes a plan, edits code, hits test failures, revises its approach, composes a commit message, and drafts a pull request. Every earlier thought remains in context. The implementation inherits planning chatter. A failure can come from any phase. The strongest model spends tokens naming branches while the most difficult build arrives with a crowded window.</p></div>
+
+        <div class="move move--picture"><p class="move-label">2 · Picture</p><h3>One run, nine visible workspaces</h3></div>
+
+        <div class="move move--story"><p class="move-label">3 · Story</p><h3>The plan frees the implementer’s context</h3><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t2020-agents-observability-dir.png" alt="VS Code explorer showing nine per-agent folders for ADW run cb881e79" loading="lazy"><figcaption><span class="frame-card__t">33:40</span>The <code>agents/cb881e79/</code> tree makes decomposition inspectable: classifier, branch generator, planner, plan finder, two committers, implementer, PR creator, and workflow log.</figcaption></figure><p>The classifier receives issue data and returns one of three commands. The branch generator receives only what it needs to create a compliant branch. The planner receives the issue and the selected class template. The plan finder locates the new specification. A committer creates a message and commit. Only then does the implementer begin, with a fresh context window and the committed plan as its prompt. It does not need the planner’s internal conversation. It needs the concrete asset the planner produced.</p><p>That boundary is the key. An artifact crosses the step boundary; hidden reasoning does not. The system can inspect, diff, commit, and improve the artifact.</p></div>
+
+        <div class="move move--name"><p class="move-label">4 · Name it</p><h3>Isolate the Big Three</h3><aside class="callout callout--term"><p class="callout__label">Micro-agent rule</p><p>Separate agents so each step can isolate context, model, and prompt to solve one problem and solve it well.</p></aside><p>The run uses eight agent invocations for the feature path: issue classifier, branch generator, planner, plan finder, planner committer, implementer, implementer committer, and PR creator. The ninth directory in the frame holds the parent workflow’s own logging.</p></div>
+
+        <div class="move move--example"><p class="move-label">5 · Worked example</p><h3>Match model cost to step difficulty</h3><table class="contract-table"><thead><tr><th>Step</th><th>Job</th><th>Context</th><th>Course policy</th></tr></thead><tbody><tr><td>Classifier</td><td>Choose <code>/chore</code>, <code>/bug</code>, or <code>/feature</code></td><td>Issue JSON + classification template</td><td>Fast/cheap is sufficient</td></tr><tr><td>Branch generator</td><td>Create one compliant branch</td><td>Issue metadata + branch contract</td><td>Fast/cheap</td></tr><tr><td>Planner</td><td>Explore repo and write the specification</td><td>Issue + class template + repository</td><td>Use a top model</td></tr><tr><td>Implementer</td><td>Build and validate the plan</td><td>Fresh window + committed plan + repository</td><td>Use a top model</td></tr><tr><td>Commit/PR glue</td><td>Produce bounded outputs</td><td>Git state + strict template</td><td>Fast/cheap</td></tr></tbody></table><p>Dan uses the <code>sonnet</code> alias throughout the on-camera run for speed, while explicitly recommending stronger models for plan and build. The policy matters more than the period model names.</p></div>
+
+        <div class="move move--try"><p class="move-label">6 · You try</p><h3>Reconstruct the firing order</h3><ol><li>Close the chapter.</li><li>Write the eight agent steps in order.</li><li>Beside each, write its input artifact and output contract.</li><li>Mark the two steps that deserve the strongest model.</li><li>Compare against <code>adw_plan_build.py</code>.</li></ol></div>
+
+        <div class="move move--fail"><p class="move-label">7 · Common fail + fix</p><h3>Failure: splitting by file rather than responsibility</h3><p>Micro-agents are not valuable merely because there are many of them. If three agents share an ambiguous job or must read one another’s hidden state, decomposition adds cost without isolation. <strong>Fix:</strong> give each agent one decision, a bounded input artifact, a strict output contract, and a reason its context should be fresh.</p></div>
+
+        <div class="move move--current"><p class="move-label">8 · Current practice</p><h3>Structured calls can replace whole agents for glue</h3><aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Classification, branch naming, and similar glue steps may now be cheaper as structured model calls rather than full coding-agent sessions. Preserve the decomposition: one decision, one schema, one validator. Reserve agentic tool use for steps that genuinely need repository exploration and action.</p><p class="current-practice__source">Source: TAC-4 current-practice extract; re-check at publication.</p></aside></div>
+
+        <div class="move move--check"><p class="move-label">9 · Retrieval</p><h3>Recover the sequence and policy</h3><section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">List the eight micro-agent invocations in order.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Issue classifier → branch generator → planner → plan finder → planner committer → implementer → implementer committer → PR creator.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Where should the strongest models go?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Planning and implementation—the steps with the deepest repository reasoning and largest consequences.</p></details></div></section></div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><h3>Defend the artifact boundary</h3><div class="teach-back"><p>Explain why the implementer receives a plan file instead of inheriting the planner’s context. Include one benefit for testing, one for observability, and one for model selection.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="programmable">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Programmable mode turns the agent into a workflow primitive</h2>
+        <p class="section-lead">TAC-1 introduced the agent as a function you can call. TAC-4 uses that call repeatedly, archives every prompt and stream, and threads each response into ordinary control flow.</p>
+
+        <div class="move move--hook"><p class="move-label">1 · Hook</p><h3>An interactive agent cannot be scheduled by code</h3><p>A terminal conversation is useful while you are present, but a webhook cannot click into your conversation and type the next slash command. The workflow needs a callable boundary: input text in, streamed events and a final result out, with an exit condition code can inspect.</p></div>
+
+        <div class="move move--picture"><p class="move-label">2 · Picture</p><h3>The primitive is an explicit process invocation</h3><div class="terminal"><div class="terminal__bar"><span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span></div><pre><code>claude -p "&lt;slash-command&gt; &lt;args&gt;" \
+  --model &lt;sonnet|opus&gt; \
+  --output-format stream-json \
+  --verbose \
+  --dangerously-skip-permissions</code></pre></div></div>
+
+        <div class="move move--story"><p class="move-label">3 · Story</p><h3><code>execute_template</code> packages one micro-agent run</h3><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t1930-agent-py-programmable-mode.png" alt="agent.py building a Claude Code programmable-mode command with stream-json and dangerously-skip-permissions" loading="lazy"><figcaption><span class="frame-card__t">32:10</span><code>agent.py</code> builds the command, writes the stream to disk, and parses the final result. The dangerous flag is visible because the environment must justify it.</figcaption></figure><p>The wrapper composes a prompt from a slash command and its arguments. The referenced markdown template supplies the actual instructions through the CLI’s command mechanism. Before launch, the wrapper saves the exact prompt under <code>agents/{adw_id}/{agent}/prompts/</code>. It streams JSONL output to disk, produces a readable JSON representation, and parses the final result message for success, session ID, text, and run metadata. A minimal environment allowlist passes the API key, configured Claude path, ordinary process paths, and an optional GitHub token mapping.</p><p>The result is a function-like seam with durable evidence on both sides: exact request and exact event stream. The ADW can call it eight times without pretending the calls are deterministic.</p></div>
+
+        <div class="move move--name"><p class="move-label">4 · Name it</p><h3>Claude Code programmable mode</h3><aside class="callout callout--term"><p class="callout__label">Pipeline primitive</p><p>Programmable mode lets code call the coding agent with a prompt at any workflow step that needs non-deterministic engineering judgment.</p></aside></div>
+
+        <div class="move move--example"><p class="move-label">5 · Worked example</p><h3>Follow one classifier call</h3><ol><li><code>adw_plan_build.py</code> creates an <code>AgentTemplateRequest</code> for <code>/classify_issue</code>.</li><li><code>execute_template</code> joins the slash command and issue data into a prompt.</li><li>The prompt is saved before the subprocess runs.</li><li>The CLI streams JSONL events into the run’s agent directory.</li><li>The wrapper locates the final result and returns its text.</li><li>Deterministic Python strips the text and checks membership in the three allowed issue classes.</li></ol><p>Notice the division: the model decides; code validates. The agent is a component, not the control plane.</p></div>
+
+        <div class="move move--try"><p class="move-label">6 · You try</p><h3>Trace request to result without running it</h3><ol><li>Open <code>adws/agent.py</code>.</li><li>Find <code>execute_template</code> and the lower-level prompt function it calls.</li><li>List the on-disk artifacts created for one agent.</li><li>Find the environment allowlist and the dangerous-permission branch.</li><li>Explain what the caller receives back.</li></ol></div>
+
+        <div class="move move--fail"><p class="move-label">7 · Common fail + fix</p><h3>Failure: copying the flag without copying the boundary</h3><p><strong>Symptom:</strong> <code>--dangerously-skip-permissions</code> runs on your daily-driver checkout with broad credentials because “the course does it.” <strong>Fix:</strong> create a disposable checkout or dedicated machine, pass only required environment values, keep production secrets absent, and make the pull request—not direct deployment—the output. If you cannot state what the process can destroy, the environment is not ready.</p></div>
+
+        <div class="move move--current"><p class="move-label">8 · Current practice</p><h3>The wrapper is period detail; the callable seam is durable</h3><aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Dedicated agent SDK and headless interfaces can expose structured execution more directly than a subprocess wrapper. Migrate when useful, but keep prompt capture, streamed telemetry, final-result parsing, minimal environment exposure, and explicit permission boundaries.</p><p class="current-practice__source">Source: TAC-4 current-practice extract; re-check at publication.</p></aside></div>
+
+        <div class="move move--check"><p class="move-label">9 · Retrieval</p><h3>Write the command from memory</h3><section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the command shape used by the lesson?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>claude -p "&lt;command and args&gt;" --model &lt;model&gt; --output-format stream-json --verbose --dangerously-skip-permissions</code>.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is the dangerous flag considered acceptable here?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Only because the workflow is confined to a dedicated, disposable environment with bounded credentials. The environment is the permission boundary.</p></details></div></section></div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><h3>Explain “agent as component” precisely</h3><div class="teach-back"><p>Trace one request from Python object to saved prompt, subprocess, JSONL stream, parsed result, and deterministic validator. Do not use the phrase “it just runs Claude.”</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="contracts">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Chain uncertainty with contracts and loud failure</h2>
+        <p class="section-lead">Deterministic code cannot branch on an essay. Every glue agent ends with a narrow output contract, and the workflow validates the answer before it spends more time or money.</p>
+
+        <div class="move move--hook"><p class="move-label">1 · Hook</p><h3>The polite paragraph that breaks the pipeline</h3><p>Your classifier returns, “This appears to be a feature because it adds new upload behavior. I recommend using the feature workflow.” A person understands it. Code expecting <code>/feature</code> does not. If the script guesses, the next failure becomes ambiguous. If it silently continues with a default, the workflow may do the wrong class of work. Helpful prose is harmful at a machine boundary.</p></div>
+
+        <div class="move move--picture"><p class="move-label">2 · Picture</p><h3>Agent freedom inside; a one-token door outside</h3></div>
+
+        <div class="move move--story"><p class="move-label">3 · Story</p><h3>The feature run crosses five strict seams</h3><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t1540-manual-trigger-kickoff.png" alt="Terminal showing a failed wrong-path launch followed by a successful ADW run with issue class, ADW ID, and branch" loading="lazy"><figcaption><span class="frame-card__t">25:40</span>The successful run emits machine-shaped outputs: ADW ID <code>cb881e79</code>, issue command <code>/feature</code>, branch <code>feat-33-cb881e79-jsonl-support</code>. Above it, Dan’s wrong-directory <code>Failed to spawn</code> remains visible.</figcaption></figure><p>The issue classifier can think freely but must return only <code>/chore</code>, <code>/bug</code>, <code>/feature</code>, or <code>0</code>. The branch generator must return only the branch name. The plan finder must return only a path or <code>0</code>. The commit agent must return only the commit message it used. The PR creator must return only the URL. Each response becomes input to ordinary Python that checks shape, membership, or error status.</p><p>The wrong-path error in the frame teaches the same design ethic at another boundary: a command failed loudly before any work was performed. The repair is not to reinterpret the error. It is to use the actual course path, <code>uv run adws/adw_plan_build.py &lt;issue&gt;</code>.</p></div>
+
+        <div class="move move--name"><p class="move-label">4 · Name it</p><h3>Structured return contracts</h3><aside class="callout callout--term"><p class="callout__label">Workflow rule</p><p>No ad hoc prompts embedded in the orchestrator. Isolate prompts in templates, end glue steps with exact return contracts, validate every response, and stop visibly on breach.</p></aside></div>
+
+        <div class="move move--example"><p class="move-label">5 · Worked example</p><h3>Read contracts as function signatures</h3><table class="contract-table"><thead><tr><th>Template</th><th>Allowed return</th><th>Consumer</th><th>Failure</th></tr></thead><tbody><tr><td><code>classify_issue.md</code></td><td><code>/chore</code>, <code>/bug</code>, <code>/feature</code>, or <code>0</code></td><td>Class switch in Python</td><td>Comment ❌ and exit</td></tr><tr><td><code>generate_branch_name.md</code></td><td>Branch name only</td><td>Git step</td><td>Report and stop</td></tr><tr><td><code>find_plan_file.md</code></td><td><code>specs/*.md</code> path or <code>0</code></td><td>Implementer request</td><td>Missing plan is fatal</td></tr><tr><td><code>commit.md</code></td><td>Used commit message only</td><td>Status and evidence</td><td>Report and stop</td></tr><tr><td><code>pull_request.md</code></td><td>PR URL only</td><td>Final issue update</td><td>Run remains incomplete</td></tr></tbody></table><p>The commit subject has an additional contract: <code>&lt;agent_name&gt;: &lt;issue_class&gt;: &lt;message&gt;</code>, present tense, with the message kept short. The contract belongs in the template because the agent performs the Git action; the validator belongs in code because the workflow owns control.</p></div>
+
+        <div class="move move--try"><p class="move-label">6 · You try</p><h3>Design one boundary before one agent</h3><ol><li>Choose a new classification such as <code>/docs</code>.</li><li>Write the exact legal output set before writing the prompt.</li><li>Write the invalid-output branch in plain English: what gets logged, where it is reported, and whether the run exits.</li><li>Only then read <code>classify_issue.md</code> and <code>adws/data_types.py</code> to compare the course pattern.</li></ol></div>
+
+        <div class="move move--fail"><p class="move-label">7 · Common fail + fix</p><h3>Failure: permissive parsing and silent recovery</h3><p><strong>Symptom:</strong> the code searches a paragraph for the word “feature,” or defaults to chore when the classifier returns something unexpected. The run continues, but evidence is no longer trustworthy. <strong>Fix:</strong> reject values outside the contract, post the exact failure to the issue, and exit. A visible dead run is easier to repair than a plausible half-run.</p></div>
+
+        <div class="move move--current"><p class="move-label">8 · Current practice</p><h3>Schemas strengthen the same idea</h3><aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Modern structured-output features can replace some “Return ONLY” text contracts with schemas and typed results. That reduces parsing ambiguity but does not remove validation. The workflow must still reject illegal classes, missing artifacts, and failed actions, then report the failure to the review surface.</p><p class="current-practice__source">Source: TAC-4 current-practice extract; re-check at publication.</p></aside></div>
+
+        <div class="move move--check"><p class="move-label">9 · Retrieval</p><h3>Recover the classifier boundary</h3><section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What are the classifier’s only legal outputs?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>/chore</code>, <code>/bug</code>, <code>/feature</code>, or <code>0</code>.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What happens when a step’s contract breaks?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The workflow logs the problem, posts a ❌ status to the issue, and exits rather than guessing.</p></details></div></section></div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><h3>Explain why strictness enables autonomy</h3><div class="teach-back"><p>Explain why an agent gets broad freedom inside a task but a narrow contract at the workflow boundary. Use classifier and plan-finder examples.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="observability">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Observe every run, then fix the system</h2>
+        <p class="section-lead">AFK without evidence is gambling. The lesson supplies four layers of observability and one compounding repair rule: when an artifact is wrong, improve the template or workflow that produced it.</p>
+
+        <div class="move move--hook"><p class="move-label">1 · Hook</p><h3>The successful pull request you cannot explain</h3><p>An agent opens a pull request. The diff looks reasonable, but you do not know which prompt it received, how many attempts occurred, which model ran, whether a plan existed, or where the branch name came from. The result may be correct, yet the system is not improvable. Success without traceability teaches you nothing; failure without traceability costs you hours.</p></div>
+
+        <div class="move move--picture"><p class="move-label">2 · Picture</p><h3>Four views of the same run</h3><div class="telemetry-stack" aria-label="Four observability layers"><article><h4>1 · Live feed</h4><p><code>{adw_id}_{agent}: ✅/❌</code> issue comments show progress where the request lives.</p></article><article><h4>2 · Agent artifacts</h4><p><code>agents/{adw_id}/</code> holds exact prompts, JSONL, readable output, and execution logs.</p></article><article><h4>3 · Session logs</h4><p><code>logs/{session_id}/</code> receives the five configured hook events.</p></article><article><h4>4 · Concrete plan</h4><p><code>specs/*.md</code> records planner output and becomes the implementer’s input.</p></article></div><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t0700-chore-issue-live-feed.png" alt="GitHub issue #31 showing ADW progress comments with tracking ID 5615f7c8" loading="lazy"><figcaption><span class="frame-card__t">11:40</span>The live feed threads run ID <code>5615f7c8</code> through classification, branch creation, and planning. It is a status surface, not the full debugging record.</figcaption></figure></div>
+
+        <div class="move move--story"><p class="move-label">3 · Story</p><h3>The bad PR is the lesson’s best evidence</h3><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t0890-chore-pr-review.png" alt="Pull request #32 showing implementation plan, changes, files, ADW tracking ID, and closing issue reference" loading="lazy"><figcaption><span class="frame-card__t">14:50</span>PR #32 is cleanly structured and factually imperfect. It expands ADW incorrectly and lists plausible files that do not exist.</figcaption></figure><p>The instinct is to edit the PR description and move on. Dan rejects that instinct. A hand edit repairs one artifact. The next documentation chore will use the same prompt and can repeat the same mistake. The durable repair belongs in the owning template: define ADW as “AI Developer Workflow,” require file claims to be checked against the repository, and improve the PR template if its report invites speculation.</p><p>The repository contains a second honest exhibit. Its agent-written <code>adws/README.md</code> points model selection to “agent.py line 129,” although the real choices are represented in type literals and per-step requests. Its commit-format section conflicts with <code>commit.md</code>. Review is not a ceremony after autonomy; it is the input to system improvement.</p></div>
+
+        <div class="move move--name"><p class="move-label">4 · Name it</p><h3>Fix the system, not the issue</h3><aside class="callout callout--term"><p class="callout__label">Compounding rule</p><p>When agent output is wrong, identify the prompt, contract, workflow step, or environment condition that caused the class of error. Improve that source before rerunning.</p></aside></div>
+
+        <div class="move move--example"><p class="move-label">5 · Worked example</p><h3>Turn one false file claim into a reusable check</h3><ol><li><strong>Observe:</strong> PR #32 describes files absent from the repository.</li><li><strong>Trace:</strong> use ADW ID <code>5615f7c8</code> to find the PR creator’s prompt and output.</li><li><strong>Locate ownership:</strong> decide whether the false claim originated in the implementation report or <code>pull_request.md</code>.</li><li><strong>Encode:</strong> add an instruction to describe only files that exist and verify names against the diff.</li><li><strong>Reset:</strong> clear issue comments and delete the test PR with the course scripts.</li><li><strong>Rerun:</strong> use the same issue so the input stays stable.</li><li><strong>Compare:</strong> diff the two PR bodies. The improvement passes only if the error class disappears without hand editing.</li></ol><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t2245-jsonl-feature-verified.png" alt="Running app showing a successfully uploaded JSONL table with flattened nested columns and list indices" loading="lazy"><figcaption><span class="frame-card__t">37:25</span>Review ends in behavior, not prose. The app shows a five-row table with <code>__</code> and <code>_0</code> column conventions from the original issue.</figcaption></figure></div>
+
+        <div class="move move--try"><p class="move-label">6 · You try</p><h3>Trace one ADW ID through five surfaces</h3><ol><li>Start with an issue comment carrying the run ID.</li><li>Find the ID in the branch name.</li><li>Open the matching <code>agents/{id}/</code> directory.</li><li>Find the ID in commit messages and the PR body.</li><li>Choose one claim in the PR and trace it back to the prompt or artifact that produced it.</li></ol><p>You pass only when you can move from symptom to owning system component without guessing.</p></div>
+
+        <div class="move move--fail"><p class="move-label">7 · Common fail + fix</p><h3>Failure: watching telemetry like television</h3><p><strong>Symptom:</strong> you refresh the live feed, celebrate green check marks, and never open the saved prompts or raw output. When a result is wrong, you hand-edit it. <strong>Fix:</strong> treat every run as an experiment. Preserve input, inspect the artifact chain, change one owning system component, rerun, and compare.</p></div>
+
+        <div class="move move--current"><p class="move-label">8 · Current practice</p><h3>Add structured telemetry without losing the simple surfaces</h3><aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Production systems may add check runs, job summaries, trace-style spans, queues, and cost dashboards. The course’s issue feed remains an excellent zero-infrastructure status surface. Keep the four evidence layers even when richer telemetry arrives: user-visible progress, exact per-agent artifacts, session-level logs, and committed plans.</p><p class="current-practice__source">Source: TAC-4 current-practice extract; re-check at publication.</p></aside></div>
+
+        <div class="move move--check"><p class="move-label">9 · Retrieval</p><h3>Name the evidence before the doctrine</h3><section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What are the four observability layers?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Issue-comment live feed; <code>agents/{adw_id}/</code> prompts and outputs; <code>logs/{session_id}/</code> hook logs; committed plan file.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does “fix the system, not the issue” require?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Trace a bad output to its owning template, contract, workflow step, or environment condition; improve that source; rerun and compare instead of hand-patching the artifact.</p></details></div></section></div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><h3>Tell the story of one compounding correction</h3><div class="teach-back"><p>Use PR #32 to explain symptom → trace → owning template → rerun → comparison. Your listener should be able to name the one-off fix you deliberately refused.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="adoption">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Adopt from the bottom: health check, chore, bug, feature</h2>
+        <p class="section-lead">The lesson’s urgency is paired with operational humility. Validate the environment before every run, start with work the agent should remove “with no debate,” and climb only as evidence earns trust.</p>
+
+        <div class="move move--hook"><p class="move-label">1 · Hook</p><h3>The ambitious first feature that fails for a boring reason</h3><p>You launch a substantial feature to “really test” the system. It fails to comment on the issue because the remote still points at the course repository. You fix that, rerun, and the subprocess cannot locate Claude. You fix that, rerun, and discover GitHub CLI is unauthenticated. After three attempts, you blame the agent’s reasoning even though it never reached the planning step. Infrastructure noise destroyed the learning signal.</p></div>
+
+        <div class="move move--picture"><p class="move-label">2 · Picture</p><h3>Pre-flight before flight; trust before scope</h3><div class="trust-ladder" aria-label="Trust ladder from chores to features"><article><h4>1 · Chores</h4><p>Clear artifacts, low ambiguity, cheap review. Prove the perimeter and trace.</p></article><article><h4>2 · Bugs</h4><p>Known failure and expected correction. Add reproducible evidence.</p></article><article><h4>3 · Features</h4><p>Larger planning and implementation surface. Require constraints, tests, and mature review.</p></article></div></div>
+
+        <div class="move move--story"><p class="move-label">3 · Story</p><h3>Dan’s setup catches the viewer’s most likely mistake</h3><figure class="frame-card"><img src="../media/frames/tac-4-afk-agents/t1460-health-check-healthy.png" alt="Terminal output showing Overall Status HEALTHY, repository warning, GitHub CLI checks, and Claude Code test" loading="lazy"><figcaption><span class="frame-card__t">24:20</span>The course health check validates environment variables, Git remote, GitHub CLI, and a live Claude Code round-trip, then can post the result to the issue.</figcaption></figure><p>The install command removes the course remote, initializes the working repository, copies environment samples, installs dependencies, and reports the actions it cannot complete for you. You must create and push to a repository you own because the ADW needs to create your issues, branches, comments, and pull requests. The health check then warns if the remote still points at <code>disler</code>, verifies GitHub CLI installation and authentication, checks required paths and environment values, and performs a live 2+2 Claude round-trip expecting <code>4</code>.</p><p>Only after that does the course run the two-line documentation chore. The chore is not a toy to skip. It is the cheap rehearsal that proves every PITER element and every ADW stage before the feature spends eight agent invocations.</p></div>
+
+        <div class="move move--name"><p class="move-label">4 · Name it</p><h3>The health-check pattern and trust ladder</h3><aside class="callout callout--term"><p class="callout__label">Adoption rule</p><p>Build pre-flight validation into the workflow layer. Start with chores, move to bugs, then attempt constrained features as templates and evidence improve.</p></aside></div>
+
+        <div class="move move--example"><p class="move-label">5 · Worked example</p><h3>Read a green pre-flight as a proof bundle</h3><ul class="evidence-list"><li><strong>Environment:</strong> required keys and <code>CLAUDE_CODE_PATH</code> are available to the subprocess.</li><li><strong>Repository:</strong> the remote targets a repository you own rather than the course source.</li><li><strong>GitHub:</strong> <code>gh</code> exists and is authenticated for issue comments and pull requests.</li><li><strong>Agent:</strong> programmable mode completes a live arithmetic request and returns <code>4</code>.</li><li><strong>Review path:</strong> a ✅ health comment appears on the chosen issue.</li></ul><p>“HEALTHY” does not prove the feature will succeed. It proves that a reasoning failure will not be confounded with the most common configuration failures.</p></div>
+
+        <div class="move move--try"><p class="move-label">6 · You try</p><h3>Predict the failure before running the check</h3><ol><li>Inspect the root <code>.env.sample</code>, <code>adws/health_check.py</code>, and your Git remote.</li><li>Write which check you expect to fail.</li><li>Run <code>uv run adws/health_check.py &lt;issue&gt;</code>.</li><li>Compare prediction to output.</li><li>Do not proceed until status is healthy, the <code>disler</code> warning is absent, and the issue has a ✅ comment.</li></ol></div>
+
+        <div class="move move--fail"><p class="move-label">7 · Common fail + fix</p><h3>Failure: treating demo timings as service guarantees</h3><p>The chore took roughly five minutes and the feature roughly seventeen in the recording. Different machines, models, network conditions, and run behavior will vary. <strong>Fix:</strong> budget by invocation count and evidence, not the stopwatch. Record duration, turns, and cost from your result lines. Improve the slow or expensive step instead of declaring the system broken.</p></div>
+
+        <div class="move move--current"><p class="move-label">8 · Current practice</p><h3>Serialize the course workflow or isolate every run</h3><aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>The course ADW uses one working checkout and changes branches in place. Concurrent webhook launches can collide. For this lab, serialize triggers. Production systems commonly add a queue or lock and use a worktree or container per run. Parallelism belongs after one serial path is trustworthy.</p><p class="current-practice__source">Source: TAC-4 current-practice extract; re-check at publication.</p></aside></div>
+
+        <div class="move move--check"><p class="move-label">9 · Retrieval</p><h3>State the gate and ladder</h3><section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does the course health check verify?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Environment variables and Claude path, Git remote, GitHub CLI installation/authentication, a live Claude Code round-trip, and optionally the issue-comment path.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the adoption ladder?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Chores → bugs → features.</p></details></div></section></div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><h3>Explain why pre-flight belongs inside the layer</h3><div class="teach-back"><p>Teach why a health check is not merely setup documentation. Your answer must connect repeatability, error attribution, issue-visible evidence, and the trust ladder.</p></div></div>
+      </section>
+
+      <section class="chapter-section" id="current-practice">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Current practice: preserve the architecture, update the implementation</h2>
+        <p class="section-lead">The course captures a durable system with period-specific wrappers. Use the distinction below to modernize without erasing what the lesson teaches.</p>
+
+        <div class="comparison">
+          <article class="comparison__card"><div class="comparison__head"><h3>Course-era implementation</h3><p>What the code and video actually demonstrate</p></div><div class="comparison__body"><ul><li>Claude Code invoked through <code>claude -p</code> subprocesses.</li><li>Markdown slash-command templates.</li><li><code>--dangerously-skip-permissions</code> inside a dedicated environment.</li><li>One serial ADW changing branches in a single checkout.</li><li>Issue comments, run folders, hook logs, and committed plans.</li><li>On-camera <code>sonnet</code> aliases and a pinned health-check model ID.</li></ul></div></article>
+          <article class="comparison__card comparison__card--agentic"><div class="comparison__head"><h3>Durable 2026 interpretation</h3><p>What to carry forward</p></div><div class="comparison__body"><ul><li>Use current headless or SDK surfaces when they improve control.</li><li>Package repository-native skills or instructions, preserving explicit interfaces.</li><li>Prefer real sandboxing and bounded credentials; do not trust a flag.</li><li>Queue concurrent triggers and isolate runs with worktrees or containers.</li><li>Add structured telemetry without losing exact prompts and artifacts.</li><li>Use the cheapest model that clears each step; strongest on plan and build.</li></ul></div></article>
+        </div>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Do not productionize the demo as-is</p>
+          <p>The single-checkout branch choreography can collide if two triggers fire together. Serialize lab runs. For concurrent systems, add run isolation and trigger-side queueing or locking.</p>
+        </aside>
+
+        <h3>Two optional video overlays</h3>
+        <p>These are concept overlays, not prerequisites and not substitutes for the course codebase.</p>
+        <div class="video-cards">
+          <a class="video-card" href="https://www.youtube.com/watch?v=hGg3nWp7afg"><span class="video-card__type">Operationalize the layer</span><strong>3 Codebase Folders</strong><p>Use after the agentic-layer section to reinforce how repository folders encode operational context.</p><span class="video-card__watch">Watch on YouTube →</span></a>
+          <a class="video-card" href="https://www.youtube.com/watch?v=fop_yxV-mPo"><span class="video-card__type">Where this goes</span><strong>Codebase Singularity</strong><p>Use as the forward-looking vision once templates, ADWs, PITER, and review are concrete.</p><span class="video-card__watch">Watch on YouTube →</span></a>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Graded lab: build and audit the AFK perimeter</h2>
+        <p class="section-lead">Run only in the TAC-4 course codebase pushed to a repository you own. You type zero lines of application code by hand. The agent builds the feature; you build, trace, and improve the system.</p>
+
+        <aside class="callout callout--warning"><p class="callout__label">Before you begin</p><p>Time box: 90–150 minutes. Expect two or more full ADW runs, each with several agent invocations. Use a disposable checkout or dedicated environment with no production credentials. The lab’s dangerous-permission mode is justified only inside that boundary.</p></aside>
+
+        <section class="lab-box" id="lab-setup">
+          <h3 class="lab-box__title">Lab 4.0 · Build your PITER perimeter</h3>
+          <ul class="lab-box__meta"><li>25 min</li><li>Gate</li><li>Course repo only</li></ul>
+          <ol class="lab-box__steps"><li>Clone <code>https://github.com/disler/tac-4.git</code> into a fresh directory and enter it.</li><li>Read <code>.claude/commands/install.md</code> before running <code>/install</code>. Say what it will do: remove the course remote, initialize Git, copy environment samples, install frontend and backend dependencies, and attempt the TAC-2 environment copy.</li><li>Create a new empty GitHub repository you own. Add it as <code>origin</code> and push <code>main</code>.</li><li>Fill the root <code>.env</code> with <code>ANTHROPIC_API_KEY</code> and <code>CLAUDE_CODE_PATH</code>. Use <code>which claude</code> when the subprocess cannot find the CLI. Fill <code>app/server/.env</code> for the application provider.</li><li>Audit <code>.claude/settings.json</code>. Record the interactive Bash allowlist, the three denied command patterns (two force-push forms and <code>rm -rf</code>), the five hook events, and the <code>logs/{session_id}/</code> destination.</li><li>Explain why the ADW run does not rely on those interactive permissions: <code>execute_template</code> enables dangerous-skip, so environment isolation is the boundary.</li><li>Create a warm-up issue in your repository and run <code>uv run adws/health_check.py &lt;number&gt;</code>.</li></ol>
+          <div class="checkpoint"><strong>Checkpoint 0 · hard gate</strong><p>Do not proceed until status is <code>HEALTHY</code>, the <code>disler</code> remote warning is absent, the live test returns <code>4</code>, and a ✅ health comment appears on your issue.</p></div>
+        </section>
+
+        <section class="lab-box" id="lab-chore">
+          <h3 class="lab-box__title">Lab 4.1 · First out-loop chore</h3>
+          <ul class="lab-box__meta"><li>25 min</li><li>Zero mid-run intervention</li><li>Evidence audit</li></ul>
+          <ol class="lab-box__steps"><li>Create issue A titled <code>ADW Documentation</code>. Use the course shape: <code>/chore</code> followed by a request to read the ADW directory and update its README with how it works.</li><li>Launch <code>uv run adws/adw_plan_build.py &lt;A&gt;</code>. If you run <code>uv run adw_plan_build.py</code> from the root and see <code>Failed to spawn</code>, correct the path rather than debugging the workflow.</li><li>Go hands off. Narrate the issue feed: start → classification → branch → planner → plan → first commit → implementer → second commit → PR.</li><li>Verify a branch matching <code>&lt;class&gt;-&lt;issue&gt;-&lt;adw-id&gt;-&lt;slug&gt;</code>, a new <code>specs/*-plan.md</code>, two commits matching <code>&lt;agent&gt;: &lt;class&gt;: &lt;message&gt;</code>, and a PR containing plan link, changes checklist, <code>Closes #A</code>, and the tracking ID.</li><li>Audit every PR claim against repository reality. For each inaccuracy, name the owning template or generated artifact. If there are none, write “none found” and state what you checked.</li></ol>
+          <div class="checkpoint"><strong>Checkpoint 1</strong><p>Submit the audit and trace the same ADW ID through issue comments → branch → <code>agents/{id}/</code> → commits → pull request.</p></div>
+        </section>
+
+        <section class="lab-box" id="lab-feature">
+          <h3 class="lab-box__title">Lab 4.2 · Reproduce the JSONL feature run</h3>
+          <ul class="lab-box__meta"><li>35 min active review</li><li>15–20 min run observed in course</li><li>pytest + live app</li></ul>
+          <ol class="lab-box__steps"><li>Start the app with <code>sh scripts/start.sh</code>. At <code>localhost:5173</code>, confirm that the shipped app accepts only CSV and JSON. The server rejects other extensions; JSONL support does not exist on main.</li><li>Create issue B titled <code>Jsonl Support</code>. Require a full-file field scan, standard library only, one table per file, nested keys and lists joined with centrally configurable <code>__</code>, list indexes such as <code>_0</code>, interface copy, and multiple test fixtures.</li><li>Run the health check on issue B and require <code>HEALTHY</code>.</li><li>Launch <code>uv run adws/adw_plan_build.py &lt;B&gt;</code>.</li><li>In a second terminal, follow <code>agents/&lt;id&gt;/adw_plan_build/execution.log</code>. After each agent completes, inspect its saved prompt and result. Record <code>num_turns</code>, <code>duration_ms</code>, and <code>total_cost_usd</code>.</li><li>Review the committed plan before the diff. Then check out the feature branch, run <code>cd app/server &amp;&amp; uv run pytest</code>, start the app, regression-test an old query, upload an agent-created JSONL fixture, and confirm the table uses <code>__</code> and <code>_0</code>.</li></ol>
+          <div class="checkpoint"><strong>Checkpoint 2</strong><p>Provide green tests, live behavior evidence, and one sentence answering: after clicking Create on the issue, what did you contribute? Target: prompt input and review—nothing else.</p></div>
+        </section>
+
+        <section class="lab-box" id="lab-triggers">
+          <h3 class="lab-box__title">Lab 4.3 · Swap the trigger</h3>
+          <ul class="lab-box__meta"><li>20 min</li><li>Manual + cron + webhook attempt</li></ul>
+          <ol class="lab-box__steps"><li>Run <code>uv run adws/trigger_cron.py</code>. Comment exactly <code>adw</code> on issue A and observe reprocessing within roughly twenty seconds. State the two qualifying conditions: a new issue with no comments, or a latest comment exactly equal to <code>adw</code>.</li><li>Attempt the webhook: run <code>uv run adws/trigger_webhook.py</code> on port 8001; expose it with <code>scripts/expose_webhook.sh</code> (requires <code>CLOUDFLARED_TUNNEL_TOKEN</code>) or ngrok; configure GitHub Issues and Issue-comment events; create a tiny chore from your phone. If infrastructure blocks you, document the attempted configuration and exact failure.</li><li>Read <code>GET /health</code> and connect its summary to the standalone health check.</li><li>Stop the trigger and apps with <code>scripts/kill_trigger_webhook.sh</code> and <code>scripts/stop_apps.sh</code>. Explain why a forgotten listener is a cost bug.</li><li>For reruns, use <code>scripts/clear_issue_comments.sh &lt;issue&gt;</code> and <code>scripts/delete_pr.sh &lt;pr&gt; [--delete-branch]</code>.</li></ol>
+          <div class="checkpoint"><strong>Checkpoint 3</strong><p>Explain which PITER element changed across manual, cron, and webhook triggers, and which three roles stayed conceptually stable.</p></div>
+        </section>
+
+        <section class="lab-box" id="lab-stretch">
+          <h3 class="lab-box__title">Lab 4.4 · System-improvement stretches</h3>
+          <ul class="lab-box__meta"><li>Choose 2</li><li>30–45 min</li><li>Still zero hand-typed app code</li></ul>
+          <ol class="lab-box__steps"><li><strong>New problem class:</strong> through Claude Code, add <code>/docs</code> or <code>/test</code> as a new template, extend the command Literals in <code>adws/data_types.py</code>, and update classification. Prove an issue runs end to end.</li><li><strong>Fix the system:</strong> encode the worst checkpoint-1 error into the owning template. Reset and rerun the same issue. Diff the PRs to demonstrate a class-level correction.</li><li><strong>Break pre-flight:</strong> temporarily remove the API key or point the remote back at the course. Compare the standalone health check, webhook health endpoint, and real ADW failure. Restore the environment.</li><li><strong>Model policy:</strong> through Claude Code, switch planner and implementer requests to the stronger model option. Rerun a feature-class issue and compare plan depth, turns, duration, and cost with the saved baseline.</li><li><strong>KPI scorecard:</strong> score presence, size, attempts, and streak for the chore and feature. Name the system change that would improve the weakest number.</li><li><strong>Course transfer map:</strong> map all four PITER elements in <code>tac/tac-4</code>, then list three additional course-repo chores the existing templates could accept. Circle the safest next issue, but keep every action inside this course repository.</li></ol>
+        </section>
+
+        <h3>Grading rubric</h3>
+        <div class="rubric">
+          <div class="rubric__head">Dimension</div><div class="rubric__head">Incomplete</div><div class="rubric__head">Pass</div><div class="rubric__head">Expert</div>
+          <div>Environment and safety</div><div>Skipped pre-flight or used broad credentials</div><div>Healthy owned repo; disposable boundary explained</div><div>Can predict and deliberately reproduce each pre-flight failure</div>
+          <div>Out-loop execution</div><div>Intervened mid-run or hand-edited app code</div><div>Chore and feature completed from issue to PR</div><div>Can route new work by class and justify what remains in-loop</div>
+          <div>Traceability</div><div>Only inspected PR</div><div>Traced one ID through five surfaces</div><div>Mapped a bad claim to the exact owning prompt or workflow step</div>
+          <div>Review</div><div>Accepted green status</div><div>Plan, diff, tests, and live app verified</div><div>Compared evidence across reruns and identified regression risk</div>
+          <div>System improvement</div><div>Hand-patched artifact</div><div>Named the owning template</div><div>Encoded a fix, reran stable input, and proved the error class disappeared</div>
+        </div>
+
+        <div class="lab-box__pass"><h4>All pass criteria</h4><ul><li>Zero application code typed by hand.</li><li>Healthy check against your repo, no course-remote warning, ✅ issue comment.</li><li>Chore completed with live feed, compliant branch, committed plan, two compliant commits, and complete PR.</li><li>Written factual audit mapping each issue to an owning template or artifact.</li><li>JSONL feature completed with green tests and live <code>__</code>/<code>_0</code> verification.</li><li>ADW ID traced across comments, branch, agent artifacts, commits, and PR.</li><li>Cron demonstrated; webhook demonstrated or attempted with evidence.</li><li>All listeners and apps stopped.</li><li>Oral close: PITER, ADW definition, classifier contract, safety boundary, and fix-the-system policy without notes.</li></ul></div>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">13</span>
+        <h2 class="section-title">Cumulative mastery</h2>
+        <p class="section-lead">Recognition is not enough. Answer cold, then use every miss to select a lab checkpoint or source file to revisit.</p>
+
+        <h3>Round 1 · Architecture</h3>
+        <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Expand PITER and map each element to the first demo.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Prompt input—GitHub issue #31; Trigger—GitHub webhook; Environment—dedicated Mac mini; Review—issue feed, committed artifacts, and PR #32.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What moves out of the loop, and what human work remains?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The execution transitions move out: classify, branch, plan, implement, commit, and create PR. The human still supplies the request and constraints, reviews evidence, and improves the system.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why can the manual and webhook demos use the same ADW?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The trigger and environment are swappable PITER roles; the workflow, prompt-input shape, and review surface remain stable.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Which work remains in-loop?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Experimentation, new territory, and very hard specific problems.</p></details></div></section>
+
+        <h3>Round 2 · Workflow and contracts</h3>
+        <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">5. Define an ADW and list its five stages.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Reusable workflow combining code, prompts, and agents to deliver results autonomously; fetch issue → branch → plan and commit → implement and commit → pull request.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">6. List the eight feature-run agent invocations.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Classifier, branch generator, planner, plan finder, planner committer, implementer, implementer committer, PR creator.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">7. Why is the committed plan a better boundary than planner conversation history?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It is concrete, reviewable, diffable, committable, improvable, and lets the implementer start with a fresh context window.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">8. What is the classifier contract and failure policy?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Only <code>/chore</code>, <code>/bug</code>, <code>/feature</code>, or <code>0</code>; illegal output is logged, reported with ❌, and stops the run.</p></details></div></section>
+
+        <h3>Round 3 · Safety and evidence</h3>
+        <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">9. Why is dangerous-skip safe here, and what would make it unsafe?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It is acceptable only in a dedicated, disposable environment with bounded credentials. A daily-driver checkout, production secrets, or broad filesystem access breaks the argument.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">10. Name the four observability layers.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Issue live feed; per-agent prompts and outputs; hook session logs; committed plan.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">11. What does the health check prove—and not prove?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It proves the environment, remote, GitHub CLI, Claude round-trip, and comment path are ready. It does not prove a particular plan or implementation will be correct.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">12. Why must the lab serialize runs?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The course workflow changes branches in one checkout. Concurrent triggers can collide without a queue, lock, worktree, or container per run.</p></details></div></section>
+
+        <h3>Round 4 · Judgment and transfer</h3>
+        <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">13. A PR uses the wrong expansion of ADW. What do you do?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Trace the claim to the owning prompt or report, encode the canonical definition, rerun the same issue, and compare. Do not merely edit the PR.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">14. Why does “own the pipeline” survive using a hosted agent?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Hosting can be rented while repository-specific templates, workflow semantics, contracts, standards, and review policy remain yours.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">15. Which model policy is durable after course-era names change?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Use the cheapest model that reliably clears each step; reserve the strongest models for planning and implementation.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">16. What is the adoption ladder, and why?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Chores → bugs → features. It builds trust and improves templates with low-cost, reviewable work before larger autonomous changes.</p></details></div></section>
+
+        <aside class="callout callout--why"><p class="callout__label">Scoring</p><p><strong>14–16:</strong> ready to operate and teach. <strong>10–13:</strong> rerun the lab checkpoint tied to each miss. <strong>0–9:</strong> redraw PITER, trace <code>adw_plan_build.py</code>, and complete the chore run before the feature. Answers you recognize but cannot apply count as half credit.</p></aside>
+
+        <h3>Capstone teach-back</h3>
+        <div class="teach-back"><p>Without notes, teach the complete system in seven minutes:</p><ol><li>Route one task in-loop and one out-loop.</li><li>Map PITER for issue #31.</li><li>Define the ADW and walk its five stages.</li><li>Explain micro-agent boundaries and model policy.</li><li>Write the programmable-mode command shape.</li><li>State the classifier contract and loud-failure rule.</li><li>Use PR #32 to teach “fix the system, not the issue.”</li></ol><p class="fine">Expert pass: your listener can predict why two simultaneous webhook events are unsafe in the course checkout and propose the missing isolation without changing the meaning of PITER.</p></div>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">14</span>
+        <h2 class="section-title">TAC-4 glossary</h2>
+        <p class="section-lead">Use the course’s canonical terms. These definitions are narrow enough to test against the repository and demos.</p>
+        <dl class="glossary">
+          <div><dt>Stay Out The Loop</dt><dd>Tactic #4: leave the continuous execution and prompting loop while retaining responsibility for request quality, review, and system improvement.</dd></div>
+          <div><dt>In-loop agentic coding</dt><dd>Agentic work performed while the human remains at the device, steering the session. Best retained for experimentation, new territory, and very hard specific problems.</dd></div>
+          <div><dt>Outloop agentic coding</dt><dd>Off-device agentic coding: prompt input arrives, a workflow executes while the human is AFK, and evidence returns to a review surface.</dd></div>
+          <div><dt>AFK agent</dt><dd>An agent participating in a system that can run while the human is Away From Keyboard.</dd></div>
+          <div><dt>PITER</dt><dd>Prompt input, Trigger, Environment, Review—the four tool-agnostic roles required by an AFK agent system.</dd></div>
+          <div><dt>Prompt input</dt><dd>The request, desired outcome, and constraints. The course uses GitHub issue title and body.</dd></div>
+          <div><dt>Trigger</dt><dd>The event that starts an ADW. The course demonstrates webhook and manual command and supplies a cron trigger.</dd></div>
+          <div><dt>Environment</dt><dd>The bounded checkout or machine in which the agent can act. It is the safety boundary for dangerous permission mode.</dd></div>
+          <div><dt>Review</dt><dd>The human-facing evidence and decision surface: issue feed, run artifacts, committed plan, tests, live behavior, and pull request.</dd></div>
+          <div><dt>ADW</dt><dd>AI Developer Workflow: a reusable workflow combining code, agentic prompts, and agents to deliver results autonomously.</dd></div>
+          <div><dt>Agentic layer</dt><dd>The prompts in <code>.claude/commands/</code> and workflows in <code>adws/</code>, plus supporting artifacts, wrapped around an app that does not depend on them.</dd></div>
+          <div><dt>Micro-agent</dt><dd>A fresh agent invocation with one bounded responsibility, prompt, context, model choice, and return contract.</dd></div>
+          <div><dt>Big Three</dt><dd>Context, model, prompt. Micro-agents isolate these three per workflow step.</dd></div>
+          <div><dt>Programmable mode</dt><dd>Calling Claude Code with <code>-p</code> and structured stream output so an agent becomes a component in ordinary code.</dd></div>
+          <div><dt>ADW ID</dt><dd>An eight-character run identifier threaded through issue comments, branch, agent artifacts, commits, and pull request.</dd></div>
+          <div><dt>Live feed</dt><dd>Issue comments in the form <code>{adw_id}_{agent}: ✅/❌ message</code>, providing user-visible progress.</dd></div>
+          <div><dt>Return contract</dt><dd>A narrow machine-consumable result such as one issue class, branch name, path, commit message, or PR URL.</dd></div>
+          <div><dt>Concrete plan artifact</dt><dd>A committed <code>specs/*.md</code> file that records planner output and becomes the implementer’s entire task input.</dd></div>
+          <div><dt>Fix the system, not the issue</dt><dd>Improve the template, contract, workflow, or environment that caused a bad artifact; rerun stable input and prove the error class disappears.</dd></div>
+          <div><dt>Health check</dt><dd>Pre-flight validation of environment values, repository remote, GitHub CLI, live Claude execution, and issue-comment path.</dd></div>
+          <div><dt>Trust ladder</dt><dd>The adoption sequence chores → bugs → features, using evidence from simpler work to earn larger autonomous scope.</dd></div>
+          <div><dt>Agentic coding KPIs</dt><dd>Presence down, size up, streak up, attempts down—the scoreboard used to judge whether the system is improving.</dd></div>
+        </dl>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">Volume I · Tactical Agentic Coding</p>
+        <div class="chapter-footer__nav"><a href="../index.html">← Book hub</a><a href="05-close-the-loops.html">Next: TAC-5 · Close the Loops →</a></div>
+      </footer>
+    
+      <p class="code-deep-link"><a href="../code/tac-4-afk-agents.html">Code deep-dive · how Dan built this repo →</a></p>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => { updateProgress(); progressFramePending = false; });
+      };
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => {
+          const active = link.getAttribute('href') === `#${visible.target.id}`;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+      sections.forEach(section => observer.observe(section));
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+</body>
+</html>

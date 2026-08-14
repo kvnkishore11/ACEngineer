@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first code companion to TAC-5: trace Dan's nested validation and repair loops through the real 113-file repository.">
+  <title>Code Deep-Dive · TAC-5 Close the Loops</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <style>
+    :root {
+      --rail-width: 13.5rem;
+      --chapter-max: 76rem;
+      --code-measure: 48rem;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: .5rem;
+      left: .5rem;
+      z-index: 200;
+      padding: .5rem .75rem;
+      border-radius: var(--radius-sm);
+      color: var(--ink-inverse);
+      background: var(--accent-ink);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      transform: translateY(-180%);
+    }
+    .skip-link:focus { transform: none; }
+
+    .reading-progress {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 150;
+      height: 3px;
+      background: transparent;
+    }
+    .reading-progress__bar {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--accent);
+    }
+
+    .site-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 2.5rem;
+      border-bottom: var(--hairline);
+      background: color-mix(in srgb, var(--bg) 94%, transparent);
+      backdrop-filter: blur(12px);
+    }
+    .site-bar__home { font-weight: 650; text-decoration: none; }
+    .site-bar__meta {
+      color: var(--ink-mute);
+      font-family: var(--font-mono);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .chapter-shell {
+      display: grid;
+      grid-template-columns: var(--rail-width) minmax(0, 1fr);
+      gap: 1.5rem;
+      width: min(calc(100% - 2rem), var(--chapter-max));
+      margin-inline: auto;
+    }
+    .chapter-rail {
+      position: sticky;
+      top: 3rem;
+      align-self: start;
+      max-height: calc(100vh - 3.5rem);
+      overflow-y: auto;
+      padding: 1rem .5rem 2rem 0;
+    }
+    .rail-kicker,
+    .section-number,
+    .eyebrow,
+    .micro-label,
+    .move-label {
+      color: var(--accent-ink);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 750;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+    .chapter-rail h2 { margin-top: .35rem; }
+    .rail-progress {
+      margin-top: .8rem;
+      padding-bottom: .8rem;
+      border-bottom: var(--hairline);
+    }
+    .rail-progress__line {
+      height: .35rem;
+      margin-top: .35rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--bg-inset);
+    }
+    .rail-progress__fill {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+    .rail-progress__copy {
+      display: flex;
+      justify-content: space-between;
+      margin-top: .25rem;
+      color: var(--ink-mute);
+      font-size: var(--text-xs);
+    }
+    .chapter-nav ol { list-style: none; padding: 0; }
+    .chapter-nav a { grid-template-columns: 1.5rem 1fr; }
+
+    .chapter-main { min-width: 0; padding-bottom: 4rem; }
+    .hero {
+      margin-bottom: .5rem;
+      padding: 1.15rem 0 1.35rem;
+      border-bottom: var(--hairline);
+    }
+    .hero h1 { margin-top: .35rem; }
+    .hero__dek {
+      max-width: 58ch;
+      margin-top: .45rem;
+      color: var(--ink-soft);
+      font-size: var(--text-md);
+    }
+    .hero__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-top: .75rem;
+      padding: 0;
+      list-style: none;
+    }
+    .hero__meta li {
+      max-width: none;
+      padding: .2rem .5rem;
+      border: var(--hairline);
+      border-radius: 999px;
+      background: var(--bg-card);
+      color: var(--ink-soft);
+      font-size: var(--text-xs);
+    }
+    .hero__promise {
+      max-width: var(--code-measure);
+      margin-top: .75rem;
+      padding: .65rem .8rem;
+      border-left: 4px solid var(--accent);
+      border-radius: var(--radius-sm);
+      background: var(--accent-wash);
+      font-size: var(--text-base);
+    }
+    .chapter-back { margin-top: .65rem; font-size: var(--text-sm); }
+
+    .mobile-toc { display: none; margin: .75rem 0; }
+    .mobile-toc details {
+      padding: .5rem .65rem;
+      border: var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+    }
+    .mobile-toc summary { cursor: pointer; font-weight: 700; }
+
+    .chapter-section {
+      max-width: var(--code-measure);
+      padding: 1.35rem 0;
+      scroll-margin-top: 3.25rem;
+    }
+    .chapter-section--wide { max-width: 58rem; }
+    .section-title { margin: .15rem 0 .45rem; }
+    .section-lead { max-width: 62ch; color: var(--ink-soft); font-size: var(--text-base); }
+    .chapter-section > * + * { margin-top: .85rem; }
+
+    .hook-card,
+    .truth-card,
+    .failure-card,
+    .flow-step,
+    .ledger-group {
+      border: var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-card);
+    }
+    .hook-card {
+      padding: .85rem 1rem;
+      border-left: 4px solid var(--accent);
+    }
+    .hook-card h3 { margin-top: .15rem; }
+    .hook-card p { margin-top: .35rem; }
+
+    .repo-map {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: .65rem;
+      padding: .9rem;
+      border: var(--hairline);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(90deg, transparent 24.8%, var(--border-soft) 25%, transparent 25.2%, transparent 49.8%, var(--border-soft) 50%, transparent 50.2%, transparent 74.8%, var(--border-soft) 75%, transparent 75.2%),
+        var(--bg-card);
+      box-shadow: var(--shadow-card);
+    }
+    .repo-map__lane { min-width: 0; }
+    .repo-map__lane h3 {
+      margin: 0 0 .45rem;
+      color: var(--accent-ink);
+      font-size: var(--text-base);
+    }
+    .repo-map__node {
+      min-height: 6.2rem;
+      padding: .65rem;
+      border: 1px solid var(--border-soft);
+      border-top: 4px solid var(--accent);
+      border-radius: var(--radius-md);
+      background: var(--bg-inset);
+    }
+    .repo-map__lane:nth-child(2) .repo-map__node { border-top-color: var(--ink-soft); background: var(--teach-wash); }
+    .repo-map__lane:nth-child(3) .repo-map__node { border-top-color: var(--ok); background: var(--ok-wash); }
+    .repo-map__lane:nth-child(4) .repo-map__node { border-top-color: var(--ink-soft); }
+    .repo-map__node + .repo-map__node { margin-top: .45rem; }
+    .repo-map__node strong { display: block; font-size: var(--text-sm); }
+    .repo-map__node code {
+      display: block;
+      margin-top: .2rem;
+      overflow-wrap: anywhere;
+      font-size: var(--text-xs);
+    }
+    .repo-map__node p { margin-top: .25rem; color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.4; }
+    .repo-map__legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem .75rem;
+      margin-top: .55rem;
+      color: var(--ink-mute);
+      font-size: var(--text-xs);
+    }
+    .legend-dot::before {
+      display: inline-block;
+      width: .55rem;
+      height: .55rem;
+      margin-right: .3rem;
+      border-radius: 50%;
+      background: var(--dot, var(--accent));
+      content: "";
+    }
+
+    .truth-grid,
+    .failure-grid,
+    .contract-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .65rem;
+    }
+    .truth-card,
+    .failure-card { padding: .75rem; }
+    .truth-card b,
+    .failure-card b { display: block; color: var(--accent-ink); }
+    .truth-card p,
+    .failure-card p { margin-top: .3rem; color: var(--ink-soft); font-size: var(--text-sm); line-height: 1.5; }
+
+    .tree-toolbar,
+    .file-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem;
+    }
+    .tree-toolbar button,
+    .file-toolbar button {
+      padding: .35rem .6rem;
+      border: var(--hairline);
+      border-radius: var(--radius-sm);
+      color: var(--accent-ink);
+      background: var(--bg-card);
+      font: 650 var(--text-xs) var(--font-body);
+      cursor: pointer;
+    }
+    .file-tree {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .55rem;
+    }
+    .tree-branch {
+      padding: .65rem .75rem;
+      border: var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+    }
+    .tree-branch summary {
+      cursor: pointer;
+      color: var(--accent-ink);
+      font: 700 var(--text-sm) var(--font-mono);
+    }
+    .tree-branch ul { margin-top: .45rem; padding-left: 1rem; }
+    .tree-branch li { max-width: none; margin-top: .15rem; font-size: var(--text-xs); line-height: 1.35; }
+    .tree-branch a { text-decoration: none; }
+
+    .file-card {
+      overflow: clip;
+      border: var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-card);
+    }
+    .file-card + .file-card { margin-top: .65rem; }
+    .file-card > summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: .65rem;
+      align-items: center;
+      padding: .7rem .85rem;
+      cursor: pointer;
+      list-style: none;
+      background: linear-gradient(90deg, var(--bg-card), color-mix(in srgb, var(--accent-wash) 35%, var(--bg-card)));
+    }
+    .file-card > summary::-webkit-details-marker { display: none; }
+    .file-card > summary::after {
+      content: "+";
+      color: var(--accent-ink);
+      font: 700 var(--text-md) var(--font-mono);
+      transition: transform .2s ease;
+    }
+    .file-card[open] > summary::after { content: "−"; transform: rotate(180deg); }
+    .file-card[open] .file-card__body { animation: reveal .22s ease both; }
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: none; }
+    }
+    .file-card__path {
+      display: block;
+      overflow-wrap: anywhere;
+      color: var(--ink);
+      font: 700 var(--text-sm) var(--font-mono);
+    }
+    .file-card__one-line { display: block; margin-top: .15rem; color: var(--ink-mute); font-size: var(--text-xs); }
+    .file-card__badge {
+      display: inline-flex;
+      width: fit-content;
+      margin-top: .3rem;
+      padding: .08rem .38rem;
+      border-radius: 999px;
+      background: var(--accent-wash);
+      color: var(--accent-ink);
+      font: 700 var(--text-xs) var(--font-mono);
+      text-transform: uppercase;
+    }
+    .file-card__body { padding: .8rem .85rem 1rem; border-top: var(--hairline); }
+    .file-card__body > * + * { margin-top: .65rem; }
+    .file-card__body h4 { margin-top: 0; font-size: var(--text-base); }
+    .file-card__body p,
+    .file-card__body li { font-size: var(--text-sm); }
+    .annotation-list { display: grid; gap: .35rem; padding: 0; list-style: none; }
+    .annotation-list li {
+      display: grid;
+      grid-template-columns: 5.2rem minmax(0, 1fr);
+      gap: .55rem;
+      max-width: none;
+      margin: 0;
+      padding: .4rem .5rem;
+      border-radius: var(--radius-sm);
+      background: var(--bg-inset);
+    }
+    .annotation-list b { color: var(--accent-ink); font-family: var(--font-mono); font-size: var(--text-xs); }
+
+    .code-frame { position: relative; max-width: var(--code-measure); }
+    .code-frame__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      padding: .35rem .65rem;
+      border: var(--hairline);
+      border-bottom: 0;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      background: var(--terminal-bar);
+      color: var(--terminal-ink);
+      font: 650 var(--text-xs) var(--font-mono);
+    }
+    .code-frame__bar span:last-child { color: var(--terminal-dot); font-weight: 400; }
+    .code-frame pre {
+      max-width: 100%;
+      margin: 0;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      border-color: var(--terminal-border);
+      background: var(--terminal-bg);
+      color: var(--terminal-ink);
+      white-space: pre;
+      tab-size: 2;
+    }
+    .code-frame code { color: inherit; }
+    .tok-k { color: var(--accent-wash); }
+    .tok-f { color: var(--terminal-dot); }
+    .tok-s { color: var(--ok-wash); }
+    .tok-c { color: var(--ink-mute); font-style: italic; }
+    .tok-n { color: var(--teach-wash); }
+    .tok-p { color: var(--warn-wash); }
+
+    .why-strip {
+      display: grid;
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+      gap: .65rem;
+      padding: .6rem .7rem;
+      border-left: 3px solid var(--ok);
+      border-radius: var(--radius-sm);
+      background: var(--ok-wash);
+      font-size: var(--text-sm);
+    }
+    .why-strip b { color: var(--ok); font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase; }
+
+    .flow-list { display: grid; gap: .5rem; counter-reset: flow; }
+    .flow-step {
+      position: relative;
+      display: grid;
+      grid-template-columns: 2.15rem minmax(0, 1fr) auto;
+      gap: .65rem;
+      align-items: start;
+      padding: .65rem .75rem;
+      counter-increment: flow;
+    }
+    .flow-step::before {
+      display: grid;
+      place-items: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: var(--accent-wash);
+      color: var(--accent-ink);
+      content: counter(flow, decimal-leading-zero);
+      font: 750 var(--text-xs) var(--font-mono);
+    }
+    .flow-step strong { display: block; font-size: var(--text-sm); }
+    .flow-step p { margin-top: .15rem; color: var(--ink-soft); font-size: var(--text-sm); line-height: 1.45; }
+    .flow-step code { align-self: center; white-space: nowrap; font-size: var(--text-xs); }
+
+    .loop-ladder {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: .45rem;
+    }
+    .loop-ladder article {
+      min-height: 8rem;
+      padding: .65rem;
+      border: var(--hairline);
+      border-top: 4px solid var(--accent);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+    }
+    .loop-ladder article:nth-child(2) { border-top-color: var(--ink-soft); }
+    .loop-ladder article:nth-child(3) { border-top-color: var(--ok); }
+    .loop-ladder article:nth-child(4) { border-top-color: var(--ink-soft); }
+    .loop-ladder b { display: block; font-size: var(--text-sm); }
+    .loop-ladder p { margin-top: .25rem; color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.4; }
+
+    .ledger-group { overflow: clip; }
+    .ledger-group + .ledger-group { margin-top: .55rem; }
+    .ledger-group > summary {
+      display: flex;
+      justify-content: space-between;
+      gap: .75rem;
+      padding: .6rem .75rem;
+      cursor: pointer;
+      color: var(--accent-ink);
+      background: var(--bg-inset);
+      font: 700 var(--text-xs) var(--font-mono);
+    }
+    .ledger-group__body { padding: .55rem .7rem .7rem; }
+    .file-ledger {
+      display: grid;
+      grid-template-columns: minmax(15rem, .9fr) minmax(0, 1.25fr);
+      gap: 0 .7rem;
+      margin: 0;
+    }
+    .file-ledger dt,
+    .file-ledger dd {
+      min-width: 0;
+      padding: .32rem 0;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: var(--text-xs);
+      line-height: 1.4;
+    }
+    .file-ledger dt {
+      overflow-wrap: anywhere;
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-weight: 650;
+    }
+    .file-ledger dd { margin: 0; color: var(--ink-soft); }
+    .planned-only { color: var(--warn); font-weight: 700; }
+
+    .lab-box code { font-size: var(--text-sm); }
+    .lab-box__steps > li + li { margin-top: .55rem; }
+    .lab-command { margin-top: .4rem; }
+    .teach-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .65rem;
+    }
+    .teach-grid article {
+      padding: .75rem;
+      border: var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+    }
+    .teach-grid h3 { margin: 0; font-size: var(--text-base); }
+    .teach-grid p { margin-top: .3rem; font-size: var(--text-sm); }
+
+    @media (max-width: 960px) {
+      .chapter-shell { grid-template-columns: 1fr; }
+      .chapter-rail { display: none; }
+      .mobile-toc { display: block; }
+      .repo-map { grid-template-columns: 1fr 1fr; background: var(--bg-card); }
+      .truth-grid, .failure-grid, .contract-grid { grid-template-columns: 1fr; }
+      .loop-ladder { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .site-bar__meta { display: none; }
+      .repo-map, .file-tree, .teach-grid, .loop-ladder { grid-template-columns: 1fr; }
+      .file-ledger { grid-template-columns: 1fr; }
+      .file-ledger dt { padding-bottom: .08rem; border-bottom: 0; }
+      .file-ledger dd { padding-top: 0; }
+      .annotation-list li { grid-template-columns: 1fr; gap: .15rem; }
+      .flow-step { grid-template-columns: 2.15rem minmax(0, 1fr); }
+      .flow-step code { grid-column: 2; justify-self: start; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      .site-bar, .chapter-rail, .reading-progress, .mobile-toc, .tree-toolbar, .file-toolbar { display: none !important; }
+      .chapter-shell { display: block !important; width: 100% !important; }
+      .file-card:not([open]) .file-card__body, .ledger-group:not([open]) .ledger-group__body { display: block; }
+    }
+  </style>
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to code companion</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">Code companion · TAC-5 · 113 files</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Code companion navigation">
+      <p class="rail-kicker">Volume I · Code Deep-Dive</p>
+      <h2>Close the Loops</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of companion</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#hook"><span class="chapter-nav__n">01</span><span>The hook</span></a></li>
+          <li><a href="#map"><span class="chapter-nav__n">02</span><span>Map of the repo</span></a></li>
+          <li><a href="#tree"><span class="chapter-nav__n">03</span><span>File tree</span></a></li>
+          <li><a href="#mental-model"><span class="chapter-nav__n">04</span><span>Mental model</span></a></li>
+          <li><a href="#orchestration"><span class="chapter-nav__n">05</span><span>Orchestration code</span></a></li>
+          <li><a href="#validation"><span class="chapter-nav__n">06</span><span>Validation code</span></a></li>
+          <li><a href="#application"><span class="chapter-nav__n">07</span><span>App under test</span></a></li>
+          <li><a href="#ledger"><span class="chapter-nav__n">08</span><span>Every file</span></a></li>
+          <li><a href="#run"><span class="chapter-nav__n">09</span><span>One complete run</span></a></li>
+          <li><a href="#fails"><span class="chapter-nav__n">10</span><span>Common fails</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">11</span><span>Lab</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">12</span><span>Teach-back</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero">
+        <span class="eyebrow">TAC-5 · Teaching-first code explainer</span>
+        <h1>Close the Loops — how Dan built it</h1>
+        <p class="hero__dek">The application is only half the lesson. The other half is a small workflow engine that turns a GitHub issue into a plan, code, deterministic checks, browser checks, repair attempts, evidence, a commit, and a pull request.</p>
+        <ul class="hero__meta" aria-label="Repository facts">
+          <li>113 real files</li>
+          <li>14,858 text lines</li>
+          <li>1 SQLite backup</li>
+          <li>4 bounded loop layers</li>
+          <li>Python + TypeScript</li>
+        </ul>
+        <p class="hero__promise"><strong>Your target:</strong> by the end, you should be able to point at the exact function that closes each loop, say what evidence returns, and explain where the system deliberately stops.</p>
+        <p class="chapter-back"><a href="../vol-1-tac/05-close-the-loops.html">← Back to Chapter 5 · Close the Loops</a></p>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Companion contents</summary>
+          <ol>
+            <li><a href="#hook">The hook</a></li>
+            <li><a href="#map">Map of the repo</a></li>
+            <li><a href="#tree">File tree</a></li>
+            <li><a href="#mental-model">Mental model</a></li>
+            <li><a href="#orchestration">Orchestration code</a></li>
+            <li><a href="#validation">Validation code</a></li>
+            <li><a href="#application">App under test</a></li>
+            <li><a href="#ledger">Every file</a></li>
+            <li><a href="#run">One complete run</a></li>
+            <li><a href="#fails">Common fails</a></li>
+            <li><a href="#lab">Lab</a></li>
+            <li><a href="#teach-back">Teach-back</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="hook">
+        <span class="section-number">01 · Hook</span>
+        <h2 class="section-title">“The agent finished” is not a terminal state</h2>
+        <p class="section-lead">Imagine an implementer changes the SQL app and says “done.” What, exactly, would make that claim true?</p>
+
+        <div class="hook-card">
+          <p class="move-label">The failure this repo is designed around</p>
+          <h3>A plausible diff with no returning signal</h3>
+          <p>The Python may not compile. The security suite may fail. TypeScript may be broken. The page may load but the Query button may do nothing. A human can discover all four, but then the “autonomous” workflow has quietly assigned its last mile back to the human.</p>
+        </div>
+
+        <p>Dan’s answer is architectural: represent validation as data, run it as a distinct phase, feed each failure to a resolver, and run the validator again. TAC-5 makes that answer visible at four levels:</p>
+
+        <div class="loop-ladder" aria-label="Four nested feedback loops">
+          <article><b>1 · Function loop</b><p>Unit tests exercise file parsing, LLM routing, SQL execution, and security helpers.</p></article>
+          <article><b>2 · Test/repair loop</b><p><code>adw_test.py</code> retries deterministic checks up to four times.</p></article>
+          <article><b>3 · Browser loop</b><p>Playwright executes written user stories and keeps screenshots.</p></article>
+          <article><b>4 · Delivery loop</b><p>GitHub issues, comments, branches, commits, logs, and PRs make the run observable.</p></article>
+        </div>
+
+        <aside class="callout callout--term">
+          <p class="callout__label">Keep this distinction</p>
+          <p>The SQL app has a user-facing loop—upload → ask → generate SQL → execute → render. The ADW has an engineering loop—issue → plan → build → test → repair → deliver. The second loop validates changes to the first.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="map">
+        <span class="section-number">02 · Diagram</span>
+        <h2 class="section-title">Map of the repo</h2>
+        <p class="section-lead">Read left to right. A trigger starts work; ADW orchestration chooses prompts and preserves state; validators observe the application; artifacts return proof to GitHub and disk.</p>
+
+        <figure>
+          <div class="repo-map" role="img" aria-label="Four-lane architecture map from triggers through ADW orchestration and application validators to evidence artifacts">
+            <section class="repo-map__lane">
+              <h3>1 · Intake</h3>
+              <div class="repo-map__node"><strong>GitHub event</strong><code>adw_triggers/</code><p>Cron polls or FastAPI accepts a webhook.</p></div>
+              <div class="repo-map__node"><strong>Workflow selection</strong><code>classify_adw.md</code><p>Extracts plan, build, test, or combined intent.</p></div>
+            </section>
+            <section class="repo-map__lane">
+              <h3>2 · Control plane</h3>
+              <div class="repo-map__node"><strong>Phase wrapper</strong><code>adw_plan_build_test.py</code><p>Fail-fast subprocess chain: plan → build → test.</p></div>
+              <div class="repo-map__node"><strong>Durable identity</strong><code>ADWState</code><p>Five fields reconnect separate processes.</p></div>
+              <div class="repo-map__node"><strong>Agent adapter</strong><code>agent.py</code><p>Slash template → Claude CLI → JSONL result.</p></div>
+            </section>
+            <section class="repo-map__lane">
+              <h3>3 · Validators</h3>
+              <div class="repo-map__node"><strong>Deterministic suite</strong><code>/test</code><p>Compile, lint, pytest, type-check, build.</p></div>
+              <div class="repo-map__node"><strong>Repair loop</strong><code>/resolve_failed_test</code><p>Reproduce one command, fix, re-run it.</p></div>
+              <div class="repo-map__node"><strong>Browser suite</strong><code>/test_e2e</code><p>Drive written stories and save screenshots.</p></div>
+            </section>
+            <section class="repo-map__lane">
+              <h3>4 · Work + proof</h3>
+              <div class="repo-map__node"><strong>SQL application</strong><code>app/client + app/server</code><p>The real system being changed and checked.</p></div>
+              <div class="repo-map__node"><strong>Evidence</strong><code>agents/&lt;adw_id&gt;/</code><p>Prompts, JSONL, JSON, logs, screenshots, state.</p></div>
+              <div class="repo-map__node"><strong>Delivery</strong><code>branch + PR + comments</code><p>Humans can see the path, not just the verdict.</p></div>
+            </section>
+          </div>
+          <figcaption>Arrows are conceptual: intake selects a workflow; the control plane calls validators; validators operate on the app; evidence returns to the control plane and GitHub.</figcaption>
+        </figure>
+        <div class="repo-map__legend" aria-label="Diagram legend">
+          <span class="legend-dot">request / orchestration</span>
+          <span class="legend-dot" style="--dot:var(--ink-soft)">browser / agent execution</span>
+          <span class="legend-dot" style="--dot:var(--ok)">validation / repair</span>
+          <span class="legend-dot" style="--dot:var(--ink-soft)">application / evidence</span>
+        </div>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="tree">
+        <span class="section-number">03 · File tree</span>
+        <h2 class="section-title">Jump into the real repository</h2>
+        <p class="section-lead">The tree is grouped by responsibility, not alphabetically. Expand a branch, then jump to its walkthrough or exhaustive ledger.</p>
+
+        <div class="tree-toolbar">
+          <p class="fine">All paths are relative to <code>tac/tac-5/</code>.</p>
+          <div><button type="button" data-details-action="open" data-details-target=".tree-branch">Expand tree</button> <button type="button" data-details-action="close" data-details-target=".tree-branch">Collapse tree</button></div>
+        </div>
+        <div class="file-tree">
+          <details class="tree-branch" open>
+            <summary>adws/ · workflow engine</summary>
+            <ul>
+              <li><a href="#file-wrapper"><code>adw_plan_build_test.py</code> — phase chain</a></li>
+              <li><a href="#file-plan"><code>adw_plan.py</code> — issue → plan</a></li>
+              <li><a href="#file-build"><code>adw_build.py</code> — plan → code</a></li>
+              <li><a href="#file-test"><code>adw_test.py</code> — validate → repair</a></li>
+              <li><a href="#file-state"><code>adw_modules/state.py</code> — durable hand-off</a></li>
+              <li><a href="#file-agent"><code>adw_modules/agent.py</code> — Claude adapter</a></li>
+              <li><a href="#adws-ledger">All 22 ADW files →</a></li>
+            </ul>
+          </details>
+          <details class="tree-branch" open>
+            <summary>.claude/ · executable instructions</summary>
+            <ul>
+              <li><a href="#file-test-command"><code>commands/test.md</code> — deterministic contract</a></li>
+              <li><a href="#file-resolver"><code>commands/resolve_failed_test.md</code> — one-failure repair</a></li>
+              <li><a href="#file-e2e"><code>commands/test_e2e.md</code> — browser runner</a></li>
+              <li><a href="#file-settings"><code>settings.json</code> — hooks and permissions</a></li>
+              <li><a href="#claude-ledger">All 30 Claude files →</a></li>
+            </ul>
+          </details>
+          <details class="tree-branch">
+            <summary>app/server/ · data + query backend</summary>
+            <ul>
+              <li><a href="#file-server"><code>server.py</code> — API boundary</a></li>
+              <li><a href="#file-file-processor"><code>core/file_processor.py</code> — upload conversion</a></li>
+              <li><a href="#file-llm"><code>core/llm_processor.py</code> — NL → SQL</a></li>
+              <li><a href="#file-security"><code>core/sql_security.py</code> — guardrails</a></li>
+              <li><a href="#server-ledger">All 27 server files →</a></li>
+            </ul>
+          </details>
+          <details class="tree-branch">
+            <summary>app/client/ · browser experience</summary>
+            <ul>
+              <li><a href="#file-main-ts"><code>src/main.ts</code> — DOM controller</a></li>
+              <li><a href="#file-api"><code>src/api/client.ts</code> — fetch boundary</a></li>
+              <li><a href="#file-types"><code>src/types.d.ts</code> — mirrored contracts</a></li>
+              <li><a href="#client-ledger">All 16 client files →</a></li>
+            </ul>
+          </details>
+          <details class="tree-branch">
+            <summary>specs/ · plans that became code</summary>
+            <ul>
+              <li><a href="#specs-ledger"><code>init_nlq_to_sql_to_table.md</code></a></li>
+              <li><a href="#specs-ledger"><code>jsonl-support.md</code></a></li>
+              <li><a href="#specs-ledger"><code>fix-sql-injection-vulnerabilities.md</code></a></li>
+              <li><a href="#specs-ledger"><code>replace-print-with-logging.md</code></a></li>
+              <li><a href="#specs-ledger"><code>query-history-panel.md</code> — planned, not implemented</a></li>
+            </ul>
+          </details>
+          <details class="tree-branch">
+            <summary>root + scripts/ · setup and operations</summary>
+            <ul>
+              <li><a href="#root-ledger"><code>README.md</code> — operator contract</a></li>
+              <li><a href="#root-ledger"><code>.mcp.json</code> — Playwright server</a></li>
+              <li><a href="#scripts-ledger"><code>scripts/start.sh</code> — two-service lifecycle</a></li>
+              <li><a href="#scripts-ledger"><code>scripts/reset_db.sh</code> — deterministic fixture</a></li>
+              <li><a href="#ledger">All remaining files →</a></li>
+            </ul>
+          </details>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="mental-model">
+        <span class="section-number">04 · Mental model</span>
+        <h2 class="section-title">Three facts make the code much easier to read</h2>
+        <p class="section-lead">If you miss these, <code>adw_test.py</code> looks like a pile of subprocesses. If you hold them, it reads like a state machine.</p>
+
+        <div class="truth-grid">
+          <article class="truth-card"><b>Prompts are modules</b><p>The Markdown files in <code>.claude/commands/</code> are executable interfaces. Python chooses a command and supplies typed arguments; the command supplies judgment and procedure.</p></article>
+          <article class="truth-card"><b>State is intentionally tiny</b><p><code>ADWStateData</code> persists only five identifiers. Large outputs live as files. That keeps process hand-offs cheap and inspectable.</p></article>
+          <article class="truth-card"><b>Success is re-observed</b><p>A resolver’s successful exit does not prove the test passes. The outer while-loop re-runs the whole validator and trusts the new observation.</p></article>
+        </div>
+
+        <div class="code-frame">
+          <div class="code-frame__bar"><span>The five-field spine</span><span>adw_modules/data_types.py · 185–196</span></div>
+          <pre><code><span class="tok-k">class</span> <span class="tok-f">ADWStateData</span>(BaseModel):
+    adw_id: <span class="tok-n">str</span>
+    issue_number: Optional[<span class="tok-n">str</span>] = <span class="tok-k">None</span>
+    branch_name: Optional[<span class="tok-n">str</span>] = <span class="tok-k">None</span>
+    plan_file: Optional[<span class="tok-n">str</span>] = <span class="tok-k">None</span>
+    issue_class: Optional[IssueClassSlashCommand] = <span class="tok-k">None</span></code></pre>
+        </div>
+
+        <p>Notice what is absent: issue bodies, model transcripts, test arrays, screenshots, and commit history. Those are artifacts, not routing state. A fresh process needs only enough information to find the right branch, plan, and run directory.</p>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Why Dan split Python from Markdown</p>
+          <p>Python is good at deterministic sequencing, retry budgets, exit codes, files, and subprocesses. Prompt templates are good at classification, planning, diagnosis, and repair. TAC-5 puts each kind of work where it is easiest to change.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="orchestration">
+        <span class="section-number">05 · Walk the orchestration code</span>
+        <h2 class="section-title">From one issue to three bounded phases</h2>
+        <p class="section-lead">Open the cards in order. Each one answers a single control-flow question.</p>
+
+        <div class="file-toolbar">
+          <p class="fine">Important files are collapsible; the first pass should follow wrapper → state → adapter → phase.</p>
+          <div><button type="button" data-details-action="open" data-details-target=".important-file">Open all walkthroughs</button> <button type="button" data-details-action="close" data-details-target=".important-file">Close all</button></div>
+        </div>
+
+        <details class="file-card important-file" id="file-wrapper" open>
+          <summary><span><span class="file-card__path">adws/adw_plan_build_test.py</span><span class="file-card__one-line">The outer, fail-fast phase sequencer.</span><span class="file-card__badge">start here</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Purpose.</strong> Accept an issue number, establish one ADW ID, then launch planning, building, and testing as separate Python processes. If any process returns non-zero, the chain stops.</p>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>One identity, three processes</span><span>lines 34–80</span></div>
+              <pre><code>issue_number = sys.argv[<span class="tok-n">1</span>]
+adw_id = ensure_adw_id(issue_number, adw_id)
+
+plan = subprocess.run([<span class="tok-s">"uv"</span>, <span class="tok-s">"run"</span>, plan_script, issue_number, adw_id])
+<span class="tok-k">if</span> plan.returncode != <span class="tok-n">0</span>:
+    sys.exit(<span class="tok-n">1</span>)
+
+build = subprocess.run([<span class="tok-s">"uv"</span>, <span class="tok-s">"run"</span>, build_script, issue_number, adw_id])
+<span class="tok-k">if</span> build.returncode != <span class="tok-n">0</span>:
+    sys.exit(<span class="tok-n">1</span>)
+
+test = subprocess.run([<span class="tok-s">"uv"</span>, <span class="tok-s">"run"</span>, test_script, issue_number, adw_id])</code></pre>
+            </div>
+            <ul class="annotation-list">
+              <li><b>Input</b><span><code>&lt;issue-number&gt; [adw-id]</code>.</span></li>
+              <li><b>Decision</b><span>Only process exit codes; the wrapper contains no agentic judgment.</span></li>
+              <li><b>Output</b><span>Side effects from the three phases; the test phase also writes state JSON to stdout.</span></li>
+              <li><b>Boundary</b><span>No automatic rollback. “Fail fast” means stop the next phase, not undo the previous one.</span></li>
+            </ul>
+            <div class="why-strip"><b>Why this shape</b><span>Separate processes make each phase runnable alone, restartable from durable state, and visible in its own log directory.</span></div>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-state" open>
+          <summary><span><span class="file-card__path">adws/adw_modules/state.py</span><span class="file-card__one-line">The continuity layer between fresh processes and fresh context windows.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Purpose.</strong> Keep the run addressable even when planning, building, and testing are launched independently. State is written to <code>agents/&lt;adw_id&gt;/adw_state.json</code>.</p>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>Persist and resume</span><span>lines 53–103</span></div>
+              <pre><code><span class="tok-k">def</span> <span class="tok-f">save</span>(self, workflow_step=<span class="tok-k">None</span>):
+    state_path = self.get_state_path()
+    state_data = ADWStateData(**self.data)
+    <span class="tok-k">with</span> open(state_path, <span class="tok-s">"w"</span>) <span class="tok-k">as</span> f:
+        json.dump(state_data.model_dump(), f, indent=<span class="tok-n">2</span>)
+
+<span class="tok-p">@classmethod</span>
+<span class="tok-k">def</span> <span class="tok-f">load</span>(cls, adw_id, logger=<span class="tok-k">None</span>):
+    data = json.load(open(state_path))
+    state_data = ADWStateData(**data)
+    state = cls(state_data.adw_id)
+    state.data = state_data.model_dump()
+    <span class="tok-k">return</span> state</code></pre>
+            </div>
+            <ul class="annotation-list">
+              <li><b>Filter</b><span><code>update()</code> silently accepts only five core fields.</span></li>
+              <li><b>Validate</b><span>Pydantic checks the shape before every save and after every load.</span></li>
+              <li><b>Two channels</b><span>File persistence is the real path used by the wrappers; <code>from_stdin()</code>/<code>to_stdout()</code> also support shell pipes.</span></li>
+              <li><b>Failure mode</b><span><code>load()</code> returns <code>None</code> on malformed state, so callers must handle absence explicitly.</span></li>
+            </ul>
+            <div class="why-strip"><b>Why this shape</b><span>Passing full transcripts through stdout would couple phases and invite parsing failures. Tiny state plus addressable artifacts gives loose coupling.</span></div>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-agent">
+          <summary><span><span class="file-card__path">adws/adw_modules/agent.py</span><span class="file-card__one-line">The adapter from typed Python requests to Claude Code JSONL results.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Purpose.</strong> Turn <code>AgentTemplateRequest</code> into a slash-command prompt, execute Claude in non-interactive mode, save the event stream, and return the final <code>result</code> as an <code>AgentPromptResponse</code>.</p>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>Template → prompt → artifact → typed result</span><span>lines 247–274 + 176–224</span></div>
+              <pre><code><span class="tok-k">def</span> <span class="tok-f">execute_template</span>(request):
+    prompt = <span class="tok-s">f"{request.slash_command} {' '.join(request.args)}"</span>
+    output_file = os.path.join(
+        project_root, <span class="tok-s">"agents"</span>, request.adw_id,
+        request.agent_name, <span class="tok-s">"raw_output.jsonl"</span>
+    )
+    <span class="tok-k">return</span> prompt_claude_code(AgentPromptRequest(
+        prompt=prompt,
+        dangerously_skip_permissions=<span class="tok-k">True</span>,
+        output_file=output_file,
+        ...
+    ))</code></pre>
+            </div>
+            <ul class="annotation-list">
+              <li><b>Before run</b><span><code>check_claude_installed()</code> calls <code>claude --version</code>; <code>save_prompt()</code> preserves the exact request.</span></li>
+              <li><b>CLI mode</b><span><code>-p</code>, <code>--output-format stream-json</code>, <code>--verbose</code>, selected model, optional dangerous permission bypass.</span></li>
+              <li><b>After run</b><span>Find the last JSONL message whose type is <code>result</code>, convert the full stream to a JSON array, and preserve its session ID.</span></li>
+              <li><b>Environment</b><span><code>get_claude_env()</code> passes a minimal allowlist, including <code>PATH</code> and optional GitHub tokens.</span></li>
+            </ul>
+            <div class="why-strip"><b>Why this shape</b><span>Every agent call gets the same storage layout and error contract. Orchestration code never has to know Claude CLI flags or JSONL details.</span></div>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-plan">
+          <summary><span><span class="file-card__path">adws/adw_plan.py</span><span class="file-card__one-line">Classify issue → create branch → write plan → commit → PR.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Purpose.</strong> Convert an unstructured GitHub issue into a plan file and a branch that later phases can resume.</p>
+            <ol>
+              <li>Load environment, ensure/load state, and fetch the typed GitHub issue.</li>
+              <li>Call <code>/classify_issue</code>; store <code>/chore</code>, <code>/bug</code>, or <code>/feature</code>.</li>
+              <li>Call <code>/generate_branch_name</code>, create the branch, and save its name.</li>
+              <li>Call the selected planning template. The agent writes a spec under <code>specs/</code>.</li>
+              <li>Call <code>/find_plan_file</code>, persist the path, generate a commit message, then finalize push/PR work.</li>
+            </ol>
+            <p>The repeated issue comments are not decoration. Each comment is an out-of-process trace checkpoint for a human watching the run.</p>
+            <div class="why-strip"><b>Design choice</b><span>The plan is committed before implementation. That creates a reviewable intent artifact and a restart point.</span></div>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-build">
+          <summary><span><span class="file-card__path">adws/adw_build.py</span><span class="file-card__one-line">Resume exact state → implement exact plan → integrate the change.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Purpose.</strong> Require both <code>issue-number</code> and <code>adw-id</code>, load the exact saved plan and branch, call <code>/implement</code>, then commit and push.</p>
+            <ul class="annotation-list">
+              <li><b>Guard 1</b><span>No state file means hard stop: run planning first.</span></li>
+              <li><b>Guard 2</b><span>No <code>branch_name</code> or <code>plan_file</code> means hard stop.</span></li>
+              <li><b>Mutation</b><span><code>implement_plan()</code> delegates the plan to the <code>sdlc_implementor</code> agent.</span></li>
+              <li><b>Fallback</b><span>If state lacks classification, classify again; if that fails, default to <code>/feature</code>.</span></li>
+            </ul>
+            <p>This phase does not run the full validation node itself. The combined wrapper closes that larger loop by launching <code>adw_test.py</code> next.</p>
+          </div>
+        </details>
+
+        <details class="file-card important-file">
+          <summary><span><span class="file-card__path">adws/adw_modules/workflow_ops.py + git_ops.py + github.py</span><span class="file-card__one-line">Shared business operations and external boundaries.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong><code>workflow_ops.py</code></strong> is the vocabulary of the workflow: classify, plan, find a plan, implement, name a branch, create a commit request, create a PR request, and locate existing work.</p>
+            <p><strong><code>git_ops.py</code></strong> centralizes deterministic git subprocesses and the final push/PR decision. <strong><code>github.py</code></strong> centralizes <code>gh</code> CLI calls and converts issue JSON into Pydantic models.</p>
+            <div class="contract-grid">
+              <article class="truth-card"><b>Agentic operations</b><p>Return <code>AgentPromptResponse</code> or <code>(value, error)</code>. They can interpret unstructured text.</p></article>
+              <article class="truth-card"><b>Deterministic operations</b><p>Return subprocess status and stderr. They sequence observable system changes.</p></article>
+              <article class="truth-card"><b>Typed boundary</b><p><code>GitHubIssue</code>, <code>TestResult</code>, and <code>E2ETestResult</code> stop arbitrary JSON from leaking inward.</p></article>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="chapter-section" id="validation">
+        <span class="section-number">06 · Walk the validation code</span>
+        <h2 class="section-title">The loop closes in <code>adw_test.py</code></h2>
+        <p class="section-lead">This is the load-bearing file: 1,106 lines coordinating a four-attempt deterministic loop and a two-attempt browser loop.</p>
+
+        <details class="file-card important-file" id="file-test" open>
+          <summary><span><span class="file-card__path">adws/adw_test.py</span><span class="file-card__one-line">Run → parse → resolve each failure → run again → report honestly.</span><span class="file-card__badge">core loop</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Purpose.</strong> Make validation its own resumable workflow node. It can follow planning/building or create a test-only branch when run alone.</p>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>The deterministic repair loop</span><span>lines 411–517</span></div>
+              <pre><code><span class="tok-k">while</span> attempt &lt; max_attempts:
+    attempt += <span class="tok-n">1</span>
+    test_response = run_tests(adw_id, logger)
+    results, passed_count, failed_count = parse_test_results(
+        test_response.output, logger
+    )
+
+    <span class="tok-k">if</span> failed_count == <span class="tok-n">0</span>:
+        <span class="tok-k">break</span>
+    <span class="tok-k">if</span> attempt == max_attempts:
+        <span class="tok-k">break</span>
+
+    failed_tests = [test <span class="tok-k">for</span> test <span class="tok-k">in</span> results <span class="tok-k">if not</span> test.passed]
+    resolved, unresolved = resolve_failed_tests(
+        failed_tests, adw_id, issue_number, logger, iteration=attempt
+    )
+    <span class="tok-k">if</span> resolved == <span class="tok-n">0</span>:
+        <span class="tok-k">break</span></code></pre>
+            </div>
+            <ul class="annotation-list">
+              <li><b>Observe</b><span><code>run_tests()</code> calls the <code>/test</code> template and expects a JSON array of <code>TestResult</code>.</span></li>
+              <li><b>Localize</b><span>Each failed item carries its own exact <code>execution_command</code>, purpose, and error.</span></li>
+              <li><b>Repair</b><span>A new resolver agent is named by iteration and index, so its prompt and output cannot overwrite another attempt.</span></li>
+              <li><b>Re-observe</b><span>The next while-loop iteration runs the validator again. Resolver success alone is never the final verdict.</span></li>
+              <li><b>Bound</b><span>Four unit attempts; stop early when green, on high-level runner error, at the budget, or when no resolver reports progress.</span></li>
+            </ul>
+
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>The browser gate</span><span>lines 977–1011</span></div>
+              <pre><code><span class="tok-k">if</span> failed_count &gt; <span class="tok-n">0</span>:
+    <span class="tok-c"># deterministic foundation is red</span>
+    e2e_results = []
+<span class="tok-k">elif</span> skip_e2e:
+    e2e_results = []
+<span class="tok-k">else</span>:
+    e2e_results, e2e_passed_count, e2e_failed_count = \
+        run_e2e_tests_with_resolution(adw_id, issue_number, logger)</code></pre>
+            </div>
+            <p>The ordering is deliberate: browser tests are slower and noisier, so the workflow refuses to spend them while the cheaper deterministic layer is known red. E2E files run sequentially and stop on the first failure; the resolver fixes that failure, then the suite restarts from the beginning.</p>
+
+            <div class="why-strip"><b>Why this shape</b><span>The loop is not “agent keeps trying.” It is a bounded state machine with explicit observations, typed failure payloads, unique artifacts, retry budgets, and a non-zero terminal failure.</span></div>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-test-command" open>
+          <summary><span><span class="file-card__path">.claude/commands/test.md</span><span class="file-card__one-line">The executable definition of application health.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Purpose.</strong> Teach a fresh test agent what to run, in what order, how to name each result, and exactly what JSON shape to return.</p>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>Validation stack</span><span>commands/test.md · 40–72</span></div>
+              <pre><code><span class="tok-c"># 1 · syntax</span>
+cd app/server &amp;&amp; uv run python -m py_compile server.py main.py core/*.py
+
+<span class="tok-c"># 2 · static quality</span>
+cd app/server &amp;&amp; uv run ruff check .
+
+<span class="tok-c"># 3 · backend behavior</span>
+cd app/server &amp;&amp; uv run pytest tests/ -v --tb=short
+
+<span class="tok-c"># 4 · frontend contract</span>
+cd app/client &amp;&amp; bun tsc --noEmit
+
+<span class="tok-c"># 5 · production bundle</span>
+cd app/client &amp;&amp; bun run build</code></pre>
+            </div>
+            <p>Crucially, the output is not prose. Each test becomes a repair ticket with <code>test_name</code>, <code>passed</code>, <code>execution_command</code>, <code>test_purpose</code>, and optional <code>error</code>.</p>
+            <aside class="callout callout--warning"><p class="callout__label">Prompt contradiction to notice</p><p>The command says both “execute all tests even if some fail” and “stop processing tests” on the first non-zero result. A fresh agent must reconcile those instructions. Strong validation contracts avoid mutually exclusive control rules.</p></aside>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-resolver">
+          <summary><span><span class="file-card__path">.claude/commands/resolve_failed_test.md</span><span class="file-card__one-line">A deliberately narrow inner repair loop.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Purpose.</strong> Take one typed failure, reproduce its exact command, make the smallest relevant fix, and re-run only that command.</p>
+            <ol>
+              <li>Understand the test’s name, purpose, and error.</li>
+              <li>Inspect only recent changes, a relevant spec, and files that can affect this test.</li>
+              <li>Run the payload’s <code>execution_command</code> to reproduce the red state.</li>
+              <li>Apply a minimal change.</li>
+              <li>Re-run the same command; do not run the whole suite inside this resolver.</li>
+            </ol>
+            <p>The full suite belongs to the outer loop. This prevents every resolver from paying the cost of all validators and keeps diagnosis focused.</p>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-e2e">
+          <summary><span><span class="file-card__path">.claude/commands/test_e2e.md + commands/e2e/*.md</span><span class="file-card__one-line">A generic browser runner paired with three concrete user stories.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Runner.</strong> Reset the database, start both services, open <code>http://localhost:5173</code>, execute the selected E2E Markdown file with Playwright MCP, save screenshots under the run/agent/test directory, and return one <code>E2ETestResult</code>-shaped JSON object.</p>
+            <ul>
+              <li><code>test_basic_query.md</code> checks the page contract, query submission, SQL translation, results, and Hide button.</li>
+              <li><code>test_complex_query.md</code> checks natural-language filtering and a generated <code>WHERE</code> clause.</li>
+              <li><code>test_sql_injection.md</code> checks that a destructive request is blocked and tables remain intact.</li>
+            </ul>
+            <p><code>resolve_failed_e2e_test.md</code> is the visual equivalent of the unit resolver: re-open the named test file, reproduce the exact failed step, inspect screenshots, fix minimally, and re-run only that story.</p>
+            <div class="why-strip"><b>Why Markdown</b><span>The E2E contract is legible as a user story and executable as browser instructions. Product intent and test procedure stay adjacent.</span></div>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-settings">
+          <summary><span><span class="file-card__path">.claude/settings.json + .claude/hooks/</span><span class="file-card__one-line">Guardrails and trace capture around every agent tool call.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Permissions.</strong> Allow common build operations; deny force-push variants and <code>rm -rf</code>. <strong>Hooks.</strong> Run before tools, after tools, on notification, on stop, and on subagent stop.</p>
+            <ul class="annotation-list">
+              <li><b>PreToolUse</b><span>Blocks real <code>.env</code> access and dangerous recursive removal; logs accepted tool calls.</span></li>
+              <li><b>PostToolUse</b><span>Appends tool-result events to a session JSON file.</span></li>
+              <li><b>Notification</b><span>Records notification events; the <code>--notify</code> flag is parsed but no TTS call is made here.</span></li>
+              <li><b>Stop</b><span>Records stop events and optionally converts the session transcript JSONL into <code>chat.json</code>.</span></li>
+              <li><b>SubagentStop</b><span>Captures the equivalent subagent boundary.</span></li>
+            </ul>
+            <p>Hooks are the observability substrate. They do not decide whether the application works; they make the agent’s behavior inspectable and block a few high-risk actions before execution.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="chapter-section" id="application">
+        <span class="section-number">07 · Walk the application under test</span>
+        <h2 class="section-title">The workflow needs a real workload</h2>
+        <p class="section-lead">The app is a deliberately small vertical slice: files become SQLite tables, natural language becomes SQL, validated SQL becomes rows, and TypeScript renders those rows.</p>
+
+        <details class="file-card important-file" id="file-server" open>
+          <summary><span><span class="file-card__path">app/server/server.py</span><span class="file-card__one-line">FastAPI composition root and HTTP error contract.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>Purpose.</strong> Wire Pydantic models to five core modules and expose upload, query, schema, insights, health, and table-deletion endpoints.</p>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>The user query path</span><span>lines 91–129</span></div>
+              <pre><code><span class="tok-p">@app.post</span>(<span class="tok-s">"/api/query"</span>, response_model=QueryResponse)
+<span class="tok-k">async def</span> <span class="tok-f">process_natural_language_query</span>(request):
+    schema_info = get_database_schema()
+    sql = generate_sql(request, schema_info)
+    start_time = datetime.now()
+    result = execute_sql_safely(sql)
+
+    <span class="tok-k">if</span> result[<span class="tok-s">"error"</span>]:
+        <span class="tok-k">raise</span> Exception(result[<span class="tok-s">"error"</span>])
+
+    <span class="tok-k">return</span> QueryResponse(
+        sql=sql,
+        results=result[<span class="tok-s">"results"</span>],
+        columns=result[<span class="tok-s">"columns"</span>],
+        ...
+    )</code></pre>
+            </div>
+            <p>Most endpoint failures return a valid response model with an <code>error</code> field rather than a non-2xx response. That is why the browser code must inspect both HTTP status and payload error.</p>
+            <div class="why-strip"><b>Why this shape</b><span>A thin route layer keeps file parsing, model calls, SQL execution, statistics, and security independently testable.</span></div>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-file-processor">
+          <summary><span><span class="file-card__path">app/server/core/file_processor.py</span><span class="file-card__one-line">CSV/JSON/JSONL bytes → sanitized SQLite table + schema preview.</span></span></summary>
+          <div class="file-card__body">
+            <p><strong>CSV and JSON.</strong> Sanitize the filename, build a pandas DataFrame, normalize columns, replace the SQLite table, then query its schema, five-row sample, and count through the security helper.</p>
+            <p><strong>JSONL.</strong> First scan every line to discover the union of flattened fields. Then scan again, fill missing fields with <code>None</code>, create a DataFrame, and persist it. Nested objects use <code>__</code>; array positions use <code>_0</code>, <code>_1</code>, and so on.</p>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>Recursive flattening</span><span>lines 169–194</span></div>
+              <pre><code><span class="tok-k">def</span> <span class="tok-f">flatten_json_object</span>(obj, prefix=<span class="tok-s">""</span>):
+    result = {}
+    <span class="tok-k">if</span> isinstance(obj, dict):
+        <span class="tok-k">for</span> key, value <span class="tok-k">in</span> obj.items():
+            new_key = <span class="tok-s">f"{prefix}__{key}"</span> <span class="tok-k">if</span> prefix <span class="tok-k">else</span> key
+            result.update(flatten_json_object(value, new_key))
+    <span class="tok-k">elif</span> isinstance(obj, list):
+        <span class="tok-k">for</span> i, value <span class="tok-k">in</span> enumerate(obj):
+            result.update(flatten_json_object(value, <span class="tok-s">f"{prefix}_{i}"</span>))
+    <span class="tok-k">else</span>:
+        result[prefix] = obj
+    <span class="tok-k">return</span> result</code></pre>
+            </div>
+            <p>The JSONL spec says “line by line for memory efficiency,” but the implementation decodes the whole file, builds a full records list, and then a DataFrame. It is logically line-oriented, not streaming-memory-bounded.</p>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-llm">
+          <summary><span><span class="file-card__path">app/server/core/llm_processor.py</span><span class="file-card__one-line">Database schema + user question → cleaned SQLite query.</span></span></summary>
+          <div class="file-card__body">
+            <p><code>format_schema_for_prompt()</code> serializes every table, column type, and row count. The OpenAI and Anthropic functions use nearly identical prompts, low temperature, a 500-token cap, and strip Markdown fences.</p>
+            <p><code>generate_sql()</code> routes by key availability before request preference: an OpenAI key wins even when the request says Anthropic; Anthropic is used only when OpenAI is absent. The request field is therefore a fallback, not a strict selector.</p>
+            <p>This module proposes SQL. It does not establish safety. The returned string crosses a separate security/execution boundary next.</p>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-security">
+          <summary><span><span class="file-card__path">app/server/core/sql_security.py + sql_processor.py</span><span class="file-card__one-line">Validate identifiers and generated queries before SQLite sees them.</span></span></summary>
+          <div class="file-card__body">
+            <p><code>sql_security.py</code> validates table/column identifiers, escapes them with SQLite brackets, substitutes identifier placeholders, binds value placeholders, blocks DDL unless explicitly allowed, detects dangerous query patterns, and provides small safe builders.</p>
+            <p><code>sql_processor.py</code> uses those rules in two paths: schema discovery safely interpolates identifiers; generated SQL is checked by <code>validate_sql_query()</code>, then executed as a complete statement because its values cannot be retroactively parameterized.</p>
+            <aside class="callout callout--warning"><p class="callout__label">Security boundary, not a proof of perfect parsing</p><p>The generated-query path is a regex denylist, not an SQL AST allowlist. The tests prove the named attacks are blocked; they do not prove every mutation syntax is impossible. The safest design would enforce read-only SQLite access or a parsed SELECT-only policy as another independent layer.</p></aside>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-main-ts">
+          <summary><span><span class="file-card__path">app/client/src/main.ts</span><span class="file-card__one-line">One vanilla TypeScript controller for query, upload, modal, tables, and rendering.</span></span></summary>
+          <div class="file-card__body">
+            <p>On <code>DOMContentLoaded</code>, four functions attach behavior and load schema. Query submission disables the button, calls the API, renders the SQL and table, then restores the button. File upload supports browse and drag/drop. Sample buttons fetch static files, wrap their blobs as <code>File</code>, and reuse the same upload path.</p>
+            <p>Results rows are built with DOM nodes and <code>textContent</code>, but the natural-language query, generated SQL, and server error are inserted with <code>innerHTML</code>. That mixed rendering policy is an important review seam because those strings can contain markup.</p>
+            <p>Each call to <code>displayResults()</code> adds another click listener to the same Hide button. After several queries, one click may toggle multiple times. This is exactly the kind of user-path issue an E2E loop can reveal even when TypeScript and backend tests are green.</p>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-api">
+          <summary><span><span class="file-card__path">app/client/src/api/client.ts</span><span class="file-card__one-line">Typed fetch wrapper and five API methods.</span></span></summary>
+          <div class="file-card__body">
+            <p>Development calls use <code>/api</code> and Vite proxies to port 8000; production uses <code>http://localhost:8000/api</code> directly. <code>apiRequest&lt;T&gt;</code> spreads request options, checks <code>response.ok</code>, parses JSON, and rethrows network/status errors.</p>
+            <p>The wrapper deliberately does not set a default <code>Content-Type</code>, which lets the browser create the correct multipart boundary for <code>FormData</code>. JSON methods add their own header.</p>
+          </div>
+        </details>
+
+        <details class="file-card important-file" id="file-types">
+          <summary><span><span class="file-card__path">app/client/src/types.d.ts + app/server/core/data_models.py</span><span class="file-card__one-line">Mirrored contracts across the HTTP boundary.</span></span></summary>
+          <div class="file-card__body">
+            <p>Pydantic owns runtime validation and JSON serialization; global TypeScript interfaces own compile-time expectations in the browser. Both define upload, query, schema, insight, and health shapes.</p>
+            <p>The comment “must match exactly” is a human-maintained invariant—there is no schema generator in this repo. The deterministic loop catches many mismatches indirectly through type-check/build and backend tests, but not contract drift that still compiles on both sides.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="ledger">
+        <span class="section-number">08 · Every file</span>
+        <h2 class="section-title">Exhaustive 113-file job ledger</h2>
+        <p class="section-lead">Every real path is accounted for below. Lockfiles and fixtures are included; the SQLite backup is inspected by schema and sample rows rather than treated as text.</p>
+
+        <details class="ledger-group" id="root-ledger" open>
+          <summary><span>Repository root · 5 files</span><span>operator surface</span></summary>
+          <div class="ledger-group__body"><dl class="file-ledger">
+            <dt>.env.sample</dt><dd>Documents ADW secrets and optional runtime settings without containing real credentials.</dd>
+            <dt>.gitignore</dt><dd>Excludes secrets, environments, builds, live databases, logs, agent artifacts, trees, and generated specs; explicitly keeps the backup database.</dd>
+            <dt>.mcp.json</dt><dd>Configures an isolated headless Playwright MCP server at 1920×1080 for browser validation.</dd>
+            <dt>.mcp.json.sample</dt><dd>Shareable copy of the same Playwright MCP configuration.</dd>
+            <dt>README.md</dt><dd>Top-level operator contract for the SQL app, security model, ADW modes, setup, endpoints, and troubleshooting.</dd>
+          </dl></div>
+        </details>
+
+        <details class="ledger-group" id="claude-ledger">
+          <summary><span>.claude/ · 30 files</span><span>commands, hooks, policy</span></summary>
+          <div class="ledger-group__body"><dl class="file-ledger">
+            <dt>.claude/commands/bug.md</dt><dd>Planning template for a surgical bug fix, including reproduction, root cause, E2E requirements for UI bugs, and validation commands.</dd>
+            <dt>.claude/commands/chore.md</dt><dd>Planning template for bounded maintenance work with a simpler plan schema.</dd>
+            <dt>.claude/commands/classify_adw.md</dt><dd>Extracts an ADW workflow name and optional eight-character run ID from issue or comment text.</dd>
+            <dt>.claude/commands/classify_issue.md</dt><dd>Maps issue JSON to exactly <code>/chore</code>, <code>/bug</code>, <code>/feature</code>, or <code>0</code>.</dd>
+            <dt>.claude/commands/commit.md</dt><dd>Inspects/stages changes, creates a formatted commit, and returns only its message.</dd>
+            <dt>.claude/commands/e2e/test_basic_query.md</dt><dd>User story for page presence, a basic query, SQL visibility, results, Hide behavior, and three screenshots.</dd>
+            <dt>.claude/commands/e2e/test_complex_query.md</dt><dd>User story for filtered natural language, a <code>WHERE</code> clause, result filtering, Hide behavior, and five screenshots.</dd>
+            <dt>.claude/commands/e2e/test_sql_injection.md</dt><dd>User story proving a destructive query is blocked and the users table survives, with four screenshots.</dd>
+            <dt>.claude/commands/feature.md</dt><dd>Three-phase feature-planning template with tests, acceptance criteria, and UI E2E planning rules.</dd>
+            <dt>.claude/commands/find_plan_file.md</dt><dd>Finds the plan matching issue and ADW ID, returning only the path or <code>0</code>.</dd>
+            <dt>.claude/commands/generate_branch_name.md</dt><dd>Generates the standardized issue/run branch name; also instructs the agent to switch, pull, and create it.</dd>
+            <dt>.claude/commands/implement.md</dt><dd>Thin implementation prompt: read a plan, implement it, and report a diff stat.</dd>
+            <dt>.claude/commands/install.md</dt><dd>Repository bootstrap procedure: read safe env samples, install, reset the database, start services, and explain remote setup.</dd>
+            <dt>.claude/commands/prime.md</dt><dd>Minimal codebase orientation: list tracked files and read both READMEs.</dd>
+            <dt>.claude/commands/pull_request.md</dt><dd>Builds a titled/body-linked PR from issue, plan, commits, changed files, and ADW ID; returns only the URL.</dd>
+            <dt>.claude/commands/resolve_failed_e2e_test.md</dt><dd>Reproduces one named browser story, uses screenshots and failed-step context, fixes narrowly, and re-runs only that story.</dd>
+            <dt>.claude/commands/resolve_failed_test.md</dt><dd>Reproduces one exact deterministic command, repairs the cause, and re-runs only that command.</dd>
+            <dt>.claude/commands/start.md</dt><dd>One-line adapter to the repository start script with a 300-second allowance.</dd>
+            <dt>.claude/commands/test.md</dt><dd>Defines the five-command deterministic validation stack and the typed <code>TestResult[]</code> response contract.</dd>
+            <dt>.claude/commands/test_e2e.md</dt><dd>Generic Playwright test runner: setup, execute a selected story, retain screenshots, return one typed JSON result.</dd>
+            <dt>.claude/commands/tools.md</dt><dd>Asks the agent to enumerate its built-in non-MCP development tools.</dd>
+            <dt>.claude/hooks/notification.py</dt><dd>Appends notification hook payloads to per-session JSON logs; currently records rather than speaking.</dd>
+            <dt>.claude/hooks/post_tool_use.py</dt><dd>Appends post-tool payloads to <code>post_tool_use.json</code>.</dd>
+            <dt>.claude/hooks/pre_tool_use.py</dt><dd>Blocks real env-file access and dangerous recursive removal, then logs allowed pre-tool payloads.</dd>
+            <dt>.claude/hooks/stop.py</dt><dd>Logs stop events and optionally materializes the JSONL transcript as <code>chat.json</code>.</dd>
+            <dt>.claude/hooks/subagent_stop.py</dt><dd>Logs subagent termination and optionally materializes its transcript.</dd>
+            <dt>.claude/hooks/utils/constants.py</dt><dd>Resolves and creates the per-session hook log directory.</dd>
+            <dt>.claude/hooks/utils/llm/anth.py</dt><dd>Small Anthropic helper for short completion messages; not called by the current notification hook.</dd>
+            <dt>.claude/hooks/utils/llm/oai.py</dt><dd>Equivalent OpenAI helper for short completion messages; also presently disconnected from notifications.</dd>
+            <dt>.claude/settings.json</dt><dd>Declares tool allow/deny rules and registers five hook event types.</dd>
+          </dl></div>
+        </details>
+
+        <details class="ledger-group" id="adws-ledger" open>
+          <summary><span>adws/ · 22 files</span><span>workflow control plane</span></summary>
+          <div class="ledger-group__body"><dl class="file-ledger">
+            <dt>adws/README.md</dt><dd>Detailed operator guide to manual, chained, cron, and webhook modes, state, artifacts, branch naming, and prerequisites.</dd>
+            <dt>adws/adw_build.py</dt><dd>Resumes an exact saved plan/branch, delegates implementation, commits, pushes, and updates/creates the PR.</dd>
+            <dt>adws/adw_modules/__init__.py</dt><dd>Marks the shared workflow-module package.</dd>
+            <dt>adws/adw_modules/agent.py</dt><dd>Standard Claude CLI adapter with minimal environment, prompt capture, stream-JSON capture, JSON conversion, and typed response.</dd>
+            <dt>adws/adw_modules/data_types.py</dt><dd>Pydantic boundary models for GitHub data, agent requests/results, unit/E2E results, slash commands, and persistent state.</dd>
+            <dt>adws/adw_modules/git_ops.py</dt><dd>Deterministic branch, commit, push, PR-existence, and finalization operations.</dd>
+            <dt>adws/adw_modules/github.py</dt><dd><code>gh</code> CLI adapter for issue fetch/list/comment/edit and optional token isolation.</dd>
+            <dt>adws/adw_modules/state.py</dt><dd>Five-field persistent state with Pydantic validation plus optional stdin/stdout piping.</dd>
+            <dt>adws/adw_modules/utils.py</dt><dd>ADW ID generation, dual console/file logger setup, and tolerant Markdown-wrapped JSON parsing.</dd>
+            <dt>adws/adw_modules/workflow_ops.py</dt><dd>Reusable agentic business operations: classification, planning, plan discovery, implementation, names, commits, PRs, and resumption helpers.</dd>
+            <dt>adws/adw_plan.py</dt><dd>Issue-to-plan phase: classify, branch, plan, find plan, save state, commit, push, and PR.</dd>
+            <dt>adws/adw_plan_build.py</dt><dd>Convenience wrapper chaining plan and build under one ADW ID; it does not run validation.</dd>
+            <dt>adws/adw_plan_build_test.py</dt><dd>Full fail-fast wrapper chaining plan, build, and the bounded test node.</dd>
+            <dt>adws/adw_test.py</dt><dd>Independent validation node with unit and browser repair loops, comments, artifacts, terminal exit status, and delivery finalization.</dd>
+            <dt>adws/adw_tests/__init__.py</dt><dd>Marks the ADW test-support package.</dd>
+            <dt>adws/adw_tests/health_check.py</dt><dd>Checks environment, git remote, GitHub CLI auth, and a live Claude prompt; optionally reports to an issue.</dd>
+            <dt>adws/adw_tests/sandbox_poc.py</dt><dd>E2B proof of concept documenting the non-TTY stdin-closing requirement for Claude CLI.</dd>
+            <dt>adws/adw_tests/test_adw_test_e2e.py</dt><dd>Live harness for <code>run_e2e_tests_with_resolution()</code> and its result-count invariants.</dd>
+            <dt>adws/adw_tests/test_agents.py</dt><dd>Runs Opus and Sonnet agent smoke tests concurrently and summarizes both results.</dd>
+            <dt>adws/adw_triggers/__init__.py</dt><dd>Marks the trigger package.</dd>
+            <dt>adws/adw_triggers/trigger_cron.py</dt><dd>Polls open issues every 20 seconds, deduplicates qualifying events in memory, and launches plan+build.</dd>
+            <dt>adws/adw_triggers/trigger_webhook.py</dt><dd>FastAPI webhook that classifies requested workflows, prevents its own bot-comment loop, launches background processes, and exposes health.</dd>
+          </dl></div>
+        </details>
+
+        <details class="ledger-group" id="client-ledger">
+          <summary><span>app/client/ · 16 files</span><span>browser application</span></summary>
+          <div class="ledger-group__body"><dl class="file-ledger">
+            <dt>app/client/.gitignore</dt><dd>Ignores frontend logs, dependency/build directories, local files, and editor metadata.</dd>
+            <dt>app/client/index.html</dt><dd>Static DOM skeleton for query input, results, table list, upload modal, sample buttons, and Vite entry point.</dd>
+            <dt>app/client/package-lock.json</dt><dd>npm lockfile v3 pinning 59 package entries, including Vite 6.3.5, TypeScript 5.8.3, Rollup, esbuild, and platform binaries.</dd>
+            <dt>app/client/package.json</dt><dd>Frontend metadata, Vite dev/build/preview scripts, and two direct dev dependencies.</dd>
+            <dt>app/client/public/sample-data/events.jsonl</dt><dd>Ten nested analytics events used by the Events sample button and JSONL path.</dd>
+            <dt>app/client/public/sample-data/orders_(32).csv</dt><dd>Thirty-two order fixtures; present as sample data but not wired to one of the three sample buttons.</dd>
+            <dt>app/client/public/sample-data/products.csv</dt><dd>Thirty-two inventory rows used by the Products sample button and backup database.</dd>
+            <dt>app/client/public/sample-data/users.json</dt><dd>Twenty user records used by the Users sample button and backup database.</dd>
+            <dt>app/client/public/vite.svg</dt><dd>Default Vite favicon asset referenced by <code>index.html</code>.</dd>
+            <dt>app/client/src/api/client.ts</dt><dd>Generic typed fetch helper plus upload, query, schema, insights, and health methods.</dd>
+            <dt>app/client/src/main.ts</dt><dd>All DOM behavior: initialization, query, upload, sample loading, results, tables, deletion, modal, and data-type icons.</dd>
+            <dt>app/client/src/style.css</dt><dd>Complete visual system for the SQL app: surfaces, query/results/tables, modal, samples, loading, and error states.</dd>
+            <dt>app/client/src/types.d.ts</dt><dd>Global TypeScript mirrors of the backend Pydantic request/response contracts.</dd>
+            <dt>app/client/src/vite-env.d.ts</dt><dd>Loads Vite’s ambient client types, including <code>import.meta.env</code>.</dd>
+            <dt>app/client/tsconfig.json</dt><dd>Strict ES2020 bundler-mode type checking with no emit and unused-code checks.</dd>
+            <dt>app/client/vite.config.ts</dt><dd>Proxies browser <code>/api</code> requests to FastAPI on port 8000.</dd>
+          </dl></div>
+        </details>
+
+        <details class="ledger-group" id="server-ledger">
+          <summary><span>app/server/ · 27 files</span><span>API, data, tests, fixture database</span></summary>
+          <div class="ledger-group__body"><dl class="file-ledger">
+            <dt>app/server/.env.sample</dt><dd>Safe placeholder file for OpenAI and Anthropic API keys.</dd>
+            <dt>app/server/.python-version</dt><dd>Requests Python 3.12 for local toolchains.</dd>
+            <dt>app/server/core/__init__.py</dt><dd>Marks and names the SQL application’s core package.</dd>
+            <dt>app/server/core/constants.py</dt><dd>Defines <code>__</code> for nested fields and <code>_</code> for list indices.</dd>
+            <dt>app/server/core/data_models.py</dt><dd>Pydantic models for upload, query, schema, insight, and health API contracts.</dd>
+            <dt>app/server/core/file_processor.py</dt><dd>Sanitizes names and converts CSV, JSON, or flattened two-pass JSONL into SQLite tables.</dd>
+            <dt>app/server/core/insights.py</dt><dd>Computes distinct/null counts, numeric aggregates, and five most-common values with validated identifiers.</dd>
+            <dt>app/server/core/llm_processor.py</dt><dd>Formats schema prompts, calls OpenAI or Anthropic, cleans fenced SQL, and routes by key availability.</dd>
+            <dt>app/server/core/sql_processor.py</dt><dd>Validates/executes generated SQL and discovers every safe user table’s schema/count.</dd>
+            <dt>app/server/core/sql_security.py</dt><dd>Identifier validation/escaping, safe execution, query denylist checks, LIKE escaping, IN building, and table existence.</dd>
+            <dt>app/server/db/backup.db</dt><dd>SQLite fixture: <code>users</code> (20 rows) and <code>products</code> (32 rows), restored by <code>reset_db.sh</code>.</dd>
+            <dt>app/server/main.py</dt><dd>Minimal logging-configured “Hello from server!” entry point used by the logging chore.</dd>
+            <dt>app/server/pyproject.toml</dt><dd>Backend package, exact runtime dependencies, pytest discovery, and Ruff dev dependency.</dd>
+            <dt>app/server/server.py</dt><dd>FastAPI composition root, CORS, six API routes, logging, database-directory setup, and uvicorn entry point.</dd>
+            <dt>app/server/tests/__init__.py</dt><dd>Empty marker for the server test package.</dd>
+            <dt>app/server/tests/assets/column_names.csv</dt><dd>Fixture proving spaces and hyphens become underscore column names.</dd>
+            <dt>app/server/tests/assets/complex_data.jsonl</dt><dd>Five deeply nested event fixtures with arrays, optional fields, and mixed shapes.</dd>
+            <dt>app/server/tests/assets/invalid.csv</dt><dd>Inconsistent row-width fixture expected to fail pandas parsing.</dd>
+            <dt>app/server/tests/assets/sample_data.jsonl</dt><dd>Five user fixtures for basic flattening, optional nested profile fields, arrays, and booleans.</dd>
+            <dt>app/server/tests/assets/test_products.json</dt><dd>Three product fixtures for JSON conversion and type preservation.</dd>
+            <dt>app/server/tests/assets/test_users.csv</dt><dd>Four user fixtures for CSV conversion, schema, count, and sample assertions.</dd>
+            <dt>app/server/tests/core/__init__.py</dt><dd>Empty marker for core tests.</dd>
+            <dt>app/server/tests/core/test_file_processor.py</dt><dd>CSV/JSON success/error tests plus recursive flattening, field discovery, JSONL consistency, and SQLite integration.</dd>
+            <dt>app/server/tests/core/test_llm_processor.py</dt><dd>Mocked provider calls, fence cleanup, key errors, schema formatting, and routing-priority tests.</dd>
+            <dt>app/server/tests/core/test_sql_processor.py</dt><dd>In-memory SELECT/schema/error tests and dangerous-operation coverage.</dd>
+            <dt>app/server/tests/test_sql_injection.py</dt><dd>Unit, processor, filename, insights, end-to-end, comment, and malicious-upload security tests.</dd>
+            <dt>app/server/uv.lock</dt><dd>uv lock revision 1 pinning 44 package records across supported Python versions, including two NumPy resolutions.</dd>
+          </dl></div>
+        </details>
+
+        <details class="ledger-group" id="scripts-ledger">
+          <summary><span>scripts/ · 8 files</span><span>local and GitHub operations</span></summary>
+          <div class="ledger-group__body"><dl class="file-ledger">
+            <dt>scripts/clear_issue_comments.sh</dt><dd>Deletes every comment from a numbered GitHub issue through <code>gh api</code>.</dd>
+            <dt>scripts/copy_dot_env.sh</dt><dd>Copies root/server env files from adjacent <code>tac-4</code>; the install prompt’s mention of tac-2 is stale.</dd>
+            <dt>scripts/delete_pr.sh</dt><dd>Interactively closes a PR and optionally deletes its remote/local branch.</dd>
+            <dt>scripts/expose_webhook.sh</dt><dd>Loads the tunnel token and starts a named Cloudflare tunnel.</dd>
+            <dt>scripts/kill_trigger_webhook.sh</dt><dd>Stops the webhook process and force-clears port 8001 if necessary.</dd>
+            <dt>scripts/reset_db.sh</dt><dd>Copies <code>backup.db</code> to the live <code>database.db</code> for deterministic tests.</dd>
+            <dt>scripts/start.sh</dt><dd>Checks server env, starts FastAPI and Vite, verifies both PIDs, and traps shutdown.</dd>
+            <dt>scripts/stop_apps.sh</dt><dd>Stops start/webhook processes and force-clears ports 5173, 8000, and 8001.</dd>
+          </dl></div>
+        </details>
+
+        <details class="ledger-group" id="specs-ledger">
+          <summary><span>specs/ · 5 files</span><span>intent and history</span></summary>
+          <div class="ledger-group__body"><dl class="file-ledger">
+            <dt>specs/fix-sql-injection-vulnerabilities.md</dt><dd>Bug plan that introduced the centralized security module and its cross-cutting fixes/tests.</dd>
+            <dt>specs/init_nlq_to_sql_to_table.md</dt><dd>Original architecture and product plan; some proposed component files were simplified into the current vanilla single-controller implementation.</dd>
+            <dt>specs/jsonl-support.md</dt><dd>Feature plan for constants, two-pass field discovery, flattening, fixtures, upload support, and UI sample integration.</dd>
+            <dt>specs/query-history-panel.md</dt><dd><span class="planned-only">Plan only.</span> Describes query-history files and endpoints that do not exist in this repository; useful evidence that a spec is not runtime truth.</dd>
+            <dt>specs/replace-print-with-logging.md</dt><dd>Chore plan behind the stdout logging configuration in <code>server.py</code> and <code>main.py</code>.</dd>
+          </dl></div>
+        </details>
+      </section>
+
+      <section class="chapter-section" id="run">
+        <span class="section-number">09 · End-to-end flow</span>
+        <h2 class="section-title">How one full run actually works</h2>
+        <p class="section-lead">Follow the identity <code>a1b2c3d4</code>. The same ID ties together state, prompts, logs, comments, screenshots, and agent outputs.</p>
+
+        <div class="flow-list">
+          <article class="flow-step"><div><strong>A GitHub event asks for <code>adw_plan_build_test</code></strong><p>The webhook extracts workflow and optional ID, prevents bot-comment recursion, and returns immediately after <code>Popen</code>.</p></div><code>trigger_webhook.py</code></article>
+          <article class="flow-step"><div><strong>The wrapper establishes one ADW ID</strong><p><code>ensure_adw_id()</code> loads or creates <code>agents/a1b2c3d4/adw_state.json</code>.</p></div><code>adw_plan_build_test.py</code></article>
+          <article class="flow-step"><div><strong>Planning fetches and classifies the issue</strong><p>Typed GitHub JSON goes to <code>/classify_issue</code>; the chosen class enters state.</p></div><code>adw_plan.py</code></article>
+          <article class="flow-step"><div><strong>A branch name is generated and created</strong><p>The branch embeds issue number and ADW ID, making run ownership visible in git.</p></div><code>/generate_branch_name</code></article>
+          <article class="flow-step"><div><strong>The selected planning prompt writes a spec</strong><p>Bug/chore/feature templates research the real repo and include validation work.</p></div><code>/bug · /chore · /feature</code></article>
+          <article class="flow-step"><div><strong>The plan path is discovered and persisted</strong><p>Later processes now need only the ADW ID to locate the exact intent.</p></div><code>/find_plan_file</code></article>
+          <article class="flow-step"><div><strong>Build checks out the saved branch and implements the saved plan</strong><p>The implementer’s prompt and event stream get their own artifact directory.</p></div><code>adw_build.py</code></article>
+          <article class="flow-step"><div><strong>The deterministic test agent runs the stack</strong><p>It returns typed results, failed first, with exact reproduction commands.</p></div><code>/test</code></article>
+          <article class="flow-step"><div><strong>Each red result gets a focused resolver</strong><p>Agent names include iteration and index; the payload carries the reproduction command.</p></div><code>/resolve_failed_test</code></article>
+          <article class="flow-step"><div><strong>The whole deterministic stack runs again</strong><p>Green stops the loop. Red repeats within the four-attempt budget. No progress stops early.</p></div><code>run_tests_with_resolution()</code></article>
+          <article class="flow-step"><div><strong>Only a green deterministic base unlocks browser tests</strong><p>Each E2E Markdown story is run in sequence; screenshots become durable evidence.</p></div><code>run_e2e_tests()</code></article>
+          <article class="flow-step"><div><strong>The first red browser story gets a visual resolver</strong><p>After repair, the E2E sequence restarts, bounded to two attempts.</p></div><code>resolve_failed_e2e_tests()</code></article>
+          <article class="flow-step"><div><strong>Results are summarized to the issue</strong><p>Unit and E2E totals, details, errors, and screenshot paths make the verdict inspectable.</p></div><code>log_test_results()</code></article>
+          <article class="flow-step"><div><strong>Git operations finalize delivery</strong><p>The branch is pushed; an existing PR is reused or a new one is created; its URL returns to the issue.</p></div><code>finalize_git_operations()</code></article>
+          <article class="flow-step"><div><strong>The process exits truthfully</strong><p>Any remaining failure produces exit 1, stopping the combined wrapper. A green run reports success.</p></div><code>sys.exit(1) · or 0</code></article>
+        </div>
+
+        <aside class="callout callout--tactic"><p class="callout__label">The architecture in one sentence</p><p>Deterministic Python owns when to stop; typed result payloads say what failed; focused agents decide how to repair; a fresh validation pass decides whether the repair worked.</p></aside>
+      </section>
+
+      <section class="chapter-section" id="fails">
+        <span class="section-number">10 · Common fail</span>
+        <h2 class="section-title">Where a weak reading goes wrong</h2>
+        <p class="section-lead">These are not trivia. Each one changes how you would safely extend the workflow.</p>
+
+        <div class="failure-grid">
+          <article class="failure-card"><b>“Plan+build always tests.”</b><p>No. <code>adw_plan_build.py</code> stops after implementation. Only <code>adw_plan_build_test.py</code> includes the validation node. The cron trigger currently launches plan+build, not the full pipeline.</p></article>
+          <article class="failure-card"><b>“Resolver success means green.”</b><p>No. It means the resolver process completed. Proof comes from the next full validation observation.</p></article>
+          <article class="failure-card"><b>“All state is piped.”</b><p>No. The wrappers reuse a file-backed <code>ADWState</code>. Pipe helpers exist, but persistent state is the active combined-script seam.</p></article>
+          <article class="failure-card"><b>“Specs list real files.”</b><p>No. The query-history spec names files and endpoints absent from this checkout. Repository inventory outranks planning prose.</p></article>
+          <article class="failure-card"><b>“Security is parameterization everywhere.”</b><p>No. Identifiers are validated/escaped; values can be bound in helper queries; a complete LLM-generated query is instead screened before execution.</p></article>
+          <article class="failure-card"><b>“A 200 response means query success.”</b><p>No. Several FastAPI error paths return a typed payload with <code>error</code>. Client behavior must inspect the body.</p></article>
+        </div>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">A side-effect seam worth reviewing</p>
+          <p><code>workflow_ops.create_commit()</code> sounds like a pure message generator, but it calls the <code>/commit</code> template, whose instructions stage and commit. Planning and building then also call <code>commit_changes()</code>. When function names hide agent-driven side effects, duplicate or empty commits become possible. A safer interface would separate “generate message” from “perform commit.”</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">11 · You try</span>
+        <h2 class="section-title">Lab: shrink one loop budget and prove it</h2>
+        <p class="section-lead">You will change exactly one real constant, verify both meaning and syntax, then explain the trade-off. This lab does not call GitHub, an LLM, or the browser.</p>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Change the deterministic retry budget from four attempts to two</h3>
+          <ol class="lab-box__steps">
+            <li>Open <code>tac/tac-5/adws/adw_test.py</code>. Find <code>MAX_TEST_RETRY_ATTEMPTS = 4</code> near line 59.</li>
+            <li>Change only the value to <code>2</code>. Do not change the E2E budget.</li>
+            <li>Verify the code still compiles from <code>tac/tac-5/</code>:
+              <div class="code-frame lab-command"><div class="code-frame__bar"><span>syntax feedback</span><span>no network calls</span></div><pre><code>cd adws
+uv run --with python-dotenv --with pydantic \
+  python -m py_compile adw_test.py adw_modules/*.py</code></pre></div>
+            </li>
+            <li>Verify the runtime value without starting a workflow:
+              <div class="code-frame lab-command"><div class="code-frame__bar"><span>semantic feedback</span><span>assert exact value</span></div><pre><code>uv run --with python-dotenv --with pydantic \
+  python -c "import adw_test; assert adw_test.MAX_TEST_RETRY_ATTEMPTS == 2; print('budget=2')"</code></pre></div>
+            </li>
+            <li>Use <code>git diff -- adws/adw_test.py</code>. Confirm the diff contains one changed line.</li>
+          </ol>
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <ul>
+              <li>Compilation exits 0.</li>
+              <li>The assertion prints <code>budget=2</code>.</li>
+              <li>The diff changes only <code>MAX_TEST_RETRY_ATTEMPTS</code>.</li>
+              <li>You can explain the trade-off: lower compute and faster terminal failure, but fewer repair opportunities.</li>
+            </ul>
+          </div>
+        </section>
+
+        <aside class="callout callout--why"><p class="callout__label">Why this is a closed loop</p><p>The request is one bounded edit. The first validator catches syntax/import damage. The second checks intended runtime meaning. The diff check catches scope creep. If any signal is red, repair and repeat all three.</p></aside>
+      </section>
+
+      <section class="chapter-section" id="teach-back">
+        <span class="section-number">12 · Teach-back</span>
+        <h2 class="section-title">Can you rebuild the system from memory?</h2>
+        <p class="section-lead">Close the page before answering. Reveal only after you have spoken or written a complete response.</p>
+
+        <section class="retrieval-quiz">
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">1. Why does the outer unit-test loop rerun the whole test command after a resolver reports success?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Resolver success means the agent process finished, not that the application is green. A fresh independent observation supplies the verdict and also catches regressions outside the targeted test.</p></details>
+          </div>
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">2. What are the five durable ADW state fields, and why are outputs not stored there?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>adw_id</code>, <code>issue_number</code>, <code>branch_name</code>, <code>plan_file</code>, and <code>issue_class</code>. Large outputs live as addressable artifacts so phase hand-offs stay small, validated, and loosely coupled.</p></details>
+          </div>
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">3. Why do E2E tests wait for unit checks, run sequentially, and stop at the first failure?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They are slower and noisier. A green deterministic base removes cheap causes first; sequential first-failure execution gives the resolver one localized visual problem and avoids wasting browser compute.</p></details>
+          </div>
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">4. Which combined entry point truly “closes the loops,” and which similar entry point does not test?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>adw_plan_build_test.py</code> runs all three phases. <code>adw_plan_build.py</code> stops after implementation.</p></details>
+          </div>
+        </section>
+
+        <div class="teach-grid">
+          <article><h3>60-second teach-back</h3><p>Draw four boxes: trigger, control plane, validators, evidence. Put one real file in each and narrate the returning signal.</p></article>
+          <article><h3>3-minute teach-back</h3><p>Trace one failed TypeScript build from <code>/test</code> JSON, through a resolver agent, into the next full sweep and final GitHub summary.</p></article>
+        </div>
+
+        <aside class="callout callout--tactic"><p class="callout__label">Final compression</p><p>Dan did not build one magical autonomous agent. He built small deterministic rails around several narrow agent judgments, gave every run an identity, turned failures into typed inputs, bounded every retry, and preserved enough evidence for a human to audit the result.</p></aside>
+
+        <p class="chapter-back"><a href="../vol-1-tac/05-close-the-loops.html">Continue with Chapter 5 · Close the Loops →</a></p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const navLinks = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = [...document.querySelectorAll('.chapter-section[id]')];
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const percent = max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0;
+        const value = `${percent.toFixed(1)}%`;
+        topBar.style.width = value;
+        railBar.style.width = value;
+        label.textContent = `${Math.round(percent)}%`;
+      };
+      updateProgress();
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      window.addEventListener('resize', updateProgress);
+
+      const observer = new IntersectionObserver((entries) => {
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        navLinks.forEach(link => {
+          const active = link.getAttribute('href') === `#${visible.target.id}`;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-18% 0px -68% 0px', threshold: [0, .15, .5] });
+      sections.forEach(section => observer.observe(section));
+
+      document.querySelectorAll('[data-details-action]').forEach(button => {
+        button.addEventListener('click', () => {
+          const open = button.dataset.detailsAction === 'open';
+          document.querySelectorAll(button.dataset.detailsTarget).forEach(item => item.open = open);
+        });
+      });
+
+      if (location.hash) {
+        const target = document.querySelector(location.hash);
+        if (target instanceof HTMLDetailsElement) target.open = true;
+      }
+    })();
+  </script>
+</body>
+</html>

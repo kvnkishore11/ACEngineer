@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first capstone to Agentic Horizon: map, build, and level an agentic layer from prime prompts through ADWs and an orchestrator.">
+  <title>AH-6 · Building Agentic Layers — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="14-building-agentic-layers.assets.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to chapter content</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL II · AH · LESSON 14</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume II · Agentic Horizon</p>
+      <h2>Building Agentic Layers</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation</span></a></li>
+          <li><a href="#two-layers"><span class="chapter-nav__n">01</span><span>The two-layer codebase</span></a></li>
+          <li><a href="#singularity"><span class="chapter-nav__n">02</span><span>The destination</span></a></li>
+          <li><a href="#class-one"><span class="chapter-nav__n">03</span><span>Class 1 · In-loop</span></a></li>
+          <li><a href="#class-two"><span class="chapter-nav__n">04</span><span>Class 2 · Out-loop</span></a></li>
+          <li><a href="#class-three"><span class="chapter-nav__n">05</span><span>Class 3 · Orchestrated</span></a></li>
+          <li><a href="#specialize"><span class="chapter-nav__n">06</span><span>Specialize the layer</span></a></li>
+          <li><a href="#core-four"><span class="chapter-nav__n">07</span><span>The invariant</span></a></li>
+          <li><a href="#course-recap"><span class="chapter-nav__n">08</span><span>The whole course</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">09</span><span>Graded capstone lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">10</span><span>Cumulative mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">11</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--layers">
+        <span class="hero__chapter">Agentic Horizon · Lesson 14 · Tactic 08: Prioritize Agentics</span>
+        <h1>Building Agentic Layers</h1>
+        <p class="hero__dek">Stop treating prompts, sub-agents, workflows, experts, and orchestrators as disconnected tricks. They are one buildable layer around your application—and this chapter gives you a ruler for leveling it.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 1:06:24</li>
+          <li>Capstone lab · 90–120 min</li>
+          <li>Course repo · orchestrator-agent-with-adws</li>
+          <li>13 verified 1920×1080 frames</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to separate application code from agentic infrastructure, locate a real codebase on the three-Class ladder, trace an ADW from trigger to detached process, explain how an orchestrator bridges into that workflow, and name the single next rung your own codebase should build.</p>
+        <div class="hero-system" aria-label="Three classes of agentic layer">
+          <article class="hero-system__class"><b>Class 1</b><span>You run specialized primitives in the terminal.</span><small>7 grades · in-loop</small></article>
+          <article class="hero-system__class"><b>Class 2</b><span>Deterministic code runs agents without you.</span><small>2 grades · out-loop</small></article>
+          <article class="hero-system__class"><b>Class 3</b><span>An orchestrator manages agents and launches ADWs.</span><small>3 grades · orchestrated</small></article>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation</a></li>
+            <li><a href="#two-layers">The two-layer codebase</a></li>
+            <li><a href="#singularity">The codebase singularity</a></li>
+            <li><a href="#class-one">Class 1 · In-loop</a></li>
+            <li><a href="#class-two">Class 2 · Out-loop</a></li>
+            <li><a href="#class-three">Class 3 · Orchestrated</a></li>
+            <li><a href="#specialize">Specialize the layer</a></li>
+            <li><a href="#core-four">Everything reduces to the Core Four</a></li>
+            <li><a href="#course-recap">The whole course in one build</a></li>
+            <li><a href="#lab">Graded capstone lab</a></li>
+            <li><a href="#mastery">Cumulative mastery</a></li>
+            <li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">Thirteen lessons become one object</h2>
+        <p class="section-lead">You already learned prompts, feedback loops, AFK execution, custom agents, orchestration, and agent experts. The capstone move is to stop holding them as a bag of techniques and see the system they collectively form.</p>
+
+        <p>Imagine opening a repository and finding a prime prompt, several sub-agents, a few tools, a plan command, a review command, a workflow script, a database, and an orchestrator UI. A novice sees many unrelated files. An experienced operator sees a single thing with a maturity level: an <strong>agentic layer</strong>. That change in perception matters because scattered assets receive scattered maintenance. A named layer can be audited, graded, improved, and owned.</p>
+
+        <p>The working course repository is deliberately a capstone. At the root, <code>.claude/</code> and <code>adws/</code> teach and run the agents. Under <code>apps/</code>, several different applications provide the work surface. The layer can plan, build, review, fix, remember domain knowledge, launch detached workflows, stream events, and let one orchestrator coordinate the whole system. The lesson does not ask you to copy that destination blindly. It asks you to locate your present rung and add the next missing dimension.</p>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The chapter’s one-sentence thesis</p>
+          <p>Every codebase now has an application layer and can have an agentic layer; the highest-leverage engineering move is to keep specializing and leveling the latter until it can operate the former with increasing reliability.</p>
+        </aside>
+
+        <h3>The ruler: Classes change who runs the work</h3>
+        <div class="ladder" aria-label="Class and grade ladder">
+          <article class="ladder__class">
+            <div><h3>Class 1 · In-loop</h3><p>The engineer initiates agentic primitives in the terminal.</p></div>
+            <div class="ladder__grades"><span>G1 Prime + memory</span><span>G2 Sub-agents</span><span>G3 Custom tools</span><span>G4 Closed loops</span><span>G5 Templates</span><span>G6 Prompt chains</span><span>G7 Agent experts</span></div>
+          </article>
+          <article class="ladder__class">
+            <div><h3>Class 2 · Out-loop</h3><p>A trigger and deterministic runtime can operate agents without the engineer attending.</p></div>
+            <div class="ladder__grades"><span>G1 Out-loop fabric</span><span>G2 AI Developer Workflows</span></div>
+          </article>
+          <article class="ladder__class">
+            <div><h3>Class 3 · Orchestrated</h3><p>A custom lead agent creates, reads, commands, checks, interrupts, and retires other agents.</p></div>
+            <div class="ladder__grades"><span>G1 Orchestrator</span><span>G2 Orchestrator workflows</span><span>G3 Orchestrator runs ADWs</span></div>
+          </article>
+        </div>
+
+        <p>The ladder has two rules. First, it stacks: Class 3 does not replace Class 1 or Class 2. It contains and commands them. Second, a Grade adds a new dimension inside a Class; a Class jump changes the operating relationship. Adding a review command raises the quality of an in-loop layer. Adding a detached trigger changes whether you must be present. Adding an orchestrator changes who coordinates the agents.</p>
+
+        <figure class="frame-card">
+          <img src="../media/frames/ah-6-building-agentic-layers/t0558-class3-destination-demo-ui.jpg" alt="Orchestrator interface showing two AI Developer Workflows running in an ADW swimlane view, with agents on the left and orchestrator chat on the right" width="1920" height="1080" fetchpriority="high">
+          <figcaption><span class="frame-card__t">09:18</span><strong>See the destination before climbing.</strong> Two workflows run in the ADW swimlane while the orchestrator reports the plan → build → review → fix phases. This is the Class-3 payoff, not the starting point.</figcaption>
+        </figure>
+
+        <h3>How to use this capstone</h3>
+        <p>Every major idea repeats the same learning cycle: Hook → Picture → Story → Name → Worked example → You try → Fail/fix → Current Practice → Retrieval → Teach-back. Do not skip the small action because the terms feel familiar. Recognition is not control. You have mastered a rung only when you can find it in the repository, explain the compute advantage it adds, identify its failure mode, and decide whether it is the next useful investment for a real codebase.</p>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Prime directive</p>
+          <p>You type zero application code by hand in the lab. You may inspect files, run commands, edit prompts through an agent, and operate the workflows. The object of practice is the layer that performs the engineering.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="two-layers">
+        <span class="section-number">01</span>
+        <h2 class="section-title">The two-layer codebase</h2>
+        <p class="section-lead">The application layer serves the user. The agentic layer teaches agents how to operate that application. Confusing the two makes agentic infrastructure look like disposable prompt debris.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The repository with excellent prompts nobody owns</h3>
+          <p>A team accumulates a planning prompt in a wiki, a test command in someone’s home directory, a reviewer agent in another repository, and a webhook that only its author understands. Each piece works. Together they do not improve. When an application changes, the prompts drift. When a model changes, nobody knows which workflows depend on it. The team has agentic assets, but it does not yet treat them as an engineered layer.</p>
+          <p>The failure is architectural, not linguistic. The team sees the application as the “real” product and everything around the agents as convenience glue. Dan reverses that priority: the mechanism that repeatedly operates the product is itself a first-class system. It deserves a boundary, vocabulary, maintenance loop, and roadmap.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — inner product, outer operating system</p>
+          <h3>Draw the boundary before adding capability</h3>
+          <div class="layer-map" aria-label="Application and agentic layers">
+            <article><h3>Application layer</h3><p>The inner work surface: database, frontend, backend, scripts, DevOps, infrastructure, notebooks, and related applications.</p><span class="code-path">apps/markdown_preview · apps/nile · apps/pomodoro_timer · apps/simple-html-file · apps/orchestrator_*</span></article>
+            <div class="layer-map__bridge" aria-hidden="true">⇄</div>
+            <article><h3>Agentic layer</h3><p>The outer operating system: instructions, sub-agents, tools, feedback loops, templates, chains, experts, triggers, ADWs, and orchestration.</p><span class="code-path">.claude/ · adws/ · specs/ · ai_docs/ · app_review/ · app_fix_reports/</span></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — read Dan’s ring</p>
+          <h3>Green squares operate dark squares</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t0382-agentic-layer-diagram.jpg" alt="Three increasingly large rings of green agentic-layer squares around dark application-layer squares, labeled Class 1, Class 2, and Class 3" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">06:22</span>The green outer squares are the agentic layer; the dark inner squares are the application layer. The progressively larger rings show cumulative Classes and Grades, not three unrelated architectures.</figcaption>
+          </figure>
+          <p>Notice what the diagram does not say. It does not say the application disappears. It does not say every green square is a prompt. The application remains the reason the repository exists; the outer ring becomes the way increasing amounts of engineering work are performed on it. The mature codebase contains both.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — precise term</p>
+          <aside class="callout callout--term">
+            <p class="callout__label">Agentic layer</p>
+            <p>The specialized ring of agentic primitives that teaches agents how to operate a particular application layer on the team’s behalf. It is broader than a <code>.claude</code> directory and narrower than a generic automation platform.</p>
+          </aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — split the course repository</p>
+          <h3>One shared layer, heterogeneous applications</h3>
+          <div class="repo-split">
+            <article><h3>Inspect the outer ring</h3><p>The root <code>.claude/</code> contains commands, seven sub-agent definitions, two skills, three expert directories, and hooks. The root <code>adws/</code> contains triggers, deterministic modules, tests, and plan/build/review/fix workflow programs. Runtime evidence lands in directories such as <code>specs/</code>, <code>app_review/</code>, and <code>app_fix_reports/</code>.</p></article>
+            <article><h3>Inspect the inner work surface</h3><p>The <code>apps/</code> directory includes a Vue markdown-preview app, a Python Pomodoro CLI, a static HTML file, a Nile shopping demo, and orchestrator applications. Their technologies differ. The shared layer is specialized to understand and operate this bundled product surface.</p></article>
+          </div>
+          <p>This organization creates a crucial context advantage: one team of agents can see related frontends, backends, scripts, databases, and operational code together. When related repositories are separate, Dan recommends collecting them beneath <code>apps/</code>, using git submodules where appropriate. The point is not aesthetic monorepo purity. It is to give the agentic layer the product context required to act across boundaries.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — the two-column audit</p>
+          <h3>Classify before you improve</h3>
+          <ol>
+            <li>Choose one codebase you work in regularly.</li>
+            <li>Write “application layer” and list every user-serving or operational component.</li>
+            <li>Write “agentic layer” and list every instruction, prompt, agent, tool, trigger, workflow, evidence directory, and governance hook.</li>
+            <li>Circle anything that has no owner or drifts independently of the application.</li>
+            <li>Write one sentence: “Our agentic layer currently helps agents ___, but it cannot yet ___.”</li>
+          </ol>
+          <p>Pass if another engineer can place every listed artifact on one side without asking what you meant by “AI stuff.”</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: equating the layer with a folder</h3>
+          <p><strong>Symptom:</strong> your audit ends at <code>.claude/</code>, so it omits ADW programs, database tables, runtime evidence, WebSocket events, and the orchestrator application that makes the layer observable.</p>
+          <p><strong>Fix:</strong> classify by function, not pathname. If an artifact exists to teach, trigger, coordinate, constrain, observe, validate, or improve agent work over the application, it belongs to the agentic layer. If it directly serves the product user or runs the product, it belongs to the application layer. Some infrastructure supports both; state which role you are discussing.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · mid-2026</p>
+            <p>Treat the Class/Grade ladder as a maturity model, not a filesystem specification. The working repository consolidates several teaching rungs: Grade-5 templates live inside <code>plan.md</code> rather than separate bug/feature/chore files, and the out-loop entry is a CLI or typed <code>start_adw</code> tool rather than a literal inbound webhook. Preserve the capability boundary even when file shapes change.</p>
+            <p class="current-practice__source">Transfer rule: grade the behavior the layer enables, then cite the real implementation that enables it.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Two-layer codebase retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What is the difference between the application layer and the agentic layer?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The application layer serves users and runs the product; the agentic layer teaches, triggers, coordinates, observes, and improves agents operating that application.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why can <code>adws/</code> belong to the agentic layer even though it contains Python code?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Classification follows purpose, not file type. Those programs deterministically orchestrate agent steps over the application.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why bundle related apps beneath one <code>apps/</code> directory?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>So one specialized agentic layer can see and operate the complete related product surface instead of losing cross-repository context.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <p><strong>Explain in 60 seconds:</strong> “The agentic layer is not just my prompt folder.” Use one application path, one agent instruction path, one workflow path, and one evidence path from the course repository.</p>
+            <p class="fine">Pass if your listener can redraw the inner/outer boundary and correctly place a new review report.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="singularity">
+        <span class="section-number">02</span>
+        <h2 class="section-title">The destination: codebase singularity</h2>
+        <p class="section-lead">A mature layer crosses a threshold: agents can operate the codebase better than the engineer can alone. The useful interpretation is incremental and evidence-based, not magical autonomy.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The autonomy slogan with no climb beneath it</h3>
+          <p>A team announces that its goal is a self-running codebase. It connects a frontier model to a shell and asks for end-to-end feature delivery. The first run succeeds enough to impress everyone. The second run silently misreads context. The third creates a change nobody can explain. Because the team started with the destination, it has no vocabulary for the missing rungs: memory, focused agents, review loops, composable steps, deterministic transitions, durable evidence, and orchestration.</p>
+          <p>The failure is not ambition. It is treating a threshold as a switch. Dan’s ladder makes the destination actionable by forcing a sequence: locate the current Class and Grade, name the unique missing element, build it, and verify the added compute advantage.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — a threshold built from rungs</p>
+          <div class="jump-map" aria-label="Progression toward codebase singularity">
+            <article><h3>Reliable primitive</h3><p>One prompt or agent performs one bounded job with evidence.</p></article>
+            <div class="jump-map__arrow" aria-hidden="true">→</div>
+            <article><h3>Reliable workflow</h3><p>Composable steps run with feedback, logs, and deterministic control.</p></article>
+            <div class="jump-map__arrow" aria-hidden="true">→</div>
+            <article><h3>Trusted operation</h3><p>Teams of agents carry more of the codebase safely than a human can carry alone.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the definition beat</p>
+          <div class="singularity-quote">
+            <blockquote>“My agents can now run my codebase better than I can. I trust them to ship more than I trust myself or my team.”<cite>Dan · approximately 04:24</cite></blockquote>
+          </div>
+          <p>The recording uses B-roll at this moment, so the definition is better held as a claim you can interrogate. What would “better” mean? More complete context, consistent templates, parallel focused work, repeatable review, durable evidence, less fatigue, and a lower chance that one person forgets a transition. What would “trust” mean? Not hope. It means the layer has earned a place in the delivery path through observable, repeatable outcomes.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — precise term</p>
+          <aside class="callout callout--term">
+            <p class="callout__label">Codebase singularity</p>
+            <p>The moment the engineer recognizes that agents can run the codebase better than the engineer or team can alone, and the delivery process increasingly depends on those teams of agents. Zero-touch engineering is the North Star that points toward this threshold.</p>
+          </aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — turn “trust” into evidence</p>
+          <h3>Class-3-Grade-3 is a configuration, not a prophecy</h3>
+          <p>In the course repository, the orchestrator does not merely chat about a feature. It can call <code>start_adw</code>, create a database record, launch a detached workflow program, watch plan/build/review/fix agents emit events, and query the workflow with <code>check_adw</code>. The UI offers both a generic LOGS view and an ADWS swimlane. Plans land under <code>specs/</code>; review and fix artifacts land on disk. Each layer contributes a kind of evidence.</p>
+          <div class="evidence-strip" aria-label="Three kinds of trust evidence">
+            <article><b>Process evidence</b><span>StepStart, StepEnd, tool-use events, statuses, costs, and detached process identity.</span></article>
+            <article><b>Artifact evidence</b><span>A plan, application diff, review verdict, and fix report survive the conversation.</span></article>
+            <article><b>Control evidence</b><span>Each prompt can run individually, while deterministic code owns order and state transitions.</span></article>
+          </div>
+          <p>This is the practical meaning of running toward the singularity: make more useful operation possible, and make every increase in compute produce more evidence and therefore more warranted trust.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — define your trust threshold</p>
+          <ol>
+            <li>Name one repeated engineering workflow in your codebase.</li>
+            <li>Write the steps a trusted agentic layer would carry without your relay.</li>
+            <li>For every step, name an artifact or event that would prove it happened.</li>
+            <li>Mark the decision points that still require human judgment.</li>
+            <li>Finish: “I would trust this workflow to run unattended when ___.”</li>
+          </ol>
+          <p>Pass if the blank contains observable conditions, not “the model is good enough.”</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: measuring autonomy instead of reliability</h3>
+          <p><strong>Symptom:</strong> the team celebrates a long unattended run even though it cannot isolate failures, reproduce intermediate state, or explain why the output deserves trust.</p>
+          <p><strong>Fix:</strong> grade the layer by reliable, observable capability. Add one missing rung at a time. A two-step plan/build ADW with explicit evidence is more mature than a ten-step opaque prompt chain. Autonomy without inspectable control is not the course destination.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · mid-2026</p>
+            <p>The course deliberately emphasizes impact over a complete production security story. A production-bound layer should pair the ladder with permission modes, sandboxed execution, pre/post tool gates, explicit approval boundaries, and durable observability. The repository already contains a rich hook and event spine, but its local teaching configuration is not a universal production policy.</p>
+            <p class="current-practice__source">Transfer rule: the singularity is a trust threshold; governance is part of earning that trust.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Codebase singularity retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Define the codebase singularity without using the word autonomy.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It is the threshold where the engineer trusts teams of agents to run the codebase better than the engineer or team can alone.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why is zero-touch engineering a North Star rather than the first rung?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Because unattended operation depends on accumulated primitives, feedback, composability, deterministic control, evidence, and orchestration.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What should more compute produce?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>More warranted trust through better validation, evidence, and reliable outcomes—not merely more generated work.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <p><strong>Explain in 90 seconds:</strong> why the codebase singularity is both ambitious and incremental. Use Class-3-Grade-3 as an evidence-bearing example, not as a claim of unlimited autonomy.</p>
+            <p class="fine">Pass if your listener can name one rung that must exist before trust can increase.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="class-one">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Class 1: build the in-loop ladder</h2>
+        <p class="section-lead">Class 1 is not “basic.” It is the seven-rung foundation every higher Class still depends on: prime, focus, tools, feedback, templates, composition, and learning.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The team that jumps from a prime prompt to orchestration</h3>
+          <p>A codebase has a useful memory file and one broad agent. The team immediately tries to build a multi-agent manager. It now has more sessions, more logs, and more model cost—but the agents still lack focused roles, review loops, engineering templates, composable commands, and maintained domain knowledge. Orchestration has multiplied an immature primitive.</p>
+          <p>Class 1 prevents this. Every Grade adds a distinct compute advantage the later Classes reuse. If a prompt cannot run independently, an ADW cannot make it reliable. If a review loop does not produce evidence in-loop, an orchestrator cannot conjure trustworthy review from a fleet.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — seven dimensions, one stack</p>
+          <div class="grade-grid" aria-label="Seven Class 1 grades">
+            <article><span class="grade-grid__n">Grade 1 · orient</span><h3>Prime + memory</h3><p>Give the agent the codebase map, conventions, and starting context.</p><code class="code-path">.claude/commands/prime.md · CLAUDE.md · AGENTS.md</code></article>
+            <article><span class="grade-grid__n">Grade 2 · focus</span><h3>Sub-agents</h3><p>Assign one narrow context, model, prompt, and tool set to one purpose.</p><code class="code-path">.claude/agents/docs-scraper.md · planner.md · scout-report-suggest-fast.md</code></article>
+            <article><span class="grade-grid__n">Grade 3 · extend</span><h3>Custom tools</h3><p>Add skills, MCP servers, or direct tool instructions when the task needs them.</p><code class="code-path">.claude/skills/start-orchestrator/ · .mcp.json.sample</code></article>
+            <article><span class="grade-grid__n">Grade 4 · verify</span><h3>Closed loops</h3><p>Turn request → validate → resolve into explicit, evidence-producing commands.</p><code class="code-path">.claude/commands/review.md · fix.md · app_review/</code></article>
+            <article><span class="grade-grid__n">Grade 5 · standardize</span><h3>Templates</h3><p>Encode how the team handles fixes, features, refactors, and other task types.</p><code class="code-path">.claude/commands/plan.md · task_type switch</code></article>
+            <article><span class="grade-grid__n">Grade 6 · compose</span><h3>Prompt chains</h3><p>Connect independently runnable commands and agents into larger workflows.</p><code class="code-path">orch_scout_and_build.md · build_in_parallel.md</code></article>
+            <article><span class="grade-grid__n">Grade 7 · learn</span><h3>Agent experts</h3><p>Maintain narrow mental models through Act → Learn → Reuse.</p><code class="code-path">.claude/commands/experts/{adw,database,websocket}/</code></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — watch each missing dimension appear</p>
+          <h3>Grade 2: one purpose gets its own context</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t0812-class1-grade2-subagents.jpg" alt="A fetch-docs sub-agent markdown file using a small model and saving fetched material to the ai_docs directory" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">13:32</span>The teaching frame shows a focused documentation fetcher that writes into <code>ai_docs/</code>. In the working repo, <code>docs-scraper.md</code> uses Sonnet, while the fast scout uses Haiku and heavy plan/build roles use Opus.</figcaption>
+          </figure>
+
+          <h3>Grade 3: tools expand the Core Four</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t0895-class1-grade3-mcp-tools.jpg" alt="An example MCP configuration listing Postgres, Firecrawl, Atlassian, and Notion servers" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">14:55</span>Custom tools may arrive as skills, MCP servers, or direct instructions. Dan’s important warning is that form is secondary: a prompt that teaches direct PSQL use can sometimes replace a heavier tool integration.</figcaption>
+          </figure>
+
+          <h3>Grade 4: review leaves durable evidence</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t1088-class1-grade4-closed-loop.jpg" alt="Project tree showing an app_reviews directory with several review report files" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">18:08</span>A closed loop is visible because evidence lands on disk. In the repo, <code>review.md</code> analyzes diffs, grades risk, ends in PASS/FAIL, and writes a timestamped report for <code>fix.md</code> to resolve.</figcaption>
+          </figure>
+
+          <h3>Grade 5: templates encode engineering judgment</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t1288-class1-grade5-templates.jpg" alt="Agentic layer ring annotated with bug, feature, chore, API, plan, build, review, test, and memory artifacts" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">21:28</span>The lesson diagram shows separate template files. The working repository consolidates this capability inside <code>plan.md</code>, which classifies <code>chore|feature|refactor|fix|enhancement</code> and conditionally emits the appropriate plan sections.</figcaption>
+          </figure>
+
+          <h3>Grade 6: composition without losing debuggability</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t1768-class1-grade6-prompt-chain.jpg" alt="Scout-then-plan prompt showing parallel scout agents followed by synthesis and planning" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">29:28</span>The prompt chain launches parallel scouts, collects findings, synthesizes them, then plans. The load-bearing rule: every component must remain runnable by itself.</figcaption>
+          </figure>
+
+          <h3>Grade 7: useful work updates the mental model</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t2015-class1-grade7-agent-experts.jpg" alt="Project tree and compute-advantage panel explaining expertise files and self-improving agent experts" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">33:35</span>Agent experts add maintained domain memory. The <code>expertise.yaml</code> file is a mental model checked against code, never a replacement for code as the source of truth.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — the Class-1 ladder</p>
+          <aside class="callout callout--term">
+            <p class="callout__label">Class 1 · In-loop agentics</p>
+            <p>The cumulative set of specialized agentic primitives an engineer initiates in the terminal. Its seven Grades add orientation, focus, custom capability, validation, repeatable engineering shape, composition, and self-maintained domain knowledge.</p>
+          </aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace one task through seven rungs</p>
+          <h3>“Add a word-count badge to markdown_preview”</h3>
+          <p>At Grade 1, <code>/prime</code> loads the repository’s operating context. At Grade 2, a scout can inspect the Vue app without flooding a builder’s context. At Grade 3, tools let agents search, inspect, or query the environment. At Grade 4, <code>/review</code> checks the resulting diff and writes a verdict. At Grade 5, <code>/plan</code> recognizes a feature and applies the feature-shaped plan sections. At Grade 6, a chain can connect plan → build → review while preserving individual commands. At Grade 7, the ADW or relevant domain expert can answer architecture questions using an expertise model validated against current code.</p>
+          <p>Nothing in that trace requires the engineer to start by building an orchestrator. The task becomes easier, more focused, more repeatable, more inspectable, and more reusable one Grade at a time. That is the purpose of the maturity model: make the next useful investment obvious.</p>
+
+          <h3>Read the review loop as an evidence contract</h3>
+          <pre><code>request: /build specs/word-count-badge.md
+validate: /review
+evidence: app_review/review_&lt;timestamp&gt;.md
+resolve: /fix app_review/review_&lt;timestamp&gt;.md
+evidence: app_fix_reports/fix_&lt;timestamp&gt;.md</code></pre>
+          <p>The filenames may change in another codebase. The structure is the grade: action produces an inspectable judgment, and that judgment becomes input to a resolving action.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — locate the next missing dimension</p>
+          <ol>
+            <li>Start at Grade 1 and ask whether your codebase has the unique element.</li>
+            <li>Continue in order. Do not award Grade 6 because one giant prompt happens to contain many steps; require independently runnable components.</li>
+            <li>Stop at the first missing Grade.</li>
+            <li>Write one artifact that would prove the Grade exists.</li>
+            <li>Estimate the repeated work that artifact would remove or improve.</li>
+          </ol>
+          <p>Pass if the proposed next step adds exactly one new dimension rather than “build an agent platform.”</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fails + fixes</p>
+          <div class="full-width-table">
+            <table>
+              <thead><tr><th>Rung</th><th>Failure</th><th>Repair</th></tr></thead>
+              <tbody>
+                <tr><td>G2</td><td>Every sub-agent receives the same broad context and model.</td><td>Give one agent one prompt, one purpose, and a right-sized model.</td></tr>
+                <tr><td>G3</td><td>Tool sprawl consumes context and adds fragile dependencies.</td><td>Ask whether a direct prompt and existing shell tool provide the same compute advantage.</td></tr>
+                <tr><td>G4</td><td>“Review” means another chat answer with no durable verdict.</td><td>Write risk-ranked evidence to disk and make the resolve step consume it.</td></tr>
+                <tr><td>G5</td><td>A free-form plan is mistaken for a template.</td><td>Encode conditional structure for task types and complexity.</td></tr>
+                <tr><td>G6</td><td>The chain cannot run or fail one step at a time.</td><td>Preserve an independently callable command for every composed step.</td></tr>
+                <tr><td>G7</td><td>The expertise file is treated as truth.</td><td>Require file/line validation against code and a self-improve loop.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · mid-2026</p>
+            <p>The repository reflects a late-2025 model family and UI. Current models and interfaces will differ. The transferable practice is model-to-task matching, not memorizing the displayed names. Skills and Agent SDK integrations have also matured; keep the Grade-3 distinction—custom capability—while re-verifying fast-moving APIs and flags at publication or implementation time.</p>
+            <p class="current-practice__source">Course evidence: fast scout = Haiku, docs scraper = Sonnet, heavy plan/build/review roles = Opus.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Class 1 retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. List all seven Class-1 Grades in order.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Prime + memory; sub-agents; custom tools; closed loops; templates; prompt chains; agent experts.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What distinguishes a Grade-6 prompt chain from one giant prompt?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Its component prompts and agents remain independently runnable, so failures can be isolated and components can be reused or parallelized.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why might a prompt be better than an MCP integration at Grade 3?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>If existing tools already expose the needed capability, direct instructions may add the same compute advantage with less token and maintenance overhead.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. What makes <code>expertise.yaml</code> safe to reuse?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The expert treats it as a mental model, validates claims against current code, cites files and lines, and self-improves when the model drifts.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <p><strong>Teach the ladder in two minutes:</strong> give each Grade one verb—orient, focus, extend, verify, standardize, compose, learn—and cite one real course path for each.</p>
+            <p class="fine">Expert pass: your listener can diagnose why a giant plan/build/review prompt is not automatically Grade 6.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="class-two">
+        <span class="section-number">04</span>
+        <h2 class="section-title">Class 2: get the engineer out of the loop</h2>
+        <p class="section-lead">The first Class jump happens when a trigger and deterministic runtime can run agents without the engineer attending the terminal. Grade 2 turns that fabric into complete AI Developer Workflows.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The perfect prompt chain that waits for you</h3>
+          <p>Your plan → build → review chain works. It is composable, produces evidence, and handles a recurring chore. Yet every run begins with you opening a terminal, pasting the prompt, waiting for the result, and deciding when to send the next command. The agentic capability is real, but human presence still gates its throughput.</p>
+          <p>This is where a Grade increase is no longer enough. Another prompt will not change who initiates and carries the sequence. You need an out-loop fabric: an external trigger, a durable work record, deterministic step control, and an agent runtime that can execute headlessly.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the first Class jump</p>
+          <div class="adw-flow" aria-label="Out-loop ADW flow">
+            <article><b>Trigger</b><span>CLI, webhook, or orchestrator tool creates work.</span></article>
+            <article><b>Record</b><span>The database stores prompt, workflow type, working directory, and status.</span></article>
+            <article><b>Run</b><span>Deterministic Python launches each agent step.</span></article>
+            <article><b>Observe</b><span>Hooks, logs, WebSockets, and artifacts expose progress and outcome.</span></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — fabric first, workflows second</p>
+          <h3>Class 2 Grade 1: make unattended execution possible</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t2258-class2-grade1-outloop-webhook.jpg" alt="Diagram of out-loop agentics where an external trigger invokes a core agent runtime and prompt around frontend and backend applications" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">37:38</span>The teaching diagram uses a webhook → agent core → prompt fabric. In the working repo, the corresponding entry points are <code>adw_manual_trigger.py</code> and the orchestrator’s typed <code>start_adw</code> tool; there is no literal production webhook file matching every idealized label.</figcaption>
+          </figure>
+
+          <h3>Class 2 Grade 2: deterministic code owns a full pipeline</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t2464-class2-grade2-adw.jpg" alt="Double-ring diagram where the outer Class-2 layer contains named AI Developer Workflow programs around Class-1 agentics and frontend/backend apps" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">41:04</span>Full ADWs are the payoff: named programs coordinate planning, building, reviewing, and fixing while preserving control between every non-deterministic agent step.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — precise term</p>
+          <aside class="callout callout--term">
+            <p class="callout__label">AI Developer Workflow · ADW</p>
+            <p>A deterministic program that orchestrates non-deterministic agent steps. Code owns order, state, logging, validation, retry opportunities, and handoffs; agents own the reasoning inside each bounded step.</p>
+          </aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace <code>adw_plan_build.py</code></p>
+          <h3>Two steps, one durable workflow record</h3>
+          <p>The program declares <code>TOTAL_STEPS = 2</code>. <code>run_plan_step</code> constructs a query with <code>prompt=f"/plan {prompt}"</code>; <code>run_build_step</code> later constructs <code>prompt=f"/build {plan_path}"</code>. Both attach logging hooks and message handlers. The plan step writes a plan path; the build step consumes it. The deterministic program can update step status before and after each agent invocation.</p>
+          <pre><code>STEP_PLAN = "plan"
+STEP_BUILD = "build"
+TOTAL_STEPS = 2
+
+run_plan_step  →  prompt="/plan &lt;task&gt;"
+run_build_step →  prompt="/build &lt;plan_path&gt;"</code></pre>
+          <p>The trigger path adds the Class-2 property. <code>adw_manual_trigger.py</code> creates the workflow record. <code>adw_scripts.py</code> maps the workflow type to <code>adws/adw_workflows/adw_&lt;type&gt;.py</code>, then spawns a detached process:</p>
+          <pre><code>cmd = ["uv", "run", workflow_path, "--adw-id", adw_id]
+subprocess.Popen(
+    cmd,
+    stdin=subprocess.DEVNULL,
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
+    start_new_session=True,
+)</code></pre>
+          <p>The child process needs only the ADW ID because it can fetch prompt, working directory, and status from the database. This separates durable state from one interactive terminal session. It also explains the central formula: raw code is predictable but cannot reason; raw agents can reason but vary. The ADW uses each where it is strongest.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — narrate the state machine</p>
+          <ol>
+            <li>Open <code>adws/adw_workflows/adw_plan_build.py</code>.</li>
+            <li>Find <code>TOTAL_STEPS</code>, <code>run_plan_step</code>, and <code>run_build_step</code>.</li>
+            <li>Write down which values deterministic code controls before each agent starts.</li>
+            <li>Open <code>adws/adw_triggers/adw_scripts.py</code> and find the detached <code>Popen</code>.</li>
+            <li>Explain what the new process can recover from <code>adw_id</code>.</li>
+          </ol>
+          <p>Pass if your explanation clearly separates workflow state from model reasoning.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: calling any chain an ADW</h3>
+          <p><strong>Symptom:</strong> an agent receives “plan, then build, then review” as one prompt, and the team labels it an ADW even though the host cannot inspect, validate, retry, or resume between steps.</p>
+          <p><strong>Fix:</strong> ask who owns transitions. In a prompt chain, the agent carries the sequence. In an ADW, deterministic code regains control between agent invocations. The host can write state, emit events, choose the next step, stop, retry, or route a failure before asking another agent to reason.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · mid-2026</p>
+            <p>The course’s “core Agent SDK” idea maps to current headless agent integrations with structured outputs, hooks, resumable sessions, and typed tool calls. Those APIs move quickly, so preserve the architecture rather than freezing one invocation signature: durable work record → deterministic step boundary → bounded agent call → recorded evidence.</p>
+            <p class="current-practice__source">No YouTube overlay is embedded here: the extract’s proposed ADW companion had no verified ID.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Class 2 retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What unique element creates Class 2?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>An out-loop system can trigger and run agents without the engineer attending the terminal.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why is an ADW more controllable than a prompt chain?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Deterministic code owns the transitions between agent steps, so it can log, validate, persist, retry, stop, or route each boundary.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What exactly does <code>adw_scripts.py</code> spawn?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A detached <code>uv run adws/adw_workflows/adw_&lt;type&gt;.py --adw-id &lt;uuid&gt;</code> process.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Why is <code>adw_id</code> sufficient for the child process?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The durable database record holds the workflow’s input and state, so the process can fetch the rest of its context.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <p><strong>Draw and explain:</strong> trigger → database record → detached workflow → plan agent → build agent → artifacts/events. Point to the boundary where deterministic code regains control.</p>
+            <p class="fine">Expert pass: your listener can distinguish Class-2 Grade 1 fabric from Grade-2 full ADWs.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="class-three">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Class 3: orchestrate the layer</h2>
+        <p class="section-lead">The second Class jump adds a lead agent that can manage other agents. At Grade 3, that orchestrator also launches and checks deterministic ADWs, combining centralized intelligence with inspectable pipelines.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The human becomes the hidden orchestrator</h3>
+          <p>You can run several focused agents and several ADWs, but you still decide which agent to create, which prompt to send, when to check status, when to interrupt, which logs to read, and when a larger deterministic workflow should begin. The system has a fleet; coordination still lives in your head.</p>
+          <p>Class 3 turns that coordination role into an explicit custom agent. This is not a magical supervisor with unlimited authority. It is a lead engineer with a bounded management interface. The interface matters more than its personality: create, list, command, check, delete, interrupt, inspect logs, report cost, start an ADW, and check an ADW.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — intelligence above two execution modes</p>
+          <div class="orchestrator-flow" aria-label="Orchestrator management and ADW bridge">
+            <article><b>Intent</b><span>The engineer gives one outcome to the orchestrator.</span></article>
+            <article><b>Manage</b><span>CRUD tools create and direct focused agents.</span></article>
+            <article><b>Compose</b><span>Orchestrator workflows coordinate agent teams.</span></article>
+            <article><b>Launch</b><span><code>start_adw</code> hands large pipelines to deterministic code.</span></article>
+            <article><b>Observe</b><span>Logs, swimlanes, status, and cost return evidence.</span></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — inspect the mature inventory</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t2776-class3-orchestrator-inventory.png" alt="Text-dense orchestrator system panel listing live agents, slash commands, templates, ADWs, and ten management tools" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">46:16</span>The full inventory makes the layer visible: live agents, roughly thirty slash commands, seven agent templates, three ADW workflows, and all ten orchestrator tools. The PNG preserves the small text at native resolution.</figcaption>
+          </figure>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-6-building-agentic-layers/t3124-class3-grade3-final-ui.jpg" alt="Orchestrator logs view showing completed plan, build, review, and fix agents with ADW step events and an all-fixed report" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">52:04</span>Class-3-Grade-3 in operation: completed agents on the left, tool and ADW events in the center, and the orchestrator’s workflow report on the right. The same system also exposes an ADWS swimlane view.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — precise term</p>
+          <aside class="callout callout--term">
+            <p class="callout__label">Orchestrator agent</p>
+            <p>A custom lead agent with centralized, bounded tools for managing other agents and, at the top Grade, starting and checking AI Developer Workflows. It is the decision-making control plane above focused agents and deterministic workflow programs.</p>
+          </aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace the ten-tool bridge</p>
+          <h3>Eight management tools + two ADW tools</h3>
+          <div class="full-width-table">
+            <table>
+              <thead><tr><th>Capability</th><th>Tools</th><th>What the boundary buys</th></tr></thead>
+              <tbody>
+                <tr><td>Lifecycle</td><td><code>create_agent</code>, <code>list_agents</code>, <code>delete_agent</code></td><td>The orchestrator can instantiate and retire focused workers without shell improvisation.</td></tr>
+                <tr><td>Direction</td><td><code>command_agent</code>, <code>check_agent_status</code>, <code>interrupt_agent</code></td><td>Work and control are explicit operations with observable state.</td></tr>
+                <tr><td>System view</td><td><code>read_system_logs</code>, <code>report_cost</code></td><td>The lead agent can reason over events and resource use.</td></tr>
+                <tr><td>Deterministic bridge</td><td><code>start_adw</code>, <code>check_adw</code></td><td>The orchestrator delegates big pipelines to Class-2 code instead of carrying every step in its own context.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p><code>AgentManager.create_management_tools()</code> returns exactly ten callables. A stale comment elsewhere may say eight; the code returns eight agent-management tools plus <code>start_adw</code> and <code>check_adw</code>. The latter pair is the decisive Grade-3 bridge.</p>
+          <p>When the orchestrator calls <code>start_adw</code>, the tool validates the requested workflow file, creates an <code>ai_developer_workflows</code> record, broadcasts the new state, and invokes the same detached runner used by the CLI path. There is no host parser searching for a literal “start adw:” prefix. Natural language is interpreted by the orchestrator model, which emits a typed tool call.</p>
+          <pre><code>orchestrator model
+  → mcp__mgmt__start_adw
+  → create_adw(...)
+  → run_adw_workflow_async(adw_id, workflow_type)
+  → uv run adw_&lt;type&gt;.py --adw-id &lt;uuid&gt;</code></pre>
+          <p>The repository’s canonical backend port is <code>9403</code>; the frontend is <code>5175</code>. The configured orchestrator default is <code>claude-opus-4-5-20251101</code>, which dates the implementation rather than the tactic. A newer model can be supplied through configuration without changing the management interface.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — classify an orchestrated request</p>
+          <p>For the request “add a copy button, review it, and fix any blocker,” decide which work belongs in each plane:</p>
+          <ol>
+            <li>What should the orchestrator decide?</li>
+            <li>What should a focused agent reason about?</li>
+            <li>What should deterministic ADW code order and record?</li>
+            <li>What evidence should the UI expose?</li>
+            <li>Which exact tool crosses from Class 3 into Class 2?</li>
+          </ol>
+          <p>Pass if you choose <code>start_adw</code> for the bridge and do not ask the orchestrator to simulate every pipeline transition in one context.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: starting at Class 3</h3>
+          <p><strong>Symptom:</strong> a team builds a manager before it has reliable independent commands, agent roles, review artifacts, or deterministic workflows. The orchestrator spends its context inventing work shapes and repairing lower-layer ambiguity.</p>
+          <p><strong>Fix:</strong> prove the lower rungs first. A Class-3 system should conduct capabilities that already have stable contracts. The orchestrator is a control plane, not a substitute for focused prompts or workflow design. If <code>/review</code> is unreliable alone, calling it through a lead agent merely makes the failure harder to locate.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · mid-2026</p>
+            <p>Model names, agent UIs, and tool packaging drift quickly. Keep the orchestrator thin and the management tools typed. Put long-running, auditable pipelines in deterministic ADWs; reserve the orchestrator for interpreting intent, choosing workers, monitoring state, and deciding when to invoke those pipelines. Re-verify ports, models, and SDK signatures against the actual repo rather than copying screenshots.</p>
+            <p class="current-practice__source">Accuracy anchors for this repo: 10 tools · 7 tables · backend 9403 · frontend 5175.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Class 3 retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What creates the Class-3 jump?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>An orchestrator agent can centrally create, read, command, check, interrupt, and retire other agents.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. How many management tools does the working orchestrator expose?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Ten: eight agent-management tools plus <code>start_adw</code> and <code>check_adw</code>.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Is “start adw:” parsed by host code?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. The orchestrator model interprets the request and emits a typed <code>start_adw</code> tool call.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Why keep ADWs beneath the orchestrator?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They provide deterministic, durable, inspectable control for large pipelines while the orchestrator focuses on intent and coordination.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <p><strong>Explain in two minutes:</strong> “The orchestrator does not replace the ADW.” Name the ten-tool split and trace one request from natural language to detached process.</p>
+            <p class="fine">Expert pass: your listener can explain why typed tools beat a brittle chat-string parser.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="specialize">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Specialize the layer to win</h2>
+        <p class="section-lead">The course’s most repeated warning is architectural: do not spend your leverage building a generic layer that understands no codebase deeply.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The reusable platform that cannot finish a local task</h3>
+          <p>An engineer notices that several repositories need planning, building, and review, so they design one universal agent platform. Its prompts avoid naming any framework. Its reviewers use generic checklists. Its tools expose every possible integration. It is highly reusable—and every real task requires a long preamble explaining local architecture, conventions, run commands, risk boundaries, and product vocabulary.</p>
+          <p>The platform optimized the wrong objective. Reuse is valuable only if it preserves the capability that makes the layer useful. Your application code is already a specialized solution to a particular problem. The layer that operates it should inherit that specificity.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — many apps, one product-shaped ring</p>
+          <div class="specialization-map" aria-label="Specialized layer around bundled related applications">
+            <div class="specialization-map__apps"><span>Markdown preview</span><span>Nile client/server</span><span>Pomodoro CLI</span><span>Static HTML</span><span>Orchestrator UI</span><span>Database + events</span></div>
+            <div class="specialization-map__layer">One specialized layer knows how this product surface plans, builds, reviews, fixes, launches, observes, and learns.</div>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — inspect specificity in the repo</p>
+          <p>The repository does not contain only universal commands. It contains <code>prime_nile.md</code>, experts for ADWs, databases, and WebSockets, commands that understand the project’s plan/review artifact conventions, and an orchestrator configured to work inside this bundled tree. The <code>start_adw</code> tool discovers workflow types by scanning this repository’s <code>adws/adw_workflows/adw_*.py</code> files. That is productive coupling: the layer knows the system it operates.</p>
+          <p>Specialization does not forbid reusable primitives. A logging hook, agent SDK wrapper, or review schema can be copied. It means the final layer is allowed to speak the codebase’s language and optimize for its real workflows. If two unrelated repositories require different layers, duplication may be cheaper than one abstraction that forces both into a weak common denominator.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — operating principle</p>
+          <aside class="callout callout--term">
+            <p class="callout__label">Specialize, don’t genericize</p>
+            <p>Build the agentic layer to fit one codebase and the use cases that matter there. Reuse ingredients when useful, but optimize the assembled system for domain performance rather than theoretical portability.</p>
+          </aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — general shape, local contract</p>
+          <div class="full-width-table">
+            <table>
+              <thead><tr><th>Primitive</th><th>Reusable shape</th><th>Specialized contract in this repo</th></tr></thead>
+              <tbody>
+                <tr><td>Plan</td><td>Classify work and produce ordered steps.</td><td>Recognize <code>chore|feature|refactor|fix|enhancement</code>; write to <code>specs/</code>; include conditional sections.</td></tr>
+                <tr><td>Review</td><td>Inspect changes and issue a verdict.</td><td>Read git diffs; rank Blocker/High/Medium/Low; write <code>app_review/review_*.md</code>; end PASS/FAIL.</td></tr>
+                <tr><td>ADW</td><td>Deterministic program wraps agent steps.</td><td>Use this DB schema, event types, command files, working directory, and <code>adw_&lt;type&gt;.py</code> discovery.</td></tr>
+                <tr><td>Expert</td><td>Maintain a domain mental model.</td><td>Track ADW, database, or WebSocket architecture; validate claims against this code; cap expertise at 1000 lines.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The general shape lets you transfer the idea. The specialized contract creates compute advantage. A generic reviewer can mention “test coverage.” A specialized reviewer can know the application’s artifact directories, commands, risk tiers, and expected verdict format.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — write a specialization boundary</p>
+          <ol>
+            <li>Name the codebase or tightly related app bundle the layer wraps.</li>
+            <li>List three repeated workflows worth optimizing.</li>
+            <li>List three domain terms agents must use correctly.</li>
+            <li>List one generic capability you can reuse unchanged.</li>
+            <li>List one local contract that must remain codebase-specific.</li>
+          </ol>
+          <p>Pass if the boundary is narrow enough that you can name what the layer should intentionally not support.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: confusing specialization with hard-coded accidents</h3>
+          <p><strong>Symptom:</strong> paths, ports, and model names are scattered through prompts with no configuration boundary, so every local change breaks the layer.</p>
+          <p><strong>Fix:</strong> specialize behavior and vocabulary while keeping volatile values in explicit configuration. The repo’s <code>BACKEND_PORT</code> and <code>ORCHESTRATOR_MODEL</code> are configurable environment-backed values. Specialization should deepen domain fit, not eliminate maintainability.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · mid-2026</p>
+            <p>Progressive-disclosure skills, repository-scoped instructions, and focused agent definitions make specialization cheaper than stuffing every rule into one global prompt. Keep stable domain knowledge close to the codebase, load detailed guidance only when the task needs it, and measure reuse by improved outcomes rather than reduced file duplication.</p>
+            <p class="current-practice__source">Transfer rule: share the pattern; specialize the instance.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Specialization retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What is Dan’s most repeated warning about the layer?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Do not build a generic one-size-fits-all layer; specialize it to the codebase and use cases you care about.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Does specialization forbid copying a logging hook?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. Reusable ingredients are fine; the assembled layer should still optimize for the local domain.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why can duplication be acceptable?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Separate specialized layers may outperform a shared abstraction that forces unrelated codebases into weak generic contracts.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <p><strong>Explain with one example:</strong> the difference between reusing a primitive and genericizing the whole layer. Use the review command or ADW runner.</p>
+            <p class="fine">Pass if your listener can name one contract that should remain local.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="core-four">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Everything reduces to the Core Four</h2>
+        <p class="section-lead">A prompt, skill, sub-agent, expert, ADW step, and orchestrator all package the same invariant: context, model, prompt, and tools. Form factor matters only insofar as it changes compute advantage.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The architecture debate that never diagnoses the run</h3>
+          <p>A team argues whether a capability should be an MCP server, a skill, a sub-agent, or a slash command. Meanwhile, the failed run had stale context, an oversized model for a trivial scrape, an ambiguous prompt, and a tool set that could read but not write the required artifact. The team debated packaging while ignoring the four variables that actually shaped performance.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — four knobs inside every form</p>
+          <div class="core-four-map" aria-label="Core Four">
+            <article><b>Context</b><span>What the agent can see: code, state, instructions, artifacts, observations.</span></article>
+            <article><b>Model</b><span>The reasoning capability and cost matched to the task.</span></article>
+            <article><b>Prompt</b><span>The purpose, workflow, constraints, success evidence, and stop condition.</span></article>
+            <article><b>Tools</b><span>The bounded actions available to read, change, execute, call, and report.</span></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — unwrap three forms</p>
+          <p>The documentation scraper is a markdown sub-agent with a model and instructions. The ADW plan step is a Python function that constructs a query with a model, working directory, prompt, allowed tools, hooks, and handlers. The orchestrator is a persistent Agent SDK client with a system prompt and ten management tools. Their lifecycles differ, but each resolves to the same diagnostic questions: what did it see, which model reasoned, what was it asked to do, and what actions could it take?</p>
+          <p>This is why Dan can say a skill or MCP server may be replaceable by a simple prompt. If the existing environment already provides the required action, the prompt can modify how the agent uses that tool. Conversely, if the agent lacks the action entirely, prose cannot create it. The Core Four separates a capability gap from an instruction gap.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — invariant</p>
+          <aside class="callout callout--term">
+            <p class="callout__label">Core Four</p>
+            <p>Context, model, prompt, and tools: the stable diagnostic vocabulary beneath every agentic form factor. The name of the wrapper is secondary to the compute advantage created by configuring these four well.</p>
+          </aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — diagnose one ADW plan failure</p>
+          <div class="full-width-table">
+            <table>
+              <thead><tr><th>Dimension</th><th>Question</th><th>Course-repo evidence</th><th>Possible repair</th></tr></thead>
+              <tbody>
+                <tr><td>Context</td><td>Did the planner operate in the correct working directory with repository instructions available?</td><td><code>QueryOptions(cwd=working_dir)</code>; root memory and command files.</td><td>Correct the stored working directory or prime/load missing project context.</td></tr>
+                <tr><td>Model</td><td>Was the reasoning task matched to the selected model?</td><td>Plan/build defaults use Opus; fast scouts can use Haiku.</td><td>Right-size the model rather than changing the whole workflow.</td></tr>
+                <tr><td>Prompt</td><td>Did the plan request define the actual task and invoke the intended command?</td><td><code>prompt=f"/plan {prompt}"</code>.</td><td>Repair the durable ADW input or the <code>/plan</code> contract.</td></tr>
+                <tr><td>Tools</td><td>Could the agent inspect and write what planning requires?</td><td>Allowed tools include Read, Glob, Grep, Bash, Write, Edit, Task, and Skill.</td><td>Add or remove the minimum bounded capability; do not default to tool sprawl.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The form factor tells you where to look. The Core Four tells you what to look for. This keeps debugging local: a stale expert answer may be a context/learning problem; a failed workflow spawn is deterministic runtime, not model reasoning; an orchestrator that chooses the wrong worker may have an ambiguous prompt or missing status evidence.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — unwrap a favorite abstraction</p>
+          <ol>
+            <li>Choose one agent, skill, MCP tool, expert, or workflow you rely on.</li>
+            <li>Write its context sources.</li>
+            <li>Name its model and why that model fits.</li>
+            <li>Summarize its prompt contract in one sentence.</li>
+            <li>List its tools, then cross out any that do not add capability for the purpose.</li>
+          </ol>
+          <p>Pass if you can predict one failure caused by each dimension.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating Core Four as a taxonomy of files</h3>
+          <p><strong>Symptom:</strong> the audit says “context = CLAUDE.md, prompt = command file, tools = MCP,” then stops. Runtime observations, working directory, retrieved expertise, sub-agent results, and tool outputs disappear from the model.</p>
+          <p><strong>Fix:</strong> evaluate the Core Four at execution time. Context is everything visible during the run, including observations. Prompt includes system and task instructions. Tools include the actions actually permitted. Model includes the selected capability and cost profile. The four are dynamic run variables, not four folders.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · mid-2026</p>
+            <p>New wrappers will keep arriving: richer skills, background agents, structured outputs, sandboxed tools, and new orchestration surfaces. Use the Core Four to transfer across them. Before adopting a form, state which of the four it improves and what evidence should show that improvement. If you cannot, the form may be novelty rather than leverage.</p>
+            <p class="current-practice__source">Media policy: zero unverified video overlays are published in this chapter; the extract’s proposed companion ID remains a review item.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Core Four retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Name the Core Four.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Context, model, prompt, and tools.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why does the form factor not determine maturity by itself?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A skill, prompt, sub-agent, or MCP server can package the same four primitives; maturity comes from the reliable compute advantage it adds.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Can a prompt replace a missing action?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. A prompt can teach better use of available tools, but prose cannot create a capability the environment does not expose.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <p><strong>Unwrap three forms:</strong> a sub-agent, an ADW step, and the orchestrator. Name the Core Four for each and one lifecycle difference that the wrapper adds.</p>
+            <p class="fine">Pass if your explanation separates invariant primitives from useful packaging.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="course-recap">
+        <span class="section-number">08</span>
+        <h2 class="section-title">The whole course becomes one build order</h2>
+        <p class="section-lead">AH-6 closes the arc by placing every earlier tactic inside the layer. The lessons are no longer a sequence you watched; they are capabilities you can locate.</p>
+
+        <h3>Agentic Horizon: six lenses on the same system</h3>
+        <div class="course-arc" aria-label="Agentic Horizon course arc">
+          <article><b>AH-1</b><span>Engineer the context window.</span></article>
+          <article><b>AH-2</b><span>Choose the right prompt form.</span></article>
+          <article><b>AH-3</b><span>Build focused custom agents.</span></article>
+          <article><b>AH-4</b><span>Orchestrate multiple agents.</span></article>
+          <article><b>AH-5</b><span>Make narrow experts learn.</span></article>
+          <article><b>AH-6</b><span>Assemble and level the layer.</span></article>
+        </div>
+
+        <h3>Tactical Agentic Coding: eight operating rules</h3>
+        <div class="tactic-strip" aria-label="Eight tactical rules">
+          <article><b>01 · Stop coding</b><span>Move scarce attention from hand-typing to systems that carry outcomes.</span></article>
+          <article><b>02 · Agent perspective</b><span>Ask whether the agent could solve the task with exactly what it can see.</span></article>
+          <article><b>03 · Template engineering</b><span>Encode how the team plans and builds so useful structure does not drift.</span></article>
+          <article><b>04 · Stay out the loop</b><span>Compose reliable steps, then make them triggerable without your presence.</span></article>
+          <article><b>05 · Add feedback</b><span>Request → validate → resolve; use more compute to earn more trust.</span></article>
+          <article><b>06 · Let agents focus</b><span>One agent, one prompt, one purpose; use context boundaries deliberately.</span></article>
+          <article><b>07 · Target zero-touch</b><span>Move repeated delivery toward reliable, observable unattended operation.</span></article>
+          <article><b>08 · Prioritize agentics</b><span>Build the system that builds the system; invest in the operating layer.</span></article>
+        </div>
+
+        <figure class="frame-card">
+          <img src="../media/frames/ah-6-building-agentic-layers/t3518-prioritize-agentics-recap.jpg" alt="Tactic 08 title card reading Prioritize Agentics and Build the system that builds the system" width="1920" height="1080" loading="lazy">
+          <figcaption><span class="frame-card__t">58:38</span>The capstone meta-tactic: prioritize the agentic layer. Every earlier tactic becomes a way to make that layer more capable, focused, repeatable, trustworthy, or independent.</figcaption>
+        </figure>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">The final operating loop</p>
+          <p><strong>Locate</strong> your current Class and Grade. <strong>Name</strong> the unique missing element. <strong>Build</strong> that element with the Core Four. <strong>Prove</strong> the new compute advantage with evidence. <strong>Specialize</strong> it to the codebase. Then repeat.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Graded capstone lab · Build &amp; Climb the Agentic Layer</h2>
+        <p class="section-lead">Audit every rung, read the deterministic spine, run an ADW from two entry points, operate an expert, and grade your own codebase. Use only the course repository.</p>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Lab boundary</p>
+          <p><strong>Repository:</strong> <code>agentic-horizon/orchestrator-agent-with-adws</code>. <strong>Time:</strong> 90–120 minutes. <strong>Cost:</strong> real agent and database runs may consume a few dollars of model tokens. <strong>Rule:</strong> type zero application code by hand.</p>
+        </aside>
+
+        <div class="lab-score" aria-label="Lab score allocation">
+          <article><b>5</b><span>Setup</span></article>
+          <article><b>20</b><span>Layer audit</span></article>
+          <article><b>15</b><span>Read ADW</span></article>
+          <article><b>15</b><span>CLI run</span></article>
+          <article><b>20</b><span>Orchestrator</span></article>
+          <article><b>15</b><span>Expert loop</span></article>
+          <article><b>10</b><span>Self-grade</span></article>
+        </div>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Part 0 · Prepare the course stack · 5 points</h3>
+          <ol class="lab-box__steps">
+            <li>From the course repo, copy <code>.env.sample</code> to <code>.env</code>.</li>
+            <li>Set <code>ANTHROPIC_API_KEY</code> and <code>DATABASE_URL</code> in your local environment file. Do not place secrets in your lab report.</li>
+            <li>Run <code>uv run apps/orchestrator_db/run_migrations.py</code>.</li>
+            <li>Confirm <code>uv --version</code>, <code>bun --version</code>, and <code>claude --version</code>.</li>
+            <li>Verify the database tables with <code>psql "$DATABASE_URL" -c "\dt"</code>.</li>
+          </ol>
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <ul class="checklist">
+              <li>Seven tables exist: <code>orchestrator_agents</code>, <code>agents</code>, <code>prompts</code>, <code>agent_logs</code>, <code>system_logs</code>, <code>orchestrator_chat</code>, <code>ai_developer_workflows</code>.</li>
+              <li>You can explain that migrations 5, 6, and 7 add indexes, functions, and triggers rather than tables.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Part 1 · Produce a one-page layer audit · 20 points</h3>
+          <p>Without running an agent, verify one real path for every rung. Do not copy the table blindly: open each path.</p>
+          <div class="full-width-table">
+            <table>
+              <thead><tr><th>Rung</th><th>Evidence to locate</th><th>Your verified citation</th></tr></thead>
+              <tbody>
+                <tr><td>C1 G1</td><td><code>.claude/commands/prime.md</code>, <code>CLAUDE.md</code></td><td></td></tr>
+                <tr><td>C1 G2</td><td><code>.claude/agents/*.md</code>, <code>specs/</code>, <code>ai_docs/</code></td><td></td></tr>
+                <tr><td>C1 G3</td><td><code>.claude/skills/*/SKILL.md</code>, <code>.mcp.json.sample</code></td><td></td></tr>
+                <tr><td>C1 G4</td><td><code>.claude/commands/review.md</code>, <code>fix.md</code>, <code>app_review/</code></td><td></td></tr>
+                <tr><td>C1 G5</td><td><code>.claude/commands/plan.md</code> task-type switch</td><td></td></tr>
+                <tr><td>C1 G6</td><td><code>orch_scout_and_build.md</code>, <code>adw_plan_build.py</code></td><td></td></tr>
+                <tr><td>C1 G7</td><td><code>.claude/commands/experts/{adw,database,websocket}/</code></td><td></td></tr>
+                <tr><td>C2 G1</td><td><code>adw_manual_trigger.py</code>, <code>adw_scripts.py</code>, <code>adw_agent_sdk.py</code></td><td></td></tr>
+                <tr><td>C2 G2</td><td><code>adw_plan_build{,_review,_review_fix}.py</code></td><td></td></tr>
+                <tr><td>C3 G1</td><td><code>orchestrator_service.py</code>, <code>agent_manager.py</code></td><td></td></tr>
+                <tr><td>C3 G2</td><td><code>apps/orchestrator_3_stream/.claude/commands/orch_*</code></td><td></td></tr>
+                <tr><td>C3 G3</td><td><code>start_adw</code>/<code>check_adw</code>, <code>AdwSwimlanes.vue</code></td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <ul class="checklist">
+              <li>All 12 rows contain a path you personally opened.</li>
+              <li>You identify <code>apps/*</code> as the application layer and root <code>.claude/</code> + <code>adws/</code> as the agentic layer.</li>
+              <li>You name the model choices: fast scout = Haiku, docs scraper = Sonnet, heavy plan/build roles = Opus.</li>
+              <li>You explain why the teaching diagrams and real file layout need not match one-to-one.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Part 2 · Read the deterministic ADW spine · 15 points</h3>
+          <ol class="lab-box__steps">
+            <li>Open <code>adws/adw_workflows/adw_plan_build.py</code>.</li>
+            <li>Find <code>TOTAL_STEPS = 2</code>.</li>
+            <li>Find <code>run_plan_step</code> invoking <code>/plan</code> and <code>run_build_step</code> invoking <code>/build</code>.</li>
+            <li>Find <code>create_logging_hooks</code> and <code>create_message_handlers</code>.</li>
+            <li>Open <code>adws/adw_triggers/adw_scripts.py</code> and find the <code>subprocess.Popen</code> call with <code>start_new_session=True</code>.</li>
+          </ol>
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <p>Write one sentence that names what deterministic code controls and what the non-deterministic agents control. Then add the exact detached command shape that the runner constructs.</p>
+          </div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Part 3 · Run an ADW from the CLI · 15 points</h3>
+          <pre><code>uv run adws/adw_triggers/adw_manual_trigger.py \
+  "lab-feature" \
+  "plan_build" \
+  "Add a word-count badge to the markdown_preview app footer" \
+  "$(pwd)"</code></pre>
+          <ol class="lab-box__steps">
+            <li>Query the newest <code>ai_developer_workflows</code> row and record its name, type, and status.</li>
+            <li>Confirm a plan appeared beneath <code>specs/</code>.</li>
+            <li>Confirm the agent changed <code>apps/markdown_preview</code>; you must not type the application change.</li>
+            <li>Repeat with <code>plan_build_review</code> and confirm an <code>app_review/</code> report ends in PASS or FAIL.</li>
+          </ol>
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <ul class="checklist">
+              <li>At least one CLI-triggered ADW completes end to end.</li>
+              <li>A durable workflow row, plan artifact, application diff, and review verdict are present.</li>
+              <li>Your report records the ADW ID and artifact paths, but no secrets.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Part 4 · Run an ADW through the orchestrator · 20 points</h3>
+          <pre><code>cd apps/orchestrator_3_stream
+./start_be.sh &amp;   # canonical backend port: 9403
+./start_fe.sh &amp;   # frontend port: 5175
+open "http://127.0.0.1:5175"</code></pre>
+          <ol class="lab-box__steps">
+            <li>Ask: “Start a <code>plan_build_review</code> ADW named <code>lab-orch</code> to add a copy-to-clipboard button to the markdown preview app.”</li>
+            <li>In the event stream, identify the <code>start_adw</code> tool call and returned <code>adw_id</code>.</li>
+            <li>Observe the run in both LOGS and ADWS swimlane views.</li>
+            <li>Ask the orchestrator to check the ADW using its returned ID.</li>
+            <li>From <code>agent_manager.py</code>, list all ten orchestrator tools.</li>
+          </ol>
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <ul class="checklist">
+              <li>The orchestrator-launched workflow completes and appears in both views.</li>
+              <li>You prove the bridge is the typed <code>start_adw</code> tool, not literal string parsing.</li>
+              <li>Your ten-tool list contains eight agent-management tools plus <code>start_adw</code> and <code>check_adw</code>.</li>
+              <li>If the UI cannot reach the backend, you check port <code>9403</code> rather than the stale <code>8002</code> found in older notes.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Part 5 · Operate the ADW expert · 15 points</h3>
+          <ol class="lab-box__steps">
+            <li><strong>REUSE:</strong> run <code>/experts:adw:question "How does start_adw spawn a workflow, and where is the swimlane UI rendered?"</code></li>
+            <li>Confirm the answer cites real files and lines.</li>
+            <li><strong>LEARN:</strong> use the agent to make a harmless comment-only change in an ADW file, then run <code>/experts:adw:self-improve true</code>.</li>
+            <li>Validate that <code>expertise.yaml</code> remains parseable YAML and at most 1000 lines.</li>
+          </ol>
+          <pre><code>python3 -c "import yaml; yaml.safe_load(open('.claude/commands/experts/adw/expertise.yaml'))"
+wc -l .claude/commands/experts/adw/expertise.yaml</code></pre>
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <p>You demonstrate REUSE and LEARN, explain ACT → LEARN → REUSE, and state why <code>expertise.yaml</code> is a mental model while the code remains the source of truth.</p>
+          </div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Part 6 · Grade this repo and your repo · 10 points</h3>
+          <ol class="lab-box__steps">
+            <li>Write one paragraph grading the course repo as Class-3-Grade-3.</li>
+            <li>Name at least two consolidated rungs: templates inside <code>plan.md</code>; out-loop entry through CLI/<code>start_adw</code> instead of a literal webhook.</li>
+            <li>Run <code>/plan</code> and <code>/build</code> individually as well as through the chain; explain how individual execution isolates a failed step.</li>
+            <li>Write one paragraph grading your own codebase and naming the single next element to add.</li>
+          </ol>
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <p>Both paragraphs are specific enough for a teammate to challenge. The next-rung proposal names one artifact, one repeated use case, and one piece of success evidence.</p>
+          </div>
+        </section>
+
+        <h3>Overall rubric</h3>
+        <div class="full-width-table rubric-table">
+          <table>
+            <thead><tr><th>Score</th><th>Level</th><th>Evidence</th></tr></thead>
+            <tbody>
+              <tr><td>90–100</td><td>Operator</td><td>Both trigger paths complete; every rung is cited; the expert loop runs; explanations distinguish agent reasoning from deterministic control.</td></tr>
+              <tr><td>75–89</td><td>Builder</td><td>One trigger path or expert loop has a gap, but the layer map and code trace are accurate and the next rung is specific.</td></tr>
+              <tr><td>60–74</td><td>Reader</td><td>Terms are recognized, but runtime evidence or real path verification is incomplete.</td></tr>
+              <tr><td>Below 60</td><td>Rebuild foundation</td><td>Repeat Parts 1 and 2 before launching the orchestrator. Do not use Class 3 to hide missing lower-layer understanding.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Optional stretch · course codebase only</p>
+          <p>Using an agent, add an <code>adw_plan_build_test.py</code> workflow patterned after the existing programs, prove the orchestrator discovers and runs it, then run the ADW expert’s self-improve command and verify that its mental model notices the new workflow. Do not attempt the stretch until the existing plan/build path passes.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Cumulative mastery</h2>
+        <p class="section-lead">Close the chapter. Answer from memory. Reveal only after committing to an answer, then route every miss back to evidence or a lab checkpoint.</p>
+
+        <div class="mastery-grid">
+          <article><h3>Map</h3><p>Can you place every artifact on the application/agentic split and every capability on the Class/Grade ladder?</p></article>
+          <article><h3>Trace</h3><p>Can you follow a request from CLI or orchestrator through a database record into a detached ADW process?</p></article>
+          <article><h3>Diagnose</h3><p>Can you separate context, model, prompt, tool, deterministic runtime, and orchestration failures?</p></article>
+          <article><h3>Transfer</h3><p>Can you grade your own codebase and propose one specialized next rung with observable value?</p></article>
+        </div>
+
+        <section class="retrieval-quiz" aria-label="Cumulative mastery retrieval">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What are the two layers every codebase can now contain?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The application layer that serves users and the agentic layer that teaches and runs agents over it.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What unique relationship defines each Class?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Class 1 is in-loop terminal use; Class 2 runs agents out-loop through triggers and deterministic programs; Class 3 adds an orchestrator that manages agents.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. List Class-1 Grades 1–7.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Prime + memory, sub-agents, custom tools, closed loops, templates, prompt chains, agent experts.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. What are Class-2 Grades 1 and 2?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Out-loop trigger/runtime fabric, then full AI Developer Workflows.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">5. What are Class-3 Grades 1–3?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The orchestrator agent, orchestrator developer workflows, then the orchestrator running ADWs.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">6. Why must Grade-6 components run individually?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>So a failure can be isolated to one step and each component can be reused, tested, or parallelized independently.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">7. What is the formula behind an ADW’s leverage?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Deterministic code controls transitions and evidence; non-deterministic agents provide reasoning inside bounded steps.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">8. What does the detached runner command look like?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>uv run adws/adw_workflows/adw_&lt;type&gt;.py --adw-id &lt;uuid&gt;</code>, spawned with a new session.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">9. How many orchestrator tools exist, and how are they split?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Ten: eight agent-management tools plus <code>start_adw</code> and <code>check_adw</code>.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">10. What exact tool bridges Class 3 into Class 2?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>start_adw</code>; <code>check_adw</code> then observes the launched workflow.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">11. Why is there no need for a “start adw:” parser?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The orchestrator model interprets natural language and emits a typed management tool call.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">12. What is the codebase singularity?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The threshold where agents can run the codebase better than the engineer or team can alone and earn a central place in delivery.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">13. What are the Core Four?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Context, model, prompt, and tools.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">14. Why is <code>expertise.yaml</code> not a source of truth?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It is a maintained mental model that must be validated against the current implementation, which remains authoritative.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">15. What does “specialize, don’t genericize” require?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Optimize the assembled layer for one codebase and its real use cases, even if some underlying primitives are reusable.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">16. State the capstone operating loop.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Locate the current rung, name the unique missing element, build it with the Core Four, prove its compute advantage, specialize it, and repeat.</p></details></div>
+        </section>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Scoring</p>
+          <p><strong>14–16 correct:</strong> teach the chapter and run the lab. <strong>10–13:</strong> revisit the relevant Class and reproduce its code trace. <strong>0–9:</strong> redraw the ladder and complete Lab Parts 1–2 before operating the orchestrator. A memorized noun without a real path or causal explanation earns half credit.</p>
+        </aside>
+
+        <h3>Capstone teach-back</h3>
+        <div class="teach-back">
+          <p>Without notes, teach a colleague for five minutes:</p>
+          <ol>
+            <li>Why a codebase has an application layer and an agentic layer.</li>
+            <li>How the three Classes change who initiates and coordinates work.</li>
+            <li>How the seven Class-1 Grades create the foundation.</li>
+            <li>Why ADWs combine deterministic code with non-deterministic agents.</li>
+            <li>How <code>start_adw</code> bridges the orchestrator to a detached workflow.</li>
+            <li>Why the next step is specialization, not a generic platform.</li>
+          </ol>
+          <p class="fine">Expert pass: your listener can grade a fresh repository and name one specific next artifact without opening this chapter.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Capstone glossary</h2>
+        <p class="section-lead">Use these terms narrowly enough that a repository artifact or runtime behavior can prove each one.</p>
+        <dl class="glossary">
+          <div><dt>Application layer</dt><dd>The inner product surface: databases, frontends, backends, scripts, infrastructure, notebooks, and related applications that directly serve or operate the product.</dd></div>
+          <div><dt>Agentic layer</dt><dd>The specialized outer ring of instructions, agents, tools, feedback, workflows, experts, triggers, evidence, and orchestration that operates the application.</dd></div>
+          <div><dt>Class</dt><dd>A maturity category defined by a distinct operating relationship: in-loop, out-loop, or orchestrated.</dd></div>
+          <div><dt>Grade</dt><dd>A new capability dimension within a Class. Grades stack rather than replacing prior capabilities.</dd></div>
+          <div><dt>Class 1</dt><dd>In-loop agentic primitives initiated by the engineer in the terminal.</dd></div>
+          <div><dt>Class 2</dt><dd>Out-loop infrastructure and AI Developer Workflows that can run agents without the engineer attending.</dd></div>
+          <div><dt>Class 3</dt><dd>An orchestrated layer where a custom lead agent manages other agents and eventually launches ADWs.</dd></div>
+          <div><dt>Prime</dt><dd>An orientation prompt that loads the codebase map, conventions, and starting context.</dd></div>
+          <div><dt>Sub-agent</dt><dd>A focused agent definition with a narrow purpose and right-sized context, model, prompt, and tools.</dd></div>
+          <div><dt>Closed loop</dt><dd>A request → validate → resolve structure where evidence from one action becomes input to the next.</dd></div>
+          <div><dt>Template</dt><dd>An encoded engineering shape that varies conditionally by task type or complexity rather than relying on a free-form plan every time.</dd></div>
+          <div><dt>Prompt chain</dt><dd>Several independently runnable prompts or agents composed into a larger agent-driven sequence.</dd></div>
+          <div><dt>Agent expert</dt><dd>A narrow agent that acts, learns by reconciling its mental model with code, and reuses that maintained expertise in future work.</dd></div>
+          <div><dt>Expertise file</dt><dd>A compact mental model and working memory, commonly <code>expertise.yaml</code>, validated against code rather than treated as authoritative.</dd></div>
+          <div><dt>ACT → LEARN → REUSE</dt><dd>The expert loop: perform domain work, update the mental model from current evidence, then apply that model to later questions and plans.</dd></div>
+          <div><dt>PITER framework</dt><dd>The course’s name for the out-loop framework in which external triggers and an agent runtime initiate work without the engineer present. The transcript may mishear it as “Peter.”</dd></div>
+          <div><dt>AI Developer Workflow · ADW</dt><dd>A deterministic program that owns state and transitions around bounded non-deterministic agent steps.</dd></div>
+          <div><dt>ADW ID</dt><dd>The durable identifier used to recover workflow input, status, step progress, agents, and events from the database.</dd></div>
+          <div><dt>Orchestrator agent</dt><dd>A custom lead agent with bounded tools to manage workers, inspect system state, report cost, and launch or check ADWs.</dd></div>
+          <div><dt>CRUD for agents</dt><dd>Create, read/list/check, update/command, and delete lifecycle operations applied to agent workers.</dd></div>
+          <div><dt>Core Four</dt><dd>Context, model, prompt, and tools—the invariant beneath every agentic form factor.</dd></div>
+          <div><dt>Compute advantage</dt><dd>The useful leverage created when more or better-configured compute produces a more capable, reliable, or trusted engineering outcome.</dd></div>
+          <div><dt>Specialization</dt><dd>Deliberately fitting the agentic layer to one codebase and its important use cases instead of optimizing the whole system for generic reuse.</dd></div>
+          <div><dt>Zero-touch engineering</dt><dd>The North Star of pushing repeated workflows toward reliable, observable execution without human relay.</dd></div>
+          <div><dt>Codebase singularity</dt><dd>The threshold where teams of agents can operate the codebase better than the engineer or team can alone and earn a central role in delivery.</dd></div>
+          <div><dt>Prioritize Agentics</dt><dd>Tactic 08: build the system that builds the system and treat improvement of the agentic layer as a first-class engineering investment.</dd></div>
+        </dl>
+        <p class="publication-note">Current-practice media: 0 YouTube overlays published. The extract proposes one companion for later verification; the build environment could not verify its identity, so the chapter omits it.</p>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">Volume II · Agentic Horizon · Capstone</p>
+        <div class="chapter-footer__nav">
+          <a href="13-agent-experts.html">← Previous: AH-5 · Agent Experts</a>
+          <a href="../index.html">Return to the book hub →</a>
+        </div>
+      </footer>
+    
+      <p class="code-deep-link"><a href="../code/ah-6-building-agentic-layers.html">Code deep-dive · how Dan built this repo →</a></p>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = Math.round(value * 100) + '%';
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          progressFramePending = false;
+        });
+      };
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => {
+          const active = link.getAttribute('href') === '#' + visible.target.id;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+
+      sections.forEach(section => observer.observe(section));
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+</body>
+</html>

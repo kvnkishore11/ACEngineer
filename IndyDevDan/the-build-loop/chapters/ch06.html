@@ -1,0 +1,222 @@
+<section class="chapter" id="ch06">
+  <div class="wrap wide">
+    <span class="chapnum reveal">06 — Out of the loop</span>
+    <div class="kicker reveal">the half of the system that isn't in the public repos</div>
+    <h2 class="title reveal d1" style="max-width:26ch">The ADW ladder: <em>one file, then seams.</em></h2>
+    <p class="lede reveal d2">An AI Developer Workflow is a Python script that calls agents through the CLI. Five course codebases show it evolving — and the evolution is not what the marketing says it is.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">tac-4 → tac-8</span><span class="pill blue">69 scripts</span><span class="pill olive">course tree only</span></div>
+
+    <div class="callout warn reveal"><span class="ci">A CORRECTION I OWE YOU</span>
+      <span class="cc">The common framing — <em>"one script that calls one agent, growing into a pipeline"</em> — is wrong. tac-4's origin file already makes <strong>seven agent calls</strong> in one flat 536-line script. Rung zero is a monolith. What each rung adds is not more agents. It is <strong>seams</strong> — and every seam is paid for in state.</span></div>
+
+    <div class="chapnav reveal"><span class="cnl">In this chapter</span>
+      <a href="#ch06-s1"><b>1</b>The ladder</a>
+      <a href="#ch06-s2"><b>2</b>PITER</a>
+      <a href="#ch06-s3"><b>3</b>Isolation</a>
+      <a href="#ch06-s4"><b>4</b>Where it's broken</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch06-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">One file → many → isolated → observable</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 300" role="img" aria-label="The ADW ladder from tac-4 monolith to the orchestrator, showing the state carrier at each rung">
+        <text x="24" y="24" class="s-label">EACH RUNG ADDS A SEAM · EACH SEAM IS PAID FOR IN STATE</text>
+
+        <rect x="24" y="44" width="150" height="86" rx="10" class="s-card"/>
+        <text x="40" y="68" class="s-title" font-size="13">tac-4</text>
+        <text x="40" y="88" class="s-label-sm">1 monolith, 536 L</text>
+        <text x="40" y="106" class="s-label-sm">7 agent calls</text>
+        <text x="40" y="124" class="s-label-sm">triggers exist already</text>
+
+        <rect x="186" y="44" width="150" height="86" rx="10" class="s-clay-f"/>
+        <text x="202" y="68" class="s-title" font-size="13">tac-5</text>
+        <text x="202" y="88" class="s-label-sm">5 ADWs, 8 modules</text>
+        <text x="202" y="106" class="s-label-sm">THE 71-LINE FILE</text>
+        <text x="202" y="124" class="s-label-sm">+ repair loop</text>
+
+        <rect x="348" y="44" width="150" height="86" rx="10" class="s-blue-f"/>
+        <text x="364" y="68" class="s-title" font-size="13">tac-6</text>
+        <text x="364" y="88" class="s-label-sm">12 ADWs</text>
+        <text x="364" y="106" class="s-label-sm">review w/ screenshots</text>
+        <text x="364" y="124" class="s-label-sm">document · patch</text>
+
+        <rect x="510" y="44" width="150" height="86" rx="10" class="s-olive-f"/>
+        <text x="526" y="68" class="s-title" font-size="13">tac-7</text>
+        <text x="526" y="88" class="s-label-sm">14 ADWs, all _iso</text>
+        <text x="526" y="106" class="s-label-sm">worktrees + ports</text>
+        <text x="526" y="124" class="s-label-sm">ship · ZTE</text>
+
+        <rect x="672" y="44" width="184" height="86" rx="10" class="s-plum-f"/>
+        <text x="688" y="68" class="s-title" font-size="13">tac-8 / orchestrator</text>
+        <text x="688" y="88" class="s-label-sm">26 unique ADWs, 5 apps</text>
+        <text x="688" y="106" class="s-label-sm">Notion · tasks.md · AEA</text>
+        <text x="688" y="124" class="s-label-sm">then → Postgres</text>
+
+        <path d="M24 176 H 856" class="s-line"/>
+        <text x="24" y="166" class="s-label">THE STATE CARRIER</text>
+
+        <rect x="24" y="192" width="150" height="34" rx="7" class="s-card"/>
+        <text x="99" y="214" text-anchor="middle" class="s-label-sm">argv</text>
+        <rect x="186" y="192" width="150" height="34" rx="7" class="s-clay-f"/>
+        <text x="261" y="214" text-anchor="middle" class="s-label-sm">adw_state.json</text>
+        <rect x="348" y="192" width="150" height="34" rx="7" class="s-blue-f"/>
+        <text x="423" y="214" text-anchor="middle" class="s-label-sm">+ 5 fields</text>
+        <rect x="510" y="192" width="150" height="34" rx="7" class="s-olive-f"/>
+        <text x="585" y="214" text-anchor="middle" class="s-label-sm">+ worktree + ports</text>
+        <rect x="672" y="192" width="184" height="34" rx="7" class="s-plum-f"/>
+        <text x="764" y="214" text-anchor="middle" class="s-label-sm">Postgres row</text>
+
+        <text x="24" y="262" class="s-label-sm">tac-6 → tac-7 IS A RENAME, NOT A REWRITE — 12 FILES RENAMED _iso, PLUS EXACTLY 2 NEW FILES</text>
+        <text x="24" y="284" class="s-label-sm">tac-7's 14 = 7 PRIMITIVES (plan build test review document patch ship) + 7 COMPOSERS</text>
+      </svg>
+      <div class="fcap"><b>The organizing law.</b> Every ADW file is either a <em>primitive</em> that calls agents, or a <em>composer</em> that calls other ADWs by subprocess. Nothing else.</div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">The pivot is a seventy-one line file.</p>
+        <p>tac-4's 536-line monolith becomes <code>adw_plan.py</code> plus <code>adw_build.py</code>, joined by 71 lines of subprocess glue. <strong>That file is the invention of the ADW layer</strong> — not because it does more, but because it can now be resumed, re-run, and improved one node at a time.</p>
+        <p>Composers share almost nothing with what they compose. They import a single symbol and otherwise communicate by exit code.</p>
+      </div>
+      <div>
+        <div class="codecap">adw_sdlc_iso.py — the composition pattern, ×5</div>
+        <div class="code"><pre>plan_cmd = ["uv", "run",
+            os.path.join(script_dir, "adw_plan_iso.py"),
+            issue_number, adw_id]
+plan = subprocess.run(plan_cmd)
+if plan.returncode != 0:
+    print("Isolated plan phase failed")
+    sys.exit(1)</pre></div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch06-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">PITER — the four things you need</h2></div>
+
+    <div class="grid grid-4 reveal">
+      <div class="card accent"><span class="cnum">P</span><p class="ctitle">Prompt input</p><p class="cbody">A GitHub issue. The ADW only concatenates: <code>f"{slash_command} {' '.join(args)}"</code>. Library grew 13 → 27 commands across tac-4→7.</p></div>
+      <div class="card blue"><span class="cnum">T</span><p class="ctitle">Trigger</p><p class="cbody">Cron poll or webhook. The qualifying condition is literally <code>if comment_body.strip() == "adw"</code>.</p></div>
+      <div class="card olive"><span class="cnum">E</span><p class="ctitle">Environment</p><p class="cbody">A git worktree with its own ports. Provisioning is itself a prompt — <code>install_worktree.md</code>.</p></div>
+      <div class="card amber"><span class="cnum">R</span><p class="ctitle">Review</p><p class="cbody">Agentic <em>visual</em> review. Issues carry a screenshot URL and a severity of <code>skippable</code> / <code>tech_debt</code> / <code>blocker</code>.</p></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div>
+        <div class="codecap">the state that connects every step</div>
+        <div class="code"><pre>class ADWStateData(BaseModel):
+    """Minimal persistent state for ADW workflow.
+    Stored in agents/{adw_id}/adw_state.json"""
+
+    adw_id: str
+    issue_number: Optional[str] = None
+    branch_name: Optional[str] = None
+    plan_file: Optional[str] = None
+    issue_class: Optional[IssueClassSlashCommand] = None
+    worktree_path: Optional[str] = None      # tac-7
+    backend_port: Optional[int] = None       # tac-7
+    frontend_port: Optional[int] = None      # tac-7
+    model_set: Optional[ModelSet] = "base"   # tac-7
+    all_adws: List[str] = Field(default_factory=list)</pre></div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">tac-5's version is the first five fields only. The last five arrive in tac-7 — <strong>the schema diff is the isolation feature.</strong></p>
+        <p>The handoff between scripts is an <strong>8-character id on argv</strong>. Everything else rehydrates from disk. The builder refuses to start without it:</p>
+        <p><code>"No plan file in state - run adw_plan_iso.py first"</code></p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch06-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Why a worktree, and why deterministic ports</h2></div>
+
+    <div class="spread rev reveal" style="align-items:center">
+      <div>
+        <div class="codecap">worktree_ops.py — ports derived from the id</div>
+        <div class="code"><pre>def get_ports_for_adw(adw_id: str) -&gt; Tuple[int, int]:
+    """Deterministically assign ports based on ADW ID."""
+    id_chars = ''.join(c for c in adw_id[:8] if c.isalnum())
+    index = int(id_chars, 36) % 15
+
+    backend_port  = 9100 + index
+    frontend_port = 9200 + index</pre></div>
+        <p class="note">Verified against real state files on disk: <code>41ddb633</code> → 9109/9209, <code>5d39a25f</code> → 9112/9212, <code>a8bd4d88</code> → 9105/9205. The math is real, not aspirational.</p>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Two agents editing one checkout collide on the working tree, the index, and HEAD.</p>
+        <p>A worktree gives each ADW its own filesystem <em>and</em> its own branch checkout, so N agents commit concurrently without a lock. Ports are the second half — a web app cannot have two agents on <code>:8000</code>.</p>
+        <p><code>mod 15</code> caps concurrency at fifteen. Determinism means a <em>resumed</em> script recomputes the same ports without reading state at all.</p>
+      </div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ adw_sdlc_iso.py — red tests</span><ul><li><code>WARNING: Test phase failed but continuing with review</code></li><li>Rationale in the comment: "some tests might be flaky"</li><li>But a <em>documentation</em> error hard-fails the run</li></ul></div>
+      <div class="col good"><span class="clabel">◵ adw_sdlc_zte_iso.py — red tests</span><ul><li><code>❌ ZTE Aborted - Test phase failed</code>, then <code>sys.exit(1)</code></li><li>Adds a sixth phase: a real <code>git merge --no-ff</code>, not a PR merge</li><li>But a documentation error only warns</li></ul></div>
+    </div>
+
+    <p class="note reveal">That inversion is real and worth noticing: the <em>safer</em> workflow hard-fails on a docs error while the auto-merging one shrugs it off.</p>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch06-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Where the course code is broken</h2></div>
+
+    <p class="prose reveal" style="max-width:74ch">These are not nitpicks. Three of them would bite you the first week, and the fourth is the most interesting design accident in the corpus.</p>
+
+    <div class="grid grid-2 reveal">
+      <div class="card accent"><span class="cnum">BUG 01</span><p class="ctitle">The review loop can't reach its own constant</p><p class="cbody"><code>MAX_REVIEW_RETRY_ATTEMPTS = 3</code>, but the break is <code>&gt;= MAX - 1</code> <em>after</em> resolving. It runs two reviews, never three — so <strong>the final blocker fix is never re-verified.</strong> tac-6 had it right; the <code>_iso</code> rewrite regressed it.</p></div>
+      <div class="card accent"><span class="cnum">BUG 02</span><p class="ctitle">remove_worktree crashes on its fallback</p><p class="cbody">Calls <code>shutil.rmtree</code>. Never imports <code>shutil</code>. <code>NameError</code> whenever <code>git worktree remove</code> fails — which is exactly when you need the fallback.</p></div>
+      <div class="card blue"><span class="cnum">BUG 03</span><p class="ctitle">all_adws is misnamed</p><p class="cbody">Typed <code>List[str]</code>, method is <code>append_adw_id()</code>, and all seven call sites pass a <em>workflow name</em>. It is a breadcrumb wearing an id's name.</p></div>
+      <div class="card glow amber"><span class="cnum">BUG 04</span><p class="ctitle">A case bug that is also a safety gate</p><p class="cbody">Registry says <code>adw_sdlc_ZTE_iso</code>; the file is lowercase; the launcher does <code>f"{workflow}.py"</code>. On a case-sensitive filesystem, ZTE cannot launch.</p></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote"><p>"DO NOT RUN the <code>adw_sdlc_ZTE_iso</code> workflows unless <code>ZTE</code> is EXPLICITLY uppercased. This is a dangerous workflow."</p><span class="cite">— classify_adw.md</span></div>
+      <div class="prose">
+        <p>The uppercase is <strong>deliberate</strong>. Capitalisation is being used as a human-intent confirmation for an auto-merge workflow — and it collides with <code>os.path.join</code>.</p>
+        <p>A safety mechanism and a filesystem bug wearing the same clothes. Worth copying the intent; not the implementation.</p>
+      </div>
+    </div>
+
+    <div class="callout bad reveal"><span class="ci">THE ONE THAT CHANGES THE STORY</span>
+      <span class="cc"><strong>The orchestrator drops isolation entirely.</strong> State moved to a Postgres table and agent invocation moved in-process to the SDK — but <code>worktree_ops.py</code> has <em>no successor</em>. <code>working_dir</code> is a plain path, so two concurrent ADWs share a filesystem. The database isolated <strong>observability</strong>, not edits. The ladder does not monotonically improve.</span></div>
+
+    <div class="callout idea reveal"><span class="ci">ALSO WORTH KNOWING</span>
+      <span class="cc">The cron trigger is hardcoded to one workflow and uses blocking <code>subprocess.run</code> — serial, and it <strong>cannot launch ZTE at all</strong>. Only the webhook path (<code>Popen</code> + <code>start_new_session=True</code>) runs workflows in parallel and can select any of the fourteen. "Ships while you sleep" is the <em>webhook</em> story specifically.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch06-s5"><span class="sn">5</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What "physically isolated" actually means</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">The slogan is that the agentic layer never mixes with application code. In the mature codebase you can check it mechanically.</p>
+        <p><strong><code>adws/</code> imports nothing from <code>apps/</code>.</strong> It reaches the application through exactly three seams — a Postgres table, a WebSocket client, and <code>subprocess</code>. The app reaches back through none of them.</p>
+        <p>The entire coupling surface is <strong>sixty lines</strong>, and its comment says the whole design:</p>
+        <p><code># Only adw_id needed - workflow fetches prompt, working_dir from DB</code></p>
+        <p>A workflow's only argument is a UUID. Everything else is a database read.</p>
+      </div>
+      <div class="filetree"><span class="d">.claude/</span>          <span class="c"># LAYER 1 — agentic: config, no app code</span>
+  <span class="f">agents/</span>         <span class="c"># subagent templates</span>
+  <span class="f">commands/</span>       <span class="c"># plan build review fix + experts/</span>
+  <span class="f">hooks/</span>          <span class="c"># 9 lifecycle hooks</span>
+<span class="d">adws/</span>             <span class="c"># LAYER 2 — deterministic orchestration</span>
+  <span class="f">adw_modules/</span>    <span class="c"># sdk wrapper · ws client · db · logging</span>
+  <span class="f">adw_workflows/</span>  <span class="c"># plan_build · +review · +fix</span>
+  <span class="f">adw_triggers/</span>   <span class="c"># adw_scripts.py — 60 lines, the ONLY seam</span>
+<span class="d">apps/</span>             <span class="c"># LAYER 3 — the application</span>
+  <span class="f">orchestrator_3_stream/</span>
+  <span class="f">interactive_file_tree/</span>  <span class="c"># ← built BY the workflows</span>
+  <span class="f">pomodoro_timer/</span>         <span class="c"># ← output, not source</span>
+<span class="d">specs/</span>            <span class="c"># /plan writes here</span>
+<span class="d">app_review/</span>       <span class="c"># /review writes here</span>
+<span class="d">app_fix_reports/</span>  <span class="c"># /fix writes here</span></div>
+    </div>
+
+    <div class="callout warn reveal"><span class="ci">TWO CONSTRAINTS DOING MORE WORK THAN THE PROMPT</span>
+      <span class="cc">The orchestrator's allowlist contains no <code>Write</code>, no <code>Edit</code>, no <code>Task</code> — <strong>delegation is not a policy it follows, it is the only thing it can do.</strong> And command agents get full write access but no <code>mcp__mgmt__*</code>, so they cannot manage agents. The hierarchy is exactly two levels deep and structurally cannot recurse.</span></div>
+
+    <a class="jump reveal" href="#ch07">Next · Teams of agents &nbsp;→</a>
+  </div>
+</section>

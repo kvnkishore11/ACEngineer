@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first companion to MA-3: Infinite UI Agents. Learn harness engineering, specialized learning teams, multi-model reliability, and the Infinite UI workflow in the real course codebase.">
+  <title>MA-3 · Infinite UI Agents — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="17-ui-agents.assets.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to chapter</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL III · MA · LESSON 17</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume III · Multi-Agent Systems</p>
+      <h2>Infinite UI Agents</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation</span></a></li>
+          <li><a href="#harness"><span class="chapter-nav__n">01</span><span>Harness is product</span></a></li>
+          <li><a href="#problem-class"><span class="chapter-nav__n">02</span><span>Problem classes</span></a></li>
+          <li><a href="#one-interface"><span class="chapter-nav__n">03</span><span>One interface</span></a></li>
+          <li><a href="#tiers"><span class="chapter-nav__n">04</span><span>Leads &amp; workers</span></a></li>
+          <li><a href="#specialization"><span class="chapter-nav__n">05</span><span>Specialization</span></a></li>
+          <li><a href="#memory"><span class="chapter-nav__n">06</span><span>Learning agents</span></a></li>
+          <li><a href="#workflow"><span class="chapter-nav__n">07</span><span>Workflow command</span></a></li>
+          <li><a href="#reliability"><span class="chapter-nav__n">08</span><span>Reliability</span></a></li>
+          <li><a href="#meta-agent"><span class="chapter-nav__n">09</span><span>Meta-agent</span></a></li>
+          <li><a href="#ledger"><span class="chapter-nav__n">10</span><span>Accuracy ledger</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">11</span><span>Graded lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">12</span><span>Mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">13</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--ui">
+        <span class="hero__chapter">MA-3 · Own the Harness</span>
+        <h1>Infinite UI Agents</h1>
+        <p class="hero__dek">Stop prompting one agent for one interface. Engineer a harness that turns one intent into parallel, brand-aware, validated UI variants—and gets more knowledgeable every time it runs.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 32:26</li>
+          <li>Lab · 45–120 min</li>
+          <li>Course repo · agentic-horizon-extras/ui-agents</li>
+          <li>Level · operator → harness engineer</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to draw the harness and team architecture from memory, audit an agent’s context/model/prompt/tools/domain contract, trace <code>/generate</code> across eight stages, explain the clone-versus-demo differences, grade a run from file evidence, and teach why a failing worker can be evidence of a resilient system.</p>
+        <figure class="frame-card frame-card--wide hero-frame">
+          <img src="../media/frames/ma-3-ui-agents/t0136-hero-infinite-ui-agents.jpg" alt="Infinite UI Agents title card beside the Pi coding agent logo" width="3840" height="2160" fetchpriority="high">
+          <figcaption><span class="frame-card__t">2:16</span>The lesson’s object is not a single generated screen. It is a system that can keep producing screens inside a branded, browseable, validated product hierarchy.</figcaption>
+        </figure>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation</a></li>
+            <li><a href="#harness">The harness is the product</a></li>
+            <li><a href="#problem-class">Solve a problem class</a></li>
+            <li><a href="#one-interface">One orchestrator interface</a></li>
+            <li><a href="#tiers">Leads, workers, validators</a></li>
+            <li><a href="#specialization">Front-matter specialization</a></li>
+            <li><a href="#memory">Persistent mental models</a></li>
+            <li><a href="#workflow">Reusable workflow commands</a></li>
+            <li><a href="#reliability">Model control and reliability</a></li>
+            <li><a href="#meta-agent">Claude Code as meta-agent</a></li>
+            <li><a href="#ledger">Accuracy ledger and current practice</a></li>
+            <li><a href="#lab">Graded lab</a></li>
+            <li><a href="#mastery">Cumulative mastery</a></li>
+            <li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">Begin with the wrong unit of work</h2>
+        <p class="section-lead">You ask an agent for a dashboard. It returns a plausible dashboard. Tomorrow you need a second layout, a mobile surface, a landing page, a rebrand, and validation at five widths. If every request begins from a blank chat, you are not operating a UI capability. You are purchasing isolated outputs one prompt at a time.</p>
+
+        <p>That is the concrete failure this lesson attacks. The limitation is not primarily visual quality. A one-off UI can look excellent. The limitation is that the knowledge, role boundaries, routing decisions, brand rules, validation steps, and output organization all live temporarily in your conversation. When the chat ends, the operating system disappears. Your next request pays the setup cost again.</p>
+
+        <p>Dan’s demonstration moves the leverage point down one layer. He does not ask a general-purpose agent to “build the thing.” He operates a Pi-based harness with an Orchestrator, four role-specialized team families, persistent expertise files, reusable workflow commands, per-agent model controls, file-domain permissions, and one Vue application that browses every generated result. The visible result is Infinite UI. The underlying lesson is <strong>harness engineering</strong>: own the system that repeatedly produces, checks, remembers, and organizes the result.</p>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The sentence to carry</p>
+          <p>The model may generate the leaf, but the harness defines the forest: who receives the work, what they know, which model they use, what they may touch, how they validate, where results land, and what the system remembers next time.</p>
+        </aside>
+
+        <h3>What the real course asset contains</h3>
+        <p>The committed <code>ui-agents</code> asset is inspectable rather than hypothetical. Its Pi settings register reusable prompts and automatic compaction. Its multi-team config wires <strong>eight teams</strong>. Twelve unique agent files fill <strong>twenty-four runtime slots</strong> because the UI Generation and Validation families are duplicated A/B/C. Twelve expertise files begin as one-line stubs. The Infinite UI app contains one real brand, three products, seven trees, and twenty-five <code>index.vue</code> files under Aegis—twenty-three generated leaves plus two template stubs.</p>
+
+        <p>The lesson is also a live showcase, not a line-by-line build. Dan’s screen runs a hand-tuned superset of the committed repository. Some model assignments, files, brands, and accumulated mental models visible in the recording do not ship in the clone. This chapter keeps those two layers adjacent. The demo teaches what the system can become; the repository teaches what you actually receive and can audit.</p>
+
+        <h3>What you are training</h3>
+        <ul class="learning-objectives">
+          <li><strong>Leverage judgment</strong>Tell a one-off output from a harness that operates an entire problem class.</li>
+          <li><strong>Architecture</strong>Recover the Orchestrator → lead → worker/validator route and the Setup → Brand → Generate → Validate cycle.</li>
+          <li><strong>Contract reading</strong>Audit expertise, skills, tools, model, and domain from agent front matter rather than trusting role names.</li>
+          <li><strong>Reliability</strong>Separate a worker failure from a pipeline failure and identify the redundancy that preserves the outcome.</li>
+          <li><strong>Evidence</strong>Grade the committed files and runtime artifacts, including disagreements between prose rules and actual capabilities.</li>
+          <li><strong>Transfer</strong>Explain how Claude Code can build and drive a specialized harness without turning the lesson into “Pi versus Claude Code.”</li>
+        </ul>
+
+        <div class="callout callout--warning">
+          <p class="callout__label">Prime directive for the lab</p>
+          <p>Do not hand-edit generated product code. Editing harness configuration—agent front matter, <code>brand.yaml</code>, settings, or prompt definitions—is allowed when the lab asks for it. Changes to generated <code>index.vue</code> leaves must come through the agent system. Track A is read-only and costs no tokens; Track B requires the member setup and paid model access.</p>
+        </div>
+
+        <h3>How to study this chapter</h3>
+        <p>Every major idea uses the same ten moves: hook, picture, timestamped story, canonical name, worked source example, small practice, failure repair, current-practice note, retrieval, and teach-back. Stop at each “You try” before reading on. The aim is not recognition of vocabulary. It is the ability to reconstruct the design from evidence and to notice where the system’s actual contract is weaker—or more interesting—than its slogan.</p>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="harness">
+        <span class="section-number">01</span>
+        <h2 class="section-title">The agent harness is the product</h2>
+        <p class="section-lead">If models are increasingly interchangeable, the durable engineering surface is everything that turns a model call into a trustworthy agentic system.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The benchmark shopper with no operating system</h3>
+          <p>A new model arrives. You move your UI prompt to it, gain a little visual quality, and still repeat the same setup: paste the brand brief, explain the repository, list the tools, restate which directories are safe, demand screenshots, and remind the agent to report what changed. The model changed; your human-authored harness remained implicit and disposable.</p>
+          <p>This is the trap in covering an agent tool only as a model wrapper. A capable model is necessary, but it does not decide what context is loaded, when context is compacted, which commands exist, whether work is delegated, where files may be written, how state is validated, or what persists after the session. Those are product decisions. If they live only in your habits, you own neither the workflow nor its reliability.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — six parts around the model</p>
+          <h3>Draw the harness before discussing agents</h3>
+          <figure class="diagram diagram--wide">
+            <div class="harness-orbit" role="img" aria-label="Six components of the agent harness surrounding its core">
+              <div class="harness-orbit__item"><b>Deterministic code</b><span>Parsers, routes, schemas, scripts, launchers.</span></div>
+              <div class="harness-orbit__core">Agent<br>harness</div>
+              <div class="harness-orbit__item"><b>Token caching</b><span>Reuse stable context and control context cost.</span></div>
+              <div class="harness-orbit__item"><b>Agent orchestration</b><span>Route, parallelize, track, recover, synthesize.</span></div>
+              <div class="harness-orbit__item"><b>Prompts</b><span>Reusable workflows and role instructions.</span></div>
+              <div class="harness-orbit__item"><b>Skills</b><span>Composable behavior loaded when relevant.</span></div>
+              <div class="harness-orbit__item"><b>Model control</b><span>Select and rotate the model per role.</span></div>
+            </div>
+            <figcaption>Dan’s six-part harness definition at <span class="frame-card__t">0:52</span>, redrawn because the video beat is a talking-head title card rather than a useful technical frame.</figcaption>
+          </figure>
+          <p>The model is conspicuously not the whole diagram. Deterministic code makes results legible to the application. Orchestration distributes work. Prompts express repeatable procedures. Skills compose behavior. Model control matches capability to role. Caching and compaction keep long sessions economically and cognitively viable.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — read past the leak headline</p>
+          <h3>The structural signal, not the gossip</h3>
+          <p>Dan opens with the Claude Code source-code leak, then refuses the obvious framing. Rather than orbiting leaked features or a period-specific model name, he asks what the business is really built on. His answer at 0:57 is blunt: without the harness there are no agents, no agentic coding, and therefore no agentic engineering. The leak matters as a signal that the surrounding system—not merely the model endpoint—is the leverage surface.</p>
+          <p>Later, at 16:10, the camera lands on the practical form of that claim: a file tree. The harness is settings, agent definitions, skills, expertise, sessions, team configuration, prompts, schemas, scripts, and the product surface they coordinate. “Own the harness” is not mystical. It means those decisions are artifacts you can inspect, version, change, and reuse.</p>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t0970-harness-filetree-readme.png" alt="VS Code showing the UI Agents harness file tree and README hierarchy" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">16:10</span>The harness becomes concrete as a repository: agents, skills, expertise, sessions, reusable prompts, configuration, and the Brand → Product → Tree → Branch → Leaf product hierarchy.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s term</p>
+          <h3>Harness engineering</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Canonical term</p>
+            <p><strong>Harness engineering</strong> is the work of designing and owning the deterministic code, context lifecycle, orchestration, prompts, skills, model controls, tool surface, and permissions that turn models into domain-operating agents.</p>
+          </aside>
+          <p>The word “engineering” matters. A harness is not just a folder of clever prompts. It contains executable constraints and observability surfaces. It decides which capabilities exist, which states count as done, which files form durable memory, and which failures can be recovered without asking the human to rebuild the workflow.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — four keys, then the distributed contract</p>
+          <h3>Start at <code>.pi/settings.json</code></h3>
+          <pre><code>{
+  "thinking": "high",
+  "autoCompact": true,
+  "compactThreshold": 0.8,
+  "prompts": ["./prompts/multi-team"]
+}</code></pre>
+          <p>This file is small enough to memorize. <code>thinking</code> selects the reasoning setting. <code>autoCompact</code> turns context compaction on. <code>compactThreshold: 0.8</code> sets the trigger. <code>prompts</code> registers the reusable multi-team command directory. Notice what is absent: no team roster, model assignment, tool list, or path permission. Those controls are distributed into <code>multi-team-config.yaml</code> and each agent’s front matter.</p>
+          <p>The worked lesson is therefore twofold. First, the harness has a visible root configuration. Second, no single file tells the whole story. An honest audit follows the control from settings → team wiring → agent contract → prompt workflow → deterministic app and schema code. “I found the settings file” is orientation, not completion.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — three-minute harness inventory</p>
+          <h3>Classify artifacts by function</h3>
+          <p>Without reading ahead, assign each artifact to one primary harness function: <code>.pi/settings.json</code>, <code>.pi/multi-team/multi-team-config.yaml</code>, <code>.pi/multi-team/agents/vue-generator.md</code>, <code>.pi/multi-team/skills/mental-model.md</code>, <code>.pi/prompts/multi-team/generate.md</code>, and <code>apps/infinite-ui/src/schemas/trees.schema.ts</code>. Use only these labels: global lifecycle, orchestration topology, agent contract, composable behavior, workflow command, deterministic validation.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: “owning the harness” means replacing every tool</h3>
+          <p>Dan explicitly frames his workflow as “ands, not ors.” Owning the harness does not require rejecting Claude Code, Pi, or a hosted model. It requires control over the decisions that determine behavior. You can configure a mainstream tool, extend an open harness, or build a specialized layer. The diagnostic question is not “Did I write the runtime from scratch?” It is “Can I inspect and deliberately change the context, model, prompt, tools, routing, permissions, memory, and validation that matter to this domain?”</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The tool boundary is moving; the control questions endure</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · July 2026</p>
+            <p>Mainstream coding agents increasingly expose subagents, skills, hooks, settings, permissions, and plugins. That narrows the gap between “use a tool” and “own a harness,” but it does not remove the design work. Audit the same controls wherever they live. Treat model names and leaked-feature discourse as dated context; treat control over context, routing, tools, permissions, memory, and validation as the durable practice.</p>
+          </aside>
+        </div>
+
+        <div class="move move--retrieval">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Close the section before revealing</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for harness engineering">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name Dan’s six harness components without looking.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Deterministic code, token caching, agent orchestration, prompts, skills, and model control.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What do the four committed Pi settings control, and where do model/tools/domain live?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Thinking level, automatic compaction, the 0.8 compaction threshold, and reusable prompt registration. Model, tools, expertise, skills, and domain permissions live in agent front matter; team topology lives in the multi-team config.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><h3>Explain the product beneath the product</h3><p>In ninety seconds, explain why a polished dashboard is an output while the harness is the durable product. Your explanation must name three harness artifacts from this repository and one behavior each controls.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="problem-class">
+        <span class="section-number">02</span>
+        <h2 class="section-title">Solve a problem class, not one task</h2>
+        <p class="section-lead">A system earns the word “infinite” by preserving invariants while letting outputs vary—not by generating a large number of disconnected mockups.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The gallery of unrelated lucky shots</h3>
+          <p>Suppose you ask for three dashboard variants in three separate chats. One uses cyan and purple. One uses a generic sans-serif. One invents its own spacing. Each looks reasonable in isolation, yet none can be rebranded by changing a shared source, none appears in a common navigation system, and none carries a validated status. You have variety without a product model.</p>
+          <p>The word “infinite” can hide this failure. Unlimited generation is not useful if every output increases inconsistency and review burden. The real challenge is to make variation cheap while keeping identity, file placement, routing, manifest state, responsive behavior, and validation structurally consistent.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — one reusable hierarchy</p>
+          <h3>Every leaf has an address</h3>
+          <div class="ui-hierarchy" role="img" aria-label="Infinite UI hierarchy from brand to generated Vue leaf">
+            <div class="ui-hierarchy__node"><b>Brand</b><code>aegis</code></div><span class="ui-hierarchy__arrow">→</span>
+            <div class="ui-hierarchy__node"><b>Product</b><code>app</code></div><span class="ui-hierarchy__arrow">→</span>
+            <div class="ui-hierarchy__node"><b>Tree</b><code>agent-stream</code></div><span class="ui-hierarchy__arrow">→</span>
+            <div class="ui-hierarchy__node"><b>Branch</b><code>timeline-stack</code></div><span class="ui-hierarchy__arrow">→</span>
+            <div class="ui-hierarchy__node"><b>Leaf</b><code>index.vue</code></div>
+          </div>
+          <p>A Brand owns identity. A Product is a surface within that brand. A Tree names a UI category. A Branch is one variant. A Leaf is the concrete Vue component. This hierarchy separates the stable dimensions from the variable one. The brand and product constrain; branches explore; leaves implement.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — watch the hierarchy become visible</p>
+          <h3>Aegis is not a screenshot folder</h3>
+          <p>At 3:20, Dan enters the Aegis workspace. The brand node reports an agent-security identity and connects to product nodes. Later, he opens the Agent Stream tree and browses three real interfaces: compact dashboard, timeline stack, and glassmorphism panel. The app makes their relationship visible; the variants are not loose files.</p>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t0200-canvas-aegis-brand-node.jpg" alt="Infinite UI canvas showing the Aegis brand node connected to a product" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">3:20</span>The Aegis brand node is the top of the product hierarchy. The canvas turns generated artifacts into an inspectable system of brands, products, trees, and branches.</figcaption>
+          </figure>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t1465-aegis-agent-stream-rendered.jpg" alt="Rendered Aegis Agent Stream interface with activity log and agent chat" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">24:25</span>The payoff is a real rendered Vue surface: a dense activity stream and agent chat that carry the Aegis security identity. It is one leaf inside the hierarchy, not the architecture itself.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s term</p>
+          <h3>Operate the problem class</h3>
+          <aside class="callout callout--term"><p class="callout__label">Canonical distinction</p><p><strong>One-off task:</strong> build a dashboard. <strong>Problem class:</strong> generate, organize, brand, validate, browse, fork, and rebrand UI variants for any Brand → Product → Tree address.</p></aside>
+          <p>Dan estimates that most engineering and knowledge work is a workflow—a series of tasks. The leverage move is to encode the series once, then address new instances through variables. In this repository the variables are not cosmetic. They map directly to an on-disk hierarchy and a routed application.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace one leaf to its invariants</p>
+          <h3><code>timeline-stack/index.vue</code> is specific and reusable</h3>
+          <p>The committed timeline-stack leaf is 899 lines, exactly matching Dan’s on-screen count. Its content is specific to Agent Stream, but its visual values are not scattered raw guesses. The component refers to CSS custom properties such as <code>--brand-bg</code>, <code>--brand-surface</code>, <code>--brand-primary</code>, <code>--brand-secondary</code>, <code>--brand-warning</code>, <code>--font-body</code>, <code>--space-unit</code>, <code>--radius-md</code>, and <code>--duration-normal</code>.</p>
+          <p>The authoritative committed values originate in <code>apps/infinite-ui/src/brands/aegis/brand.yaml</code>: Play typography; primary <code>#f0f0f5</code>; secondary <code>#6e7fff</code>; accent <code>#e63946</code>; background <code>#0a0a0f</code>. The app’s brand store turns the validated configuration into CSS tokens. A leaf consumes tokens. That path—configuration → injected custom property → generated component—is the mechanism behind “define brand once.”</p>
+          <p>Counts make the problem class tangible. The clone ships one real brand, three products, seven real trees, and twenty-three generated leaves. New branches can join the same structure without inventing a new app or a new brand system.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — address and invariant drill</p>
+          <h3>Separate what varies from what must hold</h3>
+          <p>Write a five-level address for a hypothetical Aegis pricing comparison leaf. Then list three properties allowed to vary between branches and three invariants that must not. A strong answer lets layout, density, and interaction vary while keeping the directory contract, brand-token use, and manifest/validation status stable.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: interpreting “zero hardcoded values” as a literal property of every byte</h3>
+          <p>The durable course rule is that generated visual values come from the brand system. The leaf visibly uses brand custom properties. Do not turn that into a broader claim that no number or literal can ever appear in component logic; layout structures, data, and responsive mechanics still need concrete code. Audit the intended invariant: visual identity should flow from brand tokens, so a token change propagates without hand-editing every leaf.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The preview mechanism is code, not narration</h3>
+          <aside class="current-practice"><p class="current-practice__label">Repository-corrected practice</p><p>Dan guesses that the canvas preview may use Vue Teleport with an iframe underneath. The committed code is precise: <code>PreviewBranchNode.vue</code> renders a real 1280×720 <code>&lt;iframe&gt;</code>, scales it with CSS, and disables pointer events. Its gallery route loads leaves with <code>import.meta.glob</code> and a dynamic component. Vue <code>Teleport</code> appears in <code>Sidebar.vue</code>, not in the leaf-preview path. Read the implementation when live narration is tentative.</p></aside>
+        </div>
+
+        <div class="move move--retrieval">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for Infinite UI as a problem class">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Recite the five-level hierarchy and give the real Agent Stream example.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Brand → Product → Tree → Branch → Leaf: <code>aegis → app → agent-stream → timeline-stack → index.vue</code>.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What makes the leaves rebrandable, and how does the canvas really preview them?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Leaves consume CSS custom properties derived from validated <code>brand.yaml</code> values. A canvas branch uses a scaled 1280×720 iframe into a gallery route; the route resolves leaves with <code>import.meta.glob</code> and a dynamic component.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><h3>Define “infinite” without using the word “many”</h3><p>Teach how stable hierarchy, brand tokens, reusable workflow commands, and validation let the system create open-ended variation without losing product coherence.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="one-interface">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Your input must not scale with agent count</h2>
+        <p class="section-lead">A larger fleet is leverage only if the human still has one place to express intent, inspect progress, and receive a synthesized result.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The operator who becomes a message bus</h3>
+          <p>You create a Setup chat, a Brand chat, three UI-generation chats, and three validation chats. Setup asks what slugs to use. Brand sends you a palette brief. You paste it into three generators, wait for each one, then paste their paths into three validators. One validator fails a branch, so you reopen the correct generation chat and carry the repair back. You now have specialized agents—and a full-time coordination job.</p>
+          <p>This flat architecture hides its cost because each conversation seems easy. The burden appears between them: classification, context transfer, dependency ordering, branch assignment, progress tracking, retries, and synthesis. Every added specialist increases the number of possible handoffs. If the human performs those handoffs, agent count scales human interruption.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — one narrow waist over many teams</p>
+          <h3>Scale behind the interface</h3>
+          <div class="team-lattice" role="img" aria-label="One Orchestrator coordinating four lead roles and specialized workers">
+            <div class="team-lattice__tier"><span class="team-lattice__label">Interface</span><div class="team-lattice__node team-lattice__node--orch"><b>Orchestrator</b><span>One request in; classification, routing, tracking, and synthesis inside.</span></div></div>
+            <div class="team-lattice__tier"><span class="team-lattice__label">Lead layer</span><div class="team-lattice__leads"><div class="team-lattice__node"><b>Setup</b><span>Scaffold and manifest state</span></div><div class="team-lattice__node"><b>Brand</b><span>Identity and token context</span></div><div class="team-lattice__node"><b>UI Generation ×3</b><span>Brief and component route</span></div><div class="team-lattice__node"><b>Validation ×3</b><span>Soft and hard checks</span></div></div></div>
+            <div class="team-lattice__tier"><span class="team-lattice__label">Worker layer</span><div class="team-lattice__workers"><div class="team-lattice__node"><b>Scaffold Worker</b><span>Directories, stubs, manifests</span></div><div class="team-lattice__node"><b>Structure Validator</b><span>Zod and filesystem sync</span></div><div class="team-lattice__node"><b>Brand Analyst</b><span>Tokens and contrast</span></div><div class="team-lattice__node"><b>Vue Generator</b><span>Vue SFC implementation</span></div><div class="team-lattice__node"><b>Animation Specialist</b><span>Motion and interaction</span></div><div class="team-lattice__node"><b>Soft + Hard Validators</b><span>Visual, responsive, a11y</span></div></div></div>
+          </div>
+          <p>The Orchestrator is a narrow waist. Above it, human input stays constant. Below it, teams can be duplicated, specialized, or reconfigured. The architecture absorbs routing complexity so capability can expand without opening more human-facing control loops.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — one command reveals the fleet</p>
+          <h3>Three model assignments, one user message</h3>
+          <p>At 5:52, the Pi terminal prints the agent hierarchy and the model beside each agent. The same screen shows Dan’s single <code>/generate aegis app agent-stream 3 ...</code> request. He does not separately prompt the Setup Lead, Brand Lead, three UI Generation teams, or three Validation teams. The Orchestrator expands his one request into engineered delegations.</p>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t0352-agent-teams-hierarchy-models.png" alt="Pi terminal showing the multi-team hierarchy, model assignments, and one generate command" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">5:52</span>The load-bearing frame: one user command under a full team tree. On screen, two Vue workers use period-specific open-source model assignments while the rest use Sonnet; the committed repository assigns Sonnet to all twelve unique agent files.</figcaption>
+          </figure>
+          <p>Dan’s key line is architectural: input to the system must not scale with the number of agents. The Orchestrator has learned how to prompt-engineer the internal handoffs. In practical terms, it receives a terse command but delegates with enough brand, path, branch, and stage context for a team lead to act.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — one orchestrator interface</p>
+          <h3>Constant-size human control</h3>
+          <aside class="callout callout--term"><p class="callout__label">Design invariant</p><p><strong>One orchestrator interface:</strong> the user expresses intent to one agent; the Orchestrator classifies, delegates, tracks, and synthesizes so the number of user conversations remains one even as the fleet expands.</p></aside>
+          <p>This is not merely a nicer chat experience. It is an anti-bottleneck constraint. If adding one team requires adding one human-managed conversation, your control cost grows with fleet size. The system may complete more work, but your attention still scales linearly. A proper orchestrator turns team multiplication into an internal implementation detail.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — recover the topology from YAML</p>
+          <h3>Count what the config actually wires</h3>
+          <p><code>.pi/multi-team/multi-team-config.yaml</code> names one Orchestrator and eight teams: Setup, Brand, UI Generation, UI Generation B, UI Generation C, Validation, Validation B, and Validation C. Setup has one lead and two members. Brand has one lead and one member. Each generation team has one lead and two members. Each validation team has one lead and two members.</p>
+          <p>That produces twenty-four runtime slots: one Orchestrator; three Setup slots; two Brand slots; nine UI Generation slots; and nine Validation slots. Yet only twelve unique agent-definition files exist because the B/C teams point to the same lead and worker files as A. Duplication happens in the topology, not by copying role definitions. A change to <code>vue-generator.md</code> affects all three generator instances.</p>
+          <p>The config’s <code>consult-when</code> text supplies routing semantics. Setup is always first for creation and last for final status. Brand is consulted before generation for context and after generation for compliance. Generation handles Vue and motion. Validation handles screenshots, interaction, responsive behavior, accessibility, and performance. The Orchestrator’s prompt adds the round-robin rule: branch 1→A, 2→B, 3→C, 4→A.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — mental round-robin</p>
+          <h3>Route seven branches without opening another chat</h3>
+          <p>Write the generation assignment for branches 1–7, then mirror it to Validation. The correct pattern is A: 1,4,7; B: 2,5; C: 3,6. Now state what the human sees: one request before the run, progress telemetry during it, and one synthesized report after it—not six independent conversations.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: the Orchestrator becomes a super-worker</h3>
+          <p>A one-interface architecture can still fail if the central agent executes every task itself. Then the Orchestrator is only a generalist with many role names nearby. Its actual job is classify → delegate → track → synthesize. Direct answers are reasonable for small lookups, but substantial domain work should cross the team boundary. Audit tool calls and outputs, not the presence of an “Orchestrator” label.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Topology is portable; syntax is not</h3>
+          <aside class="current-practice"><p class="current-practice__label">Durable architecture</p><p>Different runtimes expose subagents and delegation with different configuration files or APIs. Preserve the invariant: one human-facing intake; explicit internal roles; machine-readable routing; dependency-aware delegation; and a single synthesized result. A chat UI that displays many agents is not sufficient if you still route every message.</p></aside>
+        </div>
+
+        <div class="move move--retrieval">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for the one-interface architecture">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is one Orchestrator a scaling requirement, not a convenience?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Because it keeps human input and routing work constant while teams multiply behind it. Without the narrow waist, the human becomes the message bus and coordination cost grows with agent count.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">How can eight teams and twenty-four slots come from twelve agent files?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The B/C generation and validation teams reuse the same lead/member definition paths as their A teams. Runtime instances multiply while role definitions remain shared.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><div class="teach-back"><h3>Explain the narrow waist</h3><p>Draw user → Orchestrator → four team families → workers from memory. Then explain how a fourth generation team could be added without creating a second user interface.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="tiers">
+        <span class="section-number">04</span>
+        <h2 class="section-title">Leads think; workers do—then audit the enforcement</h2>
+        <p class="section-lead">Role prose expresses intent. Tool lists and domain permissions express capability. Expert review keeps those two layers separate.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The manager who quietly takes every ticket</h3>
+          <p>A UI Generation Lead receives a component request. It can read the repository, delegate to a specialist, and synthesize a result. It can also write, edit, and run Bash inside the product directory. Under time pressure it skips delegation and edits the Vue file directly. The output lands, but the team architecture has collapsed into a single capable lead with idle workers.</p>
+          <p>The failure is subtle because task completion looks successful. The cost appears later: worker expertise does not compound, role telemetry becomes misleading, parallelism shrinks, and the lead’s context fills with implementation details. A human team would recognize this as a manager repeatedly bypassing specialists. An agent team needs both behavioral guidance and capability design to resist the same collapse.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — three enforcement strengths</p>
+          <h3>Read the role as a stack, not a sentence</h3>
+          <div class="enforcement-ladder" aria-label="Three strengths of role enforcement">
+            <article><h3>1 · Stated rule</h3><p><code>CLAUDE.md</code>: leads and Orchestrator think, plan, manage; workers write.</p></article>
+            <article><h3>2 · Behavioral skill</h3><p><code>zero-micro-management.md</code>: if a leader is about to write, edit, or run Bash, stop and delegate.</p></article>
+            <article><h3>3 · Capability boundary</h3><p><code>tools</code> + <code>domain</code>: remove the capability or set product <code>upsert:false</code>.</p></article>
+          </div>
+          <p>The first two influence behavior. The third prevents behavior. All three can be useful, but they are not equivalent. When a course says a role “cannot” write, inspect the contract before accepting the word literally.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the live exception exposes the contract</p>
+          <h3>A dead worker turns the lead into an emergency worker</h3>
+          <p>During the demo, two open-source Vue workers return no useful response. At 13:26, UI Generation Lead (B) states that its worker is not writing to disk, acknowledges that leads normally delegate, and decides to produce the SFC itself so the task can finish. Dan reads this as team-like recovery: the lead covers for a broken worker.</p>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t0806-lead-writes-when-worker-fails.png" alt="UI Generation Lead explaining that it will write the SFC because its worker failed" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">13:26</span>The best failure frame in the lesson. The lead knows the organizational rule, detects a silent worker failure, and uses retained write capability to preserve the outcome. That is graceful recovery—and evidence that the rule is not a hard prohibition for this lead.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — roles plus enforcement</p>
+          <h3>Orchestrator, lead, worker, validator</h3>
+          <aside class="callout callout--term"><p class="callout__label">Canonical roles</p><p><strong>Orchestrator:</strong> classify, route, track, synthesize. <strong>Lead:</strong> interpret domain work, create briefs, delegate, synthesize. <strong>Worker:</strong> execute bounded changes. <strong>Validator:</strong> inspect and report PASS/FAIL without repairing the product.</p></aside>
+          <p>The conceptual three tiers are Orchestrator → leads → workers. Validators occupy worker depth but a different responsibility: read, exercise, and report. Their read-only product domain is not a lack of usefulness; it protects independence. A validator that silently fixes what it finds destroys the separation between production and evidence.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — inspect the shipped contracts</p>
+          <h3>The repository is more nuanced than the summary</h3>
+          <table class="tier-table">
+            <thead><tr><th>Role file</th><th>Relevant tools</th><th>Product-domain reality</th></tr></thead>
+            <tbody>
+              <tr><td><code>orchestrator.md</code></td><td><code>write edit delegate tilldone</code></td><td>Can update expertise; root and multi-team surfaces are otherwise <code>upsert:false</code>. Product writes are not granted.</td></tr>
+              <tr><td><code>brand-lead.md</code></td><td><code>write edit delegate tilldone</code></td><td><code>apps/infinite-ui/</code> is <code>upsert:false</code>; its own mental model is writable.</td></tr>
+              <tr><td><code>validation-lead.md</code></td><td><code>write edit bash delegate tilldone</code></td><td>Product is <code>upsert:false</code>; screenshots and its mental model are writable.</td></tr>
+              <tr><td><code>setup-lead.md</code></td><td><code>write edit bash delegate tilldone</code></td><td><strong>Product and <code>.pi/multi-team/</code> are <code>upsert:true</code>.</strong> This lead can write despite the rule.</td></tr>
+              <tr><td><code>ui-generation-lead.md</code></td><td><code>write edit bash delegate tilldone</code></td><td><strong><code>apps/infinite-ui/</code> is <code>upsert:true</code>.</strong> This enables the recorded fallback.</td></tr>
+              <tr><td><code>vue-generator.md</code></td><td><code>write edit bash</code></td><td>Product and its mental model are writable; it has no <code>delegate</code>.</td></tr>
+              <tr><td><code>hard-validator.md</code></td><td><code>read bash grep find ls</code></td><td>Product is <code>upsert:false</code>; screenshots and its mental model are writable.</td></tr>
+            </tbody>
+          </table>
+          <p><code>CLAUDE.md</code> and the zero-micro-management skill clearly say leads should not execute. The Brand and Validation leads are product-read-only. But the shipped Setup and UI Generation leads retain product-write capability, and their tool lists include execution tools. Therefore the honest statement is: <strong>the no-write rule is the intended organizational pattern, partially hard-enforced and partially behavioral in the committed asset.</strong></p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — capability audit</p>
+          <h3>Grade “cannot write” as a claim</h3>
+          <p>Pick one lead and one validator. Record (1) what the prose says, (2) whether <code>write</code>/<code>edit</code>/<code>bash</code> exist, (3) which paths allow <code>upsert</code>, and (4) whether the result is a hard boundary or a behavioral expectation. Do not infer from the role name. Your evidence must come from front matter and the shared rule files.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: forcing the architecture into a false binary</h3>
+          <p>It would be equally wrong to say “the roles are not real” because two leads can write. The hierarchy still shapes delegation, prompt responsibilities, team topology, and ordinary behavior. It would also be wrong to say “the rule is structurally enforced everywhere.” The fix is a layered claim: role intent is explicit; a shared skill reinforces it; several roles are hard-bounded; two lead roles keep an emergency execution path. That nuanced model explains both normal delegation and the on-screen fallback.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Least privilege competes with graceful degradation</h3>
+          <aside class="current-practice"><p class="current-practice__label">Design tradeoff</p><p>Removing a lead’s write capability strengthens separation and auditability; retaining it can preserve delivery when every worker fails. Choose deliberately. For high-risk domains, hard-bound the lead and recover by model rotation or sibling-team reassignment. For exploratory UI generation, an emergency fallback may be acceptable—but telemetry should label that the lead crossed roles.</p></aside>
+        </div>
+
+        <div class="move move--retrieval">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for tiers and enforcement">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Who normally writes product files, and which roles normally only route or report?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Workers normally write. Orchestrator and leads route/synthesize; validators inspect and report. In the committed asset, Setup and UI Generation leads retain product-write capability as an important exception.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the difference between a skill instruction and a domain boundary?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A skill tells the agent how it should behave. A domain boundary determines whether an operation is allowed on a path. The former guides; the latter can prevent.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><div class="teach-back"><h3>Explain safe delegation without saying “be careful”</h3><p>Use role responsibility, tool availability, path-domain permissions, and the Setup/UI-lead exceptions. Finish by naming one reason to remove the fallback and one reason to retain it.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="specialization">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Front matter is the specialization surface</h2>
+        <p class="section-lead">“You are a frontend expert” is a persona. A specialized agent is a coordinated contract over knowledge, behavior, capability, model, and file domain.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The specialist who can wander everywhere</h3>
+          <p>You prepend “Act as a Vue specialist” to a general agent. It can still read every repository secret, modify backend migrations, delete unrelated files, choose any available tool, and forget yesterday’s conventions. The prompt narrows tone but not capability. When it succeeds, the specialization is courtesy. When it fails, nothing stops it from leaving its lane.</p>
+          <p>A real specialist needs congruent controls. Give it Vue-specific expertise, worker behavior, only the tools required to implement, a model suited to long SFC generation, and an explicit product path. The system prompt then describes the same role the runtime permits.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — five coordinated controls</p>
+          <h3>The Core Four plus the path boundary</h3>
+          <div class="control-grid" aria-label="Five front-matter controls that specialize an agent">
+            <article><h3>Context</h3><code>expertise</code><p>Persistent mental model, shared context, session and conversation state.</p></article>
+            <article><h3>Model</h3><code>model</code><p>Per-agent inference engine, independently replaceable.</p></article>
+            <article><h3>Prompt</h3><code>body + skills</code><p>Purpose, instructions, injected expertise, composable behaviors.</p></article>
+            <article><h3>Tools</h3><code>tools</code><p>Actions the role can request: read, write, Bash, delegate, tilldone.</p></article>
+            <article><h3>Domain</h3><code>domain</code><p>Path-scoped read, upsert, and delete permissions—the lane itself.</p></article>
+          </div>
+          <p>Dan names context, model, prompt, and tools as the Core Four. The repository adds a practical sleeper control: <code>domain</code>. It answers where those tools can act. A write tool without an upsertable product path is not product-write capability. A narrow domain turns specialization into a bounded operational contract.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — open one agent</p>
+          <h3>The magic is legible in YAML</h3>
+          <p>At 17:58, Dan opens the Vue Generator. The frame shows a period-specific model assignment, a 10,000-line updatable expertise file, four skills, the worker’s read/write/edit/Bash tool surface, and a product domain. Nothing about the role is hidden behind a marketing label. The anatomy can be reviewed line by line.</p>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t1078-agent-frontmatter-specialization.png" alt="Vue Generator front matter showing model, expertise, skills, tools, and domain" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">17:58</span>On screen the Vue Generator uses <code>stepfun/step-3.5-flash</code>; the committed <code>vue-generator.md</code> uses <code>anthropic/claude-sonnet-4-6</code>. The durable lesson is per-agent swappability, not either model name.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — one agent, one prompt, one purpose</p>
+          <h3>Contract-level specialization</h3>
+          <aside class="callout callout--term"><p class="callout__label">Operating rule</p><p><strong>One agent, one prompt, one purpose</strong> becomes real when expertise, skills, tools, model, and domain all point at the same bounded responsibility.</p></aside>
+          <p>The phrase does not require one physical process forever. Three runtime Vue Generator instances can reuse one definition because they share one purpose. Nor does it mean an agent can never possess multiple skills. Skills such as mental-model maintenance, active listening, precise execution, and parallel update coordination support the same purpose from different angles.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — compare two contracts</p>
+          <h3>Vue Generator versus Hard Validator</h3>
+          <p>Both agents use the committed Sonnet model. Both read an updatable 10,000-line expertise file. Both load the mental-model, active-listener, precise-worker, and parallel-update skills. The specialization emerges in their different purpose, tools, and domains.</p>
+          <p>The Vue Generator has <code>write</code>, <code>edit</code>, and <code>bash</code>; its product path is <code>upsert:true</code>. Its prompt requires Vue 3 SFCs, semantic HTML, brand custom properties, responsive layout, and sibling-variant awareness. The Hard Validator lacks write/edit, sees product paths as <code>upsert:false</code>, and can write screenshots and its own expertise. Its prompt focuses on interactions, viewports, accessibility observations, animation behavior, and a PASS/FAIL report.</p>
+          <p>Calling one “builder” and one “validator” is not what separates them. The contracts do. If you accidentally granted the Hard Validator product upsert and instructed it to repair failures, you would merge evidence and implementation into one role. If you removed Bash from the Vue Generator, its prompt could still describe execution while its capability no longer matched.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — retarget on paper</p>
+          <h3>Make a site-only generator</h3>
+          <p>Write the smallest front-matter change that would constrain Vue Generator to <code>apps/infinite-ui/src/brands/aegis/products/site/</code>. Then name the fields you would leave unchanged. A good answer tightens the domain path while preserving the model, expertise, skills, tools, and worker prompt. That isolates the effect of domain scoping.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: counting fields without checking coherence</h3>
+          <p>An agent can have all five fields and still be poorly specialized. A “validator” with product-write permissions is one mismatch. A narrow frontend domain paired with backend-migration expertise is another. A precise-worker skill on an Orchestrator conflicts with delegation. Audit the contract as a sentence: “This model receives this knowledge and behavior, can take these actions, and may apply them only here.” Any clause that contradicts the purpose is a design defect.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Model IDs drift; contract design transfers</h3>
+          <aside class="current-practice"><p class="current-practice__label">Dated implementation detail</p><p>The on-screen Step, Minimax, and Sonnet IDs are April 2026 details. Re-verify model availability and provider syntax before a live run. Keep the transferable rule: choose a model per role, test it on that role’s real workload, and preserve a fast swap path. “Best model” in general is less useful than “reliable model for this contract.”</p></aside>
+        </div>
+
+        <div class="move move--retrieval">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for front-matter specialization">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name the Core Four and the additional path control used here.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Context, model, prompt, tools; plus <code>domain</code> for path-scoped read/upsert/delete permission.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is a validator’s missing write capability a feature?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It preserves independence between producing the artifact and judging it. The validator reports evidence and failures instead of silently changing the product it is supposed to assess.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><div class="teach-back"><h3>Teach specialization as a contract</h3><p>Compare Vue Generator and Hard Validator without using their names. Describe each only through context, model, prompt/skills, tools, and domain; then let a partner infer the role.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="memory">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Agents that remember become agent experts</h2>
+        <p class="section-lead">Parallel agents with first-day amnesia can increase throughput. Persistent, purpose-bound mental models let the system improve its judgment across runs.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The experienced specialist who wakes up new</h3>
+          <p>Your Vue worker discovers that a particular glassmorphism layout needs a split-panel structure, that Aegis spacing follows a <code>calc(var(--space-unit) * N)</code> pattern, and that a certain breakpoint avoids overflow. The run ends. Next week, another worker receives the same role prompt but none of those conclusions. It reopens the same files, repeats the same experiments, and pays the same failure cost.</p>
+          <p>Conversation history is not a complete answer. A log preserves everything—requests, intermediate guesses, raw output, corrections. A specialist needs the distilled model: patterns that survived use, references to key files, revised conclusions, open questions, and known failure modes. Durable expertise must be smaller and more purposeful than the transcript that produced it.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — observe, act, learn, revise</p>
+          <h3>Make every run feed the next</h3>
+          <div class="memory-cycle" aria-label="Persistent mental model learning cycle">
+            <div class="memory-cycle__step"><b>Read</b><span>Load the role’s expertise at task start.</span></div>
+            <div class="memory-cycle__step"><b>Observe</b><span>Inspect current code, brand, siblings, and team context.</span></div>
+            <div class="memory-cycle__step"><b>Act</b><span>Perform or evaluate bounded domain work.</span></div>
+            <div class="memory-cycle__step"><b>Update</b><span>Rewrite stale knowledge; add meaningful conclusions.</span></div>
+            <div class="memory-cycle__step"><b>Validate</b><span>Check line limit and YAML parseability.</span></div>
+          </div>
+          <p>The loop is not “append notes forever.” The skill explicitly says to update stale entries rather than only adding new ones. That distinction keeps the expertise file a current model of the domain instead of a chronological attic.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — 7,753 tokens of accumulated runtime state</p>
+          <h3>Dan opens the memory he never hand-authored</h3>
+          <p>At 16:55, the Vue Generator’s mental-model YAML is populated with self-authored patterns: glassmorphism layout, token prefixes, spacing, glow, SFC rules, breakpoints, and motion. The editor status bar reports 7,753 tokens. Dan’s point is not that a human prepared a giant style guide. He gave the agent a skill for maintaining its own expertise, then let work generate the knowledge.</p>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t1015-mental-model-7k-tokens.png" alt="Vue Generator mental model populated with learned UI patterns and a 7753 token count" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">16:55</span>This is accumulated demo runtime state, dated 2026-04-02. The committed repository does not ship this file populated: all twelve expertise files begin as the same one-line stub and are intended to grow through work.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — persistent mental model</p>
+          <h3>Purpose-bound memory that compounds</h3>
+          <aside class="callout callout--term"><p class="callout__label">Canonical term</p><p>An agent’s <strong>mental model</strong> is a structured, persistent expertise file the agent reads at task start and curates after meaningful work so later sessions begin with accumulated domain knowledge.</p></aside>
+          <p>“Mental model” can sound anthropomorphic. The implementation is ordinary and auditable: one YAML file per unique agent role, declared in front matter, with an update permission and line cap. The value comes from workflow discipline around the file, not from pretending it is human memory.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — read the maintenance skill</p>
+          <h3>The learning behavior is only about seventy lines</h3>
+          <p><code>.pi/multi-team/skills/mental-model.md</code> defines when to read, when to update, what not to store, and how to validate. It says to read at the start of every task and when prior observations are needed. It says to update after meaningful work, new discoveries, changed understanding, or observations about team dynamics. It prohibits whole-file copies, conversation logs, and transient test output; store conclusions and references instead.</p>
+          <p>After every expertise write, the agent must run <code>wc -l</code>. If the file exceeds its declared limit, it removes low-value entries, condenses verbose sections, or merges redundancy. Then it validates the YAML with a parser. In every committed agent front matter, <code>max-lines</code> is 10,000. The runtime warns when that bound is exceeded.</p>
+          <p>The A/B/C topology adds a concurrency problem. Three Vue Generator instances share one <code>vue-generator-mental-model.yaml</code>. The <code>parallel-mental-model-updates</code> skill tells sibling instances that file changes from another agent are coordination signals, not errors. The shared role model can compound across parallel work, but the system must expect concurrent edits.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — conclusion or transcript?</p>
+          <h3>Curate one durable entry</h3>
+          <p>Classify each candidate: (A) “The last test printed 143 lines”; (B) “Validated leaves are previewed through a scaled iframe; see <code>PreviewBranchNode.vue</code>”; (C) the entire validator response; (D) “Raw hex in generated leaf styles violates the brand-token contract.” Store B and D. Discard A unless it supports a durable pattern. Keep C in the session log and extract only its conclusion.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: mistaking the empty clone for a missing feature</h3>
+          <p>Open any committed file in <code>.pi/multi-team/expertise/</code> and you will see <code># Mental model — auto-maintained by agent</code>. All twelve are stubs. That emptiness is honest. The expertise has not yet been earned in your runtime. Shipping Dan’s accumulated state would blur provenance and might teach your agents patterns from his exact history rather than yours. Start empty, run bounded work, inspect what grows, and grade the quality of the model—not merely its size.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Memory is not the same as expertise</h3>
+          <aside class="current-practice"><p class="current-practice__label">Durable distinction</p><p>Tools increasingly provide session memory or long-context recall. A domain expertise file still serves a different purpose: explicit scope, inspectable structure, bounded size, versionable content, and role ownership. Long context can retrieve what happened; curated expertise should preserve what remains useful.</p></aside>
+        </div>
+
+        <div class="move move--retrieval">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for persistent mental models">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What will you find in the expertise files immediately after cloning, and why?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Twelve one-line stubs. The populated 7,753-token model is Dan’s runtime state; the clone starts honest and learns through your runs.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What must happen after every expertise write?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Check the line count, trim or condense if above <code>max-lines</code>, recheck, then validate that the YAML parses.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><div class="teach-back"><h3>Explain why an empty mental model is correct</h3><p>Contrast session logs, long context, and curated expertise. Include provenance, the read/update loop, the 10,000-line bound, and the risk of appending everything forever.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="workflow">
+        <span class="section-number">07</span>
+        <h2 class="section-title">A reusable command can carry a whole workflow</h2>
+        <p class="section-lead"><code>/generate</code> looks like one prompt at the interface. Inside, it is an eight-stage, multi-team, round-robin, validated state transition.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The long prompt that still has no state machine</h3>
+          <p>You write a beautifully detailed request: create three variants, respect the brand, validate responsiveness, fix failures, and summarize results. The agent returns three files and says they look good. You do not know whether the tree was registered, whether states moved from generating to validating, whether a real browser exercised the leaves, or which worker owns a failure. Length did not turn the prompt into a workflow.</p>
+          <p>A reusable command must specify variables, order, role ownership, parallel assignment, state changes, retry routing, and a report contract. The value is not that the user types fewer words. The value is that the same words reliably enter the same operating path.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — eight stages, four repeated concerns</p>
+          <h3>Setup → Brand → Generate → Validate → recover → finalize</h3>
+          <div class="pipeline" aria-label="Eight-step generate workflow">
+            <div class="pipeline__step"><b>1 · Setup</b><span>Create tree/branches, manifests, activity; Zod validate.</span></div>
+            <div class="pipeline__step"><b>2 · Brand</b><span>Load validated identity and prepare context.</span></div>
+            <div class="pipeline__step"><b>3 · Briefs</b><span>Lead creates N meaningfully different variant briefs.</span></div>
+            <div class="pipeline__step"><b>4 · Generate</b><span>Round-robin branches across UI A/B/C in parallel.</span></div>
+            <div class="pipeline__step"><b>5 · Transition</b><span>Setup changes generating → validating.</span></div>
+            <div class="pipeline__step"><b>6 · Validate</b><span>Round-robin across Validation A/B/C; report pass/fail.</span></div>
+            <div class="pipeline__step"><b>7 · Repair</b><span>Failures return to their generating team, then revalidate.</span></div>
+            <div class="pipeline__step"><b>8 · Finalize</b><span>Setup records validated/failed and clears activity.</span></div>
+          </div>
+          <p>The workflow alternates generative and deterministic concerns. Agents decide briefs and implement leaves. Manifests, schemas, statuses, activity sidecars, fixed paths, and validation routes keep the result inside a machine-readable product system.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — parallel work with visible progress</p>
+          <h3>The command expands; the interface stays still</h3>
+          <p>At 8:58, the screen shows UI Generation A/B/C operating concurrently. The TillDone panel shows the Aegis Agent Stream generation list at 1/8, while the interface exposes per-agent token and cost telemetry. Dan does not reconstruct the pipeline from memory during the run. The Orchestrator owns the checklist and the routing.</p>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t0538-parallel-teams-tilldone.png" alt="Three UI generation teams working in parallel above an eight-item TillDone list" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">8:58</span>Three generation leads fan out behind one command. The TillDone list and telemetry turn a long multi-agent run into observable state rather than a collection of hidden chats.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — workflow command and till-done list</p>
+          <h3>Work until the verifiable states close</h3>
+          <aside class="callout callout--term"><p class="callout__label">Two primitives</p><p>A <strong>reusable workflow command</strong> binds variables to a known multi-team procedure. A <strong>till-done list</strong> externalizes the work items the Orchestrator continues until complete.</p></aside>
+          <p><code>delegate</code> and <code>tilldone</code> are literal tools in the Orchestrator contract. The first routes information-dense work to an exact team. The second creates, assigns, starts, and completes verifiable tasks. This makes orchestration inspectable as operations rather than implied by persuasive prose.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — parse <code>generate.md</code></p>
+          <h3>Five variables enter; a report comes out</h3>
+          <pre><code>/generate &lt;brand&gt; &lt;product&gt; &lt;tree&gt; &lt;count&gt; &lt;prompt&gt;
+
+/generate aegis app pricing 3 \
+  "Three pricing-page layouts: tier table, single-plan hero, comparison grid."</code></pre>
+          <p>The committed command declares <code>BRAND</code>, <code>PRODUCT</code>, <code>TREE</code>, <code>COUNT</code>, and <code>PROMPT</code>. It requires the UI Generation Lead to create differentiated briefs—not color swaps—and requires all variants to use brand tokens. Setup scaffolds auto-named branch directories and writes <code>trees.yaml</code> plus <code>activity.yaml</code>. The Orchestrator round-robins generation and validation. Failures return to the team that created the branch. Setup owns final status.</p>
+          <p>The Report block demands passed count, each variant with status and route, and the gallery path. That output is not the sole proof, but it is a concise claim surface the lab can independently verify on disk and in the browser.</p>
+          <aside class="callout callout--warning"><p class="callout__label">Where the TillDone logic actually lives</p><p>The committed <code>generate.md</code> contains no task-list instructions. That omission is deliberate in <code>specs/parallel-team-duplication.md</code>. The visible list comes from the Orchestrator’s own <code>tilldone</code> tool and its instruction to create a list for substantial work. Do not search the slash-command file for UI code or a hidden checklist.</p></aside>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — narrate the state transitions</p>
+          <h3>Do not summarize as “agents make three UIs”</h3>
+          <p>Say the eight stages out loud, including who owns each state change. Then answer: if branch 2 fails Validation B, where does the fix go? It returns to UI Generation B, the team that generated branch 2, and then back to the corresponding validation path before Setup writes the final status.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: a till-done list becomes theatre</h3>
+          <p>A list is valuable only when each item corresponds to evidence. “Make it good” cannot be graded. “Three branch directories exist,” “trees manifest parses,” “branch status is validating,” “responsive screenshots captured,” and “final status recorded” can. Keep tasks discrete, owned, and tied to observable state. The list is a control surface, not a decorative progress bar.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Workflow shape outlives command syntax</h3>
+          <aside class="current-practice"><p class="current-practice__label">Transfer rule</p><p>Whether a runtime uses slash commands, skills, task graphs, hooks, or typed orchestration code, preserve the same shape: declared inputs; ordered dependencies; explicit parallelizable units; bounded ownership; objective state transitions; retry routing; and a report whose claims can be checked independently.</p></aside>
+        </div>
+
+        <div class="move move--retrieval">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for the generate workflow">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name the five variables and at least six of the eight workflow stages.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>BRAND, PRODUCT, TREE, COUNT, PROMPT. Setup scaffold, Brand context, differentiated briefs, round-robin generation, Setup transition, round-robin validation, repair/revalidate failures, Setup final status and activity clear.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why does <code>generate.md</code> not contain the on-screen task list?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The list is managed autonomously through the Orchestrator’s <code>tilldone</code> tool. The command intentionally omits a task list as part of the parallel-coordination stress test.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><div class="teach-back"><h3>Turn a command into a state machine</h3><p>Teach <code>/generate</code> from variables to final report. Your listener should be able to predict team assignment and manifest state for any branch number.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="reliability">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Model control turns failure into a routing problem</h2>
+        <p class="section-lead">The demo’s open-source workers fail. The pipeline still produces three validated leaves. That is not an embarrassment hidden by the lesson; it is the reliability lesson made visible.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The architecture that assumes every model responds</h3>
+          <p>You assign a low-cost model to a long Vue SFC task. It returns no usable result. If the workflow has one worker, no timeout policy, no sibling capacity, no lead awareness, and no model swap path, the entire run stops. The failure began in one agent but became a system failure because the harness offered no alternate route.</p>
+          <p>Reliability does not mean preventing every model failure. It means detecting failure, containing it, preserving enough state to retry or reassign, and continuing toward a validated outcome. Model choice is one control. Redundant team capacity, role-aware fallback, activity state, and independent validation are others.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — separate worker health from pipeline health</p>
+          <h3>One failure can have two endings</h3>
+          <div class="reliability-grid">
+            <article><h3>Brittle chain</h3><p>Worker silent → no branch → validator has nothing → human intervenes → run stalls.</p><p><strong>Single path, no redundancy, no explicit recovery.</strong></p></article>
+            <article><h3>Resilient harness</h3><p>Worker silent → lead/sibling detects gap → fallback writes or model rotates → validator checks → result reaches final report.</p><p><strong>The failure is contained and observable.</strong></p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — from silent workers to three validated branches</p>
+          <h3>The final report closes the argument</h3>
+          <p>On screen, the Step and Minimax-backed workers do not produce usable responses. Their Claude leads detect the absence and implement the components. Sonnet-backed team C proceeds normally. By 23:07, the Orchestrator reports compact-dashboard, timeline-stack, and glassmorphism-panel complete and validated, with exact paths.</p>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t1387-orchestrator-final-report.png" alt="Orchestrator report listing three generated and validated Agent Stream variants" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">23:07</span>The outcome survived two worker failures. Treat the report as a claim surface: the exact component paths, statuses, and rendered routes must still be independently checked.</figcaption>
+          </figure>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t1565-canvas-live-preview-nodes.jpg" alt="Infinite UI canvas showing three live preview nodes connected to the Agent Stream tree" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">26:05</span>The three leaves appear as live previews under one tree. System reliability is visible as a complete, browseable product state—not as a claim that every worker behaved perfectly.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — model control, redundancy, graceful failure</p>
+          <h3>Swap the engine; preserve the contract</h3>
+          <aside class="callout callout--term"><p class="callout__label">Reliability pattern</p><p><strong>Per-agent model control</strong> makes the engine swappable. <strong>Redundant teams</strong> provide alternate capacity. <strong>Graceful failure</strong> keeps a local model fault from terminating the problem-class workflow.</p></aside>
+          <p>Dan suggests a rotation system: if a model is not working, swap it out. The important prerequisite is that the role contract stays stable. A replacement model receives the same purpose, expertise, skills, tools, and domain. Reliability comes from preserving the interface while changing the implementation behind it.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — reconcile the demo with the clone</p>
+          <h3>Heterogeneous on screen; homogeneous on disk</h3>
+          <p>The live team tree assigns <code>stepfun/step-3.5-flash</code> to one Vue Generator and <code>openrouter/minimax/minimax-m2.7</code> to another, while the rest use <code>anthropic/claude-sonnet-4-6</code>. Dan’s file tree also shows <code>agents-os/</code> and a minimal team config. Those are live, uncommitted modifications.</p>
+          <p>The committed asset contains no <code>agents-os/</code>, no <code>multi-team-config-min.yaml</code>, and every one of the twelve unique agent files specifies Sonnet. <code>CLAUDE.md</code> recommends Claude-series models as proven reliable for long-form Vue SFC generation and validation. Therefore you can safely inspect the redundancy architecture without believing the clone reproduces the model A/B test by default.</p>
+          <p>The design experiment is still reproducible in principle for members: change a worker’s front-matter model, run the same bounded workflow, record response quality and recovery behavior, restore the model, and compare. Do not convert one recorded failure into a permanent verdict on a provider. The durable question is whether the harness can measure and survive model variance.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — classify three failures</p>
+          <h3>Local, team, or pipeline?</h3>
+          <p>Classify these: (A) Vue Generator B is silent, but its lead creates the leaf and it validates; (B) all generation paths fail and no branch exists; (C) a branch renders but Hard Validator reports broken keyboard navigation and it remains failed. A is a contained worker failure. B is a pipeline failure. C is a correctly detected product failure—the validation system is working.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: optimizing for completion by erasing role boundaries</h3>
+          <p>The on-screen lead fallback delivers, but making every lead an always-on worker would destroy the hierarchy. Treat fallback as an exception with an explicit trigger: worker non-response or failed artifact, no viable sibling route, and a recorded role crossing. Prefer rotation or reassignment when separation matters. Reliability is not “someone eventually writes the file”; it is controlled recovery with preserved evidence.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Evaluate models by workload and recovery cost</h3>
+          <aside class="current-practice"><p class="current-practice__label">Dated models, durable evaluation</p><p>Model availability, pricing, context, and tool behavior change quickly. Re-verify IDs before live use. Keep a role-level scorecard: success rate, latency, token/cost, correction count, validation pass rate, and recovery path. Cheap failure can be expensive if a premium lead must redo the whole artifact.</p></aside>
+        </div>
+
+        <div class="move move--retrieval">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for model reliability">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Give two reasons the worker failures support the tactic.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The leads detected and covered the dead workers, so the workflow continued; and owning per-agent model assignment plus redundant teams creates a clear rotation/reassignment path.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What model configuration ships in the clone?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>All twelve unique agent files specify <code>anthropic/claude-sonnet-4-6</code>. The Step/Minimax assignments and open-source agent directory are on-screen, uncommitted state.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><div class="teach-back"><h3>Defend the demo without pretending it was flawless</h3><p>Explain exactly what failed, what recovered, what completed, and which repository facts differ. End with a design recommendation for high-risk versus exploratory domains.</p></div></div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="meta-agent">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Use a meta-agent to build the system that builds the system</h2>
+        <p class="section-lead">The specialized Pi harness operates the UI problem class. Claude Code is the higher layer Dan uses to scaffold, inspect, automate, and improve that harness.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The developer who delegates product code but hand-maintains the machinery</h3>
+          <p>You proudly stop hand-writing Vue leaves, yet manually copy every agent definition, patch every command, create every expertise stub, update every config entry, start terminals, capture screenshots, and compare outcomes. You automated the artifact but became the craftsperson for the factory. The bottleneck moved one level up.</p>
+          <p>That can be the correct starting point. Harness design requires judgment. But repeated harness construction and operation also contain workflows. The next leverage move is to use a general coding agent as a meta-agent: ask it to build, prime, validate, and drive the specialized system rather than spending all of its time on the product output.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — two agentic layers</p>
+          <h3>Builder above, operator below</h3>
+          <div class="meta-loop">
+            <article><h3>Claude Code · meta-layer</h3><p>Scaffold and change the harness; run install checks; create plans; prime context; drive terminals; capture evidence.</p><p><strong>Builds and improves the operating system.</strong></p></article>
+            <article><h3>Pi multi-team · product layer</h3><p>Route Setup, Brand, UI Generation, and Validation teams; generate and browse Infinite UI leaves.</p><p><strong>Operates the UI problem class.</strong></p></article>
+          </div>
+          <p>The split is functional, not ideological. A general-purpose coding agent is valuable because it can work on the harness repository. A specialized multi-agent system is valuable because its roles, memory, commands, and domains are tuned to one recurring class of product work.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the system behind the recorded system</p>
+          <h3>Dan spends most of his time one level above the product</h3>
+          <p>At roughly 8:20, Dan says that about eighty percent of his Claude Code work is not direct product implementation. He uses it as a meta-builder: building the system that builds the system. The repository bears that out. Its <code>.claude/commands/</code> directory contains <code>build</code>, <code>install</code>, <code>plan-w-team</code>, and <code>prime</code>. Its skills include browser driving, tmux automation, SVG generation, and text-to-speech.</p>
+          <p>The <code>drive</code> skill is especially concrete. It exposes terminal session, run, send, log, poll, fanout, screenshot, and process operations. That is how a higher-level agent can script and record the lower-level teams chat. The Infinite UI canvas is therefore the visible end of a longer chain: meta-agent builds/drives harness → Orchestrator routes teams → workers and validators produce evidence → app renders the product state.</p>
+          <figure class="frame-card frame-card--wide">
+            <img src="../media/frames/ma-3-ui-agents/t0970-harness-filetree-readme.png" alt="UI Agents repository tree showing the harness as files that a meta-agent can build and inspect" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">16:10</span>Revisit the file tree from the meta-layer: this is the product Claude Code can scaffold and evolve—settings, agents, skills, expertise, configs, prompts, specs, scripts, and the app they operate.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Claude Code as meta-agent</p>
+          <h3>Build the operator, not only the output</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s pattern</p><p>A <strong>meta-agent</strong> works on the agentic system itself: its contracts, workflows, automation, tests, and observability. The specialized system then operates the product domain.</p></aside>
+          <p>This is recursive leverage with a necessary stop condition. You do not add layers because recursion is impressive. You add a layer when the lower-level workflow repeats enough to justify a stable interface, when the layer can be independently checked, and when it removes meaningful human routing or construction work.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — map the meta artifacts</p>
+          <h3>Four commands, four kinds of leverage</h3>
+          <p><code>.claude/commands/install.md</code> verifies Pi, the <code>teams</code> alias, Bun/Node/just/uv, API keys, Vue dependencies, team configuration, and dev-server readiness. <code>prime.md</code> walks the repository to establish context. <code>plan-w-team.md</code> documents a planning flow that can use Claude Code’s own task/dependency API. <code>build.md</code> executes a plan.</p>
+          <p>These are not alternative product agents. They prepare and change the environment in which the Pi team operates. A good separation test is the object of work: if the change is a Vue leaf in the Infinite UI hierarchy, route it through the product harness; if the change is the harness’s roles, workflows, configuration, scripts, or setup, the meta-agent works on the machinery.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — classify the layer</p>
+          <h3>Product task or harness task?</h3>
+          <p>Classify: (A) generate three pricing branches; (B) narrow Vue Generator’s domain; (C) add a new <code>/audit</code> workflow command; (D) rebrand Aegis through <code>brand.yaml</code>; (E) change the tmux automation used to drive the team chat. A and D operate the product through the harness. B and C modify the harness contract. E modifies the meta-automation that operates the harness.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: “Pi versus Claude Code”</h3>
+          <p>The lesson’s own resolution is “ands, not ors.” The tools occupy different roles in Dan’s workflow. Turning the chapter into a product contest misses the architecture. Ask which layer a tool controls, how inspectable that control is, and whether the combination reduces human work while preserving evidence. If a mainstream tool absorbs more harness features, the amount you custom-build may shrink; the harness-design questions remain.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Trust and scale, in that order</h3>
+          <aside class="current-practice"><p class="current-practice__label">Dan’s closing thesis · 31:56</p><p>The theme of 2026 is increasing the work you trust agents to do over time. Scale without trust produces more opaque failure. Trust grows from specialization, bounded domains, persistent learning, workflow state, validation, observability, and honest discrepancy reporting. Add scope only after the preceding scope produces evidence you can inspect.</p></aside>
+        </div>
+
+        <div class="move move--retrieval">
+          <p class="move-label">9 · Retrieval check</p>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for the meta-agent layer">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does Dan say he uses Claude Code for most of the time?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>As a meta-builder or meta-agent: building the system that builds/operates the product rather than directly implementing the product most of the time.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What underlines both harness engineering and multi-agent orchestration?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Trust and scale—increase the amount of work you can responsibly entrust to agents over time.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach"><p class="move-label">10 · Teach-back</p><div class="teach-back"><h3>Teach the two-layer tool split</h3><p>Explain why Claude Code and the Pi harness are complementary here. Name two meta-layer artifacts and two product-layer artifacts, then state the evidence required before increasing scale.</p></div></div>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="ledger">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Accuracy ledger: what Dan runs versus what you clone</h2>
+        <p class="section-lead">A showcase can demonstrate an evolved runtime while the course asset preserves a smaller starting point. Expert practice is to keep capability, committed state, and live state distinct.</p>
+
+        <aside class="callout callout--warning"><p class="callout__label">Honesty obligation</p><p>Do not debug the clone against the recording as though they are identical. The committed repository is a single-commit, all-Sonnet, one-brand, empty-expertise snapshot. The video runs a hand-tuned superset. The differences below are part of the lesson.</p></aside>
+
+        <div class="ledger-wrap wide-table">
+          <table class="accuracy-ledger">
+            <thead><tr><th>Claim surface</th><th>On screen</th><th>Committed asset</th></tr></thead>
+            <tbody>
+              <tr><td>Agent models</td><td>Vue Generator uses <code>stepfun/step-3.5-flash</code>; Vue Generator B uses <code>openrouter/minimax/minimax-m2.7</code>; most others use Sonnet.</td><td>All twelve unique agent files use <code>anthropic/claude-sonnet-4-6</code>.</td></tr>
+              <tr><td>Open-source variants</td><td><code>agents-os/</code> is visible with alternate generator/validator files.</td><td>No <code>agents-os/</code> directory.</td></tr>
+              <tr><td>Minimal config</td><td><code>multi-team-config-min.yaml</code> is visible.</td><td>Only <code>multi-team-config.yaml</code> ships.</td></tr>
+              <tr><td>Mental models</td><td>Vue Generator model is populated to about 7,753 tokens.</td><td>All twelve expertise files are one-line stubs.</td></tr>
+              <tr><td>Brands</td><td>Aegis, Agentix, and Indydevdan appear.</td><td>One real brand, <code>aegis</code>, plus <code>_template</code>.</td></tr>
+              <tr><td>Team counts</td><td>Dan narrates 15 unique / 9 minimum for his live configuration.</td><td>12 unique agent files, 24 slots, 8 teams.</td></tr>
+              <tr><td>Till-done source</td><td>TillDone advances from the Orchestrator during the run.</td><td><code>generate.md</code> has no task list; <code>tilldone</code> is an Orchestrator tool.</td></tr>
+              <tr><td>Preview</td><td>Dan tentatively describes Teleport with an iframe beneath.</td><td>Scaled 1280×720 iframe → gallery route → <code>import.meta.glob</code> dynamic component. Teleport is only in Sidebar.</td></tr>
+              <tr><td>Aegis tokens</td><td>Final narration/report references cyan and purple period state.</td><td><code>brand.yaml</code> is authoritative: Play; primary <code>#f0f0f5</code>; secondary <code>#6e7fff</code>; accent <code>#e63946</code>.</td></tr>
+              <tr><td>Leaf line counts</td><td>Timeline 899; glassmorphism described as 967.</td><td>Timeline is 899; glassmorphism is 972.</td></tr>
+              <tr><td>Lead write rule</td><td>A generation lead writes an SFC when its worker fails.</td><td>The role rule says leads do not write, but Setup and UI Generation leads retain product <code>upsert:true</code> and execution tools. Other leads are product-read-only.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Current-practice companions</h3>
+        <p>Keep the overlay narrow. This lesson already assumes the multi-team harness and trilogy context; the two course-linked videos below fill those exact prerequisites. They are companions, not evidence for claims about the committed <code>ui-agents</code> files.</p>
+        <div class="current-links">
+          <article class="current-link"><p class="eyebrow">Prerequisite · Agent teams</p><h3><a href="https://www.youtube.com/watch?v=M30gp1315Y4">One Agent Is NOT ENOUGH: Agentic Coding BEYOND Claude Code</a></h3><p>The multi-team agent-harness lesson beneath UI Agents: one interface, team leads, workers, domains, memory, and configuration.</p></article>
+          <article class="current-link"><p class="eyebrow">Trilogy context · CEO agents</p><h3><a href="https://www.youtube.com/watch?v=TqjmTZRL31E">Pi CEO Agents</a></h3><p>The first asset in the CEO → Lead → UI Agents sequence; useful for seeing how strategic and operating agent systems relate.</p></article>
+        </div>
+
+        <h3>Ledger retrieval</h3>
+        <section class="retrieval-quiz" aria-label="Retrieval questions for the accuracy ledger">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name four things the recording shows that the clone does not ship.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Any four: heterogeneous model assignments, <code>agents-os/</code>, <code>multi-team-config-min.yaml</code>, populated mental models, three brands, the exact live team count.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which layer wins when narration, a spec, and committed implementation disagree?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>For “what you clone and run,” the committed implementation is authoritative. Preserve the narration as dated demo context and state the difference adjacent to the claim.</p></details></div>
+        </section>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Graded lab: read the harness before you spend tokens</h2>
+        <p class="section-lead">The lab has an equal-access route and a live route. Track A proves you can audit the committed system from files with no Pi session and no API spend. Track B operates and specializes that exact course system if you have the member prerequisites.</p>
+
+        <aside class="callout callout--tactic"><p class="callout__label">Lab artifact</p><p>Create one evidence sheet with paths, answers, command output, and—only for Track B—screenshots or rendered routes. Grade claims from artifacts. “It seemed specialized” earns no credit; “the agent lacks <code>delegate</code>, has product <code>upsert:true</code>, and wrote only under the narrowed path” can be checked.</p></aside>
+
+        <h3>Prerequisites and guardrails</h3>
+        <div class="class-shift">
+          <article><h3>Track A · Read the Harness</h3><p>Requires only the committed <code>agentic-horizon-extras/ui-agents</code> repository and ordinary file/terminal inspection. No Pi, no <code>teams</code> alias, no API key, no model cost.</p></article>
+          <article><h3>Track B · Run &amp; Specialize</h3><p>Requires Pi, the <code>teams</code> shell alias from the member setup, Bun, Node, Just, uv, dependencies, and <code>ANTHROPIC_API_KEY</code>. Provider keys are needed only for an optional alternate-model stretch.</p></article>
+        </div>
+        <ul class="evidence-list">
+          <li><strong>Course codebase only.</strong> Work in <code>agentic-horizon-extras/ui-agents</code>. Do not substitute PiCanvas or a toy app.</li>
+          <li><strong>No hand-written product leaves.</strong> You may inspect any file and edit harness configuration where directed. Do not hand-edit generated <code>index.vue</code> components.</li>
+          <li><strong>No destructive shortcuts.</strong> Use ordinary status/diff inspection. Restore temporary front-matter or model changes after a stretch exercise.</li>
+          <li><strong>Budget consciously.</strong> The recorded three-variant demo reached roughly $6.70 and about 29 minutes in Dan’s displayed telemetry. That is a historical observation, not a promised price or duration for your run.</li>
+        </ul>
+
+        <section class="lab-box" id="lab-0">
+          <h3 class="lab-box__title">Lab 0 · Orient to the shipped system</h3>
+          <ul class="lab-box__meta"><li>Track A</li><li>10–15 minutes</li><li>No API cost</li></ul>
+          <ol class="lab-box__steps">
+            <li>Open the course repository. Read <code>README.md</code> end to end. State where it sits in the trilogy: <code>ceo-agents → lead-agents → ui-agents</code>.</li>
+            <li>Read <code>.claude/commands/install.md</code>. List the prerequisites it checks. You do not need them all for Track A.</li>
+            <li>Read <code>.pi/settings.json</code>. Explain all four keys in one sentence each.</li>
+            <li>Without notes, write Brand → Product → Tree → Branch → Leaf and the real address <code>aegis/app/agent-stream/timeline-stack/index.vue</code>.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Checkpoint 0 · pass criteria</h4><ul><li>All four settings are correctly explained: high thinking, automatic compaction, compaction at 0.8, and registration of <code>./prompts/multi-team</code>.</li><li>The five-level hierarchy is in order with one real example.</li><li>Your evidence sheet names the repository and trilogy position.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-1">
+          <h3 class="lab-box__title">Lab 1 · Map and challenge the harness</h3>
+          <ul class="lab-box__meta"><li>Track A</li><li>35–50 minutes</li><li>Pass = 7 of 8</li></ul>
+
+          <h4>1.1 · Count the topology</h4>
+          <p>From <code>.pi/multi-team/multi-team-config.yaml</code> and <code>agents/</code>, record team count, unique agent-file count, and total slots. Show the arithmetic.</p>
+          <p><strong>Expected evidence:</strong> 8 teams; 12 unique files; 24 slots = 1 Orchestrator + 3 Setup + 2 Brand + 9 UI Generation + 9 Validation.</p>
+
+          <h4>1.2 · Audit role intent against capability</h4>
+          <p>Inspect <code>orchestrator.md</code>, <code>ui-generation-lead.md</code>, <code>vue-generator.md</code>, and <code>hard-validator.md</code>. For each, record <code>tools</code>, writable domains, and whether “does not write product files” is hard-enforced or behavioral.</p>
+          <p><strong>Expected evidence:</strong> the Orchestrator can write/edit tools but product/root upsert is false except expertise; UI Generation Lead has write/edit/Bash/delegate/tilldone and product <code>upsert:true</code>; Vue Generator has write/edit/Bash, product <code>upsert:true</code>, no delegate; Hard Validator has no write/edit, product <code>upsert:false</code>, but may write screenshots and expertise. This corrects the too-broad summary that all leads are structurally product-read-only.</p>
+
+          <h4>1.3 · Locate the organizational rule</h4>
+          <p>Quote the two lines in <code>CLAUDE.md</code> that distinguish leaders and workers. Then read <code>skills/zero-micro-management.md</code>. Explain why these are strong behavior instructions but do not override a permissive front-matter capability by themselves.</p>
+
+          <h4>1.4 · Read the learning loop</h4>
+          <p>Read <code>skills/mental-model.md</code>. Record when expertise is read, when it is updated, what must not be stored, and the two checks after every write.</p>
+          <p><strong>Expected evidence:</strong> read at task start; update after meaningful work/new or changed understanding; do not copy files/logs/transient output; enforce <code>max-lines</code> with <code>wc -l</code> and validate YAML parsing.</p>
+
+          <h4>1.5 · Reconcile empty and populated memory</h4>
+          <p>Open any file in <code>.pi/multi-team/expertise/</code>, then count how many match the one-line stub. Explain why the recording shows 7,753 tokens while your clone does not.</p>
+          <p><strong>Expected evidence:</strong> all 12 are <code># Mental model — auto-maintained by agent</code>; the recorded file is accumulated runtime state, not committed starter knowledge.</p>
+
+          <h4>1.6 · Trace <code>/generate</code></h4>
+          <p>Read <code>.pi/prompts/multi-team/generate.md</code>. List its five variables and eight stages. State exactly where the on-screen TillDone list originates.</p>
+          <p><strong>Expected evidence:</strong> BRAND/PRODUCT/TREE/COUNT/PROMPT; Setup → Brand → briefs → round-robin generation → validating transition → round-robin validation → repair/revalidate → final status. The list is the Orchestrator’s <code>tilldone</code> tool, not content in <code>generate.md</code>.</p>
+
+          <h4>1.7 · Prove brand-token flow</h4>
+          <p>Open <code>apps/infinite-ui/src/brands/aegis/products/app/trees/agent-stream/timeline-stack/index.vue</code>. Record at least three custom properties it consumes. Find the authoritative source values in <code>apps/infinite-ui/src/brands/aegis/brand.yaml</code>. Note the actual committed font and primary/secondary/accent values.</p>
+          <p><strong>Expected evidence:</strong> examples include <code>--brand-bg</code>, <code>--brand-primary</code>, <code>--brand-secondary</code>, <code>--space-unit</code>, and <code>--font-body</code>. Committed brand: Play, <code>#f0f0f5</code>, <code>#6e7fff</code>, <code>#e63946</code>.</p>
+
+          <h4>1.8 · Prove the preview mechanism</h4>
+          <p>Inspect <code>src/canvas/PreviewBranchNode.vue</code>, <code>src/gallery/BranchPreview.vue</code>, and <code>src/layout/Sidebar.vue</code>. Trace a validated branch from canvas to rendered component.</p>
+          <p><strong>Expected evidence:</strong> a 1280×720 iframe scaled with CSS and <code>pointer-events:none</code> loads a gallery route; the route uses <code>import.meta.glob</code> plus a dynamic component. Teleport is used by Sidebar, not this preview path.</p>
+
+          <div class="lab-box__pass"><h4>Checkpoint 1 · pass criteria</h4><ul><li>At least 7 of 8 answers match the committed files.</li><li>Answer 1.2 explicitly identifies the UI Generation Lead write-capability exception.</li><li>Every count or claim includes a source path; no answer relies only on the video.</li><li>The evidence sheet distinguishes recorded runtime state from committed state at least three times.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-2">
+          <h3 class="lab-box__title">Lab 2 · Run one three-variant pipeline</h3>
+          <ul class="lab-box__meta"><li>Track B</li><li>30–60+ minutes</li><li>Paid model usage</li></ul>
+          <ol class="lab-box__steps">
+            <li>Run the repository’s install/prime flow and resolve only the documented prerequisites. Start the app with <code>just dev</code>. In another terminal, start the multi-team chat with <code>just team</code>.</li>
+            <li>Use an existing brand and product but a fresh tree: <pre><code>/generate aegis app pricing 3 "Three pricing-page layouts: a classic 3-tier table, a bold single-plan hero, and a comparison-grid. Use Aegis brand tokens only."</code></pre>Or use the exact Just recipe: <pre><code>just generate aegis app pricing 3 "Three pricing-page layouts: a classic 3-tier table, a bold single-plan hero, and a comparison-grid. Use Aegis brand tokens only."</code></pre></li>
+            <li>Record the delegation sequence, branch→team assignment, TillDone state, any worker non-response, and the final Orchestrator claims. Do not repair a leaf by hand.</li>
+            <li>Run <code>just list-branches aegis app pricing</code>. Inspect the product canvas at <code>/aegis/app</code> and the tree gallery at <code>/aegis/app/gallery/pricing</code>.</li>
+            <li>Compare the final report with <code>trees.yaml</code>, on-disk branch paths, rendered routes, and a token audit. Record discrepancies instead of hiding them.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Checkpoint 2 · pass criteria</h4><ul><li>A <code>pricing</code> tree exists with three branches whose final status is <code>validated</code>, or a documented <code>failed</code> status and reason.</li><li>Three non-stub <code>index.vue</code> leaves exist under the pricing tree and each is over 100 lines.</li><li>The leaf styles consume brand custom properties; any raw visual literal is investigated and documented rather than assumed compliant.</li><li>All three branches render in the gallery at multiple widths.</li><li>You typed zero Vue into a leaf by hand.</li><li>Your evidence distinguishes worker failure, product validation failure, and whole-pipeline failure.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-3">
+          <h3 class="lab-box__title">Lab 3 · Specialize the harness and observe learning</h3>
+          <ul class="lab-box__meta"><li>Track B</li><li>20–40 minutes</li><li>Restore temporary edits</li></ul>
+          <ol class="lab-box__steps">
+            <li><strong>Tighten a domain.</strong> In <code>vue-generator.md</code>, narrow the product path to <code>apps/infinite-ui/src/brands/aegis/products/site/</code>. This is a harness edit, not product-code editing. Run a generation scoped to that product and record all touched paths.</li>
+            <li><strong>Rebrand through the system.</strong> Run <code>/rebrand aegis "shift the accent from crimson to amber; keep everything else"</code>, or use the matching Just recipe. Editing <code>brand.yaml</code> directly is also an allowed harness-configuration exercise. Do not touch a leaf.</li>
+            <li><strong>Watch expertise grow.</strong> Before and after meaningful work, run <code>wc -l</code> on the relevant expertise files. Inspect whether new content is structured, relevant, within the line cap, and valid YAML.</li>
+            <li><strong>Restore.</strong> Restore the original domain and any temporary model assignment. Keep only evidence artifacts you intentionally created.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Checkpoint 3 · pass criteria</h4><ul><li>No write occurs outside the narrowed generator product domain and its declared mental-model file.</li><li>The rebrand changes rendered leaves through brand tokens; the diff contains no hand edit to existing leaf <code>index.vue</code> files.</li><li>At least one expertise file moves beyond the one-line stub, or the run’s failure to update it is recorded as an observed result.</li><li>Temporary contract changes are restored and verified with a diff.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-stretch">
+          <h3 class="lab-box__title">Lab 4 · Stretch: test the harness, not your patience</h3>
+          <ul class="lab-box__meta"><li>Optional</li><li>Choose one</li><li>Extra token cost possible</li></ul>
+          <h4>S1 · Model recovery experiment</h4>
+          <p>Assign an available alternate model to one Vue Generator role, run the same bounded three-branch workload, and record success rate, latency, validation result, and recovery behavior. Restore Sonnet. Do not assume the April 2026 IDs still resolve; verify your provider before editing.</p>
+          <h4>S2 · Compose a team command</h4>
+          <p>Add an <code>/audit &lt;brand&gt; &lt;product&gt;</code> prompt in <code>.pi/prompts/multi-team/</code> using the repository’s front matter → Purpose → Variables → Instructions → Workflow → Report shape. Route brand compliance to Brand and Validation. Prove the registered prompt executes through <code>teams</code>.</p>
+          <h4>S3 · Fork an existing leaf</h4>
+          <p>Run <code>/fork-leaf aegis app agent-stream compact-dashboard 2 "one denser, one calmer"</code>. Verify two branches, <code>forkedFrom</code> metadata in <code>trees.yaml</code>, canvas attachment, and real rendered leaves.</p>
+          <h4>S4 · Read the meta-layer</h4>
+          <p>Inspect <code>.claude/skills/drive/</code>. In one paragraph, explain how session/run/poll/fanout/screenshot operations let Claude Code drive and record the Pi team chat. Cite exact files or commands from that skill.</p>
+        </section>
+
+        <section class="lab-box" id="lab-troubleshooting">
+          <h3 class="lab-box__title">Troubleshooting by layer</h3>
+          <table>
+            <thead><tr><th>Observation</th><th>Inspect first</th><th>Interpretation / repair</th></tr></thead>
+            <tbody>
+              <tr><td><code>teams</code> not found</td><td>Install command and member setup</td><td>Track B prerequisite missing. Complete Track A; do not invent a substitute runtime.</td></tr>
+              <tr><td>Dev route does not load</td><td><code>just dev</code>, Bun deps, port 5173</td><td>Repair the documented app startup before blaming generation.</td></tr>
+              <tr><td>Worker reports no response</td><td>Team log, agent model, branch path</td><td>Record a local worker failure. Observe whether lead/sibling/fallback preserves the workflow.</td></tr>
+              <tr><td>TillDone absent from <code>generate.md</code></td><td><code>orchestrator.md</code></td><td>Expected. TillDone is an Orchestrator tool, not command-file content.</td></tr>
+              <tr><td>Mental model is one line</td><td>Committed expertise files</td><td>Expected starting state. It grows only after the relevant role updates it.</td></tr>
+              <tr><td>Preview hunt finds Teleport only in Sidebar</td><td>PreviewBranchNode + BranchPreview</td><td>Correct path is iframe + gallery route + glob-loaded dynamic component.</td></tr>
+              <tr><td>Lead writes a leaf</td><td>Lead front matter + logs</td><td>Check whether it is UI/Setup, whether a worker failed, and whether the role crossing was visible. Do not call the no-write rule hard-enforced.</td></tr>
+              <tr><td>Raw color appears in a leaf</td><td>Style block and brand token source</td><td>Determine whether it violates the visual-token contract; route repair through the generator team.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <h3>Final lab rubric</h3>
+        <table class="rubric-table">
+          <thead><tr><th>Dimension</th><th>0</th><th>1</th><th>2</th><th>3</th></tr></thead>
+          <tbody>
+            <tr><td>Harness map</td><td>Missing</td><td>Names parts</td><td>Correct counts/paths</td><td>Explains control flow</td></tr>
+            <tr><td>Contract audit</td><td>Role labels only</td><td>Tools listed</td><td>Tools + domains</td><td>Intent/capability discrepancy explained</td></tr>
+            <tr><td>Workflow trace</td><td>“Makes UIs”</td><td>Partial stages</td><td>All stages</td><td>Ownership, state, retries, evidence</td></tr>
+            <tr><td>Accuracy</td><td>Demo=clone</td><td>One difference</td><td>Three differences</td><td>Ledger used consistently</td></tr>
+            <tr><td>Product evidence</td><td>Claims only</td><td>Files or UI</td><td>Files + UI</td><td>Files + UI + manifest + validation</td></tr>
+            <tr><td>Prime directive</td><td>Hand-edited leaves</td><td>Unclear</td><td>No leaf edits</td><td>No leaf edits + clean restoration</td></tr>
+          </tbody>
+        </table>
+        <p><strong>Track A pass:</strong> Checkpoint 0 plus at least 7/8 in Lab 1, with the lead-capability correction. <strong>Track B pass:</strong> Track A plus Checkpoints 2 and 3. A failed live generation may still pass if the student correctly records the failed state, localizes the failure, preserves the prime directive, and produces the remaining required source audit; it does not count as three validated leaves.</p>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Cumulative mastery: operate, diagnose, teach</h2>
+        <p class="section-lead">Mastery is the ability to reconstruct the system under pressure, make evidence-backed distinctions, and transfer the architecture beyond this exact UI example.</p>
+
+        <h3>Closed-book retrieval</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative chapter retrieval">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What is the chapter’s one-sentence thesis?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The harness is the durable product: own the system around models so specialized, learning teams can operate a whole problem class through one interface.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Name the six harness components.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Deterministic code, token caching, agent orchestration, prompts, skills, and model control.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Give the committed system counts.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>8 teams, 12 unique agent files, 24 runtime slots; 12 expertise stubs; 1 real brand, 3 products, 7 real trees, 23 generated leaves plus 2 template leaves.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. What stays constant when teams scale?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The human-facing interface: one Orchestrator receives intent, routes work, tracks state, and synthesizes the result.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">5. Which fields make an agent specialized?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Expertise/context, model, prompt plus skills, tools, and domain permissions.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">6. Is the no-write lead rule hard-enforced everywhere?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. It is explicit in shared rules and a skill; Brand/Validation/Orchestrator product writes are bounded, but Setup and UI Generation leads retain product write capability.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">7. How does an agent mental model remain useful?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Read it at task start; update conclusions after meaningful work; rewrite stale entries; exclude transcripts/transient output; enforce the line cap; validate YAML.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">8. Recite <code>/generate</code> from inputs to final state.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Brand/product/tree/count/prompt → Setup scaffold → Brand context → differentiated briefs → round-robin generation → validating status → round-robin validation → repair/revalidate → Setup validated/failed and activity clear.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">9. Why can a worker failure support the reliability claim?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Because the harness detects and contains it, provides fallback or reassignment, validates the result, and completes the workflow without treating one model as the whole system.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">10. What previews a leaf?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A scaled 1280×720 iframe into the gallery route, where <code>import.meta.glob</code> resolves the leaf and a dynamic component renders it—not Vue Teleport.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">11. What does the clone ship versus the on-screen model experiment?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The clone uses Sonnet in all twelve agent files and has no open-source agent directory or minimal config. The recording shows live Step/Minimax substitutions.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">12. What is the meta-agent’s object of work?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The harness itself: agent contracts, workflows, configuration, scripts, setup, automation, tests, and observability.</p></details></div>
+        </section>
+
+        <h3>Three mastery levels</h3>
+        <div class="pillar-grid">
+          <article class="pillar-card"><span class="pillar-card__n">1</span><h3>Reader</h3><p>Can name the architecture, hierarchy, and workflow; can distinguish demo from clone.</p></article>
+          <article class="pillar-card"><span class="pillar-card__n">2</span><h3>Auditor</h3><p>Can inspect tools/domains, trace token and preview mechanisms, and grade claims from files.</p></article>
+          <article class="pillar-card"><span class="pillar-card__n">3</span><h3>Harness engineer</h3><p>Can safely retarget roles, compose a workflow, test model recovery, and preserve evidence.</p></article>
+        </div>
+
+        <div class="teach-back">
+          <h3>Final teach-back · seven minutes, no chapter</h3>
+          <p>Teach a skeptical engineer why this is not “agents making pretty screens.” Your explanation must include: the six-part harness; problem class versus task; one-interface invariant; role intent versus hard capability; one persistent-memory rule; all eight generate stages; one recovery path; two clone-versus-demo differences; and the role of the meta-agent. End by drawing a trust ladder: inspect → bound → run → validate → compare → expand.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">13</span>
+        <h2 class="section-title">Glossary</h2>
+        <dl class="glossary-list">
+          <div><dt>Agent harness</dt><dd>The system around the model: deterministic code, token caching, orchestration, prompts, skills, and model control; in practice also tools, permissions, state, and observability.</dd></div>
+          <div><dt>Harness engineering</dt><dd>Designing and owning that system so agents can reliably operate a domain rather than answer isolated requests.</dd></div>
+          <div><dt>Core Four</dt><dd>Context, model, prompt, and tools. UI Agents configures them per role and adds path-scoped <code>domain</code> permissions.</dd></div>
+          <div><dt>Domain</dt><dd>Front-matter rules granting read, upsert, and delete capability on named paths. The operational lane of an agent.</dd></div>
+          <div><dt>Orchestrator</dt><dd>The one human-facing agent that classifies, delegates, tracks, and synthesizes across teams.</dd></div>
+          <div><dt>Lead</dt><dd>A domain coordinator that interprets work, creates briefs, delegates to workers, and synthesizes. In the committed asset, some leads retain emergency product-write capability.</dd></div>
+          <div><dt>Worker</dt><dd>A bounded doer that implements an assignment with the tools and upsertable paths required for its role.</dd></div>
+          <div><dt>Validator</dt><dd>A read-only product judge that captures evidence and reports PASS/FAIL without silently repairing the artifact.</dd></div>
+          <div><dt>Delegate</dt><dd>A literal orchestration tool that routes a question to a team lead or, from a lead, to a named member.</dd></div>
+          <div><dt>Till-done list</dt><dd>An Orchestrator-managed set of discrete, verifiable work items that remain active until complete. It is not embedded in committed <code>generate.md</code>.</dd></div>
+          <div><dt>Mental model / expertise file</dt><dd>A persistent, structured YAML owned by one agent role, read at task start and curated after meaningful work.</dd></div>
+          <div><dt>Problem class</dt><dd>A recurring family of outcomes addressed by one reusable system; here, brand-consistent generation, validation, organization, preview, fork, and rebrand of UI variants.</dd></div>
+          <div><dt>Brand → Product → Tree → Branch → Leaf</dt><dd>The Infinite UI address hierarchy. A Leaf is the generated <code>index.vue</code> inside one Branch variant.</dd></div>
+          <div><dt>Round-robin</dt><dd>Assignment pattern 1→A, 2→B, 3→C, 4→A, repeated for generation and validation.</dd></div>
+          <div><dt>Graceful failure</dt><dd>Containment and recovery that keep one worker or model fault from terminating the whole workflow.</dd></div>
+          <div><dt>Meta-agent</dt><dd>An agent whose object of work is the agentic system itself rather than the product artifact it produces.</dd></div>
+          <div><dt>Aegis</dt><dd>The one real brand committed in the course asset, an agent-security product identity. “Egis” in transcript text refers to Aegis.</dd></div>
+          <div><dt>Pi coding agent</dt><dd>The granular agent runtime used for the multi-team UI harness. “Pie” or “Py” transcript variants refer to Pi.</dd></div>
+        </dl>
+
+        <aside class="callout callout--why"><p class="callout__label">Keep learning with the agent</p><p>Ask your coding agent to quiz you from the closed-book questions, inspect one front-matter contract with you, or challenge your evidence sheet. Do not ask it to replace the lab run with a summary; use it to tighten the feedback loop around real files.</p></aside>
+      </section>
+
+      <footer class="chapter-footer">
+        <p><strong>Infinite UI Agents</strong> · MA-3 · IndyDevDan Expert Book</p>
+        <p>Next: The Pi Verifier Agent · Return to the <a href="../index.html">book hub</a></p>
+        <p class="source-note">Primary teaching sources: the MA-3 course transcript, extracted 4K lesson frames, and the committed <code>agentic-horizon-extras/ui-agents</code> course codebase. Model names and live-demo state are dated to the April 2026 recording; committed-file claims were rechecked for this chapter.</p>
+      </footer>
+    
+      <p class="code-deep-link"><a href="../code/ma-3-ui-agents.html">Code deep-dive · how Dan built this repo →</a></p>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          progressFramePending = false;
+        });
+      };
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => {
+          const active = link.getAttribute('href') === `#${visible.target.id}`;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+
+      sections.forEach(section => observer.observe(section));
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+</body>
+</html>

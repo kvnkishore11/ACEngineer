@@ -1,0 +1,424 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550">
+  <defs>
+    <style>
+      /* ── Fonts ── */
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;family=Inter:wght@500;700&amp;display=swap');
+
+      /* ── Base ── */
+      .bg { fill: #000000; }
+      .title {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+        fill: #e0e0ff;
+        text-anchor: middle;
+      }
+      .subtitle {
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        font-size: 12px;
+        fill: #6a6a8a;
+        text-anchor: middle;
+      }
+
+      /* ── Code editor chrome ── */
+      .editor-bg  { fill: #12122a; rx: 8; ry: 8; }
+      .editor-bar { fill: #1a1a35; }
+      .dot-r { fill: #ff5f57; }
+      .dot-y { fill: #ffbd2e; }
+      .dot-g { fill: #28c840; }
+      .tab-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 9px;
+        fill: #8888aa;
+      }
+      .line-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9.5px;
+        fill: #3a3a5a;
+        text-anchor: end;
+      }
+
+      /* ── YAML syntax colours ── */
+      .yaml-key {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        fill: #ff6e96;
+      }
+      .yaml-val {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        fill: #fede5d;
+      }
+      .yaml-str {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        fill: #72f1b8;
+      }
+      .yaml-comment {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        fill: #3a3a5a;
+      }
+      .yaml-punct {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        fill: #6a6a8a;
+      }
+
+      /* ── Section dividers ── */
+      .section-bracket {
+        fill: none;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .bracket-1 { stroke: #ff6e96; }
+      .bracket-2 { stroke: #36f9f6; }
+      .bracket-3 { stroke: #ff9e64; }
+
+      /* ── Callout boxes ── */
+      .callout-bg {
+        rx: 6; ry: 6;
+        stroke-width: 1;
+      }
+      .cb-1 { fill: #1e0a1a; stroke: #ff6e96; }
+      .cb-2 { fill: #0a1a1e; stroke: #36f9f6; }
+      .cb-3 { fill: #1e150a; stroke: #ff9e64; }
+      .callout-title {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 10px;
+      }
+      .ct-1 { fill: #ff6e96; }
+      .ct-2 { fill: #36f9f6; }
+      .ct-3 { fill: #ff9e64; }
+      .callout-body {
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        font-size: 9px;
+        fill: #9999bb;
+      }
+
+      /* ── Callout arrows ── */
+      .arrow-line {
+        fill: none;
+        stroke-width: 1.2;
+        stroke-dasharray: 4 3;
+        stroke-linecap: round;
+      }
+      .al-1 { stroke: #ff6e96; }
+      .al-2 { stroke: #36f9f6; }
+      .al-3 { stroke: #ff9e64; }
+
+      /* ── Board member colour dots ── */
+      .dot-revenue   { fill: #ff7edb; }
+      .dot-product   { fill: #fede5d; }
+      .dot-technical { fill: #ff6e96; }
+      .dot-contrarian{ fill: #ff9e64; }
+
+      /* ═══════════════════════════════════
+         ANIMATIONS
+         ═══════════════════════════════════ */
+
+      /* Phase 1 — section reveal (top-to-bottom, 2 s apart) */
+      .section-1 {
+        opacity: 0;
+        animation: fadeInUp 0.8s ease-out 0.4s forwards;
+      }
+      .section-2 {
+        opacity: 0;
+        animation: fadeInUp 0.8s ease-out 2.4s forwards;
+      }
+      .section-3 {
+        opacity: 0;
+        animation: fadeInUp 0.8s ease-out 4.4s forwards;
+      }
+
+      /* Callout arrows draw-in after each section */
+      .callout-group-1 {
+        opacity: 0;
+        animation: fadeIn 0.6s ease-out 1.4s forwards;
+      }
+      .arrow-draw-1 {
+        stroke-dasharray: 80;
+        stroke-dashoffset: 80;
+        animation: drawLine 0.7s ease-out 1.2s forwards;
+      }
+      .callout-group-2 {
+        opacity: 0;
+        animation: fadeIn 0.6s ease-out 3.4s forwards;
+      }
+      .arrow-draw-2 {
+        stroke-dasharray: 80;
+        stroke-dashoffset: 80;
+        animation: drawLine 0.7s ease-out 3.2s forwards;
+      }
+      .callout-group-3 {
+        opacity: 0;
+        animation: fadeIn 0.6s ease-out 5.4s forwards;
+      }
+      .arrow-draw-3 {
+        stroke-dasharray: 80;
+        stroke-dashoffset: 80;
+        animation: drawLine 0.7s ease-out 5.2s forwards;
+      }
+
+      /* Phase 2 — board member dots pulse (starts after all sections) */
+      .pulse-dot {
+        animation: pulse 2s ease-in-out 6.4s infinite;
+      }
+      .pulse-dot-2 { animation-delay: 6.7s; }
+      .pulse-dot-3 { animation-delay: 7.0s; }
+      .pulse-dot-4 { animation-delay: 7.3s; }
+
+      /* Editor chrome fade-in */
+      .editor-chrome {
+        opacity: 0;
+        animation: fadeIn 0.6s ease-out 0s forwards;
+      }
+
+      /* ── Keyframes ── */
+      @keyframes fadeInUp {
+        0%   { opacity: 0; transform: translateY(12px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeIn {
+        0%   { opacity: 0; }
+        100% { opacity: 1; }
+      }
+      @keyframes drawLine {
+        0%   { stroke-dashoffset: 80; }
+        100% { stroke-dashoffset: 0; }
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; r: 4; }
+        50%      { opacity: 0.5; r: 6; }
+      }
+    </style>
+  </defs>
+
+  <!-- ═══ Background ═══ -->
+  <rect class="bg" width="800" height="550"/>
+
+  <!-- ═══ Title ═══ -->
+  <text class="title" x="400" y="32">One YAML. Complete Control.</text>
+  <text class="subtitle" x="400" y="48">Board Configuration — One YAML File</text>
+
+  <!-- ═══ Editor chrome ═══ -->
+  <g class="editor-chrome">
+    <!-- Editor outer frame -->
+    <rect class="editor-bg" x="40" y="60" width="480" height="472" rx="8" ry="8"/>
+    <!-- Title bar -->
+    <rect class="editor-bar" x="40" y="60" width="480" height="24" rx="8" ry="8"/>
+    <rect fill="#1a1a35" x="40" y="76" width="480" height="8"/>
+    <!-- Traffic lights -->
+    <circle class="dot-r" cx="56" cy="72" r="4.5"/>
+    <circle class="dot-y" cx="70" cy="72" r="4.5"/>
+    <circle class="dot-g" cx="84" cy="72" r="4.5"/>
+    <!-- Tab -->
+    <text class="tab-text" x="120" y="75">ceo-and-board-configuration.yaml</text>
+    <!-- Gutter background -->
+    <rect fill="#0e0e24" x="40" y="84" width="32" height="448" rx="0" ry="0"/>
+    <rect fill="#0e0e24" x="40" y="524" width="480" height="8" rx="0" ry="8"/>
+  </g>
+
+  <!-- ═══════════════════════════════════════
+       SECTION 1: meeting:  (lines 1-8)
+       ═══════════════════════════════════════ -->
+  <g class="section-1">
+    <!-- Line 1: YAML separator -->
+    <text class="line-num" x="66" y="102">1</text>
+    <text class="yaml-punct" x="78" y="102">---</text>
+
+    <!-- Line 2: meeting: -->
+    <text class="line-num" x="66" y="116">2</text>
+    <text class="yaml-key" x="78" y="116">meeting:</text>
+
+    <!-- Line 3:   constraints: -->
+    <text class="line-num" x="66" y="130">3</text>
+    <text class="yaml-key" x="78" y="130">  constraints:</text>
+
+    <!-- Line 4:     min_time_minutes: 1 -->
+    <text class="line-num" x="66" y="144">4</text>
+    <text class="yaml-key" x="78" y="144">    min_time_minutes:</text>
+    <text class="yaml-val" x="206" y="144"> 1</text>
+
+    <!-- Line 5:     max_time_minutes: 3 -->
+    <text class="line-num" x="66" y="158">5</text>
+    <text class="yaml-key" x="78" y="158">    max_time_minutes:</text>
+    <text class="yaml-val" x="206" y="158"> 3</text>
+
+    <!-- Line 6:     min_budget: $1 -->
+    <text class="line-num" x="66" y="172">6</text>
+    <text class="yaml-key" x="78" y="172">    min_budget:</text>
+    <text class="yaml-val" x="164" y="172"> $1</text>
+
+    <!-- Line 7:     max_budget: $5 -->
+    <text class="line-num" x="66" y="186">7</text>
+    <text class="yaml-key" x="78" y="186">    max_budget:</text>
+    <text class="yaml-val" x="164" y="186"> $5</text>
+
+    <!-- Line 8:   editor: 'code' -->
+    <text class="line-num" x="66" y="200">8</text>
+    <text class="yaml-key" x="78" y="200">  editor:</text>
+    <text class="yaml-str" x="134" y="200"> 'code'</text>
+
+    <!-- Section bracket -->
+    <path class="section-bracket bracket-1"
+          d="M508 98 L518 98 L518 200 L508 200"/>
+  </g>
+
+  <!-- Callout 1 -->
+  <line class="arrow-line al-1 arrow-draw-1" x1="520" y1="149" x2="568" y2="149"/>
+  <g class="callout-group-1">
+    <rect class="callout-bg cb-1" x="572" y="124" width="190" height="50"/>
+    <text class="callout-title ct-1" x="588" y="142">Time &amp; Budget Guardrails</text>
+    <text class="callout-body" x="588" y="156">Constrain how long and how much</text>
+    <text class="callout-body" x="588" y="167">each board meeting can consume.</text>
+  </g>
+
+  <!-- ═══════════════════════════════════════
+       SECTION 2: paths:  (lines 9-13)
+       ═══════════════════════════════════════ -->
+  <g class="section-2">
+    <!-- Line 9: paths: -->
+    <text class="line-num" x="66" y="224">9</text>
+    <text class="yaml-key" x="78" y="224">paths:</text>
+
+    <!-- Line 10:   briefs: -->
+    <text class="line-num" x="66" y="238">10</text>
+    <text class="yaml-key" x="78" y="238">  briefs:</text>
+    <text class="yaml-str" x="128" y="238"> .pi/ceo-agents/briefs/</text>
+
+    <!-- Line 11:   deliberations: -->
+    <text class="line-num" x="66" y="252">11</text>
+    <text class="yaml-key" x="78" y="252">  deliberations:</text>
+    <text class="yaml-str" x="167" y="252"> .pi/ceo-agents/deliberations/</text>
+
+    <!-- Line 12:   memos: -->
+    <text class="line-num" x="66" y="266">12</text>
+    <text class="yaml-key" x="78" y="266">  memos:</text>
+    <text class="yaml-str" x="123" y="266"> .pi/ceo-agents/memos/</text>
+
+    <!-- Line 13:   agents: -->
+    <text class="line-num" x="66" y="280">13</text>
+    <text class="yaml-key" x="78" y="280">  agents:</text>
+    <text class="yaml-str" x="128" y="280"> .pi/ceo-agents/agents/</text>
+
+    <!-- Section bracket -->
+    <path class="section-bracket bracket-2"
+          d="M508 220 L518 220 L518 284 L508 284"/>
+  </g>
+
+  <!-- Callout 2 -->
+  <line class="arrow-line al-2 arrow-draw-2" x1="520" y1="252" x2="568" y2="252"/>
+  <g class="callout-group-2">
+    <rect class="callout-bg cb-2" x="572" y="228" width="190" height="50"/>
+    <text class="callout-title ct-2" x="588" y="246">Where Everything Lives</text>
+    <text class="callout-body" x="588" y="260">Briefs, deliberations, memos, and</text>
+    <text class="callout-body" x="588" y="271">agent personas — all configurable.</text>
+  </g>
+
+  <!-- ═══════════════════════════════════════
+       SECTION 3: board:  (lines 14-38)
+       ═══════════════════════════════════════ -->
+  <g class="section-3">
+    <!-- Line 14: board: -->
+    <text class="line-num" x="66" y="304">14</text>
+    <text class="yaml-key" x="78" y="304">board:</text>
+
+    <!-- ── Revenue ── -->
+    <text class="line-num" x="66" y="318">15</text>
+    <text class="yaml-punct" x="78" y="318">  -</text>
+    <text class="yaml-key" x="93" y="318"> name:</text>
+    <text class="yaml-val" x="130" y="318"> Revenue</text>
+    <circle class="dot-revenue pulse-dot" cx="498" cy="314" r="4"/>
+
+    <text class="line-num" x="66" y="332">16</text>
+    <text class="yaml-key" x="90" y="332">    path:</text>
+    <text class="yaml-str" x="127" y="332"> .pi/ceo-agents/agents/revenue.md</text>
+
+    <text class="line-num" x="66" y="346">17</text>
+    <text class="yaml-key" x="90" y="346">    color:</text>
+    <text class="yaml-str" x="133" y="346"> "#ff7edb"</text>
+
+    <!-- ── Product Strategist ── -->
+    <text class="line-num" x="66" y="360">18</text>
+    <text class="yaml-punct" x="78" y="360">  -</text>
+    <text class="yaml-key" x="93" y="360"> name:</text>
+    <text class="yaml-val" x="130" y="360"> Product Strategist</text>
+    <circle class="dot-product pulse-dot pulse-dot-2" cx="498" cy="356" r="4"/>
+
+    <text class="line-num" x="66" y="374">19</text>
+    <text class="yaml-key" x="90" y="374">    path:</text>
+    <text class="yaml-str" x="127" y="374"> .../product-strategist.md</text>
+
+    <text class="line-num" x="66" y="388">20</text>
+    <text class="yaml-key" x="90" y="388">    color:</text>
+    <text class="yaml-str" x="133" y="388"> "#fede5d"</text>
+
+    <!-- ── Technical Architect ── -->
+    <text class="line-num" x="66" y="402">21</text>
+    <text class="yaml-punct" x="78" y="402">  -</text>
+    <text class="yaml-key" x="93" y="402"> name:</text>
+    <text class="yaml-val" x="130" y="402"> Technical Architect</text>
+    <circle class="dot-technical pulse-dot pulse-dot-3" cx="498" cy="398" r="4"/>
+
+    <text class="line-num" x="66" y="416">22</text>
+    <text class="yaml-key" x="90" y="416">    path:</text>
+    <text class="yaml-str" x="127" y="416"> .../technical-architect.md</text>
+
+    <text class="line-num" x="66" y="430">23</text>
+    <text class="yaml-key" x="90" y="430">    color:</text>
+    <text class="yaml-str" x="133" y="430"> "#ff6e96"</text>
+
+    <!-- ── Contrarian ── -->
+    <text class="line-num" x="66" y="444">24</text>
+    <text class="yaml-punct" x="78" y="444">  -</text>
+    <text class="yaml-key" x="93" y="444"> name:</text>
+    <text class="yaml-val" x="130" y="444"> Contrarian</text>
+    <circle class="dot-contrarian pulse-dot pulse-dot-4" cx="498" cy="440" r="4"/>
+
+    <text class="line-num" x="66" y="458">25</text>
+    <text class="yaml-key" x="90" y="458">    path:</text>
+    <text class="yaml-str" x="127" y="458"> .../contrarian.md</text>
+
+    <text class="line-num" x="66" y="472">26</text>
+    <text class="yaml-key" x="90" y="472">    color:</text>
+    <text class="yaml-str" x="133" y="472"> "#ff9e64"</text>
+
+    <!-- ── Commented-out members ── -->
+    <text class="line-num" x="66" y="490">27</text>
+    <text class="yaml-comment" x="78" y="490">  # - name: Compounder</text>
+
+    <text class="line-num" x="66" y="504">28</text>
+    <text class="yaml-comment" x="78" y="504">  # - name: Customer Oracle</text>
+
+    <text class="line-num" x="66" y="518">29</text>
+    <text class="yaml-comment" x="78" y="518">  # - name: Market Strategist</text>
+
+    <text class="line-num" x="66" y="532">30</text>
+    <text class="yaml-comment" x="78" y="532">  # - name: Moonshot</text>
+
+    <!-- Section bracket -->
+    <path class="section-bracket bracket-3"
+          d="M508 300 L518 300 L518 534 L508 534"/>
+  </g>
+
+  <!-- Callout 3 -->
+  <line class="arrow-line al-3 arrow-draw-3" x1="520" y1="416" x2="568" y2="370"/>
+  <g class="callout-group-3">
+    <rect class="callout-bg cb-3" x="572" y="338" width="196" height="64"/>
+    <text class="callout-title ct-3" x="588" y="356">Your Custom Board</text>
+    <text class="callout-body" x="588" y="370">Activate who you need — uncomment</text>
+    <text class="callout-body" x="588" y="381">to add Compounder, Customer Oracle,</text>
+    <text class="callout-body" x="588" y="392">Market Strategist, or Moonshot.</text>
+  </g>
+
+  <!-- ═══ Decorative corner marks ═══ -->
+  <path d="M8 20 L8 8 L20 8" fill="none" stroke="#2a2a4a" stroke-width="1.5"/>
+  <path d="M780 8 L792 8 L792 20" fill="none" stroke="#2a2a4a" stroke-width="1.5"/>
+  <path d="M792 530 L792 542 L780 542" fill="none" stroke="#2a2a4a" stroke-width="1.5"/>
+  <path d="M20 542 L8 542 L8 530" fill="none" stroke="#2a2a4a" stroke-width="1.5"/>
+</svg>

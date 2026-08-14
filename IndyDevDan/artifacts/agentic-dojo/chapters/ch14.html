@@ -1,0 +1,292 @@
+<section class="chapter" id="ch14">
+  <div class="wrap wide">
+    <span class="chapnum reveal">14 — Vol II · Lesson 5</span>
+    <div class="kicker reveal">agent experts · act, learn, reuse</div>
+    <h2 class="title reveal d1" style="max-width:26ch">One executes and forgets. The other executes and <em>learns</em>.</h2>
+    <p class="lede reveal d2">The massive problem with agents is that they forget — which means they don't learn. An agent expert is "a concrete form of a self-improving template meta prompt": it acts, learns, and reuses its own expertise at runtime, with no human in the loop.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">AH-5</span><span class="pill olive">act · learn · reuse</span><span class="pill amber">expertise.yaml</span><span class="pill plum">meta-agentics</span><span class="pill blue">mental model</span></div>
+
+    <div class="chapnav reveal d3"><span class="cnl">In this chapter</span>
+      <a href="#ch14-s1"><b>1</b>The Idea</a>
+      <a href="#ch14-s2"><b>2</b>The Nuggets</a>
+      <a href="#ch14-s3"><b>3</b>What Dan Did</a>
+      <a href="#ch14-s4"><b>4</b>The Workout</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch14-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Idea</h2></div>
+
+    <div class="spread reveal d1" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Your agents forget. An expert doesn't — because it carries its own mental model with it, and updates it after every job.</p>
+        <p>The expert's secret is a <strong>mental-model data structure</strong> — an expertise file. And Dan is emphatic about what it is <em>not</em>: "This is not a source of truth... You have a working memory file. You have a mental model, a data structure that you constantly update." <strong>"The true source of truth is always the code."</strong> He keeps his in YAML with a MAX_LINES cap (1000) that the agent enforces on itself.</p>
+        <p><strong>Seeding</strong> creates version one: "Ideally you run your self-improve prompt and it creates the expertise from blank... rerun it until your agent stops finding new things."</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 620 330" role="img" aria-label="The act, learn, reuse loop cycling around an expertise.yaml mental-model file">
+          <rect x="235" y="130" width="150" height="74" rx="10" class="s-amber-f"/>
+          <text x="310" y="156" text-anchor="middle" class="s-label">expertise.yaml</text>
+          <text x="310" y="172" text-anchor="middle" class="s-label-sm">mental model · MAX 1000 lines</text>
+          <text x="310" y="188" text-anchor="middle" class="s-label-sm">the code is the source of truth</text>
+          <rect x="250" y="18" width="120" height="50" rx="10" class="s-clay-f"/>
+          <text x="310" y="40" text-anchor="middle" class="s-title">ACT</text>
+          <text x="310" y="56" text-anchor="middle" class="s-label-sm">take a useful action</text>
+          <rect x="430" y="240" width="150" height="50" rx="10" class="s-blue-f"/>
+          <text x="505" y="262" text-anchor="middle" class="s-title">LEARN</text>
+          <text x="505" y="278" text-anchor="middle" class="s-label-sm">self-improve prompt</text>
+          <rect x="40" y="240" width="150" height="50" rx="10" class="s-olive-f"/>
+          <text x="115" y="262" text-anchor="middle" class="s-title">REUSE</text>
+          <text x="115" y="278" text-anchor="middle" class="s-label-sm">plan / question read it first</text>
+          <path d="M375 50 C 500 70 505 150 505 232" class="s-flow"/><path d="M499 230 L511 230 L505 240 Z" class="s-clay"/>
+          <path d="M430 272 C 370 312 250 312 200 272" class="s-flow"/><path d="M202 262 L202 276 L190 268 Z" class="s-clay"/>
+          <path d="M112 238 C 90 120 150 60 240 42" class="s-flow"/><path d="M240 36 L250 42 L240 48 Z" class="s-clay"/>
+          <path d="M445 240 C 420 216 405 206 390 198" class="s-line" style="stroke-dasharray:5 5"/>
+          <text x="452" y="212" text-anchor="middle" class="s-label-sm">writes</text>
+          <path d="M235 198 C 200 216 175 228 152 238" class="s-line" style="stroke-dasharray:5 5"/>
+          <text x="168" y="210" text-anchor="middle" class="s-label-sm">reads</text>
+          <text x="520" y="28" text-anchor="middle" class="s-label-sm">no human in the loop</text>
+        </svg>
+        <div class="fcap"><b>Act, learn, reuse.</b> The build step acts; self-improve validates and surgically updates expertise.yaml; the next plan or question reads the mental model first instead of searching.</div>
+      </div>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal d1"><span class="cnum">01</span>
+        <p class="ctitle">Act</p>
+        <p class="cbody">Take a <em>useful</em> action — e.g. the build step. Meta-agentics act but don't learn, "so they are not agent experts."</p></div>
+      <div class="card blue reveal d2"><span class="cnum">02</span>
+        <p class="ctitle">Learn</p>
+        <p class="cbody">Store new information — the self-improve prompt updating the expertise file after the work is done.</p></div>
+      <div class="card olive reveal d3"><span class="cnum">03</span>
+        <p class="ctitle">Reuse</p>
+        <p class="cbody">Apply that expertise on the next execution — the plan and question prompts read the expertise file <em>first</em>.</p></div>
+    </div>
+
+    <div class="spread reveal d2" style="align-items:center">
+      <div class="prose">
+        <p><strong>Meta-agentics</strong> sit beside experts: "meta prompts, meta agents and meta skills... they help you build elements of the system that builds the system." Dan's rule: <em>"Every codebase must have meta agentics."</em></p>
+        <p>The <strong>self-improve prompt</strong> is the learn step's anatomy: check git diff (conditional) → read current expertise → validate against the codebase → identify discrepancies → update expertise → enforce the line limit + validate YAML (closed loops). Its key lines: "Prioritize actionable, high value expertise over verbose documentation," and "after your thorough search, there may be nothing to do — this is perfectly acceptable."</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 880 210" role="img" aria-label="The six-stage self-improve pipeline with a closed validation loop at the end">
+          <rect x="16" y="64" width="118" height="56" rx="9" class="s-clay-f"/>
+          <text x="75" y="88" text-anchor="middle" class="s-label-sm">check git diff</text>
+          <text x="75" y="102" text-anchor="middle" class="s-label-sm">(conditional)</text>
+          <path d="M134 92 H148" class="s-flow"/><path d="M148 86 L156 92 L148 98 Z" class="s-clay"/>
+          <rect x="158" y="64" width="118" height="56" rx="9" class="s-card"/>
+          <text x="217" y="88" text-anchor="middle" class="s-label-sm">read current</text>
+          <text x="217" y="102" text-anchor="middle" class="s-label-sm">expertise</text>
+          <path d="M276 92 H290" class="s-flow"/><path d="M290 86 L298 92 L290 98 Z" class="s-clay"/>
+          <rect x="300" y="64" width="118" height="56" rx="9" class="s-blue-f"/>
+          <text x="359" y="88" text-anchor="middle" class="s-label-sm">validate against</text>
+          <text x="359" y="102" text-anchor="middle" class="s-label-sm">the codebase</text>
+          <path d="M418 92 H432" class="s-flow"/><path d="M432 86 L440 92 L432 98 Z" class="s-clay"/>
+          <rect x="442" y="64" width="118" height="56" rx="9" class="s-plum-f"/>
+          <text x="501" y="88" text-anchor="middle" class="s-label-sm">identify</text>
+          <text x="501" y="102" text-anchor="middle" class="s-label-sm">discrepancies</text>
+          <path d="M560 92 H574" class="s-flow"/><path d="M574 86 L582 92 L574 98 Z" class="s-clay"/>
+          <rect x="584" y="64" width="118" height="56" rx="9" class="s-amber-f"/>
+          <text x="643" y="88" text-anchor="middle" class="s-label-sm">update</text>
+          <text x="643" y="102" text-anchor="middle" class="s-label-sm">expertise</text>
+          <path d="M702 92 H716" class="s-flow"/><path d="M716 86 L724 92 L716 98 Z" class="s-clay"/>
+          <rect x="726" y="64" width="118" height="56" rx="9" class="s-olive-f"/>
+          <text x="785" y="88" text-anchor="middle" class="s-label-sm">closed loops</text>
+          <text x="785" y="102" text-anchor="middle" class="s-label-sm">line cap + YAML</text>
+          <path d="M785 60 C 785 28 643 28 643 56" class="s-line" style="stroke-dasharray:5 5"/>
+          <path d="M637 52 L649 52 L643 62 Z" class="s-dim"/>
+          <text x="714" y="24" text-anchor="middle" class="s-label-sm">fix and re-check</text>
+          <text x="440" y="158" text-anchor="middle" class="s-label-sm">"there may be nothing to do — this is perfectly acceptable"</text>
+          <text x="440" y="182" text-anchor="middle" class="s-label-sm">seeding: run it on a blank file; rerun until the agent stops finding new things</text>
+        </svg>
+        <div class="fcap"><b>The learn step, drawn.</b> Conditional git diff in, surgical YAML out — with closed loops enforcing MAX_LINES and valid YAML before the agent may finish.</div>
+      </div>
+    </div>
+
+    <div class="compare reveal d2">
+      <div class="col good"><span class="clabel">◵ deploy experts where</span>
+        <ul>
+          <li>Billing — Dan's #1: "literally saved me money"</li>
+          <li>Database · DevOps · 3–4-way integrations</li>
+          <li>ML / data science · API (front/back sync)</li>
+          <li>Data types &amp; models across microservices</li>
+          <li>"The higher the risk, the higher the intensity, experts are really great here."</li>
+          <li>Product experts: per-user expertise files powering adaptive, generative UI — "personalization to the max"</li>
+        </ul>
+      </div>
+      <div class="col bad"><span class="clabel">◴ skip the expert when</span>
+        <ul>
+          <li>The problem doesn't evolve</li>
+          <li>Simple or brand-new codebases</li>
+          <li>"If you yourself do not have a mental model in place... you will build an expert that can't solve the problem because you can't."</li>
+          <li>Known trade-offs: seeding, the "another source of truth" objection, finite context, false expertise, too-granular expertise, too many experts</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch14-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Nuggets</h2></div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal d1"><span class="cnum">01</span>
+        <p class="ctitle">Agents forget</p>
+        <p class="cbody">"Traditional software improves as it's used... Agents of today don't. Your agents forget. And that means your agents don't learn."</p></div>
+      <div class="card olive reveal d2"><span class="cnum">02</span>
+        <p class="ctitle">In their DNA</p>
+        <p class="cbody">"You don't need to tell an expert to learn. It's in their DNA." — "Real experts don't relearn their craft every time they have a new task."</p></div>
+      <div class="card blue reveal d3"><span class="cnum">03</span>
+        <p class="ctitle">The differentiator</p>
+        <p class="cbody">"It first reads this expertise file... It didn't need to go search or find these files. It knew where they were. This is the differentiated factor of an agent expert."</p></div>
+      <div class="card plum reveal d2"><span class="cnum">04</span>
+        <p class="ctitle">Surgical changes</p>
+        <p class="cbody">"I get super hyped when agents change just the right things... I wanna see surgical changes."</p></div>
+      <div class="card amber reveal d3"><span class="cnum">05</span>
+        <p class="ctitle">Revenue-catching</p>
+        <p class="cbody">"My agentic experts have caught revenue changing details in these systems."</p></div>
+      <div class="card accent reveal d4"><span class="cnum">06</span>
+        <p class="ctitle">Compounding value</p>
+        <p class="cbody">"If your product is successful, it will grow in complexity and speciality. As that happens, agent experts become more and more valuable."</p></div>
+    </div>
+
+    <div class="compare reveal d2">
+      <div class="col bad"><span class="clabel">◴ memory files</span>
+        <ul>
+          <li>"Global forced context that always loads"</li>
+          <li>Same tokens for every task, every session</li>
+          <li>A generalist "that forgets every time they work"</li>
+        </ul>
+      </div>
+      <div class="col good"><span class="clabel">◵ expertise files</span>
+        <ul>
+          <li>"Expertise requires breaking rules when the time is right"</li>
+          <li>Loaded by the expert's own prompts, when relevant</li>
+          <li>"An expert that remembers"</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="spread rev reveal d2" style="align-items:center">
+      <div class="quote big"><p>One executes and forgets, the other executes and learns.</p>
+        <span class="cite" style="display:block;margin-top:10px">— the quote of the lesson: "The difference between a generic agent and an agent expert is simple."</span></div>
+      <div class="prose">
+        <ul>
+          <li>"Build the system that builds the system. Do not work on the application layer. You're wasting your time."</li>
+          <li>"This mental model is simply put a data structure that evolves over time."</li>
+          <li>"You don't have a source of truth in your mind. You have a working memory file."</li>
+          <li>"Give your agents a mental model by giving them an expertise file."</li>
+          <li>"There is no codebase I create that does not have meta agentics."</li>
+          <li>"Three times marks a pattern" — hence the meta expert that generates whole expert prompt sets.</li>
+          <li>"More compute equals more confidence" — "sometimes if you throw five agents at the problem... you compose that together, you get a better result."</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="spread reveal d3" style="align-items:center">
+      <div class="prose">
+        <ul>
+          <li>"It's their mental model, not yours" — steer toward autonomy over prescription.</li>
+          <li>"Your mental model doesn't infinitely grow... once you get to a certain level, you just forget. That is okay."</li>
+          <li>"Prompt first so that you can execute it by hand manually... then scale it into whatever abstraction you want" — skill, sub-agent, custom agent: "everything becomes the core four."</li>
+          <li>"Do you want a generalist working on your codebase that forgets every time they work? Or do you want an expert that remembers?"</li>
+        </ul>
+      </div>
+      <div class="callout warn"><span class="ci">HANDS OFF THE YAML</span>
+        <span class="cc">"If there's something we don't like, we're not going to update the expertise file... you wanna update the self-improve step that operates your expertise." — <strong>"Don't directly update this expertise file. Teach your agents how to directly update it."</strong></span></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch14-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What Dan Did</h2></div>
+
+    <div class="spread reveal d1" style="align-items:start">
+      <div>
+        <div class="filetree reveal"><span class="d">.claude/commands/experts/</span>
+  <span class="d">database/</span>
+    <span class="f hl">expertise.yaml</span>      <span class="c"># the mental model</span>
+    <span class="f">question.md</span>         <span class="c"># reuse</span>
+    <span class="f">self-improve.md</span>     <span class="c"># learn</span>
+  <span class="d">websocket/</span>
+    <span class="f hl">expertise.yaml</span>
+    <span class="f">plan.md</span>             <span class="c"># reuse</span>
+    <span class="f">question.md</span>
+    <span class="f">self-improve.md</span>
+    <span class="f">plan_build_improve.md</span>  <span class="c"># act–learn–reuse, chained</span></div>
+        <div class="codecap">the expert commands, as run</div>
+        <div class="code"><pre>/experts:database:question "how does information flow between our database tables"
+/experts:database:self-improve
+/experts:websocket:plan_build_improve "add a session-based counter to the app
+  nav bar that displays total WebSocket events"</pre></div>
+      </div>
+      <ol class="steps">
+        <li><h4>Meta-agentics demo</h4><p><span class="mono">/meta_prompt</span> generated <span class="mono">question-w-mermaid-diagrams.md</span>; the meta-agent (an agent that writes new sub-agent files to <span class="mono">.claude/agents/</span>) generated a planner agent; a meta skill generated a start-orchestrator skill that boots the AH-4 app and opens Chrome.</p></li>
+        <li><h4>The database expert</h4><p>The question prompt read <span class="mono">expertise.yaml</span> first, validated against code, and wrote a report with an ER mermaid diagram. The expertise: "lightweight pydantic models over raw SQL, no heavy ORM," plus file paths, line numbers, query patterns, migrations. Self-improve confirmed the mental model in sync — line-count check + YAML compile as closed loops. Note: Reuse + Learn but <strong>no Act step — a partial expert</strong>.</p></li>
+        <li><h4>The WebSocket expert, full loop</h4><p><span class="mono">plan_build_improve</span> chained three sub-agents via the Task tool: plan (80K tokens, expertise-informed), build (61K tokens, 41 tool uses), self-improve with CHECK_GIT_DIFF=true — the expertise gained the new counter event, session state, and line numbers. The feature one-shotted.</p></li>
+        <li><h4>Experts at fleet scale</h4><p>Through the AH-4 orchestrator: "create three agents and run <span class="mono">/experts:websocket:question</span>" — three parallel experts, non-deterministic consumed-file sets, one failed, and the orchestrator synthesized the answer (21 event types). Then it offered "create three more experts using the Opus model... to ultra validate."</p></li>
+        <li><h4>The product expert ("Niall")</h4><p>A shopping app keeping a per-user expertise data structure (viewed products, cart adds, checkouts) updated on every action; the agent regenerates personalized landing-page sections — generative UI — on return. Opus for generation quality, dropped to Haiku for speed.</p></li>
+      </ol>
+    </div>
+
+    <div class="stats reveal d2">
+      <div class="stat"><div class="sv">80K</div><div class="sl">tokens in the expertise-informed plan step</div></div>
+      <div class="stat blue"><div class="sv">41</div><div class="sl">tool uses in the 61K-token build step</div></div>
+      <div class="stat"><div class="sv">21</div><div class="sl">WebSocket event types synthesized from three parallel experts</div></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch14-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Workout</h2></div>
+
+    <div class="callout reveal d1"><span class="ci">GOAL</span>
+      <span class="cc">Stand up <strong>one complete agent expert</strong> (Act–Learn–Reuse) for a real domain in your codebase — e.g. your database layer.</span></div>
+    <div class="callout reveal d2"><span class="ci">PREREQUISITES</span>
+      <span class="cc">AH-2 prompt formats internalized; a codebase with a non-trivial subsystem <strong>you understand well</strong> — you need your own mental model first.</span></div>
+
+    <div class="spread reveal d2" style="align-items:start">
+      <ol class="steps">
+        <li><h4>Scaffold the expert</h4><p>Create <span class="mono">.claude/commands/experts/database/</span> with four files: <span class="mono">expertise.yaml</span> (empty), <span class="mono">question.md</span>, <span class="mono">plan.md</span>, <span class="mono">self-improve.md</span>.</p></li>
+        <li><h4>Write self-improve.md — the heart</h4><p>Variables, instructions, and the six-step workflow ending in the <span class="mono">wc -l</span> line-limit check + YAML validation. See the skeleton alongside.</p></li>
+        <li><h4>Seed</h4><p>Run <span class="mono">/experts:database:self-improve</span> on the empty file. Let the agent invent the structure. Rerun until it reports "nothing to be done."</p></li>
+        <li><h4>Write question.md</h4><p>"IMPORTANT: question-answering only — DO NOT write/edit files"; "validate the information from EXPERTISE_PATH against the codebase before answering"; report = direct answer + file/line evidence + mermaid where useful. Ask it a hard question; confirm it reads expertise <em>first</em> and skips searching.</p></li>
+        <li><h4>Chain it</h4><p><span class="mono">plan.md</span> reads expertise before planning; <span class="mono">plan_build_improve.md</span> runs Task → plan, Task → build, Task → self-improve true. "DO NOT STOP between steps."</p></li>
+        <li><h4>Ship one real change</h4><p>Then <span class="mono">git diff</span> the expertise file to inspect exactly what the agent learned.</p></li>
+        <li><h4>Correct the teacher, not the notes</h4><p>If the expertise is wrong or too verbose, do NOT edit the YAML — edit <span class="mono">self-improve.md</span> and rerun.</p></li>
+      </ol>
+      <div>
+        <div class="codecap">.claude/commands/experts/database/self-improve.md</div>
+        <div class="code"><pre>---
+allowed-tools: Read, Grep, Glob, Bash, Edit, Write, TodoWrite
+---
+# Self Improve
+
+## Variables
+CHECK_GIT_DIFF: $1 (default false)
+FOCUS_AREA: $2
+EXPERTISE_FILE: .claude/commands/experts/database/expertise.yaml
+MAX_LINES: 1000
+
+## Instructions
+- Think of the expertise file as your mental model,
+  not a source of truth.
+- Prioritize actionable, high value expertise over
+  verbose documentation.
+- There may be nothing to do — this is perfectly acceptable.
+
+## Workflow
+1. git diff (conditional)   2. read expertise
+3. validate vs codebase     4. identify discrepancies
+5. update                   6. wc -l line check + YAML validation</pre></div>
+        <p class="note">The learn step is a prompt like any other — which means your expert improves whenever you improve this file.</p>
+      </div>
+    </div>
+
+    <div class="spread reveal d3" style="align-items:start">
+      <div class="callout ok"><span class="ci">DONE WHEN</span>
+        <span class="cc">The question prompt answers from the mental model with correct file/line citations; a plan → build → improve run ships a change AND the expertise diff shows only accurate, <strong>surgical</strong> updates; expertise stays under MAX_LINES with valid YAML.</span></div>
+      <div class="callout idea"><span class="ci">LEVEL UP</span>
+        <span class="cc">Build a <strong>meta expert</strong> — a template meta prompt that scaffolds question/plan/self-improve/expertise for any new domain — then add a second expert for your highest-risk system (billing/security) and wire both into your O-Agent as agent templates.</span></div>
+    </div>
+
+    <a class="jump reveal" href="#ch15">Next · Building Agentic Layers &nbsp;&rarr;</a>
+  </div>
+</section>

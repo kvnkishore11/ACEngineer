@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An agent-systems companion to The Agentic Layer: commander boundaries, prompt and permission contracts, launchers, verification, and recovery loops.">
+  <title>The Agentic Layer · Agent Systems Companion</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="tac-8-the-agentic-layer.assets.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#mission">Skip to lesson</a>
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-bar" aria-label="Book navigation">
+    <a class="site-brand" href="../index.html">
+      <span class="site-brand-mark">AS</span>
+      <span class="site-brand-copy"><strong>AGENT SYSTEMS</strong><span>IndyDevDan companion</span></span>
+    </a>
+    <nav class="site-links" aria-label="Companion links">
+      <a href="../vol-1-tac/08-the-agentic-layer.html">Chapter</a>
+      <a href="index.html">Code library</a>
+      <a href="../index.html">Book hub</a>
+    </nav>
+  </header>
+
+  <div class="book-layout">
+    <aside class="chapter-rail" aria-label="On this page">
+      <p class="chapter-rail-label">TAC · 08</p>
+      <a href="#mission">Agent mission</a>
+      <a href="#cast">Cast of agents</a>
+      <a href="#surface">Surface map</a>
+      <a href="#loop">Control loop</a>
+      <a href="#contracts">Four contracts</a>
+      <a href="#operate">Operate like Dan</a>
+      <a href="#failures">Common failures</a>
+      <a href="#lab">Agent ops lab</a>
+      <a href="#teach-back">Teach-back</a>
+      <a href="#appendix">Raw index</a>
+    </aside>
+
+    <main id="main-content">
+      <section id="mission" class="mission-card" aria-labelledby="mission-title">
+        <p class="eyebrow">Tactic 08 · The Agentic Layer</p>
+        <h1 id="mission-title">Build the ring that operates the code.</h1>
+        <p class="mission-copy">This lesson trains you to turn human judgment into callable agent interfaces: a prompt says what “good” means, an authority boundary says what may change, a launcher creates a focused worker, and a verifier decides whether the loop closes or recovers. The application stays at the center; your leverage comes from programming the system around it.</p>
+        <div class="mission-formula" aria-label="Agent operating system formula"><b>human intent</b> → prompt contract → capable agent → artifact → verifier → recover or accept</div>
+        <div class="allocation-strip" aria-label="Agentic engineering allocation">
+          <div class="allocation-meter" aria-hidden="true"><span></span><span></span></div>
+          <div class="allocation-copy">Dan’s bias: spend at least half of engineering effort improving the ring. Drop into application code for a deadline, a manual test, or an in-loop prompt check.</div>
+        </div>
+      </section>
+
+      <section id="cast" aria-labelledby="cast-title">
+        <p class="eyebrow">01 · Who acts?</p>
+        <h2 id="cast-title">The commander is not the runtime</h2>
+        <p class="section-lede">The five examples add roles without changing the boundary: the human supplies intent and authority; agents and deterministic scripts carry work; verifiers produce evidence. “Agent” below means both reasoning workers and the scripts that schedule or constrain them.</p>
+        <table class="cast-table">
+          <thead class="sr-only"><tr><th>Actor</th><th>Owns</th><th>Does not own</th></tr></thead>
+          <tbody>
+            <tr><th>Human commander</th><td><strong>Intent, risk, credentials, acceptance.</strong> Chooses the problem class, reads the contracts, grants the smallest useful authority, and decides whether evidence is enough.</td><td class="boundary">Does not manually shuttle every intermediate artifact once the workflow is trusted.</td></tr>
+            <tr><th>CLI worker</th><td><strong>One prompted purpose.</strong> A fresh <code>claude -p</code> process can prime, plan, build, test, review, or document.</td><td class="boundary">Does not invent product intent or silently enlarge its permission boundary.</td></tr>
+            <tr><th>Subagents / relay</th><td><strong>Planner → builder → tester → reviewer.</strong> Separate workers or subagents inherit narrow prompt contracts, making each role replaceable and each handoff inspectable.</td><td class="boundary">Does not depend on one long, fragile conversation.</td></tr>
+            <tr><th>Trigger / orchestrator</th><td><strong>State transitions and scheduling.</strong> Cron pollers, ADWs, task-board parsers, and worktree launchers claim work and start the right worker.</td><td class="boundary">Does not judge semantic correctness; it enforces deterministic policy.</td></tr>
+            <tr><th>Verifier</th><td><strong>Observable proof.</strong> Tests, review prompts, screenshots, status writes, and exit codes decide pass, retry, or stop.</td><td class="boundary">Does not treat “the model returned text” as success.</td></tr>
+            <tr><th>Embedded AEA</th><td><strong>A persistent product conversation.</strong> App 5 stores agent, ADW, and Claude session IDs so an in-app agent can resume after refresh.</td><td class="boundary">It is the deliberate exception—not permission to make every workflow conversational.</td></tr>
+          </tbody>
+        </table>
+        <div class="exception-note"><strong>Default rule:</strong> one agent, one prompt, one purpose. The AEA keeps a session because continuity is the product feature; the delivery workflows prefer fresh workers and explicit artifacts.</div>
+      </section>
+
+      <section id="surface" aria-labelledby="surface-title">
+        <p class="eyebrow">02 · Agent surface map</p>
+        <h2 id="surface-title">The repository exposes an operating surface</h2>
+        <p class="section-lede">Do not memorize every file. See the interfaces the agent touches. Each one converts an implicit human expectation into something a worker can read, invoke, or prove.</p>
+        <figure class="surface-map">
+          <div class="orbit">
+            <div class="orbit-node intent-node"><b>Intent</b><span>README tasks, <code>tasks.md</code>, GitHub issues, and Notion cards define work the system can claim.</span></div>
+            <div class="orbit-node context-node"><b>Context / memory</b><span><code>README.md</code>, <code>CLAUDE.md</code>, <code>specs/</code>, and <code>ai_docs/</code> teach local vocabulary and constraints.</span></div>
+            <div class="orbit-node prompt-node"><b>Prompt contract</b><span><code>.claude/commands/*.md</code> name the job, required research, output grammar, and validation.</span></div>
+            <div class="orbit-node authority-node"><b>Tools / authority</b><span><code>settings.json</code>, hooks, environment filtering, MCP configuration, and worktrees bound what the worker can touch.</span></div>
+            <div class="orbit-core"><div><strong>Application</strong><span>The product code agents operate—not the whole agent system.</span></div></div>
+            <div class="orbit-node harness-node"><b>Harness / launcher</b><span><code>adws/</code> invokes Claude, composes roles, assigns IDs, captures streams, and starts isolated workers.</span></div>
+            <div class="orbit-node state-node"><b>State / isolation</b><span>Task markers, Notion status, SQLite IDs, sparse worktrees, and ports prevent duplicate or colliding work.</span></div>
+            <div class="orbit-node proof-node"><b>Verification</b><span>Plan paths, JSONL receipts, tests, review JSON, screenshots, hashes, and exit codes make success observable.</span></div>
+            <div class="orbit-node recovery-node"><b>Recovery</b><span>Failure status, patch prompts, re-review, HIL review, or a clean restart route evidence back into the next attempt.</span></div>
+          </div>
+          <figcaption class="orbit-caption">The ring is half deterministic software and half non-deterministic instructions. Reliability comes from making the seam explicit.</figcaption>
+          <div class="maturity-row" aria-label="Progression across lesson apps">
+            <div class="maturity-step"><b>App 1 · MVAL</b>Prompt + launcher + receipt</div>
+            <div class="maturity-step"><b>App 2 · Queue</b>State + routing + worktrees</div>
+            <div class="maturity-step"><b>App 3 · Observe</b>Hooks + event stream</div>
+            <div class="maturity-step"><b>App 4 · Factory</b>External trigger + HIL</div>
+            <div class="maturity-step"><b>App 5 · Product</b>SDLC gates + resumable AEA</div>
+          </div>
+        </figure>
+      </section>
+
+      <section id="loop" aria-labelledby="loop-title">
+        <p class="eyebrow">03 · The control loop</p>
+        <h2 id="loop-title">Move judgment out of the loop only after encoding it</h2>
+        <p class="section-lede">A weak student first watches one run. Then the same decisions become prompts, state transitions, and gates. The human moves from keystroke provider to system designer.</p>
+        <div class="loop-board">
+          <div class="loop-lane in">
+            <div class="lane-label">In the loop<small>Learn the shape</small></div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Frame</b><span>Human states one bounded objective.</span></div>
+              <div class="loop-step"><b>Prime</b><span>Agent reads repo interfaces.</span></div>
+              <div class="loop-step"><b>Prompt</b><span>Human invokes one command.</span></div>
+              <div class="loop-step"><b>Inspect</b><span>Human reads artifact and trace.</span></div>
+              <div class="loop-step"><b>Verify</b><span>Human runs acceptance checks.</span></div>
+              <div class="loop-step"><b>Tune</b><span>Improve prompt or authority.</span></div>
+            </div>
+          </div>
+          <div class="loop-lane out">
+            <div class="lane-label">Out of loop<small>Run the encoded policy</small></div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Trigger</b><span>Cron, issue, card, or queue appears.</span></div>
+              <div class="loop-step"><b>Claim</b><span>Status + ADW ID prevent doubles.</span></div>
+              <div class="loop-step"><b>Isolate</b><span>Worktree, sparse paths, and ports.</span></div>
+              <div class="loop-step"><b>Compose</b><span>Plan → build → test → review.</span></div>
+              <div class="loop-step"><b>Gate</b><span>Machine evidence chooses branch.</span></div>
+              <div class="loop-step"><b>Write back</b><span>Status, hash, docs, or HIL review.</span></div>
+            </div>
+          </div>
+          <div class="recover-band"><div>RECOVER ↺</div><div>failed evidence → record reason → patch or return to human → re-run the smallest failed stage</div></div>
+        </div>
+        <div class="pattern-name">
+          <div><b>MVAL</b>Minimum viable agentic layer: commands, specs, and ADWs around a small application.</div>
+          <div><b>PITER</b>Prompt → Input → Trigger → Environment → Review. App 4 makes every surface visible.</div>
+          <div><b>PITE</b>Remove human review only when automated gates have replaced its decisions—not merely when the trigger can run unattended.</div>
+        </div>
+      </section>
+
+      <section id="contracts" aria-labelledby="contracts-title">
+        <p class="eyebrow">04 · Why these files exist</p>
+        <h2 id="contracts-title">Four contracts make the agent programmable</h2>
+        <p class="section-lede">These are not configuration trivia. They are the agent OS. Change one contract and you change what the system understands, can do, or counts as done.</p>
+        <div class="contracts">
+          <article class="contract-card">
+            <div class="contract-copy">
+              <p class="contract-path">tac8_app1__agent_layer_primitives/.claude/commands/chore.md</p>
+              <h3>1. Prompt contract</h3>
+              <p>The planner must research the request, write a plan with prescribed validation, then return one parseable path. <code>adw_chore_implement.py</code> extracts that path and hands it to the builder. A prose sentence is therefore also an API.</p>
+              <p><code>prime.md</code> separately controls what the worker reads before acting. Context is selected, not dumped.</p>
+              <p class="intent"><b>Dan’s design intent:</b> write a template meta-prompt for a class of work, then let disposable agents solve instances. Keep the output grammar rigid enough for the next program to consume.</p>
+            </div>
+            <div class="evidence" aria-label="Excerpt from chore prompt">
+              <div class="evidence-label"><span>prompt evidence</span><span>chore.md</span></div>
+              <pre><span class="tok-heading">## Plan Format</span>
+...
+<span class="tok-heading">## Validation Commands</span>
+...
+<span class="tok-heading">## Report</span>
+Return the path to the plan file created.</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <p class="contract-path">tac8_app5__nlq_to_sql_aea/.claude/settings.json · adws/adw_modules/agent.py</p>
+              <h3>2. Tool and permission contract</h3>
+              <p>The tracked settings show the intended split: routine commands and writes are allowed; force push and recursive removal are denied. Hooks add policy and telemetry. Worktrees, safe environment filtering, and MCP configuration further shape the worker’s world.</p>
+              <p>The course launchers also include a broad permission-bypass flag. Treat that as period-specific course evidence, not a default. Audit the prompt, use a disposable clone, and prefer the narrowest sandbox and allowlist your runtime supports.</p>
+              <p class="intent"><b>Dan’s design intent:</b> capability creates leverage only when authority is explicit. A “yes” from an overpowered worker is not a reliable system.</p>
+            </div>
+            <div class="evidence" aria-label="Excerpt from settings JSON">
+              <div class="evidence-label"><span>settings evidence</span><span>settings.json</span></div>
+              <pre>{
+  <span class="tok-key">"permissions"</span>: {
+    <span class="tok-key">"allow"</span>: [<span class="tok-string">"Bash(uv:*)"</span>, <span class="tok-string">"Write"</span>],
+    <span class="tok-key">"deny"</span>: [
+      <span class="tok-string">"Bash(git push --force:*)"</span>,
+      <span class="tok-string">"Bash(rm -rf:*)"</span>
+    ]
+  }
+}</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <p class="contract-path">tac8_app1__agent_layer_primitives/adws/adw_prompt.py · adw_chore_implement.py</p>
+              <h3>3. Harness and launcher</h3>
+              <p>The gateway generates an ADW ID, launches Claude in print mode, streams JSON, and writes raw output plus parsed receipts under <code>agents/{adw_id}/{agent}/</code>. The composed workflow runs the planner, extracts its plan path, and invokes the builder with that artifact.</p>
+              <div class="terminal" aria-label="Launcher command shape">claude -p &lt;prompt&gt; --model &lt;model&gt; --output-format stream-json --verbose</div>
+              <p>Apps 2 and 4 add polling, task claiming, routing tags, concurrency limits, and detached worktrees. App 5 adds isolated SDLC stages and a resumable in-product agent.</p>
+              <p class="intent"><b>Dan’s design intent:</b> stop copy-pasting between chats. Give every transition a deterministic owner, an ID, and an artifact.</p>
+            </div>
+            <div class="mini-proof" aria-label="Harness responsibilities">
+              <div><b>Call</b><br>prompt + model + working directory</div>
+              <div><b>Capture</b><br>JSONL stream + final object + summary</div>
+              <div><b>Compose</b><br>plan path → builder input</div>
+              <div><b>Route</b><br>tag + state → workflow + model</div>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <p class="contract-path">tac8_app5__nlq_to_sql_aea/.claude/commands/test.md · review.md · adws/adw_sdlc_zte_iso.py</p>
+              <h3>4. Verification contract</h3>
+              <p>Receipts prove execution, not correctness. The scaled example asks the test worker for structured results across Python compilation, Ruff, pytest, TypeScript, and frontend build; review compares the diff with the spec and may gather browser evidence.</p>
+              <p>The zero-touch workflow stops on failed test or review. The non-ZTE workflow is more permissive and can continue after a warned test failure. Read the gates—do not infer them from the filename.</p>
+              <p class="intent"><b>Dan’s design intent:</b> close the loop with evidence that can change control flow. If failure cannot stop, retry, patch, or escalate, Review is only theater.</p>
+            </div>
+            <div class="mini-proof" aria-label="Verification evidence ladder">
+              <div><b>Execution</b><br>exit code + raw JSONL receipt</div>
+              <div><b>Behavior</b><br>lint + compile + unit + build results</div>
+              <div><b>Intent</b><br>spec-versus-diff review + screenshots</div>
+              <div><b>Closure</b><br>hash / status / merge or recorded failure</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="operate" aria-labelledby="operate-title">
+        <p class="eyebrow">05 · One worked run</p>
+        <h2 id="operate-title">Operate like Dan: learn small, then compose</h2>
+        <p class="section-lede">Start in App 1. Watch one worker, inspect its receipts, then let the two-stage workflow carry the plan. Run in a disposable clone after reading the prompt and launcher authority.</p>
+        <div class="operate-grid">
+          <div class="run-steps">
+            <article class="run-step"><div><h3>Enter the minimum viable layer</h3><p>Work from <code class="inline-path">tac/tac-8/tac8_app1__agent_layer_primitives</code>. Its README defines the application center and the three agent interfaces: commands, specs, and ADWs.</p><div class="terminal">cd tac/tac-8/tac8_app1__agent_layer_primitives</div></div></article>
+            <article class="run-step"><div><h3>Audit before authority</h3><p>Read <code>README.md</code>, <code>.claude/commands/chore.md</code>, <code>implement.md</code>, and <code>adws/adw_modules/agent.py</code>. Confirm the model, environment, output directory, and permission mode.</p></div></article>
+            <article class="run-step"><div><h3>Call one focused worker</h3><p>Use the exact one-shot example in <code>adws/README.md</code>. This is the smallest proof that the harness can invoke the agent and save receipts.</p><div class="terminal">./adws/adw_prompt.py "Write a hello world Python script"</div></div></article>
+            <article class="run-step"><div><h3>Inspect the receipt, not just stdout</h3><p>Open the new <code>agents/&lt;adw_id&gt;/&lt;agent&gt;/</code> directory. Find the submitted prompt, raw JSONL stream, parsed response, and summary. Ask: can another program tell whether this stage ran?</p></div></article>
+            <article class="run-step"><div><h3>Compose planner and builder</h3><p>Run the supplied lesson-lab workflow. The planner must return a spec path; the launcher parses it; the builder implements from that file.</p><div class="terminal">./adws/adw_chore_implement.py "create a .sh version of main in apps/*"</div></div></article>
+            <article class="run-step"><div><h3>Verify the seam</h3><p>Check that a <code>specs/chore-*.md</code> plan exists, the implementation summary names both phases, the validation commands ran, and the requested shell entry point—not an unrelated refactor—is the material change.</p></div></article>
+          </div>
+          <aside class="operator-gate" aria-label="Commander checklist">
+            <h3>Commander gate</h3>
+            <p>Do not press “autonomous” until you can answer:</p>
+            <ul>
+              <li>What exact artifact hands off to the next stage?</li>
+              <li>What can this process modify or call?</li>
+              <li>What evidence changes the next branch?</li>
+              <li>Where is failure recorded?</li>
+              <li>Can a new worker resume without chat memory?</li>
+            </ul>
+          </aside>
+        </div>
+        <p class="source-note"><strong>Escalation rule:</strong> open a fresh shell at the repository root. Every command below enters its own app before invoking a tracked source interface.</p>
+        <div class="escalation">
+          <table>
+            <thead><tr><th>When the first loop is legible…</th><th>Run the next real interface</th><th>Observe</th></tr></thead>
+            <tbody>
+              <tr><td>Queue work without launching</td><td><code>cd tac/tac-8/tac8_app2__multi_agent_todone &amp;&amp; ./adws/adw_triggers/adw_trigger_cron_todone.py --once --dry-run</code></td><td>App 2 parses <code>tasks.md</code>, dependencies, and routing without delegation.</td></tr>
+              <tr><td>Claim one task-board pass</td><td><code>cd tac/tac-8/tac8_app2__multi_agent_todone &amp;&amp; ./adws/adw_triggers/adw_trigger_cron_todone.py --once</code></td><td>Pending → in progress, sparse worktree initialization, then worker launch.</td></tr>
+              <tr><td>Poll a prototyping board</td><td><code>cd tac/tac-8/tac8_app4__agentic_prototyping &amp;&amp; ./adws/adw_triggers/adw_trigger_cron_notion_tasks.py --once</code></td><td>App 4 claims eligible Notion work before launching; prerequisites and MCP credentials are required.</td></tr>
+              <tr><td>Run the scaled isolated SDLC</td><td><code>cd tac/tac-8/tac8_app5__nlq_to_sql_aea/adws &amp;&amp; uv run adw_sdlc_iso.py &lt;issue&gt;</code></td><td>App 5 separates plan, build, test, review, and documentation across an isolated worktree.</td></tr>
+              <tr><td>Explore persistent product agents</td><td><code>cd tac/tac-8/tac8_app5__nlq_to_sql_aea &amp;&amp; ./scripts/aea_server_start.sh</code></td><td>Edit the tracked machine-specific Claude path first; then the app can store and resume agent sessions.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="failures" aria-labelledby="failures-title">
+        <p class="eyebrow">06 · Fail, name, repair</p>
+        <h2 id="failures-title">Agent failures are often system failures</h2>
+        <p class="section-lede">When output looks wrong, inspect the contract that shaped it before blaming the model. These failure signatures are visible in—or exposed by—the lesson snapshot.</p>
+        <div class="failure-grid">
+          <article class="failure-card"><b>Mis-prompting breaks the relay</b><p>The planner returns commentary instead of one <code>specs/chore-*.md</code> path; the regex cannot hand off to the builder.<span class="repair">Repair: preserve a rigid Report grammar and test it as an interface.</span></p></article>
+          <article class="failure-card"><b>Over-permission hides design debt</b><p>A broad bypass makes the allowlist look meaningful while the headless process can act beyond it.<span class="repair">Repair: narrow the runtime boundary, isolate the checkout, and make exceptions visible.</span></p></article>
+          <article class="failure-card"><b>A receipt impersonates proof</b><p>JSONL shows that Claude answered. It does not prove the behavior builds, matches the spec, or is safe.<span class="repair">Repair: attach behavioral and intent gates to control flow.</span></p></article>
+          <article class="failure-card"><b>Failure is logged but cannot stop</b><p>A hook ending in <code>|| true</code>, or an SDLC that warns and continues, turns a red gate into decoration.<span class="repair">Repair: decide explicitly which signals fail open, fail closed, retry, or escalate.</span></p></article>
+          <article class="failure-card"><b>Two workers claim the same task</b><p>Polling without an immediate state transition creates duplicate branches and conflicting worktrees.<span class="repair">Repair: claim with status + ADW ID before delegation.</span></p></article>
+          <article class="failure-card"><b>The human remains a message bus</b><p>The commander copies plan text into a second chat and manually updates statuses after every stage.<span class="repair">Repair: give handoffs and state transitions deterministic owners.</span></p></article>
+          <article class="failure-card"><b>Review disappears too early</b><p>Changing PITER to PITE because the cron works removes judgment without replacing it.<span class="repair">Repair: encode the review decision as tests, reviewers, thresholds, and recovery routes first.</span></p></article>
+          <article class="failure-card"><b>Machine assumptions leak into the OS</b><p>The AEA start script contains a developer-specific Claude path; another commander cannot launch it unchanged.<span class="repair">Repair: parameterize executable paths and verify prerequisites at startup.</span></p></article>
+          <article class="failure-card snapshot-warning"><b>Documented architecture ≠ wired architecture</b><p>App 3’s README draws <code>Hook Scripts → HTTP POST → Bun Server</code>, and <code>send_event.py</code> exists, but the tracked <code>.claude/settings.json</code> invokes local logging hooks rather than that sender. Treat the page as a design plus a wiring audit—not as proof the live dashboard receives every event.<span class="repair">Repair: compare every architecture arrow with the configured callback and a failing integration test.</span></p></article>
+        </div>
+      </section>
+
+      <section id="lab" class="lab" aria-labelledby="lab-title">
+        <p class="eyebrow">07 · Lab · Agent operations</p>
+        <h2 id="lab-title">Strengthen the planner contract—without touching app logic</h2>
+        <p class="section-lede">Your target is App 1’s agent OS. You will make plans more verifiable while preserving the exact report sentence the launcher parses.</p>
+        <div class="lab-grid">
+          <div>
+            <h3>Change one interface</h3>
+            <ol>
+              <li>Use a disposable clone. From <code>tac8_app1__agent_layer_primitives</code>, inspect <code>.claude/commands/chore.md</code> and the path extraction in <code>adws/adw_chore_implement.py</code>.</li>
+              <li>Run a planner-only baseline:<div class="terminal">./adws/adw_slash_command.py /chore lab0001 "write a plan to add a shell entry point beside apps/main.py"</div></li>
+              <li>Save the generated plan and receipt. Do not implement it. Point <code>SUMMARY</code> at the gateway’s printed summary path, then exercise the composer’s first plan-path pattern against the saved output:<div class="terminal">SUMMARY=agents/&lt;run-adw-id&gt;/executor/custom_summary_output.json
+python -c 'import json,re,sys; s=json.load(open(sys.argv[1]))["output"]; m=re.search(r"specs/chore-[a-zA-Z0-9-]+\.md",s); assert m,"composer could not extract plan path"; print(m.group(0))' "$SUMMARY"</div></li>
+              <li>Edit only <code>.claude/commands/chore.md</code>. Add required <strong>Acceptance Criteria</strong> and <strong>Evidence to Capture</strong> sections to its Plan Format. Preserve <em>Return the path to the plan file created.</em></li>
+              <li>Run the same planner request with <code>lab0002</code>. Compare the two plan artifacts, inspect the new receipt, and repeat the parser-only check with the second summary.</li>
+              <li>Use <code>git diff -- .claude/commands/chore.md</code> and <code>git status --short apps/</code> to prove the human changed the agent system, not the application.</li>
+            </ol>
+            <div class="fail-try"><strong>Make it fail on purpose:</strong> temporarily replace the Report instruction with “Summarize the plan without naming its file path.” Run the planner and the parser-only check; the assertion should fail even though a plan may exist. Restore the strict sentence, run again, and name the pattern: <em>structured artifact handoff</em>.</div>
+          </div>
+          <aside class="pass-list">
+            <h3>Observable pass criteria</h3>
+            <ul>
+              <li>The second generated plan contains both new headings.</li>
+              <li>Each acceptance criterion names an observable outcome.</li>
+              <li>Evidence items point to commands, files, or output—not “looks good.”</li>
+              <li>The planner still returns one valid <code>specs/chore-*.md</code> path.</li>
+              <li>A receipt exists under the run’s <code>agents/</code> directory.</li>
+              <li>No file under <code>apps/</code> changed.</li>
+              <li>Your only manual source edit is the prompt contract.</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section id="teach-back" class="teach-back" aria-labelledby="teach-title">
+        <p class="eyebrow">08 · Retrieval check</p>
+        <h2 id="teach-title">Explain this agent OS in six sentences—without looking</h2>
+        <div class="six-sentences" aria-label="Six sentence teach-back prompts">
+          <div class="sentence">The human commander owns…</div>
+          <div class="sentence">The prompt contract converts…</div>
+          <div class="sentence">The permission and harness contracts determine…</div>
+          <div class="sentence">The out-of-loop controller moves work by…</div>
+          <div class="sentence">Verification closes the loop when…</div>
+          <div class="sentence">Dan’s leverage move is…</div>
+        </div>
+        <details class="answer-toggle">
+          <summary>Compare with a model answer</summary>
+          <div class="model-answer">The human commander owns intent, authority, risk, and the final acceptance decision. The prompt contract turns a class of work into a bounded role with a parseable artifact. Permissions define the worker’s authority, while the harness gives it an ID, context, isolation, and a place to leave receipts. Out of the loop, a trigger claims state, launches fresh specialists, and carries explicit artifacts between them. Verification closes the loop only when evidence can stop, retry, patch, or escalate the run. Dan’s leverage move is to improve this replaceable operating ring until the human designs the system instead of serving as its runtime.</div>
+        </details>
+      </section>
+
+      <section id="appendix" aria-labelledby="appendix-title">
+        <p class="eyebrow">Appendix · For the curious</p>
+        <h2 id="appendix-title">Raw agent-interface index</h2>
+        <details class="raw-index">
+          <summary>Show the load-bearing files audited for this companion</summary>
+          <div class="index-groups">
+            <div class="index-group"><h3>App 1 · Minimum layer</h3><ul>
+              <li><code>README.md</code> — doctrine and real run commands</li>
+              <li><code>.claude/commands/prime.md</code> — context selection</li>
+              <li><code>.claude/commands/start.md</code> — in-loop launcher prompt</li>
+              <li><code>.claude/commands/chore.md</code> — plan contract</li>
+              <li><code>.claude/commands/implement.md</code> — build contract</li>
+              <li><code>adws/adw_prompt.py</code> — one-shot gateway</li>
+              <li><code>adws/adw_slash_command.py</code> — command gateway</li>
+              <li><code>adws/adw_chore_implement.py</code> — plan/build composition</li>
+              <li><code>adws/adw_modules/agent.py</code> — Claude CLI adapter</li>
+              <li><code>adws/adw_modules/agent_sdk.py</code> — SDK-based gateway variant</li>
+            </ul></div>
+            <div class="index-group"><h3>App 2 · Multi-agent queue</h3><ul>
+              <li><code>README.md</code> — task-board state model</li>
+              <li><code>tasks.md</code> — Markdown control plane</li>
+              <li><code>.claude/commands/process_tasks.md</code> — strict task parser</li>
+              <li><code>.claude/commands/mark_in_progress.md</code> — claim transition</li>
+              <li><code>.claude/commands/init_worktree.md</code> — sparse isolation</li>
+              <li><code>.claude/commands/update_task.md</code> — terminal state write-back</li>
+              <li><code>adws/adw_triggers/adw_trigger_cron_todone.py</code> — poll/route/delegate loop</li>
+              <li><code>adws/adw_modules/data_models.py</code> — state and routing schema</li>
+              <li><code>adws/adw_modules/utils.py</code> — trigger utilities</li>
+            </ul></div>
+            <div class="index-group"><h3>App 3 · Observability</h3><ul>
+              <li><code>README.md</code> — intended event architecture</li>
+              <li><code>.claude/settings.json</code> — actually wired hooks</li>
+              <li><code>.claude/hooks/pre_tool_use.py</code> — safety check + local log</li>
+              <li><code>.claude/hooks/post_tool_use.py</code> — tool-result log</li>
+              <li><code>.claude/hooks/subagent_stop.py</code> — subagent lifecycle log</li>
+              <li><code>.claude/hooks/send_event.py</code> — HTTP event sender</li>
+              <li><code>scripts/start-system.sh</code> — server/client launcher</li>
+              <li><code>scripts/test-system.sh</code> — event-path smoke test</li>
+              <li><code>apps/server/CLAUDE.md</code> — Bun server instructions</li>
+            </ul></div>
+            <div class="index-group"><h3>App 4 · Prototyping factory</h3><ul>
+              <li><code>README.md</code> — PITER operating guide</li>
+              <li><code>.mcp.sample.json</code> — Notion MCP shape</li>
+              <li><code>.claude/settings.json</code> — hooks and permissions</li>
+              <li><code>.claude/commands/get_notion_tasks.md</code> — eligibility contract</li>
+              <li><code>.claude/commands/plan_uv_mcp.md</code> — specialized template meta-prompt</li>
+              <li><code>.claude/commands/build.md</code> — prototype build contract</li>
+              <li><code>.claude/commands/update_notion_task.md</code> — board write-back</li>
+              <li><code>adws/adw_triggers/adw_trigger_cron_notion_tasks.py</code> — claim/route/launch loop</li>
+              <li><code>adws/adw_modules/data_models.py</code> — card and workflow types</li>
+              <li><code>ai_docs/mcp-python-sdk.md</code> — conditional specialist context</li>
+            </ul></div>
+            <div class="index-group"><h3>App 5 · SDLC and AEA</h3><ul>
+              <li><code>README.md</code> — app and AEA start path</li>
+              <li><code>adws/README.md</code> — isolated SDLC commands</li>
+              <li><code>.claude/settings.json</code> — allow/deny + hooks</li>
+              <li><code>.claude/commands/feature.md</code> — feature-plan contract</li>
+              <li><code>.claude/commands/implement.md</code> — implementation contract</li>
+              <li><code>.claude/commands/test.md</code> — structured test contract</li>
+              <li><code>.claude/commands/review.md</code> — spec/diff review contract</li>
+              <li><code>.claude/commands/patch.md</code> — recovery contract</li>
+              <li><code>.mcp.json</code> — isolated Playwright surface</li>
+              <li><code>adws/adw_sdlc_iso.py</code> — staged isolated workflow</li>
+              <li><code>adws/adw_sdlc_zte_iso.py</code> — fail-closed ship path</li>
+              <li><code>adws/adw_aea_patch.py</code> — persisted session resume</li>
+              <li><code>adws/adw_triggers/adw_trigger_aea_server.py</code> — AEA HTTP/SQLite service</li>
+              <li><code>scripts/aea_server_start.sh</code> — local AEA launcher</li>
+            </ul></div>
+            <div class="index-group"><h3>Concept and audit sources</h3><ul>
+              <li><code>../vol-1-tac/08-the-agentic-layer.html</code> — conceptual spine</li>
+              <li><code>_extracts/tac-8-the-agentic-layer/extract.md</code> — source synthesis</li>
+              <li><code>_extracts/tac-8-the-agentic-layer/lab-spec.md</code> — operations lab evidence</li>
+              <li><code>_extracts/tac-8-the-agentic-layer/outdated-vs-current.md</code> — period/current flags</li>
+              <li><code>_extracts/tac-8-the-agentic-layer/STATUS.md</code> — extraction caveats</li>
+            </ul></div>
+          </div>
+        </details>
+        <p class="source-note">Source audit: all five <code>tac/tac-8</code> app trees were inventoried; agent-facing text, launchers, prompts, settings, hooks, READMEs, tests, and supplied extracts were read. Generated logs, dependency directories, locks, images, fonts, databases, and other binaries were identified but not treated as teaching prose. Paths above are relative to their named app unless they begin with <code>_extracts/</code> or <code>../</code>.</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const progress = document.getElementById('reading-progress');
+      const railLinks = [...document.querySelectorAll('.chapter-rail a')];
+      const sections = railLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+
+      const update = () => {
+        const max = document.documentElement.scrollHeight - innerHeight;
+        progress.style.width = `${max > 0 ? Math.min(100, scrollY / max * 100) : 0}%`;
+        let active = sections[0];
+        for (const section of sections) {
+          if (section.getBoundingClientRect().top <= 130) active = section;
+        }
+        railLinks.forEach(link => link.setAttribute('aria-current', link.getAttribute('href') === `#${active?.id}` ? 'true' : 'false'));
+      };
+
+      addEventListener('scroll', update, { passive: true });
+      addEventListener('resize', update);
+      update();
+    })();
+  </script>
+</body>
+</html>

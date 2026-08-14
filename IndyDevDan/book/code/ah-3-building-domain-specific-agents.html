@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An agent-systems companion to Building Domain-Specific Agents: commanders, prompts, tools, permissions, harnesses, verification, and recovery loops.">
+  <title>Building Domain-Specific Agents · Agent Systems Companion</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <style>
+    :root {
+      --sys-blue: #315f78;
+      --sys-blue-wash: #e8f0f3;
+      --sys-violet: #6c5578;
+      --sys-violet-wash: #eee7f1;
+      --sys-gold: #9a682a;
+      --sys-gold-wash: #f6ead8;
+    }
+
+    html { scroll-padding-top: 3.5rem; }
+    body { background: var(--bg); color: var(--ink); }
+    .skip-link { position: fixed; left: .7rem; top: -5rem; z-index: 999; padding: .55rem .75rem; background: var(--ink); color: var(--ink-inverse); }
+    .skip-link:focus { top: .7rem; }
+    .reading-progress { position: fixed; inset: 0 auto auto 0; z-index: 1000; width: 0; height: 3px; background: var(--accent); }
+
+    .site-bar {
+      position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between;
+      gap: .75rem; min-height: 2.5rem; border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 93%, transparent); backdrop-filter: blur(12px);
+    }
+    .site-brand { display: flex; align-items: center; gap: .52rem; min-width: 0; color: var(--ink); text-decoration: none; }
+    .site-brand-mark { display: grid; place-items: center; width: 1.65rem; height: 1.65rem; border-radius: 50%; background: var(--accent); color: var(--ink-inverse); font: 800 .67rem/1 var(--font-mono); }
+    .site-brand-copy { display: grid; line-height: 1.04; }
+    .site-brand-copy strong { font-size: .76rem; letter-spacing: .08em; }
+    .site-brand-copy span { color: var(--ink-mute); font-size: .67rem; }
+    .site-links { display: flex; align-items: center; justify-content: flex-end; gap: .18rem; }
+    .site-links a { padding: .28rem .48rem; border-radius: 999px; color: var(--ink-soft); text-decoration: none; font-size: .7rem; font-weight: 750; }
+    .site-links a:hover { color: var(--accent-ink); background: var(--accent-wash); }
+
+    .chapter-shell { display: grid; grid-template-columns: 13.5rem minmax(0, 1fr); align-items: start; gap: 1.25rem; width: min(calc(100% - 1.25rem), 72rem); margin-inline: auto; }
+    .chapter-rail { position: sticky; top: 3rem; max-height: calc(100vh - 3.3rem); overflow-y: auto; padding: .8rem .55rem 1rem 0; border-right: 1px solid var(--border-soft); }
+    .chapter-rail-label { margin-bottom: .55rem; color: var(--accent-ink); font: 800 .65rem/1.2 var(--font-mono); letter-spacing: .11em; text-transform: uppercase; }
+    .chapter-rail a { display: grid; grid-template-columns: 1.25rem 1fr; gap: .25rem; padding: .28rem .38rem; border-radius: .35rem; color: var(--ink-mute); text-decoration: none; font-size: .73rem; line-height: 1.25; }
+    .chapter-rail a span { color: var(--accent-ink); font: 700 .62rem/1.55 var(--font-mono); }
+    .chapter-rail a:hover, .chapter-rail a[aria-current="true"] { color: var(--accent-ink); background: var(--accent-wash); }
+    .chapter-main { min-width: 0; padding-bottom: 3rem; }
+    .chapter-main > section { margin: 0; padding-block: 1.2rem; scroll-margin-top: 3.4rem; }
+    .chapter-main > section + section { border-top: 1px solid var(--border-soft); }
+    .eyebrow { margin-bottom: .36rem; color: var(--accent-ink); font: 800 .67rem/1.3 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+    h1 { max-width: 22ch; margin: 0; font-size: clamp(1.58rem, 3vw, 2.08rem); line-height: 1.08; }
+    h2 { margin: 0 0 .5rem; font-size: clamp(1.28rem, 2.2vw, 1.56rem); }
+    h3 { margin: 0 0 .35rem; font-size: 1rem; }
+    .section-lede { max-width: 68ch; margin-bottom: .85rem; color: var(--ink-soft); font-size: .96rem; line-height: 1.52; }
+    .small-note { color: var(--ink-mute); font-size: .72rem; line-height: 1.45; }
+    .path { color: var(--accent-ink); font: 650 .73rem/1.35 var(--font-mono); overflow-wrap: anywhere; }
+
+    .mission-card { position: relative; overflow: hidden; margin-top: .8rem !important; padding: 1rem 1.1rem 1.05rem !important; border: 1px solid var(--border); border-radius: 1rem; background: radial-gradient(circle at 95% 5%, var(--accent-wash), transparent 32%), var(--bg-card); box-shadow: var(--shadow-card); }
+    .mission-card::after { position: absolute; right: -.2rem; bottom: -.25rem; content: "SPECIALIST"; color: color-mix(in srgb, var(--accent) 8%, transparent); font: 900 2.65rem/1 var(--font-mono); pointer-events: none; transform: rotate(-2deg); }
+    .mission-card > * { position: relative; z-index: 1; }
+    .mission-copy { max-width: 70ch; margin-top: .62rem; color: var(--ink-soft); font-size: .97rem; line-height: 1.55; }
+    .mission-formula { display: inline-flex; flex-wrap: wrap; gap: .35rem; margin-top: .7rem; padding: .48rem .62rem; border-radius: .55rem; background: var(--terminal-bg); color: var(--terminal-ink); font: 650 .7rem/1.42 var(--font-mono); }
+    .hook-note { margin-top: .65rem; max-width: 68ch; padding-left: .7rem; border-left: 3px solid var(--accent); color: var(--accent-ink); font-size: .78rem; line-height: 1.45; }
+
+    .cast-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: .82rem; background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .cast-table { min-width: 43rem; }
+    .cast-table th { background: var(--bg-inset); color: var(--accent-ink); font: 800 .67rem/1.3 var(--font-mono); text-transform: uppercase; }
+    .cast-table td { color: var(--ink-soft); font-size: .76rem; line-height: 1.42; }
+    .cast-table td:first-child { width: 21%; color: var(--ink); font-weight: 750; }
+    .cast-table td:nth-child(3) { width: 29%; }
+    .boundary-chip { display: inline-block; margin-top: .16rem; padding: .08rem .35rem; border-radius: 999px; background: var(--accent-wash); color: var(--accent-ink); font-size: .62rem; font-weight: 750; }
+
+    .ladder { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .42rem; margin-top: .65rem; }
+    .ladder-step { min-height: 5.25rem; padding: .58rem; border: 1px solid var(--border); border-radius: .58rem; background: var(--bg-card); }
+    .ladder-step b { display: block; color: var(--ink); font: 760 .68rem/1.3 var(--font-mono); }
+    .ladder-step span { display: block; margin-top: .2rem; color: var(--ink-mute); font-size: .69rem; line-height: 1.35; }
+    .ladder-step:nth-child(n+5) { background: var(--sys-blue-wash); }
+
+    .surface-map { padding: .85rem; border: 1px solid var(--border); border-radius: .9rem; background: var(--bg-inset); box-shadow: var(--shadow-card); }
+    .surface-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-areas: "prompt memory tools" "launch core permission" "state proof recovery"; gap: .48rem; }
+    .surface-node { min-height: 6.1rem; padding: .62rem; border: 1px solid var(--border); border-radius: .58rem; background: var(--bg-card); }
+    .surface-node b { display: block; margin-bottom: .22rem; color: var(--accent-ink); font: 800 .65rem/1.3 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; }
+    .surface-node p { color: var(--ink-mute); font-size: .68rem; line-height: 1.38; }
+    .surface-node code { color: var(--ink); font-size: .64rem; overflow-wrap: anywhere; }
+    .surface-core { grid-area: core; display: grid; place-items: center; min-height: 6.1rem; padding: .65rem; border: 2px solid var(--accent); border-radius: 50%; background: var(--accent-wash); text-align: center; }
+    .surface-core strong { color: var(--accent-ink); font-size: .79rem; }
+    .surface-core span { display: block; max-width: 17ch; margin-top: .15rem; color: var(--ink-soft); font-size: .65rem; line-height: 1.3; }
+    .node-prompt { grid-area: prompt; } .node-memory { grid-area: memory; } .node-tools { grid-area: tools; }
+    .node-launch { grid-area: launch; } .node-permission { grid-area: permission; }
+    .node-state { grid-area: state; } .node-proof { grid-area: proof; } .node-recovery { grid-area: recovery; }
+    .surface-caption { margin-top: .55rem; color: var(--ink-mute); font-size: .7rem; line-height: 1.45; text-align: center; }
+    .two-layers { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .6rem; }
+    .layer-card { padding: .62rem; border-radius: .55rem; background: var(--sys-violet-wash); color: var(--ink-soft); font-size: .72rem; line-height: 1.42; }
+    .layer-card b { color: var(--sys-violet); }
+
+    .loop-board { display: grid; gap: .62rem; }
+    .loop-lane { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: .65rem; padding: .7rem; border: 1px solid var(--border); border-radius: .75rem; }
+    .loop-lane.in { background: var(--sys-gold-wash); }
+    .loop-lane.out { background: var(--ok-wash); }
+    .lane-label { align-self: center; color: var(--ink); font: 820 .66rem/1.3 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+    .lane-label small { display: block; margin-top: .2rem; color: var(--ink-mute); font: 500 .65rem/1.35 var(--font-body); letter-spacing: 0; text-transform: none; }
+    .lane-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .38rem; }
+    .loop-step { position: relative; min-height: 4.6rem; padding: .52rem; border-radius: .5rem; background: var(--bg-card); color: var(--ink-mute); font-size: .66rem; line-height: 1.35; }
+    .loop-step:not(:last-child)::after { position: absolute; right: -.29rem; top: 34%; z-index: 2; content: "›"; color: var(--accent-ink); font-size: 1rem; font-weight: 800; }
+    .loop-step b { display: block; margin-bottom: .15rem; color: var(--ink); font-size: .7rem; }
+    .loop-recovery { padding: .55rem .7rem; border: 1px dashed var(--accent); border-radius: .52rem; background: var(--accent-wash); color: var(--accent-ink); font: 700 .68rem/1.42 var(--font-mono); text-align: center; }
+    .pattern-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: .42rem; margin-top: .55rem; }
+    .pattern-strip div { padding: .55rem; border-radius: .5rem; background: var(--sys-blue-wash); color: var(--ink-soft); font-size: .68rem; line-height: 1.38; }
+    .pattern-strip b { display: block; color: var(--sys-blue); }
+
+    .contracts { display: grid; gap: .72rem; }
+    .contract-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, .9fr); gap: .8rem; padding: .82rem; border: 1px solid var(--border); border-radius: .72rem; background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .contract-copy p { margin-top: .27rem; color: var(--ink-soft); font-size: .76rem; line-height: 1.48; }
+    .contract-path { color: var(--accent-ink) !important; font: 700 .66rem/1.38 var(--font-mono); overflow-wrap: anywhere; }
+    .intent { margin-top: .48rem !important; padding: .5rem .58rem; border-left: 3px solid var(--accent); border-radius: 0 .38rem .38rem 0; background: var(--accent-wash); color: var(--ink) !important; font-size: .69rem !important; }
+    .intent b { color: var(--accent-ink); }
+    .evidence { min-width: 0; align-self: start; overflow: hidden; border: 1px solid var(--terminal-border); border-radius: .58rem; background: var(--terminal-bg); color: var(--terminal-ink); }
+    .evidence-label { display: flex; justify-content: space-between; gap: .4rem; padding: .35rem .52rem; border-bottom: 1px solid var(--terminal-bar); color: var(--terminal-dot); font: 650 .63rem/1.3 var(--font-mono); }
+    .evidence pre { margin: 0; padding: .58rem; border: 0; border-radius: 0; background: transparent; color: inherit; font: .65rem/1.48 var(--font-mono); white-space: pre-wrap; }
+    .tok-heading { color: #f0c9a4; font-weight: 750; }
+    .tok-key { color: #a9c9da; }
+    .tok-string { color: #bfd7a7; }
+    .tok-comment { color: #b5a99b; font-style: italic; }
+    .proof-list { display: grid; gap: .35rem; align-self: start; }
+    .proof-list div { padding: .52rem .58rem; border-left: 3px solid var(--ok); border-radius: .36rem; background: var(--ok-wash); color: var(--ok); font-size: .67rem; line-height: 1.4; }
+
+    .worked-run { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(14rem, .72fr); gap: .8rem; }
+    .run-steps { counter-reset: run; display: grid; gap: .46rem; }
+    .run-step { counter-increment: run; display: grid; grid-template-columns: 1.75rem 1fr; gap: .55rem; padding: .62rem; border: 1px solid var(--border); border-radius: .58rem; background: var(--bg-card); }
+    .run-step::before { display: grid; place-items: center; width: 1.55rem; height: 1.55rem; content: counter(run); border-radius: 50%; background: var(--accent); color: var(--ink-inverse); font: 800 .65rem/1 var(--font-mono); }
+    .run-step h3 { margin-top: .05rem; font-size: .8rem; }
+    .run-step p { margin-top: .14rem; color: var(--ink-soft); font-size: .72rem; line-height: 1.43; }
+    .terminal { margin-top: .32rem; padding: .5rem .58rem; overflow-x: auto; border-radius: .42rem; background: var(--terminal-bg); color: var(--terminal-ink); font: .65rem/1.48 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .commander-gate { align-self: start; position: sticky; top: 3.2rem; padding: .78rem; border-radius: .68rem; background: var(--ink); color: var(--terminal-ink); }
+    .commander-gate h3 { color: var(--ink-inverse); }
+    .commander-gate p, .commander-gate li { color: var(--terminal-dot); font-size: .68rem; line-height: 1.45; }
+    .commander-gate ul { margin-top: .35rem; padding-left: 1rem; }
+    .run-matrix { margin-top: .7rem; overflow-x: auto; border: 1px solid var(--border); border-radius: .66rem; }
+    .run-matrix table { min-width: 48rem; font-size: .68rem; }
+    .run-matrix th { background: var(--bg-inset); color: var(--accent-ink); }
+    .run-matrix code { font-size: .62rem; overflow-wrap: anywhere; }
+    .current-note { margin-top: .58rem; padding: .6rem .7rem; border: 1px dashed var(--accent); border-radius: .52rem; background: var(--bg-card); color: var(--ink-soft); font-size: .7rem; line-height: 1.45; }
+    .current-note b { color: var(--accent-ink); }
+
+    .failure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+    .failure-card { padding: .65rem; border: 1px solid var(--border); border-radius: .58rem; background: var(--bg-card); }
+    .failure-card b { display: block; color: var(--warn); font-size: .75rem; }
+    .failure-card p { margin-top: .18rem; color: var(--ink-soft); font-size: .69rem; line-height: 1.42; }
+    .failure-card .repair { display: block; margin-top: .28rem; color: var(--ok); font-weight: 750; }
+    .failure-card.wide { grid-column: 1 / -1; background: var(--sys-gold-wash); }
+
+    .lab { padding: .9rem !important; border: 2px solid var(--accent) !important; border-radius: .78rem; background: linear-gradient(145deg, var(--bg-card), var(--accent-wash)); box-shadow: var(--shadow-card); }
+    .lab-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: .75rem; }
+    .lab ol { margin-top: .45rem; padding-left: 1.15rem; }
+    .lab li { color: var(--ink-soft); font-size: .72rem; line-height: 1.45; }
+    .pass-list { padding: .66rem; border-radius: .58rem; background: var(--ok-wash); }
+    .pass-list h3, .pass-list li { color: var(--ok); }
+    .pass-list ul { margin-top: .35rem; padding-left: 1rem; }
+    .pass-list li { font-size: .69rem; line-height: 1.42; }
+    .fail-try { margin-top: .5rem; padding: .55rem .62rem; border: 1px dashed var(--accent); border-radius: .46rem; color: var(--accent-ink); font-size: .68rem; line-height: 1.43; }
+
+    .teach-back { padding: .88rem !important; border-radius: .74rem; background: var(--terminal-bg); color: var(--terminal-ink); }
+    .teach-back h2 { color: var(--ink-inverse); }
+    .six-sentences { counter-reset: sentence; display: grid; grid-template-columns: repeat(2, 1fr); gap: .45rem; margin-top: .65rem; }
+    .sentence { counter-increment: sentence; min-height: 3.45rem; padding: .55rem; border: 1px solid var(--terminal-bar); border-radius: .46rem; color: var(--terminal-dot); font-size: .71rem; line-height: 1.4; }
+    .sentence::before { display: inline-block; margin-right: .25rem; content: counter(sentence) "."; color: #f0c9a4; font: 800 .63rem/1 var(--font-mono); }
+    details summary { cursor: pointer; }
+    details[open] > :not(summary) { animation: reveal .22s ease-out both; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .answer-toggle { margin-top: .55rem; }
+    .answer-toggle summary { color: #f0c9a4; font-size: .7rem; font-weight: 750; }
+    .model-answer { margin-top: .45rem; padding: .62rem; border-radius: .45rem; background: var(--terminal-bar); color: var(--terminal-dot); font-size: .68rem; line-height: 1.5; }
+
+    .raw-index { overflow: clip; border: 1px solid var(--border); border-radius: .65rem; background: var(--bg-card); }
+    .raw-index > summary { padding: .68rem .76rem; color: var(--accent-ink); font-size: .76rem; font-weight: 750; }
+    .index-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; padding: .62rem; border-top: 1px solid var(--border); }
+    .index-group { padding: .55rem; border-radius: .48rem; background: var(--bg-inset); }
+    .index-group h3 { color: var(--accent-ink); font-size: .73rem; }
+    .index-group ul { margin: 0; padding-left: 1rem; }
+    .index-group li { margin: .18rem 0; color: var(--ink-mute); font-size: .62rem; line-height: 1.35; break-inside: avoid; }
+    .index-group code { color: var(--ink); font-size: .61rem; overflow-wrap: anywhere; }
+    .source-note { margin-top: .55rem; color: var(--ink-mute); font-size: .67rem; line-height: 1.43; }
+
+    .page-footer { padding: .8rem 0 1.8rem; border-top: 1px solid var(--border); color: var(--ink-mute); font-size: .68rem; }
+
+    @media (max-width: 960px) {
+      .chapter-shell { grid-template-columns: 1fr; width: min(100% - 1.2rem, 58rem); }
+      .chapter-rail { display: none; }
+    }
+    @media (max-width: 700px) {
+      .site-brand-copy span { display: none; }
+      .site-links a { padding-inline: .32rem; }
+      .ladder { grid-template-columns: repeat(2, 1fr); }
+      .surface-grid { grid-template-columns: 1fr 1fr; grid-template-areas: "core core" "prompt memory" "tools permission" "launch state" "proof recovery"; }
+      .surface-core { border-radius: .58rem; }
+      .two-layers, .loop-lane, .contract-card, .worked-run, .failure-grid, .lab-grid, .six-sentences, .index-groups { grid-template-columns: 1fr; }
+      .lane-steps { grid-template-columns: repeat(2, 1fr); }
+      .pattern-strip { grid-template-columns: 1fr; }
+      .commander-gate { position: static; }
+      .failure-card.wide { grid-column: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+    @media print {
+      .site-bar, .chapter-rail, .reading-progress, .skip-link { display: none !important; }
+      .chapter-shell { display: block !important; width: auto !important; }
+      .chapter-main > section { break-inside: auto; }
+      .contract-card, .failure-card, .run-step, .lab { break-inside: avoid; }
+    }
+  </style>
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#mission">Skip to lesson</a>
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-bar" aria-label="Book navigation">
+    <a class="site-brand" href="../index.html">
+      <span class="site-brand-mark">AS</span>
+      <span class="site-brand-copy"><strong>AGENT SYSTEMS</strong><span>IndyDevDan companion</span></span>
+    </a>
+    <nav class="site-links" aria-label="Companion links">
+      <a href="../vol-2-ah/11-building-domain-specific-agents.html">Chapter</a>
+      <a href="index.html">Code library</a>
+      <a href="../index.html">Book hub</a>
+    </nav>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="On this page">
+      <p class="chapter-rail-label">AH · 03</p>
+      <a href="#mission"><span>00</span>Agent mission</a>
+      <a href="#cast"><span>01</span>Cast of agents</a>
+      <a href="#surface"><span>02</span>Surface map</a>
+      <a href="#loop"><span>03</span>Control loop</a>
+      <a href="#contracts"><span>04</span>Four contracts</a>
+      <a href="#operate"><span>05</span>Operate like Dan</a>
+      <a href="#failures"><span>06</span>Common failures</a>
+      <a href="#lab"><span>07</span>Agent ops lab</a>
+      <a href="#teach-back"><span>08</span>Teach-back</a>
+      <a href="#appendix"><span>09</span>Raw index</a>
+    </aside>
+
+    <main id="main-content" class="chapter-main">
+      <section id="mission" class="mission-card" aria-labelledby="mission-title">
+        <p class="eyebrow">Agentic Horizon · Building Domain-Specific Agents</p>
+        <h1 id="mission-title">Program the specialist around the code.</h1>
+        <p class="mission-copy">This lesson trains you to turn a repeated domain job into an operable agent system: the human commander chooses the job and risk boundary; prompts encode the role; tool and permission contracts bound action; a launcher mounts the worker; and observable artifacts decide whether to continue, recover, or stop. The eight apps are not eight code tours—they are evidence that the same operating pattern can inhabit a script, REPL, stream, backend, or multi-agent product.</p>
+        <div class="mission-formula" aria-label="Agent system formula">intent → core four → mounted agent → tool evidence → persisted state → verify / recover</div>
+        <p class="hook-note"><strong>The hook:</strong> the model is replaceable. Your leverage lives in the operating ring that makes useful behavior repeatable.</p>
+      </section>
+
+      <section id="cast" aria-labelledby="cast-title">
+        <p class="eyebrow">01 · Who acts?</p>
+        <h2 id="cast-title">The commander designs the job; agents carry it</h2>
+        <p class="section-lede">A specialist is not “Claude with a clever prompt.” It is a cast with explicit ownership. If the human still shuttles every artifact and decides every retry, the system is wearing an agent costume but remains human-powered.</p>
+        <div class="cast-table-wrap">
+          <table class="cast-table">
+            <thead><tr><th>Actor</th><th>Owns</th><th>Does not own</th></tr></thead>
+            <tbody>
+              <tr><td>Human commander<br><span class="boundary-chip">in authority</span></td><td>Selects a domain-shaped task, risk tolerance, model class, acceptance evidence, and whether custom is justified.</td><td>Should not be the message bus between every plan, build, review, stream read, or retry.</td></tr>
+              <tr><td>Claude Code / SDK worker<br><span class="boundary-chip">probabilistic</span></td><td>Interprets the prompt, chooses permitted tools, reasons across context, and emits response blocks plus a result receipt.</td><td>Cannot grant itself tools, enlarge its file boundary, or prove its own output correct by assertion.</td></tr>
+              <tr><td>Task subagents<br><span class="boundary-chip">delegated</span></td><td>Parallel codebase search inside the QA role; their calls remain subject to the QA agent’s inline hooks.</td><td>Do not redefine the parent mission or escape its hook and tool contracts.</td></tr>
+              <tr><td>Planner · Builder · Reviewer<br><span class="boundary-chip">specialists</span></td><td>Planner creates a spec; builder implements it with the general engineering preset; reviewer compares plan and diff.</td><td>No single role should silently absorb the whole SDLC. Their handoff artifact is the boundary.</td></tr>
+              <tr><td>Deterministic scripts and tools<br><span class="boundary-chip">mechanical</span></td><td>Filter streams, calculate, persist records, send notifications, restrict writes, broadcast state, and launch agents.</td><td>Do not make fuzzy domain judgments unless the rule is deliberately encoded.</td></tr>
+              <tr><td>Verifiers and observers<br><span class="boundary-chip">evidence</span></td><td>Hooks, tests, response parsers, git diff, reviews, WebSocket status, cost, session IDs, and stored artifacts expose what happened.</td><td>A receipt proves execution, not correctness. Verification must be able to change the next branch.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="ladder" aria-label="Eight agent forms in the lesson">
+          <div class="ladder-step"><b>01 · Pong</b><span>One-off query. Prompt overwrite proves identity is programmable.</span></div>
+          <div class="ladder-step"><b>02 · Echo</b><span>One custom tool mounted through an in-memory MCP server.</span></div>
+          <div class="ladder-step"><b>03 · Calc</b><span>REPL, two tools, explicit unload, and session resume.</span></div>
+          <div class="ladder-step"><b>04 · Social Hype</b><span>Deterministic filter + model judgment + notification tools.</span></div>
+          <div class="ladder-step"><b>05 · QA</b><span>Read-only specialist, Task subagents, inline deny and audit hooks.</span></div>
+          <div class="ladder-step"><b>06 · Tri-Copy</b><span>Agent as a product backend with runtime-locked output count.</span></div>
+          <div class="ladder-step"><b>07 · Micro SDLC</b><span>Artifact handoff across planner, builder, and reviewer roles.</span></div>
+          <div class="ladder-step"><b>08 · Ultra Stream</b><span>Producer/consumer agents around persisted, bounded stream state.</span></div>
+        </div>
+      </section>
+
+      <section id="surface" aria-labelledby="surface-title">
+        <p class="eyebrow">02 · Agent surface map</p>
+        <h2 id="surface-title">The agent touches interfaces, not “the repo”</h2>
+        <p class="section-lede">Adopt the worker’s perspective. Its world is the context and capabilities you mount—not every file that happens to exist on disk.</p>
+        <figure class="surface-map">
+          <div class="surface-grid">
+            <div class="surface-node node-prompt"><b>Prompt</b><p>External Markdown defines identity, workflow, output grammar, and static variables.<br><code>apps/*/prompts/</code><br><code>backend/system_prompts/</code></p></div>
+            <div class="surface-node node-memory"><b>Memory / context</b><p>Prompt text, tool definitions, MCP servers, current request, persisted records, and <code>resume=session_id</code>.</p></div>
+            <div class="surface-node node-tools"><b>Tools</b><p><code>@tool</code> functions, in-memory MCP, optional external MCP, and built-ins permitted by options.</p></div>
+            <div class="surface-node node-launch"><b>Launcher</b><p><code>query()</code> for Pong; <code>ClaudeSDKClient</code> for tools and conversations; FastAPI and async loops for products.</p></div>
+            <div class="surface-core"><div><strong>Mounted specialist</strong><span>ClaudeAgentOptions controls context, model, prompt, and tools</span></div></div>
+            <div class="surface-node node-permission"><b>Authority</b><p><code>allowed_tools</code>, <code>disallowed_tools</code>, <code>cwd</code>, permission mode, and PreToolUse hooks.</p></div>
+            <div class="surface-node node-state"><b>State</b><p>Session IDs, SQLite rows, CSV, <code>specs/</code>, <code>reviews/</code>, line indices, and raw-log cache.</p></div>
+            <div class="surface-node node-proof"><b>Proof</b><p>Tool-use blocks, tool results, cost/duration, tests, diffs, review files, stage events, and visible errors.</p></div>
+            <div class="surface-node node-recovery"><b>Recovery</b><p>Deny a call, retry a smaller batch, clear/reconnect, enter Errored, restart with new prompt, or return authority to the human.</p></div>
+          </div>
+          <figcaption class="surface-caption">The durable reading lens is the core four—context, model, prompt, tools—surrounded by launch, authority, state, proof, and recovery.</figcaption>
+        </figure>
+        <div class="two-layers">
+          <div class="layer-card"><b>Outer operating layer.</b> Root <code>.claude/settings.json</code>, slash commands, output styles, and command hooks shape an interactive Claude Code session in this repo.</div>
+          <div class="layer-card"><b>Embedded operating layer.</b> Each Python product builds its own <code>ClaudeAgentOptions</code>, inline hooks, custom tools, session policy, and form factor. Outer settings are not a substitute for these contracts.</div>
+        </div>
+      </section>
+
+      <section id="loop" aria-labelledby="loop-title">
+        <p class="eyebrow">03 · Control loop</p>
+        <h2 id="loop-title">Plan → act → verify → recover changes shape by loop position</h2>
+        <p class="section-lede">In-loop work keeps the commander at the next decision. Out-of-loop work moves evidence through a harness until a gate fails, the job finishes, or authority returns to the human.</p>
+        <div class="loop-board" role="img" aria-label="In-loop and out-of-loop control loops for the lesson agents">
+          <div class="loop-lane in">
+            <div class="lane-label">In loop<small>Pong, Echo, Calc, QA</small></div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Plan</b>Human frames one question or calculation.</div>
+              <div class="loop-step"><b>Act</b>Agent answers or calls a bounded tool.</div>
+              <div class="loop-step"><b>Verify</b>Human sees text, tool call, error, cost, and session.</div>
+              <div class="loop-step"><b>Recover</b>Rephrase, clear, quit, or change the contract.</div>
+            </div>
+          </div>
+          <div class="loop-lane out">
+            <div class="lane-label">Out of loop<small>Social, SDLC, Ultra</small></div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Plan</b>Prompt and controller encode the repeated workflow.</div>
+              <div class="loop-step"><b>Act</b>Agents consume streams or artifact paths and call tools.</div>
+              <div class="loop-step"><b>Verify</b>Hooks, stored summaries, review artifacts, and state events observe.</div>
+              <div class="loop-step"><b>Recover</b>Deny, retry, clear/reconnect, mark Errored, or escalate.</div>
+            </div>
+          </div>
+          <div class="loop-recovery">Failure evidence must route backward. If it only appears in a log while the controller keeps shipping, the loop is open.</div>
+        </div>
+        <div class="pattern-strip">
+          <div><b>Name the pattern · core-four specialist</b>Configure only the context, intelligence, instructions, and tools the domain needs.</div>
+          <div><b>Name the pattern · artifact relay</b>Pass a spec path, produced-log row, or session ID—not copied chat memory—between stages.</div>
+          <div><b>Name the pattern · replaceable worker</b>Keep deterministic state and acceptance evidence outside the model so another worker can continue.</div>
+        </div>
+      </section>
+
+      <section id="contracts" aria-labelledby="contracts-title">
+        <p class="eyebrow">04 · Why these files exist for agents</p>
+        <h2 id="contracts-title">Four contracts turn capability into an operable system</h2>
+        <p class="section-lede">These snippets are evidence of contracts, not a source walkthrough. Read each as a boundary between the commander, model, deterministic runtime, and next stage.</p>
+
+        <div class="contracts">
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Prompt contract · what the agent is allowed to understand</h3>
+              <p class="contract-path">apps/custom_7_micro_sdlc_agent/backend/system_prompts/PLANNER_AGENT_SYSTEM_PROMPT.md</p>
+              <p>The planner does not receive “be smart.” It receives a domain procedure: inspect the real codebase, ground the plan in existing patterns, write only a specific artifact class, and make it implementable by someone else.</p>
+              <p>Prompt placement also chooses identity. A string overwrites the generalist; <code>preset: claude_code</code> keeps it; <code>append</code> extends it. The SDLC uses all three judgments: planner/reviewer extend, builder stays generalist, the stream agents are complete custom specialists.</p>
+              <p class="intent"><b>Dan’s design intent:</b> teach the workflow once, then make every fresh worker perform the role without a human re-explaining it.</p>
+            </div>
+            <div class="evidence" aria-label="Prompt contract excerpt">
+              <div class="evidence-label"><span>prompt evidence</span><span>planner</span></div>
+              <pre><span class="tok-heading">### CRITICAL: Research the Codebase First</span>
+
+Before writing any plan, ALWAYS search the codebase:
+
+1. Use <span class="tok-key">`Grep`</span> to find similar features, patterns, and conventions
+2. Use <span class="tok-key">`Glob`</span> to understand project structure and organization
+3. Use <span class="tok-key">`Read`</span> to examine key files that will be affected
+
+<span class="tok-string">Never make assumptions - verify everything by searching.</span></pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Tool / permission contract · what it can do</h3>
+              <p class="contract-path">.claude/settings.json · apps/custom_5_qa_agent/qa_agent.py · apps/custom_3_calc_agent/calc_agent.py</p>
+              <p>The outer settings intercept Bash before execution and log lifecycle events. Inside the SDK apps, options and inline hooks form a separate boundary: QA keeps read/search/Task but disallows editing; Calc removes built-ins and exposes only its two custom tools; planner/reviewer hooks restrict writes to <code>specs/</code> and <code>reviews/</code>.</p>
+              <p><code>allowed_tools</code> gates calls. It does not promise that every other definition is absent from context; the Echo→Calc comparison makes <code>disallowed_tools</code> the context-pruning control.</p>
+              <p class="intent"><b>Dan’s design intent:</b> make the least authority needed obvious in configuration, then enforce conditional rules at the tool boundary.</p>
+            </div>
+            <div class="evidence" aria-label="Settings contract excerpt">
+              <div class="evidence-label"><span>settings evidence</span><span>outer layer</span></div>
+              <pre>{
+  <span class="tok-key">"PreToolUse"</span>: [{
+    <span class="tok-key">"matcher"</span>: <span class="tok-string">"Bash"</span>,
+    <span class="tok-key">"hooks"</span>: [{
+      <span class="tok-key">"type"</span>: <span class="tok-string">"command"</span>,
+      <span class="tok-key">"command"</span>: <span class="tok-string">"$CLAUDE_PROJECT_DIR/.claude/hooks/dangerous_command_blocker.py"</span>,
+      <span class="tok-key">"timeout"</span>: 5
+    }]
+  }]
+}</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Harness / launcher · how you call the agent programmatically</h3>
+              <p class="contract-path">apps/custom_7_micro_sdlc_agent/backend/main.py · backend/modules/agent_orchestrator.py</p>
+              <p>The kanban UI does not “become agentic.” A deterministic controller watches an allowed stage transition, launches planner, passes its returned <code>specs/*.md</code> path to builder and reviewer, stores session IDs, broadcasts progress, and owns terminal state.</p>
+              <p>The smaller agents teach the same seam: Pong uses one-off <code>query()</code>; custom tools require <code>ClaudeSDKClient</code>; Calc captures <code>ResultMessage.session_id</code> and passes it back through <code>resume=</code>.</p>
+              <p class="intent"><b>Dan’s design intent:</b> turn agent behavior into a callable component that can live behind a CLI, stream, API, or UI—and be replaced without losing workflow state.</p>
+            </div>
+            <div class="evidence" aria-label="Launcher contract excerpt">
+              <div class="evidence-label"><span>launcher evidence</span><span>micro SDLC</span></div>
+              <pre># controller owns the relay
+plan_result = await run_planner_agent(...)
+
+if not plan_result["plan_path"]:
+    raise Exception("Planner failed to create a plan")
+
+build_result = await run_builder_agent(
+    plan_path=plan_result["plan_path"], ...
+)
+review_result = await run_reviewer_agent(
+    plan_path=plan_result["plan_path"], ...
+)</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Verification contract · how you know it succeeded</h3>
+              <p class="contract-path">apps/custom_7_micro_sdlc_agent/backend/user_prompts/REVIEWER_AGENT_USER_PROMPT.md · apps/custom_5_qa_agent/test_inline_hooks.py</p>
+              <p>The reviewer is told to compare the actual diff with the plan across functionality, tests, security, performance, and documentation. QA’s direct hook test proves the deny function returns the expected payload. Response parsers expose calls, errors, duration, cost, and session identity.</p>
+              <p>But there is an intentional systems lesson in the shipped controller: after the reviewer returns, the ticket moves to Shipped without parsing a pass/fail verdict or requiring tests. A review artifact is evidence; it is not yet a closing gate.</p>
+              <p class="intent"><b>Dan’s design intent:</b> give agents stdout-like evidence so the next decision can be programmed. Your production step is to make that evidence branch control flow.</p>
+            </div>
+            <div class="proof-list" aria-label="Verification evidence">
+              <div><b>Plan gate</b><br>Planner must return a path or the workflow raises and moves to Errored.</div>
+              <div><b>Behavior signal</b><br>Tool blocks, WebSocket stage changes, stored rows, and direct hook tests show what ran.</div>
+              <div><b>Missing closure</b><br>Reviewer completion currently advances to Shipped; no verdict parser blocks the transition.</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="operate" aria-labelledby="operate-title">
+        <p class="eyebrow">05 · One worked run</p>
+        <h2 id="operate-title">Operate like Dan: audit the ring, then let it carry the work</h2>
+        <p class="section-lede">The worked run uses the Micro SDLC because it makes role separation and artifact handoff visible. Run it only against a codebase you are willing to modify: the builder uses <code>permission_mode="bypassPermissions"</code>.</p>
+        <div class="worked-run">
+          <div class="run-steps">
+            <article class="run-step"><div><h3>Start from the real backend project</h3><p>The README treats each Python agent as its own UV project.</p><div class="terminal">cd agentic-horizon/building-specialized-agents/apps/custom_7_micro_sdlc_agent/backend
+uv sync
+uv run python main.py</div></div></article>
+            <article class="run-step"><div><h3>Start the observer surface</h3><p>In a second terminal, launch the Vue kanban and open the README’s port.</p><div class="terminal">cd agentic-horizon/building-specialized-agents/apps/custom_7_micro_sdlc_agent/frontend
+npm install
+npm run dev
+
+# open http://127.0.0.1:5174</div></div></article>
+            <article class="run-step"><div><h3>Command, do not implement</h3><p>Create a narrow ticket such as “update the HTML title and header to ‘Plan, Build, Review, Ship Agents’.” Choose the model and confirm the codebase path before granting authority.</p></div></article>
+            <article class="run-step"><div><h3>Trigger one state transition</h3><p>Drag Idle → Plan. From here the controller—not the human—launches Planner → Builder → Reviewer and broadcasts each stage over WebSocket.</p></div></article>
+            <article class="run-step"><div><h3>Inspect handoffs and authority</h3><p>Confirm a real <code>specs/*.md</code> artifact, builder changes, a <code>reviews/*-review.md</code> artifact, tool-call counts, and separate session IDs. The shipped config uses <code>specs/</code>, despite older README wording that says <code>plans/</code>.</p></div></article>
+            <article class="run-step"><div><h3>Close the human gate</h3><p>Run the affected project’s tests and inspect <code>git diff</code>. Treat the board’s Shipped state as “workflow finished,” not proof that acceptance criteria passed. Stop both processes when done.</p></div></article>
+          </div>
+          <aside class="commander-gate" aria-label="Commander gate">
+            <h3>Commander gate</h3>
+            <p>Before Idle → Plan, answer:</p>
+            <ul>
+              <li>Is this repeated or domain-specific enough to justify a custom system?</li>
+              <li>Which prompt is overwrite, append, or pure preset?</li>
+              <li>Which directory can each role write?</li>
+              <li>What artifact crosses each seam?</li>
+              <li>What evidence can stop shipping?</li>
+              <li>Who recovers when a worker returns malformed output?</li>
+            </ul>
+          </aside>
+        </div>
+
+        <div class="run-matrix" aria-label="Real README run commands for all eight agents">
+          <table>
+            <thead><tr><th>System</th><th>Real README entrypoint</th><th>Watch for</th></tr></thead>
+            <tbody>
+              <tr><td>Pong</td><td><code>cd apps/custom_1_pong_agent &amp;&amp; uv sync &amp;&amp; uv run python pong_agent.py</code></td><td>Any input resolves to the prompt-defined identity.</td></tr>
+              <tr><td>Echo</td><td><code>cd apps/custom_2_echo_agent &amp;&amp; uv sync &amp;&amp; uv run python echo_agent.py</code></td><td>Qualified custom tool call.</td></tr>
+              <tr><td>Calc</td><td><code>cd apps/custom_3_calc_agent &amp;&amp; uv sync &amp;&amp; uv run python calc_agent.py</code></td><td>Two tools, pruned built-ins, dependent second turn.</td></tr>
+              <tr><td>Social Hype</td><td><code>cd apps/custom_4_social_hype_agent &amp;&amp; uv sync &amp;&amp; uv run python social_hype_agent.py coding -n "Notify me about major announcements"</code></td><td>Live network, token use, optional macOS/TTS side effects.</td></tr>
+              <tr><td>QA</td><td><code>cd apps/custom_5_qa_agent &amp;&amp; uv sync &amp;&amp; uv run python qa_agent.py</code></td><td>Read-only tools, Task subagents, .env deny.</td></tr>
+              <tr><td>Tri-Copy</td><td><code>cd apps/custom_6_tri_copy_writer/backend &amp;&amp; uv sync &amp;&amp; uv run python main.py -v 5</code><br><code>cd ../frontend &amp;&amp; npm install &amp;&amp; npm run dev</code></td><td>Runtime-locked count and structured response.</td></tr>
+              <tr><td>Micro SDLC</td><td><code>cd apps/custom_7_micro_sdlc_agent/backend &amp;&amp; uv sync &amp;&amp; uv run python main.py</code><br><code>cd ../frontend &amp;&amp; npm install &amp;&amp; npm run dev</code></td><td>Plan path relay, bounded writers, stage events.</td></tr>
+              <tr><td>Ultra Stream</td><td><code>cd apps/custom_8_ultra_stream_agent &amp;&amp; uv sync &amp;&amp; uv run python generate_sample_data.py &amp;&amp; uv run python backend/main.py</code><br><code>cd frontend &amp;&amp; npm install &amp;&amp; npm run dev</code></td><td>Bounded producer, persisted summaries, Inspector consumer.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="current-note"><b>Current-source audit.</b> The runnable package/class names are <code>claude-agent-sdk</code>, <code>claude_agent_sdk</code>, and <code>ClaudeAgentOptions</code>; the recording shows the former “Claude Code SDK” name. QA loads <code>.mcp.json.firecrawl_6k</code> but ships only <code>.mcp.json.firecrawl_6k.sample</code>. Ultra Stream’s README says frontend port 5173, while the shipped <code>frontend/vite.config.js</code> uses 5175. Source wins over stale prose.</div>
+      </section>
+
+      <section id="failures" aria-labelledby="failures-title">
+        <p class="eyebrow">06 · Fail, name, repair</p>
+        <h2 id="failures-title">Most “agent failures” are operating-system failures</h2>
+        <p class="section-lede">Inspect the contract that shaped behavior before blaming the model. These signatures are visible in the lesson’s own contrasts and wiring.</p>
+        <div class="failure-grid">
+          <article class="failure-card"><b>Mis-prompting replaces the wrong agent</b><p>A generic engineering job receives a full system overwrite, throwing away the useful Claude Code preset.<span class="repair">Repair: generalist → append → overwrite; move right only for a named domain mismatch.</span></p></article>
+          <article class="failure-card"><b>Allowed is mistaken for unloaded</b><p>Echo can call only its custom tool, yet other built-in definitions may still occupy context.<span class="repair">Repair: use explicit <code>disallowed_tools</code> when the domain does not need those definitions.</span></p></article>
+          <article class="failure-card"><b>Outer hooks are assumed to protect embedded agents</b><p>Root command hooks and SDK inline hooks are separate operating layers. Configuring one does not prove the other is governed.<span class="repair">Repair: trace the exact launcher and observe a denied call in that runtime.</span></p></article>
+          <article class="failure-card"><b>A file on disk impersonates capability</b><p><code>.claude/hooks/context_bundle_builder.py</code> exists, but shipped <code>.claude/settings.json</code> does not invoke it.<span class="repair">Repair: capability means mounted, triggered, and observed—not merely committed.</span></p></article>
+          <article class="failure-card"><b>A chat-shaped UI impersonates memory</b><p>A REPL or browser can look continuous while the backend starts a fresh session every request.<span class="repair">Repair: capture the result session ID, persist it, and supply it through <code>resume=</code>.</span></p></article>
+          <article class="failure-card"><b>Over-permission becomes invisible</b><p>The SDLC builder uses <code>bypassPermissions</code>; root aliases also demonstrate skip-permission modes. Convenience can exceed the apparent tool story.<span class="repair">Repair: run in a disposable scope, narrow <code>cwd</code>, audit commands, and make the exception explicit.</span></p></article>
+          <article class="failure-card"><b>The human stays in the loop as middleware</b><p>The commander copies plan text, restarts each worker, and manually advances every state.<span class="repair">Repair: pass artifact paths and let a deterministic controller own valid transitions and receipts.</span></p></article>
+          <article class="failure-card"><b>Context “clear” is taken literally</b><p>Ultra Stream’s <code>clear_context</code> tool resets a counter and broadcasts status; the outer loop disconnects and reconnects around its threshold.<span class="repair">Repair: verify actual session/reconnect behavior; do not infer a full context wipe from a tool name.</span></p></article>
+          <article class="failure-card wide"><b>Review exists, but the loop still ships open</b><p>Micro SDLC checks that a plan path exists, then awaits build and review. After reviewer completion it advances to Shipped without parsing a verdict or requiring a test result. This is the perfect “missing verify” lesson: a review document is observable evidence, but until failure changes control flow it cannot close the loop.<span class="repair">Repair: define a machine-readable verdict, require behavioral checks, and route fail/needs-work to patch, retry, Errored, or human escalation.</span></p></article>
+        </div>
+      </section>
+
+      <section id="lab" class="lab" aria-labelledby="lab-title">
+        <p class="eyebrow">07 · Lab · Agent operations</p>
+        <h2 id="lab-title">Strengthen QA’s evidence contract—without touching app logic</h2>
+        <p class="section-lede">Your target is the prompt interface around the QA worker. The exercise makes prompt behavior observable and proves that a prompt cannot override a permission hook.</p>
+        <div class="lab-grid">
+          <div>
+            <h3>Change the agent system</h3>
+            <ol>
+              <li>From <code>apps/custom_5_qa_agent</code>, run <code>uv sync</code>, then <code>uv run python qa_agent.py</code>.</li>
+              <li>Baseline: ask “How does <code>block_env_files</code> enforce the .env denial?” Save the answer and its cited paths.</li>
+              <li>Edit only <code>prompts/QA_AGENT_SYSTEM_PROMPT.md</code>. Add a short <strong>Evidence Ledger</strong> report contract requiring each conclusion to include claim, file path + line, evidence type (<em>direct</em> or <em>inference</em>), and a final <code>Verification: PASS | INCOMPLETE</code>.</li>
+              <li>Exit and restart the process. QA loads the prompt in <code>QAAgentREPL.__init__</code>; the shipped <code>/clear</code> path rebuilds the client but does not reread the prompt file.</li>
+              <li>Ask the same question. Confirm the response shape changed while the Python launcher and application files did not.</li>
+              <li>Make it fail safely: ask it to read <code>.env.sample</code>. The PreToolUse hook must deny the call even if the prompt wants comprehensive evidence.</li>
+              <li>Run the shipped direct hook check:<div class="terminal">uv run python test_inline_hooks.py</div></li>
+              <li>Use <code>git diff -- prompts/QA_AGENT_SYSTEM_PROMPT.md</code> and <code>git status --short</code> to inspect your agent-OS-only change. Restore or commit it intentionally.</li>
+            </ol>
+            <div class="fail-try"><strong>Name the pattern:</strong> prompt shapes judgment and output; permission gates authority; a fresh mount activates changed system instructions; direct tests and observed denials are different layers of proof.</div>
+          </div>
+          <aside class="pass-list">
+            <h3>Observable pass criteria</h3>
+            <ul>
+              <li>The second answer contains a structured Evidence Ledger.</li>
+              <li>Claims cite real files and lines.</li>
+              <li>Direct evidence and inference are labeled separately.</li>
+              <li>The answer ends in PASS or INCOMPLETE.</li>
+              <li><code>.env.sample</code> is denied by the hook.</li>
+              <li><code>test_inline_hooks.py</code> completes and reports the deny condition.</li>
+              <li>No <code>.py</code>, frontend, or application behavior file changed.</li>
+              <li>You can explain why restart—not <code>/clear</code>—activated the edited prompt.</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section id="teach-back" class="teach-back" aria-labelledby="teach-title">
+        <p class="eyebrow">08 · Retrieval check</p>
+        <h2 id="teach-title">Explain this lesson’s agent OS in six sentences—without looking</h2>
+        <div class="six-sentences" aria-label="Six sentence teach-back prompts">
+          <div class="sentence">The human commander owns…</div>
+          <div class="sentence">The core four control…</div>
+          <div class="sentence">The prompt and permission contracts differ because…</div>
+          <div class="sentence">The launcher makes a specialist programmable by…</div>
+          <div class="sentence">Verification closes the loop only when…</div>
+          <div class="sentence">Dan’s leverage and replaceability move is…</div>
+        </div>
+        <details class="answer-toggle">
+          <summary>Compare with a model answer</summary>
+          <div class="model-answer">The human commander owns task choice, authority, risk, and final acceptance. The core four—context, model, prompt, and tools—make a model behave like a repeatable specialist. The prompt defines what the worker should understand and produce, while permissions independently constrain what it may do. A launcher mounts those choices behind a query, client, stream, API, or multi-agent controller and keeps state outside the worker. Verification closes the loop only when observable evidence can stop, retry, patch, or escalate the run. Dan’s leverage move is to improve this operating ring so workers remain programmable and replaceable while the human stops serving as runtime.</div>
+        </details>
+      </section>
+
+      <section id="appendix" aria-labelledby="appendix-title">
+        <p class="eyebrow">09 · Appendix · For the curious</p>
+        <h2 id="appendix-title">Raw file index</h2>
+        <p class="section-lede">One line per audited file, grouped by operating layer. These are coordinates, not a second code tour.</p>
+        <details class="raw-index">
+          <summary>Show the complete codebase index</summary>
+          <div class="index-groups">
+            <div class="index-group"><h3>Repo-level agent OS</h3><ul>
+              <li><code>README.md</code> — eight-agent catalog and run commands</li>
+              <li><code>CLAUDE.md</code> — empty project memory file</li>
+              <li><code>.env.sample</code> — API-key placeholders</li>
+              <li><code>.gitignore</code> — ignored runtime and secret paths</li>
+              <li><code>.mcp.json.sample</code> — Playwright + Firecrawl example</li>
+              <li><code>.mcp.json.all_17k.sample</code> — combined MCP context example</li>
+              <li><code>.mcp.json.firecrawl_7k.sample</code> — Firecrawl-only example</li>
+              <li><code>.mcp.json.playwright_10k.sample</code> — Playwright-only example</li>
+              <li><code>ai_docs/README.md</code> — SDK, MCP, hooks, skills, and migration references</li>
+              <li><code>.claude/settings.json</code> — mounted repo-level command hooks</li>
+              <li><code>.claude/hooks/context_bundle_builder.py</code> — available but unmounted context logger</li>
+              <li><code>.claude/hooks/dangerous_command_blocker.py</code> — Bash deny hook</li>
+              <li><code>.claude/hooks/universal_hook_logger.py</code> — lifecycle JSONL logger</li>
+              <li><code>.claude/commands/all_tools.md</code> — tool inventory command</li>
+              <li><code>.claude/commands/background.md</code> — background Claude launcher contract</li>
+              <li><code>.claude/commands/build.md</code> — plan-to-build command</li>
+              <li><code>.claude/commands/build_w_report.md</code> — build with structured report</li>
+              <li><code>.claude/commands/load_ai_docs.md</code> — documentation loader</li>
+              <li><code>.claude/commands/load_bundle.md</code> — context-bundle loader</li>
+              <li><code>.claude/commands/parallel_subagents.md</code> — parallel delegation prompt</li>
+              <li><code>.claude/commands/plan_vite_vue.md</code> — Vue planning specialist</li>
+              <li><code>.claude/commands/plan_w_docs.md</code> — documentation-grounded planner</li>
+              <li><code>.claude/commands/prime.md</code> — project priming command</li>
+              <li><code>.claude/commands/prime_cc.md</code> — Claude Code priming command</li>
+              <li><code>.claude/commands/question.md</code> — focused question command</li>
+              <li><code>.claude/commands/quick-plan.md</code> — compact planner</li>
+              <li><code>.claude/commands/scout.md</code> — file-scouting workflow</li>
+              <li><code>.claude/commands/scout_plan_build.md</code> — scout/plan/build composition</li>
+              <li><code>.claude/commands/t_metaprompt_workflow.md</code> — prompt-builder command</li>
+              <li><code>.claude/commands/experts/cc_hook_expert/cc_hook_expert_plan.md</code> — hook planning expert</li>
+              <li><code>.claude/commands/experts/cc_hook_expert/cc_hook_expert_build.md</code> — hook building expert</li>
+              <li><code>.claude/commands/experts/cc_hook_expert/cc_hook_expert_improve.md</code> — hook expert feedback loop</li>
+              <li><code>.claude/output-styles/concise-done.md</code> — concise completion style</li>
+              <li><code>.claude/output-styles/concise-tts.md</code> — concise speech-oriented style</li>
+              <li><code>.claude/output-styles/concise-ultra.md</code> — ultra-compact style</li>
+              <li><code>.claude/output-styles/observable-tools-diffs-tts.md</code> — tool/diff observable style</li>
+              <li><code>.claude/output-styles/verbose-bullet-points.md</code> — verbose bullet style</li>
+              <li><code>.claude/output-styles/verbose-yaml-structured.md</code> — YAML report style</li>
+              <li><code>.claude/utils/llm/anth.py</code> — Anthropic utility</li>
+              <li><code>.claude/utils/llm/oai.py</code> — OpenAI utility</li>
+              <li><code>.claude/utils/llm/ollama.py</code> — Ollama utility</li>
+              <li><code>.claude/utils/tts/elevenlabs_tts.py</code> — ElevenLabs TTS utility</li>
+              <li><code>.claude/utils/tts/openai_tts.py</code> — OpenAI TTS utility</li>
+              <li><code>.claude/utils/tts/pyttsx3_tts.py</code> — local TTS utility</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Agents 1–3 · primitives</h3><ul>
+              <li><code>apps/custom_1_pong_agent/README.md</code> — minimal run guide</li>
+              <li><code>apps/custom_1_pong_agent/pong_agent.py</code> — Python one-off launcher</li>
+              <li><code>apps/custom_1_pong_agent/pong_agent.ts</code> — TypeScript parity launcher</li>
+              <li><code>apps/custom_1_pong_agent/prompts/PONG_AGENT_SYSTEM_PROMPT.md</code> — identity overwrite</li>
+              <li><code>apps/custom_1_pong_agent/pyproject.toml</code> — Python dependency contract</li>
+              <li><code>apps/custom_1_pong_agent/uv.lock</code> — locked Python dependencies</li>
+              <li><code>apps/custom_1_pong_agent/package.json</code> — Bun/TypeScript scripts</li>
+              <li><code>apps/custom_1_pong_agent/bun.lock</code> — locked JS dependencies</li>
+              <li><code>apps/custom_2_echo_agent/README.md</code> — custom-tool run guide</li>
+              <li><code>apps/custom_2_echo_agent/echo_agent.py</code> — tool + client launcher</li>
+              <li><code>apps/custom_2_echo_agent/prompts/ECHO_AGENT_SYSTEM_PROMPT.md</code> — echo role</li>
+              <li><code>apps/custom_2_echo_agent/pyproject.toml</code> — dependency contract</li>
+              <li><code>apps/custom_2_echo_agent/uv.lock</code> — locked dependencies</li>
+              <li><code>apps/custom_3_calc_agent/README.md</code> — REPL and continuity guide</li>
+              <li><code>apps/custom_3_calc_agent/calc_agent.py</code> — two tools + resume loop</li>
+              <li><code>apps/custom_3_calc_agent/prompts/CALC_AGENT_SYSTEM_PROMPT.md</code> — calculator workflow</li>
+              <li><code>apps/custom_3_calc_agent/pyproject.toml</code> — dependency contract</li>
+              <li><code>apps/custom_3_calc_agent/uv.lock</code> — locked dependencies</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Agents 4–5 · streams and governance</h3><ul>
+              <li><code>apps/custom_4_social_hype_agent/README.md</code> — firehose run guide</li>
+              <li><code>apps/custom_4_social_hype_agent/.env.sample</code> — optional key placeholder</li>
+              <li><code>apps/custom_4_social_hype_agent/social_hype_agent.py</code> — CLI entrypoint</li>
+              <li><code>apps/custom_4_social_hype_agent/modules/__init__.py</code> — module exports</li>
+              <li><code>apps/custom_4_social_hype_agent/modules/agent.py</code> — queue, stream, and SDK controller</li>
+              <li><code>apps/custom_4_social_hype_agent/modules/tools.py</code> — analysis and notification tools</li>
+              <li><code>apps/custom_4_social_hype_agent/modules/tts_notifier.py</code> — audio side effect</li>
+              <li><code>apps/custom_4_social_hype_agent/modules/utils.py</code> — prompt substitution and data helper</li>
+              <li><code>apps/custom_4_social_hype_agent/prompts/SOCIAL_HYPE_AGENT_SYSTEM_PROMPT.md</code> — stream analysis workflow</li>
+              <li><code>apps/custom_4_social_hype_agent/pyproject.toml</code> — dependency contract</li>
+              <li><code>apps/custom_4_social_hype_agent/uv.lock</code> — locked dependencies</li>
+              <li><code>apps/custom_4_social_hype_agent/social_hype_results.csv</code> — persisted analysis sample</li>
+              <li><code>apps/custom_5_qa_agent/README.md</code> — read-only QA run guide</li>
+              <li><code>apps/custom_5_qa_agent/.env.sample</code> — local key placeholder</li>
+              <li><code>apps/custom_5_qa_agent/.mcp.json.firecrawl_6k.sample</code> — optional Firecrawl config</li>
+              <li><code>apps/custom_5_qa_agent/.claude/commands/qa_agent.md</code> — slash-command contract</li>
+              <li><code>apps/custom_5_qa_agent/prompts/QA_AGENT_SYSTEM_PROMPT.md</code> — QA role and search policy</li>
+              <li><code>apps/custom_5_qa_agent/qa_agent.py</code> — REPL, hooks, tools, sessions</li>
+              <li><code>apps/custom_5_qa_agent/test_inline_hooks.py</code> — direct hook-function check</li>
+              <li><code>apps/custom_5_qa_agent/pyproject.toml</code> — dependency contract</li>
+              <li><code>apps/custom_5_qa_agent/uv.lock</code> — locked dependencies</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Agent 6 · Tri-Copy product</h3><ul>
+              <li><code>apps/custom_6_tri_copy_writer/README.md</code> — two-process run guide</li>
+              <li><code>apps/custom_6_tri_copy_writer/prompts/TRI_COPY_WRITER_SYSTEM_PROMPT.md</code> — structured copy contract</li>
+              <li><code>apps/custom_6_tri_copy_writer/backend/main.py</code> — CLI-configured FastAPI agent harness</li>
+              <li><code>apps/custom_6_tri_copy_writer/backend/pyproject.toml</code> — backend dependencies</li>
+              <li><code>apps/custom_6_tri_copy_writer/backend/uv.lock</code> — locked backend dependencies</li>
+              <li><code>apps/custom_6_tri_copy_writer/frontend/index.html</code> — Vite shell</li>
+              <li><code>apps/custom_6_tri_copy_writer/frontend/package.json</code> — frontend scripts and dependencies</li>
+              <li><code>apps/custom_6_tri_copy_writer/frontend/bun.lock</code> — locked frontend dependencies</li>
+              <li><code>apps/custom_6_tri_copy_writer/frontend/vite.config.js</code> — frontend server config</li>
+              <li><code>apps/custom_6_tri_copy_writer/frontend/src/main.js</code> — Vue mount</li>
+              <li><code>apps/custom_6_tri_copy_writer/frontend/src/App.vue</code> — upload/request/result UI</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Agent 7 · Micro SDLC</h3><ul>
+              <li><code>apps/custom_7_micro_sdlc_agent/README.md</code> — SDLC run and stage guide</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/main.py</code> — stage controller and WebSocket API</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/db/database.py</code> — ticket/session persistence</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/modules/agent_orchestrator.py</code> — planner/builder/reviewer launchers</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/modules/config.py</code> — paths and model choices</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/pyproject.toml</code> — backend dependencies</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/uv.lock</code> — locked backend dependencies</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/system_prompts/PLANNER_AGENT_SYSTEM_PROMPT.md</code> — planner extension</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/system_prompts/REVIEWER_AGENT_SYSTEM_PROMPT.md</code> — reviewer extension</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/user_prompts/PLANNER_AGENT_USER_PROMPT.md</code> — plan request grammar</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/user_prompts/BUILDER_AGENT_USER_PROMPT.md</code> — build handoff grammar</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/user_prompts/REVIEWER_AGENT_USER_PROMPT.md</code> — review handoff grammar</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/specs/test-user-management-api-implementation.md</code> — generated backend spec</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/specs/update-html-title-micro-sdlc.md</code> — generated backend spec</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/backend/reviews/update-html-title-micro-sdlc-review.md</code> — generated backend review</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/index.html</code> — Vite shell</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/package.json</code> — frontend scripts and dependencies</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/bun.lock</code> — locked frontend dependencies</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/vite.config.js</code> — ports and proxy</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/src/main.js</code> — Vue/Pinia mount</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/src/App.vue</code> — kanban surface</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/src/stores/tickets.js</code> — API/WebSocket state controller</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/src/components/CreateTicketModal.vue</code> — commander input form</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/src/components/ThemeToggle.vue</code> — theme control</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/src/components/TicketCard.vue</code> — stage and receipt summary</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/src/components/TicketDetailsModal.vue</code> — agent message inspection</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/src/composables/useAppTitle.js</code> — title state helper</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/frontend/src/composables/useTheme.js</code> — theme state helper</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/test_concurrent.py</code> — concurrent workflow helper</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/test_websocket.py</code> — WebSocket helper</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/specs/dark-mode-toggle-implementation.md</code> — generated spec</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/specs/golden-edges-board-tickets.md</code> — generated spec</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/specs/sync-header-title-with-html-title.md</code> — generated spec</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/specs/ticket-refresh-transition-fix.md</code> — generated spec</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/specs/update-application-titles.md</code> — generated spec</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/specs/update-html-title-micro-sdlc.md</code> — generated spec</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/reviews/dark-mode-toggle-implementation-review.md</code> — generated review</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/reviews/golden-edges-board-tickets-review.md</code> — generated review</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/reviews/sync-header-title-with-html-title-review.md</code> — generated review</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/reviews/ticket-refresh-transition-fix-review.md</code> — generated review</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/reviews/update-application-titles-review.md</code> — generated review</li>
+              <li><code>apps/custom_7_micro_sdlc_agent/reviews/update-html-title-micro-sdlc-review.md</code> — generated review</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Agent 8 · Ultra Stream</h3><ul>
+              <li><code>apps/custom_8_ultra_stream_agent/README.md</code> — dual-agent run guide</li>
+              <li><code>apps/custom_8_ultra_stream_agent/.env.sample</code> — key placeholder</li>
+              <li><code>apps/custom_8_ultra_stream_agent/backend/main.py</code> — tools, agents, loop, API, persistence</li>
+              <li><code>apps/custom_8_ultra_stream_agent/modules/data_types.py</code> — tool/state schemas</li>
+              <li><code>apps/custom_8_ultra_stream_agent/system_prompts/stream_agent_system_prompt.md</code> — bounded producer workflow</li>
+              <li><code>apps/custom_8_ultra_stream_agent/system_prompts/inspector_agent_system_prompt.md</code> — consumer investigation workflow</li>
+              <li><code>apps/custom_8_ultra_stream_agent/generate_sample_data.py</code> — JSONL fixture generator</li>
+              <li><code>apps/custom_8_ultra_stream_agent/data/ultra_stream_agent.jsonl</code> — sample stream data</li>
+              <li><code>apps/custom_8_ultra_stream_agent/pyproject.toml</code> — backend dependency contract</li>
+              <li><code>apps/custom_8_ultra_stream_agent/uv.lock</code> — locked backend dependencies</li>
+              <li><code>apps/custom_8_ultra_stream_agent/frontend/index.html</code> — Vite shell</li>
+              <li><code>apps/custom_8_ultra_stream_agent/frontend/package.json</code> — frontend scripts and dependencies</li>
+              <li><code>apps/custom_8_ultra_stream_agent/frontend/bun.lock</code> — locked frontend dependencies</li>
+              <li><code>apps/custom_8_ultra_stream_agent/frontend/vite.config.js</code> — port 5175 and backend proxy</li>
+              <li><code>apps/custom_8_ultra_stream_agent/frontend/src/main.js</code> — Vue mount</li>
+              <li><code>apps/custom_8_ultra_stream_agent/frontend/src/App.vue</code> — inspector/stream observer UI</li>
+            </ul></div>
+          </div>
+        </details>
+        <p class="source-note">Audit scope: every lesson file was inventoried; agent-facing READMEs, prompts, settings, hooks, commands, launchers, backends, frontends, tests, generated examples, and supplied extracts were inspected. Dependency locks and JSONL/CSV fixtures were indexed as artifacts rather than treated as teaching prose. The sibling chapter supplied the conceptual spine; this page narrows the lens to the operating system around the code.</p>
+      </section>
+
+      <footer class="page-footer">Agent Systems companion · AH-3 · Source-grounded against <code>agentic-horizon/building-specialized-agents</code>.</footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const progress = document.getElementById('reading-progress');
+      const railLinks = [...document.querySelectorAll('.chapter-rail a')];
+      const sections = railLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+
+      const update = () => {
+        const max = document.documentElement.scrollHeight - innerHeight;
+        progress.style.width = `${max > 0 ? Math.min(100, scrollY / max * 100) : 0}%`;
+        let active = sections[0];
+        for (const section of sections) {
+          if (section.getBoundingClientRect().top <= 120) active = section;
+        }
+        railLinks.forEach(link => link.setAttribute('aria-current', link.getAttribute('href') === `#${active?.id}` ? 'true' : 'false'));
+      };
+
+      addEventListener('scroll', update, { passive: true });
+      addEventListener('resize', update);
+      if (location.hash) {
+        requestAnimationFrame(() => document.querySelector(location.hash)?.scrollIntoView());
+      }
+      update();
+    })();
+  </script>
+</body>
+</html>

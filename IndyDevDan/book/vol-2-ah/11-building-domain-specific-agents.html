@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first companion to Agentic Horizon lesson 3: build domain-specific agents by controlling context, model, prompt, and tools in code.">
+  <title>AH-3 · Building Domain-Specific Agents — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="11-building-domain-specific-agents.assets.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to chapter content</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL II · AH · LESSON 11</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume II · Agentic Horizon</p>
+      <h2>Building Domain-Specific Agents</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation &amp; ladder</span></a></li>
+          <li><a href="#query-client"><span class="chapter-nav__n">01</span><span>Query, client, resume</span></a></li>
+          <li><a href="#tools-responses"><span class="chapter-nav__n">02</span><span>Tools &amp; responses</span></a></li>
+          <li><a href="#prompt-variables"><span class="chapter-nav__n">03</span><span>Static variables</span></a></li>
+          <li><a href="#system-prompt"><span class="chapter-nav__n">04</span><span>System prompt is law</span></a></li>
+          <li><a href="#core-four"><span class="chapter-nav__n">05</span><span>Core four in code</span></a></li>
+          <li><a href="#hooks"><span class="chapter-nav__n">06</span><span>Hooks &amp; governance</span></a></li>
+          <li><a href="#extend-overwrite"><span class="chapter-nav__n">07</span><span>Extend vs overwrite</span></a></li>
+          <li><a href="#form-factors"><span class="chapter-nav__n">08</span><span>Agents everywhere</span></a></li>
+          <li><a href="#decision"><span class="chapter-nav__n">09</span><span>When to build</span></a></li>
+          <li><a href="#current-practice"><span class="chapter-nav__n">10</span><span>Current practice</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">11</span><span>Graded lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">12</span><span>Cumulative mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">13</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--agents">
+        <span class="hero__chapter">Agentic Horizon · Lesson 11 · Tactic: Build Custom Agents</span>
+        <h1>Building Domain-Specific Agents</h1>
+        <p class="hero__dek">Go to the bare metal only when the mismatch is real. Then make context, model, prompt, and tools explicit in code so your compute behaves like a specialist every run.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 1:07:10</li>
+          <li>Core lab · 90–150 min</li>
+          <li>Course repo · building-specialized-agents</li>
+          <li>12 verified 1920×1080 frames</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to read any lesson agent through the core four, explain the SDK’s one-off and conversational surfaces, build and observe custom tools, enforce permissions with hooks, choose overwrite or extension deliberately, trace the eight-agent progression, and defend when a custom agent is—or is not—the right move.</p>
+
+        <div class="agent-path" role="img" aria-label="The agentic path moves from a base agent to better agents, more agents, then custom agents">
+          <div class="agent-path__step"><b>Base</b><span>Begin with the out-of-the-box generalist.</span></div>
+          <div class="agent-path__step"><b>Better</b><span>Improve one agent with prompt and context engineering.</span></div>
+          <div class="agent-path__step"><b>More</b><span>Scale compute with additional and delegated agents.</span></div>
+          <div class="agent-path__step agent-path__step--destination"><b>Custom</b><span>Control the core four in code for a real domain mismatch.</span></div>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation &amp; ladder</a></li><li><a href="#query-client">Query, client, resume</a></li><li><a href="#tools-responses">Tools &amp; responses</a></li><li><a href="#prompt-variables">Static variables</a></li><li><a href="#system-prompt">System prompt is law</a></li><li><a href="#core-four">Core four in code</a></li><li><a href="#hooks">Hooks &amp; governance</a></li><li><a href="#extend-overwrite">Extend vs overwrite</a></li><li><a href="#form-factors">Agents everywhere</a></li><li><a href="#decision">When to build</a></li><li><a href="#current-practice">Current practice</a></li><li><a href="#lab">Graded lab</a></li><li><a href="#mastery">Mastery</a></li><li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">Custom is the destination, not the starting line</h2>
+        <p class="section-lead">The temptation is to start this lesson with decorators and SDK classes. Dan starts one level higher: why an engineer arrives at custom agents at all. You first make one generalist better, then use more agents, and only then specialize the machine.</p>
+
+        <p>The out-of-the-box agent is strong because it is general. The same prompt and tool surface must work for many repositories, teams, and tasks. That breadth is also the mismatch. A growing codebase contains specific architecture, permissions, workflows, and repeated hard problems that a general agent was not built around. If you repeatedly reload that domain into a generic surface, you pay in attention and context. A custom agent makes selected domain assumptions permanent and programmatic.</p>
+        <p>That does not mean “replace the generalist.” It means control the last mile. The lesson’s eight agents begin with a deliberately absurd specialist—Pong—and end with two agents operating a log stream through a web application. At every rung, the code introduces one new primitive. The ladder is a teaching device: isolate one idea, make it visible, then compose it.</p>
+
+        <figure class="frame-card">
+          <img src="../media/frames/ah-3-building-domain-specific-agents/t0018-the-agentic-path.jpg" alt="The Agentic Path title card showing Base, Better, More, and Custom agents" width="1920" height="1080" fetchpriority="high">
+          <figcaption><span class="frame-card__t">0:18</span>The lesson’s complete scaffold in one frame: better agents, more agents, then custom agents. Customization follows demonstrated need.</figcaption>
+        </figure>
+
+        <div class="rename-banner" role="note" aria-label="Important SDK rename">
+          <div class="rename-banner__mark">!</div>
+          <div><strong>Read “Claude Code SDK” as “Claude Agent SDK.”</strong><p>The recording and two frames show the course-era name <code>ClaudeCodeOptions</code>. The shipped repository already uses the package <code>claude-agent-sdk</code>, imports from <code>claude_agent_sdk</code>, and constructs <code>ClaudeAgentOptions</code>. This chapter uses the repository’s current names.</p></div>
+        </div>
+
+        <h3>The eight-agent ladder</h3>
+        <p>Read the ladder left to right. The “new primitive” column is the reason each example exists. The model strings are period details from the course code, not model recommendations to memorize.</p>
+        <div class="ladder-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Agent</th><th>Form</th><th>New primitive</th><th>Prompt strategy</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td><strong>Pong</strong></td><td>CLI script</td><td>System prompt defines the product</td><td>Three-line overwrite</td></tr>
+              <tr><td>2</td><td><strong>Echo</strong></td><td>CLI script</td><td>Custom <code>@tool</code>, in-memory MCP, cheaper model</td><td>One-line overwrite</td></tr>
+              <tr><td>3</td><td><strong>Calc</strong></td><td>Terminal REPL</td><td><code>disallowed_tools</code> and <code>resume</code></td><td>Overwrite</td></tr>
+              <tr><td>4</td><td><strong>Social Hype</strong></td><td>Stream handler</td><td>Live data, static variable, fixed workflow</td><td>Overwrite + <code>{VAR}</code></td></tr>
+              <tr><td>5</td><td><strong>QA</strong></td><td>Terminal REPL</td><td>Hooks, optional Firecrawl MCP, parallel Task</td><td>Overwrite + examples</td></tr>
+              <tr><td>6</td><td><strong>Tri-Copy-Writer</strong></td><td>Vue + FastAPI</td><td>Agent as backend method, one prompt → N outputs</td><td>Overwrite + <code>{VAR}</code></td></tr>
+              <tr><td>7</td><td><strong>Micro SDLC</strong></td><td>Kanban + FastAPI</td><td>Three-agent hand-off, extend vs overwrite, path hooks</td><td>Append / pure preset</td></tr>
+              <tr><td>8</td><td><strong>Ultra Stream</strong></td><td>Dual-panel web app</td><td>Producer/consumer agents, chunked reads, periodic reconnect</td><td>Two overwrites</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>What you are training</h3>
+        <ul class="learning-objectives">
+          <li><strong>Read</strong>Find <code>ClaudeAgentOptions</code> and explain how context, model, prompt, and tools are set.</li>
+          <li><strong>Operate</strong>Run the CLI and UI agents from their real per-agent project directories.</li>
+          <li><strong>Diagnose</strong>Separate permission, context, session, prompt-scope, and response-management failures.</li>
+          <li><strong>Judge</strong>Choose a generalist, an extension, or a complete custom agent from task shape—not excitement.</li>
+        </ul>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Lab prime directive</p>
+          <p>You do not hand-edit an agent to make a checkpoint pass. You configure behavior through <code>ClaudeAgentOptions</code>; stretch changes go through Claude Code. The point is to command custom agents, not become their hidden runtime.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="query-client">
+        <span class="section-number">01</span>
+        <h2 class="section-title">One-off query, conversational client, resumed session</h2>
+        <p class="section-lead">Pong needs one answer. Echo needs a custom tool. Calc needs the last turn. Those are three different runtime requirements, and the SDK surface makes the difference explicit.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the disappearing calculation</p>
+          <h3>The REPL answers once, then forgets</h3>
+          <p>Imagine Calc converts Fahrenheit to Celsius correctly. You then ask, “What was my last calculation?” and it responds as if the first turn never happened. The terminal still looks conversational, but the backend rebuilt a one-off request without carrying a session. A chat-shaped interface is not evidence of conversational state.</p>
+          <p>Echo reveals a second boundary. Its custom tool requires <code>ClaudeSDKClient</code>; the simpler <code>query()</code> entrypoint used by Pong is not the lesson’s custom-tool path. The choice is architectural before it is syntactic: isolated job or continuing agent?</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — two execution lanes</p>
+          <h3>Choose the runtime that matches the interaction</h3>
+          <div class="comparison">
+            <article class="comparison__card"><div class="comparison__head"><h3>One-off</h3><p>One prompt, no custom tools, no next turn.</p></div><div class="comparison__body"><div class="workflow workflow--stacked"><div class="workflow__step"><strong>Options</strong><code>core four</code></div><div class="workflow__step"><strong><code>query()</code></strong><code>prompt + options</code></div><div class="workflow__step"><strong>Iterator</strong><code>messages → result</code></div></div></div></article>
+            <article class="comparison__card comparison__card--agentic"><div class="comparison__head"><h3>Conversation + tools</h3><p>Mount a client, send turns, preserve a session.</p></div><div class="comparison__body"><div class="workflow workflow--stacked"><div class="workflow__step"><strong>Client</strong><code>ClaudeSDKClient(options)</code></div><div class="workflow__step"><strong>Turn</strong><code>client.query()</code></div><div class="workflow__step"><strong>Continuity</strong><code>session_id → resume</code></div></div></div></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the ladder adds memory</p>
+          <h3>Pong → Echo → Calc</h3>
+          <p>Pong creates options and passes them directly to <code>query(prompt=..., options=...)</code>. Nothing must survive after the answer. Echo mounts an in-memory MCP server and enters <code>async with ClaudeSDKClient(options=options) as client</code>; its custom tool lives on that client surface. Calc turns the client pattern into a REPL. After each turn, it captures the <code>ResultMessage.session_id</code> and uses that value as <code>resume=current_session_id</code> in the next options object.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-3-building-domain-specific-agents/t1040-calc-disallowed-tools.jpg" alt="Calc agent options showing allowed and disallowed tools with resume set to the current session ID" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">17:20</span>The context lesson occupies most of the frame, but the continuity mechanism is visible at the bottom: <code>resume=current_session_id</code>.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Entrypoint, client lifecycle, session continuity</h3>
+          <aside class="callout callout--term"><p class="callout__label">Three separate decisions</p><p><strong><code>query()</code></strong> is the one-off surface. <strong><code>ClaudeSDKClient</code></strong> is the conversational/custom-tool surface. <strong><code>resume=</code></strong> reattaches a later call to an earlier session.</p></aside>
+          <p>Client and resume solve related but distinct problems. The client gives you a mounted conversational runtime inside the current async lifecycle. Resume lets a rebuilt options/client sequence continue an existing session. If you remember only “use client for chat,” you miss why Calc persists when its loop reconstructs options.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace two turns</p>
+          <h3>Where Calc’s memory actually travels</h3>
+          <div class="code-anatomy">
+            <div class="code-anatomy__title">apps/custom_3_calc_agent/calc_agent.py · conceptual trace from shipped code</div>
+            <pre><code># turn 1
+options = ClaudeAgentOptions(..., resume=current_session_id)
+async with ClaudeSDKClient(options=options) as client:
+    await client.query(user_input)
+    async for message in client.receive_response():
+        if isinstance(message, ResultMessage):
+            current_session_id = message.session_id
+
+# turn 2 rebuilds options with that captured ID
+options = ClaudeAgentOptions(..., resume=current_session_id)</code></pre>
+            <div class="code-anatomy__notes"><p><b>Capture</b> The result exposes the session identifier after the first response.</p><p><b>Carry</b> The loop stores it outside the response iterator.</p><p><b>Resume</b> The next options object supplies the stored value.</p></div>
+          </div>
+          <p>State is not the terminal transcript. The transcript is only a display. Continuity comes from the identifier that lets the runtime reconnect the new call with the existing conversation.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — prove state</p>
+          <h3>Ask a dependent second question</h3>
+          <ol>
+            <li>Start Calc from <code>apps/custom_3_calc_agent</code>.</li>
+            <li>Ask it to convert 55 Fahrenheit to Celsius.</li>
+            <li>Ask, “What was my last calculation?” without restating the values.</li>
+            <li>Locate the session capture and <code>resume=</code> lines in source.</li>
+            <li>Explain why reprinting the first answer in the terminal would not, by itself, preserve model context.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: choosing by interface appearance</h3>
+          <p><strong>Symptom:</strong> a web chat or REPL looks continuous, but every backend request creates a fresh one-off call. Or a custom tool is registered, yet the implementation still uses the one-off path.</p>
+          <p><strong>Fix:</strong> inspect the runtime surface and the data flow. A custom tool needs the client path in this lesson. A later request that depends on prior turns needs the captured session identifier supplied through <code>resume=</code>.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Preserve the concept when SDK shapes drift</h3>
+          <p>The exact message classes and fields are version-sensitive; the extract explicitly warns that they can change. The durable model is one-off versus mounted conversation, plus an explicit continuity token. When copying code, check the SDK reference matching the installed package rather than treating a recording-era block shape as permanent.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <div class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which lesson entrypoint is used for a one-off agent without custom tools?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>query(prompt, options)</code>, as used by Pong.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which runtime is required by the lesson’s custom tools?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>ClaudeSDKClient</code>.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What crosses the boundary between Calc turns?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The captured <code>ResultMessage.session_id</code>, passed back through <code>resume=</code>.</p></details></div>
+          </div>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Explain client and resume as two different controls.</strong> Use Pong, Echo, and Calc as your three examples. Pass if your listener can predict the runtime surface before opening each file.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="tools-responses">
+        <span class="section-number">02</span>
+        <h2 class="section-title">A tool is deterministic code; the stream makes it observable</h2>
+        <p class="section-lead">The model chooses when to invoke a capability. The function decides what actually happens. You improve the agent by seeing both sides of that boundary.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — power without perspective</p>
+          <h3>The final answer looks right. Did the tool ever run?</h3>
+          <p>If you print only final prose, you cannot tell whether the model called your custom capability, improvised the answer, encountered an error, retried, or spent several turns wandering. A custom agent without response management hides the very behavior you need to improve.</p>
+          <p>Echo and Social Hype make the missing perspective visible. Echo prints the tool call for its transform. Social Hype shows an agent response, a structured <code>submit_analysis</code> call, and a <code>notify</code> call against the live stream.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — from description to observation</p>
+          <h3>The custom-tool path</h3>
+          <div class="workflow" aria-label="Custom tool path from decorator to response management">
+            <div class="workflow__step"><strong>Define</strong><code>@tool(...)</code></div>
+            <div class="workflow__step"><strong>Mount</strong><code>create_sdk_mcp_server</code></div>
+            <div class="workflow__step"><strong>Expose</strong><code>mcp__server__tool</code></div>
+            <div class="workflow__step"><strong>Execute</strong><code>deterministic fn</code></div>
+            <div class="workflow__step"><strong>Observe</strong><code>blocks + result</code></div>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — one call becomes a workflow</p>
+          <h3>Social Hype joins deterministic filtering to model judgment</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-3-building-domain-specific-agents/t1360-social-hype-stream.jpg" alt="Terminal showing Social Hype matching the live stream, analyzing sentiment, submitting analysis, and calling notify" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">22:40</span>A live end-to-end trace: the stream is filtered, the agent produces a summary and sentiment, <code>submit_analysis</code> records structure, and <code>notify</code> takes action.</figcaption>
+          </figure>
+          <p>The interesting architecture is the hand-off between worlds. Fast deterministic code filters a large stream for keywords. The model handles the fuzzy judgment of summary and sentiment. Deterministic tools persist the analysis and notify. Each layer does the work it is suited for.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Custom tool, in-memory MCP, response-stream primitives</h3>
+          <aside class="callout callout--term"><p class="callout__label">Universal flow</p><p><strong>Options → mount agent → send query → manage responses.</strong> Tool descriptions tell the model when and how to call; ordinary code performs the action; messages expose reasoning, calls, results, session, duration, cost, and failure.</p></aside>
+          <p><code>@tool</code> supplies a name, description, and input schema. <code>create_sdk_mcp_server</code> mounts one or more of those functions as an in-memory server. The allowed name follows <code>mcp__&lt;server&gt;__&lt;tool&gt;</code>. External MCP is the same architectural role through configuration: QA can load Firecrawl rather than reimplementing web retrieval.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace Echo end to end</p>
+          <h3>Probabilistic selection, deterministic transform</h3>
+          <div class="code-anatomy">
+            <div class="code-anatomy__title">apps/custom_2_echo_agent/echo_agent.py · structure</div>
+            <pre><code>@tool("echo", "Echo text with repeat and transform options", {...})
+async def echo_tool(args):
+    # ordinary deterministic transformation
+    return {"content": [{"type": "text", "text": result}]}
+
+echo_server = create_sdk_mcp_server(
+    name="echo_server", version="1.0.0", tools=[echo_tool]
+)
+
+options = ClaudeAgentOptions(
+    mcp_servers={"echo": echo_server},
+    allowed_tools=["mcp__echo__echo"],
+    ...
+)</code></pre>
+            <div class="code-anatomy__notes"><p><b>Description</b> Guides model selection and parameter use.</p><p><b>Function</b> Executes normal code after the model chooses the call.</p><p><b>Return</b> Supplies content—and should surface usable error content on failure.</p></div>
+          </div>
+          <p>A tool error is not something to hide from the agent. Return it in the expected content shape so the model can pivot. That is the same leverage pattern as giving an agent stdout: execution produces evidence, and evidence enables the next decision.</p>
+
+          <figure class="frame-card">
+            <img src="../media/frames/ah-3-building-domain-specific-agents/t1852-consistent-codebase-architecture.jpg" alt="VS Code explorer showing multiple custom-agent folders with consistent prompts, entrypoints, README, and configuration" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">30:52</span>The repeated folder shape is a leverage point: similar prompt directories, agent entrypoints, READMEs, and configuration make every new tool and response loop easier for humans and agents to read.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — the seven-link trace</p>
+          <h3>Follow one tool without skipping layers</h3>
+          <ol>
+            <li>Start with the Echo user prompt.</li>
+            <li>Find the system instruction that directs tool use.</li>
+            <li>Read the <code>@tool</code> description and input schema.</li>
+            <li>Find the MCP server registration.</li>
+            <li>Match its qualified name in <code>allowed_tools</code>.</li>
+            <li>Find the response branch that prints the tool call.</li>
+            <li>Identify which step chooses probabilistically and which step transforms deterministically.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: tool magic and final-answer-only logging</h3>
+          <p><strong>Symptom:</strong> the description is vague, errors are swallowed, and the wrapper prints only assistant text. When the agent behaves strangely, the operator reruns it blind.</p>
+          <p><strong>Fix:</strong> make the tool contract specific, return deterministic evidence including errors, and expose the response stream. Exact block class names may change; the categories remain: text, thinking, call, result, and run metadata.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Skills and SDK agents solve different packaging problems</h3>
+          <p>The extract marks first-class Agent Skills as a newer way to package reusable expertise for an interactive agent. That does not replace this lesson. Use skills when the in-loop generalist should discover and load expertise. Use the SDK when you need programmatic model selection, custom tools, hooks, sessions, or deployment as a script, stream, backend, or UI.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <div class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the tool description for?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It teaches the model when and how to invoke the capability and what inputs to supply.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Where does deterministic behavior begin?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Inside the invoked tool function. The model decides whether and how to call it; ordinary code performs the action.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why should failures be returned to the agent?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>So the result becomes evidence the model can use to correct parameters, choose another tool, or report the real failure.</p></details></div>
+          </div>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Draw the complete path from user prompt to tool result.</strong> Mark the point where model judgment chooses a call and the point where deterministic code takes over. Then name the response evidence you would log.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="prompt-variables">
+        <span class="section-number">03</span>
+        <h2 class="section-title">A runtime variable can become part of the law</h2>
+        <p class="section-lead">Social Hype and Tri-Copy-Writer both accept values at startup, substitute them into the system prompt, and keep them fixed for the life of that agent.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the misleading braces</p>
+          <h3><code>{NUMBER_OF_VERSIONS}</code> looks dynamic. When does it actually change?</h3>
+          <p>Braces tell you that a value is substituted; they do not tell you the lifetime of that substitution. Tri-Copy-Writer reads <code>-v 6</code> when its backend starts. That number enters the system prompt once. Every user request handled by that running configuration inherits the same six-version contract.</p>
+          <p>Social Hype does the same with <code>{NOTIFICATION_CRITERIA}</code>. The user selects criteria at boot, not per analyzed post. That is not a limitation when the product is “watch this stream for this condition.” It is specialization made explicit.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — two variable lifetimes</p>
+          <h3>Choose once for the run, or choose on each call</h3>
+          <div class="prompt-scope">
+            <article><strong>Runtime-locked system value</strong><p>Boot argument → substitute into system prompt → fixed across that agent run.</p><p><code>{NOTIFICATION_CRITERIA}</code><br><code>{NUMBER_OF_VERSIONS}</code></p></article>
+            <article><strong>Per-call user value</strong><p>New user request → supplied to <code>client.query()</code> → may change every turn.</p><p><code>$1</code> / <code>$ARGUMENTS</code><br>current copy request</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — one prompt becomes six panels</p>
+          <h3>The UI makes a system variable visible as product behavior</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-3-building-domain-specific-agents/t2265-tri-copy-writer-ui.jpg" alt="Tri-Copy-Writer web interface showing six copy variations generated from one user prompt" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">37:45</span>One user prompt returns six variations because the backend booted with six as the system-level contract. The browser is a form factor; the agent remains a configured backend method.</figcaption>
+          </figure>
+          <p>The Social Hype frame in the previous section shows the other shape: a stream agent continuously applies one notification contract. The workflow belongs in the system prompt because the same filter → analyze → record → notify sequence should run for every matched event.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Runtime-locked system variable and workflow-as-law</h3>
+          <aside class="callout callout--term"><p class="callout__label">Lifetime test</p><p>Ask <strong>when is the value chosen?</strong> and <strong>how long must it govern?</strong> Boot-time values can safely shape a single-purpose agent. Per-call values belong with the current user request.</p></aside>
+          <p>A domain agent can encode a workflow in its system prompt because its purpose is deliberately narrow. The generic coding agent cannot assume “analyze sentiment and notify” on every turn. Social Hype can. Specialization converts a repeated decision into persistent law.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — Tri-Copy-Writer’s core four</p>
+          <h3>A backend method with no tools</h3>
+          <div class="proof-grid">
+            <article><strong>Context</strong><p>User copy request plus optional text/Markdown file context; the backend tracks sent files per session.</p></article>
+            <article><strong>Model</strong><p>The course pins a Sonnet-era ID. The selection principle matters more than the string.</p></article>
+            <article><strong>Prompt</strong><p>Complete overwrite with <code>{NUMBER_OF_VERSIONS}</code> substituted from the clamped <code>-v</code> argument.</p></article>
+            <article><strong>Tools</strong><p>All built-ins are disallowed. The task is structured generation, so tools would add irrelevant context.</p></article>
+            <article><strong>Response</strong><p>JSON is parsed into the shipped Pydantic response models, including <code>CopyResponse</code>.</p></article>
+            <article><strong>Form factor</strong><p>FastAPI exposes the agent as an application method; Vue renders the variations and context files.</p></article>
+          </div>
+          <p>The agent becomes product logic without gaining extra capabilities. This is a useful correction to “custom means more tools.” Tri-Copy-Writer specializes by narrowing prompt, output, and surface.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — trace substitution time</p>
+          <h3>Prove the lifetime from code</h3>
+          <ol>
+            <li>Open <code>apps/custom_6_tri_copy_writer/backend/main.py</code>.</li>
+            <li>Find the <code>-v</code>/<code>--versions</code> parser and the 1–10 clamp.</li>
+            <li>Find where <code>NUMBER_OF_VERSIONS</code> enters the system prompt.</li>
+            <li>Open <code>prompts/TRI_COPY_WRITER_SYSTEM_PROMPT.md</code> and locate the placeholder.</li>
+            <li>Explain why a different request does not alter the version count until the backend configuration changes.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: confusing substitution syntax with per-turn scope</h3>
+          <p><strong>Symptom:</strong> a user expects “make eight now” to change a value that was frozen into the system prompt at boot, or a developer rebuilds the entire agent for a value that should simply ride with each user call.</p>
+          <p><strong>Fix:</strong> map lifetime to layer. Stable run configuration belongs in the boot-time system prompt. Truly changing request data belongs in the user prompt or per-call arguments.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Reusable expertise also has an in-loop package</h3>
+          <p>The extract’s newer companion is Agent Skills: reusable expertise discovered by an interactive agent. Skills and this SDK pattern are complementary. A skill packages knowledge for the generalist; a custom SDK agent freezes a programmatic runtime with explicit models, tools, hooks, sessions, and deployment.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <div class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">When does <code>{NOTIFICATION_CRITERIA}</code> change?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>When Social Hype boots with the notification argument. It remains fixed for that run.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why can the Social Hype workflow live in its system prompt?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Because it is a single-purpose domain agent whose filter/analyze/record/notify workflow should happen on every matched event.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does Tri-Copy-Writer prove about custom agents and tools?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A useful custom agent can disable every tool. Specialization may come from prompt, output contract, and deployment rather than added capabilities.</p></details></div>
+          </div>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Explain two variable lifetimes without saying “static” or “dynamic.”</strong> Use the exact moment each value is chosen and the exact events that inherit it.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="system-prompt">
+        <span class="section-number">04</span>
+        <h2 class="section-title">The system prompt is the law of the agent</h2>
+        <p class="section-lead">A tiny agent exposes the highest-leverage control. Pong can receive any user request, yet three lines placed before every request make its answer invariant.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the stubborn machine</p>
+          <h3>You ask for a summary. It says “pong.”</h3>
+          <p>A user prompt normally feels like the center of the interaction. Pong reverses that intuition. “Hello,” “summarize this codebase,” and “king” are different user prompts with the same result. The model did not lose capability. A higher-priority instruction constrained which capability could surface.</p>
+          <p>This matters because teams often improve user prompts while leaving the persistent agent contract vague. If an instruction should govern every turn, repeating it in each user request is the wrong layer. Put stable identity, purpose, constraints, and workflow in the system prompt.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — one input below a stronger contract</p>
+          <h3>Every user prompt enters through the same law</h3>
+          <div class="workflow" aria-label="System prompt is applied before user prompt, then the model produces the response">
+            <div class="workflow__step"><strong>System</strong><code>always answer pong</code></div>
+            <div class="workflow__step"><strong>User</strong><code>summarize repo</code></div>
+            <div class="workflow__step"><strong>Model</strong><code>same capability</code></div>
+            <div class="workflow__step"><strong>Response</strong><code>pong</code></div>
+            <div class="workflow__step"><strong>Next turn</strong><code>law repeats</code></div>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — Dan’s two-frame proof</p>
+          <h3>Observe behavior, then reveal the cause</h3>
+          <div class="frame-sequence">
+            <figure class="frame-card">
+              <img src="../media/frames/ah-3-building-domain-specific-agents/t0225-pong-run-session-stats.jpg" alt="Terminal showing the Pong agent responding pong and reporting session duration and cost" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">3:45</span>The terminal provides behavioral proof: the user says “hello,” the real agent returns “pong,” and the run reports session, duration, and cost.</figcaption>
+            </figure>
+            <figure class="frame-card">
+              <img src="../media/frames/ah-3-building-domain-specific-agents/t0300-pong-system-prompt.jpg" alt="Editor showing the complete three-line Pong agent system prompt" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">5:00</span>The entire behavior-defining artifact fits on screen. Most of <code>pong_agent.py</code> is response display and accounting; these three prompt lines make the specialist.</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>System-prompt overwrite</h3>
+          <aside class="callout callout--term"><p class="callout__label">Canonical principle</p><p>The <strong>system prompt</strong> is the persistent instruction injected before every user prompt. A string supplied as <code>system_prompt=...</code> fully overwrites the Claude Code preset in these examples. Same model, different product.</p></aside>
+          <p>Dan’s phrase—“the law of the agent”—is useful because it carries two properties. Law is persistent: it applies to every turn. Law is constraining: a later request cannot casually escape it. The user prompt still supplies the current job, but it operates inside the specialist’s constitution.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — read the actual options</p>
+          <h3>Two configuration fields define Pong</h3>
+          <div class="code-anatomy">
+            <div class="code-anatomy__title">apps/custom_1_pong_agent/pong_agent.py</div>
+            <pre><code>system_prompt = load_system_prompt()
+model = "claude-sonnet-4-20250514"
+
+options = ClaudeAgentOptions(
+    system_prompt=system_prompt,
+    model=model,
+)
+
+async for message in query(prompt=input_prompt, options=options):
+    ...</code></pre>
+            <div class="code-anatomy__notes"><p><b>Prompt</b> Loaded from the three-line Markdown file.</p><p><b>Model</b> Pinned in course code; treat the ID as recording-era detail.</p><p><b>Surface</b> <code>query()</code> is enough because there are no custom tools or follow-ups.</p></div>
+          </div>
+          <p>The source file is longer than this excerpt because it prints panels, extracts text blocks, and reports cost. Those features improve operation. They do not define “pong.” This distinction is your first code-reading skill: separate behavior configuration from interface plumbing.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — three-minute invariant test</p>
+          <h3>Try to break the law without editing it</h3>
+          <ol>
+            <li>From <code>apps/custom_1_pong_agent</code>, run the agent with three unrelated prompts.</li>
+            <li>Before each run, predict the response.</li>
+            <li>Open <code>prompts/PONG_AGENT_SYSTEM_PROMPT.md</code> and underline the smallest phrase responsible for the invariant.</li>
+            <li>Explain why a smarter model would not change the product while that law remains.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: coding around a weak constitution</h3>
+          <p><strong>Symptom:</strong> you add conditional Python, retry loops, or output filters to force behavior the prompt should define. The wrapper grows while the contract remains ambiguous.</p>
+          <p><strong>Fix:</strong> state the stable purpose and invariants in the system prompt first. Keep deterministic checks in code when they truly require determinism, but do not use plumbing to compensate for an unnamed identity.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The class name changed; the control did not</h3>
+          <p>The frame shows <code>ClaudeCodeOptions</code> in later examples. The repository has migrated to <code>ClaudeAgentOptions</code>. That naming correction matters when you run the lab, but the durable practice is unchanged: persistent agent identity belongs in the system-prompt configuration, not scattered across user calls.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <div class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What two fields turn the general coding model into Pong?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The chosen model and the complete system-prompt overwrite. The behavior itself comes from the three-line prompt.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why does the system prompt have multiplicative leverage?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Because it is applied before every user prompt, so one improvement or mistake influences every turn.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What part of <code>pong_agent.py</code> is plumbing rather than product identity?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The terminal UI, message parsing, session statistics, duration, and cost reporting. They make the run observable but do not cause “pong.”</p></details></div>
+          </div>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Teach Pong without saying “it is hard-coded.”</strong> Explain how the same model becomes a different agent through a persistent prompt overwrite, and point to the exact course files that prove your claim.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="core-four">
+        <span class="section-number">05</span>
+        <h2 class="section-title">A custom agent is the core four set in code</h2>
+        <p class="section-lead">Context, model, prompt, tools: the chapter becomes legible when you stop reading top to bottom and find these four controls first.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the invisible bill</p>
+          <h3>You add one tool. The agent still sees the built-ins.</h3>
+          <p>Echo registers one custom tool, yet the lesson’s “list your tools” probe reveals the built-in Claude Code tools still loaded beside it. The exact count can drift with SDK versions; the economic fact does not. A definition the agent can see consumes context even when a permission list prevents it from calling that definition.</p>
+          <p>This is the subtle failure: confusing authorization with attention. <code>allowed_tools</code> answers “what may be called?” It does not necessarily answer “what definitions occupy the window?” Calc adds the missing control through an explicit <code>disallowed_tools</code> list.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — scan the four facets</p>
+          <h3>Read every agent through the same lens</h3>
+          <div class="core-four-grid" role="img" aria-label="Four cards representing context, model, prompt, and tools in ClaudeAgentOptions">
+            <article><b>Context</b><p>System and user prompts, tool definitions, MCP configuration, files, observations, and session history.</p><code>disallowed_tools</code></article>
+            <article><b>Model</b><p>Right-size intelligence, latency, and cost to the domain task. Do not memorize the course IDs.</p><code>model=...</code></article>
+            <article><b>Prompt</b><p>Overwrite for a new product; use a preset and append when the generalist should remain intact.</p><code>system_prompt=...</code></article>
+            <article><b>Tools</b><p>Expose only the capabilities needed: built-ins, in-memory MCP tools, or external MCP servers.</p><code>allowed_tools</code></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — Echo grows; Calc trims</p>
+          <h3>Two options blocks teach one context lesson</h3>
+          <div class="frame-sequence">
+            <figure class="frame-card">
+              <img src="../media/frames/ah-3-building-domain-specific-agents/t0565-echo-mcp-server-model.jpg" alt="Editor showing Echo agent MCP server, allowed tool, system prompt, model, and ClaudeSDKClient" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">9:25</span>Echo’s code puts three core-four decisions on one screen: the custom MCP server, its allowed tool, and a cheaper model for a trivial transform. The visible <code>ClaudeCodeOptions</code> name is recording-era; the repo now uses <code>ClaudeAgentOptions</code>.</figcaption>
+            </figure>
+            <figure class="frame-card">
+              <img src="../media/frames/ah-3-building-domain-specific-agents/t1040-calc-disallowed-tools.jpg" alt="Editor showing Calc agent allowed tools, complete disallowed tools list, model, and resume session" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">17:20</span>Calc makes context control explicit: two calculator tools stay visible, listed built-ins are removed, and <code>resume=current_session_id</code> carries the conversation.</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Core-four control and de-contexting</h3>
+          <aside class="callout callout--term"><p class="callout__label">The reading habit</p><p>Whenever you open an agent, find <code>ClaudeAgentOptions</code> and ask: <strong>what context enters, which model runs, what prompt governs, and which tools exist?</strong></p></aside>
+          <p><code>allowed_tools</code> is a capability gate. <code>disallowed_tools</code> also removes listed built-in definitions from what the agent can see. Dan calls this “de-contexting”: protect the scarce window from irrelevant choices. The best context control is not compression after overload; it is refusing to load what the domain never needs.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — compare the context ledgers</p>
+          <h3>Echo pays for breadth; Calc buys focus</h3>
+          <div class="context-ledger">
+            <article class="context-ledger__agent"><strong>Echo · permissive context</strong><ul><li>Custom echo definition</li><li>Built-in definitions remain visible</li><li><code>allowed_tools</code> gates calls</li><li>Cheap model fits the transform</li></ul></article>
+            <div class="context-ledger__bridge">→</div>
+            <article class="context-ledger__agent context-ledger__agent--lean"><strong>Calc · deliberate context</strong><ul><li>Two calculator definitions</li><li>Listed built-ins removed</li><li>Sonnet-class course model</li><li>Session resumes across REPL turns</li></ul></article>
+          </div>
+          <p>Notice what is and is not being optimized. The code does not claim every agent should have only two tools. It claims the tool surface should match the job. A QA agent legitimately needs read/search capabilities. A calculator does not. Context engineering becomes architectural when those choices live in code and repeat every run.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — the options-block table</p>
+          <h3>Read Pong, Echo, and Calc without executing</h3>
+          <ol>
+            <li>Open the three Python files in order.</li>
+            <li>For each, record context, model, prompt strategy, and tools.</li>
+            <li>Mark whether the agent uses <code>query()</code> or <code>ClaudeSDKClient</code>.</li>
+            <li>Predict which agent will list the broadest tool surface and which will preserve conversation state.</li>
+            <li>Only then run the context experiment and compare observation with prediction.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating “allowed” as “loaded”</h3>
+          <p><strong>Symptom:</strong> the agent calls only the expected tool, so you assume its context is lean. Cost or confusion grows as MCP servers and built-ins accumulate.</p>
+          <p><strong>Fix:</strong> inspect the initialized tool list and the options block. Keep the smallest legitimate surface. Use <code>disallowed_tools</code> for irrelevant built-ins; do not cargo-cult Calc’s exact list into an agent that actually needs those capabilities.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Teach selection classes, not pinned model IDs</h3>
+          <p>The course code pins Haiku, Sonnet, and Opus-era IDs. Preserve them when reading the historical source, then choose a currently available equivalent when operating in the future. The durable practice is task matching: cheap/fast for trivial high-volume transforms, a balanced model for most work, and the strongest reasoning for the hardest planning or review.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <div class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What are the core four?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Context, model, prompt, and tools.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is <code>allowed_tools</code> insufficient as a context optimization?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It gates which tools may be called, while built-in definitions can still be loaded and consume attention/context. Listed <code>disallowed_tools</code> are removed.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is Echo’s cheaper model a design decision rather than a downgrade?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The domain task is a trivial deterministic transform. Paying for more reasoning would add cost without useful capability.</p></details></div>
+          </div>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Use the Echo→Calc contrast.</strong> Teach a teammate why an allowed-tool list is about calls while a disallowed-tool list can also be about context. End by explaining why the right tool count depends on the domain.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="hooks">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Hooks turn policy into executable governance</h2>
+        <p class="section-lead">A prompt can ask an agent to avoid secrets. A hook can prevent the read. The difference is the difference between advice and a boundary.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the agent tries anyway</p>
+          <h3>“Read <code>.env.sample</code>.” The request never reaches the tool.</h3>
+          <p>The QA agent is built to explore a codebase, so reading files is a legitimate capability. Credentials are the exception. If you remove <code>Read</code> entirely, the specialist cannot perform its job. If you rely only on a sentence saying “do not read secrets,” the model remains the final enforcement point. The lesson uses a more precise seam: inspect each matching read request before execution and deny only paths containing <code>.env</code>.</p>
+          <p>This pattern scales from secrets to role boundaries. In Micro SDLC, the planner may write plans but not application code; the reviewer may write reviews but not plans. Hooks allow the general tool to exist while constraining its domain.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — permission before execution</p>
+          <h3>The request becomes data a policy can inspect</h3>
+          <div class="workflow" aria-label="Tool call moves through a pre-tool hook that allows or denies before execution, followed by an audit hook">
+            <div class="workflow__step"><strong>Model</strong><code>Read(.env.sample)</code></div>
+            <div class="workflow__step"><strong>PreToolUse</strong><code>match Read</code></div>
+            <div class="workflow__step"><strong>Policy</strong><code>path contains .env?</code></div>
+            <div class="workflow__step"><strong>Decision</strong><code>deny + reason</code></div>
+            <div class="workflow__step"><strong>Agent</strong><code>pivot / report</code></div>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — two boundaries on screen</p>
+          <h3>Block a secret; allow a plan</h3>
+          <div class="frame-sequence">
+            <figure class="frame-card">
+              <img src="../media/frames/ah-3-building-domain-specific-agents/t2170-qa-hook-block-env.jpg" alt="QA agent source showing a PreToolUse hook that denies file reads containing dot env" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">36:10</span>The exact policy is visible: inspect the file path; if it contains <code>.env</code>, return a deny decision and a security reason.</figcaption>
+            </figure>
+            <figure class="frame-card">
+              <img src="../media/frames/ah-3-building-domain-specific-agents/t2825-planner-write-hook.jpg" alt="Micro SDLC planner hook allowing a write to the specs directory during a live run" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">47:05</span>A planner write request is intercepted, checked against the course app’s <code>specs/</code> directory, allowed, and then completed. The older README calls this <code>plans/</code>; shipped code uses <code>specs/</code>.</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3><code>PreToolUse</code>, <code>PostToolUse</code>, and permission decisions</h3>
+          <aside class="callout callout--term"><p class="callout__label">Governance contract</p><p>A hook receives the proposed tool use as data. Returning an empty allow result permits execution. Returning <code>hookSpecificOutput.permissionDecision = "deny"</code> blocks it and supplies a reason the agent can see.</p></aside>
+          <p>The QA agent also logs tool use, creating an audit surface around action. Dan’s transcript and source comments state that hooks apply to subagents too: a <code>Task</code> agent does not escape the parent runtime’s enforcement. The shipped inline test directly exercises the hook function; it is not a separate end-to-end subagent security test, so keep those two pieces of evidence distinct.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace the deny payload</p>
+          <h3>Read capability remains; one path class does not</h3>
+          <div class="code-anatomy">
+            <div class="code-anatomy__title">apps/custom_5_qa_agent/qa_agent.py · block_env_files</div>
+            <pre><code>if ".env" in file_path:
+    return {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": (
+                "Security policy: .env files are blocked..."
+            ),
+        }
+    }
+
+return {}</code></pre>
+            <div class="code-anatomy__notes"><p><b>Match</b> The hook is registered for <code>Read</code> requests.</p><p><b>Inspect</b> The proposed path is extracted from tool input.</p><p><b>Enforce</b> A structured deny stops execution and returns a reason.</p></div>
+          </div>
+          <p>Compare this with removing <code>Read</code> from the tool surface. That would be simpler but would destroy the QA agent’s purpose. A hook expresses conditional capability: read the codebase, never read this protected class.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — trigger and inspect</p>
+          <h3>Make the boundary visible</h3>
+          <ol>
+            <li>Start the QA agent from its own project directory.</li>
+            <li>Ask it to read <code>.env.sample</code>.</li>
+            <li>Record the hook panel and the agent’s explanation.</li>
+            <li>Run <code>uv run python test_inline_hooks.py</code>.</li>
+            <li>Open <code>block_env_files</code> and trace input → path → deny payload.</li>
+            <li>Explain why the inline test proves hook logic but not a complete subagent integration path.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: role instructions without role enforcement</h3>
+          <p><strong>Symptom:</strong> the planner prompt says “write only plans,” but the agent still owns an unconstrained Write tool. A prompt mistake or adversarial input can cross the lane.</p>
+          <p><strong>Fix:</strong> keep purpose in the prompt and permission in code. Add path-aware hooks at the tool boundary and log the decisions. Prompt and hook are complementary: one teaches intended behavior; the other bounds possible behavior.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The optional MCP config has a real setup seam</h3>
+          <p><code>qa_agent.py</code> looks for <code>.mcp.json.firecrawl_6k</code>, while the repository ships <code>.mcp.json.firecrawl_6k.sample</code>. Rename the sample and configure <code>FIRECRAWL_API_KEY</code> to enable it. Without that change, the agent warns and falls back to WebSearch/WebFetch. Do not mistake the fallback for a hook failure.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <div class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What exact field blocks the QA read?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>hookSpecificOutput.permissionDecision</code> with the value <code>"deny"</code>.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why not simply remove the Read tool?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Reading the codebase is central to QA. The policy must block protected paths while preserving normal reads.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Where may the planner and reviewer write?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The planner is restricted to <code>specs/</code>; the reviewer is restricted to <code>reviews/</code>.</p></details></div>
+          </div>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Teach advice versus enforcement.</strong> Explain why “do not read secrets” belongs in the agent’s instructions while a <code>PreToolUse</code> deny hook belongs at the execution boundary.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="extend-overwrite">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Extend before you overwrite</h2>
+        <p class="section-lead">The Micro SDLC builder keeps the pure Claude Code system prompt. That is not a missing customization; it is the chapter’s strongest customization judgment.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the “uncustom” custom agent</p>
+          <h3>The builder has no appended role prompt</h3>
+          <p>A weak reading says the builder is unfinished. A stronger reading asks what the job is. The builder receives an implementation plan and writes software. General software construction is exactly what Claude Code’s preset is designed to do. Overwriting that prompt would discard a capable engineering agent to recreate a weaker one.</p>
+          <p>The planner and reviewer have different needs. Each remains an engineering agent, but each receives a narrow role and a bounded output directory. They extend. The lesson therefore teaches three points on a spectrum, not a binary custom/non-custom switch.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the least-invasive spectrum</p>
+          <h3>Preserve capability until the mismatch demands replacement</h3>
+          <div class="form-factor-map" role="img" aria-label="Spectrum from pure preset to appended preset to full prompt overwrite to overwrite plus custom tools">
+            <div><strong>Pure preset</strong><span><code>preset: claude_code</code></span></div>
+            <div><strong>Append</strong><span>preset + role instructions</span></div>
+            <div><strong>Append + hooks</strong><span>role plus enforced lane</span></div>
+            <div><strong>Overwrite</strong><span>new system identity</span></div>
+            <div><strong>Custom runtime</strong><span>overwrite + tools + deployment</span></div>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — work crosses three roles</p>
+          <h3>Plan → Build → Review → Ship</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-3-building-domain-specific-agents/t2565-micro-sdlc-kanban-board.jpg" alt="Micro SDLC kanban board with Idle, Plan, Build, Review, Shipped, and Errored stages" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">42:45</span>The board makes specialization legible. A ticket is planned, built, reviewed, and shipped by roles with different prompt and permission strategies.</figcaption>
+          </figure>
+          <p>The planner extends the preset with planning instructions and writes only a specification. The builder consumes that artifact with the pure preset and broad execution permission. The reviewer extends the preset with review instructions and writes only its assessment. Specialization lives at the seams: role prompt, hand-off artifact, and path hook.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Pure preset, extended agent, complete custom agent</h3>
+          <aside class="callout callout--term"><p class="callout__label">Prompt forms</p><p><code>{"type":"preset","preset":"claude_code"}</code> keeps the generalist. Add <code>"append": ...</code> to extend it. Supply a bare prompt string to overwrite it.</p></aside>
+          <p>Choose the least invasive form that solves the mismatch. Preset is not “less advanced.” It is more appropriate when the domain task already matches the general agent. Append says “keep your engineering competence, adopt this role.” Overwrite says “the product’s identity is now different.”</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — classify all three roles</p>
+          <h3>The options blocks tell the truth</h3>
+          <div class="proof-grid">
+            <article><strong>Planner · extend</strong><p>Claude Code preset + appended planner prompt + <code>acceptEdits</code> + write hook restricted to <code>specs/</code>.</p></article>
+            <article><strong>Builder · preserve</strong><p>Pure Claude Code preset + ticket codebase working directory + <code>bypassPermissions</code>. No role append.</p></article>
+            <article><strong>Reviewer · extend</strong><p>Claude Code preset + appended reviewer prompt + <code>acceptEdits</code> + write hook restricted to <code>reviews/</code>.</p></article>
+          </div>
+          <p>Do not infer behavior from filenames alone. Read <code>backend/modules/agent_orchestrator.py</code> and identify the dictionary form assigned to each <code>system_prompt</code>. Configuration is the evidence.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — three-role audit</p>
+          <h3>Prove each strategy from source</h3>
+          <ol>
+            <li>Open <code>backend/modules/agent_orchestrator.py</code>.</li>
+            <li>Find planner, builder, and reviewer options blocks.</li>
+            <li>Copy only each <code>system_prompt</code> value into a comparison note.</li>
+            <li>Add each role’s permission mode, working directory, and hook.</li>
+            <li>Defend why changing the builder to a complete overwrite would be a regression unless a new mismatch were demonstrated.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: specialization as prompt destruction</h3>
+          <p><strong>Symptom:</strong> every named role gets a new complete system prompt, including roles doing ordinary engineering work. General capabilities disappear and must be laboriously recreated.</p>
+          <p><strong>Fix:</strong> start from the job. If the preset already owns the job, preserve it. Append a narrow role when necessary. Overwrite only when the identity or workflow is genuinely different.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The principle has not aged</h3>
+          <p>The extract explicitly marks extend-versus-overwrite as durable. Models and SDK names move; the design judgment remains: do not discard a strong generalist to hand-build a generic replacement. Specialize the last mile.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <div class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why does the builder use a pure preset?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Its job is ordinary software construction, exactly the general engineering agent’s domain.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What one key distinguishes extension from overwrite?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Extension retains the <code>claude_code</code> preset and supplies <code>append</code>; overwrite supplies a standalone system-prompt string.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What makes planner and reviewer more than prompt-only roles?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Their write-path hooks enforce distinct output lanes in <code>specs/</code> and <code>reviews/</code>.</p></details></div>
+          </div>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Defend the apparent inconsistency.</strong> Explain why one system contains two extended agents and one pure generalist, and why that mix is better design than three complete overwrites.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="form-factors">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Agents are components, not chat windows</h2>
+        <p class="section-lead">The same core-four runtime can appear as a script, REPL, stream handler, backend method, or full application—and one agent’s structured output can become another’s context.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the input never ends</p>
+          <h3>No context window can contain an unbounded log stream</h3>
+          <p>A larger window delays the limit; it does not remove it. Ultra Stream treats the problem as system design. A Stream agent asks a deterministic tool for a small line range, summarizes individual logs, classifies severity, persists structured output, and periodically reconnects its processing loop. An Inspector agent queries the produced logs rather than loading the raw file.</p>
+          <p>The hand-off is not two chatbots exchanging prose. It is a producer writing structured domain artifacts and a consumer reading those artifacts through its own tools.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — bounded producer, queryable consumer</p>
+          <h3>Move the durable state outside the prompt</h3>
+          <div class="producer-consumer" role="img" aria-label="Ultra Stream producer agent reads small JSONL chunks and writes structured summaries that an inspector agent queries">
+            <article class="producer-consumer__agent"><b>Stream agent · producer</b><p><code>read_stream_file</code> reads 3–5 lines. <code>raw_log_cache</code> holds the raw records needed by the summary tool. Produced logs and alerts are persisted.</p></article>
+            <div class="producer-consumer__pipe">→<span>produced logs</span></div>
+            <article class="producer-consumer__agent"><b>Inspector agent · consumer</b><p>Reads produced entries, finds logs for a user, answers questions, and can notify engineering or support.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — both roles fit on one screen</p>
+          <h3>A product makes the architecture visible</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-3-building-domain-specific-agents/t3060-ultra-stream-dual-panel.jpg" alt="Ultra Stream dual-panel interface with Inspector Agent and a severity-tagged live Stream Agent feed" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">51:00</span>The Inspector sits on the left with an alert; the Stream agent sits on the right with severity-tagged produced logs. One agent creates the knowledge surface the other explores.</figcaption>
+          </figure>
+          <p>The UI is not the key novelty. Earlier agents already prove the deployment ladder: Pong and Echo are scripts; Calc and QA are REPLs; Social Hype is a stream handler; Tri-Copy-Writer wraps an agent in a backend method; Micro SDLC and Ultra Stream expose coordinated agents through full web interfaces.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Form-factor freedom and producer/consumer agents</h3>
+          <aside class="callout callout--term"><p class="callout__label">Architecture pattern</p><p>A <strong>producer agent</strong> converts raw domain input into smaller structured artifacts. A <strong>consumer agent</strong> operates on those artifacts. Persistence, not shared chat memory, carries the hand-off.</p></aside>
+          <p>The lesson describes <code>clear_context</code> as self-managed context. The shipped implementation is worth reading precisely: the tool resets a counter and broadcasts status, while the outer processing loop periodically disconnects and initializes the Stream agent again with session resume. Treat this as the course’s intended context-management pattern, not evidence that one tool call magically erases every SDK token.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — the chunk reader</p>
+          <h3>Use a narrow tool instead of loading the file</h3>
+          <div class="code-anatomy">
+            <div class="code-anatomy__title">apps/custom_8_ultra_stream_agent/backend/main.py · read_stream_file pattern</div>
+            <pre><code>@tool("read_stream_file", "Read a small range of JSONL lines", ...)
+async def read_stream_file(args):
+    start = args["start_line_index"]
+    end = args["end_line_index"]
+    # shipped code invokes sed for the requested range
+    # each parsed line is cached by its index
+    raw_log_cache[start + offset] = parsed_log
+    return {"content": [{"type": "text", "text": ...}]}
+
+# a later tool retrieves cached raw data for each produced summary</code></pre>
+            <div class="code-anatomy__notes"><p><b>Bounded read</b> The prompt receives a small range, not the entire JSONL source.</p><p><b>Cache</b> Raw records remain available to deterministic persistence code by index.</p><p><b>Production caution</b> The shipped <code>sed</code>/<code>shell=True</code> implementation is instructional; harden path handling before production reuse.</p></div>
+          </div>
+          <p>One summary per log provides a stable unit of work. Severity and alert creation are explicit outputs. The database becomes the durable seam between agents, while WebSocket updates make the system visible to the UI.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — follow the produced artifact</p>
+          <h3>Run the flagship with its real ports</h3>
+          <ol>
+            <li>From <code>apps/custom_8_ultra_stream_agent</code>, run <code>uv sync</code> and <code>uv run python backend/main.py --reset</code>.</li>
+            <li>Start the frontend from <code>frontend/</code>; the shipped Vite config uses <code>http://127.0.0.1:5175</code>.</li>
+            <li>Observe one produced log’s source index, summary, and severity.</li>
+            <li>Ask the Inspector for issues 1–3, summary only.</li>
+            <li>Choose a user ID visible in your run and ask for that user’s logs.</li>
+            <li>Trace the Inspector tool that reads the persisted output; do not invent a user ID or expected alert.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating context size as storage architecture</h3>
+          <p><strong>Symptom:</strong> every raw record, old summary, and prior conversation is stuffed into one prompt until processing becomes expensive or impossible. Or two agents “coordinate” by sending growing transcripts to one another.</p>
+          <p><strong>Fix:</strong> keep raw data outside the model, expose bounded reads, persist structured results, and let downstream agents query only what their job needs. Context is a working set, not your database.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The architecture is durable; implementation details need review</h3>
+          <p>The extract marks form-factor freedom, producer/consumer hand-offs, and token-efficient domain tools as current patterns. The code audit adds two cautions: the context-reset behavior is an outer-loop/reconnect pattern rather than a proven instant window wipe, and the shell-based chunk reader needs production hardening. Preserve the system idea; review the mechanism.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <div class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">How large is each course chunk?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The system prompt directs small reads of about 3–5 JSONL lines.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why keep <code>raw_log_cache</code>?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Later deterministic persistence/summarization steps need the raw record associated with each line index without reloading the whole source.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What passes from Stream to Inspector?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Persisted produced-log artifacts—summaries, severity, indices, user data—not a shared raw transcript.</p></details></div>
+          </div>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Explain Ultra Stream without saying “it remembers the file.”</strong> Describe bounded reads, raw caching, produced logs, persistence, the Inspector’s tools, and the outer-loop context-management intent.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="decision">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Build custom only when the task shape earns it</h2>
+        <p class="section-lead">After eight impressive demos, Dan spends the finale telling you when not to copy them. Judgment is the last primitive.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the custom-agent tax</p>
+          <h3>You built a framework for a one-off conversation</h3>
+          <p>A developer can spend hours creating a system prompt, wrapper, deployment surface, tool schemas, response parser, and logging for a task they could have completed in one in-loop Claude Code session. The custom agent may work perfectly and still be the wrong system.</p>
+          <p>Customization creates ownership: prompts, permissions, SDK changes, tests, operational costs, and user-facing behavior. You earn that ownership when the work repeats, the domain mismatch matters, or the process must run programmatically without you.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the decision board</p>
+          <h3>Task shape before implementation choice</h3>
+          <div class="decision-board" role="img" aria-label="Decision board comparing reasons to build a custom agent with reasons to use a generalist or extension">
+            <article><h3>Build custom</h3><ul><li>Programmatic agent</li><li>Repeated workflow</li><li>Domain-specific advantage</li><li>Cost down while performance rises</li><li>Permission checks for team use</li><li>Stay out of the loop</li></ul><p class="verdict">Own a specialist because the repeated mismatch is valuable.</p></article>
+            <article><h3>Use generalist / extend</h3><ul><li>You are actively in the loop</li><li>Generic engineering workflow</li><li>Exploration or prototyping</li><li>An 80% generalist is enough</li><li>Short-lived or lightweight work</li><li>Non-repeatable, non-domain task</li></ul><p class="verdict">Preserve the generalist when the job does not justify a product.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — return to the path</p>
+          <h3>The destination is conditional</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-3-building-domain-specific-agents/t0018-the-agentic-path.jpg" alt="The Agentic Path frame showing the progression from Base to Better, More, and Custom agents" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">0:18</span>This opening frame carries the path visually; the closing narration returns to the same idea at 1:07:04. Better and more come first; custom is the bare-metal choice when the domain mismatch survives those moves.</figcaption>
+          </figure>
+          <p>The frame plan intentionally marks the spoken decision framework as unframed B-roll. The board above is therefore a designed reconstruction from the transcript lists, not a fabricated course screenshot.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Custom-agent decision discipline</h3>
+          <aside class="callout callout--term"><p class="callout__label">Least-invasive order</p><p><strong>Generalist → extension → complete custom.</strong> Move right only when you can name the mismatch the previous form cannot clear.</p></aside>
+          <p>This prevents a subtle form of technology-first design. “Can I build it?” is answered by the eight examples. “Should this be a custom agent?” is answered by repetition, domain specificity, programmatic deployment, permission needs, cost/performance, and loop position.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — classify three course roles</p>
+          <h3>One system contains all three choices</h3>
+          <div class="proof-grid">
+            <article><strong>Generalist · SDLC builder</strong><p>Ordinary engineering work. Pure Claude Code preset already fits.</p></article>
+            <article><strong>Extension · planner/reviewer</strong><p>Engineering competence remains useful, but role instructions and bounded write lanes add the missing domain control.</p></article>
+            <article><strong>Complete custom · Ultra Stream</strong><p>Repeated out-of-loop stream processing, narrow tools, producer/consumer data, severity workflow, and application deployment.</p></article>
+          </div>
+          <p>This comparison is more useful than asking which agent is “most advanced.” Each is advanced if it is the smallest system that reliably fits its job.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — judgment drill</p>
+          <h3>Classify your own work before choosing a template</h3>
+          <ol>
+            <li>List three tasks that are programmatic, repeated, domain-specific, permission-gated, cost-sensitive, or out-of-loop.</li>
+            <li>List three tasks that are in-loop, generic, exploratory, lightweight, or one-off.</li>
+            <li>Select one candidate from the first list.</li>
+            <li>Name its closest lesson template among the eight agents.</li>
+            <li>Write the exact mismatch that pure Claude Code or a light extension would not solve.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: competing with the general engineering agent</h3>
+          <p><strong>Symptom:</strong> the planned product is “Claude Code, but ours,” with broad coding tools, generic prompts, and no distinctive domain workflow.</p>
+          <p><strong>Fix:</strong> stop. Use Claude Code for generic engineering. Identify the last-mile domain process it cannot perform out of the box, then customize only that seam—or do not customize at all.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The finale is the most durable part</h3>
+          <p>The extract marks this judgment as unchanged. Tool names, model IDs, and message classes move. The economic question remains: is there enough repeated, specific value to justify owning a specialist runtime?</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <div class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name three reasons to build custom.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Any three of: programmatic use, repeated workflow, domain-specific advantage, cost-down/performance-up, permission checks, or staying out of the loop.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name three reasons to stay generalist or lightly extended.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Any three of: active in-loop work, generic workflow, exploration/prototyping, 80% generalist need, short-lived/lightweight work, or non-repeatable/non-domain work.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What evidence must justify moving from append to overwrite?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A named domain mismatch that preserving the generalist plus narrow appended instructions cannot clear.</p></details></div>
+          </div>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Classify builder, planner, and Ultra Stream.</strong> Teach why pure preset, append, and overwrite can all be correct choices in the same chapter. End with one task you would refuse to custom-build.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="current-practice">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Current practice · preserve principles, re-check surfaces</h2>
+        <p class="section-lead">The repository has already migrated further than the recording. Use the current names in runnable code, keep course-era strings as evidence, and treat the durable architecture separately from version-sensitive SDK details.</p>
+
+        <div class="practice-grid">
+          <article><strong>Use the current SDK names</strong><p>Package <code>claude-agent-sdk</code>; import <code>claude_agent_sdk</code>; construct <code>ClaudeAgentOptions</code>. Two teaching frames still show the former class name.</p></article>
+          <article><strong>Select a model class, not a relic</strong><p>Course IDs are period detail. Preserve the principle: cheap/fast for trivial volume, balanced for most work, strongest reasoning for difficult planning/review.</p></article>
+          <article><strong>Re-check message shapes</strong><p>Text, thinking, call, result, and run metadata are durable categories. Exact classes and fields can move between SDK versions.</p></article>
+          <article><strong>Harden deterministic code</strong><p>Calc’s restricted <code>eval()</code> and Ultra Stream’s shell-based <code>sed</code> reader are teaching implementations. The lab’s stretch work points toward parsers and safer file handling.</p></article>
+          <article><strong>Use Skills for in-loop expertise</strong><p>Agent Skills package reusable knowledge for the interactive generalist. SDK agents remain the choice for programmatic tools, hooks, models, sessions, and deployed products.</p></article>
+          <article><strong>Verify setup against source</strong><p>QA’s Firecrawl sample needs renaming; Micro SDLC uses <code>specs/</code>; Ultra Stream’s shipped frontend port is 5175. Repository code wins over stale README prose.</p></article>
+        </div>
+
+        <h3>Two source-approved companion videos</h3>
+        <p>The extract approves exactly two overlays for named gaps. Both IDs and titles were rechecked against YouTube metadata on 2026-07-13; no additional videos are introduced.</p>
+        <div class="video-cards">
+          <a class="video-card" href="https://www.youtube.com/watch?v=6fCqj4xFCZI">
+            <span class="video-card__type">Named gap · SDK era shift</span>
+            <strong>How Claude Code CHANGED Engineering Forever (and what’s next)</strong>
+            <p>Use after the SDK rename note to connect the recording-era surface with the broader programmable-agent direction.</p>
+            <span class="video-card__watch">Open video ↗</span>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/watch?v=X2ciJedw2vU">
+            <span class="video-card__type">Named gap · reusable expertise</span>
+            <strong>RAW Agentic Coding: ZERO to Agent SKILL</strong>
+            <p>Use after distinguishing in-loop skills from programmatic SDK agents. The two forms package expertise at different runtime layers.</p>
+            <span class="video-card__watch">Open video ↗</span>
+          </a>
+        </div>
+
+        <aside class="source-lock"><strong>Source discipline.</strong> This current-practice section only resolves gaps named in the extract and discrepancies verified in the shipped course code. It does not nominate a “best current model,” promise stable SDK class shapes, or invent a production architecture beyond the lesson.</aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="lab">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Graded lab · read, run, govern, judge</h2>
+        <p class="section-lead">Work only inside <code>agentic-horizon/building-specialized-agents</code>—or the lesson symlink <code>IndyDevDan/ah-3-building-domain-specific-agents/codebase</code>. The core lab takes 90–150 minutes and grades your ability to read agent configuration above raw execution.</p>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Cost, access, and process safety</p>
+          <p>The agents call real models. UI agents and live streams can consume meaningful tokens; stop every backend, frontend, and stream when finished. Social Hype is optional because it depends on a live network stream and can trigger macOS notification/TTS behavior. Do not commit real keys. Each Python agent is its own UV project, so run <code>uv sync</code> and commands from that agent’s directory. Start each lab box in a fresh terminal at the course repository root unless the box explicitly moves between sibling agent directories.</p>
+        </aside>
+
+        <section class="lab-box" id="lab-setup">
+          <h3 class="lab-box__title">Lab 0 · Setup and SDK sanity check</h3>
+          <ul class="lab-box__meta"><li>10 minutes</li><li>Required</li><li>Checkpoint 0</li></ul>
+          <p><strong>Failure this exposes:</strong> following the recording’s former SDK names or stale root README paths instead of the code you will run.</p>
+          <ol class="lab-box__steps">
+            <li>Enter the course repository:
+              <pre><code>cd agentic-horizon/building-specialized-agents</code></pre>
+            </li>
+            <li>Read <code>README.md</code> as a catalog, then treat each agent’s source and local README as the executable authority.</li>
+            <li>Check the toolbelt:
+              <pre><code>uv --version
+claude --version
+node --version
+bun --version</code></pre>
+              <p>Bun is used by the shipped Vue projects, though the lab’s listed frontend commands use npm.</p>
+            </li>
+            <li>Open any agent’s <code>pyproject.toml</code> and Python entrypoint. Verify <code>claude-agent-sdk</code>, <code>from claude_agent_sdk import ...</code>, and <code>ClaudeAgentOptions</code>.</li>
+            <li>Create the course-local environment file specified by the lesson extract:
+              <pre><code>cp .env.sample .env</code></pre>
+              <p>Set <code>ANTHROPIC_API_KEY</code> when using API-key authentication, or use your configured Claude plan. Do not commit the populated file. The SDK may also use your existing CLI/environment authentication; the copy is the course’s explicit setup surface.</p>
+            </li>
+            <li>Optional integrations use their own variables: <code>FIRECRAWL_API_KEY</code> for QA retrieval and <code>ELEVENLABS_API_KEY</code> for Social Hype TTS. Other placeholders in <code>.env.sample</code> are not required by the graded core.</li>
+            <li>If you want Firecrawl in QA, rename <code>apps/custom_5_qa_agent/.mcp.json.firecrawl_6k.sample</code> to the exact filename the source loads and set <code>FIRECRAWL_API_KEY</code>. Otherwise plan to use the fallback tools.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 0 · say it without looking.</strong> “The package is <code>claude-agent-sdk</code>; the Python module is <code>claude_agent_sdk</code>; the options class is <code>ClaudeAgentOptions</code>. The recording shows the former name.”</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>Required tool versions resolve.</li><li>You can state the current three SDK names.</li><li>You know which optional keys/services you are not configuring.</li><li>You are in the course repository and will run each UV project locally.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-reading">
+          <h3 class="lab-box__title">Lab 1 · Read the core four before running</h3>
+          <ul class="lab-box__meta"><li>15 minutes</li><li>Required</li><li>Checkpoint 1</li></ul>
+          <p><strong>Failure this exposes:</strong> understanding an agent from its UI while missing the options that actually define behavior.</p>
+          <ol class="lab-box__steps">
+            <li>Open, in order:
+              <ul>
+                <li><code>apps/custom_1_pong_agent/pong_agent.py</code></li>
+                <li><code>apps/custom_2_echo_agent/echo_agent.py</code></li>
+                <li><code>apps/custom_3_calc_agent/calc_agent.py</code></li>
+              </ul>
+            </li>
+            <li>For each, find <code>ClaudeAgentOptions(...)</code> and complete this table on paper:</li>
+          </ol>
+          <div class="rubric-wrap">
+            <table>
+              <thead><tr><th>Agent</th><th>Context</th><th>Model</th><th>Prompt</th><th>Tools</th><th>Runtime/session</th></tr></thead>
+              <tbody>
+                <tr><td>Pong</td><td>What is loaded or omitted?</td><td>Which pinned model ID?</td><td>Overwrite or append?</td><td>Custom or built-in?</td><td><code>query()</code> or client?</td></tr>
+                <tr><td>Echo</td><td>Which definitions stay visible?</td><td>Why fit the task?</td><td>Where loaded?</td><td>Qualified MCP name?</td><td>Why client?</td></tr>
+                <tr><td>Calc</td><td>What is removed?</td><td>Why different?</td><td>Where loaded?</td><td>Which two tools?</td><td>Where resume?</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <ol class="lab-box__steps" start="3">
+            <li>Annotate the exact difference between <code>allowed_tools</code> and <code>disallowed_tools</code>.</li>
+            <li>Mark every model ID “period detail”; write the task-selection principle beside it.</li>
+            <li>Predict each agent’s behavior and tool surface before execution.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 1 · oral audit.</strong> Pong: prompt overwrite and one-off query. Echo: one custom MCP tool, cheaper course model, client, built-ins not explicitly removed. Calc: two custom tools, listed built-ins removed, session continuity.</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>Every table cell cites a source line or prompt file.</li><li>You distinguish prompt strategy from user prompt.</li><li>You identify entrypoint and session behavior separately.</li><li>You make no claim that a recording-era exact built-in-tool count is permanent.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-ladder">
+          <h3 class="lab-box__title">Lab 2 · Run the first three rungs</h3>
+          <ul class="lab-box__meta"><li>20 minutes</li><li>Required</li><li>Checkpoint 2</li></ul>
+          <p><strong>Failure this exposes:</strong> recognizing code patterns without observing their behavioral consequence.</p>
+
+          <h4>Pong · system prompt law</h4>
+          <pre><code>cd apps/custom_1_pong_agent
+uv sync
+uv run python pong_agent.py --prompt "summarize this codebase"</code></pre>
+          <p>It should answer according to <code>prompts/PONG_AGENT_SYSTEM_PROMPT.md</code>, not according to the request. Run a second unrelated prompt if needed to prove the invariant.</p>
+
+          <h4>Echo · custom tool</h4>
+          <pre><code>cd ../custom_2_echo_agent
+uv sync
+uv run python echo_agent.py "echo 'custom agents' in reverse uppercase repeat 2"</code></pre>
+          <p>Observe the tool-call panel. Trace the printed name back to <code>mcp__echo__echo</code> and the in-memory MCP server registration.</p>
+
+          <h4>Calc · continuity</h4>
+          <pre><code>cd ../custom_3_calc_agent
+uv sync
+uv run python calc_agent.py</code></pre>
+          <p>Ask for 55 Fahrenheit in Celsius. Then ask what the last calculation was. Type <code>quit</code> when the state test passes.</p>
+
+          <div class="checkpoint"><strong>Checkpoint 2 · three one-sentence explanations.</strong> Why Pong ignores the user’s task; why Echo uses a client; why Calc remembers the previous turn.</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>Pong’s behavior matches the prompt file.</li><li>Echo visibly invokes the custom tool.</li><li>Calc answers a dependent second turn.</li><li>You can point to the exact configuration responsible for each result.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-context">
+          <h3 class="lab-box__title">Lab 3 · The context experiment</h3>
+          <ul class="lab-box__meta"><li>10 minutes</li><li>Highest-value drill</li><li>Checkpoint 3</li></ul>
+          <p><strong>Failure this exposes:</strong> believing an allowlist makes unlisted tool definitions disappear.</p>
+          <ol class="lab-box__steps">
+            <li>From a fresh terminal at the course repository root, enter Echo and run:
+              <pre><code>cd apps/custom_2_echo_agent
+uv run python echo_agent.py "list your available tools"</code></pre>
+            </li>
+            <li>Record every tool the current installed SDK reports. Your count may differ from the recording; grade the contrast, not a fixed number.</li>
+            <li>Move to Calc, start it, and ask: “list all your tools, names only.” Record its surface:
+              <pre><code>cd ../custom_3_calc_agent
+uv run python calc_agent.py</code></pre>
+            </li>
+            <li>Return to both options blocks. Highlight the presence or absence of <code>disallowed_tools</code>.</li>
+            <li>Complete this sentence in your own words: “<code>allowed_tools</code> controls ___; <code>disallowed_tools</code> changes ___.”</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 3 · the money sentence.</strong> <code>allowed_tools</code> gates calls; the built-in definitions can still occupy context unless they are explicitly disallowed. Echo demonstrates the first surface; Calc demonstrates de-contexting.</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>Both tool lists are observed, not copied from the chapter.</li><li>Your explanation distinguishes authorization from visibility.</li><li>You do not claim the current built-in count is timeless.</li><li>You can name a legitimate reason a QA agent should keep more tools than Calc.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-governance">
+          <h3 class="lab-box__title">Lab 4 · Governance that says no</h3>
+          <ul class="lab-box__meta"><li>15 minutes</li><li>Required</li><li>Checkpoint 4</li></ul>
+          <p><strong>Failure this exposes:</strong> confusing a safety instruction with an enforced permission boundary.</p>
+          <ol class="lab-box__steps">
+            <li>Start QA from its project:
+              <pre><code>cd apps/custom_5_qa_agent
+uv sync
+uv run python qa_agent.py</code></pre>
+            </li>
+            <li>Ask: “read the <code>.env.sample</code> file.” Observe the security hook deny the call and the agent explain the reason.</li>
+            <li>Open <code>qa_agent.py</code> and trace <code>block_env_files</code> from matcher to <code>permissionDecision</code>.</li>
+            <li>Run the shipped direct hook test:
+              <pre><code>uv run python test_inline_hooks.py</code></pre>
+            </li>
+            <li>Ask a legitimate codebase question and observe text, thinking if requested, tool use, and result reporting.</li>
+            <li>Explain the evidence boundary: the transcript/source assert subagent coverage; this inline test directly checks the hook function, not a full <code>Task</code> integration.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 4 · enforceable answer.</strong> The hook blocks before the Read tool executes by returning <code>permissionDecision: "deny"</code> with a reason. The agent retains normal read capability.</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>The real <code>.env.sample</code> request is denied.</li><li>The direct hook test passes.</li><li>You can reconstruct the deny payload.</li><li>You distinguish source claims, direct unit evidence, and observed runtime behavior.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-ui">
+          <h3 class="lab-box__title">Lab 5 · Agents inside products</h3>
+          <ul class="lab-box__meta"><li>20–50 minutes</li><li>Run ≥2</li><li>Ultra Stream required</li></ul>
+          <p><strong>Failure this exposes:</strong> treating a custom agent as synonymous with a terminal chat.</p>
+          <p>For each selected option, open fresh backend and frontend terminals at the course repository root before running the shown <code>cd</code> commands.</p>
+
+          <h4>A · Tri-Copy-Writer</h4>
+          <pre><code># terminal 1
+cd apps/custom_6_tri_copy_writer/backend
+uv sync
+uv run python main.py -v 6
+
+# terminal 2
+cd apps/custom_6_tri_copy_writer/frontend
+npm install
+npm run dev</code></pre>
+          <p>Open <code>http://127.0.0.1:5173</code>. Request a blog-post title for a productivity app and confirm six variations. In <code>backend/main.py</code>, find the all-tools-off list and Pydantic response models. In the prompt file, find <code>{NUMBER_OF_VERSIONS}</code>.</p>
+
+          <h4>B · Micro SDLC</h4>
+          <pre><code># terminal 1
+cd apps/custom_7_micro_sdlc_agent/backend
+uv sync
+uv run python main.py
+
+# terminal 2
+cd apps/custom_7_micro_sdlc_agent/frontend
+npm install
+npm run dev</code></pre>
+          <p>Open <code>http://127.0.0.1:5174</code>. Create a small ticket against the course app itself and move it to Plan. Observe Plan → Build → Review → Shipped. In <code>backend/modules/agent_orchestrator.py</code>, prove planner preset+append+<code>specs/</code> hook, builder pure preset, reviewer preset+append+<code>reviews/</code> hook.</p>
+
+          <h4>C · Ultra Stream · required</h4>
+          <pre><code># terminal 1
+cd apps/custom_8_ultra_stream_agent
+uv sync
+uv run python backend/main.py --reset
+
+# terminal 2
+cd apps/custom_8_ultra_stream_agent/frontend
+npm install
+npm run dev</code></pre>
+          <p>Open <code>http://127.0.0.1:5175</code>. Watch produced summaries and severities. Ask the Inspector for issues 1–3, then query a user ID visible in your run. Read <code>read_stream_file</code>, <code>raw_log_cache</code>, the produced-log tool, and <code>clear_context</code>; then inspect the outer loop’s reconnect/resume behavior.</p>
+
+          <div class="checkpoint"><strong>Checkpoint 5 · product explanation.</strong> For every app you ran, name its SDK surface and explain what the form factor enables. For Ultra Stream, explain bounded raw reads, persisted produced logs, and Inspector consumption.</div>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>At least two UI agents ran, including Ultra Stream.</li><li>Tri-Copy-Writer, if selected, returned the configured count.</li><li>Micro SDLC, if selected, showed the three prompt strategies and write lanes.</li><li>Ultra Stream showed producer and consumer behavior.</li><li>All processes are stopped after evidence is collected.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-judgment">
+          <h3 class="lab-box__title">Lab 6 · Judgment before architecture</h3>
+          <ul class="lab-box__meta"><li>10 minutes</li><li>Required</li><li>Checkpoint 6</li></ul>
+          <ol class="lab-box__steps">
+            <li>Write three tasks from your work that are custom-agent-shaped: programmatic, repeated, domain-specific, permission-gated, cost/performance sensitive, or out-of-loop.</li>
+            <li>Write three tasks that should remain on an out-of-the-box or extended agent: in-loop, generic, exploratory, short-lived, lightweight, or non-repeatable.</li>
+            <li>Choose the first custom candidate you would build.</li>
+            <li>Name the closest lesson template and list the core-four changes you would need.</li>
+            <li>Write why a pure or extended generalist is insufficient. If you cannot, move the task to the second list.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 6 · defend the first build.</strong> It must be genuinely domain-specific or out-of-loop, not a generic coding agent under a new name.</div>
+        </section>
+
+        <section class="lab-box" id="lab-stretch">
+          <h3 class="lab-box__title">Stretch · change agents through Claude Code</h3>
+          <ul class="lab-box__meta"><li>30–45 minutes</li><li>Optional</li><li>Course repo only</li></ul>
+          <p>Type zero lines of application code by hand. Ask Claude Code to make each selected change, then review and run the evidence.</p>
+          <ol class="lab-box__steps">
+            <li><strong>Model swap:</strong> change Echo to an available cheap/fast model and prove the tool still runs. Do not copy a model ID from this chapter as a current recommendation.</li>
+            <li><strong>New Calc tool:</strong> add a percentage tool, register it in the in-memory MCP server, allow it, and observe a real tool call.</li>
+            <li><strong>Tighter QA governance:</strong> deny reads of <code>*.pem</code> and <code>*.key</code>, test with a temporary fake file, then remove the fixture.</li>
+            <li><strong>Extend, do not overwrite:</strong> append one planner instruction; verify the builder’s pure preset remains unchanged.</li>
+            <li><strong>Harden Calc:</strong> replace the restricted <code>eval()</code> path with an AST-based or small math parser; verify normal conversions and reject an import expression.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Stretch pass criteria</h4><ul><li>Every source change was produced through Claude Code.</li><li>Every change has observed behavior or a test.</li><li>Core-four configuration remains explicit.</li><li>Temporary secrets/fixtures and running processes are cleaned up.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-final">
+          <h3 class="lab-box__title">Final pass sheet</h3>
+          <ul class="lab-box__meta"><li>All seven required</li><li>Grade from evidence</li></ul>
+          <ul class="lab-checklist">
+            <li>You can point at any lesson agent’s <code>ClaudeAgentOptions</code> and name context, model, prompt, and tools.</li>
+            <li>You state <code>claude-agent-sdk</code> / <code>ClaudeAgentOptions</code> and explain the former names in the recording.</li>
+            <li>You demonstrated the Echo→Calc allowed-versus-disallowed context lesson in your own words.</li>
+            <li>You triggered the QA <code>.env</code> deny hook and can reconstruct its permission decision.</li>
+            <li>You ran at least two UI agents, including Ultra Stream, and can explain bounded stream processing.</li>
+            <li>You explain extend versus overwrite using the SDLC builder’s pure preset as evidence.</li>
+            <li>You produced custom-versus-generalist lists and selected a defensible first template.</li>
+          </ul>
+          <div class="checkpoint"><strong>Expert pass.</strong> A reviewer can choose any of the eight agent directories, and you can reconstruct its behavior from the options block before running it.</div>
+        </section>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Cumulative mastery · retrieve, trace, diagnose, choose</h2>
+        <p class="section-lead">Close the chapter before answering. A recognized phrase earns half credit; a source-grounded explanation that predicts behavior earns full credit.</p>
+
+        <h3>Round 1 · Foundations</h3>
+        <section class="retrieval-quiz" aria-label="Foundations retrieval questions">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Reconstruct the agentic path.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Better agents → more agents → custom agents. Custom follows prompt/context mastery and scaled compute; it is not the default starting point.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What are the four fields you locate before reading an agent top to bottom?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Context, model, prompt, and tools—the core four.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why can Pong remain Pong across unrelated user requests?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Its complete system-prompt overwrite is injected before every user prompt and constrains the same model to the same narrow behavior.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. State the SDK rename in all three runnable forms.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Package <code>claude-agent-sdk</code>, module <code>claude_agent_sdk</code>, class <code>ClaudeAgentOptions</code>. The recording shows the earlier Claude Code SDK / <code>ClaudeCodeOptions</code> name.</p></details></div>
+        </section>
+
+        <h3>Round 2 · Trace the runtime</h3>
+        <section class="retrieval-quiz" aria-label="SDK runtime retrieval questions">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">5. When is <code>query()</code> sufficient?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>For a one-off request without the lesson’s custom tools or multi-turn client lifecycle, as in Pong.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">6. What two things does <code>ClaudeSDKClient</code> enable in this lesson?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Custom tools and a continuing conversation/client lifecycle.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">7. What exact value makes Calc’s later call continuous?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The prior <code>ResultMessage.session_id</code>, supplied to the next <code>ClaudeAgentOptions</code> via <code>resume=</code>.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">8. Reconstruct custom tool registration from function to allowed name.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Decorate the async function with <code>@tool</code>; mount it using <code>create_sdk_mcp_server</code>; attach the server in <code>mcp_servers</code>; expose its qualified <code>mcp__server__tool</code> name in <code>allowed_tools</code>.</p></details></div>
+        </section>
+
+        <h3>Round 3 · Diagnose the failure</h3>
+        <section class="retrieval-quiz" aria-label="Diagnosis retrieval questions">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">9. Echo calls only its custom tool but still reports many built-ins. Which assumption failed?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The assumption that <code>allowed_tools</code> removes other definitions from context. It gates calls; explicit <code>disallowed_tools</code> removes listed built-ins.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">10. A custom tool never fires, and the code uses the Pong runtime surface. First repair?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Use <code>ClaudeSDKClient</code>, register the in-memory MCP server, and expose the qualified tool name.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">11. QA can read source files but refuses <code>.env.sample</code>. Is that a prompt or tool absence?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Neither. A <code>PreToolUse</code> hook conditionally denies that specific path class while preserving Read for normal files.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">12. The planner writes application code instead of a specification. What two layers should you inspect?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The appended planner system instructions and the write-path hook that should restrict output to <code>specs/</code>.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">13. Ultra Stream cost grows because every raw log is kept in the prompt. Architectural repair?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Use bounded line-range tools, keep raw data/cache outside the prompt, persist one produced summary per log, and let the Inspector query the produced artifacts.</p></details></div>
+        </section>
+
+        <h3>Round 4 · Transfer and judgment</h3>
+        <section class="retrieval-quiz" aria-label="Transfer and judgment retrieval questions">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">14. Why are planner, builder, and reviewer allowed to use different prompt forms?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Their job shapes differ. Planner/reviewer need role extensions and bounded output; builder’s job already matches the pure engineering preset.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">15. A one-time exploratory refactor needs a human in the loop. Complete custom, extension, or generalist?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Start with the generalist; extend only if a specific role instruction is repeatedly missing. The source decision framework argues against complete custom for in-loop, generic, one-off work.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">16. A repeated log triage workflow needs bounded reads, severity summaries, alerts, and a query UI. Closest template?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Ultra Stream: a producer Stream agent, persisted produced logs, and a consumer Inspector agent with narrow domain tools.</p></details></div>
+        </section>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Scoring</p>
+          <p><strong>14–16:</strong> ready to teach and template a real specialist. <strong>10–13:</strong> rerun the lab checkpoint attached to each miss. <strong>0–9:</strong> redraw the agentic path and annotate Pong, Echo, and Calc through the core four before returning to the UI agents.</p>
+        </aside>
+
+        <h3>Capstone teach-back</h3>
+        <div class="teach-back">
+          <p>Without notes, teach a colleague for seven minutes:</p>
+          <ol>
+            <li>Why the path is better → more → custom rather than custom first.</li>
+            <li>How overwrite differs from preset+append.</li>
+            <li>What the Echo→Calc contrast proves about tool visibility and context.</li>
+            <li>Why custom tools change the runtime surface and how a session resumes.</li>
+            <li>How QA and Micro SDLC enforce governance with hooks.</li>
+            <li>How Ultra Stream passes structured knowledge from producer to consumer without loading an unbounded source.</li>
+            <li>When you would refuse to build a custom agent.</li>
+          </ol>
+          <p class="fine">Expert pass: your listener can open an unfamiliar lesson agent, locate the options block, predict behavior, and choose whether pure, extended, or custom is appropriate.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">13</span>
+        <h2 class="section-title">AH-3 glossary</h2>
+        <p class="section-lead">Use these terms narrowly. Each definition connects to an observable lesson file, runtime behavior, or configuration choice.</p>
+        <dl class="glossary">
+          <div><dt>Claude Agent SDK</dt><dd>The current name for the programmatic SDK used by all eight agents. The package is <code>claude-agent-sdk</code>; the recording uses the former Claude Code SDK name.</dd></div>
+          <div><dt><code>ClaudeAgentOptions</code></dt><dd>The shipped Python configuration object where the lesson sets context, model, system prompt, tools, hooks, working directory, permission mode, and session resume.</dd></div>
+          <div><dt>Core four</dt><dd>Context, model, prompt, and tools—the first reading lens for every custom agent.</dd></div>
+          <div><dt>System-prompt overwrite</dt><dd>A standalone string that replaces the Claude Code preset and defines a new persistent agent identity, as in Pong.</dd></div>
+          <div><dt>Preset</dt><dd>The retained <code>claude_code</code> system prompt. The SDLC builder uses it without appended role instructions.</dd></div>
+          <div><dt>Extended agent</dt><dd>An agent that keeps the preset and adds role instructions through <code>append</code>, often with additional hooks or options.</dd></div>
+          <div><dt>Complete custom agent</dt><dd>An agent whose system identity is overwritten and whose domain may also add custom tools, constrained context, sessions, and a deployed form factor.</dd></div>
+          <div><dt><code>query()</code></dt><dd>The lesson’s one-off request surface, used by Pong where no custom tools or continuing conversation is needed.</dd></div>
+          <div><dt><code>ClaudeSDKClient</code></dt><dd>The mounted client used for custom tools and continuous interaction.</dd></div>
+          <div><dt><code>resume</code></dt><dd>An option that reconnects a new call with a prior session by using its captured session ID.</dd></div>
+          <div><dt><code>allowed_tools</code></dt><dd>A list that permits specific tool calls. It does not by itself guarantee that every other built-in definition is absent from context.</dd></div>
+          <div><dt><code>disallowed_tools</code></dt><dd>A list that forbids and removes named built-in tool definitions from the agent’s visible context.</dd></div>
+          <div><dt>Custom tool</dt><dd>A typed async function exposed to the agent with <code>@tool</code>; the model decides when to call it and deterministic code performs the action.</dd></div>
+          <div><dt>In-memory MCP server</dt><dd>A server created by <code>create_sdk_mcp_server</code> to mount custom tools directly inside the runtime.</dd></div>
+          <div><dt>External MCP server</dt><dd>A configured external tool provider, such as the optional Firecrawl setup used by QA.</dd></div>
+          <div><dt>Response stream</dt><dd>The sequence of assistant content, thinking, tool calls, tool results, and final run metadata that the wrapper parses for behavior and observability.</dd></div>
+          <div><dt>Runtime-locked system value</dt><dd>A placeholder substituted when the agent boots and held for that run, such as notification criteria or copy variation count.</dd></div>
+          <div><dt>Per-call user value</dt><dd>Data supplied with the current query and free to change between turns, such as the current copy request.</dd></div>
+          <div><dt>Hook</dt><dd>Code executed around tool use to allow, deny, modify, or audit an action.</dd></div>
+          <div><dt><code>PreToolUse</code></dt><dd>A hook stage before execution. QA uses it to deny reads whose paths contain <code>.env</code>.</dd></div>
+          <div><dt><code>PostToolUse</code></dt><dd>A hook stage after execution, suitable for logging and observation of completed calls.</dd></div>
+          <div><dt>Producer/consumer agents</dt><dd>A multi-agent pattern where one agent creates structured artifacts and another queries or acts on them. Ultra Stream persists produced logs for Inspector.</dd></div>
+          <div><dt>Self-managed context</dt><dd>The lesson’s pattern of bounded reads plus periodic context/reconnect control so work does not require loading an unbounded source. The exact reset mechanics should be checked in the installed SDK and shipped loop.</dd></div>
+          <div><dt>Peter framework</dt><dd>The out-of-loop review pattern referenced by the Micro SDLC example: a ticket supplies prompt input and the review system evaluates the implemented work.</dd></div>
+          <div><dt>Consistent codebase architecture</dt><dd>The repeated agent folder shape—prompts, entrypoint, README, configuration—that reduces navigation cost for humans and agents.</dd></div>
+        </dl>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">Volume II · Agentic Horizon</p>
+        <div class="chapter-footer__nav">
+          <a href="../index.html">← Book hub</a>
+          <a href="10-seven-levels-agentic-prompt-formats.html">Previous: AH-2 · Seven Levels Agentic Prompt Formats</a>
+        </div>
+      </footer>
+    
+      <p class="code-deep-link"><a href="../code/ah-3-building-domain-specific-agents.html">Code deep-dive · how Dan built this repo →</a></p>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          progressFramePending = false;
+        });
+      };
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => {
+          const active = link.getAttribute('href') === `#${visible.target.id}`;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+
+      sections.forEach(section => observer.observe(section));
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+</body>
+</html>

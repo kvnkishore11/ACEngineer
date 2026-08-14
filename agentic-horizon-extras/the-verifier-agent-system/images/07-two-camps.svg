@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <style>
+      .bg { fill: #0a0e27; }
+      .label { font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace; fill: #e5e7eb; }
+      .muted { fill: #94a3b8; }
+      .red { fill: #ff6b6b; }
+      .cyan { fill: #00d4ff; }
+      .panel { fill: #0f1430; stroke: #1e2a52; stroke-width: 2; }
+      .divider { stroke: #1e2a52; stroke-width: 2; stroke-dasharray: 6 8; }
+
+      /* Chaos arrows - opacity-only flicker so paths never escape viewBox */
+      .chaos-arrow { stroke: #ff6b6b; stroke-width: 2.5; fill: none; stroke-linecap: round; opacity: 0.7; }
+      .chaos1 { animation: chaos1 1.2s ease-in-out infinite; }
+      .chaos2 { animation: chaos2 1.0s ease-in-out infinite; }
+      .chaos3 { animation: chaos3 0.8s ease-in-out infinite; }
+      @keyframes chaos1 {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 0.9; }
+      }
+      @keyframes chaos2 {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+      }
+      @keyframes chaos3 {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 0.85; }
+      }
+
+      /* Stick figure jitter: tiny ±2px translate, well within viewBox */
+      .stick-jiggle {
+        animation: jiggle 0.5s ease-in-out infinite;
+      }
+      @keyframes jiggle {
+        0%, 100% { transform: translate(250px, 480px); }
+        25%      { transform: translate(248px, 481px); }
+        50%      { transform: translate(250px, 479px); }
+        75%      { transform: translate(252px, 481px); }
+      }
+
+      /* Agent shake: tiny ±2px translate, no rotation to keep bbox inside */
+      .agent-shake {
+        animation: shake 0.6s ease-in-out infinite;
+      }
+      @keyframes shake {
+        0%, 100% { transform: translate(550px, 480px); }
+        25%      { transform: translate(552px, 480px); }
+        75%      { transform: translate(548px, 480px); }
+      }
+
+      /* Calm side - smooth circular pulse */
+      .calm-pulse {
+        animation: calmPulse 4s ease-in-out infinite;
+        transform-origin: center;
+      }
+      @keyframes calmPulse {
+        0%, 100% { opacity: 0.3; r: 130; }
+        50%      { opacity: 0.7; r: 145; }
+      }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="900"/>
+
+  <!-- Top caption -->
+  <text class="label muted" x="800" y="80" text-anchor="middle" font-size="22" letter-spacing="3">Two engineers diverging fast</text>
+
+  <!-- Divider -->
+  <line class="divider" x1="800" y1="120" x2="800" y2="850"/>
+
+  <!-- LEFT: CAMP A -->
+  <g>
+    <text class="label red" x="400" y="170" text-anchor="middle" font-size="26" font-weight="700">CAMP A</text>
+    <text class="label muted" x="400" y="200" text-anchor="middle" font-size="16">stuck in the loop</text>
+
+    <!-- Stick figure engineer at (250, 480) - jiggling
+         Head circle r=24 at (0,-70) → top at y=480-70-24=386. All inside viewBox. -->
+    <g class="stick-jiggle">
+      <circle cx="0" cy="-70" r="24" fill="none" stroke="#e5e7eb" stroke-width="3"/>
+      <line x1="0" y1="-46" x2="0" y2="30" stroke="#e5e7eb" stroke-width="3"/>
+      <line x1="0" y1="-20" x2="-30" y2="0" stroke="#e5e7eb" stroke-width="3"/>
+      <line x1="0" y1="-20" x2="30" y2="0" stroke="#e5e7eb" stroke-width="3"/>
+      <line x1="0" y1="30" x2="-22" y2="70" stroke="#e5e7eb" stroke-width="3"/>
+      <line x1="0" y1="30" x2="22" y2="70" stroke="#e5e7eb" stroke-width="3"/>
+      <text class="label muted" x="0" y="100" text-anchor="middle" font-size="14">engineer</text>
+    </g>
+
+    <!-- Agent rectangle at (550, 480) -->
+    <g class="agent-shake">
+      <rect x="-70" y="-50" width="140" height="100" rx="12" fill="#0f1430" stroke="#ff6b6b" stroke-width="2"/>
+      <text class="label red" x="0" y="8" text-anchor="middle" font-size="24" font-weight="700">agent</text>
+    </g>
+
+    <!-- Frantic arrows bouncing between engineer (x≈250) and agent (x≈550) -->
+    <g class="chaos-arrow">
+      <path class="chaos1" d="M 280 440 C 360 380, 440 380, 480 440" />
+      <path class="chaos2" d="M 480 480 C 400 510, 340 510, 280 480" />
+      <path class="chaos3" d="M 280 520 C 360 580, 440 580, 480 520" />
+      <path class="chaos1" d="M 480 510 C 400 540, 340 540, 280 510" />
+    </g>
+    <!-- arrowheads — rotated to match each curve's tangent at endpoint -->
+    <g fill="#ff6b6b" opacity="0.85">
+      <polygon points="480,440 468,433 478,427" class="chaos1"/>
+      <polygon points="280,480 293,480 288,491" class="chaos2"/>
+      <polygon points="480,520 478,533 468,527" class="chaos3"/>
+      <polygon points="280,510 293,510 288,521" class="chaos1"/>
+    </g>
+
+    <text class="label muted" x="400" y="780" text-anchor="middle" font-size="14">prompt → babysit → re-prompt → babysit</text>
+  </g>
+
+  <!-- RIGHT: CAMP B (unchanged) -->
+  <g transform="translate(800,0)">
+    <text class="label cyan" x="400" y="170" text-anchor="middle" font-size="26" font-weight="700">CAMP B</text>
+    <text class="label muted" x="400" y="200" text-anchor="middle" font-size="16">building systems</text>
+
+    <!-- Calm pulse halo around the connection -->
+    <circle class="calm-pulse" cx="400" cy="470" r="130" fill="none" stroke="#00d4ff" stroke-width="2"/>
+
+    <!-- Builder node -->
+    <g transform="translate(220, 470)">
+      <rect x="-90" y="-60" width="180" height="120" rx="14" fill="#0f1430" stroke="#00d4ff" stroke-width="2"/>
+      <text class="label cyan" x="0" y="6" text-anchor="middle" font-size="22" font-weight="700">BUILDER</text>
+    </g>
+
+    <!-- Verifier node -->
+    <g transform="translate(580, 470)">
+      <rect x="-90" y="-60" width="180" height="120" rx="14" fill="#0f1430" stroke="#00d4ff" stroke-width="2"/>
+      <text class="label cyan" x="0" y="6" text-anchor="middle" font-size="22" font-weight="700">VERIFIER</text>
+    </g>
+
+    <!-- Connection line + traveling dot -->
+    <line x1="310" y1="470" x2="490" y2="470" stroke="#00d4ff" stroke-width="2" opacity="0.6"/>
+    <line x1="490" y1="470" x2="310" y2="470" stroke="#00d4ff" stroke-width="2" opacity="0.6"/>
+
+    <circle r="9" fill="#00d4ff" filter="drop-shadow(0 0 10px #00d4ff)">
+      <animateMotion dur="4s" repeatCount="indefinite"
+        path="M 310 470 Q 400 410 490 470 Q 400 530 310 470 Z" rotate="auto"/>
+    </circle>
+
+    <text class="label muted" x="400" y="780" text-anchor="middle" font-size="14">build · verify · feedback · repeat</text>
+  </g>
+</svg>

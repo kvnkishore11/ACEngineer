@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A visual, evidence-based operating system reconstructed from IndyDevDan's courses, videos, and public artifacts.">
+<title>The IndyDevDan System — Codex</title>
+<style>
+  :root {
+    --background: oklch(0.97 0.005 260);
+    --foreground: oklch(0.18 0.02 260);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.18 0.02 260);
+    --muted: oklch(0.92 0.01 260);
+    --muted-foreground: oklch(0.40 0.02 260);
+    --primary: oklch(0.50 0.25 280);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.50 0.18 180);
+    --accent: oklch(0.60 0.22 50);
+    --accent-foreground: oklch(0.18 0.02 260);
+    --destructive: oklch(0.50 0.25 25);
+    --success: oklch(0.45 0.20 150);
+    --warning: oklch(0.55 0.18 85);
+    --border: oklch(0.88 0.01 260);
+    --code-bg: oklch(0.92 0.01 260);
+    --ring: oklch(0.50 0.25 280);
+    --radius: 0.75rem;
+    --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+    --font-display: ui-serif, Georgia, "Times New Roman", serif;
+    --human: oklch(0.58 0.19 50);
+    --agent: oklch(0.54 0.20 280);
+    --code: oklch(0.48 0.15 180);
+    --shadow: 0 18px 45px color-mix(in oklab, var(--foreground) 8%, transparent);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: oklch(0.15 0.02 260);
+      --foreground: oklch(0.90 0.01 260);
+      --card: oklch(0.22 0.02 260);
+      --card-foreground: oklch(0.90 0.01 260);
+      --muted: oklch(0.26 0.02 260);
+      --muted-foreground: oklch(0.72 0.02 260);
+      --primary: oklch(0.75 0.18 280);
+      --primary-foreground: oklch(0.15 0.02 260);
+      --secondary: oklch(0.70 0.15 180);
+      --accent: oklch(0.70 0.20 60);
+      --border: oklch(0.35 0.02 260);
+      --code-bg: oklch(0.26 0.02 260);
+      --destructive: oklch(0.65 0.20 25);
+      --success: oklch(0.72 0.17 150);
+      --warning: oklch(0.75 0.15 85);
+      --human: oklch(0.72 0.16 55);
+      --agent: oklch(0.75 0.16 280);
+      --code: oklch(0.70 0.14 180);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--foreground);
+    background-color: var(--background);
+    background-image:
+      radial-gradient(circle at 10% 8%, color-mix(in oklab, var(--primary) 8%, transparent), transparent 30rem),
+      radial-gradient(circle at 92% 18%, color-mix(in oklab, var(--secondary) 7%, transparent), transparent 28rem);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    overflow-wrap: break-word;
+  }
+  a { color: var(--primary); text-underline-offset: 0.18em; }
+  button, input, textarea { font: inherit; }
+  button { color: inherit; }
+  :focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; }
+  .mt-10 { margin-top: 10px !important; }
+  .mt-14 { margin-top: 14px !important; }
+  .mt-18 { margin-top: 18px !important; }
+  .mb-10 { margin-bottom: 10px !important; }
+  .mb-14 { margin-bottom: 14px !important; }
+  .text-center { text-align: center; }
+  .button-row--center { justify-content: center; }
+  .two-col--equal { grid-template-columns: 1fr 1fr; }
+
+  .wrap {
+    width: min(1460px, 100%);
+    margin: 0 auto;
+    padding: 28px 32px 80px;
+    display: grid;
+    grid-template-columns: 185px minmax(0, 1fr);
+    gap: 0 42px;
+  }
+  .main { min-width: 0; }
+  .toc {
+    position: sticky;
+    top: 22px;
+    align-self: start;
+    max-height: calc(100dvh - 44px);
+    overflow-y: auto;
+    grid-row: 1 / -1;
+    padding: 14px 0;
+  }
+  .toc-title {
+    padding-bottom: 10px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font: 700 10px/1.3 var(--font-mono);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .toc a {
+    display: block;
+    padding: 6px 9px;
+    margin-bottom: 2px;
+    border-left: 2px solid transparent;
+    border-radius: 5px;
+    color: var(--muted-foreground);
+    font-size: 12px;
+    line-height: 1.35;
+    text-decoration: none;
+    transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+  }
+  .toc a:hover { color: var(--foreground); background: var(--muted); }
+  .toc a.active { color: var(--foreground); border-left-color: var(--primary); background: var(--card); }
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(30px, 6vw, 72px);
+    border: 1.5px solid var(--primary);
+    border-radius: calc(var(--radius) * 1.5);
+    background: color-mix(in oklab, var(--primary) 5%, var(--card));
+    box-shadow: var(--shadow);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    width: 310px;
+    height: 310px;
+    right: -120px;
+    top: -150px;
+    border: 38px solid color-mix(in oklab, var(--primary) 11%, transparent);
+    border-radius: 50%;
+  }
+  .eyebrow {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    color: var(--primary);
+    font: 700 11px/1.3 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px;
+    border: 1px solid color-mix(in oklab, currentColor 30%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, currentColor 8%, transparent);
+    font: 650 10px/1.2 var(--font-mono);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  h1, h2, h3 { text-wrap: balance; }
+  h1 {
+    position: relative;
+    z-index: 1;
+    max-width: 870px;
+    margin: 0;
+    font: 700 clamp(44px, 8vw, 82px)/0.98 var(--font-display);
+    letter-spacing: -0.045em;
+  }
+  .hero-lead {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 24px 0 0;
+    color: var(--muted-foreground);
+    font-size: clamp(18px, 2.2vw, 24px);
+    line-height: 1.45;
+  }
+  .hero-lead strong { color: var(--foreground); }
+  .hero-answer {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 14px;
+    align-items: center;
+    max-width: 830px;
+    margin-top: 34px;
+  }
+  .answer-block {
+    min-width: 0;
+    padding: 15px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+  .answer-block small {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted-foreground);
+    font: 650 10px/1.3 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .answer-block strong { font-size: 17px; }
+  .answer-arrow { color: var(--primary); font-size: 28px; }
+
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .kpi-card {
+    padding: 15px 17px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+  .kpi-value { font: 700 28px/1 var(--font-display); }
+  .kpi-label {
+    margin-top: 6px;
+    color: var(--muted-foreground);
+    font: 600 10px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  section { margin-top: clamp(72px, 9vw, 128px); scroll-margin-top: 30px; }
+  .sec-head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px 18px;
+    align-items: start;
+    margin-bottom: 28px;
+  }
+  .sec-num {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--primary);
+    border-radius: 50%;
+    color: var(--primary);
+    font: 700 12px/1 var(--font-mono);
+  }
+  .sec-copy { min-width: 0; }
+  .sec-copy h2 {
+    margin: 0;
+    font: 700 clamp(30px, 5vw, 48px)/1.05 var(--font-display);
+    letter-spacing: -0.035em;
+  }
+  .sec-copy p {
+    max-width: 760px;
+    margin: 9px 0 0;
+    color: var(--muted-foreground);
+    font-size: 17px;
+  }
+
+  .ve-card {
+    min-width: 0;
+    padding: 22px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+  .ve-card--hero {
+    border-color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 5%, var(--card));
+    box-shadow: 0 8px 26px color-mix(in oklab, var(--primary) 9%, transparent);
+  }
+  .ve-card--recessed { background: var(--muted); border-color: transparent; }
+  .ve-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 11px;
+    color: var(--primary);
+    font: 700 10px/1.3 var(--font-mono);
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+  .ve-label::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .ve-card h3 { margin: 0 0 8px; font-size: 18px; line-height: 1.25; }
+  .ve-card p { margin: 0; color: var(--muted-foreground); }
+
+  .jee-map, .two-col, .three-col, .route-grid, .rule-grid, .example-grid, .source-grid {
+    display: grid;
+    gap: 16px;
+  }
+  .jee-map { grid-template-columns: 1fr 72px 1fr; align-items: stretch; }
+  .map-arrow { display: grid; place-items: center; color: var(--primary); font-size: 32px; }
+  .map-steps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .map-step { padding: 5px 9px; border-radius: 999px; background: var(--muted); font: 600 11px/1.3 var(--font-mono); }
+
+  .rail-shell { margin-top: 22px; }
+  .rail-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .owner {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    border: 1px solid color-mix(in oklab, currentColor 35%, transparent);
+    border-radius: 999px;
+    font: 650 9px/1.3 var(--font-mono);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+  .owner::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .owner--human { color: var(--human); }
+  .owner--agent { color: var(--agent); }
+  .owner--code { color: var(--code); }
+  .rail {
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    padding: 12px 4px 18px;
+    scrollbar-color: var(--border) transparent;
+  }
+  .station {
+    flex: 0 0 155px;
+    position: relative;
+    padding: 18px 14px 16px;
+    border: 1.5px solid var(--border);
+    border-top: 4px solid var(--station-color, var(--primary));
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+  .station-num { color: var(--station-color, var(--primary)); font: 750 10px/1.2 var(--font-mono); letter-spacing: 0.1em; }
+  .station-name { margin-top: 7px; font-weight: 800; font-size: 16px; }
+  .station-output { margin-top: 7px; color: var(--muted-foreground); font-size: 12px; line-height: 1.4; }
+  .station-owner { margin-top: 12px; }
+  .rail-arrow { flex: 0 0 30px; display: grid; place-items: center; color: var(--muted-foreground); font-size: 19px; }
+  .rail-rule {
+    margin-top: 4px;
+    padding: 15px 18px;
+    border-left: 4px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: color-mix(in oklab, var(--accent) 8%, var(--card));
+    font-size: 15px;
+  }
+
+  .rule-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rule-card { position: relative; padding-left: 54px; }
+  .rule-number {
+    position: absolute;
+    left: 18px;
+    top: 21px;
+    color: var(--primary);
+    font: 800 13px/1 var(--font-mono);
+  }
+
+  .brief {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.6fr);
+    gap: 18px;
+  }
+  .brief-form { display: grid; gap: 14px; }
+  label span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted-foreground);
+    font: 700 10px/1.3 var(--font-mono);
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+  textarea {
+    width: 100%;
+    min-height: 74px;
+    resize: vertical;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--background);
+    color: var(--foreground);
+    line-height: 1.45;
+  }
+  textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 15%, transparent); }
+  .button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+  }
+  .button:hover { transform: translateY(-1px); border-color: var(--primary); }
+  .button--primary { border-color: var(--primary); background: var(--primary); color: var(--primary-foreground); }
+  .button--quiet { background: var(--muted); }
+  .brief-preview {
+    position: sticky;
+    top: 18px;
+    align-self: start;
+    min-width: 0;
+  }
+  .code-block {
+    min-height: 210px;
+    margin: 0;
+    padding: 16px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--code-bg);
+    color: var(--foreground);
+    font: 12px/1.65 var(--font-mono);
+  }
+  .tiny { color: var(--muted-foreground); font-size: 12px; }
+
+  .route-grid { grid-template-columns: repeat(5, minmax(170px, 1fr)); overflow-x: auto; padding-bottom: 10px; }
+  .route-card { min-width: 170px; }
+  .route-chain { margin: 14px 0 0; color: var(--foreground); font: 650 11px/1.7 var(--font-mono); }
+  .route-note { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); color: var(--muted-foreground); font-size: 12px; }
+
+  .three-col { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .actor-card { border-top: 4px solid var(--actor-color); }
+  .actor-card .ve-label { color: var(--actor-color); }
+  .actor-list { list-style: none; padding: 0; margin: 14px 0 0; }
+  .actor-list li { position: relative; padding-left: 16px; margin-top: 7px; color: var(--muted-foreground); font-size: 13px; }
+  .actor-list li::before { content: "›"; position: absolute; left: 0; color: var(--actor-color); font-weight: 800; }
+  .decision-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    overflow: hidden;
+    margin-top: 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--border);
+  }
+  .decision-cell { padding: 15px; background: var(--card); font-size: 13px; }
+  .decision-cell strong { display: block; margin-bottom: 4px; }
+
+  .prove-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr); gap: 18px; }
+  .loop {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 10px;
+    align-items: center;
+  }
+  .loop-step { min-width: 0; padding: 16px; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--card); text-align: center; }
+  .loop-step strong { display: block; }
+  .loop-step small { color: var(--muted-foreground); }
+  .loop-arrow { color: var(--primary); font-size: 22px; }
+  .loop-fail {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .loop-fail div { padding: 10px; border-radius: 8px; background: color-mix(in oklab, var(--destructive) 8%, var(--card)); color: var(--muted-foreground); font-size: 12px; text-align: center; }
+  .proof-stack { display: grid; gap: 10px; }
+  .proof-item { padding: 13px 14px; border-left: 4px solid var(--proof-color); border-radius: 0 8px 8px 0; background: var(--muted); }
+  .proof-item strong { display: block; font-size: 13px; }
+  .proof-item span { color: var(--muted-foreground); font-size: 12px; }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .tab { border-color: var(--border); }
+  .tab[aria-selected="true"] { border-color: var(--primary); background: var(--primary); color: var(--primary-foreground); }
+  .example-title { margin: 0 0 16px; font-size: 21px; }
+  .example-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .example-step { min-height: 152px; }
+  .example-step small { color: var(--primary); font: 700 10px/1.2 var(--font-mono); letter-spacing: 0.08em; }
+  .example-step strong { display: block; margin: 8px 0 6px; }
+
+  .layer-layout { display: grid; grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.15fr); gap: 18px; }
+  .dir-tree {
+    margin: 0;
+    padding: 20px;
+    overflow-x: auto;
+    white-space: pre;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--code-bg);
+    font: 12px/1.75 var(--font-mono);
+  }
+  .dir-tree .app { color: var(--human); }
+  .dir-tree .agentic { color: var(--agent); font-weight: 700; }
+  .dir-tree .proof { color: var(--code); }
+  .ladder { display: grid; gap: 12px; counter-reset: rung; }
+  .rung {
+    counter-increment: rung;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 14px;
+    align-items: start;
+    padding: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+  .rung::before {
+    content: counter(rung);
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: color-mix(in oklab, var(--primary) 11%, var(--card));
+    color: var(--primary);
+    font: 800 13px/1 var(--font-mono);
+  }
+  .rung strong { display: block; margin-bottom: 3px; }
+  .rung span { color: var(--muted-foreground); font-size: 13px; }
+
+  details.collapsible { margin-top: 12px; overflow: hidden; border: 1.5px solid var(--border); border-radius: var(--radius); }
+  details.collapsible summary {
+    padding: 14px 18px;
+    background: var(--card);
+    cursor: pointer;
+    list-style: none;
+    font: 700 12px/1.4 var(--font-mono);
+  }
+  details.collapsible summary::-webkit-details-marker { display: none; }
+  details.collapsible summary::before { content: "▸"; display: inline-block; margin-right: 8px; color: var(--primary); transition: transform 150ms ease; }
+  details.collapsible[open] summary::before { transform: rotate(90deg); }
+  .details-body { padding: 16px 18px; border-top: 1px solid var(--border); background: var(--muted); }
+  .prompt-text { margin: 0; white-space: pre-wrap; font: 12px/1.65 var(--font-mono); }
+
+  .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .metric-direction { color: var(--success); font: 800 28px/1 var(--font-display); }
+  .metric-card h3 { margin-top: 9px; }
+  .metric-card p { font-size: 13px; }
+  .diagnostic-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+  .diagnostic { padding: 11px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); }
+  .diagnostic strong { display: block; font-size: 12px; }
+  .diagnostic span { color: var(--muted-foreground); font-size: 11px; }
+
+  .start-layout { display: grid; grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr); gap: 18px; }
+  .progress-ring {
+    display: grid;
+    place-items: center;
+    width: 150px;
+    height: 150px;
+    margin: 4px auto 20px;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary) calc(var(--progress, 0) * 1%), var(--muted) 0);
+    position: relative;
+  }
+  .progress-ring::after { content: ""; position: absolute; inset: 13px; border-radius: 50%; background: var(--card); }
+  .progress-value { position: relative; z-index: 1; font: 800 30px/1 var(--font-display); }
+  .checklist { display: grid; gap: 8px; }
+  .check-item {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 10px;
+    align-items: start;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+  }
+  .check-item input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--primary); }
+  .check-item span { color: var(--foreground); font-size: 13px; }
+  .check-item:has(input:checked) { background: color-mix(in oklab, var(--success) 8%, var(--card)); border-color: color-mix(in oklab, var(--success) 45%, var(--border)); }
+  .check-item:has(input:checked) span { color: var(--muted-foreground); text-decoration: line-through; }
+
+  .source-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .source-card { display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: start; }
+  .source-id { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: var(--muted); color: var(--primary); font: 800 11px/1 var(--font-mono); }
+  .source-card h3 { font-size: 15px; }
+  .source-card p { font-size: 12px; }
+  .source-card a { display: inline-block; margin-top: 8px; font-size: 12px; }
+  .research-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .research-links a { padding: 8px 11px; border: 1px solid var(--border); border-radius: 7px; background: var(--card); font-size: 12px; text-decoration: none; }
+
+  .footer {
+    margin-top: 96px;
+    padding: 24px 0 0;
+    border-top: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-size: 12px;
+  }
+  .toast {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 500;
+    padding: 11px 15px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--foreground);
+    color: var(--background);
+    box-shadow: var(--shadow);
+    font-weight: 750;
+    font-size: 12px;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 1100px) {
+    .wrap { grid-template-columns: 1fr; padding-top: 0; }
+    .toc {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      grid-row: auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      max-height: none;
+      overflow-x: auto;
+      padding: 9px 24px;
+      margin: 0 -32px 22px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in oklab, var(--background) 94%, transparent);
+      backdrop-filter: blur(10px);
+    }
+    .toc-title { display: none; }
+    .toc a { flex: 0 0 auto; white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
+    .toc a.active { border-left: none; border-bottom-color: var(--primary); }
+    section { scroll-margin-top: 62px; }
+    .route-grid { grid-template-columns: repeat(5, 210px); }
+  }
+  @media (max-width: 800px) {
+    .wrap { padding-left: 18px; padding-right: 18px; }
+    .toc { margin-left: -18px; margin-right: -18px; padding-left: 18px; padding-right: 18px; }
+    .hero { padding: 28px 22px; }
+    .hero-answer, .jee-map { grid-template-columns: 1fr; }
+    .answer-arrow, .map-arrow { transform: rotate(90deg); }
+    .kpi-row, .rule-grid, .three-col, .metrics, .source-grid, .example-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .brief, .prove-layout, .layer-layout, .start-layout { grid-template-columns: 1fr; }
+    .brief-preview { position: static; }
+    .decision-bar { grid-template-columns: 1fr; }
+    .loop { grid-template-columns: 1fr; }
+    .loop-arrow { transform: rotate(90deg); text-align: center; }
+    .loop-fail { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 520px) {
+    h1 { font-size: 43px; }
+    .kpi-row, .rule-grid, .three-col, .metrics, .source-grid, .example-grid, .diagnostic-grid { grid-template-columns: 1fr; }
+    .sec-head { grid-template-columns: 1fr; }
+    .sec-num { width: 36px; height: 36px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+  @media print {
+    .toc, .button-row, .tabs, .toast { display: none !important; }
+    .wrap { display: block; padding: 0; }
+    .hero, .ve-card, .station { box-shadow: none; break-inside: avoid; }
+    section { margin-top: 50px; }
+    details.collapsible > .details-body { display: block; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="toc" id="toc" aria-label="Page sections">
+    <div class="toc-title">System map</div>
+    <a href="#rail">1. The rail</a>
+    <a href="#brief">2. Task card</a>
+    <a href="#router">3. Router</a>
+    <a href="#actors">4. Three actors</a>
+    <a href="#prove">5. Prove it</a>
+    <a href="#examples">6. Examples</a>
+    <a href="#layer">7. Agentic layer</a>
+    <a href="#improve">8. Improve</a>
+    <a href="#start">9. Start now</a>
+    <a href="#evidence">10. Evidence</a>
+  </nav>
+
+  <main class="main">
+    <header class="hero">
+      <div class="eyebrow">
+        <span>Visual operating system</span>
+        <span class="badge">Reconstructed · not official</span>
+        <span class="badge">Codex</span>
+      </div>
+      <h1>The IndyDevDan System</h1>
+      <p class="hero-lead">The shortest faithful answer to your question: <strong>keep the outer method fixed; swap the inner tools only when the problem demands it.</strong></p>
+      <div class="hero-answer" role="group" aria-label="Core idea">
+        <div class="answer-block"><small>Always fixed</small><strong>Intent → artifacts → proof → learning</strong></div>
+        <div class="answer-arrow" aria-hidden="true">×</div>
+        <div class="answer-block"><small>Always swappable</small><strong>Models → agents → tools → checks</strong></div>
+      </div>
+      <div class="kpi-row" role="group" aria-label="Evidence base">
+        <div class="kpi-card"><div class="kpi-value">18</div><div class="kpi-label">Course lessons</div></div>
+        <div class="kpi-card"><div class="kpi-value">56</div><div class="kpi-label">Recent videos</div></div>
+        <div class="kpi-card"><div class="kpi-value">52</div><div class="kpi-label">Public repos scanned</div></div>
+        <div class="kpi-card"><div class="kpi-value">3</div><div class="kpi-label">Independent panels</div></div>
+      </div>
+    </header>
+
+    <section id="rail">
+      <div class="sec-head">
+        <div class="sec-num">01</div>
+        <div class="sec-copy">
+          <h2>The 8-station rail</h2>
+          <p>Your JEE instinct is right—with one adjustment. Engineering needs one repeatable <em>outer method</em>, not one formula forced onto every problem.</p>
+        </div>
+      </div>
+
+      <div class="jee-map">
+        <div class="ve-card">
+          <div class="ve-label">IIT-JEE problem</div>
+          <h3>Same solving discipline</h3>
+          <p>The exact law changes, but the way you attack the question stays stable.</p>
+          <div class="map-steps"><span class="map-step">Knowns</span><span class="map-step">Unknown</span><span class="map-step">Law</span><span class="map-step">Solve</span><span class="map-step">Check</span></div>
+        </div>
+        <div class="map-arrow" aria-hidden="true">→</div>
+        <div class="ve-card ve-card--hero">
+          <div class="ve-label">Agentic work</div>
+          <h3>Same engineering discipline</h3>
+          <p>The exact workflow changes, but every task moves from intent to evidence to learning.</p>
+          <div class="map-steps"><span class="map-step">Define</span><span class="map-step">Context</span><span class="map-step">Plan</span><span class="map-step">Execute</span><span class="map-step">Prove</span></div>
+        </div>
+      </div>
+
+      <div class="rail-shell">
+        <div class="rail-legend">
+          <span class="owner owner--human">Human</span>
+          <span class="owner owner--agent">Agent</span>
+          <span class="owner owner--code">Code</span>
+        </div>
+        <div class="rail" role="group" aria-label="Eight station workflow">
+          <div class="station" style="--station-color:var(--human)"><div class="station-num">STATION 1</div><div class="station-name">Define</div><div class="station-output">Output: four-line task card</div><div class="station-owner"><span class="owner owner--human">Human</span></div></div>
+          <div class="rail-arrow">→</div>
+          <div class="station" style="--station-color:var(--code)"><div class="station-num">STATION 2</div><div class="station-name">Prime</div><div class="station-output">Output: exact task context</div><div class="station-owner"><span class="owner owner--code">Code</span> <span class="owner owner--agent">Agent</span></div></div>
+          <div class="rail-arrow">→</div>
+          <div class="station" style="--station-color:var(--agent)"><div class="station-num">STATION 3</div><div class="station-name">Scout</div><div class="station-output">Output: facts, paths, risks</div><div class="station-owner"><span class="owner owner--agent">Agent</span></div></div>
+          <div class="rail-arrow">→</div>
+          <div class="station" style="--station-color:var(--agent)"><div class="station-num">STATION 4</div><div class="station-name">Plan</div><div class="station-output">Output: phases + gates</div><div class="station-owner"><span class="owner owner--agent">Agent</span> <span class="owner owner--human">Human</span></div></div>
+          <div class="rail-arrow">→</div>
+          <div class="station" style="--station-color:var(--agent)"><div class="station-num">STATION 5</div><div class="station-name">Build</div><div class="station-output">Output: the deliverable</div><div class="station-owner"><span class="owner owner--agent">Agent</span></div></div>
+          <div class="rail-arrow">→</div>
+          <div class="station" style="--station-color:var(--code)"><div class="station-num">STATION 6</div><div class="station-name">Prove</div><div class="station-output">Output: evidence + verdict</div><div class="station-owner"><span class="owner owner--code">Code</span> <span class="owner owner--agent">Agent</span></div></div>
+          <div class="rail-arrow">→</div>
+          <div class="station" style="--station-color:var(--human)"><div class="station-num">STATION 7</div><div class="station-name">Ship</div><div class="station-output">Output: usable hand-off</div><div class="station-owner"><span class="owner owner--human">Human</span> <span class="owner owner--code">Code</span></div></div>
+          <div class="rail-arrow">→</div>
+          <div class="station" style="--station-color:var(--secondary)"><div class="station-num">STATION 8</div><div class="station-name">Compound</div><div class="station-output">Output: system improvement</div><div class="station-owner"><span class="owner owner--agent">Agent</span></div></div>
+        </div>
+        <div class="rail-rule"><strong>The operating rule:</strong> every station must leave an artifact. If a station is unnecessary, record <code>N/A + the reason</code>. Never silently skip.</div>
+      </div>
+
+      <div class="rule-grid mt-18">
+        <div class="ve-card rule-card"><div class="rule-number">01</div><h3>Outcome before tools</h3><p>Decide what “better” means before choosing an agent or model.</p></div>
+        <div class="ve-card rule-card"><div class="rule-number">02</div><h3>Facts before plan</h3><p>Verify files, sources, constraints, and current state before designing work.</p></div>
+        <div class="ve-card rule-card"><div class="rule-number">03</div><h3>Plan before complexity</h3><p>If the shape is not obvious, create a fresh plan before a builder touches anything.</p></div>
+        <div class="ve-card rule-card"><div class="rule-number">04</div><h3>One purpose per agent</h3><p>Planning, building, testing, and reviewing ask different questions.</p></div>
+        <div class="ve-card rule-card"><div class="rule-number">05</div><h3>Proof beats confidence</h3><p>“Done” is a claim. Tests, artifacts, and independent review are evidence.</p></div>
+        <div class="ve-card rule-card"><div class="rule-number">06</div><h3>Fix the system</h3><p>A one-off correction saves one run. A template or gate saves every future run.</p></div>
+      </div>
+    </section>
+
+    <section id="brief">
+      <div class="sec-head">
+        <div class="sec-num">02</div>
+        <div class="sec-copy">
+          <h2>Start every task with four lines</h2>
+          <p>This is the current Super Simple Software Factory request shape: clearer than your raw thought, but never different from your intent.</p>
+        </div>
+      </div>
+
+      <div class="brief">
+        <div class="ve-card">
+          <div class="ve-label">Interactive task card</div>
+          <div class="button-row mb-14">
+            <button class="button button--quiet example-loader" type="button" data-example="feature">Load feature</button>
+            <button class="button button--quiet example-loader" type="button" data-example="presentation">Load presentation</button>
+            <button class="button button--quiet example-loader" type="button" data-example="research">Load research</button>
+          </div>
+          <div class="brief-form" id="brief-form">
+            <label><span>Ask — one imperative sentence</span><textarea id="ask" placeholder="Create the exact outcome I want..."></textarea></label>
+            <label><span>Where — verified scope or context</span><textarea id="where" placeholder="Files, audience, sources, system, or boundary..."></textarea></label>
+            <label><span>Done means — observable proof</span><textarea id="done" placeholder="The file opens, tests pass, claims are cited..."></textarea></label>
+            <label><span>Out of scope — stop the drift</span><textarea id="out" placeholder="Things this task must not quietly add..."></textarea></label>
+            <div class="button-row">
+              <button class="button button--primary" type="button" id="copy-brief">Copy task card</button>
+              <button class="button" type="button" id="clear-brief">Clear</button>
+            </div>
+          </div>
+        </div>
+        <aside class="brief-preview ve-card ve-card--recessed">
+          <div class="ve-label">What the workflow receives</div>
+          <pre class="code-block" id="brief-output">ASK:
+
+WHERE:
+
+DONE MEANS:
+
+OUT OF SCOPE:</pre>
+          <p class="tiny mt-10">Do not put “use five agents” here. That is a routing choice, not part of the product intent.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="router">
+      <div class="sec-head">
+        <div class="sec-num">03</div>
+        <div class="sec-copy">
+          <h2>One rail, five routes</h2>
+          <p>You are not changing the method. You are choosing how much machinery each station deserves.</p>
+        </div>
+      </div>
+      <div class="route-grid">
+        <div class="ve-card route-card"><div class="ve-label">Question</div><h3>Nothing changes</h3><div class="route-chain">DEFINE → PRIME → SCOUT → PROVE → SHIP → COMPOUND</div><div class="route-note">Use a read-only agent. Mark Plan and Build N/A.</div></div>
+        <div class="ve-card route-card"><div class="ve-label">Small</div><h3>Known edit</h3><div class="route-chain">DEFINE → PRIME → BUILD → PROVE → SHIP → COMPOUND</div><div class="route-note">Scout/Plan can be N/A only when the shape is truly obvious.</div></div>
+        <div class="ve-card ve-card--hero route-card"><div class="ve-label">Complex</div><h3>New or unclear work</h3><div class="route-chain">ALL 8 STATIONS</div><div class="route-note">Multi-file, behavior, interfaces, data, or anything you had to guess.</div></div>
+        <div class="ve-card route-card"><div class="ve-label">Repeated</div><h3>Same class again</h3><div class="route-chain">ALL 8 → TEMPLATE / ADW</div><div class="route-note">After a pattern is real, encode it so success can repeat.</div></div>
+        <div class="ve-card route-card"><div class="ve-label">High risk</div><h3>Real downside</h3><div class="route-chain">ALL 8 + ISOLATION + HUMAN GATE</div><div class="route-note">Money, production, private data, safety, deletion, or reputation.</div></div>
+      </div>
+    </section>
+
+    <section id="actors">
+      <div class="sec-head">
+        <div class="sec-num">04</div>
+        <div class="sec-copy">
+          <h2>Give work to the right actor</h2>
+          <p>His newest shift is simple: “more agents” is not the goal. The best result comes from humans, agents, and code doing different jobs.</p>
+        </div>
+      </div>
+      <div class="three-col">
+        <div class="ve-card actor-card" style="--actor-color:var(--human)"><div class="ve-label">Human</div><h3>Intent and responsibility</h3><p>You decide what is worth building and what risk is acceptable.</p><ul class="actor-list"><li>Value and direction</li><li>Domain judgment</li><li>Novel trade-offs</li><li>High-risk approval</li></ul></div>
+        <div class="ve-card actor-card" style="--actor-color:var(--agent)"><div class="ve-label">Agent</div><h3>Reading and judgment</h3><p>Use compute where the work requires understanding or creation.</p><ul class="actor-list"><li>Scout unfamiliar material</li><li>Create a plan</li><li>Build the deliverable</li><li>Review meaning and quality</li></ul></div>
+        <div class="ve-card actor-card" style="--actor-color:var(--code)"><div class="ve-label">Code</div><h3>Known and repeatable</h3><p>If you can write the exact invocation down, code should own it.</p><ul class="actor-list"><li>Sequence phases</li><li>Run tests and lint</li><li>Validate schemas</li><li>Record traces and retries</li></ul></div>
+      </div>
+      <div class="decision-bar">
+        <div class="decision-cell"><strong>Needs taste or accountability?</strong> Keep a human decision.</div>
+        <div class="decision-cell"><strong>Needs reading or deciding?</strong> Give it to a focused agent.</div>
+        <div class="decision-cell"><strong>Known command with pass/fail?</strong> Make it deterministic code.</div>
+      </div>
+    </section>
+
+    <section id="prove">
+      <div class="sec-head">
+        <div class="sec-num">05</div>
+        <div class="sec-copy">
+          <h2>“Done” must be proven</h2>
+          <p>The builder’s summary is not proof. A good system asks separate questions and routes exact failures back to the owner.</p>
+        </div>
+      </div>
+      <div class="prove-layout">
+        <div class="ve-card ve-card--hero">
+          <div class="ve-label">Request → validate → resolve</div>
+          <div class="loop">
+            <div class="loop-step"><strong>Build</strong><small>produce artifact</small></div><div class="loop-arrow">→</div>
+            <div class="loop-step"><strong>Gate</strong><small>check reality</small></div><div class="loop-arrow">→</div>
+            <div class="loop-step"><strong>Verdict</strong><small>pass or evidence</small></div>
+          </div>
+          <div class="loop-fail" role="group" aria-label="Failure correction path">
+            <div>1. Capture exact failure</div><div>2. Return it to same builder</div><div>3. Re-run only the gate</div><div>4. Bound attempts, then escalate</div>
+          </div>
+          <p class="tiny mt-14"><strong>Never restart blind.</strong> Keep the context that learned from the failure whenever the harness allows it.</p>
+        </div>
+        <div class="proof-stack">
+          <div class="proof-item" style="--proof-color:var(--code)"><strong>Test asks: does it work?</strong><span>Commands, schemas, files, links, rendering, counts.</span></div>
+          <div class="proof-item" style="--proof-color:var(--agent)"><strong>Reviewer asks: is it what we asked?</strong><span>Compare the output against the plan and task card.</span></div>
+          <div class="proof-item" style="--proof-color:var(--human)"><strong>Human asks: is it safe and valuable?</strong><span>Required when consequences exceed the system’s proven trust.</span></div>
+          <div class="proof-item" style="--proof-color:var(--success)"><strong>Ship only when all required gates agree</strong><span>Green code can still be off-spec. Good taste can still be broken.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="examples">
+      <div class="sec-head">
+        <div class="sec-num">06</div>
+        <div class="sec-copy">
+          <h2>Same rail, different problems</h2>
+          <p>Choose an example. Notice that the station names stay fixed while the artifacts and proof change.</p>
+        </div>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Worked examples">
+        <button class="button tab" type="button" role="tab" aria-selected="true" data-tab="presentation">Presentation</button>
+        <button class="button tab" type="button" role="tab" aria-selected="false" data-tab="feature">Software feature</button>
+        <button class="button tab" type="button" role="tab" aria-selected="false" data-tab="research">Research</button>
+      </div>
+      <div class="ve-card" id="example-panel" role="tabpanel" aria-live="polite"></div>
+    </section>
+
+    <section id="layer">
+      <div class="sec-head">
+        <div class="sec-num">07</div>
+        <div class="sec-copy">
+          <h2>Build your agentic layer in order</h2>
+          <p>Do not start with a giant swarm. Start with files that preserve your method, then add code and orchestration only after real repetitions.</p>
+        </div>
+      </div>
+      <div class="layer-layout">
+        <div class="ve-card">
+          <div class="ve-label">Tool-agnostic starter shape</div>
+          <pre class="dir-tree">project/
+├── <span class="app">app/</span>                 ← user value
+├── <span class="proof">tests/</span>               ← proof
+├── <span class="agentic">.agentic/</span>           ← your method
+│   ├── prompts/
+│   │   ├── prime.md
+│   │   ├── scout.md
+│   │   ├── plan.md
+│   │   ├── build.md
+│   │   ├── verify.md
+│   │   └── learn.md
+│   ├── agents/
+│   └── expertise/
+├── <span class="agentic">specs/</span>              ← plans
+├── <span class="agentic">workflows/</span>          ← ADWs
+├── <span class="proof">checks/</span>             ← known gates
+└── runs/               ← traces, ignored</pre>
+          <p class="tiny mt-10">The folder names can be <code>.claude</code>, <code>.codex</code>, <code>adws</code>, or something else. The responsibilities must exist.</p>
+        </div>
+        <div class="ladder">
+          <div class="rung"><div><strong>Manual rail</strong><span>Use the task card and 8 stations on real work. Learn where your method is vague.</span></div></div>
+          <div class="rung"><div><strong>Reusable prompts</strong><span>When a class repeats, save prime, plan, build, verify, and learn formats.</span></div></div>
+          <div class="rung"><div><strong>Deterministic gates</strong><span>Put exact commands, schemas, and checks in code. Do not spend agents on known work.</span></div></div>
+          <div class="rung"><div><strong>AI Developer Workflow</strong><span>Let code own the graph; place focused agents inside bounded phases with explicit handoffs.</span></div></div>
+          <div class="rung"><div><strong>Factory and orchestrator</strong><span>Add routing, observability, model stacks, sandboxes, and parallel teams only when the lower levels are trusted.</span></div></div>
+        </div>
+      </div>
+
+      <details class="collapsible">
+        <summary>Level 0 master prompt — use until your rail becomes real files</summary>
+        <div class="details-body">
+          <div class="button-row mb-10"><button class="button copy-prompt" type="button" data-copy="master-prompt">Copy prompt</button></div>
+          <pre class="prompt-text" id="master-prompt">Follow my 8-station rail for the request below.
+
+1. DEFINE — rewrite the request as Ask / Where / Done means / Out of scope. Preserve my intent.
+2. PRIME — load only the context needed for this task. State what you inspected.
+3. SCOUT — report verified facts, relevant artifacts, risks, and open ambiguity. Change nothing.
+4. PLAN — create ordered phases. Each phase must name its output and a concrete gate.
+5. BUILD — execute the plan. Keep changed artifacts explicit.
+6. PROVE — run deterministic checks first, then independently compare the result to the task card.
+7. SHIP — package the accepted result and report where it is.
+8. COMPOUND — record which station was weakest and propose one reusable prompt, check, or workflow improvement.
+
+Rules:
+- Every station leaves an artifact. If unnecessary, write N/A and why.
+- Known pass/fail commands are code work. Reading and judgment are agent work. Intent and high-risk approval are human work.
+- Never accept an agent's “done” as proof.
+- On failure, return exact evidence to the responsible builder, re-run the gate, and stop after three failed correction rounds—or earlier when safety demands it—for human escalation.
+- End with a compact station-by-station report and the four KPIs: size, attempts, streak, presence.
+
+REQUEST:
+[paste the four-line task card here]</pre>
+        </div>
+      </details>
+    </section>
+
+    <section id="improve">
+      <div class="sec-head">
+        <div class="sec-num">08</div>
+        <div class="sec-copy">
+          <h2>Measure the system, not the excitement</h2>
+          <p>A demo that worked once is not a system. Track whether your rail handles bigger work with fewer corrections and less babysitting.</p>
+        </div>
+      </div>
+      <div class="kpi-row metrics">
+        <div class="kpi-card metric-card"><div class="metric-direction">↑</div><h3>Size</h3><p>How much valuable work can one clean hand-off carry?</p></div>
+        <div class="kpi-card metric-card"><div class="metric-direction">↓</div><h3>Attempts</h3><p>How many human corrections before the gates are green?</p></div>
+        <div class="kpi-card metric-card"><div class="metric-direction">↑</div><h3>Streak</h3><p>How many similar tasks passed back-to-back?</p></div>
+        <div class="kpi-card metric-card"><div class="metric-direction">↓</div><h3>Presence</h3><p>How many times did you have to sit inside the run?</p></div>
+      </div>
+
+      <div class="two-col two-col--equal mt-18">
+        <div class="ve-card ve-card--hero">
+          <div class="ve-label">After every failed run</div>
+          <h3>Do not ask, “Why is AI bad?”</h3>
+          <p>Ask which leverage point was missing. Then improve the reusable layer and replay a similar problem.</p>
+          <div class="map-steps"><span class="map-step">Find failed station</span><span class="map-step">Name missing leverage</span><span class="map-step">Edit system</span><span class="map-step">Replay</span><span class="map-step">Compare KPI</span></div>
+        </div>
+        <div class="ve-card">
+          <div class="ve-label">Autonomy rule</div>
+          <h3>Presence falls only after trust rises</h3>
+          <p>Keep observability high. Remove human review only for a low-risk problem class whose measured streak and gates make the human a bottleneck, not a safety net.</p>
+        </div>
+      </div>
+
+      <details class="collapsible">
+        <summary>Failure diagnostic — the 12 leverage points</summary>
+        <div class="details-body">
+          <div class="diagnostic-grid">
+            <div class="diagnostic"><strong>Context</strong><span>Did it see the right facts?</span></div>
+            <div class="diagnostic"><strong>Model</strong><span>Could it reason at this level?</span></div>
+            <div class="diagnostic"><strong>Prompt</strong><span>Was intent precise?</span></div>
+            <div class="diagnostic"><strong>Tools</strong><span>Could it act and inspect?</span></div>
+            <div class="diagnostic"><strong>Standard output</strong><span>Could it see reality?</span></div>
+            <div class="diagnostic"><strong>Types</strong><span>Was information explicit?</span></div>
+            <div class="diagnostic"><strong>Documentation</strong><span>Were local rules available?</span></div>
+            <div class="diagnostic"><strong>Tests</strong><span>Was there a real oracle?</span></div>
+            <div class="diagnostic"><strong>Architecture</strong><span>Could it navigate cleanly?</span></div>
+            <div class="diagnostic"><strong>Plans</strong><span>Was the work executable?</span></div>
+            <div class="diagnostic"><strong>Templates</strong><span>Was your formula encoded?</span></div>
+            <div class="diagnostic"><strong>ADWs</strong><span>Was the whole chain reliable?</span></div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section id="start">
+      <div class="sec-head">
+        <div class="sec-num">09</div>
+        <div class="sec-copy">
+          <h2>Start with one real task now</h2>
+          <p>Do not build a factory in theory. Complete one ordinary task manually on the rail, then make the weakest station better.</p>
+        </div>
+      </div>
+      <div class="start-layout">
+        <div class="ve-card ve-card--hero">
+          <div class="ve-label">Your first run</div>
+          <div class="progress-ring" id="progress-ring"><div class="progress-value" id="progress-value">0%</div></div>
+          <p class="text-center">Progress is saved in this browser.</p>
+          <div class="button-row button-row--center mt-14"><button class="button" type="button" id="reset-checklist">Reset checklist</button></div>
+        </div>
+        <div class="checklist" id="checklist">
+          <label class="check-item"><input type="checkbox" data-check="pick"><span>Pick one real, low-risk task you actually care about.</span></label>
+          <label class="check-item"><input type="checkbox" data-check="brief"><span>Fill the four-line task card: Ask, Where, Done means, Out of scope.</span></label>
+          <label class="check-item"><input type="checkbox" data-check="route"><span>Choose the route: question, small, complex, repeated, or high risk.</span></label>
+          <label class="check-item"><input type="checkbox" data-check="context"><span>Prime exact context and verify every file, source, or constraint you name.</span></label>
+          <label class="check-item"><input type="checkbox" data-check="artifacts"><span>Move station by station. Save each artifact—or N/A with a reason.</span></label>
+          <label class="check-item"><input type="checkbox" data-check="proof"><span>Run deterministic gates and an independent spec review.</span></label>
+          <label class="check-item"><input type="checkbox" data-check="ship"><span>Package the accepted output so another person can use it.</span></label>
+          <label class="check-item"><input type="checkbox" data-check="learn"><span>Record the weakest station and improve one reusable system asset.</span></label>
+          <label class="check-item"><input type="checkbox" data-check="score"><span>Log size, attempts, streak, and presence.</span></label>
+          <label class="check-item"><input type="checkbox" data-check="repeat"><span>Repeat on the same problem class before adding more agents or autonomy.</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section id="evidence">
+      <div class="sec-head">
+        <div class="sec-num">10</div>
+        <div class="sec-copy">
+          <h2>Why this reconstruction is credible</h2>
+          <p>The visible system above is a synthesis, not a quote or an official IndyDevDan framework. These first-party artifacts anchor its parts.</p>
+        </div>
+      </div>
+      <div class="source-grid">
+        <article class="ve-card source-card"><div class="source-id">01</div><div><h3>Super Simple Software Factory</h3><p>Current request shape, agents-plus-code, bounded phases, typed outputs, gates, observability, and reusable installation.</p><a href="https://github.com/disler/super-simple-software-factory">GitHub repository ↗</a></div></article>
+        <article class="ve-card source-card"><div class="source-id">02</div><div><h3>Forget Loop Engineering</h3><p>Three actors, AI Developer Workflows, specialization, software factories, and the human at the ends.</p><a href="https://www.youtube.com/watch?v=VQy50fuxI34">YouTube video ↗</a></div></article>
+        <article class="ve-card source-card"><div class="source-id">03</div><div><h3>Plans for Fable 5</h3><p>Human judgment, property-first engineering, living plans, phase gates, and the plan as a build contract.</p><a href="https://github.com/disler/planf3">Planf3 repository ↗</a></div></article>
+        <article class="ve-card source-card"><div class="source-id">04</div><div><h3>Elite Context Engineering</h3><p>Reduce and Delegate, minimum sufficient context, focused agents, fresh execution windows, and explicit handoffs.</p><a href="https://www.youtube.com/watch?v=Kf5-HWJPTIE">YouTube video ↗</a></div></article>
+        <article class="ve-card source-card"><div class="source-id">05</div><div><h3>Agent Experts</h3><p>Act–Learn–Reuse: validated domain knowledge compounds across executions rather than dying with a chat.</p><a href="https://www.youtube.com/watch?v=zTcDwqopvKE">YouTube video ↗</a></div></article>
+        <article class="ve-card source-card"><div class="source-id">06</div><div><h3>The Verifier Agent</h3><p>Atomic claims, read-only independent review, evidence instead of builder confidence, and bounded correction loops.</p><a href="https://github.com/disler/the-verifier-agent">GitHub repository ↗</a></div></article>
+        <article class="ve-card source-card"><div class="source-id">07</div><div><h3>The Codebase Singularity</h3><p>The agentic-layer maturity ladder and the warning not to jump straight into orchestration.</p><a href="https://www.youtube.com/watch?v=fop_yxV-mPo">YouTube video ↗</a></div></article>
+        <article class="ve-card source-card"><div class="source-id">08</div><div><h3>The 12 Leverage Points</h3><p>Core Four, external leverage, agentic KPIs, agent-readable architecture, and “which leverage was missing?” diagnosis.</p><a href="https://agenticengineer.com/tactical-agentic-coding/course/the-12-leverage-points">Course page ↗</a></div></article>
+      </div>
+      <nav class="research-links" aria-label="Detailed research notes">
+        <a href="research/indydevdan-principles.md">Principles panel note</a>
+        <a href="research/indydevdan-artifacts.md">Artifacts panel note</a>
+        <a href="research/indydevdan-workflow-panel.md">Workflow panel note</a>
+      </nav>
+      <div class="rail-rule mt-18"><strong>Honest limit:</strong> this system can reproduce his process discipline. It cannot copy his accumulated taste or domain knowledge. The <em>Compound</em> station is how you build your own.</div>
+    </section>
+
+    <footer class="footer">
+      <strong>The IndyDevDan System — Codex</strong><br>
+      Visual reconstruction created 2026-08-04 from the local course/video corpus and current first-party public artifacts.
+    </footer>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Copied</div>
+
+<script>
+  const briefFields = ["ask", "where", "done", "out"];
+  const briefExamples = {
+    feature: {
+      ask: "Add a classic light theme while keeping dark mode as the default.",
+      where: "The existing application theme system and its automated tests.",
+      done: "A user can switch themes, the preference survives reload, and all existing plus new tests pass.",
+      out: "No new themes, design-system rewrite, or unrelated component styling."
+    },
+    presentation: {
+      ask: "Create a five-slide visual lesson that explains agentic engineering to a 20-year-old.",
+      where: "Use the supplied notes, a 16:9 deck, and the existing brand colors.",
+      done: "The deck opens, has one idea per slide, all claims are cited, nothing overflows, and a spoken run fits the allotted slot.",
+      out: "No company history, model benchmark debate, or dense paragraphs."
+    },
+    research: {
+      ask: "Determine the most repeatable principles in IndyDevDan's current agentic engineering method.",
+      where: "First-party blog, course, YouTube, and GitHub material; prefer the newest implementation when ideas evolved.",
+      done: "Every major claim has a direct source and at least two recurring appearances, with tensions clearly labeled.",
+      out: "No anonymous commentary, fan summaries, or unsupported mind-reading."
+    }
+  };
+
+  function updateBrief() {
+    const values = Object.fromEntries(briefFields.map(id => [id, document.getElementById(id).value.trim()]));
+    document.getElementById("brief-output").textContent = `ASK:\n${values.ask}\n\nWHERE:\n${values.where}\n\nDONE MEANS:\n${values.done}\n\nOUT OF SCOPE:\n${values.out}`;
+    localStorage.setItem("indy-system-brief", JSON.stringify(values));
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.remove("show"), 1400);
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("Copied");
+    } catch (_) {
+      const area = document.createElement("textarea");
+      area.value = text;
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+      showToast("Copied");
+    }
+  }
+
+  briefFields.forEach(id => document.getElementById(id).addEventListener("input", updateBrief));
+  document.querySelectorAll(".example-loader").forEach(button => {
+    button.addEventListener("click", () => {
+      const data = briefExamples[button.dataset.example];
+      briefFields.forEach(id => document.getElementById(id).value = data[id]);
+      updateBrief();
+    });
+  });
+  document.getElementById("copy-brief").addEventListener("click", () => copyText(document.getElementById("brief-output").textContent));
+  document.getElementById("clear-brief").addEventListener("click", () => {
+    briefFields.forEach(id => document.getElementById(id).value = "");
+    updateBrief();
+  });
+  try {
+    const savedBrief = JSON.parse(localStorage.getItem("indy-system-brief") || "null");
+    if (savedBrief) briefFields.forEach(id => document.getElementById(id).value = savedBrief[id] || "");
+  } catch (_) {}
+  updateBrief();
+
+  document.querySelectorAll(".copy-prompt").forEach(button => {
+    button.addEventListener("click", () => copyText(document.getElementById(button.dataset.copy).textContent));
+  });
+
+  const workedExamples = {
+    presentation: {
+      title: "Example: a five-slide visual lesson",
+      steps: [
+        ["1 · Define", "Five slides, one idea each, for a 20-year-old."],
+        ["2 · Prime", "Load audience, slot, notes, brand, output format."],
+        ["3 · Scout", "Find the strongest story, evidence, and existing assets."],
+        ["4 · Plan", "Create the slide-by-slide storyboard and proof checklist."],
+        ["5 · Build", "Generate the deck with visuals and speaker notes."],
+        ["6 · Prove", "Open it, check overflow, citations, contrast, and rehearsal time."],
+        ["7 · Ship", "Export editable deck plus PDF with a clear version name."],
+        ["8 · Compound", "Update the deck template with the review failure you found."]
+      ]
+    },
+    feature: {
+      title: "Example: add light mode",
+      steps: [
+        ["1 · Define", "Theme switcher, dark default, persistence, no redesign."],
+        ["2 · Prime", "Load theme tokens, entry points, tests, and run commands."],
+        ["3 · Scout", "Trace current colors, state, storage, and affected files."],
+        ["4 · Plan", "Specify token changes, UI control, persistence, and tests."],
+        ["5 · Build", "A focused builder implements the accepted plan."],
+        ["6 · Prove", "Run tests in code; reviewer compares result to the plan."],
+        ["7 · Ship", "Commit only the green, approved change and its docs."],
+        ["8 · Compound", "Save a reusable theme-feature workflow and its gates."]
+      ]
+    },
+    research: {
+      title: "Example: research a creator's method",
+      steps: [
+        ["1 · Define", "Find recurring principles, current practice, and tensions."],
+        ["2 · Prime", "Set source standard, date range, scope, and citation rules."],
+        ["3 · Scout", "Inventory blog, video, course, repositories, and artifacts."],
+        ["4 · Plan", "Split lenses, evidence table, contradiction checks, synthesis."],
+        ["5 · Build", "Panelists produce independent, source-linked findings."],
+        ["6 · Prove", "Check each claim against first-party evidence and recency."],
+        ["7 · Ship", "Deliver a visual system plus detailed research notes."],
+        ["8 · Compound", "Save the research rubric and source-inventory template."]
+      ]
+    }
+  };
+
+  function renderExample(key) {
+    const example = workedExamples[key];
+    document.getElementById("example-panel").innerHTML = `<h3 class="example-title">${example.title}</h3><div class="example-grid">${example.steps.map(([name, copy]) => `<div class="ve-card ve-card--recessed example-step"><small>${name}</small><strong>${copy}</strong></div>`).join("")}</div>`;
+    document.querySelectorAll(".tab").forEach(tab => tab.setAttribute("aria-selected", String(tab.dataset.tab === key)));
+  }
+  document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => renderExample(tab.dataset.tab)));
+  renderExample("presentation");
+
+  const checks = [...document.querySelectorAll("[data-check]")];
+  function updateChecklist() {
+    const state = Object.fromEntries(checks.map(input => [input.dataset.check, input.checked]));
+    localStorage.setItem("indy-system-checklist", JSON.stringify(state));
+    const complete = checks.filter(input => input.checked).length;
+    const progress = Math.round((complete / checks.length) * 100);
+    document.getElementById("progress-ring").style.setProperty("--progress", progress);
+    document.getElementById("progress-value").textContent = `${progress}%`;
+  }
+  try {
+    const savedChecks = JSON.parse(localStorage.getItem("indy-system-checklist") || "null");
+    if (savedChecks) checks.forEach(input => input.checked = Boolean(savedChecks[input.dataset.check]));
+  } catch (_) {}
+  checks.forEach(input => input.addEventListener("change", updateChecklist));
+  document.getElementById("reset-checklist").addEventListener("click", () => { checks.forEach(input => input.checked = false); updateChecklist(); });
+  updateChecklist();
+
+  (function initToc() {
+    const toc = document.getElementById("toc");
+    const links = [...toc.querySelectorAll("a")];
+    const sections = links.map(link => ({ link, section: document.querySelector(link.getAttribute("href")) })).filter(item => item.section);
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        links.forEach(link => link.classList.remove("active"));
+        const item = sections.find(candidate => candidate.section === entry.target);
+        if (item) {
+          item.link.classList.add("active");
+          if (innerWidth <= 1100) item.link.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        }
+      });
+    }, { rootMargin: "-10% 0px -78% 0px" });
+    sections.forEach(item => observer.observe(item.section));
+  })();
+</script>
+</body>
+</html>

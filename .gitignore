@@ -1,5 +1,75 @@
+# Ignore policy for the AgenticEngineer archive.
+#
+# The rule of thumb: this repo tracks *source and prose*, never *bytes we can
+# re-download or re-generate*. The 22 GB of lesson video is deliberately not in
+# git — see docs/adr/0002-media-is-ignored-not-tracked.md. media/MANIFEST.md is
+# tracked instead, so the ignored tree stays auditable.
 
-# ML Model files (too large for GitHub)
-multi-agent-orchestration/asset/*.safetensors
-multi-agent-orchestration/asset/gpt/
-multi-agent-orchestration/asset/tokenizer/
+# --- OS / editor -------------------------------------------------------------
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# --- JavaScript --------------------------------------------------------------
+node_modules/
+dist/
+build/
+.next/
+*.tsbuildinfo
+
+# --- Media bytes (~22 GB) ----------------------------------------------------
+# Ignored by EXTENSION rather than by directory. Excluding `media/raw/` wholesale
+# would be unrecoverable: git cannot re-include a file whose parent directory is
+# excluded, so the *-sync.json sidecars the recorder validation reads — and
+# media/MANIFEST.md itself — would be silently dropped. Extension rules ignore
+# every byte while leaving the .json/.md metadata tracked with no negation games.
+*.mp4
+*.m4a
+*.mov
+*.webm
+*.aac
+
+# Recorder frame captures: 5,286 files / 1.2 GB of contact sheets, preflight
+# frames and per-frame stills. Scoped to media/raw/ on purpose — catalog/ holds
+# ~400 legitimate tracked thumbnails and course-page images.
+media/raw/**/*.jpg
+media/raw/**/*.jpeg
+media/raw/**/*.png
+# TRANSITIONAL: the same tree under its pre-restructure name. The root->media/
+# move is committed after this ignore policy, so these frames must be ignored at
+# both paths or 1.2 GB enters history in the interim commit. Deleted once
+# videos/ no longer exists.
+videos/**/*.jpg
+videos/**/*.jpeg
+videos/**/*.png
+
+# --- Model weights -----------------------------------------------------------
+# The leading **/ is load-bearing: these live at
+# codebases/ah/multi-agent-orchestration/asset/, not at the repo root.
+**/asset/*.safetensors
+**/asset/gpt/
+**/asset/tokenizer/
+
+# --- Agent scratch -----------------------------------------------------------
+.claude/worktrees/
+worktrees/
+
+# --- Run logs ----------------------------------------------------------------
+*.log
+**/_weekly_run_*.json
+**/_batch_summary_*.json
+# _weekly_last_run.json is the idempotency state tools/youtube/weekly_update.py
+# reads on every run — it must stay tracked.
+!**/_weekly_last_run.json

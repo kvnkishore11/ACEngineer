@@ -1,0 +1,478 @@
+{
+  "lesson_key": "ah-4-multi-agent-orchestration-the-o-agent",
+  "title": "Multi-Agent Orchestration: The O-Agent",
+  "course": "AH",
+  "order": 12,
+  "lesson_url": "https://agenticengineer.com/tactical-agentic-coding/course/multi-agent-orchestration-the-o-agent",
+  "video": {
+    "file": "ah-4-multi-agent-orchestration-the-o-agent/video/ah-4-multi-agent-orchestration-the-o-agent.mp4",
+    "duration_seconds": 3368,
+    "duration_display": "56:08",
+    "resolution": "1920x1080",
+    "fps": 15
+  },
+  "tactic": {
+    "name": "Orchestrate Your Agents",
+    "one_liner": "Stop hopping into one terminal at a time to run one agent at a time. Put a single custom agent — the Orchestrator (O-agent) — in front of your whole fleet, give it CRUD over your agents plus real-time observability, and command agents at scale through one interface.",
+    "why_uncomfortable": "It asks engineers who just learned to love a single Claude Code session (and even to build custom agents) to admit that the interface itself is now the bottleneck: 'the rate at which you can create and command your agents becomes the constraint of your engineering output.' You have to accept that at scale, if you lose track of your agents you lose control of your results — and that the fix is to build and maintain yet another system (an orchestrator, a database, WebSockets, an observability UI) before it pays off. Dan repeatedly de-risks the discomfort: this is an advanced concept that comes AFTER custom agents; you can adopt the ideas even in a plain terminal; you don't need his exact UI; and it is explicitly imperfect ('engineering happens in the gray')."
+  },
+  "mission": "Give you a working paradigm for commanding fleets of agents so you can scale your compute to scale your impact without drowning in your own agents. By the end you can look at a pile of specialized agents and know how to unify them behind one Orchestrator Agent, give yourself CRUD-for-agents and observability, keep every agent focused (one agent, one prompt, one purpose) on a protected context window, and operate out of the loop — reviewing concrete results instead of typing back-and-forth prompts. The deeper Agentic Horizon mission continues: 'it's not about what you can do anymore, it's about what you can teach your agents to do.' The O-agent is the next rung of the scale framework and the key to organizing an entire agentic layer.",
+  "scale_framework": {
+    "the_path": "Base agents -> Better agents -> More agents -> Custom agents -> Orchestrated agents. At each step you scale your compute to scale your impact. The orchestrator is the newest, highest rung — Dan calls it 'an advanced agentic coding concept. It comes last after custom agents' — because you cannot orchestrate what you cannot yet build (custom agents) or measure (observability).",
+    "base": "Out-of-the-box agents used as-is.",
+    "better": "A single agent made to perform via prompt engineering and context engineering (the R&D framework, agentic prompt formats).",
+    "more": "Scaling compute by running additional agents/subagents in parallel.",
+    "custom": "Agents whose core four (context, model, prompt, tools) you set in code — tailored to your domain problems (the AH-3 lesson).",
+    "orchestrated": "One Orchestrator Agent conducting a whole fleet of custom/primary agents through a single interface, with CRUD-for-agents and observability. 'This is agentic engineering scaled to the next level.'"
+  },
+  "three_pillars": {
+    "summary": "Multi-agent orchestration is not just the orchestrator agent — it is the combination of three design elements that unlock 'agents at scale' you can actually control.",
+    "orchestrator_agent": "Your unified interface to your agents (the single interface pattern). One custom agent you talk to; it creates, commands, updates, and deletes the others.",
+    "crud_for_agents": "The orchestrator's tools give you CRUD over agents (create / command+read-status / update / delete), which is what actually unlocks 'agents at scale.'",
+    "observability": "Real-time monitoring of every agent's performance, cost, and — critically — results. 'If you can't measure it, you can't improve it. And if you can't measure it, you can't scale it.' Filter by response / tool / thinking / hook, by individual agent, and see consumed vs produced assets with inline diffs.",
+    "why_together": "'When you combine these three, you get a powerful solution to multi-agent orchestration. This is you controlling your compute at scale.' The orchestrator agent is the first pattern where Dan felt 'the perfect combination of observability, customizability, and agents at scale.'"
+  },
+  "core_concepts": [
+    {
+      "id": "multi-agent-orchestration",
+      "name": "Multi-agent orchestration is the next step",
+      "plain_english": "Once you have better, more, and custom agents, you hit a hard wall: the current interface of agents. You cannot scale by opening one terminal at a time and writing one prompt at a time. Orchestration is how you manage a fleet — and 'in the generative AI age, the rate at which you can create and command your agents becomes the constraint of your engineering output.'",
+      "dan_words": "\"Multi-agent orchestration is the next step in our journey as agentic engineers... When your agents are slow, you're slow. When your agents have a problem, you have a problem.\"",
+      "misconception": "That you scale agents by just launching more terminals/tabs. Beyond a handful, ungoverned parallel agents become noise — 'if you lose track of your agents, you lose control of your results.' Scale needs an interface and observability, not more windows."
+    },
+    {
+      "id": "orchestrator-agent",
+      "name": "The Orchestrator Agent (O-agent) — one agent to rule them all",
+      "plain_english": "The O-agent is a single custom agent whose entire job is to manage other agents. Its system prompt is completely overwritten ('You are the Orchestrator Agent - a meta-agent that manages other Agents'), and its tools are specialized (8 fleet-management tools). You talk only to it; it does the terminal work of creating and commanding agents for you.",
+      "dan_words": "\"The orchestrator agent is a custom agent... Its system prompt is completely overwritten. Its tools are specialized. It's designed to manage other agents.\"",
+      "misconception": "That the orchestrator does the engineering work itself. It does not — it orchestrates. 'We don't want our orchestrator agent getting involved in the actual work. It is just here to orchestrate.' Its context window stays tiny because it delegates."
+    },
+    {
+      "id": "single-interface-pattern",
+      "name": "The single interface pattern, applied to agents",
+      "plain_english": "A decades-old engineering paradigm: put one interface in front of many things so you control them all from one place. Dan applies it to agents — you talk to the orchestrator, and it creates/deletes/updates/manages your agents. One interface to rule them all.",
+      "dan_words": "\"The one agent [to] rule them all. The Orchestrator Agent. This is the single interface pattern applied to your fleet of agents. It's an existing engineering paradigm that great engineers have used for decades.\"",
+      "misconception": "That it is a brand-new invention. It is a well-worn interface pattern (facade/single-entry-point) newly pointed at agents. The novelty is the target (fleets of agents), not the pattern."
+    },
+    {
+      "id": "three-pillars",
+      "name": "Three pillars: Orchestrator + CRUD-for-agents + Observability",
+      "plain_english": "Orchestration is the combination of three things, not one. The orchestrator agent is your unified interface; CRUD-for-agents (its tools) unlocks agents at scale; observability lets you monitor performance, cost, and results in real time. Remove any one and the system collapses.",
+      "dan_words": "\"We're combining three pillars. The Orchestrator Agent, your unified interface to your agents... unlocks CRUD for your agents. This gives you agents at scale. And lastly, we're combining observability for real-time monitoring of your agents' performance, costs, and, as you'll see, results.\"",
+      "misconception": "That the orchestrator alone is the lesson. Without observability you're flying blind; without CRUD you can't manage a fleet. The three together are the unlock."
+    },
+    {
+      "id": "observability-is-key",
+      "name": "Observability is key — measure it or you can't scale it",
+      "plain_english": "You must be able to see everything every agent is doing — responses, tool calls, thinking, hooks, models, costs, context windows, and produced files — and filter it. If you can't measure it, you can't improve it or scale it. Ten agents doing the wrong thing is worse than one.",
+      "dan_words": "\"Observability is a key component of a successful multi-agent system... if you can't measure it, you can't improve it. And if you can't measure it, you can't scale it. If you have 10 agents doing the wrong thing, does it matter that you have 10? Of course not.\"",
+      "misconception": "That observability is a nice-to-have dashboard. It is a pillar: it is how you keep control of results at scale and how you debug 'which agent messed up — the planner, the builder, or the other agents in this pipeline?'"
+    },
+    {
+      "id": "crud-for-agents",
+      "name": "CRUD for agents — and delete is the endgame",
+      "plain_english": "The orchestrator exposes Create/Read/Update/Delete over agents: create_agent, command_agent (+ list_agents / check_agent_status / read_system_logs / report_cost to read), re-command to update, and delete_agent / interrupt_agent to remove. You must treat agents as deletable, temporary resources that serve a single purpose — spin up, do the job, delete.",
+      "dan_words": "\"You must treat your agents as deletable temporary resources that serve a single purpose... First, you learn how to read code, then you create code, then you update code, and then in the end, you learn that the best code is no code at all. You learn to delete. Command K, delete all agents.\"",
+      "misconception": "That deleting agents wastes work. The produced artifacts (docs, plans, diffs, code) persist; the agent is the temporary resource. 'The work is done, the job is done. Let the agents go home.'"
+    },
+    {
+      "id": "primary-agents-not-subagents",
+      "name": "Primary agents, not sub-agents (why it's differentiated)",
+      "plain_english": "The orchestrator commands PRIMARY agents, not blind sub-agents. A primary agent is re-promptable, holds its own session/memory, produces inspectable results, and can be tapped again and again until the job is done. You build one by pulling a sub-agent template UP a level — overwrite its system prompt and give it custom tools — so it becomes a full primary agent the orchestrator can conduct.",
+      "dan_words": "\"Instead of just using a sub-agent here, we can turn this into a full-on primary agent by blowing away the system prompt and by giving it custom tools... You can't do all this with a sub-agent. You're locked in, it's too narrow. By adding an additional level of agents, we can do a lot more.\"",
+      "misconception": "'Aren't these just sub-agents?' No. Sub-agents (Task) are ephemeral, narrow, and their context is blown away. Primary agents persist, can be re-commanded, and can themselves run slash commands, skills, and even spawn their own sub-agents."
+    },
+    {
+      "id": "core-four-at-scale",
+      "name": "Managing the core four of every agent",
+      "plain_english": "Every feature, UI, and experience is still just the core four — context, model, prompt, tools — for each agent. The orchestrator UI surfaces each agent's context window (x/200k), model, cost, tools, hooks, and reasoning so you can adopt each agent's perspective. You must protect context windows, especially the orchestrator's.",
+      "dan_words": "\"We're managing the core four of every single agent we spin up. If you do not adopt your agent's perspective, if you do not know what they can do, you do not know what you can do... on top of every feature, any lab builds, any UI... it's all just the core four. Context, model, prompt, tools.\"",
+      "misconception": "That a fancy multi-agent UI is something new to learn. It is just the core four multiplied across a fleet. Learn to read the core four of any one agent and you can read the whole system."
+    },
+    {
+      "id": "piter-outloop",
+      "name": "The PITER out-loop system (stay out the loop)",
+      "plain_english": "This is an out-loop system: Prompt input (your Cmd+K message), Trigger (an HTTP request to the server), Environment (the working directory the agents operate in), and Review (observability). You observe work from your agents outside the loop; you hop in only when you need to. This is tactic four: stay out the loop.",
+      "dan_words": "\"This system is in fact an [out-loop PITER] system. We are observing work from our agents outside the loop... This is quite literally a prompt input. We then have our trigger, which is our HTTP requests coming into our server. And then we have our full on environment... Remember tactic four, stay out the loop.\"",
+      "misconception": "That 'out of the loop' means 'unsupervised and hoping.' You still review — the R in PITER is Review via observability. You move fluidly from in-loop (one click into a file) to out-loop (high-level) as needed."
+    },
+    {
+      "id": "one-agent-one-prompt-one-purpose",
+      "name": "One agent, one prompt, one purpose (let your agents focus)",
+      "plain_english": "Focus each agent on a single task with a dedicated, protected context window, then delete it. This sidesteps context rot / pollution / toxic context. A 200K window is plenty — the problem is stuffing one agent with too much work. Force your agents to focus like a good engineer, then let them go home.",
+      "dan_words": "\"One agent, one prompt, one purpose... You want your agents to be just like you, a focused engineer working on a single task at a time. Let your agents focus... 200K context window is plenty. You're just stuffing a single agent with too much work, just like your boss did to you at your last job.\"",
+      "misconception": "That bigger context windows remove the need for focus. More context invites more context switching; multi-agent orchestration lets you divide work into focused windows instead of overloading one."
+    },
+    {
+      "id": "rd-framework-at-scale",
+      "name": "R&D framework at scale (Reduce & Delegate)",
+      "plain_english": "Keep the orchestrator's context minimal (Reduce) and hand the actual work to specialized agents with focused windows (Delegate). That is why the orchestrator's context stays tiny even after conducting huge amounts of work — the context is reduced and delegated to the max.",
+      "dan_words": "\"We're tapping into the R and D framework. We discussed this inside of the Elite Context Engineering Agentic Horizon lesson. We are reducing and delegating context to the max... our orchestrator, still with very minimal context... it's because we are indeed [reducing] all of the context, reduced, and delegated.\"",
+      "misconception": "That the orchestrator should read all the agent logs to 'stay informed.' It must not — 'it is not always observing the logs, it cannot be. We have to protect its context window.' It checks status only when asked or as its workflow dictates."
+    },
+    {
+      "id": "every-agent-produces-a-result",
+      "name": "Every agent produces a concrete result",
+      "plain_english": "Every agent must produce a concrete, inspectable artifact — a plan, a log, a scout report, a diff, a doc — that can be handed off, inspected, and reviewed. Otherwise, what was the point? This is what makes the out-loop review possible.",
+      "dan_words": "\"Our agents are always producing a document that can be handed off, inspected, reviewed... Every agent should produce some concrete result. Otherwise, what was the point in the first place?\"",
+      "misconception": "That agent output is the chat transcript. The deliverable is a durable artifact (file/diff) you can one-click into and review — and it survives after the agent is deleted."
+    },
+    {
+      "id": "templating-your-engineering",
+      "name": "Template your engineering into your agents (defensibility)",
+      "plain_english": "Encode the way you engineer — your planning style, your report format, your scout structure — into system prompts, sub-agents, skills, and reusable prompts. That embedded engineering is your edge. If your work is one, two, three prompts away with zero effort on an out-of-the-box tool, it isn't defensible; specialization is.",
+      "dan_words": "\"You need to be putting your engineering into your agents. This is what makes them special... If it's just one, two, three, four prompts away with zero effort... how defensible is your work really? This is why specialization, solving your problems very well, is very important.\"",
+      "misconception": "That the orchestrator app is the product. The moat is the accumulated specialized prompts, tools, and agents you template into it for YOUR domain — 'specialization all the way down.'"
+    },
+    {
+      "id": "ecosystem-interoperability",
+      "name": "Interoperable with the entire Claude Code ecosystem",
+      "plain_english": "Because it's built on the Claude Agent SDK, the orchestrator and its agents can use everything in the Claude Code ecosystem: slash commands (reusable prompts like /question, /prime), skills, agent templates from .claude/agents, and hooks. The orchestrator can even be told to make an agent run a slash command.",
+      "dan_words": "\"It is interoperable with the entire Claude Code ecosystem... Cloud code and the agent SDK and the ecosystem is far ahead of the pack. It's not just about the agent loop or the model. It's about the ecosystem that lets you build the way you need to, to solve your problems at scale.\"",
+      "misconception": "That a custom multi-agent app means giving up your existing prompts/skills. The opposite — everything you already built (slash commands, skills, sub-agent templates, hooks) plugs straight in as reusable units of compute."
+    },
+    {
+      "id": "orchestrator-as-glue",
+      "name": "The orchestrator is the glue (sleep-check monitoring)",
+      "plain_english": "The orchestrator connects a workflow: it commands an agent, sleeps, checks that agent's status (~every 15s), reads its produced result, then commands the next agent — passing context forward. This 'sleep-check' is prompt-driven behavior (Bash sleep + check_agent_status in the workflow), and it beats blind sub-agent hand-offs because the primary agents are less ephemeral and re-promptable.",
+      "dan_words": "\"The orchestrator is now a part of connecting the workflow... It's glue for the workflow. I think this is vastly superior to agent hand-offs. It's more superior to blind sub-agents. We have a primary agent here that has been given context. It can reference other files. It is less ephemeral. We can reprompt.\"",
+      "misconception": "That the ~15-second monitoring loop is a hidden background process. It is the orchestrator running Bash(sleep 15) and check_agent_status because its workflow prompt tells it to — you can read it in the command file."
+    },
+    {
+      "id": "orchestration-prompts-and-adws",
+      "name": "Orchestration prompts: specialized agentic prompts (the ADW)",
+      "plain_english": "Once you build a custom agent, you can write prompts specialized for it — prompts only it can run. The demo's 'plan with scouts, build, and review' is a three-phase workflow with a final report: the AI Developer Workflow (ADW) shape from Tactical Agentic Coding, now driven by the orchestrator across freshly spun-up primary agents.",
+      "dan_words": "\"Once you build a custom agent, you can then write prompts, specialized for that custom agent... We have plan with scouts, build and review. So a three-step workflow... This should make you think of the ADW.\"",
+      "misconception": "That multi-agent means many one-off prompts. The power is domain-specific agentic prompts (plan->build->review->report) that only your specialized agents can execute — 'domain-specific expert agency through prompts.'"
+    },
+    {
+      "id": "the-agentic-layer",
+      "name": "The O-agent is part of (and the key to) the agentic layer",
+      "plain_english": "The orchestrator is a piece of your agentic layer — and the key to organizing, creating, and using it. Its big early advantage: you can use it BEFORE you have a full agentic layer (before you have concrete ADWs wired into your codebase). Later it can manage your entire agentic layer — call your ADWs, prompts, and agents. Prioritize agentics (tactic eight): spend >50% of your time on the system that builds the system.",
+      "dan_words": "\"The multi-agent orchestration, your O-agent, it is a part of your agentic layer. In fact, it is the key to unlocking how to best organize, create, and use your agentic layer... More than 50% of your time, as a rough guideline, should be spent investing into your agentic layer.\"",
+      "misconception": "That you must first build a full agentic layer (ADWs, triggers) to benefit. The O-agent is the intermediate step that helps you build the layer while you have it — usable long before the layer is complete."
+    },
+    {
+      "id": "operating-in-the-gray",
+      "name": "Operating in the gray (honest trade-offs)",
+      "plain_english": "This is not a magic, finished, fully-out-loop utopia. It costs real upfront investment; you must maintain the orchestrator, the database, the WebSocket plumbing — another piece of your agentic layer. Engineering happens in the gray, in the messiness. But having an out-loop agentic coding system is 'ultra key,' and this pattern works in AND out of the loop.",
+      "dan_words": "\"Engineering happens in the gray. It happens in the messiness of it all... multi-agent orchestration and the O-agent cost upfront investment and you have to manage your orchestration agent, you have to manage the plumbing, the database, the WebSocket connections... Is this worth investing into? I think the answer is a very clear yes.\"",
+      "misconception": "That out-loop means you never touch the terminal again. Dan had to hop into the loop multiple times while building this. In-loop is still a valid mode; the goal is a spectrum of modes and more out-loop work over time."
+    }
+  ],
+  "core_four_at_scale": {
+    "context": "Every agent has its own 200K context window shown as a live bar (x/200k). The orchestrator keeps its own context minimal by reducing + delegating (R&D framework), never reading all agent logs. Agents are kept focused (one purpose) so no single window rots; the system prompt sets COMMAND_LEVEL_COMPACT_PERCENTAGE=80% and the orchestrator proactively suggests command_agent(agent, '/compact') at ~80-90% usage.",
+    "model": "Right-sized per agent. Orchestrator + primary/build/review agents run Sonnet (claude-sonnet-4-5-20250929); fast scouts, docs-scraper, and all AI event-summarization run Haiku (claude-haiku-4-5-20251001); the meta-agent template runs Opus. On-screen badges read SONNET-4.5 / HAIKU-4.5. Aliases sonnet/haiku/fast resolve in code (agent_manager.py).",
+    "prompt": "Two layers. The orchestrator's SYSTEM prompt is fully overwritten (orchestrator_agent_system_prompt.md) and defines it as a meta-agent with 8 tools, a workflow pattern (Analyze->Plan->Create->Dispatch->Monitor->Report), and a compaction policy. USER prompts arrive via Cmd+K; some are plain instructions, others are specialized orchestration prompts (slash-command ADWs like /orch_plan_w_scouts_build_review) that only the O-agent runs. 'use thinking' injects the ultrathink keyword into command_agent.",
+    "tools": "The orchestrator's tools are an in-memory MCP server (create_sdk_mcp_server name='mgmt') of 8 management tools, PLUS Bash, Read, SlashCommand, and Skill. Spawned agents get tools from their template's frontmatter (e.g. scout-report-suggest-fast = Read/Glob/Grep) or a default engineering toolset, with disallowed_tools=['NotebookEdit','ExitPlanMode'] and permission_mode='acceptEdits'.",
+    "why_it_matters": "Multi-agent orchestration is still, at bottom, the core four — now multiplied across a fleet and made visible per agent. The whole differentiated DX exists so you can adopt each agent's perspective (its core four) at a glance. 'It's all about the flow of information between your agents and understanding how you can peer into the core four to get more, better, faster results.'"
+  },
+  "sdk_mechanics": {
+    "package": "claude-agent-sdk (Python; imported as claude_agent_sdk). This lesson's repo uses the CURRENT SDK name end-to-end — pyproject.toml depends on 'claude-agent-sdk', every import is 'from claude_agent_sdk import ... ClaudeAgentOptions', and Dan SAYS 'the Claude Agent SDK' on camera (unlike the AH-3 recording, which still said 'Claude Code SDK'). There is zero legacy claude_code_sdk / ClaudeCodeOptions anywhere.",
+    "orchestrator_setup": "OrchestratorService (backend/modules/orchestrator_service.py) builds ClaudeAgentOptions(system_prompt=<overwritten>, model=ORCHESTRATOR_MODEL, cwd, resume=<session>, env, mcp_servers={'mgmt': create_sdk_mcp_server(...)}, allowed_tools=[8 mcp__mgmt__* + Bash + Read + SlashCommand + Skill], setting_sources=['project'], hooks=<orchestrator hooks>) and runs the universal loop: async with ClaudeSDKClient(options) as client -> client.query(user_message) -> async for message in client.receive_response().",
+    "universal_flow": "Same four-beat SDK loop as AH-3, now used twice (orchestrator AND each spawned agent): 1) build ClaudeAgentOptions (the core four); 2) mount ClaudeSDKClient; 3) client.query(prompt); 4) manage the streamed response blocks (TextBlock, ThinkingBlock, ToolUseBlock) and ResultMessage (session_id, usage, total_cost_usd).",
+    "management_tools_as_mcp": "The 8 orchestrator tools are @tool-decorated callables mounted via create_sdk_mcp_server(name='mgmt', version='1.0.0', tools=[...]) — an entire MCP server built in memory (exactly the AH-3 custom-tool pattern), which the mermaid diagram labels 'Management Tools MCP Server' / 'Agent Manager 8 Management Tools'.",
+    "spawning_agents": "create_agent (agent_manager.py) resolves a subagent_template (from .claude/agents/*.md via SubagentRegistry) into system_prompt + model + allowed_tools, inserts a DB row, builds per-agent hooks, then mounts a fresh ClaudeSDKClient with ClaudeAgentOptions(system_prompt, model, cwd, hooks, allowed_tools, disallowed_tools=['NotebookEdit','ExitPlanMode'], permission_mode='acceptEdits', env, setting_sources=['project']) and greets it. command_agent re-mounts with resume=agent.session_id and max_turns=500 for true continuation.",
+    "session_continuity": "Each agent keeps its own Claude session; resume=session_id re-commands it with full memory ('Each agent maintains its own session and memory. You can command agents multiple times — they remember previous interactions').",
+    "thinking_mode": "If the user says 'use thinking', the orchestrator passes the 'ultrathink' keyword inside command_agent's command field, surfacing ThinkingBlocks (the brain icon) in the target agent.",
+    "message_and_block_types": "AssistantMessage.content = [TextBlock, ThinkingBlock, ToolUseBlock]; SystemMessage (captured once per boot for session/tools/model metadata); ResultMessage (session_id, usage.input_tokens/output_tokens, total_cost_usd). Same 'manage the primitives' skill as AH-3.",
+    "hooks": "Two active hook modules built with HookMatcher: command_agent_hooks.py registers 6 subagent hooks (PreToolUse, PostToolUse, UserPromptSubmit, Stop, SubagentStop, PreCompact) plus a file-tracking hook; orchestrator_hooks.py registers the orchestrator's own pre/post-tool + stop hooks. Every hook event is written to the DB and broadcast over WebSocket, then AI-summarized by a Haiku query(). (modules/hooks.py is legacy/orphan — no importers.)"
+  },
+  "system_architecture": {
+    "one_line": "A Vue 3 + Pinia frontend talks to a FastAPI backend over HTTP (commands) and WebSocket (event stream); the backend runs the Orchestrator Agent and its fleet on the Claude Agent SDK and persists everything to Postgres. The app points at its own codebase — 'we are using the system to build the system, quite literally.'",
+    "frontend": "Vue 3 + TypeScript + Pinia + Vite (port 5175). Pinia store useOrchestratorStore (id 'orchestrator') holds agents[], orchestratorAgent, eventStreamEntries[], fileTrackingEvents, chatMessages[], commandInputVisible (Cmd+K), chatWidth, isConnected; getters activeAgents/runningAgents/idleAgents, filteredEventStream, stats{active,running,logs,cost}. Three-column App.vue: AgentList (per-agent core-four cards) | EventStream (filterable log stream) | OrchestratorChat (cost + context header). GlobalCommandInput = the Cmd+K palette; event-rows/FileChangesDisplay = Consumed-vs-Produced + inline diff + one-click-open-in-IDE.",
+    "services": "api.ts (axios, baseURL http://127.0.0.1:9403); agentService->GET /list_agents; chatService->GET /get_orchestrator, POST /load_chat, POST /send_chat, connectWebSocket ws://127.0.0.1:9403/ws; eventService->GET /get_events; fileService->POST /api/open-file (the one-click-into-editor); useHeaderBar->GET /get_headers (cwd). The WebSocket is receive-only; outbound chat is POST /send_chat.",
+    "backend": "FastAPI (backend/main.py, port 9403): routes /health, /get_orchestrator (returns orchestrator + slash_commands + agent_templates + orchestrator_tools), /get_headers, /api/open-file, /load_chat, /send_chat (fire-and-forget streaming), /get_events, /list_agents, WS /ws. Modules: orchestrator_service.py, agent_manager.py (the 8 tools + spawn/command), subagent_loader.py (SubagentRegistry over .claude/agents/*.md), command_agent_hooks.py + orchestrator_hooks.py, database.py (asyncpg pool), websocket_manager.py, single_agent_prompt.py (Haiku summarizer), file_tracker.py, config.py.",
+    "data_layer": "PostgreSQL — Neon serverless recommended, or local/Docker Postgres — via an asyncpg pool. 6 tables (apps/orchestrator_db/migrations/, applied 0->8 by run_migrations.py via psql): orchestrator_agents, agents (FK CASCADE to orchestrator), prompts, agent_logs (event_category hook|response), system_logs, orchestrator_chat. 'Everything we're doing here is operating and firing into a Postgres database with concrete structure.'",
+    "observability_pipeline": "SDK/hook event -> written to agent_logs/system_logs/orchestrator_chat -> broadcast over WebSocket (~14 event types incl. agent_log, agent_created/updated/deleted, orchestrator_chat, thinking_block, tool_use_block) -> Pinia store -> live UI. A Haiku query() adds a one-sentence AI summary per event. file_tracker.py classifies Consumed (Read) vs Produced (Write/Edit/MultiEdit/Bash).",
+    "ws_deployment_note": "The server currently points at ONE codebase at a time (--cwd flag). Dan flags multi-codebase support through a single UI as a future direction."
+  },
+  "management_tools": {
+    "note": "The orchestrator's 8 fleet-management tools == the mermaid diagram's 'Agent Manager 8 Management Tools' == the palette-frame 'Orchestrator Tools' == the 'CRUD for agents' pillar. Signatures verified in agent_manager.py and the orchestrator system prompt.",
+    "create_agent": "create_agent(name, system_prompt?, model?, subagent_template?) — CREATE. Spawns a managed primary agent; if a subagent_template is given, its prompt/tools/model are applied automatically; model can override (sonnet/haiku/fast aliases). If no name, the orchestrator infers one.",
+    "list_agents": "list_agents() — READ. Lists agents scoped to this orchestrator with status + metadata.",
+    "command_agent": "command_agent(agent_name, command) — CREATE-a-task / UPDATE. Dispatches a task (or a slash command like /compact) to an existing agent; runs it in the background; the agent remembers prior interactions (resume). 'use thinking' injects ultrathink here.",
+    "check_agent_status": "check_agent_status(agent_name, tail_count=10, offset=0, verbose_logs=false) — READ. Returns agent status + a tail of its activity (AI summaries by default, raw if verbose). The tool the sleep-check loop polls. System prompt warns: 'Don't be too eager… only monitor tasks if requested.'",
+    "delete_agent": "delete_agent(agent_name) — DELETE. Deletes the agent and cleans up resources; produced files remain.",
+    "interrupt_agent": "interrupt_agent(agent_name) — DELETE/UPDATE. Calls client.interrupt() on a running agent.",
+    "read_system_logs": "read_system_logs(offset=0, limit=50, message_contains?, level?) — READ. Application-level logs for debugging.",
+    "report_cost": "report_cost() — READ. Reports the orchestrator's own tokens, cost, context-window %, and session ID (also how you answer 'what's your session ID?')."
+  },
+  "agent_templates": {
+    "note": "Reusable Claude Code sub-agent definitions in .claude/agents/*.md (name, description, tools, model, color frontmatter + a markdown body). create_agent(subagent_template=...) resolves them into a spawned PRIMARY agent. Injected into the orchestrator system prompt as {{SUBAGENT_MAP}}.",
+    "scout-report-suggest-fast": "model haiku; tools Read, Glob, Grep. Read-only 'scout fast' — investigate, locate issues, emit a SCOUT REPORT with suggested fixes; no writes. The template the lesson demos by name.",
+    "scout-report-suggest": "model sonnet; tools Read, Glob, Grep. Same body as fast, deeper analysis on Sonnet.",
+    "build-agent": "model sonnet; tools Write, Read, Edit, Grep, Glob, Bash, TodoWrite. Implements ONE specific file from a detailed spec (parallel-build worker); the demo's builder.",
+    "review-agent": "model sonnet; tools Write, Read, Bash, Grep, Glob. Analyzes git diff, categorizes findings Blocker/High/Medium/Low, writes a report, ends PASS/FAIL; the demo's reviewer. (Inner app layer.)",
+    "meta-agent": "model opus; tools include Write + firecrawl. Agent architect — generates a new sub-agent config file from a description.",
+    "docs-scraper": "model haiku; firecrawl + WebFetch + Write. Scrape a URL into verbatim markdown under ai_docs/.",
+    "playwright-validator": "model sonnet; 19 mcp__playwright__browser_* tools + Write/Edit. Drives a browser, screenshots each step, produces a validation report.",
+    "the_planner_is_dynamic": "There is NO static planner.md template. The plan->build->review workflow tells the orchestrator to create_agent a 'planner-<task>' with a CUSTOM system prompt and no template (tools Read/Glob/Grep/Write/Bash), writing its plan into specs/. Good evidence that create_agent works both with and without a template."
+  },
+  "workflow_commands": {
+    "note": "Slash-command 'orchestration prompts' the O-agent runs — the ADW shape (plan/build/review + report) encoded as reusable prompts in apps/orchestrator_3_stream/.claude/commands/. All use a prompt-driven sleep+check monitoring loop.",
+    "orch_one_shot_agent": "Full CRUD lifecycle for a throwaway agent: create_agent -> command_agent -> sleep + check_agent_status loop -> interrupt_agent + delete_agent.",
+    "orch_scout_and_build": "2-phase: create a scout (scout-report-suggest-fast template) + a builder (build-agent template); scout analyzes and produces a report, builder implements; SLEEP_INTERVAL: 15 seconds; agents are NOT auto-deleted. The 'gray pills' demo.",
+    "orch_plan_w_scouts_build_review": "The 3-phase ADW the lesson climaxes on. Setup: create a custom planner (no template), a builder (build-agent), a reviewer (review-agent) up front. Phase 1 Plan -> Phase 2 Build -> Phase 3 Review, each: command_agent, then Bash(sleep 15) + check_agent_status until a 'response' event_category is followed by a 'hook' 'Stop' event_type, then read the produced artifact and report. Commands each agent with the ultrathink keyword. Ends with a 12-step progress narration + final report; agents left alive for inspection.",
+    "t_metaprompt_workflow": "'MetaPrompt' — builds a NEW slash command from a high-level prompt (parallel Task + WebFetch doc gathering).",
+    "completion_signal": "The universal 'is it done?' signal used across all orch workflows: an agent_logs entry from check_agent_status with a 'response' event_category immediately followed by a 'hook' with a 'Stop' event_type."
+  },
+  "piter_outloop": {
+    "what_it_is": "PITER = the out-loop system framework Dan overlays on this app: Prompt input -> Trigger (HTTP) -> Environment -> Review (observability). It operationalizes tactic four (stay out the loop). NOTE: the auto-generated transcript renders 'PITER' as 'Peter'; the loot-box notes spell it out.",
+    "prompt_input": "Your Cmd+K message to the orchestrator (POST /send_chat).",
+    "trigger": "The HTTP request arriving at the FastAPI server, which fires the work as a background task (asyncio.create_task).",
+    "environment": "The working directory (cwd / setting_sources) the orchestrator and every spawned agent operate in — here, the app's own codebase, running locally.",
+    "review": "Observability — the WebSocket event stream + agent_logs/system_logs/orchestrator_chat persistence + AI summaries + consumed/produced diffs. You review results outside the loop, hopping in only when needed.",
+    "repo_caveat": "'PITER' is a lesson concept, not a string in the codebase; it maps cleanly onto the real mechanics (send_chat -> FastAPI+asyncio -> cwd -> WebSocket/DB observability)."
+  },
+  "step_by_step_demo": [
+    "(0:07-3:40) Thesis: agentic engineering builds the system that builds the system. You've scaled better -> more -> custom agents, but you hit the wall of the single-terminal interface. 'The rate at which you can create and command your agents becomes the constraint of your engineering output.' The scale framework (Base/Better/More/Custom) needs one more rung: orchestration.",
+    "(3:40-4:56) Introduce the Orchestrator Agent (O-agent), the single interface pattern applied to a fleet, and the three pillars: Orchestrator + CRUD-for-agents + Observability. Open the custom web app (MULTI-AGENT ORCHESTRATION, 127.0.0.1:5175); Cmd+K reveals the prompt input with capability metadata; a simple 'ping' gets a quick orchestrator response.",
+    "(4:56-8:40) Command: 'create three agents to summarize the codebase and build an app-structure summary (markdown + mermaid).' The orchestrator crafts three agents (2 fast Haiku front/back-end + 1 primary Sonnet QA) and prompts them = 6 tool calls (3x create_agent + 3x command_agent). The differentiated observability DX: name, status, context window, response/tool/hook/reasoning, model, cost; filter by response/tool/thinking/hook and per-agent. 'With a single prompt, I've deployed three times the compute an engineer in a terminal has.'",
+    "(8:40-11:55) The primary QA agent finishes; view its consumed vs produced assets, inline diff, and one-click into the editor. Read the produced full-stack-architecture-summary.md (mermaid): Axios/HTTP + WebSocket -> FastAPI main.py -> Orchestrator Service (Claude SDK) -> Orchestrator Agent (Sonnet 4.5) -> Management Tools MCP Server / Agent Manager (8 tools); Postgres data layer. 'We are using the system to build the system.' Frame it as a PITER out-loop system (tactic four).",
+    "(11:55-19:20) Scale + manage: 'list agents and check status' -> orchestrator runs check_agent_status / tail (it does NOT read all logs — protect its context). 'command all agents… enable thinking' -> agents show the ultrathink brain icon. Then the CRUD payoff: 'Command K, delete all agents' -> 3x delete_agent. 'Treat your agents as deletable temporary resources… one agent, one prompt, one purpose' (tactic six) and R&D framework (reduce + delegate).",
+    "(19:20-27:05) Ecosystem interop: create an agent and command it to run /question ('can the orchestrator and agents use skills?' -> Yes); run /prime on a primary agent (a user-activated memory command). 'Interoperable with the entire Claude Code ecosystem.' Then agent templates: create an agent from the scout-report-suggest-fast template ('agents/scout fast' in .claude/agents) — pulling a sub-agent UP to a primary agent by overwriting the system prompt + custom tools.",
+    "(27:05-37:05) Templating your engineering (defensibility): the scout agent produces a concrete report in your dedicated structure. 'Every agent should produce some concrete result.' Deploy a small team: /orch_scout_and_build creates a scout + a builder for a 'simple gray pills' UI change; the orchestrator sleeps and runs check_agent_status (~15s) as glue while the scout and builder work.",
+    "(37:05-48:40) Full ADW: /orch_plan_w_scouts_build_review for a responsive-UI change (collapse agent list + small chat mode under 650px). All three agents created up front — a custom planner, a build-agent builder, a review-agent reviewer. Plan (planner produces specs/responsive-ui-plan.md, ~21K tokens) -> Build -> Review, with the orchestrator as glue and a final report. 'This is agents at scale.' Prioritize agentics (tactic eight): >50% of your time in the agentic layer.",
+    "(48:40-56:08) Operating in the gray: honest trade-offs (upfront cost, maintaining orchestrator + DB + WebSockets), what's missing (human-in-the-loop decision points, multi-codebase support, forking agent context windows, prompt autocomplete, and the big one — plugging into deterministic AI Developer Workflows), and the future direction. Recap: orchestrator -> CRUD -> observability, results-oriented, focused deletable agents. 'The orchestrator agent is the first pattern where I felt the perfect combination of observability, customizability, and agents at scale… if you see big AI labs picking this concept up, remember where you saw this first.' Codebase link in the loot box."
+  ],
+  "quotes": [
+    { "text": "There is one mode of engineering that matters above all now, agentic engineering. Here, we don't focus on the application layer, we focus on the agentic layer. We build the system that builds the system.", "approx_timestamp": "0:38" },
+    { "text": "You can't scale by hopping into one terminal at a time, writing one prompt at a time.", "approx_timestamp": "1:30" },
+    { "text": "In the generative AI age, the rate at which you can create and command your agents becomes the constraint of your engineering output. When your agents are slow, you're slow. When your agents have a problem, you have a problem.", "approx_timestamp": "2:15" },
+    { "text": "It's not about what you can do anymore, it's about where you can teach your agents to do for you.", "approx_timestamp": "3:01" },
+    { "text": "The one agent [to] rule them all. The Orchestrator Agent. This is the single interface pattern applied to your fleet of agents.", "approx_timestamp": "3:40" },
+    { "text": "We're combining three pillars. The Orchestrator Agent, your unified interface to your agents... unlocks CRUD for your agents. This gives you agents at scale. And lastly, we're combining observability for real-time monitoring of your agents' performance, costs, and, as you'll see, results.", "approx_timestamp": "4:01" },
+    { "text": "If you can't measure it, you can't improve it. And if you can't measure it, you can't scale it. If you have 10 agents doing the wrong thing, does it matter that you have 10? Of course not.", "approx_timestamp": "6:15" },
+    { "text": "The orchestrator is an advanced agentic coding concept. It comes last after custom agents.", "approx_timestamp": "6:40" },
+    { "text": "We're managing the core four of every single agent we spin up. If you do not adopt your agent's perspective, if you do not know what they can do, you do not know what you can do.", "approx_timestamp": "8:42" },
+    { "text": "The working directory is the multi-agent orchestration system. We are using the system to build the system, quite literally.", "approx_timestamp": "10:17" },
+    { "text": "This system is in fact an out-loop [PITER] system. We are observing work from our agents outside the loop... Remember tactic four, stay out the loop.", "approx_timestamp": "11:28" },
+    { "text": "You must treat your agents as deletable temporary resources that serve a single purpose... the best code is no code at all. You learn to delete.", "approx_timestamp": "18:57" },
+    { "text": "You want your agents to be just like you, a focused engineer working on a single task at a time. Let your agents focus.", "approx_timestamp": "19:46" },
+    { "text": "200K context window is plenty. You're just stuffing a single agent with too much work, just like your boss did to you at your last job.", "approx_timestamp": "20:35" },
+    { "text": "The orchestrator agent is a custom agent. Its system prompt is completely overwritten. Its tools are specialized. It's designed to manage other agents.", "approx_timestamp": "21:28" },
+    { "text": "Base, better, more, custom, orchestrator. This is agentic engineering scaled to the next level.", "approx_timestamp": "22:08" },
+    { "text": "It is interoperable with the entire Claude Code ecosystem... Cloud code and the agent SDK and the ecosystem is far ahead of the pack.", "approx_timestamp": "22:22" },
+    { "text": "Every agent should produce some concrete result. Otherwise, what was the point in the first place?", "approx_timestamp": "28:37" },
+    { "text": "If it's just one, two, three, four prompts away with zero effort... how defensible is your work really?", "approx_timestamp": "32:12" },
+    { "text": "Once you build a custom agent, you can then write prompts, specialized for that custom agent.", "approx_timestamp": "40:30" },
+    { "text": "The orchestrator is now a part of connecting the workflow. It's glue for the workflow. I think this is vastly superior to agent hand-offs. It's more superior to blind sub-agents.", "approx_timestamp": "44:40" },
+    { "text": "The multi-agent orchestration, your O-agent, it is a part of your agentic layer. In fact, it is the key to unlocking how to best organize, create, and use your agentic layer.", "approx_timestamp": "40:05" },
+    { "text": "More than 50% of your time, as a rough guideline, should be spent investing into your agentic layer, into the system that builds the system.", "approx_timestamp": "48:40" },
+    { "text": "Engineering happens in the gray. It happens in the messiness of it all.", "approx_timestamp": "51:30" },
+    { "text": "The orchestrator agent is the first pattern where I felt the perfect combination of observability, customizability, and agents at scale.", "approx_timestamp": "54:39" },
+    { "text": "If you see big AI labs picking this concept up, remember where you saw this first.", "approx_timestamp": "55:35" }
+  ],
+  "prerequisites_tools": [
+    "A terminal + an IDE (Dan uses VS Code; /api/open-file uses the 'code' command by default)",
+    "Python + Astral UV (the repo mandates 'uv only, never raw python'); every backend command is `uv run`",
+    "Node.js + Bun (Bun for the Vue frontend install; frontend runs on Vite)",
+    "Claude Code + the Claude Agent SDK (`claude-agent-sdk`) with a Claude plan or ANTHROPIC_API_KEY (funds for millions of tokens — orchestration fans out compute)",
+    "A PostgreSQL database: a Neon serverless Postgres (recommended) OR a local/Docker Postgres; `psql` on PATH to run migrations",
+    "Optional MCP servers via .mcp.json (playwright, neon, firecrawl) for the meta-agent / docs-scraper / playwright-validator templates",
+    "Strongly recommended prior lessons: TAC 1-8 (esp. tactic 4 out-loop, tactic 6 let-your-agents-focus, tactic 8 prioritize-agentics, and ADWs); AH-1 (R&D framework / context window mastery), AH-2 (agentic prompt formats), AH-3 (building custom agents) — orchestration is explicitly the rung after custom agents"
+  ],
+  "what_student_must_internalize": [
+    "The scale framework is fixed: Base -> Better -> More -> Custom -> Orchestrated. You arrive at orchestration by pushing compute past the single-terminal interface, and it comes AFTER custom agents (you can only orchestrate what you can build and measure).",
+    "Multi-agent orchestration = three pillars together: an Orchestrator Agent (single interface) + CRUD-for-agents (create/command/check/delete) + Observability (performance, cost, and results in real time). One without the others fails.",
+    "The Orchestrator is a custom agent with an overwritten system prompt and 8 specialized tools; it orchestrates and must NOT do the work itself — protect its context window by reducing + delegating (R&D).",
+    "Observability is a pillar, not a dashboard: if you can't measure it, you can't improve or scale it; 10 agents doing the wrong thing is worse than 1.",
+    "Command PRIMARY agents, not blind sub-agents: they persist, remember (resume=session_id), are re-promptable, produce concrete results, and can themselves run slash commands/skills/sub-agents. You build one by pulling a sub-agent template up a level (overwrite prompt + custom tools).",
+    "Every agent produces a concrete artifact (plan/report/diff/doc) that outlives the agent — which is what makes out-loop review possible.",
+    "One agent, one prompt, one purpose (tactic 6): keep each context window focused, then delete the agent. A 200K window is plenty; overloading one agent, not window size, is the problem.",
+    "Stay out the loop (tactic 4) via the PITER system (Prompt input -> Trigger/HTTP -> Environment -> Review/observability); move fluidly in and out of the loop.",
+    "Template your engineering into your agents/prompts/skills — that embedded specialization is your defensibility; out-of-the-box tools are built for everyone's codebase, not yours.",
+    "The orchestrator is interoperable with the whole Claude Code ecosystem (slash commands, skills, agent templates, hooks) because it's built on the Claude Agent SDK — reuse everything you already have.",
+    "The ~15s 'sleep-check' monitoring is prompt-driven behavior (Bash sleep + check_agent_status in the workflow command), not hidden machinery — the orchestrator is glue for the workflow.",
+    "The O-agent is part of AND the key to your agentic layer, usable BEFORE you have one; prioritize agentics (tactic 8): >50% of your time on the system that builds the system.",
+    "This is honest, not utopian: real upfront cost, real plumbing to maintain, and it works in AND out of the loop. Engineering happens in the gray."
+  ],
+  "common_weak_student_failures": [
+    "Hearing 'orchestration' and just opening more terminals/tabs — scaling agent COUNT without an interface or observability, then losing control of results ('10 agents doing the wrong thing').",
+    "Letting the orchestrator do the actual engineering work (or read every agent log), blowing up its context window — instead of keeping it a thin conductor that reduces + delegates.",
+    "Dismissing the whole thing as 'just sub-agents,' missing that primary agents persist, are re-promptable, produce inspectable results, and can run slash commands/skills/sub-agents themselves.",
+    "Treating observability as optional eye-candy rather than the pillar that makes scale controllable and debugging ('which agent messed up?') possible.",
+    "Never deleting agents — hoarding stale, context-polluted agents instead of 'one agent, one prompt, one purpose' then delete (the produced artifacts persist; the agent is disposable).",
+    "Assuming the ~15s monitoring loop is hidden Python — and being unable to change it — instead of reading the workflow command where Bash(sleep 15) + check_agent_status live.",
+    "Copying Dan's exact UI as 'the product' and stalling when theirs differs — instead of taking the pattern (single interface + CRUD + observability) into any tool, even a plain terminal.",
+    "Building the orchestrator app but templating none of THEIR engineering into it (no specialized prompts/tools/agents) — shipping an undifferentiated tool with no moat.",
+    "Confusing the PITER concept and the on-screen models with the repo: expecting a 'PITER'/'Peter' string in code, or trusting the orchestrator system prompt's stale haiku id (claude-3-5-haiku-20241022) over the code's claude-haiku-4-5-20251001.",
+    "Believing they need a full agentic layer (ADWs, triggers) before this pays off — missing that the O-agent is the intermediate step you use WHILE building the layer, and that ADW integration is explicitly still missing/future."
+  ],
+  "teach_back_prompt": "Without notes, teach a colleague: (1) where the Orchestrator Agent sits on the scale framework (Base->Better->More->Custom->Orchestrated) and why it necessarily comes AFTER custom agents; (2) the three pillars of multi-agent orchestration and what breaks if you drop each one; (3) using the 8 management tools, map them to CRUD and explain why the orchestrator commands PRIMARY agents rather than blind sub-agents; (4) how the system stays out of the loop (PITER: Prompt input -> Trigger -> Environment -> Review) while still giving you control, and how 'one agent, one prompt, one purpose' + R&D keep every context window (including the orchestrator's) healthy; and (5) why the ~15s sleep-check loop is prompt-driven glue rather than hidden machinery. Finish with Dan's honest trade-off: what does this cost to build and maintain, and why is it still 'a very clear yes' to invest in an out-loop agentic system?",
+  "retrieval_questions": [
+    { "q": "What is the full agent-scale framework, and where does the orchestrator sit?", "a": "Base -> Better -> More -> Custom -> Orchestrated. The orchestrator is the last/highest rung; it comes after custom agents because you can only orchestrate agents you can build and measure." },
+    { "q": "What are the three pillars of multi-agent orchestration?", "a": "The Orchestrator Agent (unified single interface), CRUD-for-agents (create/command/check/delete = agents at scale), and Observability (real-time monitoring of performance, cost, and results)." },
+    { "q": "Why is observability called 'key'?", "a": "'If you can't measure it, you can't improve it; if you can't measure it, you can't scale it.' Ten agents doing the wrong thing is worse than one — you need to see and filter everything to keep control at scale." },
+    { "q": "What kind of agent is the orchestrator, and what does it NOT do?", "a": "A custom agent with a fully overwritten system prompt ('a meta-agent that manages other Agents') and 8 specialized tools. It orchestrates only — it does not do the engineering work, so its context window stays minimal." },
+    { "q": "Name the 8 orchestrator (management) tools and their CRUD roles.", "a": "create_agent (C), list_agents / check_agent_status / read_system_logs / report_cost (R), command_agent (create-a-task / U), delete_agent + interrupt_agent (D)." },
+    { "q": "Why command PRIMARY agents instead of sub-agents?", "a": "Primary agents persist with their own session/memory (resume=), are re-promptable until the job is done, produce inspectable results, and can run slash commands/skills/their own sub-agents. Sub-agents are ephemeral, narrow, and their context is blown away. You make a primary by pulling a sub-agent template up a level (overwrite prompt + custom tools)." },
+    { "q": "What does PITER stand for and which tactic is it?", "a": "Prompt input -> Trigger (HTTP) -> Environment -> Review (observability). It's tactic four: stay out the loop. (The auto-transcript renders it 'Peter'; it isn't a string in the repo.)" },
+    { "q": "State 'one agent, one prompt, one purpose' and its context claim.", "a": "Tactic six: focus each agent on a single task with a protected context window, then delete it. A 200K window is plenty — overloading one agent (not window size) causes context rot." },
+    { "q": "How does the ~15-second monitoring loop actually work?", "a": "It's prompt-driven: the workflow command sets SLEEP_INTERVAL: 15 seconds and tells the orchestrator to run Bash(sleep 15) + check_agent_status until a 'response' event_category is followed by a 'hook' 'Stop' event_type. Not hidden Python." },
+    { "q": "What is the R&D framework's role for the orchestrator?", "a": "Reduce the orchestrator's own context and Delegate work to specialized agents with focused windows — which is why the orchestrator's context stays tiny even after conducting lots of work." },
+    { "q": "What must every agent produce, and why?", "a": "A concrete, inspectable artifact (plan, scout report, diff, doc) that can be handed off and reviewed — and that outlives the deleted agent. 'Otherwise, what was the point?'" },
+    { "q": "Which models run which agents in this codebase?", "a": "Sonnet (claude-sonnet-4-5-20250929) for the orchestrator and primary/build/review agents; Haiku (claude-haiku-4-5-20251001) for fast scouts, docs-scraper, and AI summaries; Opus for the meta-agent template. On-screen badges: SONNET-4.5 / HAIKU-4.5." },
+    { "q": "How is the orchestrator 'interoperable with the Claude Code ecosystem'?", "a": "Built on the Claude Agent SDK, it and its agents can use slash commands (/question, /prime), skills, agent templates (.claude/agents), and hooks — and the orchestrator can command an agent to run a slash command." },
+    { "q": "What is the honest trade-off Dan names?", "a": "It costs real upfront investment and ongoing maintenance (orchestrator, Postgres, WebSocket plumbing) — 'another piece of your agentic layer you'll have to maintain.' Still 'a very clear yes' because an out-loop agentic system is ultra key. And ADW/deterministic-code integration is still missing (future)." }
+  ],
+  "codebase_map": {
+    "repo": "agentic-horizon/multi-agent-orchestration (symlinked as the lesson 'codebase'). Two apps: apps/orchestrator_3_stream (the app in the video: 3='stream') and apps/orchestrator_db (shared schema/migrations). Two .claude layers: repo-root (full power-user setup) and apps/orchestrator_3_stream/.claude (the fleet's operational toolkit).",
+    "run_commands": {
+      "database": "uv run apps/orchestrator_db/run_migrations.py  (needs psql + DATABASE_URL; applies 6 tables, migrations 0->8)",
+      "backend": "cd apps/orchestrator_3_stream && ./start_be.sh  (uv run python backend/main.py --cwd <dir> [--session <id>]; http://127.0.0.1:9403)",
+      "frontend": "bun install && ./start_fe.sh  (vite; http://127.0.0.1:5175)",
+      "env": "cp .env.sample .env (set ANTHROPIC_API_KEY + DATABASE_URL); copy the root .env into apps/orchestrator_3_stream/.env and apps/orchestrator_db/.env"
+    },
+    "root_files": {
+      "README.md": "Product/setup/run doc: 'A production-ready web-based orchestration system for managing and coordinating multiple Claude Code agents at scale with real-time streaming, PostgreSQL persistence, and comprehensive observability.' Documents the 8 management tools + a mermaid architecture diagram + Neon/Docker/local DB setup.",
+      "CLAUDE.md": "Engineering rules: no mocked tests (real DB + real Claude Agent SDK, ephemeral), keep apps/orchestrator_db/models.py in sync with migrations, python-dotenv, UV never raw python, full-width rich panels, don't commit unless asked, prefer pydantic over dict.",
+      ".env.sample": "Canonical env: ANTHROPIC_API_KEY, DATABASE_URL (Neon / Docker / local examples), plus optional ORCHESTRATOR_MODEL, DEFAULT_AGENT_MODEL, FAST_MODEL, ports (BE 9403 / FE 5175), CORS, IDE_COMMAND, MAX_AGENT_TURNS.",
+      ".mcp.json.sample": "Three MCP servers backing the templates: playwright, neon (Postgres), firecrawl-mcp. Rename to .mcp.json to activate.",
+      "playwright-mcp-config.json": "Headless chromium + video/viewport config for the playwright-validator template.",
+      "ai_docs/README.md": "Index of ~28 Anthropic/Claude Code doc URLs the agents load as context (SDK python/typescript, headless, MCP, sub-agents, hooks, custom-tools, cost-tracking, SDK migration-guide, skills, uv). Only the README index is committed; scraped markdown is generated.",
+      "ARCHITECTURE.md / DETAILED_STREAMING_IMPLEMENTATION_ANALYSIS.md / ARCHITECTURE_DOCUMENTATION.html": "Long generated design docs (system overview, WebSocket architecture, log flow, schema, streaming/summarization analysis). Reference, not source of truth.",
+      "asset/": "ChatTTS model weights (.safetensors) for the optional TTS hook — tangential to the O-agent lesson."
+    },
+    "agentic_layer": {
+      ".claude/agents/*.md (root: 6; app: 7 incl review-agent)": "Reusable sub-agent templates (name/description/tools/model/color frontmatter): scout-report-suggest-fast (haiku), scout-report-suggest (sonnet), build-agent (sonnet), review-agent (sonnet), meta-agent (opus), docs-scraper (haiku), playwright-validator (sonnet). Resolved by create_agent(subagent_template=...).",
+      ".claude/commands/*.md (18)": "Slash-command reusable prompts. Generic: question, prime, prime_3, prime_cc, scout, plan/plan_w_docs/plan_w_scouters/quick-plan, build/build_in_parallel, background, parallel_subagents, find_and_summarize, load_ai_docs, load_bundle, all_tools. Orchestration ADWs (inner app): orch_one_shot_agent, orch_scout_and_build, orch_plan_w_scouts_build_review, t_metaprompt_workflow.",
+      ".claude/skills/": "meta-agent skill (root; generates sub-agents) and meta-prompt skill (inner app; generates slash commands — 'DO NOT use disable-model-invocation — we want agents to be able to trigger commands'). Confirms 'orchestrator and agents can use skills.'",
+      ".claude/hooks/*.py (root)": "Outer Claude-Code lifecycle hooks (uv PEP-723 scripts wired in settings.json): pre_tool_use.py (active dangerous-command blocker; .env blocker present but commented out), post_tool_use, notification, stop, subagent_stop, user_prompt_submit (writes .claude/data/sessions/<id>.json), send_event.py (universal observability forwarder to localhost:4000). session_start.py + pre_compact.py exist but are NOT wired. utils/llm (anth/oai/ollama) + utils/tts (7 engines) + summarizer.",
+      ".claude/output-styles/*.md (11)": "bullet-points, genui, html-structured, markdown-focused, table-based, ultra-concise, yaml-structured, and the observability payloads observable-tools-diffs (+ -tts), tts-summary (+ -base). (elevenlabs paths in the tts styles are reference-repo residue.)",
+      ".claude/status_lines/status_line_main.py": "Renders [agent_name] | [model] | last-prompt from .claude/data/sessions; git info coded but OFF; does NOT show cost/context/tokens.",
+      ".claude/settings.json": "Only statusLine + hooks keys (no outputStyle/permissions/env); wires the 7 lifecycle events to local handler + send_event.py."
+    },
+    "backend": {
+      "apps/orchestrator_3_stream/backend/main.py": "FastAPI app (port 9403): /health, /get_orchestrator, /get_headers, /api/open-file (one-click into IDE), /load_chat, /send_chat (fire-and-forget streaming), /get_events, /list_agents, WS /ws. discover_slash_commands() scans .claude/commands/.",
+      "backend/pyproject.toml": "Depends on claude-agent-sdk (requires-python >=3.12). No version pin / uv.lock committed.",
+      "backend/prompts/orchestrator_agent_system_prompt.md": "The O-agent's fully-overwritten system prompt (168 lines): 'You are the Orchestrator Agent - a meta-agent that manages other Agents'; documents the 8 tools, the ultrathink thinking trigger, COMMAND_LEVEL_COMPACT_PERCENTAGE 80% (command_agent(agent, '/compact')), a Workflow Pattern (Analyze->Plan->Create->Dispatch->Monitor->Report), and 'don't be overeager to check status.' Injects {{SUBAGENT_MAP}}.",
+      "backend/prompts/event_summarizer_*.md": "System + user prompts for the Haiku AI event summarizer.",
+      "backend/modules/orchestrator_service.py": "class OrchestratorService (~1009 lines): builds ClaudeAgentOptions (core four + mgmt MCP server + orchestrator hooks + setting_sources=['project']), runs the ClaudeSDKClient receive loop, captures SystemMessage metadata, streams TextBlock to chat, persists thinking/tool blocks + costs. get_orchestrator_tools() returns the 8 signatures.",
+      "backend/modules/agent_manager.py": "class AgentManager (~1397 lines): the 8 @tool management tools via create_sdk_mcp_server('mgmt'); create_agent (template resolution + spawn ClaudeAgentOptions with disallowed_tools=['NotebookEdit','ExitPlanMode'], permission_mode='acceptEdits'); command_agent (resume=session_id, max_turns=500); _process_agent_messages persists every block to agent_logs + broadcasts.",
+      "backend/modules/subagent_loader.py": "SubagentRegistry scans <cwd>/.claude/agents/*.md; parse_subagent_file() splits YAML frontmatter (name/description/tools/model/color) from the markdown body.",
+      "backend/modules/subagent_models.py": "Pydantic SubagentFrontmatter / SubagentTemplate.",
+      "backend/modules/command_agent_hooks.py": "6 subagent hooks (PreToolUse, PostToolUse, UserPromptSubmit, Stop, SubagentStop, PreCompact) + file-tracking hook -> agent_logs + WebSocket + AI summary (ACTIVE).",
+      "backend/modules/orchestrator_hooks.py": "Orchestrator's own pre/post-tool + stop hooks -> orchestrator_chat + WebSocket (ACTIVE).",
+      "backend/modules/hooks.py": "LEGACY/orphan hook module (556 lines) — no importers; the two active hook modules above supersede it.",
+      "backend/modules/database.py": "asyncpg pool + ~40 async CRUD functions over the 6 tables.",
+      "backend/modules/websocket_manager.py": "Singleton WebSocketManager; broadcasts ~14 event types (agent_log, agent_created/updated/deleted, agent_status_changed, agent_summary_update, orchestrator_chat, thinking_block, tool_use_block, orchestrator_updated, chat_stream, chat_typing, connection_established, error).",
+      "backend/modules/single_agent_prompt.py": "Stateless Haiku query() summarizer (FAST_MODEL) that produces one-sentence AI summaries per event.",
+      "backend/modules/file_tracker.py": "FileTracker; FILE_MODIFYING_TOOLS=[Write,Edit,MultiEdit,Bash], FILE_READING_TOOLS=[Read]; drives the Consumed-vs-Produced ledger.",
+      "backend/modules/config.py": "Env/config. DEFAULT_MODEL=claude-sonnet-4-5-20250929, FAST_MODEL=claude-haiku-4-5-20251001, AVAILABLE_MODELS=[both]. PROJECT_ROOT resolves so the backend loads apps/orchestrator_3_stream/.env (NOT repo root).",
+      "backend/modules/{slash_command_parser,logger,orch_database_models,event_summarizer}.py": "Slash-command discovery; hourly-rotating Rich logger; app-local Pydantic DB models; back-compat summarizer re-export.",
+      "backend/tests/": "Non-mock tests against real DB + WebSocket (test_database, test_websocket_raw, test_agent_events, test_display)."
+    },
+    "frontend": {
+      "apps/orchestrator_3_stream/frontend/package.json": "Vue ^3.4, Pinia ^2.1.7, Vite ^5, axios, marked, dompurify, highlight.js; TypeScript. Scripts dev/build(vue-tsc && vite build)/preview. No router, no test runner.",
+      "src/App.vue": "Three-column layout: AgentList (280px) | EventStream (1fr) | OrchestratorChat (toggleable width) + AppHeader + GlobalCommandInput.",
+      "src/stores/orchestratorStore.ts": "Pinia store useOrchestratorStore (id 'orchestrator', setup-style): agents[], orchestratorAgent, eventStreamEntries[], eventStreamFilter, fileTrackingEvents (Map), chatMessages[], isTyping, commandInputVisible, chatWidth, isConnected; getters activeAgents/runningAgents/idleAgents, filteredEventStream, stats{active,running,logs,cost}; initialize() wires info->WS->agents->chat->events.",
+      "src/services/{api,agentService,chatService,eventService,fileService}.ts": "axios apiClient (http://127.0.0.1:9403); loadAgents(GET /list_agents); getOrchestratorInfo(GET /get_orchestrator), loadChatHistory(POST /load_chat), sendMessage(POST /send_chat), connectWebSocket(ws://127.0.0.1:9403/ws); getEvents(GET /get_events); openFileInIDE(POST /api/open-file).",
+      "src/components/AppHeader.vue": "Connection dot + stat pills (Active / Running / Logs / Cost $) + PROMPT (Cmd+K).",
+      "src/components/AgentList.vue": "Per-agent cards: name, status badge, template badge, task, Context-Window bar (tokens/200k), tool/hook/response/thinking counters, model badge, cost, pulse animation.",
+      "src/components/GlobalCommandInput.vue": "The Command-K palette: textarea + system-info panel (orchestrator session ID, CWD, click-to-append badges for agents / slash commands / agent templates / orchestrator tools) fetched from GET /get_orchestrator.",
+      "src/components/OrchestratorChat.vue": "Chat with Cost + Context (usedk/200k) header (color states at >=50/70/90%); routes text/thinking(->ThinkingBubble)/tool_use(->ToolUseBubble).",
+      "src/components/EventStream.vue + FilterControls.vue": "Filterable log stream (category buttons, per-agent chips, regex search, Auto-Follow).",
+      "src/components/event-rows/FileChangesDisplay.vue": "Consumed (Read) vs Produced (modified) two-column panel, +N/-N line stats, inline diff viewer (Show Diff), click-to-open-in-IDE, export JSON.",
+      "src/composables/": "useKeyboardShortcuts (Cmd+K toggles the palette), useHeaderBar (cost/CWD/stats/export), useEventStreamFilter (regex + category/agent filters), useAgentPulse, useAgentColors.",
+      "src/{types.d.ts,utils/markdown.ts,styles/global.css,config/constants.ts}": "TS types mirroring DB models; marked + DOMPurify + highlight.js renderer; dark cyan/teal theme; DEFAULT_*_HISTORY_LIMIT=300."
+    },
+    "data_layer": {
+      "apps/orchestrator_db/migrations/*.sql (0->8)": "0_orchestrator_agents, 1_agents (FK CASCADE to orchestrator; UNIQUE(orchestrator_agent_id,name)), 2_prompts, 3_agent_logs (event_category hook|response), 4_system_logs, 8_orchestrator_chat (sender/receiver user|orchestrator|agent), 5_indexes, 6_functions, 7_triggers (updated_at auto-touch).",
+      "apps/orchestrator_db/{models.py,sync_models.py,run_migrations.py}": "Canonical Pydantic DB models; sync into apps; uv-script migration runner (psql, idempotent CREATE IF NOT EXISTS).",
+      "engine": "PostgreSQL via asyncpg pool — Neon serverless (recommended) or local/Docker Postgres."
+    },
+    "generated_at_runtime": {
+      "the database (Neon/Postgres)": "All orchestrator/agent/log/chat rows — external, not a committed file.",
+      "apps/orchestrator_3_stream/specs/*.md + app_docs/*.md": "Plans (e.g. responsive-ui-plan.md) and summaries (backend-structure-summary.md, full-stack-architecture-summary.md, header-pills-scout-report.md) written BY the agents during runs.",
+      ".claude/data/** + logs/ + .env": "Session JSONs, model cache, hourly-rotating logs, secrets — gitignored runtime artifacts."
+    }
+  },
+  "current_practice_gaps": [
+    {
+      "gap": "The lesson's OWN named gap: no deterministic AI Developer Workflows (ADWs) yet",
+      "why": "Dan states the biggest missing piece explicitly: 'How does this plug into deterministic code?... We're missing our AI developer workflows. This is the big missing piece... something we will be building in upcoming Agentic Horizon lessons.' The O-agent is very agentic (autonomy knob turned up); wiring it to deterministic ADWs/triggers is the acknowledged next step. Treat the ADW integration as forward-looking, not shipped.",
+      "yt_candidates": ["fop_yxV-mPo"]
+    },
+    {
+      "gap": "Orchestrator system prompt lists a STALE haiku model id (internal inconsistency)",
+      "why": "backend/prompts/orchestrator_agent_system_prompt.md documents `haiku`/`fast` -> claude-3-5-haiku-20241022, but config.py/agent_manager.py actually resolve those aliases to claude-haiku-4-5-20251001. The doc string is out of sync with the code. Trust the code (Haiku 4.5) and the on-screen SONNET-4.5/HAIKU-4.5 badges; treat any pinned id as period detail and teach the model-selection PRINCIPLE (fast/Haiku for scouts+summaries, Sonnet for primary work, Opus for the meta-agent).",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Stale docs/ports in the repo (README + inner CLAUDE.md)",
+      "why": "apps/orchestrator_3_stream/README.md's example ORCHESTRATOR_MODEL=claude-sonnet-4-20250514 is stale vs the real default claude-sonnet-4-5-20250929; the inner apps/orchestrator_3_stream/CLAUDE.md still says backend 'port 8002' while README + .env + start_be.sh + the frontend all use 9403 (frontend 5175 is consistent). Inner CLAUDE.md also references files that no longer exist (src/data/testData.ts, ThinkingBlockRow). Use the code/scripts as source of truth in any lab.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "This is a private, bespoke system — not an out-of-the-box product",
+      "why": "Dan is emphatic: 'I'm not here to tell you... that you need to use this... I don't care what user interface you use.' The teaching payload is the PATTERN (single interface + CRUD + observability + out-loop), not this exact Vue/FastAPI/Postgres app. Big labs are building primitive versions (one-agent-at-a-time cloud tools); the durable lesson is the paradigm. Frame the codebase as a reference implementation to learn from, not a dependency.",
+      "yt_candidates": ["fop_yxV-mPo"]
+    },
+    {
+      "gap": "Model/UI drift and the Claude Agent SDK will keep moving",
+      "why": "Unlike AH-3, this repo already uses the current SDK name (claude-agent-sdk / ClaudeAgentOptions) and current model families (Sonnet 4.5 / Haiku 4.5), and Dan says 'Claude Agent SDK' on camera — so the SDK-rename correction is NOT needed here. But SDK message/block shapes, model ids, and Claude Code ecosystem features (skills, hooks, subagents) keep evolving; teach the durable primitive (set the core four, manage the response stream, orchestrate primary agents) and re-check specifics against the current SDK reference.",
+      "yt_candidates": ["6fCqj4xFCZI"]
+    },
+    {
+      "gap": "Missing features Dan names as future directions",
+      "why": "Human-in-the-loop decision points (agents asking YOU questions); better orchestration-agent management + multiple codebases through one UI (the server currently targets one --cwd); forking an agent's context window / duplicating an agent from a point; and prompt-engineering autocomplete/tab (a cheap fast model in the terminal). All are explicitly 'missing here' and flagged as future work — don't present them as present.",
+      "yt_candidates": []
+    }
+  ],
+  "yt_overlay_candidates": [
+    {
+      "video_id": "fop_yxV-mPo",
+      "title": "Codebase Singularity",
+      "maps_to": "named hole",
+      "include_in_phase1": true,
+      "verify_before_publish": true,
+      "rationale": "Maps directly to THIS lesson's end-state: the O-agent as 'part of, and the key to, your agentic layer' and the self-operating codebase Dan is building toward. In the tac-1 extract this ID was deferred to 'a later chapter' precisely because it front-runs scale; AH-4 IS that scale chapter, so it is now on-topic and non-drifting. ID carried from the tac-1 seed list; not fetched — confirm it resolves and re-check the title before shipping the link."
+    },
+    {
+      "video_id": "6fCqj4xFCZI",
+      "title": "How Claude Code CHANGED Engineering Forever",
+      "maps_to": "named hole",
+      "include_in_phase1": true,
+      "verify_before_publish": true,
+      "rationale": "The lesson's core enabling claim is 'the Claude Agent SDK and the ecosystem is far ahead of the pack... it's the extensibility of this tool' that makes multi-agent orchestration buildable. This public treatment bridges the recording's SDK/ecosystem claims to the current state of the tool. ID carried from the tac-1 seed list; not fetched — verify before publishing."
+    },
+    {
+      "video_id": "X2ciJedw2vU",
+      "title": "RAW Agentic Coding: ZERO to Agent SKILL",
+      "maps_to": "corrects outdated",
+      "include_in_phase1": false,
+      "verify_before_publish": true,
+      "rationale": "The lesson confirms 'orchestrator and agents can use skills,' so an Agent Skills primer maps to a named-in-lesson concept — but Skills are the heart of AH-3/skills lessons, so this belongs there, not front-and-center on the orchestration chapter. Listed for the volume map only (phase1=false)."
+    }
+  ],
+  "frame_plan_note": "See frame-plan.json for the full 11-frame plan with why_for_weak_student and verified_visual notes, plus documented alternates and unframed-beats-by-design. All 11 frames extracted at native 1920x1080 from the lesson MP4 (15fps screen recording) and verified on disk under book/media/frames/ah-4-multi-agent-orchestration-the-o-agent/. Three beats are marked diagram_instead (the Base->Better->More->Custom->Orchestrated scale ladder; the PITER out-loop pipeline; a redrawn three-pillar figure).",
+  "frame_plan": [
+    { "t_seconds": 258, "label": "three-pillars-empty-shell", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t0258-three-pillars-empty-shell.jpg", "why_for_weak_student": "The three pillars (AGENT ORCHESTRATION / OBSERVABILITY / AGENTS AT SCALE) printed on the tool's empty starting state — the whole lesson's scaffold plus the blank canvas the demo fills.", "diagram_instead": false },
+    { "t_seconds": 300, "label": "command-k-capability-palette", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t0300-command-k-capability-palette.jpg", "why_for_weak_student": "The entire capability surface on one screen: the 8 orchestrator tools (with signatures), 7 agent templates, 18 slash commands, and the working directory. HERO reference frame.", "diagram_instead": false },
+    { "t_seconds": 402, "label": "populated-observability-3-agents", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t0402-populated-observability-3-agents.jpg", "why_for_weak_student": "'Three times the compute from one prompt' made concrete: 2 fast Haiku + 1 primary Sonnet agent, each with model/cost/context, filterable by response/tool/thinking/hook.", "diagram_instead": false },
+    { "t_seconds": 528, "label": "the-core-four", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t0528-the-core-four.jpg", "why_for_weak_student": "Dan's CONTEXT/MODEL/PROMPT/TOOLS Venn over the live per-agent core-four stats — 'manage the core four of every agent' made literal.", "diagram_instead": false },
+    { "t_seconds": 636, "label": "architecture-mermaid", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t0636-architecture-mermaid.jpg", "why_for_weak_student": "The clearest 'how does this work' frame: browser (HTTP+WebSocket) -> FastAPI -> Orchestrator Service -> Orchestrator Agent (Sonnet 4.5) -> Management Tools MCP Server / Agent Manager (8 tools). HERO architecture frame; the system documented itself.", "diagram_instead": false },
+    { "t_seconds": 690, "label": "produced-consumed-assets", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t0690-produced-consumed-assets.jpg", "why_for_weak_student": "'Every agent must produce a concrete result': produced .md files with +Added diffs, Show Diff, and read files — the payoff of out-loop review.", "diagram_instead": false },
+    { "t_seconds": 1143, "label": "crud-delete-all-agents", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t1143-crud-delete-all-agents.jpg", "why_for_weak_student": "The 'D' in CRUD: three delete_agent{agent_name} calls + '✅ All agents deleted successfully.' Makes 'treat agents as deletable temporary resources' tangible.", "diagram_instead": false },
+    { "t_seconds": 1445, "label": "ecosystem-interop-slash-commands", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t1445-ecosystem-interop-slash-commands.jpg", "why_for_weak_student": "Proof of ecosystem interop: the orchestrator made a Haiku agent run /question ('agents can use Skills — Yes') with /prime being typed. Everything you already built plugs in.", "diagram_instead": false },
+    { "t_seconds": 2148, "label": "sleep-check-agent-status", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t2148-sleep-check-agent-status.jpg", "why_for_weak_student": "Template-based agents (scout-report-suggest-fast on Haiku + build-agent on Sonnet) plus the check_agent_status sleep-check loop — the orchestrator monitoring as prompt-driven glue.", "diagram_instead": false },
+    { "t_seconds": 2625, "label": "plan-build-review-workflow", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t2625-plan-build-review-workflow.jpg", "why_for_weak_student": "The ADW climax: planner (custom, no template) + builder (build-agent) + reviewer (review-agent), the planner consuming real Vue files and producing specs/responsive-ui-plan.md. HERO workflow frame.", "diagram_instead": false },
+    { "t_seconds": 3215, "label": "reviewer-verify-finale", "file": "media/frames/ah-4-multi-agent-orchestration-the-o-agent/t3215-reviewer-verify-finale.jpg", "why_for_weak_student": "The reviewer agent verifying the vite build (closing the loop) while the orchestrator runs Bash(sleep 20) + check_agent_status — verification + observability + the sleep-check glue in one frame.", "diagram_instead": false }
+  ],
+  "estimated_print_pages_when_expanded": 46,
+  "confidence_notes": [
+    "Quotes cross-checked against the VTT (2602 cues; auto-generated). Anchor timestamps machine-verified via a VTT parser: 3:40 rule-them-all, 4:01 three pillars, 6:15 can't-measure, 8:42 core-four, 10:17 system-builds-system, 11:28 out-loop/tactic-four, 18:57 deletable-resources, 19:46 let-agents-focus, 20:35 200K, 21:28 orchestrator-is-custom, 22:08 base-better-more, 22:22 interoperable, 28:37 concrete-result, 32:12 defensible, 48:40 50%/prioritize-agentics, 54:39 first-pattern, 55:35 saw-this-first, 56:02 loot-box. A few quote timestamps (40:05, 40:30, 44:40, 51:30) are approximate to within ~30s. Transcription artifacts: 'PITER' -> 'Peter'; 'Cloud Code'/'clog code' -> Claude Code; 'O agent'/'OA' = Orchestrator Agent; 'ultrathink' spoken as 'ultra thinking'.",
+    "Video is 1920x1080, 15fps, 3368.5s (56:08) per ffprobe + metadata/validation.json (PASS).",
+    "SDK naming verified directly: backend/pyproject.toml depends on `claude-agent-sdk`; all imports are `claude_agent_sdk` / `ClaudeAgentOptions` / `ClaudeSDKClient`; NO legacy claude_code_sdk anywhere. Unlike AH-3, Dan also SAYS 'Claude Agent SDK' on camera — so no SDK-rename correction is needed for this chapter.",
+    "Model ids read from source: config.py DEFAULT_MODEL=claude-sonnet-4-5-20250929, FAST_MODEL=claude-haiku-4-5-20251001; agent_manager.py alias map sonnet/haiku/fast; meta-agent template=opus. On-screen badges (frames t0402/t0528/t0636/t2625) confirm SONNET-4.5 / HAIKU-4.5. NOTE the internal inconsistency: the orchestrator system prompt still documents haiku->claude-3-5-haiku-20241022 (stale) — code wins.",
+    "The 8 management tools are triple-verified: the palette frame t0300, the orchestrator system prompt (read verbatim), and agent_manager.py's @tool definitions all agree (create_agent, list_agents, command_agent, check_agent_status, delete_agent, interrupt_agent, read_system_logs, report_cost) — and the mermaid frame t0636 labels them 'Agent Manager 8 Management Tools' / 'Management Tools MCP Server'.",
+    "The ~15s sleep-check loop was confirmed to be PROMPT-driven, not Python: orch_scout_and_build.md / orch_plan_w_scouts_build_review.md set SLEEP_INTERVAL: 15 seconds and instruct Bash(sleep) + check_agent_status until a 'response' event_category is followed by a 'hook' 'Stop' event_type. Frame t3215 shows a literal Bash{command:'sleep 20'} + check_agent_status.",
+    "Data layer verified: apps/orchestrator_db/migrations 0->8 define 6 tables (orchestrator_agents, agents FK CASCADE, prompts, agent_logs, system_logs, orchestrator_chat); README + .env.sample document Neon (recommended) / Docker / local Postgres via asyncpg; run_migrations.py uses psql. Ports: backend 9403, frontend 5175 (inner CLAUDE.md's 8002 is stale).",
+    "codebase_map covers both apps (orchestrator_3_stream + orchestrator_db) and both .claude layers (root + inner). Runtime/generated artifacts (the Postgres DB, specs/*.md, app_docs/*.md, .claude/data/**, logs/, .env) are documented separately. modules/hooks.py flagged as legacy/orphan (no importers). Two subagents mapped the codebase (backend/DB/arch + agentic-layer/frontend) and their findings were cross-checked against the frames and my direct reads of the orchestrator system prompt + both CLAUDE.md files.",
+    "The 'planner' is created dynamically (custom system prompt, no template) by the plan->build->review workflow; the committed templates are scout-report-suggest-fast, scout-report-suggest, build-agent, review-agent (inner), meta-agent, docs-scraper, playwright-validator. Frame t2625 shows the planner card with NO template badge, corroborating this.",
+    "YouTube overlay IDs (fop_yxV-mPo, 6fCqj4xFCZI, X2ciJedw2vU) are carried from the tac-1 seed list and were NOT fetched (per brief). Exactly 2 are include_in_phase1=true, within the 1-3 limit; all flagged verify_before_publish — confirm each resolves and re-check titles before shipping links.",
+    "Loot box: metadata course-notes lists 11 notes, incl. the codebase link (git clone https://github.com/disler/multi-agent-orchestration.git), the Agent-SDK docs link, and the PITER framing ('out-loop PITER system: Prompt input, Trigger (HTTP), Environment, and Review'). This corroborates PITER (not the transcript's 'Peter') and the Base->Better->More->Custom->Orchestrated path."
+  ]
+}

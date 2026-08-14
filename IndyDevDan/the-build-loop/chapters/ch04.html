@@ -1,0 +1,97 @@
+<section class="chapter" id="ch04">
+  <div class="wrap wide">
+    <span class="chapnum reveal">04 — When it fails</span>
+    <div class="kicker reveal">the engine of the whole method</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Never fix the output. <em>Fix what produced it.</em></h2>
+    <p class="lede reveal d2">Everything else in this guide is setup. This chapter is the part that compounds — and the part almost nobody actually does, because fixing the output by hand is always faster once.</p>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big"><p>Why didn't you just do that by hand? You're missing the point.</p><span class="cite" style="display:block;margin-top:10px">— TAC-6, pre-empting the obvious objection</span></div>
+      <div class="prose">
+        <p class="lead-in">The rule has a specific shape: <strong>you don't fix the issue, you fix the system that caused the issue.</strong></p>
+        <p>You fix the template. You fix the prompt. You fix the workflow. The broken output is a symptom, and patching it by hand throws away the only information the failure gave you.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch04-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Blame in this order</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 190" role="img" aria-label="Blame order: your wording, then your tooling, then the model">
+        <rect x="40" y="50" width="220" height="80" rx="10" class="s-clay-f"/>
+        <text x="150" y="80" text-anchor="middle" class="s-title" font-size="14">1 · your wording</text>
+        <text x="150" y="104" text-anchor="middle" class="s-label-sm">was the prompt actually clear?</text>
+
+        <path d="M268 90 H 320" class="s-flow"/><path d="M320 90 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="328" y="50" width="220" height="80" rx="10" class="s-amber-f"/>
+        <text x="438" y="80" text-anchor="middle" class="s-title" font-size="14">2 · your tooling</text>
+        <text x="438" y="104" text-anchor="middle" class="s-label-sm">which leverage point is missing?</text>
+
+        <path d="M556 90 H 608" class="s-flow"/><path d="M608 90 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="616" y="50" width="220" height="80" rx="10" class="s-card"/>
+        <text x="726" y="80" text-anchor="middle" class="s-title" font-size="14">3 · the model</text>
+        <text x="726" y="104" text-anchor="middle" class="s-label-sm">almost never the answer</text>
+
+        <text x="40" y="166" class="s-label-sm">"IT CAN BE SO EASY TO JUST BLAME THE MODEL, BUT YOU REALLY HAVE TO BLAME YOURSELF FIRST."</text>
+      </svg>
+      <div class="fcap"><b>Strict order.</b> Skipping to step three is how a broken template survives for months.</div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch04-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Attempts &gt; 1 means a missing lever</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">The target is one shot. Iteration is not a virtue here — it is a diagnostic signal.</p>
+        <p><em>"If your attempts are high in the five to ten range, even the three to six range, you need to spend more time figuring out which of the twelve leverage points you're missing."</em></p>
+        <p>When you hit that range, <strong>stop prompting</strong>. The table beside this is the diagnosis.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 440 220" role="img" aria-label="Attempts KPI: one shot is the target, three to six is the diagnosis trigger">
+          <text x="20" y="24" class="s-label">ATTEMPTS ON ONE TASK</text>
+          <rect x="20" y="44" width="70" height="34" rx="7" class="s-olive-f"/>
+          <text x="55" y="66" text-anchor="middle" class="s-label">1</text>
+          <text x="104" y="66" class="s-label-sm">the target — don't break the streak</text>
+          <rect x="20" y="92" width="140" height="34" rx="7" class="s-amber-f"/>
+          <text x="90" y="114" text-anchor="middle" class="s-label">2</text>
+          <text x="174" y="114" class="s-label-sm">acceptable, note why</text>
+          <rect x="20" y="140" width="280" height="34" rx="7" class="s-clay-f"/>
+          <text x="160" y="162" text-anchor="middle" class="s-label">3 – 6 &nbsp; STOP PROMPTING</text>
+          <text x="20" y="200" class="s-label-sm">INSTALL THE MISSING LEVERAGE POINT INSTEAD</text>
+        </svg>
+        <div class="fcap"><b>Counterintuitively, iterating is not good.</b></div>
+      </div>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">SYMPTOM</span><p class="ctitle">Agent confused by data shapes</p><p class="cbody">Missing lever — <strong>Types</strong>. Use them over dicts.</p></div>
+      <div class="card accent"><span class="cnum">SYMPTOM</span><p class="ctitle">Agent can't navigate</p><p class="cbody">Missing lever — <strong>Architecture</strong>. Verbose names, one responsibility per file.</p></div>
+      <div class="card blue"><span class="cnum">SYMPTOM</span><p class="ctitle">You are reading the errors</p><p class="cbody">Missing lever — <strong>Standard Out</strong>. Make the code talk to the agent.</p></div>
+      <div class="card blue"><span class="cnum">SYMPTOM</span><p class="ctitle">"Success" but behaviour wrong</p><p class="cbody">Missing lever — <strong>Tests</strong>.</p></div>
+      <div class="card olive"><span class="cnum">SYMPTOM</span><p class="ctitle">Short iterative prompts</p><p class="cbody">Missing lever — <strong>Plans</strong>. Sit down and write one.</p></div>
+      <div class="card glow amber"><span class="cnum">SYMPTOM</span><p class="ctitle">You've done this three times</p><p class="cbody">Missing lever — <strong>Templates</strong>. Extract the command.</p></div>
+    </div>
+
+    <div class="quote reveal"><p>"Are you still manually looking at error messages? Stop. Stop… Give them to your agent. And only when your agent fails do you take your precious time and dig into the error."</p><span class="cite">— TAC-2</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch04-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Live recovery, in his actual order</h2></div>
+
+    <ol class="steps reveal">
+      <li><h4>Kill the wrong-direction run</h4><p><em>"So I'm going to stop it. Ignore the skill. Just run this directly."</em> Do not let a confused agent keep going out of politeness.</p></li>
+      <li><h4>Re-prompt more explicitly, with IMPORTANT</h4><p><em>"I'm going to use the important information dense keyword so that the agent really respects this."</em></p></li>
+      <li><h4>Escape, rewind history, Ctrl-Z</h4><p>Roll back to the last good turn rather than arguing forwards from a bad one.</p></li>
+      <li><h4>Full clear and restart</h4><p><em>"Never be afraid to just start fresh."</em> Cheaper than it feels.</p></li>
+    </ol>
+
+    <div class="callout bad reveal"><span class="ci">NEVER</span>
+      <span class="cc"><strong>Never <code>/compact</code>.</strong> <em>"If your agent is running compact, it is losing information."</em> A full window means the task was too large — chop the task, do not compress the context.</span></div>
+
+    <a class="jump reveal" href="#ch05">Next · Escalate only when earned &nbsp;→</a>
+  </div>
+</section>

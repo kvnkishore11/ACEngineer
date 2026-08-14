@@ -1,0 +1,18 @@
+mod attach_client;
+mod cfg;
+mod clipboard;
+mod config;
+mod console;
+mod daemon;
+pub mod dekit;
+mod error;
+mod js;
+mod kernel;
+mod logging;
+pub mod mprocs;
+mod parse_shell;
+mod process;
+mod protocol;
+mod task;
+mod term;
+mod term_driver;

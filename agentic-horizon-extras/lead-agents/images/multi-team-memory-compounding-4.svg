@@ -1,0 +1,512 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1920 1080" width="1920" height="1080"
+     role="img" aria-label="Agent session lifecycle — Boot, Load Mental Model, Read Context, Do Work, Update Model cycle showing how agent expertise compounds each session">
+  <title>The Session Lifecycle — Agent Memory Compounds Every Cycle</title>
+  <desc>
+    A circular lifecycle diagram centered on a Backend Dev agent. Five stages
+    arranged in a clockwise ring (Boot, Load Mental Model, Read Context, Do Work,
+    Update Model) with arc connectors between them. A traveling dot circuits the
+    ring showing how each session compounds the agent's expertise. Animation: 15s
+    cycle — center reveal, clockwise stage-by-stage reveal with arc draws, dot
+    circuit pulse, breathe and reset.
+  </desc>
+
+  <!-- ================================================================
+       LAYOUT:
+         Canvas center: (960, 540)
+         Stage ring radius: R=300
+         Arc connector radius: 330 (slightly larger for clean arcs)
+
+         Stage positions (clockwise from top, 72° apart):
+           S1 BOOT:              (960.0,  240.0)  -90°  #f59e0b amber
+           S2 LOAD MENTAL MODEL: (1245.3, 447.3)  -18°  #a855f7 violet
+           S3 READ CONTEXT:      (1136.3, 782.7)   54°  #3b82f6 blue
+           S4 DO WORK:           (783.7,  782.7)  126°  #22c55e emerald
+           S5 UPDATE MODEL:      (674.7,  447.3)  198°  #f43f5e rose
+
+         Stage rects: 140x38, rx=8, centered on stage position
+         Center agent circle: r=52 at (960,540)
+         Arc connector paths: SVG arcs r=330, sweep=1 (clockwise)
+         Full circuit circumference: 2073.5px
+
+         Timing map (t/15*100):
+           0s=0%   0.7s=4.67%  1s=6.67%   1.5s=10%   1.8s=12%
+           2.3s=15.33%  2.5s=16.67%  3.0s=20%   3.2s=21.33%  3.5s=23.33%
+           3.7s=24.67%  3.8s=25.33%  4.0s=26.67%  4.3s=28.67%  4.5s=30%
+           5s=33.33%  6s=40%  7s=46.67%  8s=53.33%  9s=60%
+           14.7s=98%  15s=100%
+       ================================================================ -->
+  <defs>
+    <filter id="f-center" x="-50%" y="-50%" width="200%" height="200%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-amber" x="-40%" y="-40%" width="180%" height="180%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-violet" x="-40%" y="-40%" width="180%" height="180%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-blue" x="-40%" y="-40%" width="180%" height="180%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-green" x="-40%" y="-40%" width="180%" height="180%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-rose" x="-40%" y="-40%" width="180%" height="180%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-hit" x="-60%" y="-60%" width="220%" height="220%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-dot" x="-80%" y="-80%" width="260%" height="260%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Radial ambient glow behind center -->
+    <radialGradient id="rg-center" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#a855f7" stop-opacity="0.1"/>
+      <stop offset="60%"  stop-color="#6366f1" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Play:wght@400;700&amp;display=swap');
+
+    /* Typography */
+    .t {
+      font-family: 'Play', sans-serif;
+      font-weight: 700;
+      fill: #ffffff;
+      paint-order: stroke fill;
+      stroke: rgba(0,0,0,0.9);
+      stroke-width: 2.5px;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+    .t-title { font-size: 22px; letter-spacing: 4px; }
+    .t-sub   { font-size: 13px; fill: rgba(255,255,255,0.5); stroke: rgba(0,0,0,0.8);
+               stroke-width: 2px; letter-spacing: 1px; }
+    .t-stage { font-size: 12px; letter-spacing: 1px; font-weight: 800; }
+    .t-ctr   { font-size: 13px; letter-spacing: 0.5px; }
+    .t-sub2  { font-size: 12px; fill: rgba(255,255,255,0.5); stroke: rgba(0,0,0,0.8);
+               stroke-width: 2px; }
+    .t-code  { font-family: 'Play', sans-serif;
+               font-size: 12px; fill: rgba(168,85,247,0.85); stroke: rgba(0,0,0,0.85);
+               stroke-width: 2px; dominant-baseline: middle; text-anchor: middle;
+               font-weight: 400; }
+    .t-tag   { font-size: 12px; letter-spacing: 2px; fill: rgba(255,255,255,0.45);
+               stroke: rgba(0,0,0,0.8); stroke-width: 2.5px; }
+
+    /* ================================================================
+       PHASE 1 REVEAL (0%-26.67%)
+       ================================================================ */
+
+    /* Ambient glow + center agent */
+    #g-ambient { animation: rev-ambient 15s infinite; }
+    @keyframes rev-ambient {
+      0%      { opacity: 0; }
+      4.67%   { opacity: 1; }
+      98%     { opacity: 1; }
+      100%    { opacity: 0; }
+    }
+
+    #g-center { animation: rev-center 15s infinite; }
+    @keyframes rev-center {
+      0%      { opacity: 0; }
+      4.67%   { opacity: 1; }
+      98%     { opacity: 1; }
+      100%    { opacity: 0; }
+    }
+
+    /* Title: 3.33%-10% */
+    #g-title { animation: rev-title 15s infinite; }
+    @keyframes rev-title {
+      0%,3.33%  { opacity: 0; }
+      10%       { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+
+    /* Stage 1 BOOT: 6.67%-10% */
+    #g-s1 { animation: rev-s1 15s infinite; }
+    @keyframes rev-s1 {
+      0%,6.67%  { opacity: 0; }
+      10%       { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+
+    /* Arc 1→2: 10%-13.33% (len=415, dasharray 415, offset 415→0) */
+    #arc-1-2 { stroke-dasharray: 415; stroke-dashoffset: 415;
+                animation: draw-arc12 15s infinite; }
+    @keyframes draw-arc12 {
+      0%,10%    { stroke-dashoffset: 415; opacity: 1; }
+      13.33%    { stroke-dashoffset: 0; opacity: 1; }
+      98%       { stroke-dashoffset: 0; opacity: 1; }
+      100%      { stroke-dashoffset: 0; opacity: 0; }
+    }
+
+    /* Stage 2 LOAD: 12%-15.33% */
+    #g-s2 { animation: rev-s2 15s infinite; }
+    @keyframes rev-s2 {
+      0%,12%    { opacity: 0; }
+      15.33%    { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+
+    /* Arc 2→3: 15.33%-18% */
+    #arc-2-3 { stroke-dasharray: 415; stroke-dashoffset: 415;
+                animation: draw-arc23 15s infinite; }
+    @keyframes draw-arc23 {
+      0%,15.33% { stroke-dashoffset: 415; opacity: 1; }
+      18%       { stroke-dashoffset: 0; opacity: 1; }
+      98%       { stroke-dashoffset: 0; opacity: 1; }
+      100%      { stroke-dashoffset: 0; opacity: 0; }
+    }
+
+    /* Stage 3 READ: 16.67%-20% */
+    #g-s3 { animation: rev-s3 15s infinite; }
+    @keyframes rev-s3 {
+      0%,16.67% { opacity: 0; }
+      20%       { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+
+    /* Arc 3→4: 20%-22.67% */
+    #arc-3-4 { stroke-dasharray: 415; stroke-dashoffset: 415;
+                animation: draw-arc34 15s infinite; }
+    @keyframes draw-arc34 {
+      0%,20%    { stroke-dashoffset: 415; opacity: 1; }
+      22.67%    { stroke-dashoffset: 0; opacity: 1; }
+      98%       { stroke-dashoffset: 0; opacity: 1; }
+      100%      { stroke-dashoffset: 0; opacity: 0; }
+    }
+
+    /* Stage 4 WORK: 21.33%-24.67% */
+    #g-s4 { animation: rev-s4 15s infinite; }
+    @keyframes rev-s4 {
+      0%,21.33% { opacity: 0; }
+      24.67%    { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+
+    /* Arc 4→5: 24.67%-26.67% */
+    #arc-4-5 { stroke-dasharray: 415; stroke-dashoffset: 415;
+                animation: draw-arc45 15s infinite; }
+    @keyframes draw-arc45 {
+      0%,24.67% { stroke-dashoffset: 415; opacity: 1; }
+      26.67%    { stroke-dashoffset: 0; opacity: 1; }
+      98%       { stroke-dashoffset: 0; opacity: 1; }
+      100%      { stroke-dashoffset: 0; opacity: 0; }
+    }
+
+    /* Stage 5 UPDATE: 25.33%-28.67% */
+    #g-s5 { animation: rev-s5 15s infinite; }
+    @keyframes rev-s5 {
+      0%,25.33% { opacity: 0; }
+      28.67%    { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+
+    /* Arc 5→1 (closing loop): 28.67%-31.33% */
+    #arc-5-1 { stroke-dasharray: 415; stroke-dashoffset: 415;
+                animation: draw-arc51 15s infinite; }
+    @keyframes draw-arc51 {
+      0%,28.67% { stroke-dashoffset: 415; opacity: 1; }
+      31.33%    { stroke-dashoffset: 0; opacity: 1; }
+      98%       { stroke-dashoffset: 0; opacity: 1; }
+      100%      { stroke-dashoffset: 0; opacity: 0; }
+    }
+
+    /* Tagline: 23.33%-30% */
+    #g-tagline { animation: rev-tag 15s infinite; }
+    @keyframes rev-tag {
+      0%,23.33% { opacity: 0; }
+      30%       { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+
+    /* ================================================================
+       PHASE 2 — DOT CIRCUIT (26.67%-60%)
+       Single dot travels full ring circumference 2073px
+       dasharray: "28 2073", dashoffset sweeps 2101→0
+       5 segments of 414.7px each, covers all 5 stages in 5s
+       ================================================================ */
+
+    /* Dot path rides a full-circle at r=330, starting at top */
+    #dot-circuit {
+      stroke-dasharray: 28 2073;
+      animation: dot-ride 15s infinite;
+    }
+    @keyframes dot-ride {
+      0%,26.67% { stroke-dashoffset: 2101; opacity: 0; }
+      27.34%    { opacity: 1; }
+      60%       { stroke-dashoffset: 0; }
+      60.67%    { opacity: 0; }
+      99%       { stroke-dashoffset: 2101; opacity: 0; }
+      100%      { stroke-dashoffset: 2101; opacity: 0; }
+    }
+
+    /* Stage highlight flashes as dot passes through each */
+    /* S1 BOOT: dot arrives at 26.67% (top of ring) */
+    #hl-s1 { animation: hl-s1 15s infinite; }
+    @keyframes hl-s1 {
+      0%,26.67% { opacity: 0; }
+      27.34%    { opacity: 1; }
+      28%       { opacity: 1; }
+      29.34%    { opacity: 0; }
+      99%       { opacity: 0; }
+      100%      { opacity: 0; }
+    }
+
+    /* S2: +1/5 of cycle = +33.33% of 5s = 6.67% later → 33.33% */
+    #hl-s2 { animation: hl-s2 15s infinite; }
+    @keyframes hl-s2 {
+      0%,33.33% { opacity: 0; }
+      34%       { opacity: 1; }
+      34.67%    { opacity: 1; }
+      36%       { opacity: 0; }
+      99%       { opacity: 0; }
+      100%      { opacity: 0; }
+    }
+
+    /* S3: 40% */
+    #hl-s3 { animation: hl-s3 15s infinite; }
+    @keyframes hl-s3 {
+      0%,40%    { opacity: 0; }
+      40.67%    { opacity: 1; }
+      41.34%    { opacity: 1; }
+      42.67%    { opacity: 0; }
+      99%       { opacity: 0; }
+      100%      { opacity: 0; }
+    }
+
+    /* S4: 46.67% */
+    #hl-s4 { animation: hl-s4 15s infinite; }
+    @keyframes hl-s4 {
+      0%,46.67% { opacity: 0; }
+      47.34%    { opacity: 1; }
+      48%       { opacity: 1; }
+      49.34%    { opacity: 0; }
+      99%       { opacity: 0; }
+      100%      { opacity: 0; }
+    }
+
+    /* S5: 53.33% */
+    #hl-s5 { animation: hl-s5 15s infinite; }
+    @keyframes hl-s5 {
+      0%,53.33% { opacity: 0; }
+      54%       { opacity: 1; }
+      54.67%    { opacity: 1; }
+      56%       { opacity: 0; }
+      99%       { opacity: 0; }
+      100%      { opacity: 0; }
+    }
+
+    /* ================================================================
+       PHASE 3 — CENTER BREATHE (60%-98%)
+       ================================================================ */
+    #center-breathe {
+      animation: ctr-breathe 15s infinite;
+      transform-origin: 960px 540px;
+    }
+    @keyframes ctr-breathe {
+      0%,60%   { transform: scale(1);    opacity: 0; }
+      68%      { transform: scale(1.1);  opacity: 0.7; }
+      76%      { transform: scale(1);    opacity: 0.3; }
+      86%      { transform: scale(1.08); opacity: 0.7; }
+      94%      { transform: scale(1);    opacity: 0.3; }
+      98%      { opacity: 0; }
+      100%     { opacity: 0; }
+    }
+  </style>
+
+  <!-- ================================================================
+       LAYER 1: AMBIENT BACKGROUND GLOW
+       ================================================================ -->
+  <g id="g-ambient">
+    <circle cx="960" cy="540" r="380" fill="url(#rg-center)"/>
+  </g>
+
+  <!-- ================================================================
+       LAYER 2: TITLE
+       ================================================================ -->
+  <g id="g-title">
+    <text x="960" y="90"  class="t t-title">THE SESSION LIFECYCLE</text>
+    <text x="960" y="122" class="t t-sub">Boot · Load · Read · Work · Update · Repeat</text>
+  </g>
+
+  <!-- ================================================================
+       LAYER 3: ARC CONNECTORS (draw animation)
+       Each arc: M stage_center A 330,330 0 0,1 next_stage_center
+       ================================================================ -->
+  <g id="g-arcs">
+    <!-- Arc 1: Boot → Load (amber to violet) -->
+    <path id="arc-1-2"
+          d="M 960,240 A 330,330 0 0,1 1245.3,447.3"
+          fill="none" stroke="#2a3248" stroke-width="2" stroke-linecap="round"/>
+    <!-- Arc 2: Load → Read (violet to blue) -->
+    <path id="arc-2-3"
+          d="M 1245.3,447.3 A 330,330 0 0,1 1136.3,782.7"
+          fill="none" stroke="#2a3248" stroke-width="2" stroke-linecap="round"/>
+    <!-- Arc 3: Read → Work (blue to emerald) -->
+    <path id="arc-3-4"
+          d="M 1136.3,782.7 A 330,330 0 0,1 783.7,782.7"
+          fill="none" stroke="#2a3248" stroke-width="2" stroke-linecap="round"/>
+    <!-- Arc 4: Work → Update (emerald to rose) -->
+    <path id="arc-4-5"
+          d="M 783.7,782.7 A 330,330 0 0,1 674.7,447.3"
+          fill="none" stroke="#2a3248" stroke-width="2" stroke-linecap="round"/>
+    <!-- Arc 5: Update → Boot (rose to amber, closing loop) -->
+    <path id="arc-5-1"
+          d="M 674.7,447.3 A 330,330 0 0,1 960,240"
+          fill="none" stroke="#2a3248" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- ================================================================
+       LAYER 4: TRAVELING DOT (phase 2)
+       Travels full ring using a circle path at r=330
+       SVG circle as path: M cx+r,cy A r,r 0 1,1 cx+r-0.01,cy
+       (standard trick for circular path with stroke-dashoffset)
+       ================================================================ -->
+  <!-- Full circle at r=330 centered at (960,540), starting at (1290,540) = right side
+       But we want to start at top (960,210). Rotate the start point.
+       Top of r=330 circle: (960, 540-330) = (960, 210)
+       Right: (1290, 540), Bottom: (960, 870), Left: (630, 540)
+       Path starting at top (960,210) going clockwise:
+       M 960,210 A 330,330 0 0,1 1290,540 A 330,330 0 0,1 960,870 A 330,330 0 0,1 630,540 A 330,330 0 0,1 960,210
+  -->
+  <path id="dot-circuit"
+        d="M 960,210 A 330,330 0 0,1 1290,540 A 330,330 0 0,1 960,870 A 330,330 0 0,1 630,540 A 330,330 0 0,1 960,210"
+        fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"
+        filter="url(#f-dot)" opacity="0"/>
+
+  <!-- ================================================================
+       LAYER 5: STAGE HIGHLIGHT OVERLAYS (phase 2 flashes)
+       ================================================================ -->
+  <g id="g-highlights">
+    <rect id="hl-s1" class="hl" x="886" y="217" width="148" height="46" rx="12"
+          fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="2"
+          filter="url(#f-hit)" opacity="0"/>
+    <rect id="hl-s2" class="hl" x="1171.3" y="424.3" width="148" height="46" rx="12"
+          fill="rgba(168,85,247,0.25)" stroke="#a855f7" stroke-width="2"
+          filter="url(#f-hit)" opacity="0"/>
+    <rect id="hl-s3" class="hl" x="1062.3" y="759.7" width="148" height="46" rx="12"
+          fill="rgba(59,130,246,0.25)" stroke="#3b82f6" stroke-width="2"
+          filter="url(#f-hit)" opacity="0"/>
+    <rect id="hl-s4" class="hl" x="709.7" y="759.7" width="148" height="46" rx="12"
+          fill="rgba(34,197,94,0.25)" stroke="#22c55e" stroke-width="2"
+          filter="url(#f-hit)" opacity="0"/>
+    <rect id="hl-s5" class="hl" x="600.7" y="424.3" width="148" height="46" rx="12"
+          fill="rgba(244,63,94,0.25)" stroke="#f43f5e" stroke-width="2"
+          filter="url(#f-hit)" opacity="0"/>
+  </g>
+
+  <!-- ================================================================
+       LAYER 6: STAGE NODES (rect 140x38, rx=8)
+       ================================================================ -->
+
+  <!-- Stage 1: BOOT @ (960, 240) amber -->
+  <g id="g-s1">
+    <rect x="890" y="221" width="140" height="38" rx="8"
+          fill="#161b2e" stroke="#f59e0b" stroke-width="2"
+          filter="url(#f-amber)"/>
+    <text x="960" y="240" class="t t-stage"
+          style="fill:#f5e0a0;">BOOT</text>
+  </g>
+
+  <!-- Stage 2: LOAD MENTAL MODEL @ (1245.3, 447.3) violet -->
+  <g id="g-s2">
+    <rect x="1175.3" y="428.3" width="140" height="38" rx="8"
+          fill="#161b2e" stroke="#a855f7" stroke-width="2"
+          filter="url(#f-violet)"/>
+    <text x="1245.3" y="441.3" class="t t-stage"
+          style="font-size:12px;">LOAD MENTAL</text>
+    <text x="1245.3" y="455.3" class="t t-stage"
+          style="font-size:12px;">MODEL</text>
+    <!-- Code annotation -->
+    <text x="1255.3" y="497.3" class="t-code">mental-model.yaml</text>
+  </g>
+
+  <!-- Stage 3: READ CONTEXT @ (1136.3, 782.7) blue -->
+  <g id="g-s3">
+    <rect x="1066.3" y="763.7" width="140" height="38" rx="8"
+          fill="#161b2e" stroke="#3b82f6" stroke-width="2"
+          filter="url(#f-blue)"/>
+    <text x="1136.3" y="782.7" class="t t-stage"
+          style="font-size:12px;">READ CONTEXT</text>
+  </g>
+
+  <!-- Stage 4: DO WORK @ (783.7, 782.7) emerald -->
+  <g id="g-s4">
+    <rect x="713.7" y="763.7" width="140" height="38" rx="8"
+          fill="#161b2e" stroke="#22c55e" stroke-width="2"
+          filter="url(#f-green)"/>
+    <text x="783.7" y="782.7" class="t t-stage"
+          style="font-size:12px;">DO WORK</text>
+  </g>
+
+  <!-- Stage 5: UPDATE MODEL @ (674.7, 447.3) rose -->
+  <g id="g-s5">
+    <rect x="604.7" y="428.3" width="140" height="38" rx="8"
+          fill="#161b2e" stroke="#f43f5e" stroke-width="2"
+          filter="url(#f-rose)"/>
+    <text x="674.7" y="447.3" class="t t-stage"
+          style="font-size:12px;">UPDATE MODEL</text>
+  </g>
+
+  <!-- ================================================================
+       LAYER 7: CENTER AGENT NODE
+       ================================================================ -->
+  <g id="g-center">
+    <!-- Breathe ring (phase 3) -->
+    <circle id="center-breathe" cx="960" cy="540" r="68"
+            fill="none" stroke="#a855f7" stroke-width="1.2"
+            stroke-dasharray="5 8" opacity="0"/>
+    <!-- Main circle -->
+    <circle cx="960" cy="540" r="52"
+            fill="#161b2e" stroke="#a855f7" stroke-width="2"
+            filter="url(#f-center)"/>
+    <!-- Inner ring detail -->
+    <circle cx="960" cy="540" r="44"
+            fill="none" stroke="#a855f7" stroke-width="0.5"
+            stroke-dasharray="3 6" opacity="0.4"/>
+    <!-- Labels -->
+    <text x="960" y="533" class="t t-ctr">Backend Dev</text>
+    <text x="960" y="548" class="t t-sub2">claude-sonnet-4-6</text>
+    <!-- Session counter below -->
+    <text x="960" y="615" class="t-code"
+          style="font-size:12px; fill:rgba(168,85,247,0.6);">session n + 1</text>
+  </g>
+
+  <!-- ================================================================
+       LAYER 8: TAGLINE
+       ================================================================ -->
+  <g id="g-tagline">
+    <text x="960" y="1010" class="t t-tag">
+      EVERY SESSION COMPOUNDS THE AGENT'S EXPERTISE
+    </text>
+  </g>
+
+</svg>

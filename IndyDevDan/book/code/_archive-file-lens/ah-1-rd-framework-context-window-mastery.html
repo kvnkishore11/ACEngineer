@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first code deep dive into Elite Context Engineering: context reduction, delegation, observability hooks, and a Claude Code TypeScript wrapper.">
+  <title>Elite Context Engineering — Code Deep Dive</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
+  <style>
+    body { background: var(--bg); color: var(--ink); }
+    .skip-link {
+      position: fixed; z-index: 100; top: .5rem; left: .5rem;
+      transform: translateY(-180%); padding: .45rem .7rem;
+      border-radius: var(--radius-sm); background: var(--ink); color: var(--ink-inverse);
+    }
+    .skip-link:focus { transform: none; }
+
+    .site-bar {
+      position: sticky; z-index: 20; top: 0; display: flex; align-items: center;
+      min-height: var(--site-bar-h); border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(10px);
+    }
+    .site-bar__inner {
+      display: flex; align-items: center; gap: .7rem; width: min(100%, var(--chapter-max));
+      margin-inline: auto; padding-inline: .7rem;
+    }
+    .site-bar a { text-decoration: none; }
+    .site-bar__brand { color: var(--ink); font-size: var(--text-sm); font-weight: 700; }
+    .site-bar__crumb { color: var(--ink-mute); font-size: var(--text-xs); }
+    .site-bar__chapter { margin-left: auto; font-size: var(--text-xs); font-weight: 650; }
+
+    .chapter-shell {
+      display: grid; grid-template-columns: var(--rail-width) minmax(0, 1fr); align-items: start;
+      gap: 1.25rem; width: min(calc(100% - 1.25rem), var(--chapter-max)); margin-inline: auto;
+    }
+    .chapter-rail {
+      position: sticky; top: calc(var(--site-bar-h) + 6px); max-height: calc(100vh - var(--site-bar-h) - 12px);
+      overflow-y: auto; padding: .75rem .5rem 1rem 0; border-right: 1px solid var(--border-soft);
+    }
+    .chapter-rail .rail-title { color: var(--ink); font: 600 var(--text-base)/1.25 var(--font-display); }
+    .chapter-rail .rail-meta { color: var(--ink-mute); font-size: var(--text-xs); line-height: 1.35; margin-top: .25rem; }
+    .chapter-nav .nav-group {
+      color: var(--accent-ink); font-size: var(--text-xs); font-weight: 800;
+      letter-spacing: .09em; margin: .75rem 0 .2rem; text-transform: uppercase;
+    }
+
+    .chapter-main { min-width: 0; }
+    .measure { width: min(100%, 48rem); max-width: 48rem; }
+    .wide { width: min(100%, 58rem); max-width: 58rem; }
+    .lesson-head { padding: 1.2rem 0 1rem; border-bottom: 1px solid var(--border); }
+    .eyebrow {
+      color: var(--accent-ink); font-size: var(--text-xs); font-weight: 800;
+      letter-spacing: .1em; text-transform: uppercase;
+    }
+    .lesson-head h1 { font-size: var(--text-2xl); margin: .28rem 0 .45rem; }
+    .dek { max-width: 48rem; color: var(--ink-soft); font-size: var(--text-base); line-height: 1.5; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .72rem; }
+    .meta-chip {
+      display: inline-flex; align-items: center; gap: .3rem; padding: .22rem .48rem;
+      border: 1px solid var(--border); border-radius: 999px; background: var(--bg-card);
+      color: var(--ink-soft); font-size: var(--text-xs); font-weight: 650;
+    }
+
+    .mobile-jump { display: none; margin: .7rem 0; }
+    .mobile-jump summary { cursor: pointer; color: var(--accent-ink); font-size: var(--text-sm); font-weight: 700; }
+    .mobile-jump a { display: inline-block; margin: .3rem .55rem 0 0; font-size: var(--text-xs); }
+
+    section { scroll-margin-top: 3.5rem; }
+    .lesson-section { padding-block: 1.25rem; }
+    .lesson-section + .lesson-section { border-top: 1px solid var(--border-soft); }
+    .section-label {
+      display: block; color: var(--accent-ink); font-size: var(--text-xs); font-weight: 800;
+      letter-spacing: .1em; margin-bottom: .2rem; text-transform: uppercase;
+    }
+    .lesson-section h2 { font-size: var(--text-xl); margin: 0 0 .55rem; }
+    .lesson-section h3 { font-size: var(--text-base); margin-top: 1.2rem; }
+    .lede { color: var(--ink-soft); font-size: var(--text-base); line-height: 1.62; }
+    .small { color: var(--ink-mute); font-size: var(--text-xs); }
+
+    .hook-card {
+      position: relative; overflow: hidden; margin-top: .75rem; padding: .95rem 1rem;
+      border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--border));
+      border-radius: var(--radius-md); background: linear-gradient(135deg, var(--accent-wash), var(--bg-card));
+      box-shadow: var(--shadow-card);
+    }
+    .hook-card::after {
+      position: absolute; right: -.35rem; bottom: -1.4rem; content: "65×";
+      color: color-mix(in srgb, var(--accent) 12%, transparent); font: 700 var(--text-3xl)/1 var(--font-display);
+    }
+    .hook-card__question { position: relative; z-index: 1; font: 600 var(--text-md)/1.4 var(--font-display); }
+    .hook-card__answer { position: relative; z-index: 1; max-width: 42rem; margin-top: .55rem; color: var(--ink-soft); }
+    .ratio-strip { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .6rem; margin-top: .8rem; }
+    .ratio-file { padding: .55rem .65rem; border: 1px solid var(--border); border-radius: .55rem; background: var(--bg-card); }
+    .ratio-file b { display: block; font-family: var(--font-mono); font-size: var(--text-xs); }
+    .ratio-file span { color: var(--ink-mute); font-size: var(--text-xs); }
+    .ratio-arrow { color: var(--accent-ink); font: 800 var(--text-xs)/1 var(--font-mono); }
+
+    .repo-map {
+      margin-top: .8rem; padding: .9rem; overflow: hidden; border: 1px solid var(--border);
+      border-radius: var(--radius-lg); background: var(--bg-card); box-shadow: var(--shadow-card);
+    }
+    .map-lane { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: .55rem; align-items: stretch; }
+    .map-lane + .map-lane { margin-top: .55rem; }
+    .lane-label {
+      display: grid; place-items: center; min-height: 4.25rem; padding: .5rem;
+      border-radius: .55rem; background: var(--bg-inset); color: var(--ink-soft);
+      font-size: var(--text-xs); font-weight: 800; letter-spacing: .07em; text-align: center; text-transform: uppercase;
+    }
+    .lane-nodes { display: grid; grid-template-columns: repeat(4, minmax(7.5rem, 1fr)); gap: .5rem; overflow-x: auto; padding-bottom: .1rem; }
+    .map-node {
+      position: relative; min-width: 7.5rem; padding: .55rem .6rem; border: 1px solid var(--border);
+      border-radius: .55rem; background: var(--bg); font-size: var(--text-xs); line-height: 1.38;
+    }
+    .map-node:not(:last-child)::after {
+      position: absolute; z-index: 2; top: 50%; right: -.36rem; content: "→";
+      transform: translate(50%, -50%); color: var(--accent-ink); font-weight: 900;
+    }
+    .map-node b { display: block; color: var(--ink); font-size: var(--text-xs); }
+    .map-node span { display: block; margin-top: .16rem; color: var(--ink-mute); }
+    .map-node.reduce { background: var(--accent-wash); }
+    .map-node.delegate { background: var(--teach-wash); }
+    .map-node.observe { background: var(--ok-wash); }
+    .map-node.sdk { background: var(--bg-inset); }
+    .map-rule {
+      display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+      margin-top: .7rem; padding: .55rem .65rem; border-top: 1px dashed var(--border);
+      color: var(--ink-soft); font-size: var(--text-xs);
+    }
+    .map-rule strong { color: var(--accent-ink); }
+
+    .tree {
+      margin-top: .7rem; padding: .8rem .9rem; overflow-x: auto; border: 1px solid var(--border);
+      border-radius: var(--radius-md); background: var(--bg-code); color: var(--ink);
+      font: var(--text-xs)/1.52 var(--font-mono); white-space: pre;
+    }
+    .tree a { color: var(--ink); text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+    .tree .folder { color: var(--accent-ink); font-weight: 800; }
+    .tree .dim { color: var(--ink-mute); }
+
+    .move-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .55rem; margin-top: .75rem; }
+    .move-card { min-width: 0; padding: .7rem; border: 1px solid var(--border); border-radius: .65rem; background: var(--bg-card); }
+    .move-card b { color: var(--accent-ink); font: 800 var(--text-xs)/1 var(--font-mono); }
+    .move-card h3 { margin: .35rem 0 .25rem; font-size: var(--text-base); }
+    .move-card p { color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.45; }
+
+    details.file-card {
+      margin: .65rem 0; overflow: clip; border: 1px solid var(--border);
+      border-radius: var(--radius-md); background: var(--bg-card); box-shadow: var(--shadow-card);
+    }
+    details.file-card > summary {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .55rem;
+      padding: .72rem .82rem; cursor: pointer; list-style: none;
+    }
+    details.file-card > summary::-webkit-details-marker { display: none; }
+    details.file-card > summary::before {
+      content: "+"; color: var(--accent-ink); font: 800 var(--text-base)/1 var(--font-mono); transition: transform .2s ease;
+    }
+    details.file-card[open] > summary::before { content: "−"; transform: rotate(180deg); }
+    details.file-card[open] > summary { border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--accent-wash) 40%, var(--bg-card)); }
+    .file-name { min-width: 0; }
+    .file-name code { color: var(--ink); font-size: var(--text-xs); overflow-wrap: anywhere; }
+    .file-name small { display: block; margin-top: .12rem; color: var(--ink-mute); font-size: var(--text-xs); }
+    .file-tag {
+      padding: .22rem .4rem; border-radius: 999px; background: var(--accent-wash);
+      color: var(--accent-ink); font-size: var(--text-xs); font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+    }
+    .file-body { padding: .35rem .85rem .9rem; animation: file-reveal .2s ease both; }
+    .file-body p, .file-body li { font-size: var(--text-sm); line-height: 1.58; }
+    .file-body > * + * { margin-top: .65rem; }
+    .file-body h3 { margin-top: .85rem; font-size: var(--text-base); }
+    @keyframes file-reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+    .code-wrap { min-width: 0; margin: .65rem 0; }
+    .code-label {
+      display: flex; justify-content: space-between; gap: .6rem; padding: .35rem .55rem;
+      border-radius: .45rem .45rem 0 0; background: var(--terminal-bar); color: var(--terminal-ink);
+      font: var(--text-xs)/1.3 var(--font-mono);
+    }
+    pre {
+      max-width: 100%; margin: 0; padding: .72rem !important; overflow-x: auto;
+      border: 1px solid var(--border); border-radius: 0 0 .5rem .5rem;
+      background: var(--bg-code) !important; color: var(--ink); font-size: var(--text-xs) !important; line-height: 1.52 !important; tab-size: 2;
+    }
+    pre code { font-size: inherit; }
+    :not(pre) > code { overflow-wrap: anywhere; }
+    .annotations { counter-reset: note; list-style: none; padding: 0; }
+    .annotations li { counter-increment: note; display: grid; grid-template-columns: 1.25rem 1fr; gap: .45rem; margin: .38rem 0; }
+    .annotations li::before {
+      display: grid; place-items: center; width: 1.2rem; height: 1.2rem; content: counter(note);
+      border-radius: 50%; background: var(--accent); color: var(--ink-inverse); font-size: var(--text-xs); font-weight: 800;
+    }
+
+    .why-box, .warning-box, .evidence-box {
+      padding: .65rem .75rem; border-left: 3px solid var(--ok); border-radius: 0 .5rem .5rem 0; background: var(--ok-wash);
+    }
+    .warning-box { border-left-color: var(--warn); background: var(--warn-wash); }
+    .evidence-box { border-left-color: var(--accent); background: var(--accent-wash); }
+    .why-box strong, .warning-box strong, .evidence-box strong { display: block; margin-bottom: .12rem; font-size: var(--text-xs); }
+    .why-box p, .warning-box p, .evidence-box p { margin: 0; font-size: var(--text-sm); }
+
+    .flow-list { counter-reset: flow; list-style: none; padding: 0; margin-top: .75rem; }
+    .flow-list li { counter-increment: flow; display: grid; grid-template-columns: 1.8rem 1fr; gap: .65rem; padding-bottom: .8rem; }
+    .flow-list li::before {
+      display: grid; place-items: center; width: 1.8rem; height: 1.8rem; content: counter(flow);
+      border-radius: .45rem; background: var(--accent); color: var(--ink-inverse); font-size: var(--text-xs); font-weight: 800;
+    }
+    .flow-copy { padding-bottom: .75rem; border-bottom: 1px dashed var(--border); }
+    .flow-list li:last-child .flow-copy { border-bottom: 0; }
+    .flow-copy b { display: block; font-size: var(--text-sm); }
+    .flow-copy p { margin-top: .1rem; color: var(--ink-soft); font-size: var(--text-sm); line-height: 1.5; }
+
+    .failure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; margin-top: .7rem; }
+    .failure-card { padding: .68rem; border: 1px solid var(--border); border-radius: .6rem; background: var(--bg-card); }
+    .failure-card b { display: block; color: var(--warn); font-size: var(--text-sm); }
+    .failure-card p { margin-top: .2rem; color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.46; }
+
+    .ledger-group { margin-top: .85rem; }
+    .ledger-group h3 { margin: 0 0 .35rem; font-size: var(--text-base); }
+    .file-ledger { columns: 2; column-gap: 1.1rem; list-style: none; padding: 0; }
+    .file-ledger li { break-inside: avoid; padding: .34rem 0; border-bottom: 1px dotted var(--border); }
+    .file-ledger code { display: block; color: var(--ink); font-size: var(--text-xs); line-height: 1.35; overflow-wrap: anywhere; }
+    .file-ledger span { display: block; margin-top: .08rem; color: var(--ink-mute); font-size: var(--text-xs); line-height: 1.38; }
+
+    .lab-card {
+      margin-top: .75rem; padding: .9rem; border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+      border-radius: var(--radius-md); background: linear-gradient(145deg, var(--bg-card), var(--accent-wash)); box-shadow: var(--shadow-card);
+    }
+    .lab-card h3 { margin: 0; }
+    .lab-card ol { margin-top: .55rem; }
+    .lab-card li { margin-top: .45rem; }
+    .pass-box { margin-top: .7rem; padding: .6rem .7rem; border-left: 3px solid var(--ok); border-radius: .4rem; background: var(--bg-card); }
+    .pass-box b { display: block; font-size: var(--text-xs); }
+    .pass-box p { margin-top: .15rem; color: var(--ink-soft); font-size: var(--text-xs); }
+
+    .quiz details { margin: .45rem 0; padding: .58rem .65rem; border: 1px solid var(--border); border-radius: .55rem; background: var(--bg-card); }
+    .quiz summary { cursor: pointer; font-size: var(--text-sm); font-weight: 700; }
+    .quiz details p { margin-top: .45rem; color: var(--ink-soft); font-size: var(--text-sm); }
+
+    .page-footer { padding: 1rem 0 2.5rem; border-top: 1px solid var(--border); color: var(--ink-mute); font-size: var(--text-xs); }
+
+    @media (max-width: 960px) {
+      .mobile-jump { display: block; }
+      .measure, .wide { width: min(100%, 48rem); margin-inline: auto; padding-inline: .8rem; }
+      .move-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .site-bar__crumb { display: none; }
+      .ratio-strip { grid-template-columns: 1fr; }
+      .ratio-arrow { transform: rotate(90deg); justify-self: center; }
+      .map-lane { grid-template-columns: 1fr; }
+      .lane-label { min-height: auto; }
+      .move-grid, .failure-grid { grid-template-columns: 1fr; }
+      .file-ledger { columns: 1; }
+      details.file-card > summary { grid-template-columns: auto minmax(0, 1fr); }
+      .file-tag { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      details.file-card:not([open]) > *:not(summary) { display: block; }
+      .site-bar, .chapter-rail, .mobile-jump { display: none !important; }
+    }
+  </style>
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to lesson</a>
+
+  <header class="site-bar">
+    <div class="site-bar__inner">
+      <a class="site-bar__brand" href="../index.html">Agentic Engineer</a>
+      <span class="site-bar__crumb">Code companion · AH-1</span>
+      <a class="site-bar__chapter" href="../vol-2-ah/09-rd-framework-context-window-mastery.html">← Chapter</a>
+    </div>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Lesson navigation">
+      <p class="rail-kicker">Code deep dive</p>
+      <p class="rail-title">Elite Context Engineering</p>
+      <p class="rail-meta">53 files · 6,745 lines · teaching repo</p>
+      <nav class="chapter-nav">
+        <p class="nav-group">Orient</p>
+        <ol>
+          <li><a href="#hook"><span class="chapter-nav__n">01</span><span>Hook</span></a></li>
+          <li><a href="#map"><span class="chapter-nav__n">02</span><span>Repo map</span></a></li>
+          <li><a href="#tree"><span class="chapter-nav__n">03</span><span>File tree</span></a></li>
+          <li><a href="#moves"><span class="chapter-nav__n">04</span><span>Design moves</span></a></li>
+        </ol>
+        <p class="nav-group">Walk the code</p>
+        <ol>
+          <li><a href="#always-on"><span class="chapter-nav__n">05</span><span>Always-on cost</span></a></li>
+          <li><a href="#prime"><span class="chapter-nav__n">06</span><span>Prime on purpose</span></a></li>
+          <li><a href="#observe"><span class="chapter-nav__n">07</span><span>Observe context</span></a></li>
+          <li><a href="#delegate"><span class="chapter-nav__n">08</span><span>Delegate work</span></a></li>
+          <li><a href="#experts"><span class="chapter-nav__n">09</span><span>Expert pipeline</span></a></li>
+          <li><a href="#sdk"><span class="chapter-nav__n">10</span><span>SDK wrapper</span></a></li>
+          <li><a href="#ledger"><span class="chapter-nav__n">11</span><span>Every file</span></a></li>
+        </ol>
+        <p class="nav-group">Use it</p>
+        <ol>
+          <li><a href="#run"><span class="chapter-nav__n">12</span><span>End-to-end run</span></a></li>
+          <li><a href="#fails"><span class="chapter-nav__n">13</span><span>Common fails</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">14</span><span>You try</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">15</span><span>Teach-back</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main id="main" class="chapter-main">
+      <header class="lesson-head measure">
+        <span class="eyebrow">AH-1 · Code deep dive</span>
+        <h1>Elite Context Engineering</h1>
+        <p class="dek">Dan built a laboratory for one idea: an agent performs better when every token has a job. The repo reduces automatic context, loads task-specific context on demand, delegates isolated work, and records enough evidence to restart cleanly.</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="meta-chip">53 / 53 files inspected</span>
+          <span class="meta-chip">6,745 text lines</span>
+          <span class="meta-chip">Python · TypeScript · Markdown · shell</span>
+          <span class="meta-chip">Beginner path · ~30 min</span>
+        </div>
+      </header>
+
+      <details class="mobile-jump measure">
+        <summary>Jump around this lesson</summary>
+        <a href="#map">Map</a><a href="#always-on">Always-on</a><a href="#observe">Hooks</a><a href="#sdk">SDK</a><a href="#lab">Lab</a>
+      </details>
+
+      <section id="hook" class="lesson-section measure">
+        <span class="section-label">Hook</span>
+        <h2>Would you staple a 79 KB handbook to every tiny request?</h2>
+        <div class="hook-card">
+          <p class="hook-card__question">The large memory file is not merely documentation. It is a controlled demonstration of context bloat.</p>
+          <p class="hook-card__answer">The active <code>CLAUDE.md</code> is 1,222 bytes. The deliberately bloated <code>CLAUDE.large.md</code> is 79,709 bytes—about <strong>65× larger</strong>. If the large version were always loaded, even “rename this variable” would begin under thousands of unrelated lines about CQRS, caching, tracing, APIs, and testing.</p>
+          <div class="ratio-strip" aria-label="Size comparison between the concise and large Claude instruction files">
+            <div class="ratio-file"><b>CLAUDE.md</b><span>43 lines · 1,222 bytes · active universal rules</span></div>
+            <span class="ratio-arrow">1 : 65</span>
+            <div class="ratio-file"><b>CLAUDE.large.md</b><span>2,978 lines · 79,709 bytes · anti-pattern specimen</span></div>
+          </div>
+        </div>
+        <p class="lede">Dan’s architecture answers a simple question at every boundary: <strong>does this information deserve to be present now?</strong> If yes, prime it. If another worker can own it, delegate it. If it may matter later, write a compact artifact instead of carrying the entire conversation.</p>
+      </section>
+
+      <section id="map" class="lesson-section wide">
+        <span class="section-label">Diagram first</span>
+        <h2>Map of the repo</h2>
+        <p class="lede">The repository is a context control system with four cooperating lanes. Read each lane left to right.</p>
+        <figure class="repo-map">
+          <div class="map-lane">
+            <div class="lane-label">Reduce startup</div>
+            <div class="lane-nodes">
+              <div class="map-node reduce"><b>Small <code>CLAUDE.md</code></b><span>Only rules needed on every turn.</span></div>
+              <div class="map-node reduce"><b>Scoped MCP JSON</b><span>Start with only the tools this job needs.</span></div>
+              <div class="map-node reduce"><b>Output style</b><span>Keep expensive answers from compounding.</span></div>
+              <div class="map-node reduce"><b>Focused prompt</b><span>One purpose, one result contract.</span></div>
+            </div>
+          </div>
+          <div class="map-lane">
+            <div class="lane-label">Prime on demand</div>
+            <div class="lane-nodes">
+              <div class="map-node"><b><code>/prime</code></b><span>Inventory plus README.</span></div>
+              <div class="map-node"><b><code>/prime_cc</code></b><span>Add commands, styles, hooks, settings.</span></div>
+              <div class="map-node"><b><code>/load_bundle</code></b><span>Replay deduplicated reads.</span></div>
+              <div class="map-node"><b><code>/quick-plan</code></b><span>Spend exploration once; save the spec.</span></div>
+            </div>
+          </div>
+          <div class="map-lane">
+            <div class="lane-label">Delegate</div>
+            <div class="lane-nodes">
+              <div class="map-node delegate"><b>Docs sub-agent</b><span>Fetches one source in an isolated window.</span></div>
+              <div class="map-node delegate"><b>Meta-agent</b><span>Designs another specialist.</span></div>
+              <div class="map-node delegate"><b>Hook expert</b><span>Plan → build → improve.</span></div>
+              <div class="map-node delegate"><b>Background primary</b><span>Separate Claude process; file report.</span></div>
+            </div>
+          </div>
+          <div class="map-lane">
+            <div class="lane-label">Observe + automate</div>
+            <div class="lane-nodes">
+              <div class="map-node observe"><b><code>settings.json</code></b><span>Routes lifecycle events to hooks.</span></div>
+              <div class="map-node observe"><b>Python hooks</b><span>Append file operations and full event payloads.</span></div>
+              <div class="map-node sdk"><b>TypeScript wrapper</b><span>Normalizes prompts and settings.</span></div>
+              <div class="map-node sdk"><b>Claude SDK stream</b><span>Returns session, result, cost, and turns.</span></div>
+            </div>
+          </div>
+          <div class="map-rule"><span><strong>R</strong>educe what enters · <strong>D</strong>elegate coherent work</span><span>Persist evidence, then reset safely</span></div>
+          <figcaption>Generated output directories mentioned by the hooks and commands are runtime artifacts; they are not presented as checkout files in the tree below.</figcaption>
+        </figure>
+      </section>
+
+      <section id="tree" class="lesson-section measure">
+        <span class="section-label">Orient yourself</span>
+        <h2>File tree with the useful seams</h2>
+        <p class="lede">The jump links take you to the explanation, not to an invented source path. The exhaustive 53-file ledger appears later.</p>
+        <div class="tree" aria-label="Condensed tree of the elite context engineering repository"><span class="folder">elite-context-engineering/</span>
+├── <a href="#always-on">README.md</a>                         <span class="dim"># the twelve-technique syllabus</span>
+├── <a href="#always-on">CLAUDE.md</a>                         <span class="dim"># small always-on contract</span>
+├── <a href="#always-on">CLAUDE.concise.md</a>                 <span class="dim"># identical swap-ready copy</span>
+├── <a href="#always-on">CLAUDE.large.md</a>                   <span class="dim"># intentional bloat specimen</span>
+├── <a href="#always-on">.mcp.json.sample</a>                  <span class="dim"># Playwright + Firecrawl example</span>
+├── <a href="#always-on">.mcp.json.firecrawl_7k.sample</a>     <span class="dim"># scoped Firecrawl comparison</span>
+├── <a href="#always-on">.mcp.json.all_16k.sample</a>          <span class="dim"># full two-server comparison</span>
+├── <span class="folder">.claude/</span>
+│   ├── <a href="#delegate">agents/</a>                        <span class="dim"># docs, research, meta specialist prompts</span>
+│   ├── <span class="folder">commands/</span>
+│   │   ├── <a href="#prime">prime.md · prime_cc.md</a>        <span class="dim"># purpose-specific loading</span>
+│   │   ├── <a href="#observe">load_bundle.md</a>              <span class="dim"># deduplicated replay</span>
+│   │   ├── <a href="#delegate">load_ai_docs.md</a>            <span class="dim"># parallel docs fan-out</span>
+│   │   ├── <a href="#background">background.md</a>            <span class="dim"># independent primary process</span>
+│   │   ├── <a href="#experts">quick-plan.md · build.md</a>    <span class="dim"># architect/editor handoff</span>
+│   │   └── <a href="#experts">experts/cc_hook_expert/</a>     <span class="dim"># plan/build/improve trio</span>
+│   ├── <a href="#observe">hooks/</a>                          <span class="dim"># bundle builder + universal logger</span>
+│   ├── <a href="#outputs">output-styles/</a>                  <span class="dim"># response-size controls</span>
+│   ├── <a href="#utilities">utils/llm/ · utils/tts/</a>       <span class="dim"># provider adapters</span>
+│   ├── <a href="#observe">settings.json</a>                   <span class="dim"># lifecycle event wiring</span>
+│   └── <a href="#outputs">settings.local.concise.json</a>     <span class="dim"># local MCP + output mode</span>
+├── <span class="folder">apps/</span>
+│   ├── <a href="#sdk">hello_cc_1.ts · hello_cc_2.ts</a>       <span class="dim"># raw SDK probes</span>
+│   └── <span class="folder">cc_ts_wrapper/</span>
+│       ├── <a href="#sdk-types">types.ts</a>                  <span class="dim"># public contracts + defaults</span>
+│       ├── <a href="#sdk-core">core.ts</a>                    <span class="dim"># query adapter + registry</span>
+│       ├── <a href="#sdk-cli">cli.ts</a>                      <span class="dim"># argument boundary</span>
+│       └── package.json · tsconfig.json · bun.lock
+├── ai_docs/README.md                  <span class="dim"># URLs, not fetched docs</span>
+└── <a href="#background">scripts/bg_claude_code_test.sh</a>   <span class="dim"># minimal primary-agent experiment</span></div>
+      </section>
+
+      <section id="moves" class="lesson-section measure">
+        <span class="section-label">Architecture</span>
+        <h2>Four design moves explain almost everything</h2>
+        <div class="move-grid">
+          <article class="move-card"><b>01 · COST</b><h3>Make startup cheap</h3><p>Keep universal memory short and launch only the MCP schemas a job needs.</p></article>
+          <article class="move-card"><b>02 · TIMING</b><h3>Load late</h3><p>Slash commands turn optional knowledge into an explicit choice at the moment of use.</p></article>
+          <article class="move-card"><b>03 · OWNERSHIP</b><h3>Move the job</h3><p>Sub-agents and separate processes carry their own exploration instead of polluting the primary window.</p></article>
+          <article class="move-card"><b>04 · EVIDENCE</b><h3>Write the trail</h3><p>Specs, JSONL bundles, logs, session IDs, and reports survive after a context reset.</p></article>
+        </div>
+        <aside class="evidence-box"><strong>Why this design is a teaching repo</strong><p>Some files deliberately disagree with the checkout or contain rough edges. Dan is demonstrating context bloat, context rot, isolation, and control mechanisms—not shipping one cohesive production application.</p></aside>
+      </section>
+
+      <section id="always-on" class="lesson-section measure">
+        <span class="section-label">Walk the code · Reduce</span>
+        <h2>1. Shrink what every session pays for</h2>
+
+        <details class="file-card" open>
+          <summary><span class="file-name"><code>README.md</code><small>The conceptual spine and twelve-technique syllabus</small></span><span class="file-tag">Purpose</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> teach the R&amp;D framework, then point at each executable example in the repository. The README progresses from measurement and MCP reduction through priming, output control, sub-agents, architect/editor separation, bundles, primary agents, and experts.</p>
+            <div class="code-wrap"><div class="code-label"><span>README.md</span><span>the governing rule</span></div><pre><code class="language-markdown">There are only two ways to manage your context window effectively:
+
+**R and D - Reduce and Delegate**
+
+- **Reduce**: Remove junk context, minimize token usage, focus on what matters
+- **Delegate**: Offload work to sub-agents, separate agents, or specialized systems</code></pre></div>
+            <ol class="annotations"><li>The twelve techniques are not twelve unrelated tricks. Each implements Reduce, Delegate, or both.</li><li>The repository contains probes and configurations for the techniques; it is not the frontend/backend product described by some stale instructions.</li></ol>
+          </div>
+        </details>
+
+        <details class="file-card" open>
+          <summary><span class="file-name"><code>CLAUDE.md</code> · <code>CLAUDE.concise.md</code> · <code>CLAUDE.large.md</code><small>Active universal contract, spare copy, and deliberate anti-pattern</small></span><span class="file-tag">Memory</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> make the cost of static memory visible. <code>CLAUDE.md</code> and <code>CLAUDE.concise.md</code> are byte-for-byte identical 43-line contracts. <code>CLAUDE.large.md</code> expands to 2,978 lines of generic practices and explicitly labels itself dangerous.</p>
+            <div class="code-wrap"><div class="code-label"><span>CLAUDE.md</span><span>small, universal rules</span></div><pre><code class="language-markdown">## Development Guidelines
+1. Write tests first (TDD)
+2. Use TypeScript strict mode
+3. Follow existing naming conventions
+4. Add JSDoc for public APIs
+5. Keep functions under 50 lines</code></pre></div>
+            <p>Dan keeps the large file under a non-special filename, so it is evidence rather than the active default. That is the key design choice: keep examples available without charging every session for them.</p>
+            <aside class="warning-box"><strong>Context-rot specimen</strong><p>The small file says <code>apps/frontend/</code> and <code>apps/backend/</code> exist, but neither path is in this checkout. Its test/lint/build commands also have no matching root scripts. The stale claims make the lesson concrete: “short” is not automatically “correct.”</p></aside>
+          </div>
+        </details>
+
+        <details id="mcp" class="file-card">
+          <summary><span class="file-name"><code>.mcp.json.sample</code> · <code>.mcp.json.firecrawl_7k.sample</code> · <code>.mcp.json.all_16k.sample</code><small>Tool-schema budgeting by launch configuration</small></span><span class="file-tag">MCP</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> show that tool availability has a context price before any tool is called. The general and “all” samples declare Playwright plus Firecrawl; the focused sample declares only Firecrawl. The <code>7k</code>/<code>16k</code> names communicate the intended comparison, not a runtime counter implemented in this repo.</p>
+            <div class="code-wrap"><div class="code-label"><span>launch pattern from README.md</span><span>strict scope</span></div><pre><code class="language-bash">claude --mcp-config .mcp.json --strict-mcp-config</code></pre></div>
+            <p><code>--strict-mcp-config</code> is the boundary: it prevents unrelated user- or local-scope MCP servers from sneaking into this one session.</p>
+          </div>
+        </details>
+      </section>
+
+      <section id="prime" class="lesson-section measure">
+        <span class="section-label">Walk the code · Load late</span>
+        <h2>2. Prime for the job, not for every possible job</h2>
+
+        <details class="file-card" open>
+          <summary><span class="file-name"><code>.claude/commands/prime.md</code><small>The cheapest useful orientation</small></span><span class="file-tag">Command</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> establish a general model of the codebase with only a file inventory and the README. It deliberately does not say “read everything.”</p>
+            <div class="code-wrap"><div class="code-label"><span>prime.md</span><span>two inputs</span></div><pre><code class="language-markdown">## Run
+
+git ls-files
+
+## Read
+
+README.md</code></pre></div>
+            <p>The inventory supplies shape; the README supplies intent. The agent can search deeper only when the current request demands it.</p>
+          </div>
+        </details>
+
+        <details class="file-card">
+          <summary><span class="file-name"><code>.claude/commands/prime_cc.md</code><small>A compositional, domain-specific prime</small></span><span class="file-tag">Command</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> reuse <code>/prime</code>, then add the Claude Code layer: command contracts, output styles, the bundle hook, and settings.</p>
+            <div class="code-wrap"><div class="code-label"><span>prime_cc.md</span><span>stack, do not duplicate</span></div><pre><code class="language-markdown">## Run
+
+Read and execute the .claude/commands/prime.md file top to bottom.
+
+## Read
+
+.claude/commands/**
+.claude/output-styles/**
+.claude/hooks/context_bundle_builder.py
+.claude/settings.json</code></pre></div>
+            <p>This is a small but deep design move: a specialized prime extends a base prime. The user pays for Claude-specific context only while changing the agentic layer.</p>
+          </div>
+        </details>
+      </section>
+
+      <section id="observe" class="lesson-section measure">
+        <span class="section-label">Walk the code · Evidence</span>
+        <h2>3. Turn invisible context into an append-only trail</h2>
+
+        <details class="file-card" open>
+          <summary><span class="file-name"><code>.claude/settings.json</code><small>The event router for both logging systems</small></span><span class="file-tag">Wiring</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> attach hooks to Claude Code lifecycle events. Every event goes to the universal logger. User prompts plus successful Read/Write operations also go to the compact context bundle.</p>
+            <div class="code-wrap"><div class="code-label"><span>settings.json</span><span>selected routes</span></div><pre><code class="language-json">{
+  "PostToolUse": [
+    {
+      "matcher": "Read|Write",
+      "hooks": [{
+        "type": "command",
+        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/context_bundle_builder.py --type file_ops"
+      }]
+    },
+    {
+      "matcher": "*",
+      "hooks": [{
+        "type": "command",
+        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/universal_hook_logger.py"
+      }]
+    }
+  ]
+}</code></pre></div>
+            <ol class="annotations"><li><code>PreToolUse</code> logs the proposed action; <code>PostToolUse</code> logs its result.</li><li><code>UserPromptSubmit</code> feeds both loggers, while Stop, SubagentStop, Notification, PreCompact, SessionStart, and SessionEnd feed the universal logger.</li><li>The Python files are executable UV scripts, so settings can invoke them directly through their shebangs.</li></ol>
+          </div>
+        </details>
+
+        <details class="file-card" open>
+          <summary><span class="file-name"><code>.claude/hooks/context_bundle_builder.py</code><small>A compact replay index, not a transcript</small></span><span class="file-tag">Python hook</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> preserve just enough history to reconstruct a focused session: user prompt prefixes, file paths, Read ranges, and Write content lengths.</p>
+            <div class="code-wrap"><div class="code-label"><span>context_bundle_builder.py</span><span>data reduction</span></div><pre><code class="language-python">log_entry = {
+    "operation": tool_name.lower(),
+    "file_path": file_path_relative
+}
+
+if tool_name == "Read":
+    if "limit" in tool_input:
+        tool_input_filtered["limit"] = tool_input["limit"]
+    if "offset" in tool_input:
+        tool_input_filtered["offset"] = tool_input["offset"]
+
+# UserPromptSubmit path
+log_entry = {
+    "operation": "prompt",
+    "prompt": prompt[:500]
+}</code></pre></div>
+            <ol class="annotations"><li>It exits early for tools other than Read/Write and failed Write responses.</li><li>It converts paths under <code>CLAUDE_PROJECT_DIR</code> to relative paths, keeping outside paths absolute.</li><li>It appends one JSON object per line to a day/hour + session filename. JSONL makes each observation cheap to append and easy to stream.</li><li>It never stores written content, and it truncates prompts at 500 characters. That is intentional reduction.</li></ol>
+            <aside class="warning-box"><strong>Boundary to notice</strong><p>The bundle directory is relative to the hook process’s current working directory, while the universal logger anchors itself to <code>CLAUDE_PROJECT_DIR</code>. If the hook runs from an unexpected directory, the two logs can land under different roots.</p></aside>
+          </div>
+        </details>
+
+        <details class="file-card">
+          <summary><span class="file-name"><code>.claude/hooks/universal_hook_logger.py</code><small>Full-fidelity lifecycle diagnostics</small></span><span class="file-tag">Python hook</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> retain the complete incoming payload for each event, enriched with an ISO timestamp and separated by session and hook name. Unlike the compact bundle, this is diagnostic evidence.</p>
+            <div class="code-wrap"><div class="code-label"><span>universal_hook_logger.py</span><span>full payload</span></div><pre><code class="language-python">def create_log_entry(input_data: dict) -> dict:
+    return {
+        "timestamp": datetime.now().isoformat(),
+        "payload": input_data
+    }
+
+log_dir = Path(project_dir) / "agents" / "hook_logs" / session_id
+log_file = log_dir / f"{hook_name}.jsonl"</code></pre></div>
+            <p>Its broad <code>except</code> returns exit code 0 so observability cannot block the agent. The tradeoff is silent data loss after one terse stderr message. Full payloads may also contain sensitive prompt or tool data, so the generated log directory must remain private.</p>
+          </div>
+        </details>
+
+        <details class="file-card">
+          <summary><span class="file-name"><code>.claude/commands/load_bundle.md</code><small>The reset-and-replay algorithm</small></span><span class="file-tag">Command</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> read one JSONL bundle, understand prior prompts without executing them, deduplicate file entries, and replay each file once with the most comprehensive recorded range.</p>
+            <div class="code-wrap"><div class="code-label"><span>load_bundle.md</span><span>selection rule</span></div><pre><code class="language-text">If ANY entry has no tool_input parameters, read the ENTIRE file.
+Otherwise prefer offset 0, then the largest limit.
+If all reads start later, choose the largest offset + limit.
+If a file appears more than three times, read the entire file.</code></pre></div>
+            <p>The command separates <em>intent history</em> from <em>action authority</em>: prompt entries explain what the previous user asked, but the loader is explicitly forbidden from acting on those old prompts.</p>
+          </div>
+        </details>
+      </section>
+
+      <section id="delegate" class="lesson-section measure">
+        <span class="section-label">Walk the code · Delegate</span>
+        <h2>4. Give isolated research to isolated agents</h2>
+
+        <details class="file-card" open>
+          <summary><span class="file-name"><code>.claude/commands/load_ai_docs.md</code> → <code>.claude/agents/docs-scraper.md</code><small>One URL per focused worker</small></span><span class="file-tag">Fan-out</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> read the URL inventory in <code>ai_docs/README.md</code>, keep fresh cached files, delete stale ones, and launch one docs-scraper task per missing URL in parallel.</p>
+            <div class="code-wrap"><div class="code-label"><span>load_ai_docs.md</span><span>delegation boundary</span></div><pre><code class="language-markdown">For each url in ai_docs/README.md that was not skipped,
+Use the Task tool in parallel and follow the scrape_loop_prompt:
+
+Use @agent-docs-scraper agent - pass it the url as the prompt</code></pre></div>
+            <p>The parent retains the URL list and final report. Each child carries webpage chrome, scraping details, cleanup, and file writing in its own window. The agent’s exact response contract—success/failure, saved path, source URL—keeps the result small.</p>
+          </div>
+        </details>
+
+        <details class="file-card">
+          <summary><span class="file-name"><code>.claude/agents/research-docs-fetcher.md</code> · <code>.claude/agents/meta-agent.md</code><small>Broader research and specialist generation</small></span><span class="file-tag">Agents</span></summary>
+          <div class="file-body">
+            <p><strong>Research agent:</strong> accepts URLs or topics, skips research artifacts younger than 24 hours, cleans sources into Markdown with metadata, and reports batch successes and failures.</p>
+            <p><strong>Meta-agent:</strong> reads current sub-agent documentation, infers the minimum tools for a requested role, and writes a new configuration into <code>.claude/agents/</code>. Its job is to design the isolated context boundary itself.</p>
+            <aside class="why-box"><strong>Why two documentation agents?</strong><p><code>docs-scraper</code> is a narrow URL-to-file worker used by <code>/load_ai_docs</code>. <code>research-agent</code> can search a topic, manage freshness, batch sources, and cross-reference results. Different purpose means different context.</p></aside>
+          </div>
+        </details>
+
+        <details id="background" class="file-card">
+          <summary><span class="file-name"><code>.claude/commands/background.md</code> · <code>scripts/bg_claude_code_test.sh</code><small>A separate primary agent that reports through a file</small></span><span class="file-tag">Process</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> launch a complete <code>claude --print</code> process with its own model, system prompt, tool context, and report file. This is stronger isolation than a sub-agent because the whole primary session is separate.</p>
+            <div class="code-wrap"><div class="code-label"><span>background.md</span><span>primary-process handoff</span></div><pre><code class="language-bash">claude \
+  --model "${MODEL}" \
+  --output-format text \
+  --dangerously-skip-permissions \
+  --append-system-prompt "...continuously update ${REPORT_FILE}..." \
+  --print "${USER_PROMPT}"</code></pre></div>
+            <p>The durable report is the communication channel. The parent does not need the worker’s intermediate conversation; it can inspect progress and the final renamed artifact.</p>
+            <aside class="warning-box"><strong>Demo sharp edges</strong><p>The shell probe assigns <code>REPORT_FILE=${2:-...}</code>, so its second argument doubles as both model and report path; the command contract correctly describes report file as <code>$3</code>. The Markdown example also contains fragile shell interpolation/line-continuation text. Treat these as experiments to repair before production use.</p></aside>
+          </div>
+        </details>
+      </section>
+
+      <section id="experts" class="lesson-section measure">
+        <span class="section-label">Walk the code · Architect/editor</span>
+        <h2>5. Spend exploration once, then hand over a crisp artifact</h2>
+
+        <details class="file-card" open>
+          <summary><span class="file-name"><code>.claude/commands/quick-plan.md</code> → <code>.claude/commands/build.md</code><small>Planner and builder communicate through a spec path</small></span><span class="file-tag">Pipeline</span></summary>
+          <div class="file-body">
+            <p><strong>Planner job:</strong> explore the request, architecture, edge cases, tests, and success criteria, then save a kebab-case specification. <strong>Builder job:</strong> accept only <code>PATH_TO_PLAN</code>, read it, implement it, and report the diff.</p>
+            <div class="code-wrap"><div class="code-label"><span>build.md</span><span>tiny editor contract</span></div><pre><code class="language-markdown">## Variables
+PATH_TO_PLAN: $ARGUMENTS
+
+## Workflow
+- Read the plan at `PATH_TO_PLAN`. Think hard about the plan and implement it.
+
+## Report
+- Summarize the work in a concise bullet list.
+- Report files and total lines changed with `git diff --stat`.</code></pre></div>
+            <p>The planner is allowed to be messy. The builder begins with the cleaned artifact instead of the planner’s search history—that is Reduce achieved through Delegate.</p>
+          </div>
+        </details>
+
+        <details class="file-card">
+          <summary><span class="file-name"><code>.claude/commands/experts/cc_hook_expert/</code><small>Three real commands: cc_hook_expert_plan.md, cc_hook_expert_build.md, cc_hook_expert_improve.md</small></span><span class="file-tag">Expert trio</span></summary>
+          <div class="file-body">
+            <p><strong>Plan</strong> loads hook docs and current infrastructure, chooses events/output formats, and writes a specification. <strong>Build</strong> converts that spec into executable UV hooks, settings, tests, and documentation. <strong>Improve</strong> reviews recent hook diffs and updates only the stable commands’ <code>## Expertise</code> sections when a reusable lesson exists.</p>
+            <div class="code-wrap"><div class="code-label"><span>expert control loop</span><span>knowledge compounds</span></div><pre><code class="language-text">request
+  → cc_hook_expert_plan      (investigate + specify)
+  → cc_hook_expert_build     (implement + validate)
+  → cc_hook_expert_improve   (extract reusable learning)
+  ↺ future plan/build starts with better expertise</code></pre></div>
+            <p>Separating the workflows from the <code>## Expertise</code> section is deliberate. The improve stage can refresh domain knowledge without casually rewriting the operating procedure.</p>
+            <aside class="warning-box"><strong>Contract versus checkout</strong><p>The expert files reference fetched AI docs and generated spec directories that are absent here. They are dependencies the commands expect to create or load, not files in the audited tree.</p></aside>
+          </div>
+        </details>
+
+        <details id="outputs" class="file-card">
+          <summary><span class="file-name"><code>.claude/output-styles/</code> · <code>.claude/settings.local.concise.json</code><small>Control how much output returns to context</small></span><span class="file-tag">Output</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> make response size an explicit mode. The styles range from one-word <code>Done.</code> and ultra-concise fragments to hierarchical bullets and valid YAML. The TTS style keeps visible text short, then calls ElevenLabs for a spoken summary.</p>
+            <div class="code-wrap"><div class="code-label"><span>concise-done.md</span><span>extreme reduction</span></div><pre><code class="language-markdown">Respond with only "Done."
+
+There are only three exceptions:
+1. A different response was explicitly requested.
+2. A direct question needs a concise answer.
+3. A blocker or error needs a concise explanation.</code></pre></div>
+            <p>The local settings example selects <code>One Word Output</code> and enables the project Firecrawl server. This demonstrates that response policy and tool policy are independent knobs.</p>
+          </div>
+        </details>
+      </section>
+
+      <section id="sdk" class="lesson-section measure">
+        <span class="section-label">Walk the code · Agentic control</span>
+        <h2>6. Move the same controls behind a TypeScript boundary</h2>
+
+        <details class="file-card">
+          <summary><span class="file-name"><code>apps/hello_cc_1.ts</code> · <code>apps/hello_cc_2.ts</code><small>Two minimal probes of the async SDK stream</small></span><span class="file-tag">Probe</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> reveal the Claude Code SDK message protocol before building an abstraction. Both call <code>query()</code>; one permits Bash for a time lookup and two turns, while the other permits no tools and one turn.</p>
+            <div class="code-wrap"><div class="code-label"><span>hello_cc_2.ts</span><span>stream inspection</span></div><pre><code class="language-typescript">for await (const message of query({
+  prompt: "Hello! Please respond with a friendly greeting...",
+  options: {
+    model: "sonnet",
+    maxTurns: 1,
+    systemPrompt: "You are a helpful AI assistant...",
+    allowedTools: []
+  }
+})) {
+  if (message.type === "system" && message.subtype === "init") {
+    console.log(`Session started: ${message.session_id}`);
+  }
+  if (message.type === "result") console.log(message.result);
+}</code></pre></div>
+            <p>The examples surface session ID, model, working directory, tools, duration, cost, turns, and success. Measurement comes before abstraction.</p>
+          </div>
+        </details>
+
+        <details id="sdk-types" class="file-card" open>
+          <summary><span class="file-name"><code>apps/cc_ts_wrapper/types.ts</code><small>The small public language of the wrapper</small></span><span class="file-tag">Types</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> define what callers may configure and what they get back. <code>ClaudeSettings</code> holds turn/tool/system/session controls; <code>ReusablePromptConfig</code> holds a named prompt template; <code>PromptResult</code> normalizes success, messages, error, and session ID.</p>
+            <div class="code-wrap"><div class="code-label"><span>types.ts</span><span>safe defaults</span></div><pre><code class="language-typescript">export const DEFAULT_SETTINGS: ClaudeSettings = {
+  maxTurns: 5,
+  allowedTools: ["Bash", "Read", "Write", "Edit", "WebSearch"],
+};</code></pre></div>
+            <p>The types are the seam: the CLI and future programmatic callers do not need to understand every SDK message variant.</p>
+          </div>
+        </details>
+
+        <details id="sdk-core" class="file-card" open>
+          <summary><span class="file-name"><code>apps/cc_ts_wrapper/core.ts</code><small>One-shot adapter plus reusable prompt registry</small></span><span class="file-tag">Core</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> offer two paths over one execution primitive. <code>adhoc_prompt()</code> calls the SDK directly. <code>reusable_prompt()</code> looks up a named configuration, expands <code>{USER_PROMPT}</code>, layers defaults, then delegates to <code>adhoc_prompt()</code>.</p>
+            <div class="code-wrap"><div class="code-label"><span>core.ts</span><span>the shared execution seam</span></div><pre><code class="language-typescript">const mergedSettings = { ...DEFAULT_SETTINGS, ...settings };
+
+for await (const message of query({
+  prompt,
+  options: {
+    abortController,
+    maxTurns: mergedSettings.maxTurns,
+    customSystemPrompt: mergedSettings.systemPrompt,
+    allowedTools: mergedSettings.allowedTools,
+    continue: mergedSettings.continue,
+    resume: mergedSettings.resume,
+  }
+})) {
+  if (message.type === "result" && message.subtype === "success") {
+    result.messages.push(message.result);
+  }
+  if (message.type === "system") result.sessionId = message.session_id;
+}</code></pre></div>
+            <ol class="annotations"><li>The in-memory <code>Map</code> is enough because commands are registered at process startup.</li><li>Layering is global defaults → command defaults → call settings; a call can specialize a reusable expert without editing it.</li><li>Only successful result text is collected. System messages contribute the session ID; other stream messages stay internal.</li></ol>
+            <aside class="warning-box"><strong>Subtle merge bug</strong><p>Spreading an object that contains <code>undefined</code> overwrites a real default. The CLI always constructs keys for <code>maxTurns</code> and <code>allowedTools</code>, even when flags are absent, so direct ad-hoc calls can erase <code>DEFAULT_SETTINGS</code>. Filter undefined keys or merge with <code>??</code> before production use.</p></aside>
+          </div>
+        </details>
+
+        <details id="sdk-cli" class="file-card" open>
+          <summary><span class="file-name"><code>apps/cc_ts_wrapper/cli.ts</code><small>The human-facing argument and command boundary</small></span><span class="file-tag">CLI</span></summary>
+          <div class="file-body">
+            <p><strong>Job:</strong> register <code>/analyze</code> and <code>/refactor</code>, parse Bun arguments, list commands, translate flags into <code>ClaudeSettings</code>, choose reusable versus ad-hoc execution, and print normalized results.</p>
+            <div class="code-wrap"><div class="code-label"><span>cli.ts</span><span>a reusable expert definition</span></div><pre><code class="language-typescript">register_prompt("/analyze", {
+  name: "analyze",
+  description: "Analyze code or system performance",
+  systemPrompt: "You are a senior engineer analyzing code quality and performance",
+  defaultSettings: {
+    maxTurns: 10,
+    allowedTools: ["Read", "Grep", "Bash"]
+  },
+  promptTemplate: "Analyze the following: {USER_PROMPT}"
+});</code></pre></div>
+            <p>This is the programmatic version of context engineering: a purpose-specific system prompt, tool allowlist, turn budget, and prompt template travel as one reusable object.</p>
+            <aside class="evidence-box"><strong>Why the lab uses <code>--list</code></strong><p>The list path proves registration and argument parsing without spending model tokens or requiring an API key. It is the smallest feedback loop around the extension seam.</p></aside>
+          </div>
+        </details>
+
+        <details id="utilities" class="file-card">
+          <summary><span class="file-name"><code>.claude/utils/llm/</code> · <code>.claude/utils/tts/</code><small>Small provider adapters behind output experiments</small></span><span class="file-tag">Utilities</span></summary>
+          <div class="file-body">
+            <p><strong>LLM job:</strong> the Anthropic, OpenAI, and Ollama scripts expose the same three operations: prompt a fast model, generate a short completion message, and generate a one-word agent name with fallbacks. Provider details stay behind matching function names.</p>
+            <p><strong>TTS job:</strong> the ElevenLabs, OpenAI, and offline <code>pyttsx3</code> scripts accept text from argv and play it immediately. UV inline metadata makes each script self-declaring; environment variables select remote credentials.</p>
+            <p>These utilities are supporting experiments, not wired into the hooks. <code>concise-tts.md</code> explicitly calls the ElevenLabs script. The Ollama metadata lists <code>openai</code> twice, and several files import unused modules—more evidence that this is an instructional workbench.</p>
+          </div>
+        </details>
+      </section>
+
+      <section id="ledger" class="lesson-section measure">
+        <span class="section-label">Exhaustive audit</span>
+        <h2>Every real file and its job</h2>
+        <p class="lede">No generated bundle, fetched AI doc, spec, background report, or imagined application directory is counted here. This ledger reconciles exactly to the 53 files in the checkout.</p>
+
+        <div class="ledger-group">
+          <h3>Root · 11 files</h3>
+          <ul class="file-ledger">
+            <li><code>.env.sample</code><span>Names the three remote-service API keys without storing secrets.</span></li>
+            <li><code>.gitignore</code><span>Excludes dependencies, environments, runtime logs, fetched docs, bundles, reports, specs, and local MCP files.</span></li>
+            <li><code>.mcp.json.sample</code><span>Example Playwright + Firecrawl project MCP configuration.</span></li>
+            <li><code>.mcp.json.firecrawl_7k.sample</code><span>Focused Firecrawl-only MCP comparison.</span></li>
+            <li><code>.mcp.json.all_16k.sample</code><span>Named full two-server context comparison.</span></li>
+            <li><code>CLAUDE.md</code><span>Active 43-line universal project contract.</span></li>
+            <li><code>CLAUDE.concise.md</code><span>Identical concise contract retained as a named variant.</span></li>
+            <li><code>CLAUDE.large.md</code><span>Intentional 2,978-line context-bloat anti-pattern.</span></li>
+            <li><code>README.md</code><span>Explains R&amp;D and all twelve context-engineering techniques.</span></li>
+            <li><code>package.json</code><span>Declares only the root TypeScript development dependency.</span></li>
+            <li><code>bun.lock</code><span>Pins the root TypeScript 5.9.2 package resolution.</span></li>
+          </ul>
+        </div>
+
+        <div class="ledger-group">
+          <h3><code>.claude/</code> · 28 files</h3>
+          <ul class="file-ledger">
+            <li><code>.claude/agents/docs-scraper.md</code><span>Fetches one URL and saves cleaned, complete Markdown.</span></li>
+            <li><code>.claude/agents/meta-agent.md</code><span>Designs and writes a new focused sub-agent definition.</span></li>
+            <li><code>.claude/agents/research-docs-fetcher.md</code><span>Searches or fetches research sources with freshness metadata.</span></li>
+            <li><code>.claude/commands/background.md</code><span>Launch contract for a separate report-writing Claude process.</span></li>
+            <li><code>.claude/commands/build.md</code><span>Implements one saved plan and reports the diff.</span></li>
+            <li><code>.claude/commands/load_ai_docs.md</code><span>Refreshes URL docs through parallel scraper sub-agents.</span></li>
+            <li><code>.claude/commands/load_bundle.md</code><span>Deduplicates and replays a prior session’s recorded reads.</span></li>
+            <li><code>.claude/commands/prime.md</code><span>Loads the inventory and README for general orientation.</span></li>
+            <li><code>.claude/commands/prime_cc.md</code><span>Extends the base prime with Claude Code infrastructure.</span></li>
+            <li><code>.claude/commands/quick-plan.md</code><span>Turns a request into a saved implementation specification.</span></li>
+            <li><code>.claude/commands/experts/cc_hook_expert/cc_hook_expert_plan.md</code><span>Designs a hook feature specification from docs and infrastructure.</span></li>
+            <li><code>.claude/commands/experts/cc_hook_expert/cc_hook_expert_build.md</code><span>Builds, secures, tests, and documents hooks from a spec.</span></li>
+            <li><code>.claude/commands/experts/cc_hook_expert/cc_hook_expert_improve.md</code><span>Extracts recent hook lessons into expert knowledge sections.</span></li>
+            <li><code>.claude/hooks/context_bundle_builder.py</code><span>Appends reduced prompt and Read/Write evidence to JSONL.</span></li>
+            <li><code>.claude/hooks/universal_hook_logger.py</code><span>Appends full lifecycle payloads by session and event.</span></li>
+            <li><code>.claude/output-styles/concise-done.md</code><span>Constrains normal completion output to <code>Done.</code></span></li>
+            <li><code>.claude/output-styles/concise-tts.md</code><span>Pairs an ultra-short answer with ElevenLabs playback.</span></li>
+            <li><code>.claude/output-styles/concise-ultra.md</code><span>Requests minimal fragments and direct actions.</span></li>
+            <li><code>.claude/output-styles/verbose-bullet-points.md</code><span>Defines a deeply structured bullet response mode.</span></li>
+            <li><code>.claude/output-styles/verbose-yaml-structured.md</code><span>Defines a parseable YAML response contract.</span></li>
+            <li><code>.claude/settings.json</code><span>Connects lifecycle events to both Python hooks.</span></li>
+            <li><code>.claude/settings.local.concise.json</code><span>Example local Firecrawl + one-word-output mode.</span></li>
+            <li><code>.claude/utils/llm/anth.py</code><span>Anthropic prompt, completion-message, and agent-name adapter.</span></li>
+            <li><code>.claude/utils/llm/oai.py</code><span>OpenAI equivalent of the small LLM utility contract.</span></li>
+            <li><code>.claude/utils/llm/ollama.py</code><span>Local OpenAI-compatible Ollama implementation and fallbacks.</span></li>
+            <li><code>.claude/utils/tts/elevenlabs_tts.py</code><span>ElevenLabs Turbo speech generation and playback.</span></li>
+            <li><code>.claude/utils/tts/openai_tts.py</code><span>Async streaming OpenAI speech playback.</span></li>
+            <li><code>.claude/utils/tts/pyttsx3_tts.py</code><span>Offline local speech with a random default completion phrase.</span></li>
+          </ul>
+        </div>
+
+        <div class="ledger-group">
+          <h3><code>apps/</code> · 12 files</h3>
+          <ul class="file-ledger">
+            <li><code>apps/hello_cc_1.ts</code><span>Two-turn SDK probe with Bash, result metrics, and error handling.</span></li>
+            <li><code>apps/hello_cc_2.ts</code><span>One-turn, no-tool SDK probe that displays init metadata.</span></li>
+            <li><code>apps/cc_ts_wrapper/.gitignore</code><span>Ignores wrapper dependencies, builds, logs, caches, env, and IDE files.</span></li>
+            <li><code>apps/cc_ts_wrapper/CLAUDE.md</code><span>Bun-specific local development rules and API examples.</span></li>
+            <li><code>apps/cc_ts_wrapper/README.md</code><span>Minimal install/run notes generated by Bun init.</span></li>
+            <li><code>apps/cc_ts_wrapper/bun.lock</code><span>Pins Claude Code SDK 1.0.108 and platform/type dependencies.</span></li>
+            <li><code>apps/cc_ts_wrapper/cli.ts</code><span>Registers commands, parses flags, dispatches, and prints results.</span></li>
+            <li><code>apps/cc_ts_wrapper/core.ts</code><span>Owns the SDK stream adapter and reusable prompt registry.</span></li>
+            <li><code>apps/cc_ts_wrapper/index.ts</code><span>Bun-init placeholder that prints a hello message.</span></li>
+            <li><code>apps/cc_ts_wrapper/package.json</code><span>Defines Bun scripts and SDK/TypeScript dependencies.</span></li>
+            <li><code>apps/cc_ts_wrapper/tsconfig.json</code><span>Strict ES2022 bundler-oriented TypeScript configuration.</span></li>
+            <li><code>apps/cc_ts_wrapper/types.ts</code><span>Defines settings, reusable prompt, result, and default contracts.</span></li>
+          </ul>
+        </div>
+
+        <div class="ledger-group">
+          <h3>Reference + script · 2 files</h3>
+          <ul class="file-ledger">
+            <li><code>ai_docs/README.md</code><span>Lists eleven documentation URLs to fetch only when needed.</span></li>
+            <li><code>scripts/bg_claude_code_test.sh</code><span>Minimal shell experiment for a report-writing background process.</span></li>
+          </ul>
+        </div>
+        <aside class="why-box"><strong>Audit check</strong><p>11 root + 28 Claude infrastructure + 12 apps + 2 reference/script = <strong>53 real files</strong>. Newline-counted source coverage is <strong>6,745 lines</strong>; the one-line <code>index.ts</code> has no trailing newline, so <code>wc -l</code> reports zero for that file even though it was read.</p></aside>
+      </section>
+
+      <section id="run" class="lesson-section measure">
+        <span class="section-label">Put it together</span>
+        <h2>How a focused run works end to end</h2>
+        <ol class="flow-list">
+          <li><div class="flow-copy"><b>Start with the universal floor.</b><p>Claude loads the concise project contract. A strict MCP launch can restrict startup tool schemas to the selected project file.</p></div></li>
+          <li><div class="flow-copy"><b>Prime for this purpose.</b><p><code>/prime</code> loads only inventory + README; <code>/prime_cc</code> composes the extra agentic layer when the task concerns Claude Code.</p></div></li>
+          <li><div class="flow-copy"><b>Record the request.</b><p><code>UserPromptSubmit</code> sends a shortened prompt to the bundle builder and the full lifecycle payload to the universal logger.</p></div></li>
+          <li><div class="flow-copy"><b>Execute one bounded job.</b><p>A command may work locally, fan out URLs to docs agents, hand a spec from planner to builder, or launch an independent primary process.</p></div></li>
+          <li><div class="flow-copy"><b>Capture tool evidence.</b><p>Every tool event is logged; successful Reads/Writes also add reduced path/range metadata to the context bundle.</p></div></li>
+          <li><div class="flow-copy"><b>Return a small result.</b><p>An output style or a specialist’s response contract controls what comes back into the primary context.</p></div></li>
+          <li><div class="flow-copy"><b>Reset without amnesia.</b><p>After <code>/clear</code>, <code>/load_bundle</code> reconstructs the most comprehensive unique reads while treating old prompts as history, not new instructions.</p></div></li>
+        </ol>
+
+        <h3>The SDK path is the same architecture in code</h3>
+        <ol class="flow-list">
+          <li><div class="flow-copy"><b>CLI parses intent.</b><p>Flags and positionals become a command name, prompt, and settings object.</p></div></li>
+          <li><div class="flow-copy"><b>Registry supplies purpose.</b><p>A reusable command contributes its system prompt, tool allowlist, turn budget, and template.</p></div></li>
+          <li><div class="flow-copy"><b>Core opens the stream.</b><p><code>adhoc_prompt()</code> calls <code>query()</code> and observes system/result messages.</p></div></li>
+          <li><div class="flow-copy"><b>Normalized evidence returns.</b><p>The caller receives success, result messages, error, and session ID instead of the raw stream.</p></div></li>
+        </ol>
+      </section>
+
+      <section id="fails" class="lesson-section measure">
+        <span class="section-label">Common fail</span>
+        <h2>Six ways the idea gets misapplied</h2>
+        <div class="failure-grid">
+          <article class="failure-card"><b>“Concise means correct.”</b><p>The active memory is short but names absent app directories. Reduce size and verify freshness.</p></article>
+          <article class="failure-card"><b>“Available tools are free.”</b><p>MCP schemas consume startup context even if unused. Launch with the narrow strict configuration.</p></article>
+          <article class="failure-card"><b>“The bundle is a backup.”</b><p>It stores prompt prefixes and Read/Write metadata, not full conversation or file contents.</p></article>
+          <article class="failure-card"><b>“Every delegation is the same.”</b><p>A sub-agent is a partially isolated worker; <code>/background</code> launches an independent primary process with a file channel.</p></article>
+          <article class="failure-card"><b>“Spreads preserve defaults.”</b><p>An explicit <code>undefined</code> overwrites defaults in JavaScript. The wrapper’s CLI/core boundary demonstrates the trap.</p></article>
+          <article class="failure-card"><b>“Observability is harmless.”</b><p>The universal logger stores full payloads. Keep runtime logs ignored, private, and subject to retention rules.</p></article>
+        </div>
+      </section>
+
+      <section id="lab" class="lesson-section measure">
+        <span class="section-label">You try</span>
+        <h2>Lab: add one focused SDK command</h2>
+        <div class="lab-card">
+          <h3>Add a beginner-only <code>/explain</code> expert</h3>
+          <p class="small">This changes one registry entry and verifies the cheapest observable behavior before spending any model tokens.</p>
+          <ol>
+            <li>Open <code>apps/cc_ts_wrapper/cli.ts</code>.</li>
+            <li>After the existing <code>/refactor</code> registration, add:</li>
+          </ol>
+          <div class="code-wrap"><div class="code-label"><span>cli.ts</span><span>your modification</span></div><pre><code class="language-typescript">register_prompt("/explain", {
+  name: "explain",
+  description: "Explain code for a beginner",
+  systemPrompt: "You teach with one analogy, one code trace, and one check question",
+  defaultSettings: {
+    maxTurns: 4,
+    allowedTools: ["Read", "Grep"]
+  },
+  promptTemplate: "Explain this without assuming prior knowledge: {USER_PROMPT}"
+});</code></pre></div>
+          <ol start="3">
+            <li>From <code>apps/cc_ts_wrapper/</code>, run the no-token feedback loop:</li>
+          </ol>
+          <div class="code-wrap"><div class="code-label"><span>terminal</span><span>requires Bun</span></div><pre><code class="language-bash">bun run typecheck
+bun run cli.ts --list</code></pre></div>
+          <div class="pass-box"><b>Pass criteria</b><p>TypeScript reports no errors, and the list contains <code>/explain - Explain code for a beginner</code>. No API key or model call is needed for <code>--list</code>.</p></div>
+          <aside class="warning-box"><strong>Verification note for this companion</strong><p>The repository’s Bun checks could not be executed in the current workspace because <code>bun</code> is not installed. The lab path was verified by static control-flow inspection; run the two commands in a Bun-enabled checkout.</p></aside>
+        </div>
+      </section>
+
+      <section id="teach-back" class="lesson-section measure">
+        <span class="section-label">Teach-back</span>
+        <h2>Close the page, then explain these</h2>
+        <div class="quiz">
+          <details><summary>1. Why is <code>/prime_cc</code> better than putting every Claude Code fact in <code>CLAUDE.md</code>?</summary><p>Because the facts are loaded only for Claude Code work. General tasks keep a smaller startup context, while the specialized prime composes the base orientation when needed.</p></details>
+          <details><summary>2. What is the difference between the context bundle and the universal hook log?</summary><p>The bundle is reduced replay metadata: prompt prefixes plus Read/Write paths and ranges. The universal log is full lifecycle diagnostics: timestamp plus complete event payload, separated by session and event.</p></details>
+          <details><summary>3. How does the planner/builder pair reduce context?</summary><p>The planner spends tokens exploring and writes a clean spec. A fresh builder reads the spec rather than inheriting the planner’s search history.</p></details>
+          <details><summary>4. What four controls make <code>/analyze</code> a focused expert?</summary><p>A purpose-specific system prompt, a bounded tool allowlist, a turn budget, and a prompt template.</p></details>
+          <details><summary>5. Name one place where this repo demonstrates context rot.</summary><p>The active root <code>CLAUDE.md</code> names <code>apps/frontend/</code> and <code>apps/backend/</code>, but those paths do not exist in the audited checkout.</p></details>
+        </div>
+        <aside class="evidence-box"><strong>One-sentence test</strong><p>If you can say “Dan reduces always-on cost, primes late, delegates coherent work, and writes compact evidence so a fresh agent can resume,” you have the architecture.</p></aside>
+      </section>
+
+      <footer class="page-footer measure">
+        <p><a href="../vol-2-ah/09-rd-framework-context-window-mastery.html">← Return to the Elite Context Engineering chapter</a> · Source audit: 2026-07-13 · Companion coverage: 53 files / 6,745 lines</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+  <script>
+    if (window.hljs) window.hljs.highlightAll();
+  </script>
+</body>
+</html>

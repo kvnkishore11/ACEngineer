@@ -1,0 +1,3093 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:08.360
+Engineers, it's official. Opus has real
+
+2
+00:00:04.320 --> 00:00:10.760
+competition. GLM 5.2 is the leading open
+
+3
+00:00:08.360 --> 00:00:13.240
+weights model, and right behind it is
+
+4
+00:00:10.760 --> 00:00:16.160
+another really fantastic model, Minimax
+
+5
+00:00:13.240 --> 00:00:17.600
+M3. Normally, I ignore the open weight
+
+6
+00:00:16.160 --> 00:00:18.880
+models. In the past, they haven't been
+
+7
+00:00:17.600 --> 00:00:21.000
+good. They haven't been competitive.
+
+8
+00:00:18.880 --> 00:00:24.000
+That is no longer the case. It is now
+
+9
+00:00:21.000 --> 00:00:26.520
+official. Opus has real competition. It
+
+10
+00:00:24.000 --> 00:00:28.520
+has competition on multiple dimensions.
+
+11
+00:00:26.520 --> 00:00:30.280
+Of course, as soon as Fable is launched,
+
+12
+00:00:28.520 --> 00:00:32.400
+that competition is going to disappear,
+
+13
+00:00:30.280 --> 00:00:33.840
+but there are other important key pieces
+
+14
+00:00:32.400 --> 00:00:35.480
+of information I want to share with you
+
+15
+00:00:33.840 --> 00:00:37.840
+here that can help your agentic
+
+16
+00:00:35.480 --> 00:00:41.560
+engineering. So, let's frame our focus
+
+17
+00:00:37.840 --> 00:00:44.400
+here on GLM 5.2 versus Minimax M3,
+
+18
+00:00:41.560 --> 00:00:47.080
+because this is going to reveal four big
+
+19
+00:00:44.400 --> 00:00:48.960
+ideas and 10 insights. Here they are. If
+
+20
+00:00:47.080 --> 00:00:51.040
+these ideas interest you, stick around.
+
+21
+00:00:48.960 --> 00:00:53.000
+Let's jump right into the conversation.
+
+22
+00:00:51.040 --> 00:00:54.800
+The headline is simple. Opus has
+
+23
+00:00:53.000 --> 00:00:56.520
+competition, but it goes deeper than
+
+24
+00:00:54.800 --> 00:00:58.680
+that. As you know, the industry is
+
+25
+00:00:56.520 --> 00:01:00.600
+undergoing a massive shift right now,
+
+26
+00:00:58.680 --> 00:01:01.880
+and one of the big things I'm worried
+
+27
+00:01:00.600 --> 00:01:03.440
+about, one of the big things many
+
+28
+00:01:01.880 --> 00:01:05.239
+engineers are concerned about right now,
+
+29
+00:01:03.440 --> 00:01:07.320
+is can an AI lab, the government, or
+
+30
+00:01:05.239 --> 00:01:09.360
+anyone kill your agents at any point in
+
+31
+00:01:07.320 --> 00:01:11.360
+time? We're thinking about resiliency.
+
+32
+00:01:09.360 --> 00:01:13.680
+We're thinking about control and true
+
+33
+00:01:11.360 --> 00:01:16.040
+ownership over our AI. And this is where
+
+34
+00:01:13.680 --> 00:01:18.720
+open weight models really stand out.
+
+35
+00:01:16.040 --> 00:01:20.560
+There are many providers for GLM 5.2,
+
+36
+00:01:18.720 --> 00:01:23.960
+for Minimax M3, and we're going to
+
+37
+00:01:20.560 --> 00:01:27.040
+discuss when and how can we really own a
+
+38
+00:01:23.960 --> 00:01:28.400
+powerful model like GLM 5.2 that is near
+
+39
+00:01:27.040 --> 00:01:29.800
+the front tier. This is not a
+
+40
+00:01:28.400 --> 00:01:31.720
+benchmarking video. I want to give you
+
+41
+00:01:29.800 --> 00:01:33.680
+the insights. I want to give you the oil
+
+42
+00:01:31.720 --> 00:01:35.440
+of all the benchmarks out there, of all
+
+43
+00:01:33.680 --> 00:01:37.280
+the information up there, so you can
+
+44
+00:01:35.440 --> 00:01:39.040
+really understand the open weight
+
+45
+00:01:37.280 --> 00:01:41.200
+landscape in a very efficient
+
+46
+00:01:39.040 --> 00:01:42.400
+engineering first way. So, this is not
+
+47
+00:01:41.200 --> 00:01:43.920
+about live coding. This is about
+
+48
+00:01:42.400 --> 00:01:46.240
+engineering. This is about building out
+
+49
+00:01:43.920 --> 00:01:47.720
+your engineering agents and your product
+
+50
+00:01:46.240 --> 00:01:49.640
+agents. And then, at the end, I'm going
+
+51
+00:01:47.720 --> 00:01:52.280
+to share my model stack. So, I'm going
+
+52
+00:01:49.640 --> 00:01:54.600
+to share how I'm organizing all of these
+
+53
+00:01:52.280 --> 00:01:56.200
+models on three tiers, [music] three
+
+54
+00:01:54.600 --> 00:01:58.520
+categories, which we'll break down right
+
+55
+00:01:56.200 --> 00:02:00.360
+now, State-of-the-art workhorse and
+
+56
+00:01:58.520 --> 00:02:01.600
+lightweight models. So, of course, we're
+
+57
+00:02:00.360 --> 00:02:02.680
+going to have the cracked Fable in
+
+58
+00:02:01.600 --> 00:02:06.160
+there. You already know where that's
+
+59
+00:02:02.680 --> 00:02:09.680
+going, but let's refocus on GLM 5.2
+
+60
+00:02:06.160 --> 00:02:09.680
+versus [music] Minimax M3.
+
+61
+00:02:12.600 --> 00:02:18.720
+What I like to do with all of my models
+
+62
+00:02:14.959 --> 00:02:19.920
+is I place them on one of three tiers.
+
+63
+00:02:18.720 --> 00:02:21.760
+We have the state-of-the-art tier, we
+
+64
+00:02:19.920 --> 00:02:23.880
+have the workhorse tier, and we have the
+
+65
+00:02:21.760 --> 00:02:26.000
+lightweight tier. This is a quick mental
+
+66
+00:02:23.880 --> 00:02:27.800
+model for understanding where the
+
+67
+00:02:26.000 --> 00:02:30.160
+language models capability sit. We're
+
+68
+00:02:27.800 --> 00:02:32.560
+going to use Opus as our max control
+
+69
+00:02:30.160 --> 00:02:34.480
+group. GLM 5.2 and Minimax are going to
+
+70
+00:02:32.560 --> 00:02:36.200
+be the experimental groups we're going
+
+71
+00:02:34.480 --> 00:02:37.720
+to be focusing all of our attention on.
+
+72
+00:02:36.200 --> 00:02:39.760
+And then we're going to also have a min
+
+73
+00:02:37.720 --> 00:02:41.880
+control model. Comparing a model in
+
+74
+00:02:39.760 --> 00:02:43.320
+isolation is useless. So, what I like to
+
+75
+00:02:41.880 --> 00:02:45.600
+do is I like to set up a
+
+76
+00:02:43.320 --> 00:02:47.440
+state-of-the-art
+
+77
+00:02:45.600 --> 00:02:49.520
+comparison. So, as you can imagine, Opus
+
+78
+00:02:47.440 --> 00:02:51.480
+4.8, this is the ceiling. This is the
+
+79
+00:02:49.520 --> 00:02:53.600
+very top of the capability of models.
+
+80
+00:02:51.480 --> 00:02:54.800
+There are others in this category, but
+
+81
+00:02:53.600 --> 00:02:57.640
+just for this experiment, just to
+
+82
+00:02:54.800 --> 00:02:59.040
+compare GLM 5.2 and Minimax M3, we're
+
+83
+00:02:57.640 --> 00:02:59.959
+going to have a single front tier model.
+
+84
+00:02:59.040 --> 00:03:03.040
+And we're also going to compare it
+
+85
+00:02:59.959 --> 00:03:04.840
+against Quinn 3.6. So, this is running
+
+86
+00:03:03.040 --> 00:03:07.120
+right on your local hardware. This is a
+
+87
+00:03:04.840 --> 00:03:08.840
+lightweight model that you can own right
+
+88
+00:03:07.120 --> 00:03:10.800
+now. So, when we have a max control
+
+89
+00:03:08.840 --> 00:03:13.320
+model and a minimum control model, this
+
+90
+00:03:10.800 --> 00:03:16.080
+gives us a clear framing to inspect and
+
+91
+00:03:13.320 --> 00:03:18.440
+understand GLM 5.2 and Minimax at a
+
+92
+00:03:16.080 --> 00:03:21.080
+deeper level. GLM 5.2 is going in the A
+
+93
+00:03:18.440 --> 00:03:23.320
+tier and Minimax M3 is going in the B
+
+94
+00:03:21.080 --> 00:03:24.840
+tier on raw performance. This is a
+
+95
+00:03:23.320 --> 00:03:26.880
+performance benchmark, by the way, just
+
+96
+00:03:24.840 --> 00:03:28.480
+to make that super, super clear. This is
+
+97
+00:03:26.880 --> 00:03:30.440
+how I like to organize my models. I
+
+98
+00:03:28.480 --> 00:03:32.760
+think about tiers of models, three
+
+99
+00:03:30.440 --> 00:03:34.080
+tiers, and a single stack. So, it's not
+
+100
+00:03:32.760 --> 00:03:36.600
+about picking one model, it's about
+
+101
+00:03:34.080 --> 00:03:38.800
+having multiple options for your
+
+102
+00:03:36.600 --> 00:03:40.480
+engineering agents and your product
+
+103
+00:03:38.800 --> 00:03:41.440
+agents. So, here's the headline. I'm
+
+104
+00:03:40.480 --> 00:03:44.080
+just going to give it all away right
+
+105
+00:03:41.440 --> 00:03:46.880
+now. GLM 5.2 is the better model, but
+
+106
+00:03:44.080 --> 00:03:48.160
+Minimax M3 is the better deal. So, the
+
+107
+00:03:46.880 --> 00:03:50.239
+only real question that should be
+
+108
+00:03:48.160 --> 00:03:52.120
+guiding your decision on which model to
+
+109
+00:03:50.239 --> 00:03:54.200
+be using here, again for engineering
+
+110
+00:03:52.120 --> 00:03:56.080
+agents and product agents is this. Do
+
+111
+00:03:54.200 --> 00:03:58.520
+you need maximum capability or can you
+
+112
+00:03:56.080 --> 00:04:00.520
+optimize for price? And that basically
+
+113
+00:03:58.520 --> 00:04:02.520
+will flip your tier list. Opus goes
+
+114
+00:04:00.520 --> 00:04:04.880
+right to the bottom, GLM goes right to
+
+115
+00:04:02.520 --> 00:04:07.000
+the B tier, Minimax goes into A tier,
+
+116
+00:04:04.880 --> 00:04:09.280
+and Quinn, of course, jumps into S tier.
+
+117
+00:04:07.000 --> 00:04:11.320
+You can run this, air quotes, for free
+
+118
+00:04:09.280 --> 00:04:13.120
+on your local hardware. And with a cloud
+
+119
+00:04:11.320 --> 00:04:16.000
+provider, Quinn becomes a lot more
+
+120
+00:04:13.120 --> 00:04:17.680
+powerful and fast while paying a very
+
+121
+00:04:16.000 --> 00:04:20.760
+minimal price. So, that's the headline.
+
+122
+00:04:17.680 --> 00:04:22.000
+GLM wins on performance, Minimax wins on
+
+123
+00:04:20.760 --> 00:04:23.600
+price. And this is where things get
+
+124
+00:04:22.000 --> 00:04:25.320
+pretty interesting. So, if we look at
+
+125
+00:04:23.600 --> 00:04:26.880
+the raw stats of this, this is what
+
+126
+00:04:25.320 --> 00:04:29.320
+really matters here. It's performance,
+
+127
+00:04:26.880 --> 00:04:32.240
+speed, and cost. So, it's very clear
+
+128
+00:04:29.320 --> 00:04:33.440
+Opus is in a decent lead above these
+
+129
+00:04:32.240 --> 00:04:35.400
+open-weight models. A lot of
+
+130
+00:04:33.440 --> 00:04:36.960
+hype-centered content creators and
+
+131
+00:04:35.400 --> 00:04:39.400
+creators on X, they're going to tell you
+
+132
+00:04:36.960 --> 00:04:40.960
+that GLM is a replacement for Opus 4.8.
+
+133
+00:04:39.400 --> 00:04:42.640
+And as you likely know, that is not
+
+134
+00:04:40.960 --> 00:04:44.000
+true. They are competitive. They're
+
+135
+00:04:42.640 --> 00:04:46.160
+competitive in two dimensions,
+
+136
+00:04:44.000 --> 00:04:47.919
+performance and cost, but they are not
+
+137
+00:04:46.160 --> 00:04:50.280
+going to beat Opus. Let me just de-hype
+
+138
+00:04:47.919 --> 00:04:52.640
+that. GLM cannot replace Opus. Let's be
+
+139
+00:04:50.280 --> 00:04:54.520
+super clear about that. But both GLM 5.2
+
+140
+00:04:52.640 --> 00:04:56.240
+and Minimax have some pretty great
+
+141
+00:04:54.520 --> 00:04:58.560
+things to offer, great speed, and of
+
+142
+00:04:56.240 --> 00:05:00.040
+course, great price. Now, this is where
+
+143
+00:04:58.560 --> 00:05:04.160
+things really break down and where the
+
+144
+00:05:00.040 --> 00:05:04.160
+numbers don't look so good for Opus.
+
+145
+00:05:07.000 --> 00:05:10.919
+Starting with tokens per second, as you
+
+146
+00:05:08.720 --> 00:05:12.480
+can guess, these lightweight sub-100
+
+147
+00:05:10.919 --> 00:05:14.560
+billion parameter models, they're very,
+
+148
+00:05:12.480 --> 00:05:16.600
+very fast and they're nowhere near as
+
+149
+00:05:14.560 --> 00:05:18.160
+fast as they can be when we start adding
+
+150
+00:05:16.600 --> 00:05:20.440
+things like speculative decoding,
+
+151
+00:05:18.160 --> 00:05:22.160
+multi-token prediction. There are many
+
+152
+00:05:20.440 --> 00:05:24.600
+ways to speed these models up even
+
+153
+00:05:22.160 --> 00:05:26.160
+further. If you're on a Mac device, MLX
+
+154
+00:05:24.600 --> 00:05:28.960
+is going to be a great first place to
+
+155
+00:05:26.160 --> 00:05:31.240
+go. GLM's surprisingly fast, but the
+
+156
+00:05:28.960 --> 00:05:33.400
+catch with this model is that GLM 5.2
+
+157
+00:05:31.240 --> 00:05:35.680
+thinks a lot. Many, many, many of its
+
+158
+00:05:33.400 --> 00:05:38.040
+tokens are just reasoning. And this
+
+159
+00:05:35.680 --> 00:05:39.640
+shows up directly in the benchmarks. So,
+
+160
+00:05:38.040 --> 00:05:42.480
+on artificial analysis, if we scroll
+
+161
+00:05:39.640 --> 00:05:44.320
+down to output tokens here, GLM 5.2, if
+
+162
+00:05:42.480 --> 00:05:46.320
+we look at the total output tokens per
+
+163
+00:05:44.320 --> 00:05:48.520
+task, pretty much all the tokens were
+
+164
+00:05:46.320 --> 00:05:50.960
+spent reasoning. And it's even more than
+
+165
+00:05:48.520 --> 00:05:52.880
+Opus in max mode. It's much more than
+
+166
+00:05:50.960 --> 00:05:54.920
+Minimax M3. So, very interesting here
+
+167
+00:05:52.880 --> 00:05:57.560
+that a model can be quite fast, but if
+
+168
+00:05:54.920 --> 00:05:59.480
+that speed is put toward thinking, it
+
+169
+00:05:57.560 --> 00:06:02.040
+doesn't really, really matter. Because
+
+170
+00:05:59.480 --> 00:06:04.440
+what we're looking for is response time.
+
+171
+00:06:02.040 --> 00:06:05.640
+It's that total wall time that matters
+
+172
+00:06:04.440 --> 00:06:06.680
+when we're thinking about getting
+
+173
+00:06:05.640 --> 00:06:07.960
+results, when we're thinking about
+
+174
+00:06:06.680 --> 00:06:10.120
+calling tools, and when we're thinking
+
+175
+00:06:07.960 --> 00:06:12.280
+about the experiences that users will
+
+176
+00:06:10.120 --> 00:06:14.520
+have when they're using your product
+
+177
+00:06:12.280 --> 00:06:15.760
+agent. Okay, so inside one speed, all
+
+178
+00:06:14.520 --> 00:06:17.520
+these models are viable. All these
+
+179
+00:06:15.760 --> 00:06:21.800
+models are usable. This isn't really the
+
+180
+00:06:17.520 --> 00:06:21.800
+differentiation point of these models.
+
+181
+00:06:24.800 --> 00:06:28.080
+So, insight number two is the raw
+
+182
+00:06:26.800 --> 00:06:29.480
+comparison. So, what is the
+
+183
+00:06:28.080 --> 00:06:31.760
+differentiation? It is, of course,
+
+184
+00:06:29.480 --> 00:06:33.160
+performance against price. So, this is
+
+185
+00:06:31.760 --> 00:06:34.840
+what really matters in the, you know,
+
+186
+00:06:33.160 --> 00:06:37.280
+the decision tree is quite simple. You
+
+187
+00:06:34.840 --> 00:06:39.160
+should pick GLM 5.2 when capability is
+
+188
+00:06:37.280 --> 00:06:40.640
+the most important thing at a lower
+
+189
+00:06:39.160 --> 00:06:42.680
+price than Opus. And then you're going
+
+190
+00:06:40.640 --> 00:06:44.640
+to want to pick Minimax when cost and
+
+191
+00:06:42.680 --> 00:06:47.200
+volume are the constraints. And, of
+
+192
+00:06:44.640 --> 00:06:48.919
+course, when Minimax can do the job. And
+
+193
+00:06:47.200 --> 00:06:50.520
+this is like always the decision tree
+
+194
+00:06:48.919 --> 00:06:51.760
+here. If the model can't do the job, it
+
+195
+00:06:50.520 --> 00:06:53.600
+doesn't matter the price, it doesn't
+
+196
+00:06:51.760 --> 00:06:55.120
+matter the speed, you can't use it. And
+
+197
+00:06:53.600 --> 00:06:57.280
+that's the interesting part about GLM
+
+198
+00:06:55.120 --> 00:07:00.919
+5.2 is that we're getting into the space
+
+199
+00:06:57.280 --> 00:07:03.280
+where GLM 5.2 is performing on par and
+
+200
+00:07:00.919 --> 00:07:05.600
+slightly under a lot of the tasks Opus
+
+201
+00:07:03.280 --> 00:07:07.960
+4.8 is executing on. But when it comes
+
+202
+00:07:05.600 --> 00:07:09.840
+to GLM 5.2 versus Minimax, this is the
+
+203
+00:07:07.960 --> 00:07:12.000
+big takeaway. Use GLM if you need
+
+204
+00:07:09.840 --> 00:07:14.120
+performance, use Minimax, though, if it
+
+205
+00:07:12.000 --> 00:07:16.280
+can do the job. This is where we get to
+
+206
+00:07:14.120 --> 00:07:17.480
+the cost curve. Because things get
+
+207
+00:07:16.280 --> 00:07:19.240
+really, really interesting when you just
+
+208
+00:07:17.480 --> 00:07:21.440
+look at the cost curve. The number here
+
+209
+00:07:19.240 --> 00:07:23.760
+is that every time you drop a tier of
+
+210
+00:07:21.440 --> 00:07:25.480
+capability, and the tier capability is
+
+211
+00:07:23.760 --> 00:07:26.720
+becoming smaller and smaller every
+
+212
+00:07:25.480 --> 00:07:28.360
+single month. But every time you drop a
+
+213
+00:07:26.720 --> 00:07:31.400
+tier capability, you basically drop your
+
+214
+00:07:28.360 --> 00:07:33.800
+price 5x. And it's the same from GLM to
+
+215
+00:07:31.400 --> 00:07:36.160
+Minimax, and it's the same from Minimax
+
+216
+00:07:33.800 --> 00:07:38.160
+down to Qwen 3.6. Although at this
+
+217
+00:07:36.160 --> 00:07:40.240
+level, you lose too much capability. The
+
+218
+00:07:38.160 --> 00:07:42.160
+Qwen models, although very powerful,
+
+219
+00:07:40.240 --> 00:07:43.520
+although on device, although private,
+
+220
+00:07:42.160 --> 00:07:44.880
+which are all important things we're
+
+221
+00:07:43.520 --> 00:07:47.080
+paying close attention to, the
+
+222
+00:07:44.880 --> 00:07:48.520
+intelligence must be at a certain level.
+
+223
+00:07:47.080 --> 00:07:51.160
+I got to say though, you know, the more
+
+224
+00:07:48.520 --> 00:07:53.570
+I experiment with Qwen 3.6 35 billion
+
+225
+00:07:51.160 --> 00:07:54.080
+reactive, the more I like it.
+
+226
+00:07:53.570 --> 00:07:56.520
+>> [laughter]
+
+227
+00:07:54.080 --> 00:07:59.600
+>> And the more excited I am for the next
+
+228
+00:07:56.520 --> 00:08:01.560
+Qwen local model release. The cost curve
+
+229
+00:07:59.600 --> 00:08:04.000
+looks terrible. Like it's a cliff. It's
+
+230
+00:08:01.560 --> 00:08:06.160
+a 5x cliff. And again, you just drop
+
+231
+00:08:04.000 --> 00:08:09.040
+down one tier. And with each tier
+
+232
+00:08:06.160 --> 00:08:10.320
+capability, you're not losing that much.
+
+233
+00:08:09.040 --> 00:08:12.080
+Okay, so that's insight number three.
+
+234
+00:08:10.320 --> 00:08:14.560
+The cost curve looks really, really
+
+235
+00:08:12.080 --> 00:08:16.360
+rough for Opus. Opus 4.8 doesn't have
+
+236
+00:08:14.560 --> 00:08:17.800
+much longer on the market before open
+
+237
+00:08:16.360 --> 00:08:20.640
+weights models catch up pretty
+
+238
+00:08:17.800 --> 00:08:20.640
+indefinitely.
+
+239
+00:08:23.480 --> 00:08:27.680
+With that being said, insight four is us
+
+240
+00:08:26.320 --> 00:08:28.720
+being really balanced here. Engineering
+
+241
+00:08:27.680 --> 00:08:29.760
+is all about trade-offs. We'll talk
+
+242
+00:08:28.720 --> 00:08:31.800
+about that more in a moment. The
+
+243
+00:08:29.760 --> 00:08:33.760
+workhorse models called tools like Opus,
+
+244
+00:08:31.800 --> 00:08:35.760
+but they don't ship like Opus. You can
+
+245
+00:08:33.760 --> 00:08:37.320
+look across every single benchmark in
+
+246
+00:08:35.760 --> 00:08:39.280
+this benchmark here on artificial
+
+247
+00:08:37.320 --> 00:08:41.400
+analysis. I've dialed into these four
+
+248
+00:08:39.280 --> 00:08:43.560
+models to simplify the comparison. But
+
+249
+00:08:41.400 --> 00:08:45.640
+if we just search GLM 5.2 max, across
+
+250
+00:08:43.560 --> 00:08:48.839
+the board this model will always lose to
+
+251
+00:08:45.640 --> 00:08:50.040
+Opus. And sometimes very dramatically.
+
+252
+00:08:48.839 --> 00:08:52.280
+And you can see here, every once in a
+
+253
+00:08:50.040 --> 00:08:53.560
+while it's losing to Minimax as well.
+
+254
+00:08:52.280 --> 00:08:56.000
+But the thing to pay attention to here
+
+255
+00:08:53.560 --> 00:08:59.440
+isn't just all the benchmarks that GLM
+
+256
+00:08:56.000 --> 00:09:02.240
+5.2, it's the emergent behavior that
+
+257
+00:08:59.440 --> 00:09:03.839
+emerges as you go up on these benchmark
+
+258
+00:09:02.240 --> 00:09:06.360
+scores. Like all of these benchmarks are
+
+259
+00:09:03.839 --> 00:09:08.000
+proxies for some capability. Terminal
+
+260
+00:09:06.360 --> 00:09:10.839
+bench, super popular one, agenda coding
+
+261
+00:09:08.000 --> 00:09:13.000
+and terminal use. This is just one proxy
+
+262
+00:09:10.839 --> 00:09:14.839
+for agenda coding. The benchmarks do a
+
+263
+00:09:13.000 --> 00:09:17.480
+decent job alone. When you really put
+
+264
+00:09:14.839 --> 00:09:18.720
+together the index, it means a lot more.
+
+265
+00:09:17.480 --> 00:09:21.320
+And so when you just look at the raw
+
+266
+00:09:18.720 --> 00:09:23.160
+numbers here on how much better this
+
+267
+00:09:21.320 --> 00:09:24.920
+five points looks like a small amount,
+
+268
+00:09:23.160 --> 00:09:26.640
+it's not. It's a massive amount. The
+
+269
+00:09:24.920 --> 00:09:28.360
+five points of difference on the index
+
+270
+00:09:26.640 --> 00:09:30.320
+means a lot. Just because you can call
+
+271
+00:09:28.360 --> 00:09:32.560
+tool doesn't mean you're a great model.
+
+272
+00:09:30.320 --> 00:09:35.280
+And things really start to fall off for
+
+273
+00:09:32.560 --> 00:09:37.240
+long horizon tasks. Whatever Anthropic
+
+274
+00:09:35.280 --> 00:09:39.240
+is doing to train their Claude series
+
+275
+00:09:37.240 --> 00:09:41.480
+models, specifically Opus and Fable.
+
+276
+00:09:39.240 --> 00:09:43.600
+This is a huge point of differentiation.
+
+277
+00:09:41.480 --> 00:09:45.480
+Workhorse models called tools like Opus,
+
+278
+00:09:43.600 --> 00:09:47.280
+but they don't ship like Opus. The
+
+279
+00:09:45.480 --> 00:09:48.960
+results are not the same. So, there's
+
+280
+00:09:47.280 --> 00:09:51.200
+still a gap. Let's be super honest about
+
+281
+00:09:48.960 --> 00:09:55.240
+that. GLM is not a replacement for Opus
+
+282
+00:09:51.200 --> 00:09:55.240
+4.8. It's a decent competitor.
+
+283
+00:09:58.160 --> 00:10:02.120
+I always think about this trade-off
+
+284
+00:10:00.200 --> 00:10:03.520
+triangle. As I'm working through
+
+285
+00:10:02.120 --> 00:10:05.320
+benchmarks, as I'm creating my own
+
+286
+00:10:03.520 --> 00:10:07.600
+custom benchmarks, and as I'm building
+
+287
+00:10:05.320 --> 00:10:09.360
+engineering agents and product agents,
+
+288
+00:10:07.600 --> 00:10:10.800
+I'm always comparing these models with
+
+289
+00:10:09.360 --> 00:10:12.760
+this framework. And this is how I like
+
+290
+00:10:10.800 --> 00:10:14.760
+to visualize this. There are three axes.
+
+291
+00:10:12.760 --> 00:10:16.800
+You have performance, you have speed,
+
+292
+00:10:14.760 --> 00:10:19.080
+and you have cost. And in reality, you
+
+293
+00:10:16.800 --> 00:10:20.840
+get to pick two, never all three. Very
+
+294
+00:10:19.080 --> 00:10:23.080
+clearly, Opus gives you performance.
+
+295
+00:10:20.840 --> 00:10:25.160
+Minimax is going to give you cost and
+
+296
+00:10:23.080 --> 00:10:27.320
+performance, more on the cost side.
+
+297
+00:10:25.160 --> 00:10:29.280
+Quinn, of course, this is all speed and
+
+298
+00:10:27.320 --> 00:10:31.240
+cost, probably more on the cost side.
+
+299
+00:10:29.280 --> 00:10:32.840
+And then, GLM is going to give you the
+
+300
+00:10:31.240 --> 00:10:34.440
+speed and performance. And honestly,
+
+301
+00:10:32.840 --> 00:10:36.080
+this one's pretty good on cost, as well.
+
+302
+00:10:34.440 --> 00:10:38.520
+GLM's probably going to be that closest
+
+303
+00:10:36.080 --> 00:10:40.320
+one that does all three for you. Every
+
+304
+00:10:38.520 --> 00:10:41.320
+single model has a trade-off. And if
+
+305
+00:10:40.320 --> 00:10:43.400
+we're going to be objective, if we're
+
+306
+00:10:41.320 --> 00:10:45.640
+going to do actual engineering and not
+
+307
+00:10:43.400 --> 00:10:47.400
+vibing, we need to be honest about where
+
+308
+00:10:45.640 --> 00:10:49.120
+all these models are. I use this
+
+309
+00:10:47.400 --> 00:10:51.200
+trade-off triangle all the time to help
+
+310
+00:10:49.120 --> 00:10:53.080
+me place these models. I use this and
+
+311
+00:10:51.200 --> 00:10:54.960
+the tier list. Engineering is all about
+
+312
+00:10:53.080 --> 00:10:56.800
+trade-offs. Language models and agents
+
+313
+00:10:54.960 --> 00:10:58.200
+are no different. Every model can be
+
+314
+00:10:56.800 --> 00:11:00.400
+placed on this chart. We can probably
+
+315
+00:10:58.200 --> 00:11:02.440
+push GLM's performance up a little bit
+
+316
+00:11:00.400 --> 00:11:04.480
+more here, as well as Minimax. But this
+
+317
+00:11:02.440 --> 00:11:06.800
+is really what it's about. Understanding
+
+318
+00:11:04.480 --> 00:11:08.080
+your model and then creating a model
+
+319
+00:11:06.800 --> 00:11:09.800
+stack, which we'll talk about more
+
+320
+00:11:08.080 --> 00:11:11.600
+later. I keep saying engineering agents
+
+321
+00:11:09.800 --> 00:11:13.920
+and product agents. Let me just clarify
+
+322
+00:11:11.600 --> 00:11:15.480
+this. Engineering agents are the first
+
+323
+00:11:13.920 --> 00:11:17.480
+version of agents. Thanks to Claude
+
+324
+00:11:15.480 --> 00:11:19.880
+Code, thanks to the first Claude series
+
+325
+00:11:17.480 --> 00:11:22.240
+models, agents for engineers have been
+
+326
+00:11:19.880 --> 00:11:25.080
+unlocked. But this is just a fraction,
+
+327
+00:11:22.240 --> 00:11:26.720
+literally less than 1% of all the agents
+
+328
+00:11:25.080 --> 00:11:28.440
+that will be created in the future. What
+
+329
+00:11:26.720 --> 00:11:30.200
+are the other agents? It's product
+
+330
+00:11:28.440 --> 00:11:32.440
+agents. Here, I'm just grouping every
+
+331
+00:11:30.200 --> 00:11:34.200
+other domain under product agents. And
+
+332
+00:11:32.440 --> 00:11:36.360
+these are the agents you'll deploy into
+
+333
+00:11:34.200 --> 00:11:38.240
+your products. This is where tokenomics
+
+334
+00:11:36.360 --> 00:11:40.640
+really matters and where you have to
+
+335
+00:11:38.240 --> 00:11:42.440
+arbitrage your tokens because that's the
+
+336
+00:11:40.640 --> 00:11:44.400
+business. For engineering, we can be a
+
+337
+00:11:42.440 --> 00:11:46.200
+little bit more loose and dynamic with
+
+338
+00:11:44.400 --> 00:11:48.160
+our token spend because of course we're
+
+339
+00:11:46.200 --> 00:11:51.120
+still in the experimentation phase, but
+
+340
+00:11:48.160 --> 00:11:53.640
+it's also harder to measure the ROI
+
+341
+00:11:51.120 --> 00:11:55.480
+right now out of engineering agents. All
+
+342
+00:11:53.640 --> 00:11:57.880
+that being said, it's still important to
+
+343
+00:11:55.480 --> 00:11:59.600
+know how and when to use the right
+
+344
+00:11:57.880 --> 00:12:01.760
+language model for your agents. The
+
+345
+00:11:59.600 --> 00:12:03.440
+simple guideline is if you can afford
+
+346
+00:12:01.760 --> 00:12:04.960
+the best compute, use it because you'll
+
+347
+00:12:03.440 --> 00:12:07.000
+be getting the best results. At the same
+
+348
+00:12:04.960 --> 00:12:09.160
+time, as these models catch up, as we
+
+349
+00:12:07.000 --> 00:12:11.480
+discussed in our Fable band video, just
+
+350
+00:12:09.160 --> 00:12:12.880
+like Opus can do a lot of what Fable can
+
+351
+00:12:11.480 --> 00:12:14.560
+do, we're getting to that point where
+
+352
+00:12:12.880 --> 00:12:17.200
+some of these open weight models can do
+
+353
+00:12:14.560 --> 00:12:19.640
+80, 90% of what Opus can do. And I'm
+
+354
+00:12:17.200 --> 00:12:20.800
+specifically looking at GLM 5.2. If
+
+355
+00:12:19.640 --> 00:12:23.320
+you've been using this model, you
+
+356
+00:12:20.800 --> 00:12:26.120
+understand that it is getting close. It
+
+357
+00:12:23.320 --> 00:12:27.840
+is competitive with Opus 4.8 at a fifth
+
+358
+00:12:26.120 --> 00:12:29.360
+of the price. It's becoming harder and
+
+359
+00:12:27.840 --> 00:12:30.880
+harder to ignore that. So, again, just
+
+360
+00:12:29.360 --> 00:12:32.120
+thinking about that three-tier
+
+361
+00:12:30.880 --> 00:12:33.720
+framework, right? We have
+
+362
+00:12:32.120 --> 00:12:35.520
+state-of-the-art for our hardest work,
+
+363
+00:12:33.720 --> 00:12:37.480
+and then we have daily drivers and
+
+364
+00:12:35.520 --> 00:12:39.240
+high-volume agents. These are your
+
+365
+00:12:37.480 --> 00:12:41.320
+workhorse agents that can do a lot of
+
+366
+00:12:39.240 --> 00:12:42.800
+work, not at the best performance, but
+
+367
+00:12:41.320 --> 00:12:44.560
+it's going to be a lot cheaper, and by a
+
+368
+00:12:42.800 --> 00:12:46.520
+lot, we're talking 5x cheaper, and then
+
+369
+00:12:44.560 --> 00:12:48.240
+20x cheaper if you drop down to the
+
+370
+00:12:46.520 --> 00:12:49.680
+Minimax tier level. And then of course,
+
+371
+00:12:48.240 --> 00:12:52.000
+we have what we're all looking for,
+
+372
+00:12:49.680 --> 00:12:53.560
+local private models. This is coming. We
+
+373
+00:12:52.000 --> 00:12:55.000
+need more time. As mentioned, we're
+
+374
+00:12:53.560 --> 00:12:57.920
+going to talk about some of the hardware
+
+375
+00:12:55.000 --> 00:13:00.839
+requirements needed to ship and really
+
+376
+00:12:57.920 --> 00:13:02.280
+use a GLM level model on local hardware
+
+377
+00:13:00.839 --> 00:13:03.960
+in just a moment here. So, this is how I
+
+378
+00:13:02.280 --> 00:13:05.520
+think about engineering agents.
+
+379
+00:13:03.960 --> 00:13:07.560
+Basically, if you can, spend all the
+
+380
+00:13:05.520 --> 00:13:09.560
+compute. If you can't, delegate to
+
+381
+00:13:07.560 --> 00:13:11.040
+smaller, cheaper models. And I think
+
+382
+00:13:09.560 --> 00:13:12.800
+it's important to understand the local
+
+383
+00:13:11.040 --> 00:13:15.920
+model capabilities of models like Qwen
+
+384
+00:13:12.800 --> 00:13:18.360
+3.6, Gemma 4, so you really know what is
+
+385
+00:13:15.920 --> 00:13:20.360
+possible on device right now. I'm going
+
+386
+00:13:18.360 --> 00:13:22.320
+to be creating a lot more content around
+
+387
+00:13:20.360 --> 00:13:24.080
+these local models because they're
+
+388
+00:13:22.320 --> 00:13:26.040
+catching up and there are a lot of use
+
+389
+00:13:24.080 --> 00:13:28.200
+cases that they can cover now while
+
+390
+00:13:26.040 --> 00:13:29.320
+being local and private. So, make sure
+
+391
+00:13:28.200 --> 00:13:32.600
+you like, make sure you subscribe, all
+
+392
+00:13:29.320 --> 00:13:32.600
+that good stuff. Let's keep rolling.
+
+393
+00:13:35.400 --> 00:13:39.160
+Product agents is a bit different
+
+394
+00:13:37.120 --> 00:13:41.160
+because tokens matter. The tokenomics
+
+395
+00:13:39.160 --> 00:13:43.120
+matters. Routing to the cheapest model
+
+396
+00:13:41.160 --> 00:13:45.240
+that clears the bar, that satisfies your
+
+397
+00:13:43.120 --> 00:13:46.960
+users is what makes or breaks your
+
+398
+00:13:45.240 --> 00:13:48.840
+business when we're talking about your
+
+399
+00:13:46.960 --> 00:13:50.320
+product agents. So, for example, with
+
+400
+00:13:48.840 --> 00:13:52.440
+our two models we're looking at right
+
+401
+00:13:50.320 --> 00:13:54.200
+here, GLM versus Minimax, when you have
+
+402
+00:13:52.440 --> 00:13:55.440
+users at scale and we're talking tens of
+
+403
+00:13:54.200 --> 00:13:57.120
+thousands, hundreds of thousands of
+
+404
+00:13:55.440 --> 00:13:59.240
+users, you have to think about the
+
+405
+00:13:57.120 --> 00:14:01.360
+tokenomics. You cannot just throw Opus
+
+406
+00:13:59.240 --> 00:14:03.240
+at it. It's not scalable. As you can
+
+407
+00:14:01.360 --> 00:14:05.080
+very easily imagine, at the same time,
+
+408
+00:14:03.240 --> 00:14:07.000
+something like Qwen 1.5 6 super low
+
+409
+00:14:05.080 --> 00:14:08.920
+performance, all that to say very, very
+
+410
+00:14:07.000 --> 00:14:10.520
+simple task. And I'm not talking about
+
+411
+00:14:08.920 --> 00:14:12.800
+role-playing, I'm not talking about
+
+412
+00:14:10.520 --> 00:14:14.160
+these stupid really low-level entry use
+
+413
+00:14:12.800 --> 00:14:15.400
+cases for these models. I'm talking
+
+414
+00:14:14.160 --> 00:14:16.720
+about like real work, right? We're
+
+415
+00:14:15.400 --> 00:14:17.760
+talking about accounting, we're talking
+
+416
+00:14:16.720 --> 00:14:18.600
+about finance, we're talking about
+
+417
+00:14:17.760 --> 00:14:20.440
+healthcare, we're talking about
+
+418
+00:14:18.600 --> 00:14:22.480
+biomedicine, we're talking about getting
+
+419
+00:14:20.440 --> 00:14:24.480
+value out of these models at consumer
+
+420
+00:14:22.480 --> 00:14:27.760
+level scale. These models make
+
+421
+00:14:24.480 --> 00:14:28.920
+businesses run now. GLM 5.2, Minimax M3.
+
+422
+00:14:27.760 --> 00:14:30.080
+If you study these models, if you
+
+423
+00:14:28.920 --> 00:14:31.200
+understand the tokenomics, if you
+
+424
+00:14:30.080 --> 00:14:33.400
+understand the performance, you know,
+
+425
+00:14:31.200 --> 00:14:35.280
+GLM is your performance per action and
+
+426
+00:14:33.400 --> 00:14:37.080
+then Minimax M3 is going to be your cost
+
+427
+00:14:35.280 --> 00:14:40.080
+per action winner here. This matters a
+
+428
+00:14:37.080 --> 00:14:41.960
+lot for your product agents and I'm
+
+429
+00:14:40.080 --> 00:14:43.960
+building out products right now that I'm
+
+430
+00:14:41.960 --> 00:14:45.320
+consciously making this decision on. Do
+
+431
+00:14:43.960 --> 00:14:47.280
+I need performance here? Do I need cost
+
+432
+00:14:45.320 --> 00:14:49.520
+here? When I benchmark both these, what
+
+433
+00:14:47.280 --> 00:14:54.800
+does the result look like? When can I
+
+434
+00:14:49.520 --> 00:14:54.800
+use Minimax? When should I use GLM 5.2?
+
+435
+00:14:57.680 --> 00:15:00.160
+Another important insight I want to
+
+436
+00:14:58.880 --> 00:15:01.800
+share with you, three of the four of
+
+437
+00:15:00.160 --> 00:15:03.200
+these models can't be switched off.
+
+438
+00:15:01.800 --> 00:15:05.240
+We're all up to date on what's going on
+
+439
+00:15:03.200 --> 00:15:08.080
+with Fable, the government, Anthropic.
+
+440
+00:15:05.240 --> 00:15:09.880
+Insert any AI lab substitutability isn't
+
+441
+00:15:08.080 --> 00:15:11.760
+a footnote, it's the whole strategy in
+
+442
+00:15:09.880 --> 00:15:13.960
+2026 and beyond. If you're going to
+
+443
+00:15:11.760 --> 00:15:16.800
+scale your engineering agents and your
+
+444
+00:15:13.960 --> 00:15:18.560
+product agents into production, we can't
+
+445
+00:15:16.800 --> 00:15:20.400
+have models that can just switch off at
+
+446
+00:15:18.560 --> 00:15:22.680
+any second. Now, of course, there's a
+
+447
+00:15:20.400 --> 00:15:25.520
+lot of fear around this. The economics
+
+448
+00:15:22.680 --> 00:15:27.640
+around shutting down an AI model is so
+
+449
+00:15:25.520 --> 00:15:29.800
+bad for Anthropic, for OpenAI, for
+
+450
+00:15:27.640 --> 00:15:31.520
+Gemini, that they would never allow it
+
+451
+00:15:29.800 --> 00:15:33.760
+to happen for too long. But, um things
+
+452
+00:15:31.520 --> 00:15:35.120
+that can happen do happen.
+
+453
+00:15:33.760 --> 00:15:36.720
+Right? As we saw with the Fable model.
+
+454
+00:15:35.120 --> 00:15:38.520
+And it's not like mythos class of the
+
+455
+00:15:36.720 --> 00:15:40.080
+models are going to stop. It's being
+
+456
+00:15:38.520 --> 00:15:42.400
+said that Anthropic has finished
+
+457
+00:15:40.080 --> 00:15:44.000
+training the model after Fable. So, it's
+
+458
+00:15:42.400 --> 00:15:45.480
+not like the model progression stops.
+
+459
+00:15:44.000 --> 00:15:47.120
+But, the key here is we're not in
+
+460
+00:15:45.480 --> 00:15:49.040
+control of this. This is a closed source
+
+461
+00:15:47.120 --> 00:15:50.600
+model. Fable was the last straw. We
+
+462
+00:15:49.040 --> 00:15:52.520
+cannot fully depend on the most
+
+463
+00:15:50.600 --> 00:15:55.000
+important technology to be available to
+
+464
+00:15:52.520 --> 00:15:56.800
+us. We must make sure it's available to
+
+465
+00:15:55.000 --> 00:15:58.480
+us. And so, these open models are going
+
+466
+00:15:56.800 --> 00:16:01.000
+to be really, really important for that.
+
+467
+00:15:58.480 --> 00:16:03.600
+Right now, only lightweight models are
+
+468
+00:16:01.000 --> 00:16:05.320
+available to really own end-to-end. I
+
+469
+00:16:03.600 --> 00:16:07.400
+definitely recommend, if you don't, grab
+
+470
+00:16:05.320 --> 00:16:09.160
+whatever chips, any device you can, so
+
+471
+00:16:07.400 --> 00:16:11.440
+that you can get your hands on these
+
+472
+00:16:09.160 --> 00:16:13.320
+sub-50 billion parameter models with the
+
+473
+00:16:11.440 --> 00:16:15.960
+mixture of experts on it, so that you
+
+474
+00:16:13.320 --> 00:16:17.560
+can really have local AI, no matter
+
+475
+00:16:15.960 --> 00:16:18.960
+what. But, what's coming next, and what
+
+476
+00:16:17.560 --> 00:16:21.840
+I think a lot of us are really excited
+
+477
+00:16:18.960 --> 00:16:24.680
+for, is when we can run GLM 5.2 and
+
+478
+00:16:21.840 --> 00:16:27.000
+MinimaX M3 on some local hardware, on
+
+479
+00:16:24.680 --> 00:16:29.200
+our home lab. Now, this is possible now.
+
+480
+00:16:27.000 --> 00:16:30.480
+Some prosumers, some engineers, you
+
+481
+00:16:29.200 --> 00:16:32.200
+know, spending tens of thousands of
+
+482
+00:16:30.480 --> 00:16:34.120
+dollars can do this now. So, let's
+
+483
+00:16:32.200 --> 00:16:39.560
+analyze like what does it really take to
+
+484
+00:16:34.120 --> 00:16:39.560
+own GLM 5.2, a powerful workhorse model.
+
+485
+00:16:42.360 --> 00:16:46.480
+GLM is available right now. You and I
+
+486
+00:16:44.440 --> 00:16:48.000
+can own this, but it's just not all too
+
+487
+00:16:46.480 --> 00:16:51.160
+realistic yet when you look at the
+
+488
+00:16:48.000 --> 00:16:53.120
+actual cost breakdown. So, an M5 Max
+
+489
+00:16:51.160 --> 00:16:54.839
+MacBook Pro device like mine, I cannot
+
+490
+00:16:53.120 --> 00:16:57.120
+run this. Okay, so I'm out of the
+
+491
+00:16:54.839 --> 00:16:59.760
+running already. I need custom hardware,
+
+492
+00:16:57.120 --> 00:17:01.760
+custom chips, Nvidia hardware to be able
+
+493
+00:16:59.760 --> 00:17:04.439
+to run this thing. At about a budget of
+
+494
+00:17:01.760 --> 00:17:08.040
+2 to 4,000, you could probably get a
+
+495
+00:17:04.439 --> 00:17:10.800
+serious 1 2-bit quant of GLM 5.2 running
+
+496
+00:17:08.040 --> 00:17:12.920
+on your budget home lab at a very slow 6
+
+497
+00:17:10.800 --> 00:17:14.920
+to 11 tokens per second. To me, this is
+
+498
+00:17:12.920 --> 00:17:16.600
+unrunnable. So, this is not worth it at
+
+499
+00:17:14.920 --> 00:17:18.199
+all. Now, at the next tier up, things
+
+500
+00:17:16.600 --> 00:17:20.360
+become a bit more viable, but it's going
+
+501
+00:17:18.199 --> 00:17:21.439
+to cost you. This is usable, 10 to third
+
+502
+00:17:20.360 --> 00:17:23.640
+tokens, but you're going to need
+
+503
+00:17:21.439 --> 00:17:25.720
+something like Mac Studio M3 Ultras or
+
+504
+00:17:23.640 --> 00:17:27.800
+DGX Sparks stacked up. Bandwidth is
+
+505
+00:17:25.720 --> 00:17:29.040
+going to be the constraint here. Again,
+
+506
+00:17:27.800 --> 00:17:30.680
+this is viable. This is something you
+
+507
+00:17:29.040 --> 00:17:33.200
+can do right now. It's getting harder
+
+508
+00:17:30.680 --> 00:17:34.880
+and harder to find access to RAM and
+
+509
+00:17:33.200 --> 00:17:37.240
+it's becoming more and more expensive,
+
+510
+00:17:34.880 --> 00:17:39.160
+but this is available. Now, where this
+
+511
+00:17:37.240 --> 00:17:41.240
+really becomes viable is if you're
+
+512
+00:17:39.160 --> 00:17:43.920
+willing to drop, you know, 50 to 90k,
+
+513
+00:17:41.240 --> 00:17:46.080
+really 50 to 100,000 dollars on, you
+
+514
+00:17:43.920 --> 00:17:47.920
+know, something like six RTX Pro Black
+
+515
+00:17:46.080 --> 00:17:49.360
+Wells. That's going to give you a 500 GB
+
+516
+00:17:47.920 --> 00:17:52.520
+of RAM. Then you'll be able to run the
+
+517
+00:17:49.360 --> 00:17:54.800
+like 4-bit quant GLM 5.2. As you can
+
+518
+00:17:52.520 --> 00:17:56.520
+see, very, very expensive. I have a
+
+519
+00:17:54.800 --> 00:17:58.680
+rough timeline here. This is just my
+
+520
+00:17:56.520 --> 00:18:00.520
+rough estimate. I'm looking for that
+
+521
+00:17:58.680 --> 00:18:03.120
+mid-2027
+
+522
+00:18:00.520 --> 00:18:05.640
+time period to really get a GLM class
+
+523
+00:18:03.120 --> 00:18:07.480
+model running locally on my hardware, on
+
+524
+00:18:05.640 --> 00:18:10.560
+some box. I'm really hoping for that
+
+525
+00:18:07.480 --> 00:18:11.920
+next gen M5 Ultra from Apple, but if
+
+526
+00:18:10.560 --> 00:18:14.160
+they don't put it out, I'll build it
+
+527
+00:18:11.920 --> 00:18:15.680
+myself with some Nvidia and AMD
+
+528
+00:18:14.160 --> 00:18:18.000
+hardware. Whatever I have to do to get
+
+529
+00:18:15.680 --> 00:18:20.760
+that, it's now a priority for me to make
+
+530
+00:18:18.000 --> 00:18:22.760
+sure I de-leverage off of closed-source
+
+531
+00:18:20.760 --> 00:18:24.240
+AI models. As we kind of move toward
+
+532
+00:18:22.760 --> 00:18:25.600
+that place, you know, not all of us are
+
+533
+00:18:24.240 --> 00:18:27.640
+going to drop tens of thousands of
+
+534
+00:18:25.600 --> 00:18:29.400
+dollars on compute when we can take this
+
+535
+00:18:27.640 --> 00:18:30.440
+compute and throw it against an API. So,
+
+536
+00:18:29.400 --> 00:18:31.840
+you know, I just want to list out the
+
+537
+00:18:30.440 --> 00:18:32.840
+options for you. This is how I'm
+
+538
+00:18:31.840 --> 00:18:34.520
+thinking about this right now. There's
+
+539
+00:18:32.840 --> 00:18:36.800
+kind of four options, right? You can set
+
+540
+00:18:34.520 --> 00:18:38.360
+up a home lab. You can rent GPU by the
+
+541
+00:18:36.800 --> 00:18:40.400
+hour. So, if you're running a business
+
+542
+00:18:38.360 --> 00:18:42.640
+at scale, this is an option. Someone
+
+543
+00:18:40.400 --> 00:18:44.760
+else can host the open weights. There
+
+544
+00:18:42.640 --> 00:18:46.360
+are tons of providers. I think this is
+
+545
+00:18:44.760 --> 00:18:48.880
+going to be the current action for most
+
+546
+00:18:46.360 --> 00:18:51.040
+of us because we can always have one of
+
+547
+00:18:48.880 --> 00:18:52.680
+20 providers up and running for us. Very
+
+548
+00:18:51.040 --> 00:18:54.440
+likely you'll only need two or three,
+
+549
+00:18:52.680 --> 00:18:56.160
+but you for sure want to de-leverage off
+
+550
+00:18:54.440 --> 00:18:57.680
+of a single provider for the model
+
+551
+00:18:56.160 --> 00:18:59.040
+that's running your business.
+
+552
+00:18:57.680 --> 00:19:00.920
+Specifically talking about product
+
+553
+00:18:59.040 --> 00:19:02.440
+agents here, but also engineering agents
+
+554
+00:19:00.920 --> 00:19:04.200
+as well. And then there's of course just
+
+555
+00:19:02.440 --> 00:19:06.480
+paying per second, scale to zero, best
+
+556
+00:19:04.200 --> 00:19:09.240
+for burst to uses. But this sits very
+
+557
+00:19:06.480 --> 00:19:10.840
+closely to hosted open weight APIs. So,
+
+558
+00:19:09.240 --> 00:19:12.600
+these are kind of the options that I'm
+
+559
+00:19:10.840 --> 00:19:13.800
+looking at. I'm really, really looking
+
+560
+00:19:12.600 --> 00:19:15.120
+forward to getting the home lab, but
+
+561
+00:19:13.800 --> 00:19:16.600
+it's not all too realistic. And it's
+
+562
+00:19:15.120 --> 00:19:18.080
+going to be a lot simpler, especially if
+
+563
+00:19:16.600 --> 00:19:19.480
+you're running a business, to rent GPU
+
+564
+00:19:18.080 --> 00:19:21.080
+by the hour or to do what we're all
+
+565
+00:19:19.480 --> 00:19:23.520
+doing right now, which is just to hit
+
+566
+00:19:21.080 --> 00:19:26.160
+serverless. So, the story for owning
+
+567
+00:19:23.520 --> 00:19:27.800
+your own GLM 5.2 is basically you have
+
+568
+00:19:26.160 --> 00:19:29.520
+to wait a year. Right now, we're stuck
+
+569
+00:19:27.800 --> 00:19:31.000
+using cloud providers. But that's okay,
+
+570
+00:19:29.520 --> 00:19:33.640
+because we have more cloud providers
+
+571
+00:19:31.000 --> 00:19:35.440
+than ever. GLM is hosted on some 10, 20
+
+572
+00:19:33.640 --> 00:19:37.000
+different providers. I'm really, really
+
+573
+00:19:35.440 --> 00:19:39.360
+looking forward to this. There is a
+
+574
+00:19:37.000 --> 00:19:41.840
+nightmare scenario here where GPU and
+
+575
+00:19:39.360 --> 00:19:43.800
+and RAM prices continue to just go up
+
+576
+00:19:41.840 --> 00:19:45.560
+throughout 2027. This is a real
+
+577
+00:19:43.800 --> 00:19:47.600
+possibility, which will then push out
+
+578
+00:19:45.560 --> 00:19:50.080
+this timeline even further for owning
+
+579
+00:19:47.600 --> 00:19:52.680
+these workhorse models locally on your
+
+580
+00:19:50.080 --> 00:19:55.280
+device. So, I think Minimax is smaller,
+
+581
+00:19:52.680 --> 00:19:58.360
+right? Minimax is 400 billion parameters
+
+582
+00:19:55.280 --> 00:20:00.520
+and runs 23. So, Minimax is a lot closer
+
+583
+00:19:58.360 --> 00:20:01.800
+to being run on some local hardware. If
+
+584
+00:20:00.520 --> 00:20:02.760
+you really want that Opus level
+
+585
+00:20:01.800 --> 00:20:04.240
+performance, we're going to have to wait
+
+586
+00:20:02.760 --> 00:20:07.080
+a bit longer. But this is just something
+
+587
+00:20:04.240 --> 00:20:07.080
+to keep your eyes on.
+
+588
+00:20:09.960 --> 00:20:12.760
+Don't pick a model, pick a model stack.
+
+589
+00:20:11.480 --> 00:20:14.000
+So, this is one of the, you know, big
+
+590
+00:20:12.760 --> 00:20:15.320
+ideas that I've been talking about on
+
+591
+00:20:14.000 --> 00:20:17.200
+the channel more and more and more. You
+
+592
+00:20:15.320 --> 00:20:18.200
+don't want to be dependent on one model.
+
+593
+00:20:17.200 --> 00:20:19.800
+You don't want to be dependent on one
+
+594
+00:20:18.200 --> 00:20:21.240
+model provider. Everything going on with
+
+595
+00:20:19.800 --> 00:20:23.040
+Anthropic, with Fable, with the
+
+596
+00:20:21.240 --> 00:20:25.360
+government is kind of showing us that
+
+597
+00:20:23.040 --> 00:20:27.320
+right now. It's time to pick a model
+
+598
+00:20:25.360 --> 00:20:29.360
+stack. Let's elevate ourselves. Let's
+
+599
+00:20:27.320 --> 00:20:31.160
+de-leverage. Let's become more resilient
+
+600
+00:20:29.360 --> 00:20:33.640
+as agentic engineers. We need model
+
+601
+00:20:31.160 --> 00:20:35.200
+stacks. So, these are all the models I'm
+
+602
+00:20:33.640 --> 00:20:36.880
+actively using, researching,
+
+603
+00:20:35.200 --> 00:20:39.000
+experimenting, and using in both
+
+604
+00:20:36.880 --> 00:20:40.720
+engineering and product agents right
+
+605
+00:20:39.000 --> 00:20:41.840
+now. I wanted to kind of share my tier
+
+606
+00:20:40.720 --> 00:20:44.080
+list with you to kind of give you an
+
+607
+00:20:41.840 --> 00:20:45.480
+idea of where these models belong in
+
+608
+00:20:44.080 --> 00:20:47.560
+each category. Let's start with the top
+
+609
+00:20:45.480 --> 00:20:49.120
+and the bottom. So, Fable 5 is S+ tier.
+
+610
+00:20:47.560 --> 00:20:51.080
+No other model is going to be an S+
+
+611
+00:20:49.120 --> 00:20:52.400
+tier. This is the best of the best. As
+
+612
+00:20:51.080 --> 00:20:54.240
+soon as this comes back online, I have
+
+613
+00:20:52.400 --> 00:20:55.960
+several gnarly experiments that I want
+
+614
+00:20:54.240 --> 00:20:57.560
+to run, and I'll be doing heavy, heavy
+
+615
+00:20:55.960 --> 00:20:58.840
+multi-agent orchestration. Check out the
+
+616
+00:20:57.560 --> 00:21:00.720
+previous couple videos where we talked
+
+617
+00:20:58.840 --> 00:21:02.040
+about this model in detail. So, that's
+
+618
+00:21:00.720 --> 00:21:04.480
+our very state-of-the-art. And then at
+
+619
+00:21:02.040 --> 00:21:07.160
+the bottom, we have our Gemma, and we
+
+620
+00:21:04.480 --> 00:21:08.960
+have the Quint 3.6 35 billion parameter
+
+621
+00:21:07.160 --> 00:21:10.680
+model. So, I'm actively using these,
+
+622
+00:21:08.960 --> 00:21:12.160
+testing, building on these. These are
+
+623
+00:21:10.680 --> 00:21:14.280
+the lightweight models. At the
+
+624
+00:21:12.160 --> 00:21:15.200
+lightweight level, you own this fully.
+
+625
+00:21:14.280 --> 00:21:16.920
+That's one of the properties of
+
+626
+00:21:15.200 --> 00:21:18.400
+lightweight, it can run on your device.
+
+627
+00:21:16.920 --> 00:21:19.480
+So, we're talking sub 100 billion
+
+628
+00:21:18.400 --> 00:21:21.080
+parameter model. Then we have our
+
+629
+00:21:19.480 --> 00:21:23.600
+workhorses. So, these are the models
+
+630
+00:21:21.080 --> 00:21:25.520
+that could run up to 90% of what you're
+
+631
+00:21:23.600 --> 00:21:28.480
+probably using state-of-the-art for.
+
+632
+00:21:25.520 --> 00:21:30.880
+These models are the GLM 5.2 and the
+
+633
+00:21:28.480 --> 00:21:33.160
+Minimax M3. And the only difference here
+
+634
+00:21:30.880 --> 00:21:36.600
+really between the A and B tier is a
+
+635
+00:21:33.160 --> 00:21:39.160
+performance hit of maybe 5 to 10 points
+
+636
+00:21:36.600 --> 00:21:40.680
+on artificial analysis. GLM 5.2 down to
+
+637
+00:21:39.160 --> 00:21:43.400
+Minimax, it's going to be like 5-6
+
+638
+00:21:40.680 --> 00:21:44.400
+points in that 40 to 50 range. And
+
+639
+00:21:43.400 --> 00:21:46.160
+that's going to be pretty consistent
+
+640
+00:21:44.400 --> 00:21:48.440
+across every single benchmark. You're
+
+641
+00:21:46.160 --> 00:21:51.120
+going to see a 5 to 10% drop in
+
+642
+00:21:48.440 --> 00:21:52.680
+performance by dropping down the A tier
+
+643
+00:21:51.120 --> 00:21:54.960
+to the B tier, but you're still going to
+
+644
+00:21:52.680 --> 00:21:56.720
+have a great workhorse. And with great
+
+645
+00:21:54.960 --> 00:21:58.560
+prompt, context, and harness
+
+646
+00:21:56.720 --> 00:22:00.400
+engineering, you can easily make a B
+
+647
+00:21:58.560 --> 00:22:02.440
+tier an A tier. But, you know, by
+
+648
+00:22:00.400 --> 00:22:03.520
+default, out the box, your B tier is
+
+649
+00:22:02.440 --> 00:22:04.960
+going to be a little more optimized for
+
+650
+00:22:03.520 --> 00:22:06.520
+price, while your A tier is going to be
+
+651
+00:22:04.960 --> 00:22:07.520
+more optimized for performance. I'm just
+
+652
+00:22:06.520 --> 00:22:08.800
+going to go ahead and place the rest of
+
+653
+00:22:07.520 --> 00:22:11.360
+these, right? These are all the models
+
+654
+00:22:08.800 --> 00:22:13.920
+I'm using right now in my model stacks.
+
+655
+00:22:11.360 --> 00:22:16.320
+Opus, obviously S tier. GPT 5.5 coming
+
+656
+00:22:13.920 --> 00:22:18.800
+right before it. We have a ton of
+
+657
+00:22:16.320 --> 00:22:21.560
+workhorse models here. So, Gemini Flash
+
+658
+00:22:18.800 --> 00:22:24.560
+coming in here. We have Gemini 3.1 Pro.
+
+659
+00:22:21.560 --> 00:22:26.240
+I'm going to throw that behind GLM 5.2.
+
+660
+00:22:24.560 --> 00:22:27.680
+We of course have our Deep Seek Pro. And
+
+661
+00:22:26.240 --> 00:22:29.560
+then we have Deep Seek Flash. That's
+
+662
+00:22:27.680 --> 00:22:31.520
+going to be your B tier model. Uh Kimika
+
+663
+00:22:29.560 --> 00:22:33.120
+2.6, that's going to be a B tier. And
+
+664
+00:22:31.520 --> 00:22:35.760
+then Quinmax, this is also going to be
+
+665
+00:22:33.120 --> 00:22:37.640
+an A tier model. This is my model stack.
+
+666
+00:22:35.760 --> 00:22:40.240
+And the whole idea here is you want to
+
+667
+00:22:37.640 --> 00:22:41.160
+think about your models in tiers, in a
+
+668
+00:22:40.240 --> 00:22:42.840
+stack. You want to have your
+
+669
+00:22:41.160 --> 00:22:44.080
+state-of-the-art for your hardest work,
+
+670
+00:22:42.840 --> 00:22:45.320
+for your engineering work. You want to
+
+671
+00:22:44.080 --> 00:22:46.560
+have your workhorses that you put in
+
+672
+00:22:45.320 --> 00:22:48.400
+your products. And then you have your
+
+673
+00:22:46.560 --> 00:22:50.240
+lightweight that you can run locally and
+
+674
+00:22:48.400 --> 00:22:52.360
+use for private personal things. And
+
+675
+00:22:50.240 --> 00:22:54.200
+eventually, the idea is that all these
+
+676
+00:22:52.360 --> 00:22:56.240
+models over time will move down the
+
+677
+00:22:54.200 --> 00:22:58.360
+stack while new ones come in to the
+
+678
+00:22:56.240 --> 00:22:59.760
+state-of-the-art and in to the S tier.
+
+679
+00:22:58.360 --> 00:23:02.240
+And this gives you and I more and more
+
+680
+00:22:59.760 --> 00:23:04.120
+control, but we have to choose the right
+
+681
+00:23:02.240 --> 00:23:06.440
+model for the job trading off
+
+682
+00:23:04.120 --> 00:23:08.440
+performance, speed, and cost when it
+
+683
+00:23:06.440 --> 00:23:10.320
+matters the most. And a great side
+
+684
+00:23:08.440 --> 00:23:13.160
+effect of this is that you deleverage
+
+685
+00:23:10.320 --> 00:23:15.120
+off of the closed sourced models that at
+
+686
+00:23:13.160 --> 00:23:17.600
+any point in time can just rug pull or
+
+687
+00:23:15.120 --> 00:23:19.280
+be rug pulled as we saw with the Fable
+
+688
+00:23:17.600 --> 00:23:21.360
+model. We have a ton of open weights
+
+689
+00:23:19.280 --> 00:23:23.720
+options now. I think GLM is actually
+
+690
+00:23:21.360 --> 00:23:25.680
+outperforming 3.5 Flash. We can go ahead
+
+691
+00:23:23.720 --> 00:23:28.440
+and look at that. Exactly, yeah, it is.
+
+692
+00:23:25.680 --> 00:23:30.720
+So, it's just a point above Gemini 3.5
+
+693
+00:23:28.440 --> 00:23:32.400
+Flash, which is pretty insane. Minimax
+
+694
+00:23:30.720 --> 00:23:34.280
+and GLM, two really, really great
+
+695
+00:23:32.400 --> 00:23:36.880
+models. It's a simple question of
+
+696
+00:23:34.280 --> 00:23:39.040
+performance versus cost. It's incredible
+
+697
+00:23:36.880 --> 00:23:40.640
+to see an open weights model this high
+
+698
+00:23:39.040 --> 00:23:42.320
+up in the benchmarks. I don't think an
+
+699
+00:23:40.640 --> 00:23:44.360
+open weights model has ever hit this
+
+700
+00:23:42.320 --> 00:23:46.000
+high. This is a top five model, which is
+
+701
+00:23:44.360 --> 00:23:47.720
+a, you know, pretty insane thing to say.
+
+702
+00:23:46.000 --> 00:23:50.760
+If you're looking at pure intelligence,
+
+703
+00:23:47.720 --> 00:23:53.480
+GLM 5.2 is top five. And also, pretty
+
+704
+00:23:50.760 --> 00:23:55.120
+insane, Minimax M3 is also top five,
+
+705
+00:23:53.480 --> 00:23:56.720
+although it's on the edge here. There
+
+706
+00:23:55.120 --> 00:23:58.200
+are other models that can do what
+
+707
+00:23:56.720 --> 00:24:00.840
+Minimax can do. For instance, DeepSeek
+
+708
+00:23:58.200 --> 00:24:03.600
+V4 Pro is a great example. As mentioned,
+
+709
+00:24:00.840 --> 00:24:05.440
+GLM 5.2 is also very fast, but most of
+
+710
+00:24:03.600 --> 00:24:06.640
+those tokens are going to be reasoning
+
+711
+00:24:05.440 --> 00:24:08.600
+tokens. So, it's not going to really
+
+712
+00:24:06.640 --> 00:24:11.000
+feel fast unless you're staring at the
+
+713
+00:24:08.600 --> 00:24:13.200
+thinking trace. And as a side effect of
+
+714
+00:24:11.000 --> 00:24:14.520
+that, the GLM 5.2 price is actually
+
+715
+00:24:13.200 --> 00:24:15.840
+going to be a little higher than you
+
+716
+00:24:14.520 --> 00:24:19.200
+want it to be. Although, it's going to
+
+717
+00:24:15.840 --> 00:24:21.800
+be a decent amount cheaper than your top
+
+718
+00:24:19.200 --> 00:24:24.000
+end models, of course, like the GPTs and
+
+719
+00:24:21.800 --> 00:24:26.400
+the Fable fives. I'm personally a really
+
+720
+00:24:24.000 --> 00:24:28.080
+huge fan of Minimax 3. I've been
+
+721
+00:24:26.400 --> 00:24:30.600
+enjoying using this model and really
+
+722
+00:24:28.080 --> 00:24:32.360
+dialing in the system prompt of agents
+
+723
+00:24:30.600 --> 00:24:35.160
+running this model so that it runs in
+
+724
+00:24:32.360 --> 00:24:36.640
+exact straight lines at really, really,
+
+725
+00:24:35.160 --> 00:24:38.240
+really cheap prices. This is a
+
+726
+00:24:36.640 --> 00:24:40.160
+capability that I think is super
+
+727
+00:24:38.240 --> 00:24:42.440
+underrated right now. If you really
+
+728
+00:24:40.160 --> 00:24:44.800
+specialize your model, uh if you build
+
+729
+00:24:42.440 --> 00:24:47.920
+agent experts as we talk about and
+
+730
+00:24:44.800 --> 00:24:49.520
+discuss in Agent Horizon, your model can
+
+731
+00:24:47.920 --> 00:24:51.080
+really, really bump up in capability,
+
+732
+00:24:49.520 --> 00:24:53.560
+but that's if you're being specific and
+
+733
+00:24:51.080 --> 00:24:55.600
+if you know the exact repeat task that
+
+734
+00:24:53.560 --> 00:24:58.360
+you want your Minimax, your Flashes, and
+
+735
+00:24:55.600 --> 00:24:59.880
+your Kimmys to execute. And really all
+
+736
+00:24:58.360 --> 00:25:01.560
+of your workhorse models. If you can
+
+737
+00:24:59.880 --> 00:25:03.560
+really guide and steer your workhorse
+
+738
+00:25:01.560 --> 00:25:06.280
+models, you can drop down your price
+
+739
+00:25:03.560 --> 00:25:08.200
+even further. That's where great agentic
+
+740
+00:25:06.280 --> 00:25:09.800
+engineering comes into play. So, this is
+
+741
+00:25:08.200 --> 00:25:12.200
+my model stack. This is how I'm thinking
+
+742
+00:25:09.800 --> 00:25:15.000
+about great open weight models like GLM
+
+743
+00:25:12.200 --> 00:25:17.080
+5.2 and Minimax M3. If you got value out
+
+744
+00:25:15.000 --> 00:25:20.040
+of this video, if the model stack
+
+745
+00:25:17.080 --> 00:25:21.960
+framing helps you engineer, drop a like,
+
+746
+00:25:20.040 --> 00:25:24.000
+subscribe, join the journey. We're on a
+
+747
+00:25:21.960 --> 00:25:25.760
+mission to build software that works
+
+748
+00:25:24.000 --> 00:25:27.800
+while we sleep. Comment down below. Let
+
+749
+00:25:25.760 --> 00:25:29.280
+me know what your model stack is if you
+
+750
+00:25:27.800 --> 00:25:31.120
+have one. And if you don't, comment down
+
+751
+00:25:29.280 --> 00:25:32.440
+below and let me know what you think
+
+752
+00:25:31.120 --> 00:25:34.160
+your model stack is going to be.
+
+753
+00:25:32.440 --> 00:25:36.160
+Building your model stack is going to be
+
+754
+00:25:34.160 --> 00:25:38.480
+more important every single day as we
+
+755
+00:25:36.160 --> 00:25:40.760
+use these powerful fable mythos class
+
+756
+00:25:38.480 --> 00:25:43.440
+level models to orchestrate other work
+
+757
+00:25:40.760 --> 00:25:45.840
+and as we build out individual agents
+
+758
+00:25:43.440 --> 00:25:48.520
+running inside of products for our
+
+759
+00:25:45.840 --> 00:25:50.560
+users. We're in the age of agents. So,
+
+760
+00:25:48.520 --> 00:25:52.680
+knowing the best tools, models,
+
+761
+00:25:50.560 --> 00:25:55.120
+contexts, and prompts to equip your
+
+762
+00:25:52.680 --> 00:25:57.320
+agents with is the name of the game. And
+
+763
+00:25:55.120 --> 00:25:59.880
+when you have optionality and resiliency
+
+764
+00:25:57.320 --> 00:26:01.600
+built into your model stack, when one of
+
+765
+00:25:59.880 --> 00:26:04.240
+these models go down, you will be the
+
+766
+00:26:01.600 --> 00:26:06.440
+engineer unaffected continuing to win,
+
+767
+00:26:04.240 --> 00:26:08.600
+continuing to ship as everyone moves
+
+768
+00:26:06.440 --> 00:26:10.240
+more and more into the vibes of all
+
+769
+00:26:08.600 --> 00:26:11.840
+these models. Let's stay focused on
+
+770
+00:26:10.240 --> 00:26:13.720
+great engineering patterns and
+
+771
+00:26:11.840 --> 00:26:16.200
+principles. You know where to find me
+
+772
+00:26:13.720 --> 00:26:19.480
+every single Monday. Stay focused and
+
+773
+00:26:16.200 --> 00:26:19.480
+keep building.

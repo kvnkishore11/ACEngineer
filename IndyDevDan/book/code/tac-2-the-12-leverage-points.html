@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An agent-systems companion to TAC-2: The 12 Leverage Points. Learn the human-agent contract, permissions, prompts, harness, feedback loop, and cold-start operations around the code.">
+  <title>Agent OS Companion · TAC-2 · The 12 Leverage Points</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="tac-2-the-12-leverage-points.assets.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to companion content</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+
+  <header class="site-bar">
+    <a class="site-bar__home" href="../vol-1-tac/02-the-12-leverage-points.html">← Chapter · The 12 Leverage Points</a>
+    <nav class="site-bar__links" aria-label="Companion navigation">
+      <a href="index.html">Code library</a>
+      <a href="../index.html">Book hub</a>
+    </nav>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Companion sections">
+      <p class="rail-kicker">TAC-2 · Agent systems</p>
+      <h2>The agent OS around the code</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of companion</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#mission"><span class="chapter-nav__n">00</span><span>Agent mission</span></a></li>
+          <li><a href="#cast"><span class="chapter-nav__n">01</span><span>Cast of agents</span></a></li>
+          <li><a href="#surface"><span class="chapter-nav__n">02</span><span>Surface map</span></a></li>
+          <li><a href="#loop"><span class="chapter-nav__n">03</span><span>Control loop</span></a></li>
+          <li><a href="#contracts"><span class="chapter-nav__n">04</span><span>Agent contracts</span></a></li>
+          <li><a href="#worked-run"><span class="chapter-nav__n">05</span><span>Worked run</span></a></li>
+          <li><a href="#operate"><span class="chapter-nav__n">06</span><span>Operate like Dan</span></a></li>
+          <li><a href="#failures"><span class="chapter-nav__n">07</span><span>Failure modes</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">08</span><span>Agent-ops lab</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">09</span><span>Teach-back</span></a></li>
+          <li><a href="#appendix"><span class="chapter-nav__n">10</span><span>Raw file index</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero" id="mission">
+        <div class="agent-hero">
+          <div class="agent-hero__copy">
+            <span class="hero__chapter">Agent Systems Companion · TAC-2</span>
+            <h1>The 12 Leverage Points</h1>
+            <p class="hero__dek">The application is the worksite. The lesson is the operating system that lets an agent enter it, see it, change it, and prove the change.</p>
+            <ul class="hero__meta" aria-label="Companion details">
+              <li>Lens · agent systems</li>
+              <li>Core four · context, model, prompt, tools</li>
+              <li>Loop · plan → act → verify → recover</li>
+            </ul>
+          </div>
+          <aside class="mission-card" aria-label="Agent mission">
+            <p class="mission-card__label">Agent mission</p>
+            <p class="mission-card__text">Train a human commander to turn a brilliant-but-blind coding agent into a reliable operator by designing its starting context, prompt, permissions, runtime harness, and returned evidence.</p>
+            <p class="mission-card__test"><strong>Success test:</strong> a fresh agent can orient, run, observe, repair, and verify without the human becoming its memory, terminal, or test runner.</p>
+          </aside>
+        </div>
+        <div class="hook-strip" aria-label="The motivating visibility failure">
+          <span class="hook-strip__node">Browser knows</span>
+          <span class="hook-strip__line" aria-hidden="true"></span>
+          <span class="hook-strip__node hook-strip__node--blind">Agent does not</span>
+          <span>The planted CSV error is visible to the UI user but absent from detailed server stdout. The first repair is to the information path, not the model.</span>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Companion contents</summary>
+          <ol>
+            <li><a href="#mission">Agent mission</a></li>
+            <li><a href="#cast">Cast of agents</a></li>
+            <li><a href="#surface">Agent surface map</a></li>
+            <li><a href="#loop">Control loop</a></li>
+            <li><a href="#contracts">Agent contracts</a></li>
+            <li><a href="#worked-run">Worked run</a></li>
+            <li><a href="#operate">Operate like Dan</a></li>
+            <li><a href="#failures">Failure modes</a></li>
+            <li><a href="#lab">Agent-ops lab</a></li>
+            <li><a href="#teach-back">Teach-back</a></li>
+            <li><a href="#appendix">Raw file index</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section chapter-section--wide" id="cast">
+        <span class="section-number">01</span>
+        <h2 class="section-title">Cast the system before you cast the code</h2>
+        <p class="section-lead">Several kinds of intelligence appear in TAC-2. Only one is the coding agent, and several expected agent layers do not ship at all.</p>
+
+        <table class="agent-table">
+          <thead>
+            <tr><th>Actor</th><th>What it owns</th><th>What it must not silently own</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="role-chip role-chip--human">Human commander</span></td>
+              <td>Outcome, safety boundary, repository choice, review judgment, and the decision to increase autonomy.</td>
+              <td>Relaying every error, typing the repair, running every check, or carrying hidden state between fresh sessions.</td>
+            </tr>
+            <tr>
+              <td><span class="role-chip role-chip--agent">Claude Code / CLI agent</span></td>
+              <td>Prime itself, inspect files, use permitted tools, run the app, read stdout, edit, test, and return evidence.</td>
+              <td>Assuming it can see a browser or outside terminal, inventing repository guides, or declaring success without a check.</td>
+            </tr>
+            <tr>
+              <td><span class="role-chip role-chip--agent">Fresh-session verifier</span></td>
+              <td>Re-enter with zero conversational memory and independently trace a contract such as <code>DatabaseSchemaResponse</code>.</td>
+              <td>Pretending to be a separately configured verifier agent. In TAC-2 this is a role played by another fresh CLI session.</td>
+            </tr>
+            <tr>
+              <td><span class="role-chip">Shell harness</span></td>
+              <td><code>scripts/start.sh</code> launches both services, checks startup, prints endpoints, waits, and traps shutdown.</td>
+              <td>Reasoning. It is deterministic orchestration around the agent, not an autonomous agent itself.</td>
+            </tr>
+            <tr>
+              <td><span class="role-chip">Application LLM</span></td>
+              <td>OpenAI or Anthropic converts a natural-language data question into SQL inside the demo application.</td>
+              <td>Editing the repository. The app’s provider model and the coding agent are different systems.</td>
+            </tr>
+            <tr>
+              <td><span class="role-chip role-chip--missing">Not shipped</span></td>
+              <td><code>agents/</code>, <code>adws/</code>, and <code>trees/</code> are empty scaffolds with README placeholders.</td>
+              <td>No committed subagent definitions, verifier configuration, hooks, skills, <code>CLAUDE.md</code>, or Claude launcher should be inferred.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <aside class="callout callout--term">
+          <p class="callout__label">Name the pattern</p>
+          <p><strong>Replaceability is a design property.</strong> Dan can open a fresh agent because the operating knowledge lives in repository interfaces—README, command prompts, settings, types, tests, and scripts—rather than only in one long conversation.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="surface">
+        <span class="section-number">02</span>
+        <h2 class="section-title">The agent touches interfaces, not “the whole repo”</h2>
+        <p class="section-lead">A useful repository map shows where information enters the agent, where capability is granted, and where evidence comes back.</p>
+
+        <figure class="diagram surface-map observe-draw">
+          <div class="diagram__canvas">
+            <svg viewBox="0 0 920 470" role="img" aria-labelledby="surface-title surface-desc">
+              <title id="surface-title">TAC-2 agent surface map</title>
+              <desc id="surface-desc">The human commander sends a mission to the coding agent. Prompt, context, permission, and launcher interfaces feed the agent. The agent operates the application and verification interfaces, which return stdout and test evidence.</desc>
+              <defs>
+                <marker id="surface-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                  <path d="M0,0 L8,4 L0,8 z" fill="var(--accent)"></path>
+                </marker>
+                <marker id="surface-back" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto">
+                  <path d="M8,0 L0,4 L8,8 z" fill="var(--ok)"></path>
+                </marker>
+              </defs>
+
+              <rect x="26" y="188" width="154" height="94" rx="18" fill="var(--accent-wash)" stroke="var(--accent)" stroke-width="2"></rect>
+              <text x="103" y="226" text-anchor="middle" fill="var(--ink)" font-family="var(--font-display)" font-size="20" font-weight="600">Human</text>
+              <text x="103" y="250" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--font-body)" font-size="14">goal · boundary · review</text>
+
+              <rect x="354" y="173" width="210" height="124" rx="22" fill="var(--bg-card)" stroke="var(--ok)" stroke-width="3"></rect>
+              <text x="459" y="218" text-anchor="middle" fill="var(--ink)" font-family="var(--font-display)" font-size="23" font-weight="600">Coding agent</text>
+              <text x="459" y="246" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--font-body)" font-size="14">plan · act · observe</text>
+              <text x="459" y="268" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--font-body)" font-size="14">verify · recover</text>
+
+              <rect x="258" y="24" width="174" height="76" rx="13" fill="var(--bg-inset)" stroke="var(--border)" stroke-width="2"></rect>
+              <text x="345" y="53" text-anchor="middle" fill="var(--accent-ink)" font-family="var(--font-mono)" font-size="12" font-weight="700">PROMPTS</text>
+              <text x="345" y="77" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--font-body)" font-size="13">prime · install · tools</text>
+
+              <rect x="458" y="24" width="190" height="76" rx="13" fill="var(--bg-inset)" stroke="var(--border)" stroke-width="2"></rect>
+              <text x="553" y="53" text-anchor="middle" fill="var(--accent-ink)" font-family="var(--font-mono)" font-size="12" font-weight="700">CONTEXT</text>
+              <text x="553" y="77" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--font-body)" font-size="13">README · spec · ai_docs</text>
+
+              <rect x="674" y="24" width="218" height="76" rx="13" fill="var(--bg-inset)" stroke="var(--border)" stroke-width="2"></rect>
+              <text x="783" y="53" text-anchor="middle" fill="var(--accent-ink)" font-family="var(--font-mono)" font-size="12" font-weight="700">PERMISSIONS</text>
+              <text x="783" y="77" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--font-body)" font-size="13">settings allow · explicit deny</text>
+
+              <rect x="666" y="186" width="226" height="98" rx="16" fill="var(--bg-card)" stroke="var(--accent)" stroke-width="2"></rect>
+              <text x="779" y="219" text-anchor="middle" fill="var(--accent-ink)" font-family="var(--font-mono)" font-size="12" font-weight="700">HARNESS</text>
+              <text x="779" y="244" text-anchor="middle" fill="var(--ink)" font-family="var(--font-body)" font-size="14">scripts/start.sh</text>
+              <text x="779" y="265" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--font-body)" font-size="13">two services · one observable call</text>
+
+              <rect x="238" y="372" width="204" height="76" rx="13" fill="var(--ok-wash)" stroke="var(--ok)" stroke-width="2"></rect>
+              <text x="340" y="401" text-anchor="middle" fill="var(--ok)" font-family="var(--font-mono)" font-size="12" font-weight="700">RUNTIME EVIDENCE</text>
+              <text x="340" y="425" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--font-body)" font-size="13">stdout · health · schema</text>
+
+              <rect x="478" y="372" width="194" height="76" rx="13" fill="var(--ok-wash)" stroke="var(--ok)" stroke-width="2"></rect>
+              <text x="575" y="401" text-anchor="middle" fill="var(--ok)" font-family="var(--font-mono)" font-size="12" font-weight="700">CHECKS</text>
+              <text x="575" y="425" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--font-body)" font-size="13">pytest · npm build</text>
+
+              <rect x="708" y="372" width="184" height="76" rx="13" fill="var(--bg-inset)" stroke="var(--border)" stroke-width="2" stroke-dasharray="7 6"></rect>
+              <text x="800" y="401" text-anchor="middle" fill="var(--ink-mute)" font-family="var(--font-mono)" font-size="12" font-weight="700">NOT COMMITTED</text>
+              <text x="800" y="425" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--font-body)" font-size="13">subagents · hooks · ADW</text>
+
+              <path class="draw-line" d="M180 235 H 338" fill="none" stroke="var(--accent)" stroke-width="3" marker-end="url(#surface-arrow)"></path>
+              <path class="draw-line" d="M345 100 C345 134 385 136 413 173" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#surface-arrow)"></path>
+              <path class="draw-line" d="M553 100 C553 136 522 140 504 173" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#surface-arrow)"></path>
+              <path class="draw-line" d="M783 100 C783 143 638 137 556 190" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#surface-arrow)"></path>
+              <path class="draw-line" d="M564 235 H 666" fill="none" stroke="var(--accent)" stroke-width="3" marker-end="url(#surface-arrow)"></path>
+              <path class="draw-line" d="M779 284 C779 337 651 334 612 372" fill="none" stroke="var(--ok)" stroke-width="3" marker-end="url(#surface-back)"></path>
+              <path class="draw-line" d="M340 372 C340 334 398 326 423 297" fill="none" stroke="var(--ok)" stroke-width="3" marker-end="url(#surface-back)"></path>
+              <path class="draw-line" d="M575 372 C575 330 526 325 501 297" fill="none" stroke="var(--ok)" stroke-width="3" marker-end="url(#surface-back)"></path>
+            </svg>
+          </div>
+          <figcaption>The operating surface is asymmetric: prompts, context, and permissions make action possible; runtime and checks make correction possible.</figcaption>
+        </figure>
+
+        <div class="surface-legend">
+          <article><strong>Memory surfaces</strong><span>The cold-start briefing is distributed.</span><code>README.md · specs/ · ai_docs/</code></article>
+          <article><strong>Action surfaces</strong><span>The agent’s automatic and blocked operations are declared.</span><code>.claude/settings.json</code></article>
+          <article><strong>Execution surfaces</strong><span>One script turns two services into one operable unit.</span><code>scripts/start.sh</code></article>
+          <article><strong>Evidence surfaces</strong><span>Tests and textual endpoints return machine-readable proof.</span><code>tests/ · /api/health · /api/schema</code></article>
+          <article><strong>Reusable prompts</strong><span>Slash commands preserve successful instructions.</span><code>.claude/commands/</code></article>
+          <article><strong>Empty destinations</strong><span>Scaffolds point toward later orchestration without pretending it exists.</span><code>agents/ · adws/ · trees/</code></article>
+        </div>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="loop">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Close the loop where the agent can see it</h2>
+        <p class="section-lead">A human-readable error is only a fact. It becomes leverage when the acting agent can observe it, compare it with a check, and choose the next move.</p>
+
+        <figure class="loop-shell observe-draw">
+          <svg viewBox="0 0 940 265" role="img" aria-labelledby="loop-title loop-desc">
+            <title id="loop-title">Plan, act, observe, verify, recover control loop</title>
+            <desc id="loop-desc">Five loop nodes move from plan to act to observe to verify to recover, with recovery returning to plan. A gap between application error and stdout blocks observation.</desc>
+            <defs>
+              <marker id="loop-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--accent)"></path></marker>
+            </defs>
+            <g font-family="var(--font-body)" text-anchor="middle">
+              <rect x="25" y="82" width="142" height="72" rx="16" fill="var(--accent-wash)" stroke="var(--accent)" stroke-width="2"></rect>
+              <text x="96" y="112" fill="var(--ink)" font-size="18" font-weight="700">Plan</text>
+              <text x="96" y="136" fill="var(--ink-soft)" font-size="13">outcome + proof</text>
+
+              <rect x="215" y="82" width="142" height="72" rx="16" fill="var(--bg-card)" stroke="var(--border)" stroke-width="2"></rect>
+              <text x="286" y="112" fill="var(--ink)" font-size="18" font-weight="700">Act</text>
+              <text x="286" y="136" fill="var(--ink-soft)" font-size="13">tools + harness</text>
+
+              <rect x="405" y="82" width="142" height="72" rx="16" fill="var(--warn-wash)" stroke="var(--warn)" stroke-width="2"></rect>
+              <text x="476" y="112" fill="var(--ink)" font-size="18" font-weight="700">Observe</text>
+              <text x="476" y="136" fill="var(--warn)" font-size="13">stdout gap here</text>
+
+              <rect x="595" y="82" width="142" height="72" rx="16" fill="var(--ok-wash)" stroke="var(--ok)" stroke-width="2"></rect>
+              <text x="666" y="112" fill="var(--ink)" font-size="18" font-weight="700">Verify</text>
+              <text x="666" y="136" fill="var(--ink-soft)" font-size="13">tests + endpoints</text>
+
+              <rect x="785" y="82" width="142" height="72" rx="16" fill="var(--bg-inset)" stroke="var(--border)" stroke-width="2"></rect>
+              <text x="856" y="112" fill="var(--ink)" font-size="18" font-weight="700">Recover</text>
+              <text x="856" y="136" fill="var(--ink-soft)" font-size="13">diagnose next lever</text>
+            </g>
+            <path class="draw-line" d="M167 118 H 215" fill="none" stroke="var(--accent)" stroke-width="3" marker-end="url(#loop-arrow)"></path>
+            <path class="draw-line" d="M357 118 H 405" fill="none" stroke="var(--accent)" stroke-width="3" marker-end="url(#loop-arrow)"></path>
+            <path class="draw-line" d="M547 118 H 595" fill="none" stroke="var(--accent)" stroke-width="3" marker-end="url(#loop-arrow)"></path>
+            <path class="draw-line" d="M737 118 H 785" fill="none" stroke="var(--accent)" stroke-width="3" marker-end="url(#loop-arrow)"></path>
+            <path class="draw-line" d="M856 154 C856 230 96 230 96 154" fill="none" stroke="var(--accent)" stroke-width="3" marker-end="url(#loop-arrow)"></path>
+            <text x="476" y="30" text-anchor="middle" fill="var(--warn)" font-family="var(--font-mono)" font-size="12" font-weight="700">BROWSER ERROR ≠ AGENT OBSERVATION</text>
+            <path class="draw-line" d="M476 40 V 77" fill="none" stroke="var(--warn)" stroke-width="2" stroke-dasharray="5 5"></path>
+          </svg>
+          <figcaption><strong>The committed before-state breaks at Observe.</strong> The upload handler returns <code>error=str(e)</code> to the UI but emits no detailed handler trace to stdout.</figcaption>
+        </figure>
+
+        <div class="loop-compare">
+          <article class="loop-column loop-column--in">
+            <h3>In-loop: the human is middleware</h3>
+            <ul>
+              <li>Human watches the browser and outside terminal.</li>
+              <li>Human pastes the error into chat.</li>
+              <li>Human types or steers each repair.</li>
+              <li>Human runs tests and reports the result.</li>
+            </ul>
+          </article>
+          <article class="loop-column loop-column--out">
+            <h3>Out-of-loop: the system returns evidence</h3>
+            <ul>
+              <li>Agent owns the long-lived process in its tool context.</li>
+              <li>Runtime details arrive through stdout.</li>
+              <li>Agent diagnoses and edits from its own observations.</li>
+              <li>Agent runs focused and full checks before handoff.</li>
+            </ul>
+          </article>
+        </div>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">Dan’s design intent</p>
+          <p>Presence falls only when evidence stays high. “Out of the loop” does not mean “unable to inspect”; it means the commander reviews returned proof instead of continuously operating the workflow.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="contracts">
+        <span class="section-number">04</span>
+        <h2 class="section-title">Why these files exist for agents</h2>
+        <p class="section-lead">The key files are not trivia. Each one defines a contract between the human, the agent, and the environment.</p>
+
+        <div class="contract-grid">
+          <article class="contract">
+            <p class="contract-label">01 · Prompt contract</p>
+            <h3>Give a fresh session a repeatable beginning</h3>
+            <p><code>/prime</code> says what to execute, what to read, and what to return. It is deliberately small: tracked files plus the README, then a summary.</p>
+            <pre class="snippet"><code><span class="tok-head"># Prime</span>
+<span class="tok-comment">&gt; Execute the following sections to understand the codebase then summarize your understanding.</span>
+
+<span class="tok-head">## Run</span>
+git ls-files
+
+<span class="tok-head">## Read</span>
+README.md</code></pre>
+            <div class="intent"><p class="intent__label">Dan’s design intent</p><p>Move cold-start memory into the repository so replacement sessions can orient without inheriting a private conversation.</p></div>
+          </article>
+
+          <article class="contract">
+            <p class="contract-label">02 · Tool / permission contract</p>
+            <h3>Capability is policy plus interface</h3>
+            <p>The settings auto-allow selected command families and writes, while explicitly denying force-push forms and recursive force removal.</p>
+            <pre class="snippet"><code>{
+  <span class="tok-key">"allow"</span>: [<span class="tok-str">"Bash(uv:*)"</span>, <span class="tok-str">"Bash(npm:*)"</span>, <span class="tok-str">"Write"</span>],
+  <span class="tok-key">"deny"</span>: [<span class="tok-str">"Bash(git push --force:*)"</span>, <span class="tok-str">"Bash(rm -rf:*)"</span>]
+}</code></pre>
+            <div class="intent"><p class="intent__label">Dan’s design intent</p><p>Make the safety boundary executable. Also audit the gap: <code>/prime</code> asks for <code>git ls-files</code>, and the launcher uses <code>sh</code>, but neither family appears in the automatic allow list.</p></div>
+          </article>
+
+          <article class="contract">
+            <p class="contract-label">03 · Harness / launcher</p>
+            <h3>Collapse two services into one observable process</h3>
+            <p><code>scripts/start.sh</code> checks for <code>app/server/.env</code>, starts FastAPI and Vite, checks both child PIDs, prints the three useful URLs, traps exit signals, and waits.</p>
+            <pre class="snippet"><code>uv run python server.py &amp;
+BACKEND_PID=$!
+
+npm run dev &amp;
+FRONTEND_PID=$!
+
+trap cleanup EXIT INT TERM</code></pre>
+            <div class="intent"><p class="intent__label">Dan’s design intent</p><p>Give either human or agent one stable entry point. Important distinction: this script launches the application, not Claude. The lesson’s programmable agent seed is the external CLI call <code>claude -p "/tools"</code>.</p></div>
+          </article>
+
+          <article class="contract">
+            <p class="contract-label">04 · Verification contract</p>
+            <h3>Return proof in text</h3>
+            <p>Backend tests mirror the core modules. The frontend build combines strict TypeScript checking with Vite. Health and schema routes provide deterministic runtime observations.</p>
+            <div class="command-stack" aria-label="Verification commands">
+              <samp class="command-line">cd app/server &amp;&amp; uv run pytest</samp>
+              <samp class="command-line">cd app/client &amp;&amp; npm run build</samp>
+              <samp class="command-line">curl http://localhost:8000/api/health</samp>
+              <samp class="command-line">curl http://localhost:8000/api/schema</samp>
+            </div>
+            <div class="intent"><p class="intent__label">Dan’s design intent</p><p>A claim of success should be replaceable by observations another session can inspect. The deterministic upload/schema/test path does not require a live LLM key.</p></div>
+          </article>
+        </div>
+
+        <div class="truth-note">
+          <strong>Repository truth over convention.</strong> TAC-2 has no <code>CLAUDE.md</code>, no hooks, no skills directory, and no committed <code>.claude/commands/start.md</code>. README plus <code>/prime</code> perform the cold-start role; <code>start.md</code> is a student-created lesson artifact after the action repeats.
+        </div>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="worked-run">
+        <span class="section-number">05</span>
+        <h2 class="section-title">One worked agent run: make blindness debuggable</h2>
+        <p class="section-lead">Follow the ownership handoffs. The application bug matters because it exposes exactly where the agent system loses information.</p>
+
+        <div class="run-grid">
+          <article class="run-step">
+            <span class="run-step__n">1</span><span class="run-role">Human</span>
+            <h3>State outcome and no-relay rule</h3>
+            <p>Ask for an independently observed diagnosis and verified repair. Do not paste the browser error or type the application fix.</p>
+          </article>
+          <article class="run-step run-step--agent">
+            <span class="run-step__n">2</span><span class="run-role">Agent</span>
+            <h3>Prime from repository truth</h3>
+            <p>Run <code>/prime</code>. Inspect README, tracked files, commands, settings, the long specification, types, and nearby tests as needed.</p>
+          </article>
+          <article class="run-step run-step--boundary">
+            <span class="run-step__n">3</span><span class="run-role">Boundary</span>
+            <h3>Install observability first</h3>
+            <p>The committed handlers return error strings but do not print detailed success/failure traces. Have the agent instrument stdout before asking it to solve the planted defect.</p>
+          </article>
+          <article class="run-step run-step--agent">
+            <span class="run-step__n">4</span><span class="run-role">Agent</span>
+            <h3>Own the runtime</h3>
+            <p>Run <code>sh ./scripts/start.sh</code> with a 300-second Bash tool timeout. The timeout is a tool-call property, not an argument understood by the shell script.</p>
+          </article>
+          <article class="run-step">
+            <span class="run-step__n">5</span><span class="run-role">Human trigger</span>
+            <h3>Produce the event once</h3>
+            <p>Upload <code>app/client/public/sample-data/orders_(32).csv</code>. The human causes the event; the agent must receive its consequence through owned stdout.</p>
+          </article>
+          <article class="run-step run-step--agent">
+            <span class="run-step__n">6</span><span class="run-role">Agent</span>
+            <h3>Diagnose from its own trace</h3>
+            <p>The expected chain is filename → table name <code>orders_(32)</code> → pandas table creation → unquoted <code>PRAGMA table_info(...)</code> failure.</p>
+          </article>
+          <article class="run-step run-step--agent">
+            <span class="run-step__n">7</span><span class="run-role">Agent</span>
+            <h3>Repair and create feedback</h3>
+            <p>Use the lesson prompt <code>resolve: replace bad chars and escape</code>. Require focused sanitizer cases and the full backend suite.</p>
+          </article>
+          <article class="run-step run-step--agent">
+            <span class="run-step__n">8</span><span class="run-role">Agent → Human</span>
+            <h3>Return the proof bundle</h3>
+            <p>Hand back the diff, focused and full test output, valid table identifier, and schema evidence showing 32 rows and 7 columns.</p>
+          </article>
+        </div>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Name the pattern</p>
+          <p><strong>System-first debugging:</strong> repair the observation path, keep the model constant, and rerun the same failure. If the same agent now diagnoses it, the added leverage—not magical reasoning—explains the improvement.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="operate">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Operate like Dan</h2>
+        <p class="section-lead">Use the repository’s real commands. Keep application setup, agent invocation, and verification as three separate layers.</p>
+
+        <div class="operate-grid">
+          <article class="operate-card">
+            <h3>1 · Install the worksite</h3>
+            <p>The README’s manual path is explicit and uses the lock-aware package managers already chosen by the repo.</p>
+            <div class="command-stack">
+              <samp class="command-line">cd app/server &amp;&amp; uv sync --all-extras</samp>
+              <samp class="command-line">cd app/client &amp;&amp; npm install</samp>
+            </div>
+          </article>
+          <article class="operate-card">
+            <h3>2 · Configure the boundary</h3>
+            <p>The launcher refuses to start without <code>app/server/.env</code>. Copy the sample, then add keys locally only if you need the optional natural-language query.</p>
+            <div class="command-stack">
+              <samp class="command-line">cd app/server</samp>
+              <samp class="command-line">cp .env.sample .env</samp>
+            </div>
+          </article>
+          <article class="operate-card">
+            <h3>3 · Launch through one harness</h3>
+            <p>Run from repository root. Success prints frontend, backend, and API-doc URLs; <kbd>Ctrl</kbd>+<kbd>C</kbd> triggers graceful child cleanup.</p>
+            <div class="command-stack">
+              <samp class="command-line">./scripts/start.sh</samp>
+            </div>
+          </article>
+          <article class="operate-card">
+            <h3>4 · Give the process to the agent</h3>
+            <p>After stdout is useful, run the same harness inside the agent. Configure the Bash tool timeout separately so the process remains observable long enough for the event.</p>
+            <div class="command-stack">
+              <samp class="command-line">sh ./scripts/start.sh</samp>
+            </div>
+          </article>
+          <article class="operate-card">
+            <h3>5 · Verify both halves</h3>
+            <p>Tests prove backend behavior; the production build proves strict TypeScript plus bundling. Ask the agent to return both outputs.</p>
+            <div class="command-stack">
+              <samp class="command-line">cd app/server &amp;&amp; uv run pytest</samp>
+              <samp class="command-line">cd app/client &amp;&amp; npm run build</samp>
+            </div>
+          </article>
+          <article class="operate-card">
+            <h3>6 · Call a prompt programmatically</h3>
+            <p>This course demonstration is outside the README and outside the repo’s scripts. It invokes the Claude CLI in print mode, runs the committed <code>/tools</code> prompt, then returns control to the shell.</p>
+            <div class="command-stack">
+              <samp class="command-line">claude -p "/tools"</samp>
+            </div>
+          </article>
+        </div>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Do not conflate the layers</p>
+          <p><code>start.sh</code> is an application launcher. <code>claude -p</code> is an agent launcher. A full ADW would still need wrapper code that composes prompt calls plus an autonomous trigger; TAC-2 does not commit that layer.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="failures">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Common agent-system failures</h2>
+        <p class="section-lead">When a run misses, diagnose the operating system before switching models or adding a paragraph of pleading.</p>
+
+        <div class="failure-grid">
+          <article class="failure-card"><h3>Mis-prompting an impossible task</h3><p>“Any issues with the server?” cannot work when the process lives outside the agent and emits no detailed trace.</p><span class="fix">Recover: move the runtime and its evidence into the tool context.</span></article>
+          <article class="failure-card"><h3>Permission drift</h3><p><code>/prime</code> asks for <code>git ls-files</code> and the lesson uses <code>sh</code>, but the settings auto-allow list does not name those command families.</p><span class="fix">Recover: audit required transitions and narrowly approve or explicitly supervise the missing ones.</span></article>
+          <article class="failure-card"><h3>Over-permission</h3><p><code>scripts/stop_apps.sh</code> uses <code>kill -9</code>; the deny list blocks recursive removal and force push, not every destructive shell effect.</p><span class="fix">Recover: treat the allow/deny file as a policy artifact to review, not a complete safety proof.</span></article>
+          <article class="failure-card"><h3>Missing verify</h3><p>An edited file plus a confident summary is not a closed loop. The agent may have repaired one path and broken another.</p><span class="fix">Recover: require focused checks, full suite, frontend build, and behavioral evidence.</span></article>
+          <article class="failure-card"><h3>Human as hidden context</h3><p>The commander remembers ports, yesterday’s diagnosis, and the open browser, then assumes a fresh agent does too.</p><span class="fix">Recover: cold-prime from local truth and make every needed observation reproducible.</span></article>
+          <article class="failure-card"><h3>Stale documentation</h3><p>The specification names files and commands that the final implementation does not ship, including a component tree and <code>npm run type-check</code>.</p><span class="fix">Recover: use the spec as plan evidence, then verify operations against README, package scripts, and actual paths.</span></article>
+          <article class="failure-card"><h3>Invented agent layers</h3><p>Empty <code>agents/</code> and <code>adws/</code> directories look suggestive, but they contain no implemented workflows.</p><span class="fix">Recover: distinguish a destination scaffold, a prompt template, and a running autonomous system.</span></article>
+          <article class="failure-card"><h3>Presence without leverage</h3><p>The human watches every token, relays every failure, and calls the interaction “autonomous” because an LLM wrote the code.</p><span class="fix">Recover: increase size, reduce attempts, build streak, and lower presence only after observation and checks are reliable.</span></article>
+        </div>
+
+        <div class="scorecard" aria-label="Dan's four agentic coding KPIs">
+          <article><b>Size ↑</b><span>More meaningful work per handoff</span></article>
+          <article><b>Attempts ↓</b><span>Fewer corrections toward one-shot</span></article>
+          <article><b>Streak ↑</b><span>More consecutive green runs</span></article>
+          <article><b>Presence ↓</b><span>Less live human mediation</span></article>
+        </div>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="lab">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Lab · harden the cold-start contract</h2>
+        <p class="section-lead">Change the agent system, not the SQL application. Make one existing prompt produce a measurably better fresh-session operator.</p>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Agent ops lab · improve <code>.claude/commands/prime.md</code></h3>
+          <ol class="lab-box__steps">
+            <li><strong>Baseline.</strong> Open a fresh agent, run the current <code>/prime</code>, then ask it to report the application launcher, backend test command, frontend build command, automatic permission gaps, and whether TAC-2 ships subagents. Save the answer.</li>
+            <li><strong>Design.</strong> Ask the agent to propose a minimal expansion of <code>prime.md</code> that reads only the repository facts needed to answer those five questions. Keep it a cold-start interface, not a dump of every source file.</li>
+            <li><strong>Change.</strong> Have the agent edit the existing prompt. Good source candidates are <code>README.md</code>, <code>.claude/settings.json</code>, <code>app/server/pyproject.toml</code>, <code>app/client/package.json</code>, and the three empty scaffold READMEs.</li>
+            <li><strong>Cold verify.</strong> Exit. Start another fresh session with no prior conversation, run the revised <code>/prime</code>, and repeat the same five questions.</li>
+            <li><strong>Recover.</strong> If an answer is still wrong, diagnose whether the problem is missing context, an ambiguous prompt, or an unverifiable claim. Change one condition and rerun.</li>
+            <li><strong>Optional permission audit.</strong> Compare every command the revised prime or launcher needs with <code>.claude/settings.json</code>. Propose the narrowest policy change; do not add a blanket shell wildcard.</li>
+          </ol>
+          <div class="lab-box__pass">
+            <h4>Observable pass criteria</h4>
+            <ul>
+              <li>A zero-history agent names <code>scripts/start.sh</code>, <code>uv run pytest</code>, and <code>npm run build</code> with source paths.</li>
+              <li>It distinguishes auto-allowed commands from commands that may need approval.</li>
+              <li>It states that no subagent, hook, skill, <code>CLAUDE.md</code>, or Claude launcher is committed.</li>
+              <li>Its answer cites repository evidence instead of relying on conversation memory.</li>
+              <li>The revised prompt is shorter than copying the whole spec and remains understandable to a human reviewer.</li>
+            </ul>
+          </div>
+        </section>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The pattern you just installed</p>
+          <p>You converted repeated human briefing into a reusable prompt interface, then verified it with a replacement agent. That is the move from presence to programmability in miniature.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="teach-back">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Teach-back · six sentences, no peeking</h2>
+        <p class="section-lead">Close the page. Explain the agent OS of TAC-2 in exactly six sentences. Use one sentence for each job below.</p>
+        <ol class="teach-six">
+          <li>Name the mission and divide responsibility between commander and coding agent.</li>
+          <li>Explain how prompts and local context make a fresh session replaceable.</li>
+          <li>Explain what the permission contract enables and what it still cannot prove.</li>
+          <li>Distinguish the application harness from the programmable agent invocation.</li>
+          <li>Walk plan → act → observe → verify → recover through the planted CSV failure.</li>
+          <li>Land the leverage thesis with size, attempts, streak, and presence.</li>
+        </ol>
+        <div class="teach-back">
+          <p><strong>Self-check:</strong> if your explanation says only “give the agent a better prompt,” you missed the lesson. It must name at least one context surface, one permission surface, one harness, and one verification surface.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section chapter-section--wide appendix" id="appendix">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Optional appendix · raw file index</h2>
+        <p class="section-lead">Forty-nine real files, one line each. This is a lookup surface for the curious—not the teaching path.</p>
+
+        <details>
+          <summary>Expand the complete TAC-2 file index</summary>
+          <div class="raw-index">
+            <p><code>.claude/commands/install.md</code>Reusable install prompt that executes prime, then installs frontend and backend dependencies.</p>
+            <p><code>.claude/commands/prime.md</code>Cold-start prompt: list tracked files, read README, summarize understanding.</p>
+            <p><code>.claude/commands/tools.md</code>Prompt that asks the agent to expose its built-in non-MCP tool signatures.</p>
+            <p><code>.claude/settings.json</code>Automatic allow list and explicit deny rules for Claude Code operations.</p>
+            <p><code>.gitignore</code>Excludes secrets, environments, dependencies, databases, logs, and generated tree content.</p>
+            <p><code>README.md</code>Primary human-and-agent operating guide: setup, launch, commands, routes, and troubleshooting.</p>
+            <p><code>adws/README.md</code>Empty placeholder; no autonomous developer workflow ships.</p>
+            <p><code>agents/README.md</code>Empty placeholder; no subagent definition ships.</p>
+            <p><code>ai_docs/anthropic_quick_start.md</code>Vendored external Anthropic setup and API quickstart knowledge.</p>
+            <p><code>ai_docs/openai_quick_start.md</code>Vendored external OpenAI API, tools, and agents quickstart knowledge.</p>
+            <p><code>app/client/.gitignore</code>Client-local ignores for dependencies, builds, logs, and editor files.</p>
+            <p><code>app/client/index.html</code>Vite document shell for query, results, tables, and upload modal.</p>
+            <p><code>app/client/package-lock.json</code>Locked npm dependency graph for Vite and TypeScript tooling.</p>
+            <p><code>app/client/package.json</code>Frontend scripts and dev dependencies; includes dev, build, and preview.</p>
+            <p><code>app/client/public/sample-data/orders_(32).csv</code>Thirty-two-row, seven-column planted filename case used by the agent-system failure demo.</p>
+            <p><code>app/client/public/sample-data/products.csv</code>Thirty-two-product CSV for ordinary upload and query use.</p>
+            <p><code>app/client/public/sample-data/users.json</code>Twenty-user JSON dataset for ordinary upload and query use.</p>
+            <p><code>app/client/public/vite.svg</code>Default Vite logo asset.</p>
+            <p><code>app/client/src/api/client.ts</code>Typed fetch wrapper and frontend API methods.</p>
+            <p><code>app/client/src/main.ts</code>DOM event wiring, uploads, queries, results, schema display, and table removal.</p>
+            <p><code>app/client/src/style.css</code>Application UI theme and component styling.</p>
+            <p><code>app/client/src/types.d.ts</code>TypeScript request/response contracts mirroring Pydantic models.</p>
+            <p><code>app/client/src/vite-env.d.ts</code>Vite client type reference.</p>
+            <p><code>app/client/tsconfig.json</code>Strict no-emit TypeScript compiler contract.</p>
+            <p><code>app/client/vite.config.ts</code>Development proxy from <code>/api</code> to the FastAPI service on port 8000.</p>
+            <p><code>app/server/.env.sample</code>Placeholders for OpenAI and Anthropic API keys.</p>
+            <p><code>app/server/.python-version</code>Pins the local Python toolchain to 3.12.</p>
+            <p><code>app/server/core/__init__.py</code>Package marker for backend core modules.</p>
+            <p><code>app/server/core/data_models.py</code>Pydantic request, response, schema, insights, and health types.</p>
+            <p><code>app/server/core/file_processor.py</code>CSV/JSON-to-SQLite conversion; contains the planted unquoted table-name path.</p>
+            <p><code>app/server/core/insights.py</code>SQLite-backed per-column statistics generation.</p>
+            <p><code>app/server/core/llm_processor.py</code>OpenAI/Anthropic SQL prompt construction, routing, and response cleanup.</p>
+            <p><code>app/server/core/sql_processor.py</code>SELECT-only execution guard and database schema introspection.</p>
+            <p><code>app/server/pyproject.toml</code>Backend runtime and test dependency contract.</p>
+            <p><code>app/server/server.py</code>FastAPI application, six routes, environment loading, and response assembly.</p>
+            <p><code>app/server/tests/__init__.py</code>Backend test package marker.</p>
+            <p><code>app/server/tests/assets/column_names.csv</code>Fixture for column-name normalization.</p>
+            <p><code>app/server/tests/assets/invalid.csv</code>Malformed CSV fixture for conversion failure behavior.</p>
+            <p><code>app/server/tests/assets/test_products.json</code>Three-product JSON fixture.</p>
+            <p><code>app/server/tests/assets/test_users.csv</code>Four-user CSV fixture.</p>
+            <p><code>app/server/tests/core/__init__.py</code>Core test package marker.</p>
+            <p><code>app/server/tests/core/test_file_processor.py</code>Conversion, schema, data, cleanup, and invalid-input tests.</p>
+            <p><code>app/server/tests/core/test_llm_processor.py</code>Mocked provider, prompt-formatting, routing, cleanup, and key-handling tests.</p>
+            <p><code>app/server/tests/core/test_sql_processor.py</code>Safe query, dangerous keyword, error, and schema tests.</p>
+            <p><code>app/server/uv.lock</code>Locked Python dependency graph.</p>
+            <p><code>scripts/start.sh</code>Environment guard, dual-service launcher, startup checks, URL output, and graceful trap.</p>
+            <p><code>scripts/stop_apps.sh</code>Forceful cleanup helper for start processes and ports 5173/8000.</p>
+            <p><code>specs/init_nlq_to_sql_to_table.md</code>Long implementation plan: architecture, contracts, commands, phases, and design direction.</p>
+            <p><code>trees/README.md</code>Empty placeholder retained while generated tree content is ignored.</p>
+          </div>
+        </details>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">TAC-2 · Agent Systems Companion</p>
+        <div class="chapter-footer__nav">
+          <a href="../vol-1-tac/02-the-12-leverage-points.html">← Return to conceptual chapter</a>
+          <a href="index.html">Browse code companions →</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          progressFramePending = false;
+        });
+      };
+
+      const sectionObserver = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => {
+          const active = link.getAttribute('href') === `#${visible.target.id}`;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-18% 0px -67% 0px', threshold: [0, .1, .5] });
+
+      const drawObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          drawObserver.unobserve(entry.target);
+        });
+      }, { threshold: .2 });
+
+      sections.forEach(section => sectionObserver.observe(section));
+      document.querySelectorAll('.observe-draw').forEach(figure => drawObserver.observe(figure));
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+</body>
+</html>

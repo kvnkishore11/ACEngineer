@@ -1,0 +1,161 @@
+<section class="chapter" id="ch08">
+  <div class="wrap wide">
+    <span class="chapnum reveal">08 — A worked example</span>
+    <div class="kicker reveal">the loop applied to a decision, not a feature</div>
+    <h2 class="title reveal d1" style="max-width:26ch">Naming a startup, <em>the same way you'd ship a feature.</em></h2>
+    <p class="lede reveal d2">The honest test of a framework is whether you can follow it on something it wasn't designed for. This is the loop run on a one-shot, irreversible naming decision — where the product is <strong>PiCanvas</strong>, and the problem is that it's named after a dependency.</p>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">"Pi" is <code>@earendil-works/pi-coding-agent</code> — a third-party SDK.</p>
+        <p>The product now also runs Claude Code sessions behind the same <code>AgentSession</code> contract, so the name is both <strong>borrowed from a vendor</strong> and <strong>factually stale</strong>. Naming yourself after one of two swappable backends invites exactly the question you don't want in a YC interview.</p>
+        <p>What should be named instead is the thing nothing else has: many agents in one repo, each isolated in a <em>lane</em>, none able to corrupt another's work or the developer's real checkout.</p>
+      </div>
+      <div class="quote"><p>"Lane engine — Scratch tree, lanes as <code>refs/picanvas/lane/*</code>, authored hunks, collisions, pop-out, resolution rounds. <strong>Nothing in oh-my-pi has this; it's your differentiator.</strong>"</p><span class="cite">— from the product's own design doc</span></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch08-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The one design decision</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 300" role="img" aria-label="Pipeline: brief, gate first, parallel generators, gate again, board, memo">
+        <rect x="18" y="118" width="112" height="64" rx="10" class="s-card"/>
+        <text x="74" y="144" text-anchor="middle" class="s-label">BRIEF</text>
+        <text x="74" y="164" text-anchor="middle" class="s-label-sm">hand-written</text>
+
+        <path d="M136 150 H 176" class="s-flow"/><path d="M176 150 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="184" y="102" width="112" height="96" rx="10" class="s-clay-f"/>
+        <text x="240" y="130" text-anchor="middle" class="s-label">GATE.PY</text>
+        <text x="240" y="150" text-anchor="middle" class="s-label-sm">written FIRST</text>
+        <text x="240" y="170" text-anchor="middle" class="s-label-sm">baseline must</text>
+        <text x="240" y="188" text-anchor="middle" class="s-label-sm">be RED</text>
+
+        <path d="M302 150 H 342" class="s-flow"/><path d="M342 150 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="350" y="34" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="54" text-anchor="middle" class="s-label-sm">isolation</text>
+        <rect x="350" y="70" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="90" text-anchor="middle" class="s-label-sm">craft</text>
+        <rect x="350" y="106" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="126" text-anchor="middle" class="s-label-sm">coined</text>
+        <rect x="350" y="142" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="162" text-anchor="middle" class="s-label-sm">classical</text>
+        <rect x="350" y="178" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="198" text-anchor="middle" class="s-label-sm">spatial</text>
+        <rect x="350" y="214" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="234" text-anchor="middle" class="s-label-sm">verb</text>
+        <rect x="350" y="250" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="270" text-anchor="middle" class="s-label-sm">contrarian</text>
+        <text x="413" y="22" text-anchor="middle" class="s-label">7 GENERATORS · PARALLEL · ONE LOCKED ANGLE EACH</text>
+
+        <path d="M482 150 H 522" class="s-flow"/><path d="M522 150 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="530" y="102" width="112" height="96" rx="10" class="s-clay-f"/>
+        <text x="586" y="132" text-anchor="middle" class="s-label">GATE.PY</text>
+        <text x="586" y="154" text-anchor="middle" class="s-label-sm">56 → 48</text>
+        <text x="586" y="176" text-anchor="middle" class="s-label-sm">code disposes</text>
+
+        <path d="M648 150 H 688" class="s-flow"/><path d="M688 150 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="696" y="70" width="166" height="160" rx="10" class="s-olive-f"/>
+        <text x="779" y="96" text-anchor="middle" class="s-label">THE BOARD</text>
+        <text x="779" y="122" text-anchor="middle" class="s-label-sm">founder voice</text>
+        <text x="779" y="142" text-anchor="middle" class="s-label-sm">market strategist</text>
+        <text x="779" y="162" text-anchor="middle" class="s-label-sm">customer oracle</text>
+        <text x="779" y="182" text-anchor="middle" class="s-label-sm">moonshot</text>
+        <rect x="710" y="192" width="138" height="28" rx="7" class="s-amber-f"/>
+        <text x="779" y="211" text-anchor="middle" class="s-label-sm">contrarian — LAST</text>
+      </svg>
+      <div class="fcap"><b>Rubric-score only what is checkable; never score taste.</b> Availability is settled by code before any agent gets an opinion. Only survivors reach a body that argues.</div>
+    </div>
+
+    <div class="callout idea reveal"><span class="ci">WHY THE SPLIT MATTERS</span>
+      <span class="cc">A 1–10 aesthetic score across 48 names produces an <strong>average</strong> — and an average is precisely what a board exists to prevent. His own corpus never rubric-scores creative output. The one verdict mechanism he does ship is a deterministic exit-code gate, and it grades <em>one</em> candidate against a spec, never N against each other.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch08-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The gate goes first, and must fail</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">Borrowed directly from his auto-validate harness: the acceptance gate is written <strong>before</strong> any candidate exists, and it must fail RED against the current state.</p>
+        <p>A gate that passes before the work is done is a broken gate — either the request is already satisfied or the checks are too weak.</p>
+        <p>Every FAIL line is written as the generator's next instruction: expected, found, and exactly what to do about it.</p>
+      </div>
+      <div>
+        <div class="codecap">the baseline run — as it must be</div>
+        <div class="code"><pre>NAMING ACCEPTANCE GATE — PiCanvas → ?
+
+FAIL: expected at least 8 candidates, found 0 at
+  naming/candidates/candidates.txt — run the
+  generators before the gate can go green
+
+RESULT: RED (0 passed, 1 failed)
+Baseline is RED, as it must be. The loop is live.</pre></div>
+      </div>
+    </div>
+
+    <p class="prose reveal" style="max-width:74ch">Tested against real names, it proved it wasn't vacuous — including on the incumbent:</p>
+
+    <div class="code reveal"><pre>FAIL: "PiCanvas"    — 'Pi' used as a prefix morpheme (the PiCanvas shape)
+FAIL: "Canvas"      — found the category word 'canvas' — cedes the positioning
+FAIL: "Conductor"   — competitor collision
+FAIL: "Thrmpx"      — no vowel — must survive being said once in a demo video
+FAIL: "Loomwright"  — RDAP 200 · github.com/loomwright HTTP 200</pre></div>
+
+    <div class="callout warn reveal"><span class="ci">THE ARGUMENT FOR GATE-FIRST</span>
+      <span class="cc"><strong>Loomwright</strong> passed every offline check and died on availability. It is a genuinely good name that a board would have happily debated for twenty minutes before anyone checked whether it could be had.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch08-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Four verdicts, not two</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">A binary gate lies in two different directions, and both lies are expensive.</p>
+        <p>If an unautomatable requirement <em>blocks</em> green, green becomes unreachable and the verdict is meaningless. If it is silently omitted, green falsely reads as <strong>"ship it."</strong></p>
+        <p>So the gate reports four states, and the distinction between <code>SKIP</code> and <code>MANUAL</code> is the whole point.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 240" role="img" aria-label="Four gate verdicts and whether each blocks green">
+          <rect x="20" y="24" width="200" height="40" rx="8" class="s-olive-f"/>
+          <text x="36" y="49" class="s-label">PASS — checked, passed</text>
+          <rect x="20" y="74" width="200" height="40" rx="8" class="s-clay-f"/>
+          <text x="36" y="99" class="s-label">FAIL — checked, failed</text>
+          <rect x="20" y="124" width="200" height="40" rx="8" class="s-amber-f"/>
+          <text x="36" y="143" class="s-label">SKIP — couldn't run</text>
+          <text x="36" y="158" class="s-label-sm">automatable · blocks green</text>
+          <rect x="20" y="174" width="200" height="44" rx="8" class="s-plum-f"/>
+          <text x="36" y="193" class="s-label">MANUAL — no machine can</text>
+          <text x="36" y="208" class="s-label-sm">never passes · never blocks</text>
+
+          <path d="M232 92 H 268" class="s-flow"/><path d="M268 92 l-9 -6 0 12 z" class="s-clay"/>
+          <rect x="276" y="52" width="168" height="80" rx="10" class="s-card"/>
+          <text x="360" y="80" text-anchor="middle" class="s-label">GREEN MEANS</text>
+          <text x="360" y="102" text-anchor="middle" class="s-label-sm">"cleared every check</text>
+          <text x="360" y="120" text-anchor="middle" class="s-label-sm">a machine can make"</text>
+          <text x="360" y="164" text-anchor="middle" class="s-label-sm">IT DOES NOT MEAN</text>
+          <text x="360" y="186" text-anchor="middle" class="s-label-sm">"CLEARED TO SHIP"</text>
+        </svg>
+        <div class="fcap"><b>USPTO class 042 is unsearchable from here.</b> So it prints on every run as an outstanding human gate.</div>
+      </div>
+    </div>
+
+    <div class="filetree reveal"><span class="d">naming/</span>
+  <span class="f">gate.py</span>              <span class="c"># written first · baseline RED · PASS/FAIL/SKIP/MANUAL</span>
+  <span class="d">brief/</span>
+    <span class="f">brief.md</span>          <span class="c"># hand-written: Situation · Stakes · Constraints · Key Question</span>
+  <span class="d">candidates/</span>
+    <span class="f">names-&lt;angle&gt;.md</span>  <span class="c"># one per generator — never a shared path</span>
+    <span class="f">gate-results.txt</span>
+  <span class="d">memos/</span>
+    <span class="f">name-memo.md</span>      <span class="c"># ranked, with recorded dissent</span>
+<span class="d">.claude/commands/</span>
+  <span class="f">name_generate.md</span>    <span class="c"># ONE parameterised generator, not seven files</span>
+  <span class="f">name_board.md</span></div>
+
+    <a class="jump reveal" href="#ch09">Next · What the run actually found &nbsp;→</a>
+  </div>
+</section>

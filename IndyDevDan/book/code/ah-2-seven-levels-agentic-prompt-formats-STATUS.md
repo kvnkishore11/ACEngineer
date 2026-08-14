@@ -17,6 +17,7 @@ LENS: agent-systems
 - Independent background primary through `claude --print`
 - Scripts-as-agents: lifecycle hooks, context-bundle recorder, universal logger, and shell launcher
 - Prompt contracts across all seven levels: call, sequence, guard, delegate, accept a plan, generate a prompt, and update Expertise
+- Course-era slash-command and sub-agent packaging versus current discoverable Agent Skills; this lesson repository contains no `SKILL.md`
 - User-prompt versus system-prompt scope and persistence
 - Context and memory contracts: empty `CLAUDE.md`, repository README, `/prime`, `/prime_cc`, and `/prime_tier_list`
 - Tool and permission contracts: command frontmatter, agent frontmatter, MCP samples, environment-key surfaces, and permission-bypass risk
@@ -69,4 +70,4 @@ LENS: agent-systems
 - The appendix contains 70 unique source paths, exactly matching the 70 real lesson files.
 - Required agent-first surfaces are present: mission, cast, map, loop, contracts, operation, failures, lab, teach-back, and appendix.
 - Desktop/mobile browser capture was attempted through the required in-app browser workflow and installed Chrome. The managed workspace prevented the in-app session from starting and aborted Chrome before page load, so screenshot QA was unavailable. Responsive behavior was checked from the loaded CSS, media queries, width constraints, overflow rules, and balanced DOM structure.
-- Pending final two-axis review and scoped commit.
+- Two-axis review completed against fixed point `833ee20`: Standards found no hard violations and one accepted self-contained-shell duplication heuristic. Spec review prompted a runnable verbatim launcher excerpt and a current Agent Skills packaging note. Its clean-checkout dependency finding is environmental: the shared design, chapter, library, and hub files all exist in the working book tree but are untracked user-owned inputs outside this two-file deliverable, so they were intentionally not absorbed into scope. The initial two-file delivery is commit `2a96f25`; final review corrections are present in the workspace, but the managed sandbox denied creation of `.git/index.lock`, so a follow-up commit could not be written.

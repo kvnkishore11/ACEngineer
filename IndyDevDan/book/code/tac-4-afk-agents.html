@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An agent-systems companion to TAC-4: AFK Agents. Learn how prompts, triggers, permissions, a programmable harness, and evidence turn an issue into a reviewable pull request without continuous human presence.">
+  <title>TAC-4 Agent OS · AFK Agents — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="tac-4-afk-agents.assets.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to the agent systems lesson</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+
+  <header class="site-bar">
+    <a class="site-bar__brand" href="../vol-1-tac/04-afk-agents.html">AGENT SYSTEMS · TAC-4</a>
+    <nav class="site-bar__links" aria-label="Companion links">
+      <a href="../vol-1-tac/04-afk-agents.html">Chapter</a>
+      <a href="index.html">Code library</a>
+      <a href="../index.html">Book hub</a>
+    </nav>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Agent systems navigation">
+      <p class="rail-kicker">Agent OS companion</p>
+      <h2>AFK Agents</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of lesson</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#mission"><span class="chapter-nav__n">00</span><span>Agent mission</span></a></li>
+          <li><a href="#cast"><span class="chapter-nav__n">01</span><span>Cast of agents</span></a></li>
+          <li><a href="#surface"><span class="chapter-nav__n">02</span><span>Surface map</span></a></li>
+          <li><a href="#loop"><span class="chapter-nav__n">03</span><span>Control loop</span></a></li>
+          <li><a href="#contracts"><span class="chapter-nav__n">04</span><span>Four contracts</span></a></li>
+          <li><a href="#operate"><span class="chapter-nav__n">05</span><span>Operate like Dan</span></a></li>
+          <li><a href="#failures"><span class="chapter-nav__n">06</span><span>Agent failures</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">07</span><span>Agent ops lab</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">08</span><span>Six-sentence test</span></a></li>
+          <li><a href="#appendix"><span class="chapter-nav__n">09</span><span>Raw file index</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero" id="mission">
+        <span class="hero__chapter">Tactic #4 · Stay Out The Loop</span>
+        <h1>The agent OS around the code</h1>
+        <p class="hero__dek">AFK is not a more obedient chatbot. It is an operating system that moves a human request through bounded agents, deterministic transitions, and reviewable evidence without using the human as the process manager.</p>
+        <ul class="hero__meta" aria-label="Lesson facts">
+          <li>Lens · agent systems</li>
+          <li>Repo · tac/tac-4</li>
+          <li>13 prompt contracts · 5 hook events</li>
+          <li>147 non-secret text artifacts audited</li>
+        </ul>
+        <div class="mission-card">
+          <span class="mission-card__mark" aria-hidden="true">AFK</span>
+          <div class="mission-card__copy">
+            <strong>Agent mission</strong>
+            <p>Train a human commander to supply a constrained GitHub issue, choose a trigger and bounded environment, then let a programmable workflow classify, branch, plan, implement, commit, and open a pull request—while saved prompts, run traces, tests, and issue comments make the unattended work observable and recoverable.</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Agent systems contents</summary>
+          <ol>
+            <li><a href="#mission">Agent mission</a></li>
+            <li><a href="#cast">Cast of agents</a></li>
+            <li><a href="#surface">Agent surface map</a></li>
+            <li><a href="#loop">Control loop</a></li>
+            <li><a href="#contracts">Four contracts</a></li>
+            <li><a href="#operate">Operate like Dan</a></li>
+            <li><a href="#failures">Common agent failures</a></li>
+            <li><a href="#lab">Agent ops lab</a></li>
+            <li><a href="#teach-back">Teach-back</a></li>
+            <li><a href="#appendix">Raw file index</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="cast">
+        <span class="section-number">01 · WHO ACTS?</span>
+        <h2 class="section-title">A cast, not one giant agent</h2>
+        <p class="section-lead">The word “agent” hides important boundaries. TAC-4 works because a commander, triggers, an orchestrator, fresh CLI workers, deterministic adapters, and reviewers own different moves.</p>
+
+        <div class="cast-grid">
+          <article class="cast-card" data-index="01">
+            <p class="cast-card__role">In-loop boundary</p>
+            <h3>Human commander</h3>
+            <p>Writes the issue’s outcome and constraints, selects an environment, enables a trigger, reviews the pull request and evidence, then improves the system when a class of error repeats.</p>
+          </article>
+          <article class="cast-card" data-index="02">
+            <p class="cast-card__role">Event actors</p>
+            <h3>Manual, cron, or webhook trigger</h3>
+            <p><code>adw_plan_build.py</code>, <code>trigger_cron.py</code>, and <code>trigger_webhook.py</code> answer one question: what event is allowed to start unattended work?</p>
+          </article>
+          <article class="cast-card" data-index="03">
+            <p class="cast-card__role">Deterministic control plane</p>
+            <h3>ADW orchestrator</h3>
+            <p><code>adw_plan_build.py</code> sequences the run, validates narrow returns, posts status, exits loudly on failure, and keeps stochastic judgment inside explicit step boundaries.</p>
+          </article>
+          <article class="cast-card" data-index="04">
+            <p class="cast-card__role">Fresh reasoning workers</p>
+            <h3>Eight Claude Code micro-agents</h3>
+            <p>Classifier, branch generator, planner, plan finder, two committers, implementer, and PR creator are independent top-level CLI processes with fresh context—not a parent agent’s subagent fleet.</p>
+          </article>
+          <article class="cast-card" data-index="05">
+            <p class="cast-card__role">Tools and witnesses</p>
+            <h3>Adapters, scripts, and hooks</h3>
+            <p><code>agent.py</code>, <code>github.py</code>, shell scripts, and five configured hook events turn model intent into subprocesses, GitHub actions, environment operations, and session logs.</p>
+          </article>
+          <article class="cast-card cast-card--absence" data-index="Ø">
+            <p class="cast-card__role">Not present as a role</p>
+            <h3>No dedicated verifier agent</h3>
+            <p>The implementer runs prompt-defined validation; hooks record events; the human reviews the plan, tests, behavior, and PR. <code>SubagentStop</code> is a telemetry hook, not proof that subagents were configured.</p>
+          </article>
+        </div>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">Name the pattern</p>
+          <p><strong>PITER outside; ADW inside; micro-agents at the judgment points.</strong> Prompt input, trigger, environment, and review surround deterministic workflow code that calls replaceable agents through narrow contracts.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="surface">
+        <span class="section-number">02 · WHAT DOES THE AGENT TOUCH?</span>
+        <h2 class="section-title">The repository is an operating surface</h2>
+        <p class="section-lead">The useful map is not a directory tree. It is the chain of interfaces that tells an agent what work exists, what context to load, what authority it has, how to act, and where proof must land.</p>
+
+        <figure class="agent-surface wide-breakout" aria-labelledby="surface-caption">
+          <div class="surface-head">
+            <strong>Issue → review surface</strong>
+            <span>AGENTIC LAYER AROUND app/**</span>
+          </div>
+          <div class="surface-flow">
+            <article class="surface-node">
+              <span class="surface-node__n">PI</span>
+              <strong>Prompt input</strong>
+              <code>GitHub issue title + body</code>
+              <p>The commander supplies outcome and constraints, not a live stream of corrections.</p>
+            </article>
+            <article class="surface-node surface-node--memory">
+              <span class="surface-node__n">T</span>
+              <strong>Trigger</strong>
+              <code>manual · cron · webhook</code>
+              <p>A command, poll result, issue-open event, or exact <code>adw</code> comment fires the workflow.</p>
+            </article>
+            <article class="surface-node surface-node--policy">
+              <span class="surface-node__n">E</span>
+              <strong>Environment + authority</strong>
+              <code>.env · settings.json · CLI flags</code>
+              <p>The checkout, credentials, allow/deny rules, hooks, and bypass mode define the blast radius.</p>
+            </article>
+            <article class="surface-node">
+              <span class="surface-node__n">CTX</span>
+              <strong>Context interfaces</strong>
+              <code>README · commands · specs</code>
+              <p>Prompt templates scope research; plans persist judgment across fresh processes.</p>
+            </article>
+            <article class="surface-node">
+              <span class="surface-node__n">RUN</span>
+              <strong>Harness + tools</strong>
+              <code>adw_plan_build → agent.py → claude -p</code>
+              <p>Ordinary Python composes GitHub, Git, filesystem, tests, and a programmable coding agent.</p>
+            </article>
+            <article class="surface-node surface-node--verify">
+              <span class="surface-node__n">R</span>
+              <strong>Review + evidence</strong>
+              <code>issue feed · agents/ · logs/ · PR</code>
+              <p>Saved prompts, JSONL, hook traces, commits, checks, and the pull request expose the run.</p>
+            </article>
+          </div>
+          <div class="surface-note">
+            <strong>ABSENCE IS PART OF THE MAP</strong>
+            <span>No <code>CLAUDE.md</code>, <code>AGENTS.md</code>, skill package, explicit subagent definition, queue, worktree-per-run layer, or dedicated verifier-agent file exists in TAC-4. The real interfaces are prompts, settings, hooks, README/specs, ADW scripts, and evidence directories.</span>
+          </div>
+          <figcaption id="surface-caption">The app is the target. The agentic layer is the control plane that makes a general coding agent operable against that target.</figcaption>
+        </figure>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Dan’s leverage move</p>
+          <p>The app does not import the agentic layer. That separation makes the agents replaceable, the prompts improvable, and the product shippable without the machinery that edits it.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="loop">
+        <span class="section-number">03 · HOW DOES CONTROL MOVE?</span>
+        <h2 class="section-title">Plan → act → verify → recover</h2>
+        <p class="section-lead">AFK does not remove the human from engineering. It moves human judgment to the request, authority, and acceptance boundaries while the workflow owns the transitions in between.</p>
+
+        <figure class="loop-board wide-breakout" aria-labelledby="loop-caption">
+          <div class="loop-legend">
+            <span>Human move · in-loop</span>
+            <span>Reasoning agent · out-loop</span>
+            <span>Deterministic tool · machine move</span>
+          </div>
+          <div class="loop-lanes">
+            <div class="loop-lane">
+              <div class="loop-lane__label">In-loop boundaries</div>
+              <article class="loop-step loop-step--human"><strong>Frame</strong><p>Write the issue’s outcome, constraints, and work class clues.</p></article>
+              <article class="loop-step loop-step--human"><strong>Bound</strong><p>Choose the checkout, credentials, trigger, and acceptable authority.</p></article>
+              <article class="loop-step loop-step--human"><strong>Leave</strong><p>Do not become the router between planning, building, and commits.</p></article>
+              <article class="loop-step loop-step--human"><strong>Review</strong><p>Compare plan, diff, checks, behavior, and PR to the original issue.</p></article>
+              <article class="loop-step loop-step--human"><strong>Improve</strong><p>Repair the reusable prompt, gate, or launcher that caused the miss.</p></article>
+            </div>
+            <div class="loop-lane">
+              <div class="loop-lane__label">Out-loop execution</div>
+              <article class="loop-step loop-step--machine"><strong>Trigger + fetch</strong><p>Receive the event, create an ADW ID, and fetch structured issue data.</p></article>
+              <article class="loop-step loop-step--agent"><strong>Classify + branch</strong><p>Return one command token and one branch name; Git operations execute.</p></article>
+              <article class="loop-step loop-step--agent"><strong>Plan + commit</strong><p>Write a durable spec, locate its path, and preserve the handoff.</p></article>
+              <article class="loop-step loop-step--agent"><strong>Build + commit</strong><p>A fresh agent consumes the plan, changes the app, and reports validation.</p></article>
+              <article class="loop-step loop-step--agent"><strong>Open review</strong><p>A final fresh agent turns the issue, plan, commits, and validation report into the pull-request surface.</p></article>
+              <article class="loop-step loop-step--machine"><strong>Report or stop</strong><p>Create the PR, or post a ❌ issue comment and exit at the failed boundary.</p></article>
+            </div>
+          </div>
+          <div class="loop-return">If evidence fails, repair the system interface that produced the error class; then re-fire stable input in a disposable environment.</div>
+          <figcaption id="loop-caption">Presence goes down because deterministic code carries state and transitions. Trust goes up only when evidence closes the return path.</figcaption>
+        </figure>
+
+        <h3>Worked run · the repository has receipts</h3>
+        <p>The saved run <code>5f2e861e</code> started from issue #9, classified it as <code>/chore</code>, created branch <code>chore-9-5f2e861e-update-readme-animation</code>, planned and implemented the README work, made two commits, and opened PR #10.</p>
+        <div class="pass-grid" aria-label="Recorded run metrics">
+          <div><strong>8</strong><span>fresh CLI agent results</span></div>
+          <div><strong>111</strong><span>recorded agent turns</span></div>
+          <div><strong>319,056 ms</strong><span>cumulative step duration</span></div>
+          <div><strong>$0.60297575</strong><span>recorded run cost</span></div>
+        </div>
+        <div class="failure-table-wrap">
+          <table class="failure-table">
+            <thead><tr><th>Micro-agent</th><th>Narrow return</th><th>What the orchestrator does next</th></tr></thead>
+            <tbody>
+              <tr><td>issue_classifier</td><td><code>/chore</code></td><td>Selects the chore planning contract.</td></tr>
+              <tr><td>branch_generator</td><td><code>chore-9-5f2e861e-update-readme-animation</code></td><td>Records the working branch.</td></tr>
+              <tr><td>sdlc_planner</td><td>Plan report</td><td>Asks a separate finder for the exact path.</td></tr>
+              <tr><td>plan_finder</td><td><code>specs/readme-animation-framework-update.md</code></td><td>Passes a durable artifact to later phases.</td></tr>
+              <tr><td>planner_committer</td><td>One commit message</td><td>Preserves the plan boundary.</td></tr>
+              <tr><td>sdlc_implementor</td><td>Implementation report</td><td>Checks the process result and continues.</td></tr>
+              <tr><td>implementor_committer</td><td>One commit message</td><td>Preserves the build boundary.</td></tr>
+              <tr><td>pr_creator</td><td>PR URL</td><td>Posts the review surface and completes the run.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="callout callout--warning">
+          <p class="callout__label">Success flags are not semantic proof</p>
+          <p>All eight result objects report success, yet the PR trace says the planner selected Motion One while the final PR body claims Framer Motion and React Spring were added. The contract kept the pipeline parseable; only review can decide whether the artifact is true.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="contracts">
+        <span class="section-number">04 · WHY THESE FILES EXIST</span>
+        <h2 class="section-title">Four contracts make AFK work possible</h2>
+        <p class="section-lead">Each contract answers a different systems question: What should the agent understand? What may it do? How is it called? What observation counts as success?</p>
+
+        <div class="contract-stack">
+          <article class="contract-card">
+            <div class="contract-card__copy">
+              <h3>1. Prompt contract · turn prose into machine-sized returns</h3>
+              <p>The thirteen files under <code>.claude/commands/</code> are not chat suggestions. They are versioned interfaces. Planning prompts restrict research and output shape; glue prompts demand a single class, branch, path, commit message, or URL.</p>
+              <div class="intent-note"><strong>Dan’s design intent</strong>Keep ad hoc prompt strings out of orchestration code. A prompt should be independently improvable, and its last line should make the next deterministic step obvious.</div>
+            </div>
+            <div class="code-shell" aria-label="Abridged prompt return contract from classify_issue.md">
+              <div class="code-label"><span>.claude/commands/classify_issue.md</span><span>exact return vocabulary</span></div>
+              <pre><code><span class="tok-heading">## Instructions</span>
+Respond exclusively with <span class="tok-key">'/' followed by the command</span>.
+
+<span class="tok-string">/chore</span> · <span class="tok-string">/bug</span> · <span class="tok-string">/feature</span>
+or <span class="tok-danger">0</span> if none apply.</code></pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-card__copy">
+              <h3>2. Tool and permission contract · decide where trust lives</h3>
+              <p><code>.claude/settings.json</code> pre-approves twelve patterns, denies three, and wires five hook events. But every ADW template run sets <code>dangerously_skip_permissions=True</code>. Interactive policy and headless policy are therefore different surfaces.</p>
+              <div class="intent-note"><strong>Dan’s design intent</strong>Move unattended authority into a bounded environment you can afford to lose. Then still layer narrow tools and tested gates; isolation is a boundary, not an excuse to stop designing permissions.</div>
+            </div>
+            <div class="code-shell" aria-label="Abridged permission and hook contract from settings.json">
+              <div class="code-label"><span>.claude/settings.json</span><span>abridged · exact entries</span></div>
+              <pre><code><span class="tok-heading">"allow"</span>: [<span class="tok-string">"Bash(uv:*)"</span>, <span class="tok-string">"Bash(npm:*)"</span>, <span class="tok-string">"Write"</span>],
+<span class="tok-heading">"deny"</span>: [<span class="tok-danger">"Bash(git push --force:*)"</span>, <span class="tok-danger">"Bash(rm -rf:*)"</span>]
+
+<span class="tok-heading">"PreToolUse"</span>:
+  <span class="tok-string">"uv run .../pre_tool_use.py || true"</span></code></pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-card__copy">
+              <h3>3. Harness and launcher · call the agent like a primitive</h3>
+              <p><code>adw_plan_build.py</code> chooses when judgment is needed. <code>execute_template()</code> turns a slash command plus arguments into a fresh request. <code>prompt_claude_code()</code> invokes the CLI, streams JSONL, converts it to JSON, and extracts the final result object.</p>
+              <div class="intent-note"><strong>Dan’s design intent</strong>Use deterministic code for ordering, error policy, persistence, and reporting; use the agent only where interpretation is valuable. A replaceable CLI call should not own the whole workflow.</div>
+            </div>
+            <div class="terminal" aria-label="Launcher command shape from agent.py">
+              <div class="terminal__bar">adws/agent.py · command shape</div>
+              <pre>claude -p "/implement specs/&lt;plan&gt;.md" --model sonnet --output-format stream-json --verbose --dangerously-skip-permissions</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-card__copy">
+              <h3>4. Verification contract · make success observable</h3>
+              <p>Pre-flight checks inspect environment, Git, GitHub CLI, and a live Claude call. Planning templates require validation commands. The harness checks each result and posts a visible ❌ before exiting. Saved prompts, JSONL, hook logs, commits, tests, behavior, and the PR form a ladder of evidence.</p>
+              <div class="intent-note"><strong>Dan’s design intent</strong>An agent run is not done when the model says “done.” It is done when the review surface contains enough independent evidence to accept the outcome or route a precise repair upstream.</div>
+            </div>
+            <div class="terminal" aria-label="Verification commands from the repository README files">
+              <div class="terminal__bar">README verification surfaces</div>
+              <pre>uv run adws/health_check.py
+cd app/server &amp;&amp; uv run pytest
+cd app/client &amp;&amp; npm run build
+cat agents/*/sdlc_planner/raw_output.jsonl | tail -1 | jq .</pre>
+            </div>
+          </article>
+        </div>
+
+        <aside class="current-practice">
+          <p class="current-practice__label">Course-era surface · durable contract</p>
+          <p>The lesson’s local extract flags the hand-built subprocess wrapper, pinned model names, flat slash-command packaging, and full permission bypass as period details. Preserve the architecture when tools move: scoped prompt in, bounded authority, structured events out, saved artifacts, explicit failure, and an independent review path.</p>
+          <p class="current-practice__source">Source: <code>_extracts/tac-4-afk-agents/outdated-vs-current.md</code>; re-check product-specific choices before adopting them.</p>
+        </aside>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">A real policy bug hiding in plain sight</p>
+          <p><code>pre_tool_use.py</code> exits with code 2 when it sees broad destructive <code>rm</code> patterns or non-sample <code>.env</code> access. The configured command appends <code>|| true</code>, which converts that failure to shell success. As written, treat this hook as telemetry—not an enforcement boundary—until you remove the fail-open wrapper and test both allow and deny cases.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="operate">
+        <span class="section-number">05 · OPERATE LIKE DAN</span>
+        <h2 class="section-title">Run the system from boundaries, not from the chat</h2>
+        <p class="section-lead">Start with a manual, low-risk chore in a repository and checkout you control. Prove every PITER role before adding an always-on trigger.</p>
+
+        <ol class="operate-list">
+          <li>
+            <h3>Own the environment first</h3>
+            <p>Use your own remote and a disposable checkout. Copy sample environment files, then enter keys locally; never paste secret values into an issue or agent prompt.</p>
+            <div class="terminal"><div class="terminal__bar">README · environment setup</div><pre>cp .env.sample .env
+cd app/server
+cp .env.sample .env</pre></div>
+          </li>
+          <li>
+            <h3>Install the target application</h3>
+            <p>The agent can only verify what the environment can run. Install both sides before blaming a model for missing tools.</p>
+            <div class="terminal"><div class="terminal__bar">README · dependencies</div><pre>cd app/server &amp;&amp; uv sync --all-extras
+cd app/client &amp;&amp; npm install</pre></div>
+          </li>
+          <li>
+            <h3>Prove the runway</h3>
+            <p>Run the ADW health check before a paid multi-agent chain. Inspect warnings about the remote, GitHub authentication, CLI availability, and the live model call.</p>
+            <div class="terminal"><div class="terminal__bar">README · pre-flight</div><pre>uv run adws/health_check.py</pre></div>
+          </li>
+          <li>
+            <h3>Create one constrained chore issue</h3>
+            <p>State the outcome and constraints. Avoid dictating an implementation; <code>/classify_issue</code> and <code>/chore</code> own classification and planning. This is Prompt input in PITER.</p>
+          </li>
+          <li>
+            <h3>Fire manually from the project root</h3>
+            <p>The root working directory is part of the contract because Claude Code discovers <code>.claude/commands/</code> there. The main README’s root-path form also matches the webhook launcher’s <code>cwd=project_root</code>.</p>
+            <div class="terminal"><div class="terminal__bar">README · manual ADW</div><pre>uv run adws/adw_plan_build.py &lt;issue-number&gt;</pre></div>
+          </li>
+          <li>
+            <h3>Review the evidence bundle</h3>
+            <p>Follow the ADW ID through issue comments, <code>agents/&lt;id&gt;/</code>, hook sessions under <code>logs/</code>, branch, commits, plan, tests, and PR. Repeat the decisive validation yourself.</p>
+            <div class="terminal"><div class="terminal__bar">adws/README.md · troubleshooting</div><pre>cat agents/*/sdlc_planner/raw_output.jsonl | tail -1 | jq .</pre></div>
+          </li>
+          <li>
+            <h3>Only then swap the trigger</h3>
+            <p>Cron and webhook are alternate T implementations. They do not improve a weak prompt, unsafe environment, or missing review surface.</p>
+            <div class="terminal"><div class="terminal__bar">README · alternate triggers</div><pre>uv run adws/trigger_cron.py
+uv run adws/trigger_webhook.py</pre></div>
+          </li>
+          <li>
+            <h3>Stop listeners when the drill ends</h3>
+            <p>Use <kbd>Ctrl</kbd>+<kbd>C</kbd> for the foreground process. The repository also includes <code>scripts/kill_trigger_webhook.sh</code> and <code>scripts/stop_apps.sh</code> for local cleanup.</p>
+          </li>
+        </ol>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Working-directory trap</p>
+          <p><code>adws/README.md</code> also says to <code>cd adws/</code> before launching. But command discovery is rooted at the repository, the video preserves a real wrong-directory “Failed to spawn,” and <code>trigger_cron.py</code> currently launches its child with <code>cwd=adws</code>. Treat working directory as an explicit harness invariant, not an incidental shell detail.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="failures">
+        <span class="section-number">06 · WHEN THE AGENT SYSTEM LIES</span>
+        <h2 class="section-title">Common failures live around the model</h2>
+        <p class="section-lead">A capable model cannot compensate for an incoherent operating surface. Diagnose the boundary that failed before changing application logic.</p>
+
+        <div class="failure-table-wrap">
+          <table class="failure-table">
+            <thead><tr><th>Failure signal</th><th>Broken agent-system contract</th><th>Recover at the system level</th></tr></thead>
+            <tbody>
+              <tr><td>The human answers questions between every phase.</td><td>No durable handoff; the commander is still the router.</td><td>Strengthen the issue and plan artifact, then start a fresh process.</td></tr>
+              <tr><td>Classifier returns a paragraph.</td><td>Prompt output is not machine-consumable.</td><td>Tighten the return vocabulary and reject anything outside the typed set.</td></tr>
+              <tr><td>Slash command is missing or the run “Failed to spawn.”</td><td>Launcher working directory does not expose <code>.claude/commands/</code>.</td><td>Run from project root; make <code>cwd</code> a tested invariant in every trigger.</td></tr>
+              <tr><td>A forbidden command still runs.</td><td>Headless bypass, settings rules, and hooks were treated as one policy.</td><td>Remove fail-open hook wrappers; scope headless tools; test the actual launch mode.</td></tr>
+              <tr><td>A public POST can start expensive work.</td><td><code>trigger_webhook.py</code> does not verify a GitHub webhook signature.</td><td>Authenticate the trigger before exposing it; rate-limit and log rejected events.</td></tr>
+              <tr><td>Two issues mutate one checkout at once.</td><td>No queue, lock, container, or worktree-per-run isolation exists.</td><td>Serialize triggers or give every ADW ID its own disposable checkout.</td></tr>
+              <tr><td>Health check passes; the workflow exits on startup.</td><td><code>health_check.py</code> tolerates default <code>CLAUDE_CODE_PATH</code>; <code>adw_plan_build.py</code> requires the variable.</td><td>Make pre-flight and runtime validate the same contract; remove drift.</td></tr>
+              <tr><td>Every result says success; the PR is inaccurate.</td><td>Process completion was confused with semantic acceptance.</td><td>Require evidence tied to the issue; add a verifier or repeat decisive checks manually.</td></tr>
+              <tr><td>Logs exist but no one can answer what happened.</td><td>Artifacts were captured without an operator review path.</td><td>Thread the ADW ID through comments, prompts, JSONL, commits, plan, and PR.</td></tr>
+              <tr><td>A model upgrade changes behavior everywhere.</td><td>Model, prompt, and context were not isolated per step.</td><td>Keep glue agents cheap and bounded; reserve stronger models for plan and build.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="cast-grid">
+          <article class="cast-card cast-card--absence" data-index="✕">
+            <p class="cast-card__role">Artifact repair</p>
+            <h3>Fix this PR by hand</h3>
+            <p>The immediate output improves, but the next run can reproduce the same error. Human presence and review load remain unchanged.</p>
+          </article>
+          <article class="cast-card" data-index="✓">
+            <p class="cast-card__role">System repair</p>
+            <h3>Fix the producing interface</h3>
+            <p>Change the prompt, permission gate, launcher invariant, or verification step; rerun stable input; prove the error class disappears.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">07 · LAB · AGENT OPS</span>
+        <h2 class="section-title">Make one guardrail enforceable—and make completion prove itself</h2>
+        <p class="section-lead">Do not touch <code>app/</code>. Change the operating system around the agent, then close a local, observable loop without running a destructive command.</p>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Mission · repair the permission and verification contracts</h3>
+          <p>Work on a disposable branch. First make the existing PreToolUse guard fail closed. Then strengthen <code>/implement</code> so a completion report must include validation evidence.</p>
+
+          <div class="lab-steps">
+            <article class="lab-step">
+              <span class="lab-step__n">1</span>
+              <h3>Observe the mismatch</h3>
+              <p>Read <code>.claude/settings.json</code> and <code>.claude/hooks/pre_tool_use.py</code>. Explain why exit code 2 cannot block when the configured shell command ends in <code>|| true</code>.</p>
+            </article>
+            <article class="lab-step">
+              <span class="lab-step__n">2</span>
+              <h3>Repair the tool contract</h3>
+              <p>Remove <code>|| true</code> from the <code>PreToolUse</code> command only. Leave logging hooks alone. Validate the JSON after editing.</p>
+              <div class="terminal"><div class="terminal__bar">local contract check</div><pre>python -m json.tool .claude/settings.json &gt; /dev/null</pre></div>
+            </article>
+            <article class="lab-step">
+              <span class="lab-step__n">3</span>
+              <h3>Test the hook without executing the tool</h3>
+              <p>Pipe synthetic hook input directly to the Python file. A harmless <code>ls</code> request must exit 0. A destructive <code>rm -rf</code> request and a Read request for <code>.env</code> must exit 2. The hook receives descriptions; it does not execute those commands.</p>
+              <div class="terminal"><div class="terminal__bar">dry inputs · inspect each exit code</div><pre>printf '%s' '{"session_id":"lab-safe","tool_name":"Bash","tool_input":{"command":"ls"}}' | uv run .claude/hooks/pre_tool_use.py; printf 'safe exit=%s\n' "$?"
+
+printf '%s' '{"session_id":"lab-rm","tool_name":"Bash","tool_input":{"command":"rm -rf ./build"}}' | uv run .claude/hooks/pre_tool_use.py; printf 'rm exit=%s\n' "$?"
+
+printf '%s' '{"session_id":"lab-env","tool_name":"Read","tool_input":{"file_path":".env"}}' | uv run .claude/hooks/pre_tool_use.py; printf 'env exit=%s\n' "$?"</pre></div>
+            </article>
+            <article class="lab-step">
+              <span class="lab-step__n">4</span>
+              <h3>Strengthen the completion contract</h3>
+              <p>Edit <code>.claude/commands/implement.md</code>. Require the final report to list every validation command actually run, its exit status, and the observed result. Require an explicit “not run” reason; forbid claiming completion when a required check failed.</p>
+            </article>
+            <article class="lab-step">
+              <span class="lab-step__n">5</span>
+              <h3>Review the agent-system diff</h3>
+              <p>The diff should touch agent interfaces only. Explain which PITER element changed, which loop is now closed, and why this is more reusable than repairing one application patch.</p>
+              <div class="terminal"><div class="terminal__bar">scope proof</div><pre>git diff -- .claude/settings.json .claude/commands/implement.md
+git diff --name-only</pre></div>
+            </article>
+          </div>
+
+          <div class="pass-grid" aria-label="Lab pass criteria">
+            <div><strong>01</strong><span><code>settings.json</code> parses and PreToolUse no longer contains <code>|| true</code>.</span></div>
+            <div><strong>02</strong><span>The safe synthetic request exits 0.</span></div>
+            <div><strong>03</strong><span>Both dangerous synthetic requests exit 2 without reading or deleting anything.</span></div>
+            <div><strong>04</strong><span><code>implement.md</code> demands command, exit status, and observed result.</span></div>
+            <div><strong>05</strong><span>No file under <code>app/</code> changed.</span></div>
+            <div><strong>06</strong><span>You can name the failed contract, the repaired boundary, and the observable proof.</span></div>
+          </div>
+          <p class="lab-box__pass"><strong>Pass:</strong> a guard that previously looked safe now proves its decision through exit status, and the implementer can no longer report “done” without exposing the validation it performed.</p>
+        </section>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Stretch · close the launcher loop</p>
+          <p>The timeout handler in <code>agent.py</code> catches <code>TimeoutExpired</code>, but its <code>subprocess.run()</code> call supplies no timeout. Add a typed timeout field, pass it to the subprocess, and prove a deliberately tiny timeout returns <code>success=False</code> without launching a real engineering run.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="teach-back">
+        <span class="section-number">08 · RETRIEVAL</span>
+        <h2 class="section-title">Explain the agent OS in six sentences</h2>
+        <p class="section-lead">Close the page. Reconstruct the system without file-by-file narration. One sentence per responsibility.</p>
+
+        <div class="teach-back">
+          <h3>Six-sentence test</h3>
+          <ol class="sentence-grid">
+            <li><strong>Human boundary</strong>What does the commander decide before leaving and after returning?</li>
+            <li><strong>PITER</strong>What are Prompt input, Trigger, Environment, and Review in this repository?</li>
+            <li><strong>ADW</strong>How does deterministic code carry one issue from fetch to pull request?</li>
+            <li><strong>Micro-agents</strong>Why are the eight CLI runs independent, narrow, and replaceable?</li>
+            <li><strong>Authority + evidence</strong>Where do permissions live, and what proves more than a success flag?</li>
+            <li><strong>Recovery</strong>When review fails, why does Dan repair the producing interface instead of only the artifact?</li>
+          </ol>
+        </div>
+
+        <section class="retrieval-quiz" aria-label="Agent OS retrieval checks">
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">Are TAC-4’s micro-agents Claude Code subagents?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. The recorded ADW uses separate top-level <code>claude -p</code> processes. A <code>SubagentStop</code> hook is configured for telemetry, but no explicit subagent definition or parent-to-child delegation layer ships here.</p></details>
+          </div>
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">What is the most dangerous misunderstanding in this repository?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Believing the allow/deny list and intended pre-tool hook automatically constrain headless ADW runs. Template runs request permission bypass, and the configured PreToolUse shell command currently fails open with <code>|| true</code>.</p></details>
+          </div>
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">What did run <code>5f2e861e</code> prove—and not prove?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It proved the eight-step issue-to-PR chain completed and left detailed artifacts. It did not prove every statement in the resulting PR was accurate; semantic acceptance still belongs to review.</p></details>
+          </div>
+        </section>
+      </section>
+
+      <section class="chapter-section" id="appendix">
+        <span class="section-number">09 · OPTIONAL APPENDIX</span>
+        <h2 class="section-title">Raw file index</h2>
+        <p class="section-lead">The teaching path above follows interfaces, not files. This collapsible inventory records every non-secret, non-binary artifact audited under <code>tac/tac-4</code>; generated Python bytecode and the value-bearing root <code>.env</code> are intentionally excluded.</p>
+
+        <details class="raw-index">
+          <summary>Open the 147-file audit index</summary>
+          <div class="raw-groups">
+            <section class="raw-group">
+              <h3>Agent contracts, policy, and orchestration</h3>
+              <ul>
+                <li><code>.claude/commands/bug.md</code></li>
+                <li><code>.claude/commands/chore.md</code></li>
+                <li><code>.claude/commands/classify_issue.md</code></li>
+                <li><code>.claude/commands/commit.md</code></li>
+                <li><code>.claude/commands/feature.md</code></li>
+                <li><code>.claude/commands/find_plan_file.md</code></li>
+                <li><code>.claude/commands/generate_branch_name.md</code></li>
+                <li><code>.claude/commands/implement.md</code></li>
+                <li><code>.claude/commands/install.md</code></li>
+                <li><code>.claude/commands/prime.md</code></li>
+                <li><code>.claude/commands/pull_request.md</code></li>
+                <li><code>.claude/commands/start.md</code></li>
+                <li><code>.claude/commands/tools.md</code></li>
+                <li><code>.claude/hooks/notification.py</code></li>
+                <li><code>.claude/hooks/post_tool_use.py</code></li>
+                <li><code>.claude/hooks/pre_tool_use.py</code></li>
+                <li><code>.claude/hooks/stop.py</code></li>
+                <li><code>.claude/hooks/subagent_stop.py</code></li>
+                <li><code>.claude/hooks/utils/constants.py</code></li>
+                <li><code>.claude/hooks/utils/llm/anth.py</code></li>
+                <li><code>.claude/hooks/utils/llm/oai.py</code></li>
+                <li><code>.claude/settings.json</code></li>
+                <li><code>.env.sample</code></li>
+                <li><code>.gitignore</code></li>
+                <li><code>README.md</code></li>
+                <li><code>adws/README.md</code></li>
+                <li><code>adws/adw_plan_build.py</code></li>
+                <li><code>adws/agent.py</code></li>
+                <li><code>adws/data_types.py</code></li>
+                <li><code>adws/github.py</code></li>
+                <li><code>adws/health_check.py</code></li>
+                <li><code>adws/trigger_cron.py</code></li>
+                <li><code>adws/trigger_webhook.py</code></li>
+                <li><code>adws/utils.py</code></li>
+              </ul>
+            </section>
+            <section class="raw-group">
+              <h3>Saved ADW run artifacts</h3>
+              <ul>
+                <li><code>agents/338dc8a6/adw_plan_build/execution.log</code></li>
+                <li><code>agents/5f2e861e/adw_plan_build/execution.log</code></li>
+                <li><code>agents/5f2e861e/branch_generator/prompts/generate_branch_name.txt</code></li>
+                <li><code>agents/5f2e861e/branch_generator/raw_output.json</code></li>
+                <li><code>agents/5f2e861e/branch_generator/raw_output.jsonl</code></li>
+                <li><code>agents/5f2e861e/issue_classifier/prompts/classify_issue.txt</code></li>
+                <li><code>agents/5f2e861e/issue_classifier/raw_output.json</code></li>
+                <li><code>agents/5f2e861e/issue_classifier/raw_output.jsonl</code></li>
+                <li><code>agents/5f2e861e/plan_finder/prompts/find_plan_file.txt</code></li>
+                <li><code>agents/5f2e861e/plan_finder/raw_output.json</code></li>
+                <li><code>agents/5f2e861e/plan_finder/raw_output.jsonl</code></li>
+                <li><code>agents/5f2e861e/pr_creator/prompts/pull_request.txt</code></li>
+                <li><code>agents/5f2e861e/pr_creator/raw_output.json</code></li>
+                <li><code>agents/5f2e861e/pr_creator/raw_output.jsonl</code></li>
+                <li><code>agents/5f2e861e/sdlc_implementor/prompts/implement.txt</code></li>
+                <li><code>agents/5f2e861e/sdlc_implementor/raw_output.json</code></li>
+                <li><code>agents/5f2e861e/sdlc_implementor/raw_output.jsonl</code></li>
+                <li><code>agents/5f2e861e/sdlc_implementor_committer/prompts/commit.txt</code></li>
+                <li><code>agents/5f2e861e/sdlc_implementor_committer/raw_output.json</code></li>
+                <li><code>agents/5f2e861e/sdlc_implementor_committer/raw_output.jsonl</code></li>
+                <li><code>agents/5f2e861e/sdlc_planner/prompts/chore.txt</code></li>
+                <li><code>agents/5f2e861e/sdlc_planner/raw_output.json</code></li>
+                <li><code>agents/5f2e861e/sdlc_planner/raw_output.jsonl</code></li>
+                <li><code>agents/5f2e861e/sdlc_planner_committer/prompts/commit.txt</code></li>
+                <li><code>agents/5f2e861e/sdlc_planner_committer/raw_output.json</code></li>
+                <li><code>agents/5f2e861e/sdlc_planner_committer/raw_output.jsonl</code></li>
+              </ul>
+            </section>
+            <section class="raw-group">
+              <h3>Knowledge and application target</h3>
+              <ul>
+                <li><code>ai_docs/anthropic_quick_start.md</code></li>
+                <li><code>ai_docs/claude_code_cli_reference.md</code></li>
+                <li><code>ai_docs/claude_code_sdk.md</code></li>
+                <li><code>ai_docs/e2b.md</code></li>
+                <li><code>ai_docs/openai_quick_start.md</code></li>
+                <li><code>app/client/.gitignore</code></li>
+                <li><code>app/client/index.html</code></li>
+                <li><code>app/client/package-lock.json</code></li>
+                <li><code>app/client/package.json</code></li>
+                <li><code>app/client/public/sample-data/orders_(32).csv</code></li>
+                <li><code>app/client/public/sample-data/products.csv</code></li>
+                <li><code>app/client/public/sample-data/users.json</code></li>
+                <li><code>app/client/public/vite.svg</code></li>
+                <li><code>app/client/src/api/client.ts</code></li>
+                <li><code>app/client/src/main.ts</code></li>
+                <li><code>app/client/src/style.css</code></li>
+                <li><code>app/client/src/types.d.ts</code></li>
+                <li><code>app/client/src/vite-env.d.ts</code></li>
+                <li><code>app/client/tsconfig.json</code></li>
+                <li><code>app/client/vite.config.ts</code></li>
+                <li><code>app/server/.env.sample</code></li>
+                <li><code>app/server/.python-version</code></li>
+                <li><code>app/server/core/__init__.py</code></li>
+                <li><code>app/server/core/data_models.py</code></li>
+                <li><code>app/server/core/file_processor.py</code></li>
+                <li><code>app/server/core/insights.py</code></li>
+                <li><code>app/server/core/llm_processor.py</code></li>
+                <li><code>app/server/core/sql_processor.py</code></li>
+                <li><code>app/server/core/sql_security.py</code></li>
+                <li><code>app/server/main.py</code></li>
+                <li><code>app/server/pyproject.toml</code></li>
+                <li><code>app/server/server.py</code></li>
+                <li><code>app/server/tests/__init__.py</code></li>
+                <li><code>app/server/tests/assets/column_names.csv</code></li>
+                <li><code>app/server/tests/assets/invalid.csv</code></li>
+                <li><code>app/server/tests/assets/test_products.json</code></li>
+                <li><code>app/server/tests/assets/test_users.csv</code></li>
+                <li><code>app/server/tests/core/__init__.py</code></li>
+                <li><code>app/server/tests/core/test_file_processor.py</code></li>
+                <li><code>app/server/tests/core/test_llm_processor.py</code></li>
+                <li><code>app/server/tests/core/test_sql_processor.py</code></li>
+                <li><code>app/server/tests/test_sql_injection.py</code></li>
+                <li><code>app/server/uv.lock</code></li>
+              </ul>
+            </section>
+            <section class="raw-group">
+              <h3>Hook session traces</h3>
+              <ul>
+                <li><code>logs/12ce3ab2-537a-4a3d-bc11-856c68063b5a/chat.json</code></li>
+                <li><code>logs/12ce3ab2-537a-4a3d-bc11-856c68063b5a/post_tool_use.json</code></li>
+                <li><code>logs/12ce3ab2-537a-4a3d-bc11-856c68063b5a/pre_tool_use.json</code></li>
+                <li><code>logs/12ce3ab2-537a-4a3d-bc11-856c68063b5a/stop.json</code></li>
+                <li><code>logs/3430bdec-2ae0-43a8-abbc-f0ef72981ce5/chat.json</code></li>
+                <li><code>logs/3430bdec-2ae0-43a8-abbc-f0ef72981ce5/post_tool_use.json</code></li>
+                <li><code>logs/3430bdec-2ae0-43a8-abbc-f0ef72981ce5/pre_tool_use.json</code></li>
+                <li><code>logs/3430bdec-2ae0-43a8-abbc-f0ef72981ce5/stop.json</code></li>
+                <li><code>logs/4f2f6443-bae5-4a27-9c3c-e4f3d256b83a/chat.json</code></li>
+                <li><code>logs/4f2f6443-bae5-4a27-9c3c-e4f3d256b83a/post_tool_use.json</code></li>
+                <li><code>logs/4f2f6443-bae5-4a27-9c3c-e4f3d256b83a/pre_tool_use.json</code></li>
+                <li><code>logs/4f2f6443-bae5-4a27-9c3c-e4f3d256b83a/stop.json</code></li>
+                <li><code>logs/5912273e-2d47-4a54-8b4c-08a8de70086d/chat.json</code></li>
+                <li><code>logs/5912273e-2d47-4a54-8b4c-08a8de70086d/post_tool_use.json</code></li>
+                <li><code>logs/5912273e-2d47-4a54-8b4c-08a8de70086d/pre_tool_use.json</code></li>
+                <li><code>logs/5912273e-2d47-4a54-8b4c-08a8de70086d/stop.json</code></li>
+                <li><code>logs/7ba9b61c-6763-4c79-8486-0a1e9948989d/chat.json</code></li>
+                <li><code>logs/7ba9b61c-6763-4c79-8486-0a1e9948989d/stop.json</code></li>
+                <li><code>logs/845feb65-4467-4109-9fd9-4a3832480c3e/chat.json</code></li>
+                <li><code>logs/845feb65-4467-4109-9fd9-4a3832480c3e/post_tool_use.json</code></li>
+                <li><code>logs/845feb65-4467-4109-9fd9-4a3832480c3e/pre_tool_use.json</code></li>
+                <li><code>logs/845feb65-4467-4109-9fd9-4a3832480c3e/stop.json</code></li>
+                <li><code>logs/8c977a65-4e02-45c3-b6ee-e87d49dd8940/chat.json</code></li>
+                <li><code>logs/8c977a65-4e02-45c3-b6ee-e87d49dd8940/post_tool_use.json</code></li>
+                <li><code>logs/8c977a65-4e02-45c3-b6ee-e87d49dd8940/pre_tool_use.json</code></li>
+                <li><code>logs/8c977a65-4e02-45c3-b6ee-e87d49dd8940/stop.json</code></li>
+                <li><code>logs/bb43b789-2709-462e-abba-1c54a6ab731f/chat.json</code></li>
+                <li><code>logs/bb43b789-2709-462e-abba-1c54a6ab731f/notification.json</code></li>
+                <li><code>logs/bb43b789-2709-462e-abba-1c54a6ab731f/stop.json</code></li>
+                <li><code>logs/ceeebbb7-3c87-4dae-8daf-c759f5efbb0c/chat.json</code></li>
+                <li><code>logs/ceeebbb7-3c87-4dae-8daf-c759f5efbb0c/post_tool_use.json</code></li>
+                <li><code>logs/ceeebbb7-3c87-4dae-8daf-c759f5efbb0c/pre_tool_use.json</code></li>
+                <li><code>logs/ceeebbb7-3c87-4dae-8daf-c759f5efbb0c/stop.json</code></li>
+              </ul>
+            </section>
+            <section class="raw-group">
+              <h3>Operator scripts and durable plans</h3>
+              <ul>
+                <li><code>scripts/clear_issue_comments.sh</code></li>
+                <li><code>scripts/copy_dot_env.sh</code></li>
+                <li><code>scripts/delete_pr.sh</code></li>
+                <li><code>scripts/expose_webhook.sh</code></li>
+                <li><code>scripts/kill_trigger_webhook.sh</code></li>
+                <li><code>scripts/start.sh</code></li>
+                <li><code>scripts/stop_apps.sh</code></li>
+                <li><code>specs/fix-sql-injection-vulnerabilities.md</code></li>
+                <li><code>specs/init_nlq_to_sql_to_table.md</code></li>
+                <li><code>specs/query-history-panel.md</code></li>
+                <li><code>specs/replace-print-with-logging.md</code></li>
+              </ul>
+            </section>
+          </div>
+        </details>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">Agent Systems Companion · Tactical Agentic Coding</p>
+        <div class="chapter-footer__nav">
+          <a href="../vol-1-tac/04-afk-agents.html">← Full AFK Agents chapter</a>
+          <a href="index.html">Code library</a>
+          <a href="../index.html">Book hub →</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let pending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = Math.round(value * 100) + '%';
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestUpdate = () => {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => { updateProgress(); pending = false; });
+      };
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => {
+          const active = link.getAttribute('href') === '#' + visible.target.id;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+
+      sections.forEach(section => observer.observe(section));
+      updateProgress();
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate);
+    })();
+  </script>
+</body>
+</html>

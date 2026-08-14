@@ -1,0 +1,294 @@
+<section class="chapter" id="ch07">
+  <div class="wrap wide">
+    <span class="chapnum reveal">07 — Vol I · Tactic 6</span>
+    <div class="kicker reveal">tac-6 · one agent, one prompt, one purpose</div>
+    <h2 class="title reveal d1" style="max-width:24ch">A focused agent is a <em>productive agent</em>.</h2>
+    <p class="lede reveal d2">Complete the SDLC with dedicated review agents — is what we built what we planned, with screenshot proof — and document agents whose conditional docs feed future agents, all governed by the tactic that sidesteps context pollution: one agent, one prompt, one purpose.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">Tactic 6</span><span class="pill plum">review agents</span><span class="pill blue">conditional docs</span><span class="pill olive">presence = 2</span></div>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch07-s1"><b>1</b>The Idea</a>
+      <a href="#ch07-s2"><b>2</b>The Nuggets</a>
+      <a href="#ch07-s3"><b>3</b>What Dan Did</a>
+      <a href="#ch07-s4"><b>4</b>The Workout</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch07-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Idea</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Tactic #6: <strong>One Agent, One Prompt, One Purpose</strong>. "Use specialized agents with focused prompts to achieve a single purpose. No agent runs more than a single prompt."</p>
+        <p>The enemy is <strong>context pollution</strong> — context overloading, toxic context. "Massive context windows often lead to a distracted, confused agent." The antidote is the <strong>minimum context principle</strong>: "You want to context engineer as little as possible — the minimum context in your prompt required to solve the problem."</p>
+        <p>Four advantages follow: you free up the context window; you let your agent focus; every prompt is committed — reproducible and improvable; and you "effectively create evals for the agentic layer of your codebase."</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 880 310" role="img" aria-label="One overloaded agent versus three focused agents with single prompts">
+          <rect x="20" y="40" width="380" height="230" rx="14" class="s-card"/>
+          <text x="210" y="28" text-anchor="middle" class="s-title" font-size="13">context pollution</text>
+          <circle cx="210" cy="160" r="36" class="s-amber-f"/>
+          <text x="210" y="164" text-anchor="middle" class="s-label">agent</text>
+          <rect x="45" y="66" width="76" height="24" rx="6" class="s-card"/><text x="83" y="82" text-anchor="middle" class="s-label-sm">spec</text>
+          <rect x="292" y="60" width="86" height="24" rx="6" class="s-card"/><text x="335" y="76" text-anchor="middle" class="s-label-sm">giant diff</text>
+          <rect x="40" y="148" width="76" height="24" rx="6" class="s-card"/><text x="78" y="164" text-anchor="middle" class="s-label-sm">docs</text>
+          <rect x="300" y="150" width="80" height="24" rx="6" class="s-card"/><text x="340" y="166" text-anchor="middle" class="s-label-sm">tests</text>
+          <rect x="52" y="228" width="86" height="24" rx="6" class="s-card"/><text x="95" y="244" text-anchor="middle" class="s-label-sm">chat log</text>
+          <rect x="286" y="230" width="96" height="24" rx="6" class="s-card"/><text x="334" y="246" text-anchor="middle" class="s-label-sm">screenshots</text>
+          <path d="M121 78 L 185 138" class="s-line"/>
+          <path d="M292 72 L 236 136" class="s-line"/>
+          <path d="M116 160 L 174 160" class="s-line"/>
+          <path d="M300 162 L 246 160" class="s-line"/>
+          <path d="M138 240 L 184 184" class="s-line"/>
+          <path d="M286 242 L 238 186" class="s-line"/>
+          <text x="210" y="292" text-anchor="middle" class="s-label-sm">a distracted, confused agent — running /compact, losing information</text>
+          <text x="440" y="165" text-anchor="middle" class="s-title" font-size="13">vs</text>
+          <rect x="480" y="40" width="380" height="230" rx="14" class="s-card"/>
+          <text x="670" y="28" text-anchor="middle" class="s-title" font-size="13">one · one · one</text>
+          <rect x="500" y="62" width="90" height="40" rx="8" class="s-clay-f"/><text x="545" y="86" text-anchor="middle" class="s-label-sm">/review</text>
+          <path d="M590 82 H 636" class="s-flow"/><path d="M644 82 l-9 -6 0 12 z" class="s-clay"/>
+          <circle cx="664" cy="82" r="19" class="s-blue-f"/>
+          <path d="M683 82 H 706" class="s-flow"/><path d="M714 82 l-9 -6 0 12 z" class="s-clay"/>
+          <rect x="714" y="62" width="126" height="40" rx="8" class="s-olive-f"/><text x="777" y="86" text-anchor="middle" class="s-label-sm">verdict + proof</text>
+          <rect x="500" y="130" width="90" height="40" rx="8" class="s-clay-f"/><text x="545" y="154" text-anchor="middle" class="s-label-sm">/document</text>
+          <path d="M590 150 H 636" class="s-flow"/><path d="M644 150 l-9 -6 0 12 z" class="s-clay"/>
+          <circle cx="664" cy="150" r="19" class="s-blue-f"/>
+          <path d="M683 150 H 706" class="s-flow"/><path d="M714 150 l-9 -6 0 12 z" class="s-clay"/>
+          <rect x="714" y="130" width="126" height="40" rx="8" class="s-olive-f"/><text x="777" y="154" text-anchor="middle" class="s-label-sm">app_docs/</text>
+          <rect x="500" y="198" width="90" height="40" rx="8" class="s-clay-f"/><text x="545" y="222" text-anchor="middle" class="s-label-sm">/patch</text>
+          <path d="M590 218 H 636" class="s-flow"/><path d="M644 218 l-9 -6 0 12 z" class="s-clay"/>
+          <circle cx="664" cy="218" r="19" class="s-blue-f"/>
+          <path d="M683 218 H 706" class="s-flow"/><path d="M714 218 l-9 -6 0 12 z" class="s-clay"/>
+          <rect x="714" y="198" width="126" height="40" rx="8" class="s-olive-f"/><text x="777" y="222" text-anchor="middle" class="s-label-sm">surgical fix</text>
+          <text x="670" y="292" text-anchor="middle" class="s-label-sm">fresh agent · single committed prompt · single purpose</text>
+        </svg>
+        <div class="fcap"><b>Why focus wins.</b> "Every piece of context you add increases the number of variables your agent has to reason about" — specialized agents each get one prompt and one purpose.</div>
+      </div>
+    </div>
+
+    <div class="fig reveal d1">
+      <svg class="draw" viewBox="0 0 920 250" role="img" aria-label="The SDLC phases as questions, with documentation looping back to planning">
+        <rect x="20" y="60" width="156" height="74" rx="10" class="s-clay-f"/>
+        <text x="98" y="88" text-anchor="middle" class="s-title" font-size="12">PLAN</text>
+        <text x="98" y="108" text-anchor="middle" class="s-label-sm">what are we building?</text>
+        <path d="M176 97 H 189" class="s-flow"/><path d="M196 97 l-8 -5 0 10 z" class="s-clay"/>
+        <rect x="196" y="60" width="156" height="74" rx="10" class="s-blue-f"/>
+        <text x="274" y="88" text-anchor="middle" class="s-title" font-size="12">BUILD</text>
+        <text x="274" y="108" text-anchor="middle" class="s-label-sm">did we make it real?</text>
+        <path d="M352 97 H 365" class="s-flow"/><path d="M372 97 l-8 -5 0 10 z" class="s-clay"/>
+        <rect x="372" y="60" width="156" height="74" rx="10" class="s-olive-f"/>
+        <text x="450" y="88" text-anchor="middle" class="s-title" font-size="12">TEST</text>
+        <text x="450" y="108" text-anchor="middle" class="s-label-sm">does it work?</text>
+        <path d="M528 97 H 541" class="s-flow"/><path d="M548 97 l-8 -5 0 10 z" class="s-clay"/>
+        <rect x="542" y="52" width="168" height="90" rx="12" class="s-line" stroke-dasharray="6 6"/>
+        <rect x="548" y="60" width="156" height="74" rx="10" class="s-plum-f"/>
+        <text x="626" y="84" text-anchor="middle" class="s-title" font-size="12">REVIEW</text>
+        <text x="626" y="103" text-anchor="middle" class="s-label-sm">is it what we planned?</text>
+        <text x="626" y="121" text-anchor="middle" class="s-label-sm">now prove it</text>
+        <path d="M710 97 H 717" class="s-flow"/><path d="M724 97 l-8 -5 0 10 z" class="s-clay"/>
+        <rect x="724" y="60" width="156" height="74" rx="10" class="s-amber-f"/>
+        <text x="802" y="88" text-anchor="middle" class="s-title" font-size="12">DOCUMENT</text>
+        <text x="802" y="108" text-anchor="middle" class="s-label-sm">how does it work?</text>
+        <path d="M802 134 V 196 H 98 V 146" class="s-flow" fill="none"/>
+        <path d="M98 138 l-6 9 12 0 z" class="s-clay"/>
+        <text x="450" y="216" text-anchor="middle" class="s-label">conditional_docs.md — documenting feeds the next plan</text>
+      </svg>
+      <div class="fcap"><b>The SDLC as questions and answers.</b> "Testing answers does it work, but review answers is what we built what we asked for." Conditional documentation closes "a complete software developer lifecycle feedback loop" from documenting back into planning.</div>
+    </div>
+
+    <div class="stats reveal d1">
+      <div class="stat"><div class="sv">3</div><div class="sl">constraints: context window, codebase complexity, your abilities</div></div>
+      <div class="stat blue"><div class="sv">2/3</div><div class="sl">bypassed by specialized agents — "model intelligence is not a constraint"</div></div>
+      <div class="stat plum"><div class="sv">3</div><div class="sl">issue severities: skippable · tech_debt · blocker</div></div>
+      <div class="stat olive"><div class="sv">2</div><div class="sl">optimal presence: your prompt in, your review + merge out</div></div>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal d1"><span class="cnum">01</span>
+        <p class="ctitle">adw_review</p>
+        <p class="cbody">Find the spec from the branch → <span class="mono">/review</span> against it (git diff + Playwright screenshots) → upload to R2 → if blockers, loop <span class="mono">create_and_implement_patch</span> (max retries) → post results + update PR.</p></div>
+      <div class="card amber reveal d2"><span class="cnum">02</span>
+        <p class="ctitle">adw_patch — the surgical template</p>
+        <p class="cbody">"Create a focused patch plan to resolve a specific issue with minimal targeted changes" — a template meta prompt distinct from chore / bug / feature.</p></div>
+      <div class="card blue reveal d3"><span class="cnum">03</span>
+        <p class="ctitle">adw_document + two doc trees</p>
+        <p class="cbody"><span class="mono">/document</span> generates concise markdown into <strong>app_docs/</strong> (your app) from git diff vs main + the spec. <strong>ai_docs/</strong> holds third-party docs.</p></div>
+      <div class="card plum reveal d2"><span class="cnum">04</span>
+        <p class="ctitle">Conditional documentation</p>
+        <p class="cbody"><span class="mono">conditional_docs.md</span>: "if your task matches any conditions listed, include those documentation files" — referenced inside <span class="mono">/bug</span>, <span class="mono">/chore</span>, <span class="mono">/feature</span>, <span class="mono">/patch</span>, and <span class="mono">/prime</span>.</p></div>
+      <div class="card olive reveal d3"><span class="cnum">05</span>
+        <p class="ctitle">The state object</p>
+        <p class="cbody"><span class="mono">state.json</span> carries ADW ID, branch name, plan file, issue class — meta info that travels along every workflow so composed ADWs can chain.</p></div>
+      <div class="card accent reveal d4"><span class="cnum">06</span>
+        <p class="ctitle">Composable ADWs</p>
+        <p class="cbody"><span class="mono">adw_plan_build_review</span>, <span class="mono">adw_plan_build_document</span>, <span class="mono">adw_plan_build_test_review</span> ("probably the winning workflow") — each a standalone uv script chained by ADW ID.</p></div>
+    </div>
+
+    <div class="callout idea reveal"><span class="ci">SEVERITY</span>
+      <span class="cc">"If you ask them to find something, they'll find something." Give review agents the tools to delineate what matters: <strong>skippable</strong>, <strong>tech_debt</strong>, <strong>blocker</strong> — only blockers stop the pipeline.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch07-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Nuggets</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big"><p>"One agent, one prompt, one purpose."</p>
+        <span class="cite" style="display:block;margin-top:10px">— quote of the lesson</span></div>
+      <div class="prose">
+        <p class="lead-in">"Isn't more context better for your agent? This is not true."</p>
+        <p>"Big tech is chasing the all-in-one god model, the super agent that can do it all. That's not what we're doing here. <strong>Real engineering requires real developer workflows</strong>, not some pie-in-the-sky god model." Every step of engineering requires "a different set of information, a different approach, a different perspective, a different set of tools and context."</p>
+      </div>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal d1"><span class="cnum">01</span>
+        <p class="ctitle">Focus is throughput</p>
+        <p class="cbody">"A focused engineer working on a single task is a productive engineer. Agents are the same." And: "When your agent's performance drops, your performance drops."</p></div>
+      <div class="card blue reveal d2"><span class="cnum">02</span>
+        <p class="ctitle">Compaction is a band-aid</p>
+        <p class="cbody">"If your agent is running compact, it is losing information." Every added piece of context increases the variables your agent must reason about.</p></div>
+      <div class="card plum reveal d3"><span class="cnum">03</span>
+        <p class="ctitle">Proof over promises</p>
+        <p class="cbody">"You want your agents communicating proof — a hard asset that proves what was built is what you asked for. Screenshots, reports, ideally video."</p></div>
+      <div class="card olive reveal d2"><span class="cnum">04</span>
+        <p class="ctitle">Fast yes/no</p>
+        <p class="cbody">"Even when your agent is wrong, when it presents you with proof that it thinks it's right, you can quickly say yes or no."</p></div>
+      <div class="card amber reveal d3"><span class="cnum">05</span>
+        <p class="ctitle">Embed your own review</p>
+        <p class="cbody">"Whatever you would do to review that the thing is what you asked for — that's what you embed into your review step."</p></div>
+      <div class="card accent reveal d4"><span class="cnum">06</span>
+        <p class="ctitle">Blame the system</p>
+        <p class="cbody">"I'm not blaming the model for this. I'm blaming my skills. I'm blaming the ADWs."</p></div>
+    </div>
+
+    <div class="spread reveal d1" style="align-items:start">
+      <div class="prose">
+        <h4>On the prompt level</h4>
+        <ul>
+          <li>"Everything comes down to the prompt level. All the ADW surrounding deterministic code is just support for the agents doing the real work."</li>
+          <li>"While other companies run big context windows blown away at the end, you'll run single focused prompts you can pinpoint and improve."</li>
+          <li>"The value in your ADWs isn't in a single workflow — it's the power of combining workflows: isolated, reviewable, improvable."</li>
+          <li>"It's a good practice to encode the agent names as constants right at the top of the file."</li>
+          <li>"Reduce the number of human-in-the-loop points in your workflow."</li>
+        </ul>
+      </div>
+      <div class="prose">
+        <h4>On documentation and identity</h4>
+        <ul>
+          <li>"There's no excuse for having poor documentation" — every ADW script self-documents its workflow at the top.</li>
+          <li>Documentation timing: "how you document and when to include your documentation is the tricky part."</li>
+          <li>"Why didn't you just do that by hand? You're missing the point… This isn't about you anymore. It's about teaching your agents to build on your behalf, so that it can be about you again."</li>
+          <li>"Do you want to be an agentic engineer, or an engineer of the past?"</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch07-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What Dan Did</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <ol class="steps">
+        <li><h4>Clone, install, tour</h4><p><span class="mono">git clone disler/tac-6</span>; <span class="mono">/install</span> in Opus + YOLO mode (adds Cloudflare R2 env vars for image upload). Toured the new ADWs: <span class="mono">adw_review</span>, <span class="mono">adw_patch</span>, <span class="mono">adw_document</span>, plus the composed pipelines — standalone uv scripts chained by ADW ID.</p></li>
+        <li><h4>Filed issue #14</h4><p>One-click table export + result export as CSV — two new endpoints, download icon placement "directly to the left of the hide button."</p></li>
+        <li><h4>Ran the composed pipeline</h4><p><span class="mono">uv run adws/adw_plan_build_review.py 14</span> on his own machine, to inspect in real time. Agents own the repo — "we shouldn't be doing anything alongside them."</p></li>
+        <li><h4>Walked the review internals live</h4><p><span class="mono">state.json</span>, branch validation, R2 uploader init, <span class="mono">run_review</span> → the <span class="mono">/review</span> prompt (collapse-first reading: review work against spec, use git diff, capture screenshots, report issues or success), prompt-level variables as on-the-fly IDKs, JSON <span class="mono">ReviewResult</span>/<span class="mono">ReviewIssue</span> Pydantic types, the three severity classes, and the patch-resolution loop with max retries.</p></li>
+        <li><h4>Reviewed the screenshots</h4><p>The feature worked — but the export button was misplaced (the agent missed "left of the hide button"): a blocker the review agent failed to flag.</p></li>
+        <li><h4>Filed a patch</h4><p>Issue comment: "make sure download button for query results is just to the left of the hide button," then <span class="mono">adw_patch.py &lt;issue&gt; --adw-id &lt;same&gt;</span> — after first passing the wrong issue number, which the state file caught. Patch plan into <span class="mono">specs/patch/</span>, implemented, UI verified fixed.</p></li>
+        <li><h4>Post-mortemed the miss</h4><p>Three root causes, all fixable in the system — see the callout.</p></li>
+        <li><h4>Ran the document agent</h4><p><span class="mono">uv run adws/adw_document.py &lt;issue&gt; &lt;same ADW ID&gt;</span>: generated an <span class="mono">app_docs/</span> feature doc (screenshots, what changed, files touched, how to use) from git diff + spec — and agentically updated <span class="mono">conditional_docs.md</span>.</p></li>
+        <li><h4>Closed the planning↔documentation loop</h4><p>Showed <span class="mono">conditional_docs</span> referenced in <span class="mono">/bug</span>, <span class="mono">/chore</span>, <span class="mono">/feature</span>, <span class="mono">/patch</span>, <span class="mono">/prime</span>. Scored the run against the KPIs: attempts 2 (patch needed), streak broken, presence ~3 vs the optimal 2.</p></li>
+      </ol>
+      <div>
+        <div class="codecap">the /review verdict — JSON with severity classes</div>
+        <div class="code reveal d1"><pre>{
+  "success": false,
+  "review_summary": "CSV export works end to end",
+  "issues": [
+    {
+      "class": "blocker",
+      "issue": "export button not placed left of hide button"
+    }
+  ],
+  "screenshots": ["review_img_1.png", "review_img_2.png"]
+}</pre></div>
+        <div class="callout bad reveal d2"><span class="ci">POST-MORTEM</span>
+          <span class="cc">Why review missed the blocker: the <strong>/review</strong> prompt captured screenshots but <strong>never read them back into context</strong> (fix: "for every image you take, read it in during the review process"); Playwright MCP wasn't in <strong>--vision</strong> mode; and the <strong>test step had been skipped entirely</strong> — <span class="mono">adw_plan_build_test_review</span> would likely have caught it.</span></div>
+        <div class="filetree reveal d3"><span class="d">adws/</span>
+  <span class="f hl">adw_review.py</span>       <span class="c"># review vs spec + screenshot proof</span>
+  <span class="f">adw_patch.py</span>        <span class="c"># surgical fixes, specs/patch/</span>
+  <span class="f">adw_document.py</span>     <span class="c"># app_docs/ + conditional_docs.md</span>
+  <span class="f">adw_plan_build_review.py</span>
+  <span class="f">adw_plan_build_document.py</span>
+<span class="d">app_docs/</span>             <span class="c"># docs about YOUR app</span>
+<span class="d">ai_docs/</span>              <span class="c"># third-party docs</span></div>
+      </div>
+    </div>
+
+    <div class="fig reveal d1">
+      <svg class="draw" viewBox="0 0 920 230" role="img" aria-label="adw_review flow with patch loop on blockers">
+        <path d="M701 80 C 701 22, 251 22, 251 72" class="s-line" fill="none" stroke-dasharray="5 5"/>
+        <path d="M251 78 l-6 -9 12 0 z" class="s-clay"/>
+        <text x="476" y="16" text-anchor="middle" class="s-label-sm">re-review after each patch · max retries</text>
+        <rect x="16" y="80" width="140" height="56" rx="10" class="s-clay-f"/>
+        <text x="86" y="104" text-anchor="middle" class="s-title" font-size="12">find spec</text>
+        <text x="86" y="122" text-anchor="middle" class="s-label-sm">from branch + state</text>
+        <path d="M156 108 H 178" class="s-flow"/><path d="M186 108 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="186" y="80" width="130" height="56" rx="10" class="s-plum-f"/>
+        <text x="251" y="104" text-anchor="middle" class="s-title" font-size="12">/review</text>
+        <text x="251" y="122" text-anchor="middle" class="s-label-sm">git diff + screenshots</text>
+        <path d="M316 108 H 338" class="s-flow"/><path d="M346 108 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="346" y="80" width="120" height="56" rx="10" class="s-blue-f"/>
+        <text x="406" y="104" text-anchor="middle" class="s-title" font-size="12">upload</text>
+        <text x="406" y="122" text-anchor="middle" class="s-label-sm">R2 bucket</text>
+        <path d="M466 108 H 488" class="s-flow"/><path d="M496 108 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="496" y="80" width="110" height="56" rx="10" class="s-amber-f"/>
+        <text x="551" y="104" text-anchor="middle" class="s-title" font-size="12">blockers?</text>
+        <text x="551" y="122" text-anchor="middle" class="s-label-sm">only blockers stop</text>
+        <path d="M606 108 H 628" class="s-flow"/><path d="M636 108 l-9 -6 0 12 z" class="s-clay"/>
+        <text x="620" y="98" text-anchor="middle" class="s-label-sm">yes</text>
+        <rect x="636" y="80" width="130" height="56" rx="10" class="s-clay-f"/>
+        <text x="701" y="104" text-anchor="middle" class="s-title" font-size="12">patch loop</text>
+        <text x="701" y="122" text-anchor="middle" class="s-label-sm">plan + implement</text>
+        <path d="M766 108 H 788" class="s-flow"/><path d="M796 108 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="796" y="80" width="110" height="56" rx="10" class="s-olive-f"/>
+        <text x="851" y="104" text-anchor="middle" class="s-title" font-size="12">post</text>
+        <text x="851" y="122" text-anchor="middle" class="s-label-sm">results + PR update</text>
+        <path d="M551 136 C 551 192, 851 192, 851 142" class="s-flow" fill="none"/>
+        <path d="M851 136 l-6 9 12 0 z" class="s-clay"/>
+        <text x="700" y="206" text-anchor="middle" class="s-label-sm">no blockers — post success</text>
+      </svg>
+      <div class="fcap"><b>adw_review.</b> Review against the spec with screenshot proof; blockers trigger a fresh patch-plan agent plus a fresh implement agent, capped by max retries, before results post back to the PR.</div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch07-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Workout</h2></div>
+
+    <div class="grid grid-2">
+      <div class="callout reveal"><span class="ci">GOAL</span>
+        <span class="cc">Add <strong>review and document agents</strong> to your pipeline, with image proof and conditional docs.</span></div>
+      <div class="callout reveal d1"><span class="ci">PREREQS</span>
+        <span class="cc">TAC-5 pipeline; Playwright MCP; any public bucket (R2/S3) or GitHub image upload for screenshots.</span></div>
+    </div>
+
+    <ol class="steps reveal d1">
+      <li><h4>Write /review.md</h4><p>Variables at top (ADW ID, spec file, agent name, screenshot dir); instructions to git-diff against main, compare against the spec, capture screenshots of critical functionality, <strong>read each screenshot back in</strong>, and output JSON <span class="mono">{success, review_summary, issues[{class: skippable|tech_debt|blocker}], screenshots}</span>.</p></li>
+      <li><h4>Write /patch.md</h4><p>"Create a focused patch plan resolving one specific issue with minimal targeted changes" → plan into <span class="mono">specs/patch/</span>.</p></li>
+      <li><h4>Write adw_review.py</h4><p>Load state → run <span class="mono">/review</span> → upload screenshots → for each blocker, fresh patch-plan agent + fresh <span class="mono">/implement</span> agent (max 3 retries) → post results with image links.</p></li>
+      <li><h4>Write /document.md</h4><p>A template meta prompt generating a doc in <span class="mono">app_docs/</span> from git diff + spec, then updating <span class="mono">conditional_docs.md</span> with when-to-read conditions.</p></li>
+      <li><h4>Wire in conditional docs</h4><p>Reference <span class="mono">conditional_docs.md</span> in the Relevant Files section of <span class="mono">/chore</span>, <span class="mono">/bug</span>, <span class="mono">/feature</span>, and <span class="mono">/prime</span>.</p></li>
+      <li><h4>Run the full lifecycle</h4><p>Plan → build → test → review → document on one feature; deliberately give a precise UI placement instruction and check whether review catches deviations.</p></li>
+    </ol>
+
+    <div class="grid grid-2">
+      <div class="callout ok reveal"><span class="ci">DONE WHEN</span>
+        <span class="cc">The review step posts <strong>screenshot proof with a severity-classified JSON verdict</strong>; a follow-up plan automatically pulls in the new documentation via conditional docs.</span></div>
+      <div class="callout idea reveal d1"><span class="ci">LEVEL UP</span>
+        <span class="cc">Make review <strong>self-healing</strong> — auto-run the patch loop on blockers without your involvement — and upgrade proof from screenshots to screen-recorded video.</span></div>
+    </div>
+
+    <a class="jump reveal" href="#ch08">Next · Zero-Touch Engineering &nbsp;&rarr;</a>
+  </div>
+</section>

@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4ede1">
+  <meta name="description" content="An agent-systems companion to Let Your Agents Focus: prompts, permissions, launchers, verification, and closed-loop operation.">
+  <title>Let Your Agents Focus · Agent Systems Companion</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <style>
+    :root {
+      --tac-ink: #25201b;
+      --tac-muted: #6f655b;
+      --tac-paper: #fbf6ed;
+      --tac-paper-strong: #fffaf2;
+      --tac-clay: #a94f35;
+      --tac-clay-dark: #793722;
+      --tac-clay-soft: #f0d7c8;
+      --tac-sage: #55715f;
+      --tac-sage-soft: #dce7dc;
+      --tac-gold: #a97722;
+      --tac-gold-soft: #f4e6bd;
+      --tac-line: #d8cbb8;
+      --tac-shadow: 0 10px 28px rgba(74, 52, 32, .08);
+    }
+
+    html { scroll-padding-top: 5.5rem; }
+    body { color: var(--tac-ink); background: var(--tac-paper); }
+    a { text-underline-offset: .18em; }
+    code { font-family: var(--font-mono, "JetBrains Mono", ui-monospace, monospace); }
+    .skip-link { position: fixed; left: 1rem; top: -5rem; z-index: 999; padding: .65rem .9rem; background: var(--tac-ink); color: white; }
+    .skip-link:focus { top: 1rem; }
+    .reading-progress { position: fixed; inset: 0 auto auto 0; height: 3px; width: 0; z-index: 1000; background: var(--tac-clay); }
+
+    .site-bar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      min-height: 3.3rem; padding: .55rem clamp(1rem, 3vw, 2.3rem);
+      border-bottom: 1px solid color-mix(in srgb, var(--tac-line) 78%, transparent);
+      background: color-mix(in srgb, var(--tac-paper) 92%, transparent);
+      backdrop-filter: blur(14px);
+    }
+    .site-brand { display: flex; align-items: center; gap: .65rem; min-width: 0; color: var(--tac-ink); text-decoration: none; }
+    .site-brand-mark { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--tac-clay); color: white; font: 700 .72rem/1 var(--font-mono, monospace); }
+    .site-brand-copy { display: grid; line-height: 1.05; }
+    .site-brand-copy strong { font-size: .85rem; letter-spacing: .08em; }
+    .site-brand-copy span { color: var(--tac-muted); font-size: .7rem; }
+    .site-links { display: flex; gap: .35rem; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+    .site-links a { padding: .36rem .58rem; border-radius: 999px; color: var(--tac-muted); text-decoration: none; font-size: .75rem; font-weight: 700; }
+    .site-links a:hover, .site-links a:focus-visible { color: var(--tac-clay-dark); background: var(--tac-clay-soft); }
+
+    .book-layout { display: grid; grid-template-columns: minmax(10.5rem, 13rem) minmax(0, 64rem); gap: clamp(1.5rem, 4vw, 4.2rem); max-width: 83rem; margin: 0 auto; padding: 1.8rem clamp(1rem, 3vw, 2.5rem) 5rem; }
+    .chapter-rail { position: sticky; top: 5.1rem; align-self: start; max-height: calc(100vh - 6rem); overflow: auto; padding: .9rem 0; }
+    .chapter-rail-label { margin: 0 0 .6rem; color: var(--tac-clay); font: 700 .68rem/1.2 var(--font-mono, monospace); letter-spacing: .12em; text-transform: uppercase; }
+    .chapter-rail a { display: block; padding: .35rem .55rem; border-left: 2px solid transparent; color: var(--tac-muted); text-decoration: none; font-size: .78rem; line-height: 1.25; }
+    .chapter-rail a:hover, .chapter-rail a[aria-current="true"] { color: var(--tac-clay-dark); border-left-color: var(--tac-clay); background: linear-gradient(90deg, var(--tac-clay-soft), transparent 80%); }
+    main { min-width: 0; }
+    section { margin-block: 3.5rem; }
+    section:first-child { margin-top: .4rem; }
+    .eyebrow { margin: 0 0 .55rem; color: var(--tac-clay); font: 700 .7rem/1.3 var(--font-mono, monospace); letter-spacing: .12em; text-transform: uppercase; }
+    h1, h2, h3 { color: var(--tac-ink); }
+    h1 { max-width: 16ch; margin: 0; font-size: clamp(2.25rem, 6vw, 4.5rem); line-height: .98; letter-spacing: -.045em; }
+    h2 { margin: 0 0 .75rem; font-size: clamp(1.55rem, 3.4vw, 2.35rem); line-height: 1.05; letter-spacing: -.025em; }
+    h3 { margin: 0 0 .45rem; font-size: 1.04rem; }
+    .section-lede { max-width: 68ch; margin: 0 0 1.25rem; color: var(--tac-muted); font-size: 1rem; line-height: 1.65; }
+    .inline-path { padding: .08rem .28rem; border-radius: .25rem; background: #eee3d4; color: var(--tac-clay-dark); font-size: .88em; overflow-wrap: anywhere; }
+
+    .mission-card { position: relative; overflow: hidden; padding: clamp(1.3rem, 4vw, 2.35rem); border: 1px solid var(--tac-line); border-radius: 1.25rem; background: radial-gradient(circle at 94% 8%, rgba(169,79,53,.15), transparent 28%), var(--tac-paper-strong); box-shadow: var(--tac-shadow); }
+    .mission-card::after { content: "ONE PURPOSE"; position: absolute; right: -1.3rem; bottom: .3rem; color: rgba(169,79,53,.07); font: 800 clamp(2.5rem, 8vw, 6.3rem)/1 var(--font-mono, monospace); white-space: nowrap; transform: rotate(-3deg); pointer-events: none; }
+    .mission-card > * { position: relative; z-index: 1; }
+    .mission-copy { max-width: 68ch; margin: 1.2rem 0 0; font-size: 1.08rem; line-height: 1.68; }
+    .mission-formula { display: inline-flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin-top: 1.2rem; padding: .62rem .75rem; border-radius: .75rem; background: #2b2722; color: #fdf7ed; font: 600 .76rem/1.45 var(--font-mono, monospace); }
+    .mission-formula b { color: #efb59b; }
+
+    .card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .85rem; }
+    .role-card { padding: 1rem; border: 1px solid var(--tac-line); border-radius: .9rem; background: rgba(255,250,242,.76); }
+    .role-card .role-tag { display: inline-block; margin-bottom: .6rem; padding: .22rem .45rem; border-radius: 999px; color: var(--tac-clay-dark); background: var(--tac-clay-soft); font: 700 .64rem/1 var(--font-mono, monospace); text-transform: uppercase; }
+    .role-card p { margin: 0; color: var(--tac-muted); font-size: .88rem; line-height: 1.52; }
+    .role-card strong { color: var(--tac-ink); }
+    .reality-note { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr; gap: .75rem; align-items: start; padding: .9rem 1rem; border-left: 3px solid var(--tac-gold); background: var(--tac-gold-soft); font-size: .87rem; line-height: 1.5; }
+    .reality-note .stamp { color: var(--tac-gold); font: 800 .68rem/1.3 var(--font-mono, monospace); letter-spacing: .08em; }
+
+    .surface-map { padding: 1.1rem; border: 1px solid var(--tac-line); border-radius: 1rem; background: #f7efe4; box-shadow: var(--tac-shadow); }
+    .surface-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .65rem; align-items: stretch; }
+    .surface-node { position: relative; min-height: 7.4rem; padding: .8rem; border-radius: .75rem; border: 1px solid #d7c6b3; background: var(--tac-paper-strong); }
+    .surface-node:not(:last-child)::after { content: "→"; position: absolute; right: -.58rem; top: 43%; z-index: 2; display: grid; place-items: center; width: 1.05rem; height: 1.05rem; border-radius: 50%; background: var(--tac-clay); color: white; font: 700 .7rem/1 var(--font-mono, monospace); }
+    .surface-node b { display: block; margin-bottom: .35rem; font-size: .83rem; }
+    .surface-node span { display: block; color: var(--tac-muted); font-size: .73rem; line-height: 1.42; overflow-wrap: anywhere; }
+    .surface-node code { color: var(--tac-clay-dark); font-size: .7rem; }
+    .surface-return { display: flex; align-items: center; justify-content: center; gap: .65rem; margin: .8rem auto 0; color: var(--tac-clay-dark); font: 700 .7rem/1.35 var(--font-mono, monospace); text-align: center; }
+    .surface-return::before, .surface-return::after { content: ""; flex: 1; height: 1px; background: var(--tac-clay); }
+    .interface-key { display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; margin-top: .8rem; }
+    .interface-key div { padding: .55rem; border-radius: .55rem; background: rgba(255,255,255,.62); font-size: .7rem; line-height: 1.35; text-align: center; }
+    .interface-key b { display: block; color: var(--tac-clay-dark); font-family: var(--font-mono, monospace); }
+
+    .loop-board { display: grid; gap: .75rem; }
+    .loop-lane { display: grid; grid-template-columns: 7.5rem 1fr; gap: .85rem; padding: .85rem; border-radius: .9rem; border: 1px solid var(--tac-line); }
+    .loop-lane.in { background: var(--tac-gold-soft); }
+    .loop-lane.out { background: var(--tac-sage-soft); }
+    .lane-label { align-self: center; font: 800 .72rem/1.3 var(--font-mono, monospace); letter-spacing: .08em; text-transform: uppercase; }
+    .lane-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .48rem; }
+    .loop-step { position: relative; padding: .66rem; border-radius: .6rem; background: rgba(255,255,255,.7); font-size: .72rem; line-height: 1.35; }
+    .loop-step:not(:last-child)::after { content: "›"; position: absolute; right: -.34rem; top: 35%; color: var(--tac-clay-dark); font-size: 1.1rem; }
+    .loop-step b { display: block; margin-bottom: .18rem; color: var(--tac-ink); }
+    .loop-step span { color: var(--tac-muted); }
+    .recovery-arrow { display: grid; grid-template-columns: 7.5rem 1fr; gap: .85rem; color: var(--tac-clay-dark); font: 700 .75rem/1.45 var(--font-mono, monospace); }
+    .recovery-arrow div:last-child { padding: .55rem .75rem; border: 1px dashed var(--tac-clay); border-radius: .6rem; text-align: center; }
+
+    .contracts { display: grid; gap: 1rem; }
+    .contract-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(15rem, .8fr); gap: 1rem; padding: 1.05rem; border: 1px solid var(--tac-line); border-radius: .9rem; background: rgba(255,250,242,.8); }
+    .contract-copy p { margin: .35rem 0; color: var(--tac-muted); font-size: .88rem; line-height: 1.55; }
+    .contract-path { color: var(--tac-clay); font: 700 .66rem/1.35 var(--font-mono, monospace); overflow-wrap: anywhere; }
+    .intent { margin-top: .7rem !important; padding: .65rem .75rem; border-left: 3px solid var(--tac-clay); background: var(--tac-clay-soft); color: var(--tac-ink) !important; }
+    .intent b { color: var(--tac-clay-dark); }
+    .evidence { min-width: 0; align-self: start; border-radius: .7rem; overflow: hidden; border: 1px solid #3a332c; background: #28241f; color: #f8efe3; }
+    .evidence-label { display: flex; justify-content: space-between; gap: .5rem; padding: .45rem .65rem; border-bottom: 1px solid #484039; color: #cbbcaf; font: 600 .64rem/1.3 var(--font-mono, monospace); }
+    .evidence pre { margin: 0; padding: .75rem; overflow: auto; color: inherit; background: transparent; font: .7rem/1.55 var(--font-mono, monospace); white-space: pre-wrap; }
+    .evidence .tok-heading { color: #f0ad91; font-weight: 700; }
+    .evidence .tok-key { color: #afd4b9; }
+    .evidence .tok-string { color: #f6d891; }
+    .evidence .tok-comment { color: #988d82; font-style: italic; }
+    .contract-table { width: 100%; border-collapse: collapse; margin-top: .7rem; font-size: .76rem; }
+    .contract-table th, .contract-table td { padding: .48rem; border-top: 1px solid var(--tac-line); text-align: left; vertical-align: top; }
+    .contract-table th { color: var(--tac-clay-dark); }
+
+    .worked-run { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; }
+    .run-steps { counter-reset: run; display: grid; gap: .65rem; }
+    .run-step { counter-increment: run; display: grid; grid-template-columns: 2rem 1fr; gap: .7rem; padding: .8rem; border: 1px solid var(--tac-line); border-radius: .7rem; background: var(--tac-paper-strong); }
+    .run-step::before { content: counter(run); display: grid; place-items: center; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--tac-clay); color: white; font: 800 .72rem/1 var(--font-mono, monospace); }
+    .run-step p { margin: .18rem 0 0; color: var(--tac-muted); font-size: .82rem; line-height: 1.48; }
+    .terminal { margin-top: .4rem; padding: .55rem .65rem; border-radius: .45rem; background: #2c2823; color: #f7efe5; font: .68rem/1.55 var(--font-mono, monospace); overflow-x: auto; white-space: pre; }
+    .operator-gate { align-self: start; position: sticky; top: 5.1rem; padding: 1rem; border-radius: .85rem; background: var(--tac-ink); color: #f9f0e4; }
+    .operator-gate h3 { color: white; }
+    .operator-gate p, .operator-gate li { color: #d6c9bb; font-size: .8rem; line-height: 1.5; }
+    .operator-gate ul { padding-left: 1.1rem; }
+
+    .failure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+    .failure-card { padding: .85rem; border: 1px solid var(--tac-line); border-radius: .7rem; background: var(--tac-paper-strong); }
+    .failure-card b { display: block; margin-bottom: .25rem; color: var(--tac-clay-dark); font-size: .82rem; }
+    .failure-card p { margin: 0; color: var(--tac-muted); font-size: .78rem; line-height: 1.48; }
+    .failure-card .repair { display: block; margin-top: .4rem; color: var(--tac-sage); font-weight: 700; }
+
+    .lab { padding: clamp(1.1rem, 3vw, 1.7rem); border: 2px solid var(--tac-clay); border-radius: 1rem; background: linear-gradient(145deg, #fff9f0, #f4e2d5); box-shadow: var(--tac-shadow); }
+    .lab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .lab ol { margin: .6rem 0; padding-left: 1.25rem; }
+    .lab li { margin-bottom: .55rem; color: var(--tac-muted); font-size: .86rem; line-height: 1.5; }
+    .pass-list { padding: .8rem 1rem; border-radius: .75rem; background: var(--tac-sage-soft); }
+    .pass-list h3 { color: #355442; }
+    .pass-list ul { margin-bottom: 0; padding-left: 1.1rem; }
+    .pass-list li { color: #40594a; }
+
+    .teach-back { padding: 1.1rem; border-radius: 1rem; background: #2b2722; color: #f6ecdf; }
+    .teach-back h2 { color: white; }
+    .six-sentences { counter-reset: sentence; display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; margin-top: 1rem; }
+    .sentence { counter-increment: sentence; min-height: 4rem; padding: .7rem; border: 1px solid #50473e; border-radius: .6rem; color: #d7c9ba; font-size: .82rem; line-height: 1.45; }
+    .sentence::before { content: counter(sentence) "."; display: inline-block; margin-right: .35rem; color: #f0ad91; font: 800 .8rem/1 var(--font-mono, monospace); }
+    .answer-toggle { margin-top: .8rem; }
+    details { border-radius: .75rem; }
+    details summary { cursor: pointer; font-weight: 750; }
+    details[open] > :not(summary) { animation: reveal .24s ease-out both; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .model-answer { margin-top: .65rem; padding: .8rem; border-radius: .6rem; background: #38322c; color: #d9ccbe; font-size: .78rem; line-height: 1.6; }
+    .raw-index { border: 1px solid var(--tac-line); background: var(--tac-paper-strong); }
+    .raw-index summary { padding: .9rem 1rem; color: var(--tac-clay-dark); }
+    .file-index { max-height: 27rem; overflow: auto; margin: 0; padding: .5rem 1rem 1rem 2.2rem; border-top: 1px solid var(--tac-line); column-count: 2; column-gap: 2rem; }
+    .file-index li { break-inside: avoid; margin: .16rem 0; color: var(--tac-muted); font-size: .68rem; line-height: 1.35; }
+    .file-index code { overflow-wrap: anywhere; }
+    .source-note { margin-top: .75rem; color: var(--tac-muted); font-size: .76rem; line-height: 1.5; }
+
+    @media (max-width: 880px) {
+      .book-layout { grid-template-columns: 1fr; }
+      .chapter-rail { display: none; }
+      .surface-row { grid-template-columns: repeat(2, 1fr); }
+      .surface-node::after { display: none !important; }
+      .interface-key { grid-template-columns: repeat(2, 1fr); }
+      .lane-steps { grid-template-columns: repeat(2, 1fr); }
+      .contract-card, .worked-run { grid-template-columns: 1fr; }
+      .operator-gate { position: static; }
+    }
+    @media (max-width: 600px) {
+      .site-brand-copy span { display: none; }
+      .site-links a { font-size: .68rem; padding-inline: .38rem; }
+      .card-grid, .failure-grid, .lab-grid, .six-sentences { grid-template-columns: 1fr; }
+      .surface-row, .lane-steps { grid-template-columns: 1fr; }
+      .loop-lane, .recovery-arrow { grid-template-columns: 1fr; }
+      .file-index { column-count: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#mission">Skip to lesson</a>
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-bar" aria-label="Book navigation">
+    <a class="site-brand" href="../index.html">
+      <span class="site-brand-mark">AS</span>
+      <span class="site-brand-copy"><strong>AGENT SYSTEMS</strong><span>IndyDevDan companion</span></span>
+    </a>
+    <nav class="site-links" aria-label="Companion links">
+      <a href="../vol-1-tac/06-let-your-agents-focus.html">Chapter</a>
+      <a href="index.html">Code library</a>
+      <a href="../index.html">Book hub</a>
+    </nav>
+  </header>
+
+  <div class="book-layout">
+    <aside class="chapter-rail" aria-label="On this page">
+      <p class="chapter-rail-label">TAC · 06</p>
+      <a href="#mission">Agent mission</a>
+      <a href="#cast">Cast of agents</a>
+      <a href="#surface">Surface map</a>
+      <a href="#loop">Control loop</a>
+      <a href="#contracts">Four contracts</a>
+      <a href="#operate">Operate like Dan</a>
+      <a href="#failures">Common failures</a>
+      <a href="#lab">Agent ops lab</a>
+      <a href="#teach-back">Teach-back</a>
+      <a href="#appendix">Raw index</a>
+    </aside>
+
+    <main id="main-content">
+      <section id="mission" class="mission-card" aria-labelledby="mission-title">
+        <p class="eyebrow">Tactic 06 · Let Your Agents Focus</p>
+        <h1 id="mission-title">One agent. One prompt. One purpose.</h1>
+        <p class="mission-copy">This lesson trains you to command a software delivery system without becoming its runtime. You define the mission and the acceptance gate; a launcher gives fresh CLI agents narrow jobs—plan, build, test, review, patch, document—and machine-readable artifacts carry the work forward. The win is not a clever chat. It is a replaceable team of programmed workers inside a closed loop.</p>
+        <div class="mission-formula" aria-label="Core operating formula"><b>human intent</b> → focused agent → artifact → verifier → recover or accept</div>
+      </section>
+
+      <section id="cast" aria-labelledby="cast-title">
+        <p class="eyebrow">01 · Who actually acts?</p>
+        <h2 id="cast-title">The cast around the code</h2>
+        <p class="section-lede">Do not picture one omniscient assistant. Picture a relay team. Roles are separated by prompts, and the filesystem plus GitHub carry the baton.</p>
+        <div class="card-grid">
+          <article class="role-card">
+            <span class="role-tag">Commander</span>
+            <h3>Human</h3>
+            <p><strong>Owns intent, authority, and acceptance.</strong> Writes or selects the issue, chooses a workflow, provides credentials, inspects proof, and decides whether to merge or improve the system.</p>
+          </article>
+          <article class="role-card">
+            <span class="role-tag">Composer</span>
+            <h3>ADW orchestrator</h3>
+            <p><strong>Chooses the sequence.</strong> Files such as <code class="inline-path">adws/adw_sdlc.py</code> run plan → build → test → review → document and stop when a stage returns nonzero.</p>
+          </article>
+          <article class="role-card">
+            <span class="role-tag">Focused workers</span>
+            <h3>Fresh Claude CLI processes</h3>
+            <p><strong>Do one prompted job.</strong> Each <code>claude -p</code> invocation receives one slash command and writes its own prompt and JSONL trace under the run directory.</p>
+          </article>
+          <article class="role-card">
+            <span class="role-tag">Verifiers</span>
+            <h3>Tester and reviewer</h3>
+            <p><strong>Ask different questions.</strong> Tests check whether behavior works. Review compares the result with the spec and gathers screenshot evidence. Blockers can enter a patch/re-review loop.</p>
+          </article>
+          <article class="role-card">
+            <span class="role-tag">Deterministic helpers</span>
+            <h3>Scripts</h3>
+            <p><strong>Provide reliable hands, not judgment.</strong> <code class="inline-path">scripts/start.sh</code>, <code>reset_db.sh</code>, and <code>stop_apps.sh</code> make repeatable environment moves the reasoning agents can call.</p>
+          </article>
+          <article class="role-card">
+            <span class="role-tag">Relay</span>
+            <h3>Issue, Git, state, and artifacts</h3>
+            <p><strong>Carry context between replaceable workers.</strong> The issue, plan file, branch, diffs, screenshots, result JSON, and <code>adw_state.json</code> are shared memory—not a long chat transcript.</p>
+          </article>
+          <div class="reality-note">
+            <span class="stamp">SOURCE REALITY</span>
+            <span>This repository has no native <code>.claude/agents/</code> fleet or lesson-local skills. “Subagents” here are separate headless CLI processes launched for separate purposes. The settings include a <code>SubagentStop</code> hook, but the course implementation’s isolation boundary is the process.</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="surface" aria-labelledby="surface-title">
+        <p class="eyebrow">02 · Agent surface map</p>
+        <h2 id="surface-title">The repo is an operating surface</h2>
+        <p class="section-lede">These are the interfaces an agent touches. Application files sit inside the workspace, but the agent system is defined by the path from intent to evidence.</p>
+        <figure class="surface-map" aria-label="Map of agent interfaces from human request through verification">
+          <div class="surface-row">
+            <div class="surface-node"><b>1 · Mission intake</b><span>GitHub issue + comments</span><span><code>adws/adw_triggers/</code></span><span>Classify and select a workflow.</span></div>
+            <div class="surface-node"><b>2 · Prompt library</b><span>27 focused command contracts</span><span><code>.claude/commands/</code></span><span>Give each worker one purpose.</span></div>
+            <div class="surface-node"><b>3 · Context &amp; authority</b><span>Conditional docs, settings, hooks, MCP</span><span><code>.claude/settings.json</code> · <code>.mcp.json</code></span><span>Shape what can be known and done.</span></div>
+            <div class="surface-node"><b>4 · Process launcher</b><span>Prompt capture, model routing, process spawn</span><span><code>adws/adw_modules/agent.py</code></span><span>Create a fresh worker boundary.</span></div>
+          </div>
+          <div class="surface-return">artifact relay: plan · branch · diff · tests · screenshots · review JSON · docs</div>
+          <div class="surface-row">
+            <div class="surface-node"><b>8 · Human gate</b><span>Inspect proof and PR</span><span>Accept, reject, or redesign the OS.</span></div>
+            <div class="surface-node"><b>7 · Recovery</b><span>Blocker → patch plan → implement → re-review</span><span><code>adws/adw_review.py</code></span><span>Capped at three review attempts.</span></div>
+            <div class="surface-node"><b>6 · Verification</b><span>Unit checks, optional E2E path, spec review</span><span><code>adws/adw_test.py</code> · <code>adw_review.py</code></span><span>Turn opinion into an observable result.</span></div>
+            <div class="surface-node"><b>5 · Shared memory</b><span>Small persisted state + per-agent traces</span><span><code>agents/{adw_id}/</code></span><span>Keep workers replaceable.</span></div>
+          </div>
+          <div class="interface-key" aria-label="Interface categories">
+            <div><b>Understand</b>prompts + docs</div>
+            <div><b>Act</b>tools + permissions</div>
+            <div><b>Invoke</b>launchers + composers</div>
+            <div><b>Remember</b>state + artifacts</div>
+            <div><b>Prove</b>tests + review</div>
+          </div>
+        </figure>
+      </section>
+
+      <section id="loop" aria-labelledby="loop-title">
+        <p class="eyebrow">03 · Control loop</p>
+        <h2 id="loop-title">You touch the loop at the leverage points</h2>
+        <p class="section-lede">“Out of the loop” means out of repetitive execution, not absent from responsibility. The human controls the mission and the gate; the system controls the repeated middle.</p>
+        <div class="loop-board" role="img" aria-label="Human in-loop decisions and automated out-of-loop execution">
+          <div class="loop-lane in">
+            <div class="lane-label">In-loop<br>human</div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Frame</b><span>Write the issue and constraints.</span></div>
+              <div class="loop-step"><b>Select</b><span>Choose the workflow composer.</span></div>
+              <div class="loop-step"><b>Authorize</b><span>Provision repo, tools, and secrets.</span></div>
+              <div class="loop-step"><b>Inspect</b><span>Read evidence, not every keystroke.</span></div>
+              <div class="loop-step"><b>Accept</b><span>Merge or change the agent OS.</span></div>
+            </div>
+          </div>
+          <div class="loop-lane out">
+            <div class="lane-label">Out-loop<br>system</div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Plan</b><span>Focused prompt writes a spec.</span></div>
+              <div class="loop-step"><b>Act</b><span>Fresh worker implements it.</span></div>
+              <div class="loop-step"><b>Verify</b><span>Checks + review produce proof.</span></div>
+              <div class="loop-step"><b>Recover</b><span>Blockers enter patch/re-review.</span></div>
+              <div class="loop-step"><b>Publish</b><span>Commit, PR, and docs externalize memory.</span></div>
+            </div>
+          </div>
+          <div class="recovery-arrow"><div></div><div>When the same failure repeats, repair the prompt, permission boundary, launcher, state schema, or verifier—not the agent’s latest conversation.</div></div>
+        </div>
+      </section>
+
+      <section id="contracts" aria-labelledby="contracts-title">
+        <p class="eyebrow">04 · Why these files exist for agents</p>
+        <h2 id="contracts-title">Four contracts make the workers programmable</h2>
+        <p class="section-lede">The application is what gets changed. These contracts decide whether an agent can change it deliberately, safely, and repeatedly.</p>
+        <div class="contracts">
+          <article class="contract-card">
+            <div class="contract-copy">
+              <span class="contract-path">.claude/commands/review.md · prime.md · conditional_docs.md</span>
+              <h3>1 · Prompt contract</h3>
+              <p>The command file defines one job, its inputs, required context, evidence, and output shape. <code>prime.md</code> inventories tracked files and reads the two READMEs; <code>conditional_docs.md</code> keeps extra context conditional instead of making every worker ingest everything.</p>
+              <p>The real review prompt also exposes contract drift: it says “ONLY JSON array” while its example and parser expect an object. It points to <code>./claude/commands/e2e</code>, while the real directory is <code>.claude/commands/e2e/</code>.</p>
+              <p class="intent"><b>Dan’s design intent:</b> put the role in a reusable prompt, then kill the process. A new worker can pick up the same contract without inheriting old attention residue.</p>
+            </div>
+            <div class="evidence" aria-label="Excerpt from review prompt">
+              <div class="evidence-label"><span>review.md</span><span>prompt evidence</span></div>
+              <pre><code><span class="tok-heading"># Review</span>
+
+<span class="tok-key">adw_id:</span> <span class="tok-string">$1</span>
+<span class="tok-key">spec_file:</span> <span class="tok-string">$2</span>
+
+<span class="tok-comment">- IMPORTANT: To be clear, we're not testing.</span>
+- IMPORTANT: Aim for <span class="tok-string">`1-5` screenshots</span>…
+- IMPORTANT: Return ONLY the <span class="tok-string">JSON array</span>…</code></pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <span class="contract-path">.claude/settings.json · .claude/hooks/ · .mcp.json</span>
+              <h3>2 · Tool and permission contract</h3>
+              <p>The settings pre-approve a small command vocabulary—package managers, basic file operations, and writing—and explicitly deny force-push and recursive deletion patterns. Hooks log lifecycle events and can block access to <code>.env</code>. Playwright MCP supplies the browser surface.</p>
+              <p>But the ADW launcher explicitly passes <code>--dangerously-skip-permissions</code>. That is a broad, course-era automation choice: do not mistake the visible allowlist for the entire runtime boundary. Hooks also use <code>|| true</code>, so their logging failures do not stop work.</p>
+              <p class="intent"><b>Dan’s design intent:</b> capability is engineered. The agent should receive enough power to finish the role, while the harness—not hope—defines the blast radius.</p>
+            </div>
+            <div class="evidence" aria-label="Excerpt from Claude settings">
+              <div class="evidence-label"><span>settings.json</span><span>permission evidence</span></div>
+              <pre><code>{
+  <span class="tok-key">"allow"</span>: [
+    <span class="tok-string">"Bash(uv:*)"</span>, <span class="tok-string">"Bash(npm:*)"</span>,
+    <span class="tok-string">"Bash(ls:*)"</span>, <span class="tok-string">"Write"</span>, …
+  ],
+  <span class="tok-key">"deny"</span>: [
+    <span class="tok-string">"Bash(git push --force:*)"</span>,
+    <span class="tok-string">"Bash(git push -f:*)"</span>,
+    <span class="tok-string">"Bash(rm -rf:*)"</span>
+  ]
+}</code></pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <span class="contract-path">adws/adw_modules/agent.py · adws/adw_modules/state.py · adws/adw_sdlc.py</span>
+              <h3>3 · Harness and launcher</h3>
+              <p><code>execute_template()</code> turns a slash command into a saved prompt, selects a model, launches a fresh process, records raw stream JSONL, and extracts the result. Composers call these workers in sequence. A deliberately tiny state object carries issue, branch, plan, and classification between stages.</p>
+              <div class="terminal" aria-label="Launcher command shape">claude -p "/review &lt;adw-id&gt; &lt;spec-file&gt;" \
+  --model &lt;routed-model&gt; \
+  --output-format stream-json --verbose \
+  --dangerously-skip-permissions</div>
+              <p class="intent"><b>Dan’s design intent:</b> the worker is disposable; its inputs, outputs, and invocation are durable. That makes roles schedulable, observable, and replaceable.</p>
+            </div>
+            <div>
+              <table class="contract-table" aria-label="Harness artifacts">
+                <thead><tr><th>Interface</th><th>What crosses it</th></tr></thead>
+                <tbody>
+                  <tr><td>Prompt capture</td><td><code>agents/{id}/{agent}/prompts/</code></td></tr>
+                  <tr><td>Raw trace</td><td><code>raw_output.jsonl</code></td></tr>
+                  <tr><td>State relay</td><td>five whitelisted fields in <code>adw_state.json</code></td></tr>
+                  <tr><td>Composer</td><td>stage exit code decides continue/stop</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <span class="contract-path">adws/adw_test.py · adws/adw_review.py · adws/adw_modules/data_types.py</span>
+              <h3>4 · Verification contract</h3>
+              <p>Tests and review are separate control surfaces. Unit testing retries up to four times; E2E has a two-attempt path. Review parses a typed result, treats <code>blocker</code> differently from <code>tech_debt</code> and <code>skippable</code>, and can patch/re-review up to three attempts.</p>
+              <p>Important source truth: every shipped composer that includes the test stage currently passes <code>--skip-e2e</code>. The review prompt asks for screenshots, but a screenshot only becomes proof when the reviewer actually reads it.</p>
+              <div class="terminal" aria-label="Review recovery flow">review → blockers? → patch plan → implement patch → re-review
+                         ↘ no blockers → success
+                         ↘ attempt 3 → stop nonzero</div>
+              <p class="intent"><b>Dan’s design intent:</b> do not ask the actor whether it succeeded. Give success a second role, a structured vocabulary, evidence, and a bounded recovery path.</p>
+            </div>
+            <div>
+              <table class="contract-table" aria-label="Verification questions">
+                <thead><tr><th>Role</th><th>Question</th></tr></thead>
+                <tbody>
+                  <tr><td>Plan</td><td>What exactly are we building?</td></tr>
+                  <tr><td>Build</td><td>Did we make the planned change real?</td></tr>
+                  <tr><td>Test</td><td>Does the behavior work?</td></tr>
+                  <tr><td>Review</td><td>Is it what we asked for—and where is the proof?</td></tr>
+                  <tr><td>Document</td><td>How will the next worker understand it?</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="operate" aria-labelledby="operate-title">
+        <p class="eyebrow">05 · Worked agent run</p>
+        <h2 id="operate-title">Operate like Dan: command the system</h2>
+        <p class="section-lede">This path uses the commands and prerequisites documented by the lesson. Replace angle-bracket placeholders with your real issue and ADW identifiers.</p>
+        <div class="worked-run">
+          <div class="run-steps">
+            <article class="run-step"><div><h3>Provision the operating surface</h3><p>Authenticate GitHub, create the server environment file described by the README, install both dependency sets, and export the ADW variables listed in <code>adws/README.md</code>—including <code>GITHUB_REPO_URL</code> and <code>ANTHROPIC_API_KEY</code>.</p><div class="terminal">gh auth login
+cd app/server
+uv sync --all-extras
+cp .env.sample .env
+cd ../client
+bun install
+cd ../../</div></div></article>
+            <article class="run-step"><div><h3>Prove the app can be operated</h3><p>The launcher and reviewer depend on a startable system. The real helper starts the backend on 8000 and frontend on 5173.</p><div class="terminal">./scripts/start.sh</div></div></article>
+            <article class="run-step"><div><h3>Give the commander’s intent a durable home</h3><p>Create a GitHub issue with observable acceptance criteria. The issue number—not a sprawling chat—is the workflow’s entry point.</p><div class="terminal">gh issue create</div></div></article>
+            <article class="run-step"><div><h3>Launch the full composer</h3><p>The SDLC composer runs plan, build, test, review, and document in sequence. On this checkout, its test call skips the E2E phase; plan your acceptance gate accordingly.</p><div class="terminal">cd adws/
+uv run adw_sdlc.py &lt;issue-number&gt;</div></div></article>
+            <article class="run-step"><div><h3>Inspect the relay, not the keystrokes</h3><p>Find the printed ADW id. Inspect its small state file, per-worker prompt, raw output, diff, review result, and screenshot directory. Ask: did every stage receive the artifact it expected?</p><div class="terminal">ls ../agents/&lt;adw-id&gt;
+git diff origin/main</div></div></article>
+            <article class="run-step"><div><h3>Re-run one role when the contract needs proof</h3><p>The README exposes focused workflow entry points. <code>--skip-resolution</code> gives you review without the patch loop, useful for comparing prompt changes in the lab below.</p><div class="terminal">uv run adw_review.py &lt;issue-number&gt; &lt;adw-id&gt; --skip-resolution
+uv run adw_document.py &lt;issue-number&gt; &lt;adw-id&gt;</div></div></article>
+            <article class="run-step"><div><h3>Exercise the human gate</h3><p>Read the spec, structured review, screenshots, checks, and PR. Merge only when the evidence meets the issue—not merely because every process exited.</p></div></article>
+          </div>
+          <aside class="operator-gate" aria-label="Human commander checklist">
+            <h3>The commander owns</h3>
+            <ul>
+              <li>A bounded, testable issue</li>
+              <li>Repository and credential authority</li>
+              <li>The workflow choice</li>
+              <li>The definition of acceptable proof</li>
+              <li>The final merge decision</li>
+              <li>System fixes when failures repeat</li>
+            </ul>
+            <p><strong>Leverage test:</strong> if you are narrating each implementation move, the system has handed control back too early.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="failures" aria-labelledby="failures-title">
+        <p class="eyebrow">06 · Fail, name, repair</p>
+        <h2 id="failures-title">Common agent-system failures in this lesson</h2>
+        <p class="section-lede">These are not reasons to abandon agents. They are evidence that a programmable interface needs repair.</p>
+        <div class="failure-grid">
+          <article class="failure-card"><b>Prompt and parser disagree</b><p><code>review.md</code> says JSON array while <code>ReviewResult</code> expects an object. The prompt also names a non-existent E2E path spelling.<span class="repair">Repair: make the output grammar and real path exact.</span></p></article>
+          <article class="failure-card"><b>Authority is broader than it looks</b><p>The settings show an allow/deny list, but the headless launcher requests permission bypass.<span class="repair">Repair: choose one enforceable boundary and test it from the launched process.</span></p></article>
+          <article class="failure-card"><b>Evidence is produced but not consumed</b><p>The reviewer is told to take screenshots, not explicitly to read every captured image before judging.<span class="repair">Repair: bind capture, inspection, and finding in the prompt contract.</span></p></article>
+          <article class="failure-card"><b>A stage name overpromises</b><p>The three shipped composers that include testing all pass <code>--skip-e2e</code> to that stage.<span class="repair">Repair: inspect composer arguments; never infer coverage from a filename.</span></p></article>
+          <article class="failure-card"><b>State silently drops the baton</b><p>Review, documentation, and patch workflows try to store fields that <code>ADWState</code> does not whitelist. Later stages must fall back to directory conventions.<span class="repair">Repair: version and validate the state schema at every producer/consumer edge.</span></p></article>
+          <article class="failure-card"><b>Classifier and trigger drift</b><p>The classifier prompt can return workflows omitted by the webhook’s typed and runtime allowlists.<span class="repair">Repair: derive all selectors from one registry, then test every advertised value.</span></p></article>
+          <article class="failure-card"><b>Hooks look stricter than they are</b><p>Lifecycle hooks are invoked with <code>|| true</code>; a hook failure becomes a log gap, not necessarily a stopped agent.<span class="repair">Repair: make safety hooks fail closed; keep telemetry hooks fail open.</span></p></article>
+          <article class="failure-card"><b>The human becomes middleware</b><p>Hand-copying every result and coaching every edit destroys replaceability.<span class="repair">Repair: externalize the baton as state, artifacts, typed results, and capped recovery loops.</span></p></article>
+        </div>
+      </section>
+
+      <section id="lab" class="lab" aria-labelledby="lab-title">
+        <p class="eyebrow">07 · Agent ops lab</p>
+        <h2 id="lab-title">Make the reviewer consume its own proof</h2>
+        <p class="section-lede">Change the agent system, not the application. Your target is <code class="inline-path">.claude/commands/review.md</code>.</p>
+        <div class="lab-grid">
+          <div>
+            <h3>Run the experiment</h3>
+            <ol>
+              <li>Choose an existing run with an issue number, ADW id, branch, and plan. Commit or stash unrelated work so the comparison is clean.</li>
+              <li>Run the focused reviewer once with <code>--skip-resolution</code>. Save its structured result and note whether each screenshot is actually examined in the reasoning/output.</li>
+              <li>Edit only <code>.claude/commands/review.md</code>: require the reviewer to read every screenshot it captures before deciding; require every visual finding to name its evidence; make the final output instruction say JSON <em>object</em>, matching <code>ReviewResult</code>.</li>
+              <li>Run the same reviewer command against the same issue, ADW id, branch, and plan. Compare parse success, evidence references, and findings.</li>
+              <li>If it fails, resist fixing app code. Diagnose which interface broke: prompt, Playwright access, runtime authority, artifact path, or result schema. Repair that interface and repeat.</li>
+            </ol>
+            <div class="terminal">cd adws/
+uv run adw_review.py &lt;issue-number&gt; &lt;adw-id&gt; --skip-resolution</div>
+          </div>
+          <div class="pass-list">
+            <h3>Observable pass criteria</h3>
+            <ul>
+              <li><code>git diff --name-only</code> shows the review prompt, not files under <code>app/</code>.</li>
+              <li>The agent result parses as one <code>ReviewResult</code> object.</li>
+              <li>Every captured screenshot is read before the final judgment.</li>
+              <li>Every visual issue names the screenshot or visible observation that supports it.</li>
+              <li>A second run receives the same fixed inputs, so the before/after comparison is meaningful.</li>
+            </ul>
+            <h3>Stretch: repair trigger drift</h3>
+            <p>Make every workflow advertised by <code>classify_adw.md</code> agree with both <code>ADWWorkflow</code> and <code>AVAILABLE_ADW_WORKFLOWS</code>. Pass when a small test proves every advertised selector is launchable.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="teach-back" class="teach-back" aria-labelledby="teach-title">
+        <p class="eyebrow">08 · Retrieval check</p>
+        <h2 id="teach-title">Explain this agent OS in six sentences—without looking</h2>
+        <div class="six-sentences" aria-label="Six sentence teach-back prompts">
+          <div class="sentence">The human commander is responsible for…</div>
+          <div class="sentence">A focused CLI worker receives… and returns…</div>
+          <div class="sentence">Prompts, permissions, launchers, and state each control…</div>
+          <div class="sentence">Testing differs from review because…</div>
+          <div class="sentence">When a blocker appears, the closed loop…</div>
+          <div class="sentence">The system creates leverage and replaceability when…</div>
+        </div>
+        <details class="answer-toggle">
+          <summary>Check a model answer</summary>
+          <p class="model-answer">The human commander defines the issue, grants authority, chooses the workflow, and owns acceptance. A fresh CLI worker receives one slash-command contract plus explicit artifacts and returns a saved, machine-readable result. Prompts bound understanding, settings and hooks shape capability, the launcher creates process isolation, and state carries the baton. Testing asks whether behavior works, while review asks whether the result matches the specification and proves it. A blocker enters a capped patch-and-re-review loop, and a persistent failure sends us back to repair the agent interface. The system creates leverage when workers are replaceable, evidence closes the loop, and the human is needed mainly at mission input and the final gate.</p>
+        </details>
+      </section>
+
+      <section id="appendix" aria-labelledby="appendix-title">
+        <p class="eyebrow">Appendix · Source audit</p>
+        <h2 id="appendix-title">Raw file index for the curious</h2>
+        <p class="section-lede">The teaching lens above is intentionally not a file tour. This collapsed index records the real lesson surface that was audited.</p>
+        <details class="raw-index">
+          <summary>Show all files in <code>tac/tac-6</code></summary>
+          <ol class="file-index" id="raw-file-index">
+            <li><code>.claude/commands/bug.md</code></li>
+            <li><code>.claude/commands/chore.md</code></li>
+            <li><code>.claude/commands/classify_adw.md</code></li>
+            <li><code>.claude/commands/classify_issue.md</code></li>
+            <li><code>.claude/commands/commit.md</code></li>
+            <li><code>.claude/commands/conditional_docs.md</code></li>
+            <li><code>.claude/commands/document.md</code></li>
+            <li><code>.claude/commands/e2e/test_basic_query.md</code></li>
+            <li><code>.claude/commands/e2e/test_complex_query.md</code></li>
+            <li><code>.claude/commands/e2e/test_disable_input_debounce.md</code></li>
+            <li><code>.claude/commands/e2e/test_random_query_generator.md</code></li>
+            <li><code>.claude/commands/e2e/test_sql_injection.md</code></li>
+            <li><code>.claude/commands/feature.md</code></li>
+            <li><code>.claude/commands/generate_branch_name.md</code></li>
+            <li><code>.claude/commands/implement.md</code></li>
+            <li><code>.claude/commands/install.md</code></li>
+            <li><code>.claude/commands/patch.md</code></li>
+            <li><code>.claude/commands/prepare_app.md</code></li>
+            <li><code>.claude/commands/prime.md</code></li>
+            <li><code>.claude/commands/pull_request.md</code></li>
+            <li><code>.claude/commands/resolve_failed_e2e_test.md</code></li>
+            <li><code>.claude/commands/resolve_failed_test.md</code></li>
+            <li><code>.claude/commands/review.md</code></li>
+            <li><code>.claude/commands/start.md</code></li>
+            <li><code>.claude/commands/test.md</code></li>
+            <li><code>.claude/commands/test_e2e.md</code></li>
+            <li><code>.claude/commands/tools.md</code></li>
+            <li><code>.claude/hooks/notification.py</code></li>
+            <li><code>.claude/hooks/post_tool_use.py</code></li>
+            <li><code>.claude/hooks/pre_compact.py</code></li>
+            <li><code>.claude/hooks/pre_tool_use.py</code></li>
+            <li><code>.claude/hooks/stop.py</code></li>
+            <li><code>.claude/hooks/subagent_stop.py</code></li>
+            <li><code>.claude/hooks/user_prompt_submit.py</code></li>
+            <li><code>.claude/hooks/utils/constants.py</code></li>
+            <li><code>.claude/hooks/utils/llm/anth.py</code></li>
+            <li><code>.claude/hooks/utils/llm/oai.py</code></li>
+            <li><code>.claude/settings.json</code></li>
+            <li><code>.env.sample</code></li>
+            <li><code>.gitignore</code></li>
+            <li><code>.mcp.json</code></li>
+            <li><code>.mcp.json.sample</code></li>
+            <li><code>README.md</code></li>
+            <li><code>adws/README.md</code></li>
+            <li><code>adws/adw_build.py</code></li>
+            <li><code>adws/adw_document.py</code></li>
+            <li><code>adws/adw_modules/__init__.py</code></li>
+            <li><code>adws/adw_modules/agent.py</code></li>
+            <li><code>adws/adw_modules/data_types.py</code></li>
+            <li><code>adws/adw_modules/git_ops.py</code></li>
+            <li><code>adws/adw_modules/github.py</code></li>
+            <li><code>adws/adw_modules/r2_uploader.py</code></li>
+            <li><code>adws/adw_modules/state.py</code></li>
+            <li><code>adws/adw_modules/utils.py</code></li>
+            <li><code>adws/adw_modules/workflow_ops.py</code></li>
+            <li><code>adws/adw_patch.py</code></li>
+            <li><code>adws/adw_plan.py</code></li>
+            <li><code>adws/adw_plan_build.py</code></li>
+            <li><code>adws/adw_plan_build_document.py</code></li>
+            <li><code>adws/adw_plan_build_review.py</code></li>
+            <li><code>adws/adw_plan_build_test.py</code></li>
+            <li><code>adws/adw_plan_build_test_review.py</code></li>
+            <li><code>adws/adw_review.py</code></li>
+            <li><code>adws/adw_sdlc.py</code></li>
+            <li><code>adws/adw_test.py</code></li>
+            <li><code>adws/adw_tests/__init__.py</code></li>
+            <li><code>adws/adw_tests/health_check.py</code></li>
+            <li><code>adws/adw_tests/sandbox_poc.py</code></li>
+            <li><code>adws/adw_tests/test_adw_test_e2e.py</code></li>
+            <li><code>adws/adw_tests/test_agents.py</code></li>
+            <li><code>adws/adw_tests/test_r2_uploader.py</code></li>
+            <li><code>adws/adw_triggers/__init__.py</code></li>
+            <li><code>adws/adw_triggers/trigger_cron.py</code></li>
+            <li><code>adws/adw_triggers/trigger_webhook.py</code></li>
+            <li><code>app/client/.gitignore</code></li>
+            <li><code>app/client/index.html</code></li>
+            <li><code>app/client/package-lock.json</code></li>
+            <li><code>app/client/package.json</code></li>
+            <li><code>app/client/public/bg.png</code></li>
+            <li><code>app/client/public/sample-data/events.jsonl</code></li>
+            <li><code>app/client/public/sample-data/orders_(32).csv</code></li>
+            <li><code>app/client/public/sample-data/products.csv</code></li>
+            <li><code>app/client/public/sample-data/users.json</code></li>
+            <li><code>app/client/public/vite.svg</code></li>
+            <li><code>app/client/src/api/client.ts</code></li>
+            <li><code>app/client/src/main.ts</code></li>
+            <li><code>app/client/src/style.css</code></li>
+            <li><code>app/client/src/types.d.ts</code></li>
+            <li><code>app/client/src/vite-env.d.ts</code></li>
+            <li><code>app/client/tsconfig.json</code></li>
+            <li><code>app/client/vite.config.ts</code></li>
+            <li><code>app/server/.env.sample</code></li>
+            <li><code>app/server/after_tables.txt</code></li>
+            <li><code>app/server/before_tables.txt</code></li>
+            <li><code>app/server/core/__init__.py</code></li>
+            <li><code>app/server/core/constants.py</code></li>
+            <li><code>app/server/core/data_models.py</code></li>
+            <li><code>app/server/core/file_processor.py</code></li>
+            <li><code>app/server/core/insights.py</code></li>
+            <li><code>app/server/core/llm_processor.py</code></li>
+            <li><code>app/server/core/sql_processor.py</code></li>
+            <li><code>app/server/core/sql_security.py</code></li>
+            <li><code>app/server/db/backup.db</code></li>
+            <li><code>app/server/main.py</code></li>
+            <li><code>app/server/pyproject.toml</code></li>
+            <li><code>app/server/server.py</code></li>
+            <li><code>app/server/tests/__init__.py</code></li>
+            <li><code>app/server/tests/assets/column_names.csv</code></li>
+            <li><code>app/server/tests/assets/complex_data.jsonl</code></li>
+            <li><code>app/server/tests/assets/invalid.csv</code></li>
+            <li><code>app/server/tests/assets/sample_data.jsonl</code></li>
+            <li><code>app/server/tests/assets/test_products.json</code></li>
+            <li><code>app/server/tests/assets/test_users.csv</code></li>
+            <li><code>app/server/tests/core/__init__.py</code></li>
+            <li><code>app/server/tests/core/test_file_processor.py</code></li>
+            <li><code>app/server/tests/core/test_llm_processor.py</code></li>
+            <li><code>app/server/tests/core/test_sql_processor.py</code></li>
+            <li><code>app/server/tests/test_sql_injection.py</code></li>
+            <li><code>app/server/uv.lock</code></li>
+            <li><code>playwright-mcp-config.json</code></li>
+            <li><code>scripts/clear_issue_comments.sh</code></li>
+            <li><code>scripts/copy_dot_env.sh</code></li>
+            <li><code>scripts/delete_pr.sh</code></li>
+            <li><code>scripts/expose_webhook.sh</code></li>
+            <li><code>scripts/kill_trigger_webhook.sh</code></li>
+            <li><code>scripts/reset_db.sh</code></li>
+            <li><code>scripts/start.sh</code></li>
+            <li><code>scripts/stop_apps.sh</code></li>
+            <li><code>specs/fix-sql-injection-vulnerabilities.md</code></li>
+            <li><code>specs/init_nlq_to_sql_to_table.md</code></li>
+            <li><code>specs/issue-111-adw-adw111-sdlc_planner-fix-sqlite-test-database.md</code></li>
+            <li><code>specs/issue-222-adw-adw222-sdlc_planner-disable-input-debounce-query.md</code></li>
+            <li><code>specs/issue-28-adw-ce364af1-sdlc_planner-random-natural-language-query.md</code></li>
+            <li><code>specs/jsonl-support.md</code></li>
+            <li><code>specs/query-history-panel.md</code></li>
+            <li><code>specs/replace-print-with-logging.md</code></li>
+          </ol>
+        </details>
+        <p class="source-note">Source basis: the full lesson checkout, its README files, command prompts, settings, hooks, launchers, workflow modules, tests, application, extracts, and sibling chapter. Binary assets were identified by path and not decoded. Course-era model names and broad permission bypass are reported as source facts, not recommended defaults.</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const progress = document.getElementById('reading-progress');
+      const railLinks = [...document.querySelectorAll('.chapter-rail a')];
+      const sections = railLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+
+      const update = () => {
+        const root = document.documentElement;
+        const distance = root.scrollHeight - root.clientHeight;
+        progress.style.width = `${distance > 0 ? (root.scrollTop / distance) * 100 : 0}%`;
+        let current = sections[0];
+        for (const section of sections) if (section.getBoundingClientRect().top <= 120) current = section;
+        railLinks.forEach(link => link.toggleAttribute('aria-current', link.getAttribute('href') === `#${current?.id}`));
+      };
+
+      update();
+      addEventListener('scroll', update, { passive: true });
+      addEventListener('resize', update);
+    })();
+  </script>
+</body>
+</html>

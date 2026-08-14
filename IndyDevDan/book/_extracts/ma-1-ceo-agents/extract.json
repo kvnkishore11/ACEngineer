@@ -1,0 +1,375 @@
+{
+  "lesson_key": "ma-1-ceo-agents",
+  "title": "CEO Agents",
+  "course": "MA",
+  "order": 15,
+  "lesson_url": "https://www.youtube.com/watch?v=TqjmTZRL31E",
+  "youtube_title": "Pi CEO Agents. Claude 1M Context. Multi-Agent Teams.",
+  "channel": "IndyDevDan",
+  "access_note": "Codebase is exclusive to Tactical Agentic Coding + Agentic Horizon members. The lesson sits in the 'Agentic Horizon extras' track (agentic-horizon-extras/ceo-agents).",
+  "video": {
+    "file": "ma-1-ceo-agents/video/ma-1-ceo-agents.mp4",
+    "duration_seconds": 2403,
+    "duration_display": "40:03",
+    "resolution": "3840x2160 (4K, AV1)"
+  },
+  "tactic": {
+    "name": "Agents That Decide (CEO & Board)",
+    "one_liner": "Stop using agents only as coding worker bees. Wrap specialized, adversarial agents in your own harness so they make your highest-leverage decisions — uncertainty in, decisions out.",
+    "why_uncomfortable": "It asks engineers to do four uncomfortable things at once. (1) Trust language models with high-stakes strategic judgment — acquisitions, career moves, regulatory responses — not just code. (2) Leave the safety of out-of-the-box tools (Claude Code, Codex) and build/customize their own agent harness all the way down to the system prompt and the subprocess spawn. (3) Spend real money and real wall-clock time on a single decision, deliberately, because a high-leverage decision is worth it. (4) Accept that 'prompting back and forth in the terminal' is the low-leverage past; the leverage is in templated, specialized, observable systems that repeat your engineering for you. Dan: 'This is where vibe coders have no shot. They cannot build something like this. The awareness just isn't there.'"
+  },
+  "mission": "Uplevel from agentic CODING to agentic ENGINEERING. Coding is the lowest-hanging fruit — 'it's a lot like vibe coding.' The frontier is building specialized multi-agent systems that turn uncertainty into decisions, so your agents help you make high-level, game-time strategic calls, not just ship low-level work. One CEO-and-board tool is 'one of many, many, many thousands, tens of thousands of specialized agents that can be built.' The engineers who can scale and command compute in the form of agents are the engineers who win.",
+  "the_question_to_hold": "How much is a high-leverage decision really worth to you? How much are you willing to spend, and how long are you willing to wait, to get the best intelligence to answer your hardest questions? (Dan poses this at 2:28 as the frame for the whole lesson — it justifies spending money and minutes on one decision.)",
+  "three_innovations": {
+    "innovation_1_true_1m_context": "The latest Claude models (Opus 4.6 / Sonnet 4.6 in the recording) deliver a TRUE 1-million-token context window: one flat price for the full window, no long-context premium, and graceful — not cliff — degradation past ~250K. This is the headliner. It lets an entire brief, financials, product overview, multi-round debate, and long expertise scratch pads all live in one session without compaction hacks. Dan: 'This means that the core four just got a massive buff.'",
+    "innovation_2_customizable_agent_harness": "Pi, a fully customizable terminal agent harness ('There are many coding agents, but this one is mine'). Unlike the fixed .claude/ directory, Pi lets you invent your own file structures, register custom tools (converse, end_deliberation), spawn agent subprocesses, and redesign the experience down to the system-prompt level via a TypeScript extension. Specialization beats general-purpose: customized agents push you out of the 'normal distribution' every other engineer gets from out-of-box tools.",
+    "innovation_3_agent_expertise": "Persistent, per-agent expertise files — not vague 'memory' but memory-and-patterns surrounding a specific problem domain. Each board member reads and updates its own scratch pad across deliberations, so the board gets sharper over time. Production expertise files run tens of thousands of tokens; the 1M window is what makes that practical. 'This is not memory. It is domain expertise.'"
+  },
+  "core_concepts": [
+    {
+      "id": "ceo-and-board",
+      "name": "The CEO & Board multi-agent team",
+      "plain_english": "A dedicated CEO agent orchestrates a board of specialist advisor agents who debate a strategic problem from opposing perspectives. The CEO frames the decision, drives the debate, decides when enough is enough, and writes the final memo. It is a strategic-decision-making team, not a coding team.",
+      "dan_words": "\"This is my CEO and board multi-agent team. This is a glimpse into the future where your agents are not only helping you ship the low level work, they're helping you make high-level game-time strategic decisions.\"",
+      "misconception": "That this is a chat you talk to. It is a one-shot deliberation system: you cannot prompt it mid-run — the only commands are /ceo-begin, stop, and wrap."
+    },
+    {
+      "id": "uncertainty-in-decision-out",
+      "name": "Uncertainty in, decision out (brief → memo)",
+      "plain_english": "The system's whole purpose stated as a function: specific input (a brief — a structured question with situation, stakes, constraints, key question) goes in; a specific output (a memo — ranked recommendations, board stances, dissent, next actions) comes out. Know your inputs, know your outputs, then design the workflow (the deliberation) in the middle.",
+      "dan_words": "\"We have uncertainty in, and we have decisions out. That is the purpose of the CEO and board multi-agent system. We take specific inputs, and then we deliver specific results.\"",
+      "misconception": "That the memo is the only artifact. The middle state (the deliberation: conversation.jsonl, expertise files, SVGs) is where the reasoning lives and where observability comes from."
+    },
+    {
+      "id": "multi-agent-orchestration",
+      "name": "Multi-agent orchestration (one node → many agents)",
+      "plain_english": "Whenever a single node fans out to multiple agents, that is multi-agent orchestration. Here the CEO node broadcasts to N board members via the converse tool; they respond, the CEO iterates, round after round, until constraints are hit.",
+      "dan_words": "\"Whenever you see a single node going out to multiple agents, immediately think multi-agent orchestration. That's exactly what's happening here.\"",
+      "misconception": "That the board members talk to each other in real time within a round. They respond in PARALLEL and blind to each other in a given round; they only 'build on each other' across rounds by re-reading the shared conversation log."
+    },
+    {
+      "id": "adversarial-board",
+      "name": "Adversarial board with controlled biases",
+      "plain_english": "Board members are not neutral. Each has a distinct objective function, time horizon, and bias: Revenue wants cash in 90 days, Compounder wants durable value over 24 months, Moonshot wants the 10x asymmetric bet, Contrarian attacks every assumption. The tension between them IS the value — it exposes flaws in your mental model you can't see alone.",
+      "dan_words": "\"This is a multi-agent adversarial pattern... The whole point is that we have multiple perspectives that don't agree so we can really flesh out the mental model that we need to make the best decision possible.\"",
+      "misconception": "That you want agreement. 'If you get a bunch of Chads on your team, every Chad is going to say, Yeah, we should use React.' You want opposing agents poking holes in each other's strategy."
+    },
+    {
+      "id": "constraints-time-budget",
+      "name": "Real constraints: time and budget",
+      "plain_english": "For the first time you can apply real constraints — a duration window (e.g. 2–5 min) and a dollar window ($1–$5) — to a deliberation. A constraint engine measures elapsed time and spend after every converse call and forces the meeting to wrap at the max, just like a real meeting. Min thresholds guarantee depth; max thresholds enforce discipline.",
+      "dan_words": "\"With 1 million contacts running rampant, you can do a lot, but it has to be guided properly... for the first time ever, we can actually apply real constraints to the duration and the budget of our meetings.\"",
+      "misconception": "That the budget is the point. Dan runs production versions with much higher budgets: 'I prioritize high leverage decision-making much more than I prioritize time and compute costs.' The $1–$5 in the demo is deliberately tiny."
+    },
+    {
+      "id": "true-1m-context",
+      "name": "True 1M context (the enabling model unlock)",
+      "plain_english": "The models can hold ~1M tokens of working memory at one flat price without a degradation cliff. For decisions you don't need perfect needle-in-haystack retrieval — you need retrieval that doesn't lose the KEY ideas. That is what unlocks agents that carry your whole business in context.",
+      "dan_words": "\"It's one price for the full context window, no long context premium... You need retrieval that doesn't lose the key ideas... And it's become quite clear the Opus 4.5 and Sonnet 4.5 [4.6] model can do that.\"",
+      "misconception": "That 1M context only matters in-loop (more room while coding). The bigger, less-obvious win is OUT-of-loop: you can build a tool that holds an entire business/product/life context and reason over it."
+    },
+    {
+      "id": "customizable-harness-pi",
+      "name": "Customizable agent harness (Pi)",
+      "plain_english": "Pi is a coding agent whose every aspect is customizable via TypeScript extensions. You're not stuck with the .claude/ directory's agents/plugins/commands/skills — you invent your own structures (agents, configuration, expertise, briefs, deliberations, memos) and register your own tools. This is what lets you build orchestration patterns impossible in out-of-box agents.",
+      "dan_words": "\"As Pi likes to say, 'There are many coding agents, but this one is mine.' That's the value proposition... a customizable agent harness where you're not just doing this normal prompting back and forth in the loop.\"",
+      "misconception": "That you must adopt Pi. The transferable idea is the customizable harness. Dan positions Pi as one of the only true Claude Code competitors precisely because of the customization; the tactic transfers to any harness that lets you go down to the primitives."
+    },
+    {
+      "id": "agent-expertise",
+      "name": "Agent expertise (persistent, domain-specific scratch pads)",
+      "plain_english": "Every agent maintains a persistent expertise file it reads and updates across deliberations. It is memory PLUS patterns tied to a specific domain — e.g. the revenue agent tracks how to outmaneuver the compounder, the CEO tracks which tensions resolved. Over many briefs, the expertise compounds and the board gets sharper.",
+      "dan_words": "\"Expertise is memory and patterns surrounding a specific problem. And that's the third key innovation here... This truly changes the types of multi-agent experiences you can build.\"",
+      "misconception": "That it's arbitrary memory. It's not 'memorize this' — it's the domain expertise the agent focuses on most. Real production files are tens of thousands of tokens; the demo files are tiny presentational examples."
+    },
+    {
+      "id": "specialization-beats-general",
+      "name": "Specialization beats the normal distribution",
+      "plain_english": "Out-of-box agents give everyone the same 'normal distribution' of results — especially with short, lazy prompts. To beat it you change the core four (context, model, prompt, tools) and go up a level: customize the harness, override the system prompt, add expertise and skills. Small pushes out of the distribution create outlier results.",
+      "dan_words": "\"If you're not building specialized agents—context model prompt tools—and you're not going high-level and customize your agent harness, you're in the normal distribution of what everyone is getting out of the agents.\"",
+      "misconception": "That specialization means only richer context. Dan: 'Don't just rely on your context being different.' Change the model, change the tools, override the system prompt entirely."
+    },
+    {
+      "id": "override-system-prompt",
+      "name": "Overriding the system prompt (front matter + runtime variables)",
+      "plain_english": "Each agent is a markdown file whose YAML front matter (model, expertise, skills, domain) the harness parses, and whose body is a full system prompt in the Purpose/Variables/Instructions/Workflow/Context/Report format. On boot the extension string-replaces {{RUNTIME}} variables and injects expertise/skills blocks. These agents completely override the default coding-agent system prompt.",
+      "dan_words": "\"We're completely overriding the system prompt. These are not coding agents. This is a CEO and a board built to make strategic decisions on your behalf... How can I do this? It's because I know the actual primitives underneath the tool.\"",
+      "misconception": "That system prompts are static. They mix static variables, runtime variables injected before boot, and dynamically inserted expertise + skills blocks assembled from the front matter."
+    },
+    {
+      "id": "template-your-engineering",
+      "name": "Template your engineering (forced prompt engineering)",
+      "plain_english": "A brief must contain required sections (Situation, Stakes, Constraints, Key Question) or the system rejects it. By templating the input, you force great prompt engineering as a pattern and teach your agents to do exactly what you did. Templating is where the true leverage is.",
+      "dan_words": "\"If you template your engineering, your agents can do exactly what you did... You're prompting back and forth, and you're not creating prescriptions, workflows, and systems for your agents to repeat, you miss out on all the true leverage.\"",
+      "misconception": "That prompt engineering is dead. 'Prompt engineering is very much still alive, don't let anyone make you think that it's not.' A lazy two-sentence prompt gets you the RL-average; a serious, structured brief gets a serious result."
+    },
+    {
+      "id": "observability",
+      "name": "Observability (the deliberation is fully logged)",
+      "plain_english": "Every deliberation writes a conversation.jsonl (from/to/message for every turn), a tool-use.jsonl (every tool call by every agent), the agents' expertise updates, and any SVGs — a full, replayable audit trail. If you can't measure it, you can't improve it.",
+      "dan_words": "\"Observability is a key element of building powerful agentic systems. If you don't measure it, you cannot improve it, full stop.\"",
+      "misconception": "That the memo is the only output worth keeping. The conversation log is where you see who said what to whom, catch failure modes, and improve the system."
+    }
+  ],
+  "innovations_detailed": {
+    "true_1m_context": "The MRCR v2 8-needle 'Long context retrieval' chart (shown ~1:15) plots Opus 4.6, Sonnet 4.6, Sonnet 4.5, GPT-5.4, and Gemini 3.1 Pro across 128K→1M input tokens. Degradation starts around 250K, but the Claude 4.6 line stays high across the full window while others fall off. The economic unlock is equally important: ONE price for the full window, no post-200K surcharge (Dan's long-standing complaint about Gemini). In Claude Code the 1M models are available by default. Enables long expertise files, whole-business context, and multi-round debate in a single session.",
+    "customizable_agent_harness": "Pi (@mariozechner/pi-coding-agent) exposes an extension API with hooks (session_start, before_agent_start, input, message_end, tool_execution_start, tool_result), custom tool registration, subprocess control, persistent sessions, model registry, and TUI widgets/footers/themes. The CEO & Board is a single ~1,300-line TypeScript extension (apps/ceo/extensions/ceo-and-board.ts) plus 5 modules. It turns Pi into a deliberation engine: the CEO is the Pi agent itself (custom system prompt via before_agent_start); board members are Pi subprocesses. Dan notes it's ~2,000 lines total and admits it needs to be broken up ('2K lines is not a great design pattern').",
+    "agent_expertise": "Expertise is declared in each agent's front matter (path, use-when, updatable). config.ts buildExpertiseBlock() renders each entry as a path + [read/write | read-only] + use-when line into {{EXPERTISE_BLOCK}} — it does NOT inline the file content; the agent reads/writes the file itself with its tools during the meeting. Persistence: expertise files live in .pi/ceo-agents/expertise/ and survive across deliberations (unlike the per-meeting session files). The CEO scratch pad tracks vote tallies, key insights, unresolved tensions, and an evolving thesis."
+  },
+  "system_architecture": {
+    "summary": "A Pi extension turns the terminal into a one-shot deliberation engine. The CEO = the Pi agent itself, running a custom system prompt injected at before_agent_start. Board members = Pi subprocesses spawned with persistent sessions, each with its own system prompt, model, and expertise. Two custom tools (converse, end_deliberation) drive the meeting; a constraint engine bounds it; a synthwave TUI streams it live.",
+    "ceo_is_the_pi_agent": "The CEO is not a subprocess. It is the primary Pi agent. On before_agent_start the extension reads .pi/ceo-agents/agents/ceo.md, builds expertise + skills blocks, string-replaces {{SESSION_ID}}, {{BRIEF_CONTENT}}, {{BOARD_MEMBERS}}, {{MEMO_PATH}}, {{MIN_TIME}}/{{MAX_TIME}}/{{MIN_BUDGET}}/{{MAX_BUDGET}}, and returns the assembled string as the systemPrompt. The CEO model (anthropic/claude-opus-4-6) is set from ceo.md front matter at session_start.",
+    "board_members_are_subprocesses": "callBoardMember (modules/subprocess.ts) spawns `pi` with: --mode json -p --no-extensions --no-skills --no-prompt-templates --no-themes --session <file> --thinking off. On the FIRST call it also passes --system-prompt <resolved body> --model <model> and preloads context files via @<file> args. On later calls it passes only the session file + the CEO's message, so the persistent session carries full conversational context. Default board model: anthropic/claude-sonnet-4-6 (the 'Sonnet/Sonic' models). It parses the JSON event stream line-by-line: tool_execution_start, message_update/text_delta (live stream), message_end (usage: input/output tokens, cost.total, totalTokens).",
+    "tool_converse": "converse(to, message): to = a member name, an array of names, or \"all\". Resolves targets, logs the CEO prompt once, then calls all targets via Promise.allSettled (PARALLEL), streams each response into a single board-live-feed widget, logs each response, adds each member's cost to budgetSpent, and returns the responses + a Constraint State block (elapsed_time_minutes, budget_spent, past_min_time, past_min_budget, approaching_max_time, approaching_max_budget, hit_max). If hit_max was already true on entry, it throws and tells the CEO to end. The CEO prompt says 'default to all'; BIAS_LIMIT caps favoritism at 5x.",
+    "tool_end_deliberation": "end_deliberation(message): guarded so it cannot run before min_time unless hit_max. Sets phase=ending, collects final one-statement positions from ALL members in parallel, logs each as a final_statement, writes meeting_end, sets phase=complete, and returns the statements + 'now write the memo to <path>'.",
+    "constraint_engine": "getConstraintState (modules/helpers.ts): elapsed = now - startTime; approaching_max = >= max*0.8; hit_max = elapsed>=maxTime OR spent>=maxBudget; hit_max_reason distinguishes time/budget/both. Budget accumulates from every board-member cost AND the CEO's own message_end cost.",
+    "memo_pipeline": "When the CEO writes memos/<slug>-<id>/memo.md, on tool_result the extension injects YAML front matter (title, date, duration, budget_used, board_members, brief, transcript), writes meeting_end, sets phase=complete, and spawns the configured editor (`code`). The CEO's skills then generate 1 decision-framework SVG and a 1–4 sentence ElevenLabs TTS summary saved beside the memo.",
+    "input_lockdown": "on('input') blocks all user text; ~20 built-in slash commands (help, clear, model, compact, cost, etc.) are shadowed to show a blocking notice. Only /ceo-begin (start), stop (hard abort), and wrap (force end_deliberation via a steer message) are honored. This is what makes it 'not a conversation.'",
+    "spec_vs_implementation_gaps": [
+      "SEQUENTIAL vs PARALLEL: ceo.md's converse doc says 'Calls are sequential — later members see earlier responses from the same round,' but the extension fires them in parallel via Promise.allSettled. The implementation (and Dan's narration: 'this runs in parallel... this isn't sequential') is authoritative: within one round, members respond BLIND to each other. They only see each other across rounds by re-reading conversation.jsonl (their prompts instruct 'reread the entire conversation'). Teach the parallel-blind-within-round, informed-across-rounds mechanic explicitly.",
+      "CONTRARIAN LAST: The README and both ceo.md and contrarian.md claim Contrarian 'speaks last (enforced automatically)'. In this v1 extension, end_deliberation collects final statements in config order (Contrarian is 4th of 8) with no reordering. The enforcement is aspirational, not implemented. A precise reader should not assume ordering guarantees the prompts promise.",
+      "CONTEXT-WINDOW FALLBACK: memberStats seeds contextWindow at 256000 as a fallback before the real value is looked up from the model registry; the TUI badge appends '1M' only to models matching /claude-.*-4-6/. So the '1M' label is string-pattern-driven, not a live capability check."
+    ],
+    "codebase_paths": [
+      "apps/ceo/extensions/ceo-and-board.ts",
+      "apps/ceo/extensions/modules/{types,config,subprocess,helpers,theme}.ts",
+      ".pi/ceo-agents/ceo-and-board-configuration.yaml",
+      ".pi/ceo-agents/agents/*.md",
+      ".pi/ceo-agents/expertise/*-scratch-pad.md",
+      ".pi/ceo-agents/briefs/*/brief.md",
+      "justfile"
+    ]
+  },
+  "deliberation_flow": [
+    "Boot — `just ceo` (alias `j ceo`) runs `cd apps/ceo && pi -e extensions/ceo-and-board.ts`; the synthwave TUI loads, shows the roster (CEO on Opus 4.6, board on Sonnet 4.6, all badged 1M) and the Time/Budget/Editor constraints.",
+    "Select brief — `/ceo-begin` lists brief directories (each a folder with brief.md + optional context .md files), sorted newest first.",
+    "Validate — the brief is checked (case-insensitive) for the required sections from config. Missing any section blocks the meeting with a notice showing exactly what to write.",
+    "Load context — every .md file in the brief dir except brief.md is a context file, preloaded into EVERY agent's context window via Pi's @file syntax on first contact.",
+    "CEO frames — the CEO reads brief + context, updates its scratch pad, and opens with converse(\"all\", ...) stating what the board is here to decide.",
+    "Board debates — members respond in parallel with their positions; the CEO iterates multiple rounds (follow-ups, tension-pair matchups, position challenges).",
+    "Constraints checked — after every converse call the CEO sees the Constraint State; at ~80% it starts wrapping; at max it must end.",
+    "Final statements — end_deliberation collects one closing statement per member (README claims Contrarian last; v1 uses config order).",
+    "Memo — the CEO synthesizes a structured memo, generates a decision-framework SVG, speaks a TTS summary, and the memo opens in VS Code. Uncertainty in, decision out."
+  ],
+  "board_members": [
+    { "name": "CEO", "role": "Chief Decider / orchestrator", "bias": "Leverage & coherence", "time_horizon": "1–3 years", "default_stance": "Which of these paths is highest leverage, and what do we stop doing to fund it?", "model": "anthropic/claude-opus-4-6", "note": "Frames, drives, synthesizes, writes the memo. 70% Rule, Regret Minimization, Capital Allocation lens. BIAS_LIMIT 5x." },
+    { "name": "Revenue", "role": "Cash-now operator", "bias": "Speed & monetization", "time_horizon": "30–90 days", "default_stance": "I want a version customers will pay for in 90 days.", "model": "anthropic/claude-sonnet-4-6" },
+    { "name": "Product Strategist", "role": "What to build & in what order", "bias": "Problem selection", "time_horizon": "This quarter", "default_stance": "I want the narrowest wedge with the strongest strategic pull.", "model": "anthropic/claude-sonnet-4-6" },
+    { "name": "Technical Architect", "role": "Feasibility & durability", "bias": "System durability", "time_horizon": "6–18 months", "default_stance": "I want the version that will survive contact with production reality.", "model": "anthropic/claude-sonnet-4-6" },
+    { "name": "Contrarian", "role": "Truth-seeker / stress-tester", "bias": "Truth-seeking", "time_horizon": "Variable", "default_stance": "I want the room to prove it is not fooling itself.", "model": "anthropic/claude-sonnet-4-6", "note": "Prompt says it speaks last before synthesis; v1 harness does not actually enforce ordering." },
+    { "name": "Compounder", "role": "Long-term value & retention", "bias": "Trust & retention", "time_horizon": "6–24 months", "default_stance": "I want a version customers still trust in 12 months.", "model": "anthropic/claude-sonnet-4-6" },
+    { "name": "Customer Oracle", "role": "Voice of the real user", "bias": "User behavior reality", "time_horizon": "Next session", "default_stance": "I want the version real users actually adopt in their existing workflow.", "model": "anthropic/claude-sonnet-4-6", "note": "The board roster is fully configurable — Dan notes members can be commented out of the config to deactivate them. All 8 ship active in the on-disk config." },
+    { "name": "Market Strategist", "role": "Positioning & distribution", "bias": "Positioning and timing", "time_horizon": "This quarter", "default_stance": "I want the version the market can understand and buy quickly.", "model": "anthropic/claude-sonnet-4-6" },
+    { "name": "Moonshot", "role": "Big-bet thinker (Dan's favorite)", "bias": "Asymmetric upside", "time_horizon": "1–3 years", "default_stance": "I want the room to avoid cowardly incrementalism.", "model": "anthropic/claude-sonnet-4-6", "note": "'What if we're thinking too small?' Advocates 10x, category-defining bets. In the acquisition demo it was the lone dissenter (reject + run a 30-day investor test)." }
+  ],
+  "brief_to_memo": {
+    "brief_required_sections": ["## Situation", "## Stakes", "## Constraints", "## Key Question"],
+    "brief_input_example": "briefs/2026-03-18-acquisition-offer/brief.md — 'Should we take the $12M acquisition offer?' BlendStack (a DTC custom-supplement company) has a non-negotiable $12M cash offer at 11x its $1.08M ARR from NutraHoldings (a PE-backed rollup), expiring in 30 days, with MoM growth decelerating 6.8%→4.2%. Context files business-metrics.md and product-overview.md ride along to every agent.",
+    "memo_output_structure": "YAML front matter (title, date, duration, budget_used, board_members, brief, transcript) + body: ranked recommendations (#1–#3), a board-member stances table (position / reasoning / key concern), dissent & unresolved tensions, a trade-offs & risks table, next actions (assignable), a 3–5 paragraph deliberation summary, plus a decision-framework SVG and an MP3 TTS summary.",
+    "nondeterminism_note": "The same brief run multiple times yields different votes: the on-screen recording's TTS memo said 'five to one', the k8wlei memo on disk says '7–1 SELL', and the ceo-scratch-pad (session pnfofr) tallied '6–2'. Moonshot dissents consistently. Teach this as expected variance, not a bug."
+  },
+  "quotes": [
+    { "text": "There are three massive innovations available to you that unlock high-leverage multi-agent teams.", "approx_timestamp": "0:00" },
+    { "text": "This is my CEO and board multi-agent team. This is a glimpse into the future where your agents are not only helping you ship the low level work, they're helping you make high-level game-time strategic decisions.", "approx_timestamp": "0:20" },
+    { "text": "It's one price for the full context window, no long context premium.", "approx_timestamp": "0:50" },
+    { "text": "This means that the core four just got a massive buff.", "approx_timestamp": "1:44" },
+    { "text": "It's you, your team, and a country of geniuses in a data center.", "approx_timestamp": "2:18" },
+    { "text": "How much is a high-leverage decision really worth to you? How much are you willing to spend? How long are you willing to wait to get the best intelligence to answer your hardest questions?", "approx_timestamp": "2:28" },
+    { "text": "We have uncertainty in, and we have decisions out. That is the purpose of the CEO and board multi-agent system.", "approx_timestamp": "2:53" },
+    { "text": "Whenever you see a single node going out to multiple agents, immediately think multi-agent orchestration.", "approx_timestamp": "3:37" },
+    { "text": "This is a multi-agent adversarial pattern... The whole point is that we have multiple perspectives that don't agree so we can really flesh out the mental model.", "approx_timestamp": "8:51" },
+    { "text": "For the first time ever, we can actually apply real constraints to the duration and the budget of our meetings.", "approx_timestamp": "10:01" },
+    { "text": "This is not a conversation. This is a one-shot multi-agent system.", "approx_timestamp": "10:15" },
+    { "text": "These are all running the Sonnet model and I put the Opus model on our CEO.", "approx_timestamp": "12:14" },
+    { "text": "That second big innovation is a customizable agent harness like Pi. There are many coding agents, but this one is mine.", "approx_timestamp": "13:29" },
+    { "text": "This is a decision-making agentic coding tool. And really, we're not coding at all here. This is an agentic engineering tool. We're not just coding anymore.", "approx_timestamp": "18:04" },
+    { "text": "If you template your engineering, your agents can do exactly what you did.", "approx_timestamp": "19:31" },
+    { "text": "We are kind of forcing great prompt engineering as a pattern into the agent harness.", "approx_timestamp": "20:17" },
+    { "text": "Don't just write a stupid two-sentence prompt. Think. Give your agents serious information to work with and it will give you a serious result.", "approx_timestamp": "21:54" },
+    { "text": "Prompt engineering is very much still alive, don't let anyone make you think that it's not.", "approx_timestamp": "22:12" },
+    { "text": "Observability is a key element of building powerful agentic systems. If you don't measure it, you cannot improve it, full stop.", "approx_timestamp": "23:39" },
+    { "text": "Expertise is memory and patterns surrounding a specific problem. And that's the third key innovation here.", "approx_timestamp": "25:15" },
+    { "text": "Every agent can create SVG elements to visually compel the CEO toward their argument.", "approx_timestamp": "27:02" },
+    { "text": "This is where vibe coders have no shot. They cannot build something like this. The awareness just isn't there. You can go all the way down to the prompt level, the system prompt level, and you can redesign how things work.", "approx_timestamp": "30:08" },
+    { "text": "We're completely overriding the system prompt. These are not coding agents. This is a CEO and a board built to make strategic decisions on your behalf.", "approx_timestamp": "30:54" },
+    { "text": "Coding is just the beginning. It's really just the beginning. It's a lot like vibe coding. It's the lowest hanging fruit.", "approx_timestamp": "31:11" },
+    { "text": "Agent model diversity is super super important for creating better conflict and unique opinion.", "approx_timestamp": "34:33" },
+    { "text": "These are micro applications that do one thing extraordinarily well, the agentic way. So that's what Pi unlocks.", "approx_timestamp": "36:12" },
+    { "text": "We're in the age of agents. The engineers that can scale and use compute in the form of agents are the engineers that are and will win.", "approx_timestamp": "39:47" }
+  ],
+  "prerequisites_tools": [
+    "Pi coding agent (the agent harness) — https://pi.dev, `npm install -g @mariozechner/pi-coding-agent`",
+    "Bun — curl -fsSL https://bun.sh/install | bash (extension is Bun/TypeScript)",
+    "just — command runner (brew install just); `j` is Dan's alias for `just`",
+    "Anthropic API key in .env (ANTHROPIC_API_KEY) — the harness FATALs without it",
+    "ELEVENLABS_API_KEY in .env for the TTS audio summary (optional — deliberation still completes without it)",
+    "An editor on PATH (config default `code`) to open the memo",
+    "macOS for TTS playback (afplay); the tts-eleven skill notes macOS-only playback",
+    "Membership: Tactical Agentic Coding + Agentic Horizon (codebase is member-exclusive)"
+  ],
+  "what_student_must_internalize": [
+    "Agents are not only coding workers. The highest-leverage use is decision-making — uncertainty in, decision out.",
+    "Know your inputs and outputs first (brief → memo), then design the workflow (the deliberation) in the middle.",
+    "The value of a multi-agent board is DISAGREEMENT — controlled biases and opposing time horizons that poke holes in your mental model.",
+    "Constraints (time + budget) make agentic decisions real and bounded; set them by how much the decision is worth, not by habit.",
+    "1M TRUE context (flat price, graceful degradation) is the enabling unlock — it lets agents hold your whole business + long expertise in one session.",
+    "Specialization beats the normal distribution: change the core four AND go up a level to a customizable harness and overridden system prompts.",
+    "Template your engineering (required brief sections) so your agents repeat what you did — and so prompt engineering becomes an enforced pattern.",
+    "Observability is non-negotiable: conversation.jsonl + tool-use.jsonl make the deliberation replayable and improvable.",
+    "Agent expertise compounds: persistent, domain-specific scratch pads make the board sharper over many briefs.",
+    "This is agentic ENGINEERING, not coding. Coding is the lowest-hanging fruit; there are tens of thousands of specialized agents to build."
+  ],
+  "common_weak_student_failures": [
+    "Treating it like a chat — trying to prompt the board mid-run. It's one-shot: only /ceo-begin, stop, wrap are honored.",
+    "Assuming board members see each other's answers within a round. They respond in parallel and blind; cross-pollination only happens across rounds via the shared conversation log.",
+    "Trusting 'Contrarian speaks last' as a guarantee. The prompts claim it; the v1 harness collects final statements in config order (Contrarian is 4th).",
+    "Writing a lazy two-sentence brief and getting the RL-average answer, then blaming the system — instead of filling Situation/Stakes/Constraints/Key Question seriously.",
+    "Skipping context files — dropping brief.md alone so the board deliberates without the business metrics/product overview that every agent should share.",
+    "Setting the budget too low for a real decision and reading a shallow memo as the tool's ceiling. Dan runs production at much higher budgets.",
+    "Thinking a single ChatGPT/Claude prompt is equivalent. It's fine for a quick starting point, but without context-engineering and multiple adversarial agents it won't perform for serious decisions.",
+    "Believing the memo is the whole output and ignoring the deliberation/observability artifacts — where the reasoning, dissent, and improvement signal live.",
+    "Fixating on Pi as the tool instead of the transferable idea (customizable harness + overridden system prompts + expertise).",
+    "Copying the demo's tiny expertise files and expecting the compounding value Dan describes from his tens-of-thousands-of-tokens production files."
+  ],
+  "teach_back_prompt": "Without notes, explain to a colleague: (1) the CEO & Board as a function — what goes in (brief), what comes out (memo), and what the deliberation in the middle actually does; (2) why an ADVERSARIAL board of biased specialists beats one smart agent, naming two tension pairs and what each member optimizes for; (3) the three innovations that make it possible now (true 1M context, customizable Pi harness, compounding agent expertise) and why 1M context specifically was the unlock; (4) how the harness actually runs a round — CEO (Opus) as the Pi agent itself vs. board members as parallel Pi subprocesses with persistent sessions, and the one place the code and the prompts disagree (parallel vs 'sequential', and 'contrarian last'); and (5) what 'template your engineering' + required brief sections buy you. Finish by resolving Dan's opening question: how do you decide how much a decision is worth spending on?",
+  "retrieval_questions": [
+    { "q": "State the CEO & Board system as a function.", "a": "Uncertainty in, decision out: a structured brief (Situation/Stakes/Constraints/Key Question + context files) goes in; a structured memo (ranked recs, board stances, dissent, next actions, SVG, TTS) comes out. The deliberation (debate) is the workflow in the middle." },
+    { "q": "What are the three innovations, and which is the enabling unlock?", "a": "(1) True 1M-token context at flat price with graceful degradation — the enabling unlock; (2) a customizable agent harness (Pi); (3) compounding, domain-specific agent expertise. 1M context is what lets agents hold the whole business + long expertise in one session ('the core four just got a massive buff')." },
+    { "q": "Why an adversarial board instead of one strong agent?", "a": "Disagreement is the value. Each member has a controlled bias and time horizon (Revenue: 90-day cash; Compounder: 24-month trust; Moonshot: 10x bet; Contrarian: attack assumptions). Their tension exposes flaws in your mental model you can't see alone. A room of agreeable agents just says 'use React.'" },
+    { "q": "Within a single deliberation round, do board members see each other's responses?", "a": "No. The harness fires them in PARALLEL (Promise.allSettled), so within a round they respond blind to each other. They only build on each other ACROSS rounds by re-reading the shared conversation.jsonl (their prompts tell them to 'reread the entire conversation'). Note ceo.md's doc text says 'sequential' — that's inaccurate vs the code and Dan's narration." },
+    { "q": "What two custom tools drive the meeting, and what does each do?", "a": "converse(to, message) — broadcast/target the board, returns responses + constraint state; end_deliberation(message) — collect final statements and trigger memo synthesis (guarded so it can't fire before min_time unless max is hit)." },
+    { "q": "How are the CEO and the board members run differently?", "a": "The CEO IS the Pi agent itself (custom system prompt injected at before_agent_start, Opus 4.6). Board members are separate `pi` subprocesses with persistent sessions (--session), each with its own --system-prompt and --model (Sonnet 4.6 by default), spawned by callBoardMember." },
+    { "q": "What makes a brief valid, and what happens if it isn't?", "a": "It must contain the configured required sections (## Situation, ## Stakes, ## Constraints, ## Key Question), matched case-insensitively. Missing any section blocks the meeting with a notice showing exactly what to add — forced prompt engineering." },
+    { "q": "What is 'agent expertise' and how is it different from memory?", "a": "Per-agent persistent scratch pads (in expertise/) declared in front matter (path, use-when, updatable). It's memory PLUS patterns tied to a specific domain — e.g. the revenue agent's notes on how to argue against the compounder. It persists across deliberations and compounds; production files are tens of thousands of tokens." },
+    { "q": "How does the system stay bounded?", "a": "A constraint engine measures elapsed time and budget after every converse call; min thresholds guarantee depth, 80% of max starts wrap-up, and hitting max forces end_deliberation. Budget counts every board-member cost plus the CEO's own token cost." },
+    { "q": "Why does Dan say specialization 'beats the normal distribution'?", "a": "Out-of-box agents with short prompts give everyone the same average output. To become an outlier you change the core four (context/model/prompt/tools) and go up a level: a customizable harness, fully overridden system prompts, expertise, and skills. 'Don't just rely on your context being different.'" },
+    { "q": "What is 'agent model diversity' and did the demo use it?", "a": "Using different model families per agent to sharpen conflict and unique opinion. The recorded demo runs ALL Claude (Opus CEO + Sonnet board). A parallel agents-multimodel config wires GPT-5.4, Gemini 3.1 Pro, Qwen, Kimi, MiniMax, etc. via OpenRouter — the diversity path Dan says he wants once other labs ship true long-context models." },
+    { "q": "What is Dan's framing question that justifies the spend?", "a": "'How much is a high-leverage decision really worth to you?' Because a good strategic decision can be worth far more than a few dollars and a few minutes, you should size time/budget to the decision's value — he runs production far above the $1–$5 demo." }
+  ],
+  "codebase_map": {
+    "root": "agentic-horizon-extras/ceo-agents (symlinked as ma-1-ceo-agents/codebase)",
+    "files": [
+      "README.md",
+      "justfile",
+      "CLAUDE.md",
+      ".env.sample",
+      "apps/ceo/extensions/ceo-and-board.ts",
+      "apps/ceo/extensions/modules/types.ts",
+      "apps/ceo/extensions/modules/config.ts",
+      "apps/ceo/extensions/modules/subprocess.ts",
+      "apps/ceo/extensions/modules/helpers.ts",
+      "apps/ceo/extensions/modules/theme.ts",
+      "apps/ceo/.pi/settings.json",
+      "apps/ceo/.pi/themes/synthwave.json",
+      "apps/ceo/package.json",
+      ".pi/ceo-agents/ceo-and-board-configuration.yaml",
+      ".pi/ceo-agents/ceo-and-board-configuration-multimodel.yaml",
+      ".pi/ceo-agents/agents/ceo.md",
+      ".pi/ceo-agents/agents/{revenue,product-strategist,technical-architect,contrarian,compounder,customer-oracle,market-strategist,moonshot}.md",
+      ".pi/ceo-agents/agents-multimodel/*.md",
+      ".pi/ceo-agents/briefs/brief-template.md",
+      ".pi/ceo-agents/briefs/2026-03-18-acquisition-offer/{brief,business-metrics,product-overview}.md",
+      ".pi/ceo-agents/expertise/*-scratch-pad.md",
+      ".claude/skills/svg-generate/SKILL.md",
+      ".claude/skills/tts-eleven/SKILL.md",
+      ".claude/skills/drive/SKILL.md",
+      ".claude/agents/meta-pi-agent.md",
+      ".claude/commands/{prime,install,build,plan-w-team}.md",
+      "ai_docs/pi-agent/*",
+      "specs/{init,init-ceo-and-board,v1-ceo-and-board-extension,modularize-ceo-extension}.md"
+    ],
+    "what_each_does": {
+      "justfile": "`just ceo` (alias `j ceo`) = `cd apps/ceo && [ -d node_modules ] || bun install && pi -e extensions/ceo-and-board.ts`. Also metacc/metapi recipes that boot a meta agent with the meta-pi-agent system prompt.",
+      "apps/ceo/extensions/ceo-and-board.ts": "The ~1,300-line deliberation engine. Registers converse + end_deliberation tools and a board-response renderer; handles session_start (theme, config, CEO model, footer), before_agent_start (inject CEO system prompt + runtime vars), input lockdown, message_end/tool_execution_start (cost + tool logging), and tool_result (memo front-matter injection + open editor).",
+      "modules/config.ts": "Hand-rolled line-by-line YAML parser (findProjectRoot walks up for the config), loadBoardMembers (front matter → model/session/expertise/skills, default sonnet-4-6), loadDotEnv (FATAL without .env), buildExpertiseBlock/buildSkillsBlock (paths + use-when, content NOT inlined).",
+      "modules/subprocess.ts": "callBoardMember spawns `pi --mode json -p --no-extensions --no-skills --no-prompt-templates --no-themes --session <f> --thinking off`, adds --system-prompt/--model + @context files on first call, parses the JSON event stream (text_delta stream, message_end usage).",
+      "modules/helpers.ts": "generateSessionId (6-char base36), parseBudget ($ strip), appendToLog/appendToolUse (jsonl), getConstraintState (elapsed/spent, past_min, approaching_max at 80%, hit_max + reason).",
+      "modules/theme.ts": "Synthwave ANSI helpers, hex parsing, token formatting, constraint gauge bars, board status card rendering.",
+      "modules/types.ts": "Shared interfaces: CeoConfig, MeetingState (phase idle/deliberating/ending/complete), MemberStats, ConstraintState, BoardMemberConfig, BoardMemberResult.",
+      ".pi/ceo-agents/ceo-and-board-configuration.yaml": "The control file: meeting.constraints (min/max time 2–5 min, budget $1–$5, editor code), brief_sections (required section + description pairs used for validation), paths, and the 8-member board roster with per-member TUI colors.",
+      "ceo-and-board-configuration-multimodel.yaml": "Same shape but points at agents-multimodel/ — the model-diversity variant (GPT-5.4 CEO; Gemini 3.1 Pro, Gemini 3 Flash, Qwen 3.5, GPT-5.4-mini, Kimi K2.5, MiniMax M2.7, Xiaomi MiMo v2 Pro board) via OpenRouter.",
+      ".pi/ceo-agents/agents/ceo.md": "The CEO system prompt: front matter (expertise ceo-scratch-pad updatable, skills svg-generate + tts-eleven, model opus-4-6) + body in Purpose/Variables(Static+Runtime)/Instructions/Workflow/Context/Report format. Documents converse/end_deliberation, tension pairs, decision heuristics.",
+      ".pi/ceo-agents/agents/<member>.md": "One system prompt per board member: front matter (model, expertise scratch pad, svg skill) + Purpose/Variables/Temperament/How-this-role-thinks/Reasoning/Heuristics/Tension-partners/Red-lines/Role-checklist/Workflow/Report. Each fully overrides the coding-agent persona.",
+      ".pi/ceo-agents/briefs/brief-template.md": "The template every brief must follow — Situation/Stakes/Constraints/Key Question with authoring guidance.",
+      ".pi/ceo-agents/briefs/<date-slug>/": "One deliberation input: brief.md (required, validated) + any number of context .md files loaded into every agent. 13 example briefs ship (shorts-platform, acquisition-offer, fda-warning, solo-plugin-bet, engineering-path, home-purchase-wfh, agentic-copilot, + 3 high-stakes ones).",
+      ".pi/ceo-agents/expertise/<member>-scratch-pad.md": "Persistent per-agent expertise; read + updated during meetings; survives across deliberations; compounds over many briefs.",
+      ".claude/skills/svg-generate/SKILL.md": "Hand-craft production SVGs (static/animated/batch). Board members use it to make decision matrices, risk maps, trade-off diagrams; the CEO makes the final decision-framework SVG (max ~1–2 uses/agent).",
+      ".claude/skills/tts-eleven/SKILL.md": "ElevenLabs TTS — the CEO speaks a 1–4 sentence audio summary of the memo (needs ELEVENLABS_API_KEY; macOS afplay for playback).",
+      ".claude/skills/drive/SKILL.md": "tmux terminal-automation CLI (sessions, keystrokes, poll, screenshot) — used to test the TUI agent programmatically. Not part of the runtime deliberation.",
+      ".claude/agents/meta-pi-agent.md": "A Claude Code / Pi 'meta agent' that builds and extends Pi extensions, themes, and orchestration — the tool that built this tool.",
+      "ai_docs/pi-agent/": "Scraped Pi documentation (extensions API, SDK, RPC, TUI) + ~60 example extensions and 12 SDK examples — the reference Dan built the harness from."
+    },
+    "generated_at_runtime": {
+      "deliberations/<slug>-<id>/conversation.jsonl": "Full from/to/message log of the meeting (meeting_start … turns … meeting_end).",
+      "deliberations/<slug>-<id>/tool-use.jsonl": "Every tool call by every agent (CEO + board), trimmed args.",
+      "deliberations/<slug>-<id>/*.svg": "Board members' argument SVGs (e.g. revenue-exit-scenario-matrix.svg, moonshot-value-trajectory.svg, contrarian-assumption-risk-map.svg).",
+      "memos/<slug>-<id>/memo.md": "The output memo; the extension injects YAML front matter after the CEO writes it.",
+      "memos/<slug>-<id>/decision-framework.svg": "The CEO's final decision diagram.",
+      "memos/<slug>-<id>/summary.mp3": "The TTS audio summary (when ELEVENLABS_API_KEY is set).",
+      ".pi/agent-sessions/<id>/<member>.jsonl": "Per-member persistent Pi session for the meeting (isolates board sessions per deliberation)."
+    }
+  },
+  "current_practice_gaps": [
+    {
+      "gap": "Model versions are near-future placeholders that already drift",
+      "why": "The recording names Opus 4.6 / Sonnet 4.6 (CEO Opus, board Sonnet), GPT-5.4, Gemini 3.1 Pro, Sonnet 4.5. As of the book's build the current Claude line is Opus 4.8 / Sonnet 5 / Haiku 4.5 / Fable 5. The tactic is model-agnostic — what matters is 'a model that can maintain true long context.' Treat the exact version strings (and the 1M badge regex /claude-.*-4-6/) as period detail to update.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "1M context is now table stakes, not a headliner",
+      "why": "The lesson frames 1M TRUE context (flat price, graceful degradation) as a fresh unlock. By publish time long context at flat pricing is broadly available across labs. The pedagogy holds (long context is what enables whole-business expertise), but the 'no one else can do this' framing is a snapshot; verify the current retrieval-benchmark landscape before repeating it.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Two spec-vs-implementation gaps in v1 (parallel; contrarian-last)",
+      "why": "ceo.md says converse calls are 'sequential' but the code runs them in parallel (Promise.allSettled); README/prompts say 'Contrarian speaks last (enforced)' but end_deliberation uses config order. These are v1 realities a precise reader must know. A future version may implement sequential rounds or true ordering — re-check against the shipping code before teaching either as a guarantee.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Custom harness maturity (Pi) and portability",
+      "why": "The lesson is Pi-specific (extensions, subprocess spawn, TUI). The transferable claim — customize your harness down to the primitives — is durable, but Pi's API and Claude Code's own extensibility (plugins, hooks, subagents, the Agent SDK) move fast. The right frame for a modern reader: this pattern can be built on any harness that exposes tool registration + subprocess/session control.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Single-vendor demo vs the model-diversity ideal",
+      "why": "Dan says 'agent model diversity is super super important' but runs the demo all-Claude, citing other labs' lack of true long context. The shipped agents-multimodel config already wires cross-vendor models via OpenRouter. As more labs ship true long-context models, the diversity path becomes the default — update the recommendation accordingly.",
+      "yt_candidates": []
+    }
+  ],
+  "yt_overlay_candidates": [
+    {
+      "video_id": "TqjmTZRL31E",
+      "title": "Pi CEO Agents. Claude 1M Context. Multi-Agent Teams.",
+      "maps_to": "source video (not an overlay)",
+      "include_in_phase1": false,
+      "rationale": "This IS the lesson's public YouTube version. Listed for provenance; do not overlay it on its own chapter."
+    },
+    {
+      "video_id": null,
+      "title": "Pi coding agent vs Claude Code (the customizable-harness breakdown Dan links on-screen)",
+      "maps_to": "named hole — innovation 2 (customizable agent harness)",
+      "include_in_phase1": true,
+      "rationale": "Dan explicitly says on camera he will link the video breaking down 'Pi coding agent versus Claude Code' and the 'PyCoding Agent' opportunity. It directly expands the customizable-harness innovation. video_id must be sourced from the IndyDevDan channel and verified before publishing — no video fetching was performed in this pass."
+    },
+    {
+      "video_id": null,
+      "title": "Agent Experts / expertise-file pattern (Agentic Horizon)",
+      "maps_to": "named hole — innovation 3 (agent expertise)",
+      "include_in_phase1": false,
+      "rationale": "Dan references Agent Experts as a core Agentic Horizon topic and ties the expertise scratch-pad pattern to it (see book chapter ah-5-agent-experts). Map to the internal chapter first; only add an external overlay if a specific public video is identified and verified."
+    }
+  ],
+  "frame_plan_summary": "12 native-4K frames extracted to media/frames/ma-1-ceo-agents/ (7 JPEG q2, 5 PNG for dense VS Code text). Coverage: 1M retrieval chart, boot/roster/models, the CEO→board architecture diagram, config YAML, CEO agent front matter, Moonshot personality prompt, brief + brief library, parallel deliberation with vote tally, MAX-REACHED constraint stop, conversation.jsonl observability + generated SVGs, memo decision-map output, and the TTS closing-the-loop summary. See frame-plan.json for per-frame details.",
+  "estimated_print_pages_when_expanded": 46,
+  "confidence_notes": [
+    "Transcript is auto-generated with predictable garbles, corrected here against the codebase: 'Neutra/Neutral Holdings' = NutraHoldings (per brief.md + memos); 'Sonic model' = Sonnet model; 'Blendstack/Blend Stack' = BlendStack; '1 million contacts' = 1M context; 'just file' = justfile; 'J' = `just` alias; 'clock/cloud code' = Claude Code; 'Agentyc/Agenta Horizon' = Agentic Horizon; '11 Labs' = ElevenLabs; 'PyCoding Agent' = Pi coding agent; 'Outlook system' = out-loop system; 'Lama 4 Maverick' = Llama 4.",
+    "The two spec-vs-implementation gaps (parallel-not-sequential; contrarian-not-actually-last) were verified by reading apps/ceo/extensions/ceo-and-board.ts (converse uses Promise.allSettled; end_deliberation iterates activeMembers in config order with no reordering) against ceo.md, contrarian.md, and README claims. High confidence.",
+    "CEO model anthropic/claude-opus-4-6 and board default anthropic/claude-sonnet-4-6 verified in ceo.md front matter and config.ts default; multimodel model list verified in agents-multimodel/*.md.",
+    "Model version strings (Opus/Sonnet 4.6, GPT-5.4, Gemini 3.1 Pro) are as spoken/shown in a March-2026 recording and are near-future relative to the book's Opus 4.8 / Sonnet 5 baseline — flagged in current_practice_gaps; do not present as the latest.",
+    "Vote counts differ by run (on-screen TTS '5–1'; k8wlei memo '7–1'; ceo-scratch-pad session pnfofr '6–2'). This is expected non-determinism, documented in brief_to_memo.nondeterminism_note.",
+    "Timestamps are from the [HH:MM:SS] transcript, accurate to ~2–3s; video duration 2403s / 40:03 and 4K/AV1 confirmed via ffprobe.",
+    "All 12 frame files exist on disk at 3840x2160; the architecture-diagram and conversation.jsonl frames were visually spot-verified this session for legibility (both crisp).",
+    "yt_overlay_candidates: only the lesson's own video ID (TqjmTZRL31E) is confirmed; the two named-hole overlays have null IDs and MUST be sourced/verified from the IndyDevDan channel before publishing (no video fetching performed, per brief).",
+    "The clean SVG source diagrams also exist in the codebase (images/main/05-ceo-board-architecture.svg, 06-deliberation-flow.svg, 21-yaml-config-anatomy.svg, 42-brief-anatomy-to-memo-anatomy.svg) and can be embedded directly by the chapter as an alternative to the composited video frame."
+  ]
+}

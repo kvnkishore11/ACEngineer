@@ -1,0 +1,861 @@
+{
+  "lesson_key": "ah-1-rd-framework-context-window-mastery",
+  "title": "Elite Context Engineering",
+  "course": "AH",
+  "order": 9,
+  "lesson_url": "https://agenticengineer.com/tactical-agentic-coding/course/rd-framework-context-window-mastery",
+  "lesson_level_label": "Intermediate",
+  "video": {
+    "file": "ah-1-rd-framework-context-window-mastery/video/ah-1-rd-framework-context-window-mastery.mp4",
+    "duration_seconds": 4400,
+    "duration_display": "73:20",
+    "resolution": "1920x1080",
+    "fps": 15
+  },
+  "tactic": {
+    "name": "The R&D Framework — Reduce & Delegate",
+    "one_liner": "There are only two ways to manage your agent's context window — Reduce (strip context out of your primary agent) and Delegate (push context onto other agents) — because a focused agent is a performant agent.",
+    "why_uncomfortable": "It asks engineers to trade convenience for discipline. You must obsessively account for every token that enters an agent, and delete the conveniences you lean on: no default .mcp.json, a shrunk CLAUDE.md, no /compact. It replaces one-click habits with 'more work' — reset and prime instead of compact, plan-then-build across two agents instead of one long chat, own your context window instead of handing it to a tool. And it demands you stop thinking from your own perspective and adopt your agent's perspective. Dan says it plainly: 'This is not vibe coding.' The payoff is scale — but only if you do the unglamorous accounting first."
+  },
+  "central_law": "A focused agent is a performant agent (and a focused engineer is a performant engineer). Context is a critical in-agent leverage point that determines how an agent performs at any given task.",
+  "mission": "Master context engineering so you can scale the intelligence you deploy both in-loop and out-of-loop. When you obsessively manage the context going into your agents — aligning the right model, prompt, and tools with the right RANGE of context — you hit the 'core four bullseye' over and over across hundreds and thousands of agent executions. That raises your agentic-coding KPIs and lets your ADWs (AI Developer Workflows) ship on your behalf. The endgame: one-shot out-loop agentic coding in a massive streak with the fewest attempts, so you can drop your presence.",
+  "rd_framework": {
+    "the_two_ways": "When you boil it down, there are only two ways to manage your context window: R and D — Reduce and Delegate. Every one of the 12 techniques fits into one or both buckets.",
+    "reduce": "Remove junk context, minimize token usage, keep only what matters entering your PRIMARY agent's context window. Techniques: measure (/context + tokenizer), delete default MCP servers, prime instead of CLAUDE.md, control output tokens with output styles, reset-and-prime instead of /compact, and the append-system-prompt read-in-increments trick.",
+    "delegate": "Offload work off your primary agent's context window onto other context windows — sub-agents (partially forked, system-prompt isolated), a separate builder agent, persisted context bundles, and independent primary agents fired in the background. Techniques: sub-agents, architect/editor split, context bundles, primary multi-agent delegation, agent experts.",
+    "search_and_destroy": "Adding the right context is the easy part. The real skill is finding context agentically, then removing and delegating it so it doesn't create context rot and context bloat. 'Search and destroy is the real skill in context engineering.'",
+    "core_four_bullseye": "Context engineering exists to hit the 'core four bullseye' — the right MODEL + PROMPT + TOOLS aligned with the right RANGE of CONTEXT (the sweet spot). Hitting it consistently at scale is what raises agentic-coding KPIs."
+  },
+  "four_levels": {
+    "note": "Three visible levels of context engineering plus a fourth hidden level for engineers pushing into agentic engineering. Techniques stack: each level assumes mastery of the ones below it.",
+    "beginner": "Measure to manage; avoid MCP-server bloat; context priming over CLAUDE.md. (Techniques 1-3)",
+    "intermediate": "Control output tokens with output styles; use sub-agents properly; the architect/editor (planner/builder) split. (Techniques 4-6)",
+    "advanced": "Avoid /compact — reset and prime; context bundles; one agent for one purpose. (Techniques 7-9)",
+    "agentic": "Modify the system prompt; primary multi-agent delegation; agent experts. Dan: 'Many engineers will not get to this level. Many engineers don't need this level.' This is where patterns scale into your ADWs. (Techniques 10-12)"
+  },
+  "core_four_reference": {
+    "what": "Builds directly on TAC-1's core four: context, model, prompt, tools. This lesson zooms into the CONTEXT element.",
+    "context_as_leverage": "Context is a critical in-agent leverage point. There is a sweet spot — a range of context where an agent performs at its maximum possible capability for the task at hand. Overshoot and you get context rot/bloat; undershoot and the agent lacks what it needs.",
+    "why_it_scales": "As you scale to hundreds and thousands of agent executions (in ADWs), hitting the context sweet spot consistently becomes even more important. Wasted context compounds: one preloaded MCP config wasting ~24k tokens across five agents/hour is ~25% of a whole context window wasted."
+  },
+  "core_concepts": [
+    {
+      "id": "focused-agent-performant-agent",
+      "name": "A focused agent is a performant agent",
+      "plain_english": "The load-bearing law of the whole lesson, repeated like a mantra (opening, ~27:26, ~32:34, ~41:41, ~42:55, sign-off). An agent with a clean, task-scoped context window makes better, more surgical decisions than one carrying a bloated, half-relevant window. Focus is not a nicety; it is the mechanism of performance.",
+      "dan_words": "\"A focused engineer is a performant engineer AND a focused agent is a performant agent.\"",
+      "misconception": "That focus means 'less capable.' The opposite: a focused agent has more usable space, less distraction, and a higher chance of one-shotting the task. Focus buys performance, not just savings."
+    },
+    {
+      "id": "context-window-precious-temporal",
+      "name": "The context window is a precious, renewable, but limited temporal resource",
+      "plain_english": "The context window is ephemeral — it resets, it's alive for only a certain amount of time, and the state inside it is what determines success. Because it determines success, you must measure it so you can improve it. It is 'the single most important leverage point for effective agentic coding.'",
+      "dan_words": "\"Your agent's context window is a precious, renewable, but limited temporal resource... The context window is the single most important leverage point for effective agentic coding.\"",
+      "misconception": "Treating the context window as infinite/free background plumbing. It is finite (e.g., ~200k tokens), expensive (Opus tokens), and temporal — every token you waste is work the agent can no longer do."
+    },
+    {
+      "id": "context-sweet-spot",
+      "name": "The context sweet spot",
+      "plain_english": "There is a RANGE of context where your agent performs at maximum capability for the task at hand — not too little, not too much. Context engineering is the practice of landing inside that range on purpose, over and over, especially at scale.",
+      "dan_words": "\"There's a sweet spot, a range of context where your agent performs to its maximum possible capability for the task at hand. As you scale up to hundreds and thousands of agent executions, hitting this sweet spot consistently becomes even more important.\"",
+      "misconception": "That 'more context is always better.' Language models lose capability as the context grows (an attention-mechanism problem); overshooting the sweet spot degrades performance just like undershooting it."
+    },
+    {
+      "id": "measured-gets-managed",
+      "name": "What gets measured gets managed",
+      "plain_english": "You cannot manage a resource you don't measure. The two measurement tools: /context (what's already in the window) and a token counter/tokenizer in your IDE (what you're about to add). If you never run /context, you won't know you've already burned 31% of your window on boot.",
+      "dan_words": "\"Whenever you have a resource that determines your success, you must measure it so you can improve it... What gets measured gets managed. So measure your context window.\"",
+      "misconception": "That you can eyeball context health. Dan shows a fresh boot already at 63k/200k (31%) — invisible unless you run /context."
+    },
+    {
+      "id": "adopt-agents-perspective",
+      "name": "Adopt your agent's perspective",
+      "plain_english": "To manage context you must stop seeing from your perspective and see from your agent's. What does THIS agent have in its window right now? What will this file cost it? Awareness of each agent's state inside your pipelines is what separates context engineering from vibe coding.",
+      "dan_words": "\"With every agent we create, we must adopt their perspective to maximize their impact... To push further, you must learn to see from your agent's perspective.\"",
+      "misconception": "That prompting well is enough. Without adopting the agent's perspective you can't tell whether a great prompt is landing in a clean window or a rotting one."
+    },
+    {
+      "id": "context-rot-bloat",
+      "name": "Context rot and context bloat",
+      "plain_english": "As you stack prompts, memory files, and MCP servers, the window fills with context that isn't relevant to the current task (bloat) and, worse, with stale or contradictory context (rot). Both degrade the agent. The fix is to reduce and delegate before the window rots.",
+      "dan_words": "\"The real trick is finding the context agentically and then removing and delegating context so that it doesn't end up creating context rot and context bloat.\"",
+      "misconception": "That bloat is only a cost problem. The worst case is contradictory context inside the window, which actively steers the agent away from the outcome you want."
+    },
+    {
+      "id": "in-loop-out-loop-zte",
+      "name": "In-loop to out-of-loop to ZTE",
+      "plain_english": "Context engineering is what lets you leave the loop. In-loop you prompt and watch; out-of-loop you fire agents that run without you; ZTE (zero-touch engineering) is the far end. Every technique that reduces or delegates context is preparation for out-loop agentic coding, where no single agent should overflow and trigger a /compact you can't predict.",
+      "dan_words": "\"This is a big theme in TAC. We want to scale from in-loop to out-loop to ZTE... For this to work at high levels across hundreds of agent executions, you need specialized agents; you know what the context will be.\"",
+      "misconception": "That out-loop scaling is about firing more prompts faster. It's about making each agent's context so predictable and focused that it reliably one-shots without you present."
+    },
+    {
+      "id": "better-agents-or-more-agents",
+      "name": "Better agents or more agents",
+      "plain_english": "Two axes of improvement. Making a single agent BETTER = mastering its context window (Reduce). Adding MORE agents = delegation to the max, one agent for one purpose (Delegate). When something goes wrong, you fix that one piece of the workflow.",
+      "dan_words": "\"The focus should always be: better agents or more agents? When you're adding more agents, you're pushing into the D, the delegation, and the R and D framework. You're pushing it to the max.\"",
+      "misconception": "That you scale by making one agent do everything. You scale by making each agent do one thing well and composing them into a pipeline."
+    },
+    {
+      "id": "spend-dont-just-save",
+      "name": "It's not about saving tokens — it's about spending them properly",
+      "plain_english": "Context engineering is not penny-pinching. You manage the window so you don't waste time and tokens correcting the agent's mistakes. The goal is one-shot out-loop agentic coding in a long streak with the fewest attempts and the largest sizes — so you can drop your presence.",
+      "dan_words": "\"It's not necessarily about saving tokens. It's about spending them properly. We manage our context window so that we don't waste time and tokens correcting our agents' mistakes.\"",
+      "misconception": "That the lesson is about cost-cutting. It's about reliability and scale; the token savings are a side effect of focus."
+    },
+    {
+      "id": "context-engineering-safe-bet",
+      "name": "Context engineering is a safe bet",
+      "plain_english": "There are scaling laws inside these models that decrease performance as the context window grows. That means investing your engineering time in context management is a bet that pays off regardless of which model you use or how big windows get. Prompt engineering matters too — bad prompts waste even a perfect context.",
+      "dan_words": "\"You can safely bet on spending your engineering time, energy, and resources on investing in great context management, in great context engineering. It's a safe bet to bet on context engineering.\"",
+      "misconception": "That bigger future context windows will make this obsolete. Bigger windows help, but the attention/performance-vs-length problem persists — better effective context is the real frontier."
+    }
+  ],
+  "twelve_techniques": [
+    {
+      "n": 1,
+      "name": "Measure to Manage",
+      "level": "Beginner",
+      "framework": "Foundation for R&D",
+      "one_liner": "You can't manage what you don't measure — use /context and an IDE token counter.",
+      "plain_english": "Two tools. /context prints exactly what your agent will process on every prompt (system prompt, system tools, MCP tools, custom agents, memory files, messages, free space). A tokenizer extension in your IDE estimates a file's token cost BEFORE it enters context. On camera a fresh boot is already at 63k/200k (31%) with a token counter showing the README at ~2,650 tokens.",
+      "how_in_codebase": "Run `claude`, then `/context`. The README (~2,650 tokens per the on-screen counter) is a high-touch file agents read often. This technique underlies every other one.",
+      "dan_words": "\"You can type slash context and see all the context in our agent's context window. This is your most important tool for measuring and therefore managing your context window.\"",
+      "misconception": "That you can feel context health without measuring it. You can't — 31% was already gone at boot, invisible without /context.",
+      "timestamp": "3:33-5:29",
+      "frame": "t0266"
+    },
+    {
+      "n": 2,
+      "name": "Avoid MCP Servers (when you don't need them)",
+      "level": "Beginner",
+      "framework": "Reduce",
+      "one_liner": "Don't preload MCP servers — a default .mcp.json can silently eat 10-12% of your window.",
+      "plain_english": "MCP tools load into context on startup. In the demo MCP tools consumed 24.1k tokens (~12% of a 200k window) before any work. Delete default project .mcp.json files; avoid global (user/local) MCP servers. Start with none, then load exactly the server you need with `claude --mcp-config <file>`; add `--strict-mcp-config` to override globals for that one instance. Dan keeps a self-fixed firecrawl config (~4-6k tokens) so he knows the cost up front.",
+      "how_in_codebase": "The repo ships .mcp.json samples (.mcp.json.sample = playwright + firecrawl; .mcp.json.firecrawl_7k.sample = firecrawl only; .mcp.json.all_16k.sample = both). settings.local.concise.json only enables firecrawl-mcp. Command shown: `claude --mcp-config .mcp.json --strict-mcp-config`. README documents the three MCP scopes (local/user/project).",
+      "dan_words": "\"Do not load MCP servers unless you need them... this is 12% of the entire available context window. It's very likely you're wasting tokens with MCP servers you're not actively using... The first thing I recommend doing is get rid of this .mcp.json.\"",
+      "misconception": "That preloaded MCP servers are free convenience. They cost tokens on every agent instance you boot — five agents/hour at ~24k each is ~25% of a window wasted.",
+      "timestamp": "5:50-9:26",
+      "frame": "t0505"
+    },
+    {
+      "n": 3,
+      "name": "More Prime, Less CLAUDE.md",
+      "level": "Beginner",
+      "framework": "Reduce",
+      "one_liner": "Prefer context priming (reusable slash commands) over an always-on memory file.",
+      "plain_english": "CLAUDE.md is incredible AND terrible for the same reason: it's ALWAYS loaded. Engineering work changes constantly, but the memory file only grows — eventually bloated with irrelevant and even contradictory context. Claude Code even warns 'Large CLAUDE.md will impact performance.' The demo's CLAUDE.large.md is a deliberately bloated 2,978-line anti-pattern (~23.7k tokens, 11.8%). Shrink CLAUDE.md to only the absolute universals you're 100% sure you want loaded 100% of the time (the concise version is 43 lines / ~350 tokens / 0.2%), and instead PRIME: use a dedicated reusable slash command to set up the initial context for the specific task type.",
+      "how_in_codebase": "CLAUDE.md / CLAUDE.concise.md (43 lines) vs CLAUDE.large.md (2,978 lines, the anti-pattern). /prime (git ls-files, read README, report) and /prime_cc (runs /prime, then reads .claude/commands/**, output-styles/**, context_bundle_builder.py, settings.json). Priming replaces the always-on file; after cleanup /context shows 92% free.",
+      "dan_words": "\"Context priming is when you use a dedicated reusable prompt, AKA a custom slash command, to set up your agent's initial context window specifically for the task type at hand... So prime, don't default.\"",
+      "misconception": "That CLAUDE.md is the 'right' place for all project knowledge. Its always-on nature is the trap; prime dynamically and keep the memory file to true universals only.",
+      "timestamp": "9:26-16:12",
+      "frame": "t0786"
+    },
+    {
+      "n": 4,
+      "name": "Control Output Tokens",
+      "level": "Intermediate",
+      "framework": "Reduce",
+      "one_liner": "Output tokens cost 3-5x input tokens and re-enter context — cap them with output styles.",
+      "plain_english": "Output tokens are the most expensive part of an agent (priced ~3-5x input) and Claude Code's responses to you get added back into context. You can't control tokens spent writing files, but you CAN control the response style. Output styles hot-swap the output-style block in Claude Code's system prompt. A one-word 'Done.' style turns a ~150-token status reply into a 2-token 'Done.' — a ~99% reduction on that response. Exceptions: questions and errors still get concise real answers.",
+      "how_in_codebase": ".claude/output-styles/: concise-done.md ('One Word Output' → respond only 'Done.'), concise-ultra.md ('Ultra Concise'), concise-tts.md ('TTS Summary'), verbose-bullet-points.md, verbose-yaml-structured.md. settings.local.concise.json sets outputStyle: 'One Word Output'. Selected via /output-style menu.",
+      "dan_words": "\"Output tokens are priced anywhere from three to five X the price of your input tokens... It effectively swaps the output style block in the system prompt of Claude Code... we have reduced our token usage here down from 150. This is some massive 99% reduction.\"",
+      "misconception": "That trimming a chat reply is trivial. At one agent it is; across tens/hundreds of prompts and agents the compounding output savings are large — and output tokens are your most expensive tokens.",
+      "timestamp": "16:27-22:24",
+      "frame": "t1085"
+    },
+    {
+      "n": 5,
+      "name": "Use Sub-Agents — Properly",
+      "level": "Intermediate",
+      "framework": "Delegate",
+      "one_liner": "Sub-agents are partially forked context windows — their system prompts don't hit your primary window.",
+      "plain_english": "A sub-agent's definition is a SYSTEM prompt, not a user prompt, so custom agents cost only ~122 tokens in your primary window even though the sub-agent itself may burn thousands doing work. That's delegation (the D): the sub-agent chews its own context (e.g., a web scrape) and returns a concise report to your PRIMARY agent — not to you. Caveat: you now must track the core four of every agent you spawn. If you're losing track of a single agent's context, you're not ready for sub-agents yet.",
+      "how_in_codebase": ".claude/agents/: docs-scraper.md (firecrawl/WebFetch → writes ai_docs/*.md), research-docs-fetcher.md (research-agent), meta-agent.md (generates new sub-agents). /load_ai_docs reads ai_docs/README.md (10-11 URLs) and fires docs-scraper sub-agents in parallel via the Task tool; each ~3k tokens stays OFF the primary window. /context shows Custom agents at only 122 tokens (0.1%).",
+      "dan_words": "\"When you use Claude Code sub-agents, you are effectively creating a partially forked context window... This is a system prompt, which is nice because it means it's not directly added to our primary agent's context window... We're leveraging the context windows of our sub-agents to do work and keep it out of our primary agent.\"",
+      "misconception": "That sub-agents are just 'more agents' with no downside. Each adds a core four you must track, and the information flow (primary prompts sub, sub replies to primary) must stay clean.",
+      "timestamp": "22:41-28:08",
+      "frame": "t1492"
+    },
+    {
+      "n": 6,
+      "name": "Architect / Editor (Planner / Builder)",
+      "level": "Intermediate",
+      "framework": "R&D (Reduce via Delegation)",
+      "one_liner": "One agent plans, a fresh agent builds — the builder gets a clean window for surgical edits.",
+      "plain_english": "A classic prompt-chaining pattern that scales into the age of agents: an architect/planner gathers context and writes a spec (it's SUPPOSED to waste tokens finding the right context — that's its job), then a separate editor/builder reads only the spec and implements with a laser-focused window. 'You go overboard planning, then delete.' The builder needs no context priming — everything it needs is in the plan.",
+      "how_in_codebase": "/quick-plan (allowed-tools Read/Write/Edit/Glob/Grep; writes specs/<name>.md; pinned to a course-era Opus model id) is the architect. /build (reads PATH_TO_PLAN, implements, reports git diff --stat) is the editor. Demo builds apps/cc_ts_wrapper (types.ts, core.ts, cli.ts) — a 3-file Claude Code TypeScript SDK wrapper — from the plan.",
+      "dan_words": "\"You have a planner and a builder, an architect and an editor... especially for your implementer, you want their context focused so they can make surgical, perfect, error-free edits... By the end of your planning phase, you should be deleting information that isn't relevant to the work you want done. You should go overboard, then delete.\"",
+      "misconception": "That prompt-chaining inside one chat window is equivalent. Stacking prompts in a single agent causes context rot with every non-focused prompt; splitting responsibilities keeps the builder's window clean.",
+      "timestamp": "28:46-33:00",
+      "frame": "t1790"
+    },
+    {
+      "n": 7,
+      "name": "Avoid /compact — Reset and Prime",
+      "level": "Advanced",
+      "framework": "Reduce",
+      "one_liner": "/compact is a bandaid that leaves an unknown window — /clear then /prime instead.",
+      "plain_english": "After /compact runs, do you know exactly what's in your window? No — you have to Ctrl-R and reread the summary. /compact is great engineering by the Claude Code team, but it's a bandaid for the real problem (the window grew too large). Don't delegate control of your context window to any tool or team. Instead: /clear (blow it away completely), then /prime to reload exactly the context you want. You trade a little work for certainty — and it prepares you for out-loop coding, where no single agent should overflow 200k and trigger a /compact you can't predict. If it would, chop up the task.",
+      "how_in_codebase": "Contrast /compact (Claude Code built-in) with /clear + /prime (or /prime_cc). The demo shows the builder's cc_ts_wrapper report, then /compact 'Compacting conversation…', and Dan recommends /clear + prime instead.",
+      "dan_words": "\"After compact runs, do you know exactly what's in your context window every single time? The answer is no... Instead of compacting, I recommend you run slash clear. Blow away the context window completely. Now reset with slash prime.\"",
+      "misconception": "That /compact is a free fix. It hands control of your window to a summarizer; you lose the guarantee of knowing your exact state, which is fatal for out-loop scale.",
+      "timestamp": "33:47-36:33",
+      "frame": "t2050"
+    },
+    {
+      "n": 8,
+      "name": "Use Context Bundles",
+      "level": "Advanced",
+      "framework": "Reduce (via delegated re-priming)",
+      "one_liner": "Hooks log an append-only trail so a fresh agent can remount ~70% of a prior agent's state.",
+      "plain_english": "Try to do what /compact does, but on YOUR terms. Claude Code hooks capture a trail of work — a per-session append-only JSONL log of prompts, reads (with limit/offset), and writes. When a window explodes, a fresh agent runs /load_bundle to deduplicate the reads and replay the previous agent's story — getting ~60-70% of where it was, without every detail. Selective: you often won't reload the whole bundle. It gives subsequent agents the fuller story of what happened and why.",
+      "how_in_codebase": ".claude/hooks/context_bundle_builder.py (PostToolUse Read|Write --type file_ops; UserPromptSubmit --type user_prompt) writes agents/context_bundles/<DAY_HOUR>_<session_id>.jsonl. /load_bundle <path> dedups and reads the most comprehensive version of each file. Wired via settings.json alongside universal_hook_logger.py (logs every hook event to agents/hook_logs/<session_id>/<hook>.jsonl).",
+      "dan_words": "\"What we have here is a simple append-only log of the work that our Claude Code instances are doing... This agent is now going to get the full story of the previous agent. It's going to deduplicate any read commands... this gets us 70% of where the previous agent was.\"",
+      "misconception": "That you should log every operation. Recording everything just overflows the next agent — the trimmed, deduped replay is the point.",
+      "timestamp": "37:11-41:00",
+      "frame": "t2345"
+    },
+    {
+      "n": 9,
+      "name": "Use One Agent for One Purpose",
+      "level": "Advanced",
+      "framework": "R&D",
+      "one_liner": "Ship one thing at a time — the natural limit of delegation, and the seed of ADWs.",
+      "plain_english": "The summary of everything before it. There's no better way to control a window than to give each agent a single purpose. It forces the question: what does the pipeline of agents look like for this work? You start problem-solving in two steps: (1) plan the work with NO regard for technology (users/customers first), then (2) plan how to delegate it across several agents, forming an agentic pipeline / AI Developer Workflow — the highest leverage in agentic coding. This is the key idea of TAC Lesson 6.",
+      "how_in_codebase": "Conceptual/summary technique — no single new file. It reframes techniques 1-8 as 'give each agent one job' and points forward to ADWs. (Chapter should render this as a designed pipeline diagram rather than a screenshot.)",
+      "dan_words": "\"Use one agent for one purpose so that your context windows are focused. A focused agent is a performant agent... First, you plan out the work you want done without regard for technology... Then you'll plan out how you'll delegate your work across several agents, forming an agentic pipeline, also known as an AI Developer Workflow.\"",
+      "misconception": "That one capable agent should own a whole feature. The natural limit of delegation is one agent, one purpose — composed into a pipeline.",
+      "timestamp": "41:28-43:01",
+      "frame": null
+    },
+    {
+      "n": 10,
+      "name": "Modify the System Prompt",
+      "level": "Agentic",
+      "framework": "Reduce",
+      "one_liner": "--append-system-prompt controls behavior at the deepest level (print mode only).",
+      "plain_english": "The system prompt controls Claude Code's behavior even more than output styles — you can override default behavior. Two knobs: --append-system-prompt (adds to the crafted default) and the SDK's customSystemPrompt (a full OVERWRITE — dangerous; the Claude Code team's default is top-tier, don't blow it away). Appending must run in print mode (-p / out-loop), not interactively. Demo instruction: 'ALWAYS read the Read tool in increments of 100 lines; if you've read enough, stop and proceed; if not, read another 100' — plus 'prefix your final message with ✅ or ❌.' The context bundle proves the agent obeyed: Read(100), Read(100). You've reduced the lines read (and tokens) by steering the read tool itself.",
+      "how_in_codebase": "CLI: `claude --dangerously-skip-permissions --model sonnet --append-system-prompt \"<read-in-100s + prefix ✅/❌>\" -p \"what is CLAUDE.large.md for?\"`. The context bundle for the run shows Read 100 / Read 100 operations. Points to the Claude Code SDK Mastery extended lesson for customSystemPrompt.",
+      "dan_words": "\"When you start modifying the system prompt, you can't run this in the loop... you have to run this in print mode... The system prompt really lets you start controlling how your agent behaves, and when you control the behavior, you control the context window... Do not use [customSystemPrompt] unless you know what you're doing.\"",
+      "misconception": "That the SDK's customSystemPrompt is the go-to. It overwrites the carefully crafted default system prompt — use --append-system-prompt unless you truly need a full replacement.",
+      "timestamp": "43:01-48:07",
+      "frame": "t2705"
+    },
+    {
+      "n": 11,
+      "name": "Primary Multi-Agent Delegation",
+      "level": "Agentic",
+      "framework": "Delegate",
+      "one_liner": "Fire independent primary agents (e.g. /background) — compute orchestrating compute.",
+      "plain_english": "Unlike sub-agents, primary agents are fully independent Claude Code instances with their own context, model, and settings — you get complete control. The most lightweight version is a reusable slash command that boots a background instance. It runs one prompt, does one thing, writes to a report file, and finishes — no babysitting. This is agents orchestrating agents, compute orchestrating compute, and it pushes you out-of-loop. Warning: it runs directly on your API keys.",
+      "how_in_codebase": ".claude/commands/background.md builds `claude --model <m> --output-format text --dangerously-skip-permissions --append-system-prompt \"<report-structure + rename to .complete.md/.failed.md>\" --print \"<USER_PROMPT>\"` with run_in_background=true, writing agents/background/background-report-<DAY_HH_MM_SS>.md. scripts/bg_claude_code_test.sh is the raw shell version. Demo: /background \"/quick-plan …\" builds a plan for a Python SDK wrapper; the report + context bundle track progress live.",
+      "dan_words": "\"We are kicking off a Claude Code instance from Claude Code. We have compute orchestrating compute, agents orchestrating agents... There's no reason for me to sit in the loop... the more your agentic engineering skill improves, the more you can stop babysitting every single agent instance.\"",
+      "misconception": "That background agents are the same as sub-agents. Primary delegation gives complete control (own model/settings/keys) and runs top-level instances — more power and more responsibility than sub-agents.",
+      "timestamp": "48:55-56:39",
+      "frame": "t3195"
+    },
+    {
+      "n": 12,
+      "name": "Agent Experts",
+      "level": "Agentic",
+      "framework": "R&D",
+      "one_liner": "Specialized plan/build/improve agents that own a codebase area and auto-update their own knowledge.",
+      "plain_english": "The culmination. Fire off specialized agents that are experts at specific parts of your codebase — and here's the kicker: have them auto-update their own knowledge. A three-step expert runs plan → build → improve. Plan and Build each carry a dedicated ## Expertise section (kept distinct from Purpose/Instructions/Workflow — don't conflate headers). After you implement, the Improve meta-agent looks at the git diff and updates the Expertise sections of the plan and build experts — self-documenting, self-improving. It's like encoding the one engineer who knows that feature better than anyone, then letting it maintain itself. This wraps straight back into an ADW (plan → build → improve → commit).",
+      "how_in_codebase": ".claude/commands/experts/cc_hook_expert/: cc_hook_expert_plan.md (reads ai_docs hooks/uv/slash-command guides, writes specs/experts/cc_hook_expert/<name>.md), cc_hook_expert_build.md (implements from spec, chmod +x, tests via echo JSON | uv run hook.py), cc_hook_expert_improve.md (git diff/log → updates ONLY the ## Expertise sections, never the Workflow). Demo builds the universal_hook_logger.py (agents/hook_logs/<session_id>/<hook>.jsonl) and the improve step folds the learnings back in.",
+      "dan_words": "\"You fire off specialized agents that are experts at specific parts of your codebase, and here's the kicker, you have them auto-update their own knowledge. This is the agent experts technique... We have a dedicated section built for this. We're following great agentic prompt engineering. We're not conflating our headers.\"",
+      "misconception": "That an expert is just a big prompt. The differentiator is the self-improving loop (improve reads the git diff and updates the dedicated Expertise section) — a maintained, encoded specialist rather than a static command.",
+      "timestamp": "56:39-68:00",
+      "frame": "t3485"
+    }
+  ],
+  "future_trends": [
+    {
+      "trend": "Larger context windows",
+      "why": "Obvious and self-explanatory — more context to get around the /compact problem. Bet on it, but don't wait for it."
+    },
+    {
+      "trend": "Better (more effective) context windows",
+      "why": "Models lose capability as context grows — an attention-mechanism problem. Big labs will focus on better EFFECTIVE context, not just bigger. This is the real frontier and why context engineering is a safe bet."
+    },
+    {
+      "trend": "Hot-swapped context windows",
+      "why": "Hot swapping tools, context, and the system prompt (like output styles already hot-swap the output-style block). Swap different contexts in/out per user/assistant/tool/system message, and delete context to free the window."
+    },
+    {
+      "trend": "Multi-agent architectures for agent delegation",
+      "why": "Sub-agents and primary-agent delegation become standard building blocks; if you're on the edge you're already doing this (and using TAC to get there faster)."
+    },
+    {
+      "trend": "Specialized agents everywhere",
+      "why": "Plug into the Claude Code SDK and other agent SDKs and specialize every element — context, model, prompt, tools — to deliver unique experiences. 'What's better than an agent? Many focused, specialized agents.'"
+    }
+  ],
+  "step_by_step_demo": [
+    "(0:16-3:00) Cold open: 'A focused agent is a performant agent.' Context engineering is the name of the game. Adopt your agent's perspective; there's a context sweet spot. Search and destroy is the real skill. The R&D framework: only two ways to manage a window — Reduce and Delegate.",
+    "(3:33-5:29) TECHNIQUE 1 — Measure: run `claude`, then `/context`. A fresh boot is already 63k/200k (31%). Install a tokenizer; the README shows ~2,650 tokens. 'What gets measured gets managed.' Without /context you're vibe coding.",
+    "(5:50-9:26) TECHNIQUE 2 — Avoid MCP: /context shows MCP tools at 24.1k (12%). Delete the default .mcp.json. Reboot: window cleared. Load just what you need with `claude --mcp-config .mcp.json.firecrawl_4k` (and `--strict-mcp-config` to override globals) → MCP drops to ~6.5k.",
+    "(9:26-16:12) TECHNIQUE 3 — Prime > CLAUDE.md: a bloated CLAUDE.large.md triggers 'Large CLAUDE.md will impact performance' and eats 23.7k (11.8%). Swap to the 43-line concise CLAUDE.md → memory files fall to 358 tokens (0.2%), /context shows 92% free. Then /prime (and /prime_cc) to load task-specific context on demand. Teaser: the new experts/ directory.",
+    "(16:27-22:24) TECHNIQUE 4 — Output styles: output tokens cost 3-5x and re-enter context. Two terminals: one on the 'One Word Output' style says only 'Done.' (2 tokens); default says ~150. /output-style lists Default, Explanatory, Learning, Ultra Concise, One Word Output, TTS Summary, Bullet Points, YAML Structured. Output styles hot-swap the output-style block in the system prompt.",
+    "(22:41-28:08) TECHNIQUE 5 — Sub-agents: custom agents cost only 122 tokens in /context (they're system prompts). /load_ai_docs reads ai_docs/README.md, deletes docs older than 24h, and fires docs-scraper sub-agents in parallel (~3k each) OFF the primary window. Delegation = the D.",
+    "(28:46-33:00) TECHNIQUE 6 — Architect/Editor: /quick-plan (Opus) writes a spec for a 3-file Claude Code TypeScript SDK wrapper while a fresh /build agent (right terminal) waits. Planner over-gathers, then the builder implements from the plan with a clean window → apps/cc_ts_wrapper runs.",
+    "(33:47-36:33) TECHNIQUE 7 — Avoid /compact: after the build, /compact 'Compacting conversation…' leaves an unknown window (Ctrl-R to reread). Recommendation: /clear then /prime — own your window; prepare for out-loop where no agent should overflow 200k.",
+    "(37:11-41:00) TECHNIQUE 8 — Context bundles: open agents/context_bundles/<DAY_HOUR>_<session_id>.jsonl — an append-only log of prompts/reads/writes built by a PostToolUse hook. Re-run /prime and watch entries append. A fresh agent runs /load_bundle to dedup and replay ~70% of the prior agent's state.",
+    "(41:28-43:01) TECHNIQUE 9 — One agent, one purpose: the summary technique. Plan the work without regard for technology, then plan the agent pipeline (the ADW). A focused agent is a performant agent.",
+    "(43:01-48:07) TECHNIQUE 10 — System prompt: `claude --dangerously-skip-permissions --model sonnet --append-system-prompt \"read in 100-line increments … prefix final message with ✅/❌\" -p \"what is CLAUDE.large.md for?\"`. The context bundle proves it: Read(100), Read(100). Must run in print mode.",
+    "(48:55-56:39) TECHNIQUE 11 — Primary delegation: /background boots an independent Claude Code instance (its own --append-system-prompt with report structure), writing agents/background/background-report-<time>.md and renaming to .complete.md/.failed.md. Compute orchestrating compute; out-of-loop, no babysitting.",
+    "(56:39-68:00) TECHNIQUE 12 — Agent experts: /experts:cc_hook_expert:cc_hook_expert_plan → _build → _improve. Plan writes a spec; a fresh agent builds the universal_hook_logger.py; improve reads the git diff and updates ONLY the dedicated ## Expertise sections. Self-documenting, self-improving; wraps into an ADW.",
+    "(68:00-73:13) Recap + future: it's not about saving tokens, it's about spending them properly — one-shot out-loop streaks so you can drop your presence. Future bets: larger windows, better effective windows, hot-swapped context, multi-agent architectures, specialized agents everywhere. Prompt engineering still matters (see the Agentic Prompt Engineering and Claude Code SDK Mastery extended lessons). 'A focused agent is a performant agent.'"
+  ],
+  "quotes": [
+    {
+      "text": "A focused engineer is a performant engineer AND a focused agent is a performant agent.",
+      "approx_timestamp": "0:16",
+      "source": "README + transcript (repeated as the lesson's refrain)"
+    },
+    {
+      "text": "Your agent's context window is a precious, renewable, but limited temporal resource.",
+      "approx_timestamp": "3:12"
+    },
+    {
+      "text": "The context window is the single most important leverage point for effective agentic coding.",
+      "approx_timestamp": "3:33"
+    },
+    {
+      "text": "Search and destroy is the real skill in context engineering.",
+      "approx_timestamp": "2:41"
+    },
+    {
+      "text": "When you boil it down, there are only two ways to manage your context window, R and D. Reduce and delegate.",
+      "approx_timestamp": "2:55"
+    },
+    {
+      "text": "What gets measured gets managed. So measure your context window.",
+      "approx_timestamp": "5:25"
+    },
+    {
+      "text": "If you aren't actively paying attention to the state of your agent's context, you're just vibe coding, and you'll only be able to tackle the lowest hanging fruit.",
+      "approx_timestamp": "5:13"
+    },
+    {
+      "text": "Do not load MCP servers unless you need them... it's very likely you're wasting tokens with MCP servers you're not actively using.",
+      "approx_timestamp": "5:50"
+    },
+    {
+      "text": "The CLAUDE.md file is incredible for one reason: it's a reusable memory file that's always loaded. Simultaneously, it's terrible for the exact same reason.",
+      "approx_timestamp": "13:35"
+    },
+    {
+      "text": "So prime, don't default. Your CLAUDE.md file should be shrunk to contain only the absolute universal essentials that you're 100% sure you want loaded 100% of the time.",
+      "approx_timestamp": "14:55"
+    },
+    {
+      "text": "Output tokens are priced anywhere from three to five X the price of your input tokens.",
+      "approx_timestamp": "16:37"
+    },
+    {
+      "text": "When you use Claude Code sub-agents, you are effectively creating a partially forked context window.",
+      "approx_timestamp": "22:55"
+    },
+    {
+      "text": "There's only two ways to manage your context window: reduce context entering your primary agent, and delegate context to sub-agents and to other primary agents.",
+      "approx_timestamp": "26:20"
+    },
+    {
+      "text": "By the end of your planning phase, you should be deleting information that isn't relevant to the work you want done. You should go overboard, then delete.",
+      "approx_timestamp": "32:10"
+    },
+    {
+      "text": "When you get to advanced agentic coding, it's time to stop guessing and start knowing. I avoid compact and I recommend that you reset and prime.",
+      "approx_timestamp": "34:14"
+    },
+    {
+      "text": "You don't want to delegate the control of your context window. You want to own this, just like you want to control your prompt or your model.",
+      "approx_timestamp": "36:00"
+    },
+    {
+      "text": "Use one agent for one purpose so that your context windows are focused. A focused agent is a performant agent.",
+      "approx_timestamp": "42:50"
+    },
+    {
+      "text": "The system prompt really lets you start controlling how your agent behaves, and when you control the behavior, you control the context window.",
+      "approx_timestamp": "45:40"
+    },
+    {
+      "text": "We are kicking off a Claude Code instance from Claude Code. We have compute orchestrating compute, agents orchestrating agents. This is where everything is headed. Better agents, and then more agents.",
+      "approx_timestamp": "52:10"
+    },
+    {
+      "text": "You fire off specialized agents that are experts at specific parts of your codebase, and here's the kicker, you have them auto-update their own knowledge. This is the agent experts technique.",
+      "approx_timestamp": "57:34"
+    },
+    {
+      "text": "It's not necessarily about saving tokens. It's about spending them properly. We manage our context window so that we don't waste time and tokens correcting our agents' mistakes.",
+      "approx_timestamp": "68:38"
+    },
+    {
+      "text": "It's a safe bet to bet on context engineering.",
+      "approx_timestamp": "70:00"
+    },
+    {
+      "text": "A focused agent is a performant agent.",
+      "approx_timestamp": "73:08",
+      "source": "sign-off"
+    }
+  ],
+  "prerequisites_tools": [
+    "Claude Code (with a Claude plan or API funds; the agentic-level techniques bill directly on your API key)",
+    "A terminal + an IDE with a token-counter/tokenizer extension (Dan uses VS Code with a token counter in the status bar)",
+    "Git (the agent-experts improve step and background reports rely on git diff/status)",
+    "Python + UV (Astral) — hooks run as `uv run` single-file scripts",
+    "Bun (for the TypeScript SDK wrapper app apps/cc_ts_wrapper)",
+    "Optional MCP servers loaded on demand (e.g. Firecrawl) — NOT preloaded",
+    "Recommended prior lessons: TAC (core four, ADWs, Lesson 6 'one agent for one purpose', Lesson 8 multi-agent); the Agentic Prompt Engineering and Claude Code SDK Mastery extended lessons"
+  ],
+  "what_student_must_internalize": [
+    "A focused agent is a performant agent — focus is the mechanism of performance, not a nicety.",
+    "There are only two moves: Reduce (strip context out of your primary agent) and Delegate (push it onto other agents). Every technique is one or both.",
+    "Measure before you manage: /context for what's in the window, a tokenizer for what you're about to add. A fresh boot can already be 31% full.",
+    "Context has a sweet spot; more is not better. Models lose capability as context grows.",
+    "Adopt your agent's perspective — reason about THIS agent's window, not your own convenience.",
+    "Own your context window; never hand its control to a tool (/compact) or a memory file (bloated CLAUDE.md). Prime, don't default.",
+    "Output tokens cost 3-5x and re-enter context — cap them with output styles.",
+    "Sub-agents are partially forked (system-prompt-isolated) context windows; primary delegation gives you independent instances. Both are the D.",
+    "Every technique prepares you for out-loop agentic coding and ADWs — one agent, one purpose, composed into a pipeline.",
+    "It's not about saving tokens; it's about spending them properly so you one-shot and can drop your presence. This is not vibe coding — you have to invest."
+  ],
+  "common_weak_student_failures": [
+    "Never running /context — managing a window you can't see, then blaming the model when a bloated boot state degrades results.",
+    "Leaving a default .mcp.json (or global MCP servers) loaded 'just in case,' silently paying ~10-12% of the window on every agent you boot.",
+    "Growing CLAUDE.md forever until it's a contradictory 3,000-line glob, and reading the 'Large CLAUDE.md will impact performance' warning as noise instead of a signal to prime.",
+    "Reaching for /compact reflexively and never knowing their exact window state — fatal the moment they try to scale out-of-loop.",
+    "Spawning sub-agents before they can keep track of a single agent's context, then losing the flow of information (who prompts whom, who reports to whom).",
+    "Prompt-chaining inside one chat window instead of splitting architect/editor, causing context rot with every non-focused prompt.",
+    "Treating output-style/token savings as trivial at one-agent scale and missing how they compound across hundreds of agents.",
+    "Jumping to the agentic level (system-prompt overrides, primary delegation, experts) without mastering the beginner/intermediate levels first — patterns then scale their mess into ADWs.",
+    "Using the SDK's customSystemPrompt (full overwrite) instead of --append-system-prompt, blowing away Claude Code's carefully crafted default.",
+    "Building an 'expert' as a static mega-prompt and skipping the improve step, so it never self-updates and rots like any other memory file."
+  ],
+  "teach_back_prompt": "Explain to a colleague, without notes: (1) state the R&D framework and sort at least six of the 12 techniques into Reduce vs Delegate; (2) name the two tools for measuring context and what a fresh /context boot revealed on camera (numbers ok to approximate); (3) explain why a bloated CLAUDE.md is 'incredible and terrible for the same reason,' and what to do instead; (4) explain why sub-agents only cost ~122 tokens in the primary window; (5) explain why Dan avoids /compact and what he does instead; and (6) describe the agent-experts plan/build/improve loop and what makes it self-improving. Finish by resolving the paradox: how is spending MORE effort on context engineering (reset-and-prime, plan-then-build, maintain experts) the thing that lets you do LESS babysitting and drop your presence?",
+  "retrieval_questions": [
+    {
+      "q": "What does R&D stand for, and what's the claim about it?",
+      "a": "Reduce and Delegate — the only two ways to manage a context window; every technique fits one or both buckets."
+    },
+    {
+      "q": "Name the two tools for measuring context and what each shows.",
+      "a": "/context (exact breakdown already in the window — system prompt, tools, MCP, agents, memory, messages, free space) and an IDE token counter/tokenizer (a file's token cost BEFORE it enters context)."
+    },
+    {
+      "q": "Roughly how much of the window did MCP tools consume in the demo, and how do you load only what you need?",
+      "a": "~24.1k tokens (~12%). Delete the default .mcp.json and use `claude --mcp-config <file>` (add `--strict-mcp-config` to override global servers)."
+    },
+    {
+      "q": "Why is CLAUDE.md 'incredible and terrible for the same reason'?",
+      "a": "Because it's always loaded. Great for guaranteed universals; terrible because it only grows and eventually carries irrelevant or contradictory context. Fix: shrink it to true universals and prime dynamically."
+    },
+    {
+      "q": "Why do output styles matter, and what's the scale of the effect shown?",
+      "a": "Output tokens cost 3-5x input and re-enter context. A one-word 'Done.' style cut a ~150-token reply to 2 tokens (~99%) by hot-swapping the output-style block in the system prompt."
+    },
+    {
+      "q": "Why do custom sub-agents cost only ~122 tokens in the primary window?",
+      "a": "A sub-agent's definition is a SYSTEM prompt, not a user prompt, so it isn't added to the primary agent's context window; the sub-agent burns its OWN window doing the work and returns a concise report to the primary agent."
+    },
+    {
+      "q": "In the architect/editor split, whose job is it to 'waste' tokens, and why?",
+      "a": "The planner/architect's — it over-gathers context to write a complete spec, then you delete the irrelevant parts so the builder/editor gets a clean, focused window for surgical edits."
+    },
+    {
+      "q": "Why does Dan avoid /compact, and what does he do instead?",
+      "a": "After /compact you don't know exactly what's in your window (you must Ctrl-R and reread). Instead /clear then /prime, so you own and know your exact state — essential for out-loop scale."
+    },
+    {
+      "q": "What is a context bundle, how is it produced, and what reloads it?",
+      "a": "An append-only per-session JSONL log of prompts/reads/writes, produced by Claude Code hooks (context_bundle_builder.py on PostToolUse/UserPromptSubmit) at agents/context_bundles/<DAY_HOUR>_<session_id>.jsonl; /load_bundle dedups and replays ~70% of the prior agent's state."
+    },
+    {
+      "q": "Which flag modifies the system prompt, what mode must it run in, and what SDK variable is the dangerous alternative?",
+      "a": "--append-system-prompt, run in print mode (-p / out-loop); the SDK's customSystemPrompt fully OVERWRITES the default system prompt (use with caution)."
+    },
+    {
+      "q": "How is primary multi-agent delegation different from sub-agents?",
+      "a": "Primary agents are fully independent Claude Code instances with their own context, model, settings, and keys (e.g. /background writing a report file); sub-agents are partially forked context windows that report back to the primary agent."
+    },
+    {
+      "q": "What are the three steps of an agent expert, and what makes it self-improving?",
+      "a": "Plan → Build → Improve. Improve reads the git diff/status and updates ONLY the dedicated ## Expertise sections of the plan and build experts (never the Workflow), so the expert auto-updates its own knowledge."
+    },
+    {
+      "q": "What's the difference between 'saving' and 'spending' tokens in Dan's framing?",
+      "a": "The goal isn't minimizing tokens; it's spending them properly so you don't waste time/tokens correcting mistakes — enabling one-shot out-loop streaks so you can drop your presence."
+    },
+    {
+      "q": "Name two future context-engineering trends Dan says to bet on.",
+      "a": "Any two of: larger context windows; better (more effective) context windows; hot-swapped context; multi-agent architectures; specialized agents everywhere."
+    }
+  ],
+  "codebase_map": {
+    "repo": "agentic-horizon/elite-context-engineering (clone: git clone https://github.com/disler/elite-context-engineering.git)",
+    "files": [
+      "README.md",
+      "CLAUDE.md",
+      "CLAUDE.concise.md",
+      "CLAUDE.large.md",
+      "package.json",
+      "bun.lock",
+      ".env.sample",
+      ".gitignore",
+      ".mcp.json.sample",
+      ".mcp.json.firecrawl_7k.sample",
+      ".mcp.json.all_16k.sample",
+      ".claude/settings.json",
+      ".claude/settings.local.concise.json",
+      ".claude/commands/prime.md",
+      ".claude/commands/prime_cc.md",
+      ".claude/commands/quick-plan.md",
+      ".claude/commands/build.md",
+      ".claude/commands/background.md",
+      ".claude/commands/load_ai_docs.md",
+      ".claude/commands/load_bundle.md",
+      ".claude/commands/experts/cc_hook_expert/cc_hook_expert_plan.md",
+      ".claude/commands/experts/cc_hook_expert/cc_hook_expert_build.md",
+      ".claude/commands/experts/cc_hook_expert/cc_hook_expert_improve.md",
+      ".claude/agents/docs-scraper.md",
+      ".claude/agents/research-docs-fetcher.md",
+      ".claude/agents/meta-agent.md",
+      ".claude/hooks/context_bundle_builder.py",
+      ".claude/hooks/universal_hook_logger.py",
+      ".claude/output-styles/concise-done.md",
+      ".claude/output-styles/concise-ultra.md",
+      ".claude/output-styles/concise-tts.md",
+      ".claude/output-styles/verbose-bullet-points.md",
+      ".claude/output-styles/verbose-yaml-structured.md",
+      ".claude/utils/llm/anth.py",
+      ".claude/utils/llm/oai.py",
+      ".claude/utils/llm/ollama.py",
+      ".claude/utils/tts/elevenlabs_tts.py",
+      ".claude/utils/tts/openai_tts.py",
+      ".claude/utils/tts/pyttsx3_tts.py",
+      "apps/hello_cc_1.ts",
+      "apps/hello_cc_2.ts",
+      "apps/cc_ts_wrapper/index.ts",
+      "apps/cc_ts_wrapper/core.ts",
+      "apps/cc_ts_wrapper/cli.ts",
+      "apps/cc_ts_wrapper/types.ts",
+      "apps/cc_ts_wrapper/README.md",
+      "apps/cc_ts_wrapper/CLAUDE.md",
+      "apps/cc_ts_wrapper/package.json",
+      "apps/cc_ts_wrapper/tsconfig.json",
+      "apps/cc_ts_wrapper/.gitignore",
+      "apps/cc_ts_wrapper/bun.lock",
+      "ai_docs/README.md",
+      "scripts/bg_claude_code_test.sh"
+    ],
+    "what_each_does": {
+      "README.md": "The 301-line lesson artifact. States the R&D framework and enumerates all 12 techniques with their Level (Beginner/Intermediate/Advanced/Agentic) and Framework (Reduce/Delegate/R&D) tags, plus the Claude Code bash aliases (cld, cldp, cldo, clds, cldys, cldy, cldyo, lfg, cldpy, cldpyo, cldr) Dan uses throughout.",
+      "CLAUDE.md": "The GOOD memory file: 43 lines of true universals (tooling: bun over npm, uv over pip; key commands; project structure; TDD guidelines). ~350 tokens. The 'demonstrates proper CLAUDE.md sizing' example.",
+      "CLAUDE.concise.md": "Identical-in-spirit 43-line concise memory file swapped in during the demo to replace the bloated one; drops /context memory usage to 0.2%.",
+      "CLAUDE.large.md": "The ANTI-PATTERN: a deliberately bloated 2,978-line 'comprehensive' memory file (~23.7k tokens, ~79.7k chars) that trips Claude Code's 'Large CLAUDE.md will impact performance' warning. Header literally says 'This is an example of a BLOATED CLAUDE.md file... the anti-pattern of over-contextualization.' Used as the target of the append-system-prompt read-in-100s demo.",
+      "package.json": "Minimal root manifest (devDependency: typescript ^5.9.2).",
+      "bun.lock": "Bun dependency lockfile for the root workspace (auto-generated; not taught).",
+      "apps/cc_ts_wrapper/bun.lock": "Bun lockfile for the wrapper sub-app (auto-generated by bun install; not taught).",
+      ".env.sample": "Placeholder keys: ANTHROPIC_API_KEY, ELEVENLABS_API_KEY, OPENAI_API_KEY (for the TTS/LLM utils).",
+      ".mcp.json.sample": "Two-server project MCP config (playwright + firecrawl-mcp) — the kind of default config Dan tells you to DELETE.",
+      ".mcp.json.firecrawl_7k.sample": "Single-server config (firecrawl-mcp only) — the 'load only what you need' pattern used with --mcp-config. (On camera the tree shows a .mcp.json.firecrawl_4k variant.)",
+      ".mcp.json.all_16k.sample": "Both servers again (playwright + firecrawl) — the 'everything' config. (On camera the tree shows .mcp.json.all_22k.)",
+      ".claude/settings.json": "Wires the two hooks across 8 events: universal_hook_logger.py on PreToolUse/PostToolUse/UserPromptSubmit/Stop/SubagentStop/Notification/PreCompact/SessionStart/SessionEnd; context_bundle_builder.py on PostToolUse (matcher Read|Write, --type file_ops) and UserPromptSubmit (--type user_prompt).",
+      ".claude/settings.local.concise.json": "Local overrides: enableAllProjectMcpServers true, enabledMcpjsonServers [firecrawl-mcp], outputStyle 'One Word Output' — the concise-mode config used in the output-tokens demo.",
+      ".claude/commands/prime.md": "Context-priming command: Run (git ls-files), Read (README.md), Report (summarize the codebase). The reusable alternative to an always-on CLAUDE.md.",
+      ".claude/commands/prime_cc.md": "Stacked prime focused on the Claude Code layer: runs prime.md, then reads .claude/commands/**, output-styles/**, context_bundle_builder.py, settings.json — the 'agentic layer' prime.",
+      ".claude/commands/quick-plan.md": "The ARCHITECT/planner: allowed-tools Read/Write/Edit/Glob/Grep; takes USER_PROMPT; writes a concise implementation spec to specs/<name>.md. Pinned to model claude-opus-4-1-20250805 (a course-era model id).",
+      ".claude/commands/build.md": "The EDITOR/builder: reads PATH_TO_PLAN, implements it, and reports a bullet summary + git diff --stat.",
+      ".claude/commands/background.md": "PRIMARY delegation: builds a full `claude --model <m> --output-format text --dangerously-skip-permissions --append-system-prompt \"<report structure + rename to .complete.md/.failed.md>\" --print \"<prompt>\"` and runs it with run_in_background=true, writing agents/background/background-report-<DAY_HH_MM_SS>.md.",
+      ".claude/commands/load_ai_docs.md": "SUB-AGENT delegation: reads ai_docs/README.md, deletes docs older than 24h, and fires @agent-docs-scraper in parallel via the Task tool (one per URL). allowed-tools include Task and mcp__firecrawl-mcp__firecrawl_scrape.",
+      ".claude/commands/load_bundle.md": "Reloads a context bundle: dedups JSONL entries per file_path, picks the most comprehensive read (full file if any entry has no limit/offset), and replays the prior agent's story without acting on logged prompts.",
+      ".claude/commands/experts/cc_hook_expert/cc_hook_expert_plan.md": "AGENT EXPERT (plan): a Claude Code hook specialist that reads ai_docs hooks/uv/slash-command guides, analyzes existing hooks, and writes a spec to specs/experts/cc_hook_expert/<name>.md. Carries a dedicated ## Expertise section (hook events, execution model, output patterns, security) that already contains 'Discovered Patterns from Universal Logger Implementation' — evidence the improve step ran.",
+      ".claude/commands/experts/cc_hook_expert/cc_hook_expert_build.md": "AGENT EXPERT (build): implements a hook from a spec, chmod +x, and tests via `echo '<json>' | uv run .claude/hooks/<hook>.py`. Its ## Expertise section holds UV-script standards, exit-code/JSON output patterns, and 'Learned Best Practices from Recent Implementations.'",
+      ".claude/commands/experts/cc_hook_expert/cc_hook_expert_improve.md": "AGENT EXPERT (improve): the self-improving meta-step. Runs git diff / git diff --cached / git log, and updates ONLY the ## Expertise sections of the plan and build experts (explicitly NOT the Workflow sections). If no relevant learnings: stop and report 'No expertise updates needed.'",
+      ".claude/agents/docs-scraper.md": "Sub-agent (model sonnet): scrapes a URL via firecrawl (fallback WebFetch) and writes clean markdown to ai_docs/. Invoked in parallel by /load_ai_docs.",
+      ".claude/agents/research-docs-fetcher.md": "Sub-agent named 'research-agent' (model sonnet): fetches/searches and writes structured markdown with metadata headers to ai_docs/research/, skipping files <24h old.",
+      ".claude/agents/meta-agent.md": "Sub-agent (model opus): an agent architect that generates brand-new sub-agent definition files from a description (scrapes current sub-agent docs first). Shows the 'agents that build agents' idea.",
+      ".claude/hooks/context_bundle_builder.py": "UV single-file hook. On Read/Write (file_ops) logs {operation, file_path(relative), limit/offset or content_length}; on UserPromptSubmit logs {operation: prompt, prompt[:500]}. Appends to agents/context_bundles/<DAY_HOUR>_<session_id>.jsonl. Powers technique #8.",
+      ".claude/hooks/universal_hook_logger.py": "UV single-file hook wired to every event; writes {timestamp, payload} to agents/hook_logs/<session_id>/<hook_event_name>.jsonl. Non-blocking (always exit 0). The observability layer the cc_hook_expert demo builds/extends.",
+      ".claude/output-styles/concise-done.md": "'One Word Output' style: respond only 'Done.' 95% of the time; exceptions for explicit requests, questions (1-2 sentences), and errors. The 2-token response in the output-tokens demo.",
+      ".claude/output-styles/concise-ultra.md": "'Ultra Concise' style: absolute minimum words, fragments over sentences, tool outputs without commentary.",
+      ".claude/output-styles/concise-tts.md": "'TTS Summary' style: ultra-concise text, then runs .claude/utils/tts/elevenlabs_tts.py with a <15-word spoken summary addressed to USER_NAME (Dan).",
+      ".claude/output-styles/verbose-bullet-points.md": "'Bullet Points' style: hierarchical bullets for quick scanning (a verbose counterpart shown in the /output-style menu).",
+      ".claude/output-styles/verbose-yaml-structured.md": "'YAML Structured' style: structured YAML with hierarchical key/value pairs.",
+      ".claude/utils/llm/{anth.py,oai.py,ollama.py}": "Minimal LLM helper utilities (Anthropic / OpenAI / Ollama) available to hooks and TTS scripts.",
+      ".claude/utils/tts/{elevenlabs_tts.py,openai_tts.py,pyttsx3_tts.py}": "Text-to-speech utilities used by the concise-tts output style.",
+      "apps/hello_cc_1.ts": "Claude Code TypeScript SDK hello-world: query() with model sonnet, prints result + cost/duration/turns/session id. Demonstrates the SDK the wrapper is built on.",
+      "apps/hello_cc_2.ts": "Second SDK hello-world variant (maxTurns 1, allowedTools []) — the 'hello calls' Dan references before building the wrapper.",
+      "apps/cc_ts_wrapper/index.ts": "Bare `bun init` stub (console.log('Hello via Bun!')) — the scaffold the planner/builder demo fills in.",
+      "apps/cc_ts_wrapper/types.ts": "The TYPES file the demo builds: ClaudeSettings, AdhocPromptOptions, ReusablePromptConfig, PromptResult, and DEFAULT_SETTINGS (maxTurns 5, allowedTools Bash/Read/Write/Edit/WebSearch).",
+      "apps/cc_ts_wrapper/core.ts": "The LOW-LEVEL wrapper the demo builds: adhoc_prompt(), register_prompt(), reusable_prompt(), list_commands() over query() from @anthropic-ai/claude-code, capturing result messages and session id.",
+      "apps/cc_ts_wrapper/cli.ts": "The CLI the demo builds: parseArgs, built-in /analyze and /refactor registered prompts, --command/--prompt/--max-turns/--system-prompt/--tools/--list/--help. The 'types file, low-level file, CLI file' three-file wrapper Dan specifies.",
+      "apps/cc_ts_wrapper/README.md": "Default bun-init README (bun install / bun run index.ts).",
+      "apps/cc_ts_wrapper/CLAUDE.md": "Bun-focused local memory file (use bun over node, Bun.serve, bun:sqlite, etc.) — a scoped memory file for the sub-app.",
+      "apps/cc_ts_wrapper/{package.json,tsconfig.json,.gitignore}": "bun-init scaffolding for the wrapper app.",
+      "ai_docs/README.md": "The URL list /load_ai_docs scrapes: Claude Code SDK (headless/python/typescript), MCP, slash-commands, sub-agents, models overview, hooks, and UV scripts/projects guides.",
+      "scripts/bg_claude_code_test.sh": "Raw shell version of primary delegation: a bg() function running `claude --print --model <m> --output-format text --dangerously-skip-permissions --mcp-config .mcp.json --append-system-prompt \"<report + rename logic>\" \"<prompt>\"`."
+    },
+    "generated_not_committed": {
+      "agents/context_bundles/<DAY_HOUR>_<session_id>.jsonl": "Per-session append-only context bundles written by context_bundle_builder.py (e.g. SAT_12_<uuid>.jsonl). Reloaded with /load_bundle.",
+      "agents/hook_logs/<session_id>/<hook_event_name>.jsonl": "Per-session, per-hook event logs written by universal_hook_logger.py (the observability structure the cc_hook_expert demo produces).",
+      "agents/background/background-report-<DAY_HH_MM_SS>.md(.complete.md/.failed.md)": "Report files written by /background primary agents; renamed on success/failure.",
+      "specs/<name>.md and specs/experts/cc_hook_expert/<name>.md": "Implementation specs written by /quick-plan and the cc_hook_expert planner.",
+      "ai_docs/*.md": "Documentation scraped at runtime by docs-scraper sub-agents (deleted/refreshed after 24h)."
+    }
+  },
+  "current_practice_gaps": [
+    {
+      "gap": "Course-era model ids are pinned in a couple of places",
+      "why": "quick-plan.md pins `model: claude-opus-4-1-20250805`, and /context on camera shows claude-opus-4-1-20250805 / claude-sonnet-4-20250514. These are recording-era models; today you'd use current families (e.g. the Claude 5 / Opus 4.x era). The technique is model-agnostic — Dan says so repeatedly ('if you're in the future, I hope you have better models; these techniques are all the same across models'). Treat model ids as period detail; update at publish.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Output styles as the system-prompt hot-swap mechanism have evolved",
+      "why": "The lesson teaches output styles that 'hot-swap the output-style block in the system prompt.' Claude Code's customization surface has since broadened (output styles, but also plugins, richer settings layering, and Skills). The CONCEPT — control the response layer to cap output tokens — is unchanged; the exact menu and mechanism may differ. Dan explicitly flags hot-swapping as a trend to watch.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "The append-system-prompt / SDK path has grown into headless mode + the Claude Agent SDK",
+      "why": "Technique #10/#11 use `--append-system-prompt`, `--print`, `--output-format text`, `--dangerously-skip-permissions`, and run_in_background. Current practice adds richer headless flags (--output-format json/stream-json, --allowedTools, --permission-mode, session resume) and the Claude Agent SDK (Python/TS) with structured output, hooks, and subagents. The lesson points to a 'Claude Code SDK Mastery' extended lesson for exactly this. Same concept; richer machinery.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Agent Experts prefigure first-class Agent Skills",
+      "why": "The agent-experts pattern (plan/build/improve slash commands with a dedicated, self-updating ## Expertise section) is a hand-rolled way to encode and maintain reusable expertise. Modern Claude Code offers Agent Skills (SKILL.md with frontmatter, on-demand discovery/loading, shareable) as a first-class encoding of the same idea. The concept maps closely; the packaging has upgraded. Teach the codebase pattern first (no magic), then note Skills as the current idiom.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Repo MCP-sample filenames on camera differ slightly from the shipped repo",
+      "why": "On-screen the file tree shows .mcp.json.all_22k, .mcp.json.empty, and .mcp.json.firecrawl_4k; the shipped repo has .mcp.json.all_16k.sample, .mcp.json.firecrawl_7k.sample, and .mcp.json.sample (no .empty). The self-fixed token counts (4k/7k/16k/22k) reflect the exact MCP surface at record time vs ship time. Teach from the shipped filenames; treat the on-screen names/numbers as period detail.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "/compact vs reset-and-prime is a stance, not a hard rule, and tooling keeps improving",
+      "why": "Dan's 'avoid /compact, reset and prime' is deliberately opinionated for out-loop reliability. /compact remains a legitimate built-in and has improved (custom summarization instructions, auto-compact). The durable lesson is 'know your exact window state and own it'; the specific avoidance is a practice you can tune as compaction gets more controllable.",
+      "yt_candidates": []
+    }
+  ],
+  "yt_overlay_candidates": [
+    {
+      "video_id": null,
+      "candidate_query": "IndyDevDan context engineering / context window management Claude Code (most recent ~10 months)",
+      "title": "(needs sourcing) IndyDevDan — context engineering / managing the context window",
+      "maps_to": "operationalizes tactic",
+      "include_in_phase1": true,
+      "needs_id_sourcing": true,
+      "rationale": "The lesson thesis IS context engineering + the R&D framework; Dan's public channel repeatedly covers context-window management. A recent free-channel treatment reinforces measure/reduce/delegate with zero topic drift. ID must be sourced and oembed-verified at review (no seed list existed for AH-1; no fabricated IDs)."
+    },
+    {
+      "video_id": null,
+      "candidate_query": "IndyDevDan Claude Code sub-agents / subagents delegation",
+      "title": "(needs sourcing) IndyDevDan — Claude Code sub-agents / delegation",
+      "maps_to": "named hole",
+      "include_in_phase1": true,
+      "needs_id_sourcing": true,
+      "rationale": "Directly expands technique #5 (sub-agents as partially forked context windows) and #11 (primary delegation) with current sub-agent/parallelism practice. Bridges the recording-era demo to today's fleet/worktree patterns. Source + oembed-verify at review."
+    },
+    {
+      "video_id": null,
+      "candidate_query": "IndyDevDan Claude Code hooks / agent skills (SKILL.md) / Claude Agent SDK",
+      "title": "(needs sourcing) IndyDevDan — Claude Code hooks / Agent Skills / Agent SDK",
+      "maps_to": "corrects outdated",
+      "include_in_phase1": true,
+      "needs_id_sourcing": true,
+      "rationale": "Covers the modern encodings the lesson prefigures: hooks (technique #8/#12 observability), Agent Skills as the first-class successor to hand-rolled agent experts (#12), and the Agent SDK behind append-system-prompt/background (#10/#11). Fills the biggest 'course-era vs current' gaps. Source + oembed-verify at review."
+    },
+    {
+      "video_id": null,
+      "candidate_query": "IndyDevDan AI Developer Workflows / ADW / multi-agent orchestration",
+      "title": "(needs sourcing) IndyDevDan — AI Developer Workflows / multi-agent orchestration",
+      "maps_to": "named hole",
+      "include_in_phase1": false,
+      "needs_id_sourcing": true,
+      "rationale": "Maps to technique #9 (one agent, one purpose → ADW) and the out-loop/ZTE endgame, but ADWs are the payload of later TAC/AH lessons; overlaying full ADW scale here front-runs the pedagogy. Reserve for a later chapter."
+    }
+  ],
+  "yt_overlay_note": "AH-1 had NO seeded overlay list in data/curriculum.json (overlays: []) and the chapter brief provided none. Per the no-fabrication rule, video_id is left null with a candidate_query; the chapter builder/reviewer must source real IDs and oembed-verify them before publishing (as was done for TAC-1). Keep include_in_phase1 <= 3.",
+  "frame_plan_summary": "12 full-resolution (1920x1080) frames extracted, one anchor per framework + technique level. See frame-plan.json for full detail. Technique #9 (one agent, one purpose) and the future-trends recap are B-roll/monologue with no unique UI and should be rendered as designed diagrams (diagram_instead).",
+  "frame_plan": [
+    {
+      "t_seconds": 176,
+      "label": "rd-reduce-and-delegate",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t0176-rd-reduce-and-delegate.jpg",
+      "maps_to": "R&D framework",
+      "why_for_weak_student": "Big centered title 'REDUCE AND DELEGATE' — names the two-bucket framework every technique sorts into; the phrase to memorize first.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 266,
+      "label": "context-measure-before",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t0266-context-measure-before.jpg",
+      "maps_to": "Technique 1 (measure) + shows the problems",
+      "why_for_weak_student": "One /context screenshot showing the whole 'before' state: 63k/200k (31%), MCP tools 24.1k (12.1%), Memory files 23.7k (11.8%), Custom agents 122 tokens, the 'Large CLAUDE.md will impact performance' warning, and the IDE token counter at 2,650. The single most information-dense frame in the lesson.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 505,
+      "label": "mcp-strict-config-tree",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t0505-mcp-strict-config-tree.jpg",
+      "maps_to": "Technique 2 (avoid MCP)",
+      "why_for_weak_student": "The repo file tree plus /context after loading only firecrawl via --mcp-config: MCP tools drop to 6.5k (3.2%). Shows both the .mcp.json.* options and the payoff of targeted loading.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 786,
+      "label": "context-after-prime",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t0786-context-after-prime.jpg",
+      "maps_to": "Technique 3 (prime > CLAUDE.md)",
+      "why_for_weak_student": "The 'after' picture: swapping the bloated CLAUDE.md for the 43-line concise one drops memory files to 358 tokens (0.2%) and frees 92.4% of the window. Perfect before/after with t0266.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 1085,
+      "label": "output-styles-done",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t1085-output-styles-done.jpg",
+      "maps_to": "Technique 4 (output tokens)",
+      "why_for_weak_student": "Left terminal: 'hi' -> 'Done.' (the One Word Output style). Right terminal: the /output-style menu listing Default/Explanatory/Learning/Ultra Concise/One Word Output/TTS Summary/Bullet Points/YAML Structured. Shows both the effect and the mechanism.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 1492,
+      "label": "subagent-docs-scrapers",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t1492-subagent-docs-scrapers.jpg",
+      "maps_to": "Technique 5 (sub-agents)",
+      "why_for_weak_student": "load_ai_docs.md (allowed-tools Task + firecrawl) plus the terminal 'Found 10 files… Launching docs-scraper agents…' — delegation in action, work kept OFF the primary window.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 1790,
+      "label": "planner-builder-split",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t1790-planner-builder-split.jpg",
+      "maps_to": "Technique 6 (architect/editor)",
+      "why_for_weak_student": "Split screen: LEFT the planner thinking through the 3-file wrapper spec; RIGHT a fresh agent at /clear then /build. The two-agent responsibility split made visible.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 2050,
+      "label": "avoid-compact",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t2050-avoid-compact.jpg",
+      "maps_to": "Technique 7 (avoid /compact)",
+      "why_for_weak_student": "The builder's completed cc_ts_wrapper report (types.ts/core.ts/cli.ts + git diff stats) followed by '/compact — Compacting conversation…' — the exact moment Dan says stop guessing, reset and prime instead.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 2345,
+      "label": "context-bundle-jsonl",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t2345-context-bundle-jsonl.jpg",
+      "maps_to": "Technique 8 (context bundles)",
+      "why_for_weak_student": "The context_bundles/ directory full of SAT_<hour>_<session>.jsonl files, with one open showing {operation:prompt /prime_cc}, {operation:read, file_path:...} lines, and the terminal replaying deduped reads. Demystifies 'append-only trail' completely.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 2705,
+      "label": "append-system-prompt",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t2705-append-system-prompt.jpg",
+      "maps_to": "Technique 10 (system prompt)",
+      "why_for_weak_student": "The full command on one line: `claude --dangerously-skip-permissions --model sonnet --append-system-prompt \"…read in increments of 100 lines… prefix your last message with ✅ or ❌…\" -p \"what is CLAUDE.large.md for?\"`. The agentic-level control mechanism, verbatim.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 3195,
+      "label": "background-primary-delegation",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t3195-background-primary-delegation.jpg",
+      "maps_to": "Technique 11 (primary delegation)",
+      "why_for_weak_student": "A background Claude Code kicked off: the report-file path, the rename-to-.complete.md/.failed.md logic, '1 background task', and the context bundle for the background run. Shows compute orchestrating compute, out of loop.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 3485,
+      "label": "agent-experts-triad",
+      "file": "media/frames/ah-1-rd-framework-context-window-mastery/t3485-agent-experts-triad.jpg",
+      "maps_to": "Technique 12 (agent experts)",
+      "why_for_weak_student": "The experts/cc_hook_expert/ directory expanded to its three files — cc_hook_expert_build.md, cc_hook_expert_improve.md, cc_hook_expert_plan.md — the plan/build/improve triad that IS the technique.",
+      "diagram_instead": false
+    },
+    {
+      "t_seconds": 4200,
+      "label": "future-trends-recap",
+      "file": null,
+      "maps_to": "Future trends recap",
+      "why_for_weak_student": "The five future bets (larger windows, better effective windows, hot-swapped context, multi-agent architectures, specialized agents everywhere) are narrated over B-roll with no slide — render as a designed diagram, not a frame.",
+      "diagram_instead": true
+    },
+    {
+      "t_seconds": 2510,
+      "label": "one-agent-one-purpose",
+      "file": null,
+      "maps_to": "Technique 9 (one agent, one purpose)",
+      "why_for_weak_student": "The summary technique is conceptual/monologue with no unique UI — render as a designed agent-pipeline (ADW) diagram rather than a screenshot.",
+      "diagram_instead": true
+    }
+  ],
+  "lab": {
+    "scope": "Course codebase only (elite-context-engineering). Clone: git clone https://github.com/disler/elite-context-engineering.git",
+    "prime_directive": "Every drill is measured with /context — you must observe the number move. The graded outcome is that you can see and control your window, not just run commands.",
+    "setup": [
+      "Clone elite-context-engineering and open it in an IDE with a token-counter extension in the status bar.",
+      "Copy .env.sample to .env (ANTHROPIC_API_KEY required; ELEVENLABS/OPENAI optional for the TTS/util demos).",
+      "Read README.md — note the 12 techniques with their Level and Framework (R/D) tags, and the bash aliases at the bottom.",
+      "Boot `claude`, run /context, and write down the boot-state numbers (total %, MCP tools, memory files, custom agents)."
+    ],
+    "reproduce_dan": [
+      "MEASURE: run /context on boot; record MCP tools and memory-files token counts. Add the README to context and watch the token counter.",
+      "REDUCE (MCP): confirm the default MCP cost, then relaunch with `claude --mcp-config .mcp.json.firecrawl_7k.sample --strict-mcp-config`; re-run /context and confirm MCP tokens dropped.",
+      "REDUCE (memory): temporarily point CLAUDE.md at the bloated content (CLAUDE.large.md) and observe the 'Large CLAUDE.md will impact performance' warning + memory-file %; restore the 43-line CLAUDE.md/CLAUDE.concise.md and confirm memory files fall to ~0.2% and free space ~90%+.",
+      "PRIME: run /prime, then /context — confirm a small, task-scoped window instead of an always-on memory blob. Inspect /prime_cc.",
+      "OUTPUT TOKENS: open two terminals; set one to the 'One Word Output' style (settings.local.concise.json / /output-style) and one to default; send the same prompt and compare the response token counts.",
+      "SUB-AGENTS: run /context to see Custom agents at ~122 tokens; run /load_ai_docs and watch docs-scraper sub-agents fire in parallel; confirm the scrape tokens did NOT land on your primary window.",
+      "ARCHITECT/EDITOR: /quick-plan a small change (writes specs/<name>.md); open a FRESH agent and /build <path-to-spec>; confirm the builder needed no priming.",
+      "AVOID COMPACT: after some work, compare /compact (then Ctrl-R to read the summary) against /clear + /prime; articulate which one leaves you knowing your exact window.",
+      "CONTEXT BUNDLES: inspect agents/context_bundles/<DAY_HOUR>_<session>.jsonl (built by the PostToolUse hook); in a fresh agent run /load_bundle <path> and confirm deduped replay.",
+      "SYSTEM PROMPT: run `claude --dangerously-skip-permissions --model sonnet --append-system-prompt \"ALWAYS read files in 100-line increments; stop when you have enough; prefix your final message with ✅ or ❌\" -p \"what is CLAUDE.large.md for?\"`; open the resulting context bundle and confirm Read(100), Read(100).",
+      "PRIMARY DELEGATION: from a primary agent run /background \"/quick-plan <something small>\" sonnet; watch agents/background/background-report-*.md get written and renamed to .complete.md.",
+      "AGENT EXPERTS: run /experts:cc_hook_expert:cc_hook_expert_plan \"<a tiny hook feature>\" -> _build <spec> -> _improve; confirm the improve step edits ONLY the ## Expertise sections (git diff)."
+    ],
+    "stretch": [
+      "Author a new prime command (e.g. /prime_bug or /prime_feature) that primes a different area of focus; prove via /context that it loads a different, task-scoped window than /prime.",
+      "Add a self-fixed .mcp.json for a second MCP server you actually use, annotate its token cost in the filename, and load it with --strict-mcp-config.",
+      "Write a new output style between 'One Word Output' and default (e.g. one-line + a status emoji); measure the response-token delta on a fixed prompt.",
+      "Extend the cc_hook_expert to a second area: create a new expert triad (plan/build/improve) for another codebase concern; run the improve step after a change and verify it updates only the Expertise section.",
+      "Chain it into an ADW: script plan -> build -> improve -> git commit as a single background workflow, and use a context bundle to remount if any step overflows."
+    ],
+    "gradable_checkpoints": [
+      "C1 (measure): you can state your boot-state /context numbers and what each line (system prompt/tools/MCP/agents/memory/messages/free) means.",
+      "C2 (reduce): MCP tokens and memory-file tokens both measurably dropped after your changes, verified in /context.",
+      "C3 (prime): /prime produces a smaller, task-scoped window than the always-on memory file did (shown in /context).",
+      "C4 (output): the concise output style produced a measurably smaller response than default on the same prompt.",
+      "C5 (delegate): /load_ai_docs kept scrape tokens off the primary window; /context custom agents stayed ~122 tokens.",
+      "C6 (architect/editor): a fresh /build agent implemented from the spec with no additional priming.",
+      "C7 (own your window): you can explain why /clear+/prime leaves a known state and /compact does not.",
+      "C8 (bundle): a fresh agent remounted prior state via /load_bundle with deduped reads.",
+      "C9 (system prompt): the context bundle shows Read(100)/Read(100), proving the append-system-prompt steered the read tool.",
+      "C10 (primary delegation): a /background agent wrote and renamed its report file without your intervention.",
+      "C11 (agent experts): the improve step updated ONLY the ## Expertise sections (git diff proves Workflow was untouched)."
+    ],
+    "pass_criteria": [
+      "You measured with /context before and after every reduce/delegate move and can cite the numbers.",
+      "You reduced MCP and memory-file token usage and can explain the R (reduce) in each case.",
+      "You delegated at least twice (sub-agents via /load_ai_docs and a primary /background agent) keeping work off your primary window.",
+      "You ran the architect/editor split and the agent-experts plan/build/improve loop end to end.",
+      "Zero application code typed by hand — the cc_ts_wrapper (or your stretch build) and the hook come from planner/builder/expert agents.",
+      "You can sort all 12 techniques into their level (Beginner/Intermediate/Advanced/Agentic) and into Reduce vs Delegate, and state the central law from memory: a focused agent is a performant agent."
+    ]
+  },
+  "estimated_print_pages_when_expanded": 52,
+  "confidence_notes": [
+    "All quotes cross-checked against the VTT; timestamps accurate to within ~3 seconds. The transcript is auto-generated with recurring mistranscriptions corrected here: 'CloudCode'/'Cloud Code' = Claude Code, 'claw.md'/'flaw.concise' = CLAUDE.md / CLAUDE.concise.md, 'ADER'/'Ader' = Aider, 'Bunn' = Bun, 'agent decoding' = agentic coding, 'Outloop' = out-of-loop, 'loot box'/'loop box' = loot box.",
+    "'name of the game' and 'What gets measured gets managed' verbatim appear in the transcript.md/README/course-notes; the auto-VTT renders 'measured gets managed' at 5:25 (confirmed) but phrases the 'name of the game' line loosely — quoted from Dan's written README/notes wording.",
+    "On-camera /context numbers verified from the extracted frames: boot 63k/200k (31%); MCP tools 24.1k (12.1%); memory files 23.7k (11.8%) bloated vs 358 tokens (0.2%) concise; custom agents 122 tokens; firecrawl-only MCP 6.5k (3.2%); README token counter 2,650. Models shown: claude-opus-4-1-20250805 and claude-sonnet-4-20250514 (course-era).",
+    "codebase_map covers every real file under the elite-context-engineering symlink (50 files incl. .claude/utils LLM+TTS helpers). apps/cc_ts_wrapper/{types,core,cli}.ts are the planner/builder demo output (committed); index.ts is the bare bun-init stub. Runtime artifacts (context_bundles, hook_logs, background reports, specs, scraped ai_docs) documented under generated_not_committed.",
+    "README claim verified: 12 techniques enumerated with Level + Framework tags; CLAUDE.large.md is 2,978 lines (the on-screen warning says 79.7k chars > 40.0k). settings.json wires the two hooks across 8 event types; context bundles land at agents/context_bundles/<DAY_HOUR>_<session_id>.jsonl and hook logs at agents/hook_logs/<session_id>/<hook>.jsonl (verified in source).",
+    "On-camera repo tree shows .mcp.json.all_22k / .mcp.json.firecrawl_4k / .mcp.json.empty; the shipped repo has .mcp.json.all_16k.sample / .mcp.json.firecrawl_7k.sample / .mcp.json.sample. Filenames + self-fixed token counts are record-time detail; teach from the shipped filenames.",
+    "12 frames extracted at native 1920x1080, -q:v 2, verified visually this session; two beats (technique #9 'one agent one purpose' and the future-trends recap) are monologue/B-roll with no unique UI and are flagged diagram_instead. Frames t0356 and t0622 were rejected because large caption overlays covered the terminal at those exact moments.",
+    "YouTube overlays: AH-1 had NO seed list (data/curriculum.json overlays: []). Per the no-fabrication rule, candidate video_ids are null with candidate_query strings and needs_id_sourcing=true; the chapter build/review stage must source and oembed-verify real IDs (as TAC-1's review did) before publishing. include_in_phase1 kept to 3.",
+    "current_practice_gaps written against Claude Code as of mid-2026 (models, Agent Skills, Agent SDK, headless flags, plugins); re-verify at publish time — this axis moves fast.",
+    "Loot box: course-notes.md lists 18 notes (metadata capture). The nuggets.md ranking is derived from those + the transcript; counts/items reflect capture time and may have been updated on agenticengineer.com since."
+  ]
+}

@@ -546,7 +546,14 @@ PATH_TO_PLAN: <span class="tok-var">$ARGUMENTS</span>
             <h3>Harness / launcher</h3>
             <p class="contract-card__path">.claude/commands/background.md · scripts/bg_claude_code_test.sh</p>
             <p>The Level-4 background prompt launches a second primary agent, passes a task unchanged, appends a report-writing system contract, and lets the interactive commander continue working.</p>
-            <pre class="terminal">claude --model MODEL +  --output-format text +  --dangerously-skip-permissions +  --append-system-prompt "Write progress to REPORT_FILE" +  --print USER_PROMPT</pre>
+            <pre class="terminal">claude --print \
+  --model "${MODEL}" \
+  --output-format text \
+  --dangerously-skip-permissions \
+  --mcp-config .mcp.json \
+  --append-system-prompt "You are running as a background agent. Document your progress continuously in ${REPORT_FILE}. When starting, create the report file and write your understanding of the task. Update it as you work through the task. Include any findings, blockers, or important information. When complete, rename the file to ${REPORT_FILE}.complete.md. If you fail or cannot complete the task, rename it to ${REPORT_FILE}.failed.md." \
+  "${USER_PROMPT}"</pre>
+            <p class="snippet-caption">Verbatim runnable invocation from <code>scripts/bg_claude_code_test.sh</code>; its argument-routing defects are covered below.</p>
             <p class="intent"><strong>Dan’s design intent.</strong> Treat the agent as callable compute with a durable status channel. The course-era launcher is intentionally vivid; production use must make model, MCP set, report path, isolation, and permission bypass explicit.</p>
           </article>
 
@@ -568,6 +575,7 @@ git diff</pre>
         <span class="section-label">06 · Operate like Dan</span>
         <h2>Run the system from mission to evidence</h2>
         <p class="section-lead">These are the repository’s real interfaces. The app commands come directly from its README; the slash commands are the Markdown files Claude Code discovers under <code>.claude/commands/</code>.</p>
+        <aside class="callout"><p class="callout__label">Packaging changed; the pattern did not</p><p>This course-era repository packages reusable workflows as slash-command Markdown and sub-agent definitions; it contains no <code>SKILL.md</code>. Current agent systems often package a Level 2–4 workflow as a discoverable Agent Skill. Keep the seven-level contract vocabulary, but treat its delivery format as replaceable infrastructure.</p></aside>
         <div class="operation-steps">
           <article><div><h3>Enter the repository and start the primary agent</h3><p>The root README documents <code>claude</code> aliases; use the ordinary CLI first so authority remains visible.</p><pre class="terminal">cd agentic-horizon/agentic-prompt-engineering
 claude</pre></div></article>

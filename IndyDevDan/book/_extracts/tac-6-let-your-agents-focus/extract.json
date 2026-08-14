@@ -1,0 +1,537 @@
+{
+  "lesson_key": "tac-6-let-your-agents-focus",
+  "title": "Let Your Agents Focus",
+  "course": "TAC",
+  "order": 6,
+  "level": "Advanced (first of three advanced lessons)",
+  "lesson_subtitle": "Agentic Review and Documentation",
+  "lesson_url": "https://agenticengineer.com/tactical-agentic-coding/course/let-your-agents-focus",
+  "video": {
+    "file": "tac-6-let-your-agents-focus/video/tac-6-let-your-agents-focus.mp4",
+    "duration_seconds": 3436,
+    "duration_display": "57:16"
+  },
+  "tactic": {
+    "name": "One Agent, One Prompt, One Purpose",
+    "one_liner": "Give every step of the software developer lifecycle its own specialized agent running one committed prompt toward one purpose — a fresh, focused context window beats a bigger, polluted one every time.",
+    "why_uncomfortable": "It forces a controversial commitment while the rest of the industry runs the other way. Generative-AI companies and big tech chase the all-in-one god model, the super agent that does it all; Dan tells you to bet against that and deliberately fragment your automation into many small single-purpose agents — 'they won't, it's not here, it's not coming soon. The real engineering still must happen.' It also extends Tactic #1 into new territory: stop even the hands-on one-off low-level prompts ('this isn't about you anymore... it's about teaching your agents how to build on your behalf, so that it can be about you again'), and when a fix is trivially yours to make by hand, run the patch workflow anyway — because you're building the system that builds the system, not the fix."
+  },
+  "mission": "Complete the last two steps of the software developer lifecycle — review and document — so your agents plan, build, test, review, and document end to end. Review makes agents check that what was built is what you asked for, prove it with hard assets (screenshots), and agentically fix blocking gaps; document makes them record what was done and wire it into conditional documentation so every future agent knows what came before. With all five steps you nearly arrive at the future where one prompt triggers a fleet of agents that ship your work end to end — running YOUR AI developer workflows, with your expertise, in your product. Dan's claim: with just plan/build/test 'you will outperform any cloud-based agentic coding tool' — review and document are what push beyond that.",
+  "sdlc_question_model": {
+    "plan": "What are we building?",
+    "build": "Did we make it real?",
+    "test": "Does it work?",
+    "review": "Is what we built what we planned? (Prove it)",
+    "document": "How does it work?",
+    "why_review_is_separate": "Some engineering teams group testing and review together; Dan calls that a massive mistake, especially in the age of agents. Testing answers 'does it work?'. Review answers 'is what we built what we asked for?' — validated against the original plan/spec, not against functionality. Review is explicitly NOT about code quality or implementation details (that's handed off to the agents); it is spec conformance plus proof, and it exists to increase your review velocity.",
+    "documentation_two_parts": "Documentation is simple; the tricky parts are HOW you document and WHEN to include it. Part 1: after review passes, generate concise docs for the work. Part 2: knowing when to pull documentation into future prompts — solved by conditional documentation inside the agentic layer."
+  },
+  "kpi_model": {
+    "targets": "Attempts down, streak up, size up, presence down (the TAC agentic coding KPIs, recapped from earlier lessons as the reason review + document exist).",
+    "lesson_worked_example": "One prompt shipped the export feature: attempts started at the optimal 1, then the patch pushed attempts to 2 (not good — but the size shipped by the single prompt was solid: table CSV export + query-result CSV export, endpoints, tests, plan). Streak broke (two ADWs needed for one feature → reset to 1). Presence was ~3 (prompt input, spotting the issue from review images, running the patch, reviewing again). Ideal presence is 2: one at the beginning for prompt input, one at the end for review and PR merge.",
+    "review_velocity": "Review's KPI contribution: even when your agent is wrong but presents proof it thinks it's right, you can say yes or no in seconds. A live/hard asset (image, video, report) that proves the work directly increases review velocity."
+  },
+  "core_concepts": [
+    {
+      "id": "sdlc-as-questions",
+      "name": "The SDLC as questions and answers",
+      "plain_english": "Every step of the software developer lifecycle is a question: Plan — what are we building? Build — did we make it real? Test — does it work? Review — is what we built what we planned? Document — how does it work? If you can name the question a step answers, you can build a dedicated agent to answer it.",
+      "dan_words": "\"Every step of the software developer lifecycle can be represented as a question and an answer... Notice testing answers the question, does it work? But review answers the question, is what we built what we asked for?\"",
+      "misconception": "That testing and review are the same step with two names. Teams that group them lose the distinct question — and in the age of agents, an agent that proves spec conformance is a different specialist from an agent that proves functionality."
+    },
+    {
+      "id": "one-agent-one-prompt-one-purpose",
+      "name": "Tactic #6: One Agent, One Prompt, One Purpose",
+      "plain_english": "Use specialized agents with focused prompts to achieve a single purpose well. In the TAC codebases no agent ever runs more than a single prompt — each ADW phase spawns a fresh named agent (sdlc_planner, sdlc_implementor, reviewer, patch_planner, documenter...) that executes exactly one slash-command template and exits.",
+      "dan_words": "\"One agent, one prompt, one purpose. You want to use specialized agents with focus prompts to achieve a single purpose. You've already seen this in the TAC codebases. No agent runs more than a single prompt.\"",
+      "misconception": "That one-purpose means small or simple prompts. The prompts are large template meta prompts and higher-order prompts (chore/bug/feature/patch generate plans; implement consumes them) — 'this doesn't mean the prompt isn't large or the prompt doesn't do a lot of work.' The purpose is singular; the work is not."
+    },
+    {
+      "id": "context-pollution",
+      "name": "Context pollution / toxic context",
+      "plain_english": "Loading more into the context window does not make the agent smarter. Past a point it makes the agent distracted and confused about the one thing you actually asked for. Call it context pollution, context overloading, or toxic context — the cure is a fresh window per purpose, not a bigger window.",
+      "dan_words": "\"Isn't more specific context better for your agent...? This is not true. Massive context windows often leads to a distracted, confused, agent. This is context pollution... When you overload the context window, your agent has a harder time focusing on what matters the most, the original task you asked it to complete.\"",
+      "misconception": "'The more it knows the better it performs.' Dan states the opposite outright — every piece of context you add increases the number of variables your agent has to reason about."
+    },
+    {
+      "id": "minimum-context-principle",
+      "name": "The minimum context principle",
+      "plain_english": "Context engineer as little as possible: put the minimum context in the prompt required to solve the problem, then give the agent the whole free window to work in. Adopt your agent's perspective — from inside the prompt it should be obvious what context it has, what tools are available, and how the problem gets solved.",
+      "dan_words": "\"You want to context engineer as little as possible. You want the minimum context in your prompt required to solve the problem... When you adopt your agent's perspective, it should be clear what context it has, the available tools, and how the problem can be solved with the focused leverage points it has available.\"",
+      "misconception": "That context engineering means adding context. In TAC it mostly means withholding it — and structuring what remains (variables at the top of prompts acting as information-dense keywords used throughout)."
+    },
+    {
+      "id": "three-constraints",
+      "name": "The three constraints of agentic engineers",
+      "plain_english": "You are constrained by (1) the context window, (2) the complexity of your codebase and the problem you're solving, and (3) your own abilities. Specialized one-purpose agents bypass two of the three: the window is freed per step, and your ability ceiling matters less because your engineering is templated into committed prompts. Model intelligence is deliberately NOT on the list.",
+      "dan_words": "\"As agentic engineers, we have three constraints, the context window, the complexity of our codebase and the problem we're solving and lastly our abilities. Specialized agents bypass two out of three of these... model intelligence is not a constraint. Don't use this as an excuse. It will set you back. This is a losing mindset.\"",
+      "misconception": "Blaming the model. At the end of the lesson Dan models the opposite posture about the review miss: 'I'm not blaming the model for this. I'm blaming my skills. I'm blaming the ADWs we have set up right now.'"
+    },
+    {
+      "id": "compact-band-aid",
+      "name": "Compact is a band-aid",
+      "plain_english": "Claude Code's compact command compresses a long session so you can keep going — but compression is loss. If your agent is running compact, it is losing information mid-task. One-purpose agents rarely need it because each step starts with a fresh window.",
+      "dan_words": "\"The compact command inside of Claude Code, maybe this will be resolved in the future, but this is a bandaid fix. If your agent is running compact, it is losing information.\"",
+      "misconception": "Treating compaction as free context. It's lossy by construction; the tactic exists so you don't lean on it."
+    },
+    {
+      "id": "committed-prompts-as-evals",
+      "name": "Committed prompts become evals",
+      "plain_english": "Because every workflow step is one committed prompt file, every step is reproducible and improvable at the prompt level. Search the slash command, open the file, and you know exactly what your agent sees. Rerun it with a different model, thinking mode, or agentic tool — git checkout the state before the run and fire again — and you have literal evals for the agentic layer of your codebase. You'll also form evals in your head passively as you watch what works.",
+      "dan_words": "\"We get to commit every one of our prompts, all of our workflows, which means we can easily improve them... You effectively create evals for the agentic layer of your codebase... You can change the model. You can add thinking mode. You can change your Agentic Coding tool. You can rerun these over and over.\"",
+      "misconception": "That prompt iteration requires an eval platform. The unit of evaluation is a committed file plus reproducible state — infrastructure you already have (git). In-loop runs battle-test prompts so they're ready to run out-loop in the AFK system."
+    },
+    {
+      "id": "review-adw",
+      "name": "The review ADW (adw_review.py + /review)",
+      "plain_english": "A dedicated pipeline that checks the implementation against the spec file and proves it: find the spec from state, run the /review prompt (screenshots via Playwright MCP along critical paths only, 1-5 numbered images), classify every finding as skippable / tech_debt / blocker, output strict JSON parsed into a pydantic ReviewResult, upload images to a public Cloudflare R2 bucket so they render on GitHub, and — if blockers exist — agentically patch and re-review, up to 3 attempts.",
+      "dan_words": "\"Review runs two workflows... we run a review and then if there are issues, right, blocking issues, we then attempt to fix and remedy the issues agentically... You don't want your agents bothering you. You want to reduce the number of human in the loop points there are in your workflow.\"",
+      "misconception": "That review re-tests the app. The prompt says it outright: 'we're not testing. We know the functionality works. We're reviewing the implementation against the spec to make sure it matches what was requested.' E2E test files are used only as navigation guides for where to screenshot."
+    },
+    {
+      "id": "severity-triage",
+      "name": "Issue severity: skippable / tech_debt / blocker",
+      "plain_english": "Review agents will find something if you ask them to — they're agreeable AND genuinely good at finding issues. So the prompt hands them a triage vocabulary: skippable (a problem, not release-blocking), tech_debt (non-blocking but will cost later), blocker (harms UX or doesn't function as expected — fix now). Only blockers make success false, and only blockers get auto-resolved.",
+      "dan_words": "\"They will find something if you ask them to. All right, these agents are very agreeable, but they're also just great at engineering... You wanna give them the tools to delineate what is important.\"",
+      "misconception": "Letting the review agent freestyle judgment. Without the severity contract, agreeable agents block releases on nitpicks — the triage classes are templated engineering judgment, not bureaucracy."
+    },
+    {
+      "id": "patch-adw",
+      "name": "The patch ADW (adw_patch.py + /patch)",
+      "plain_english": "Patches are their own class of change, distinct from chore/bug/feature: a surgical fix driven by a review_change_request. The /patch template meta prompt writes a focused plan into specs/patch/ (minimal scope, 2-5 steps, validation commands, lines-of-code estimate and risk level), then the shared create_and_implement_patch() runs /implement on it. Trigger it out-loop by commenting 'adw_patch' plus your request on the issue, or it fires automatically inside review resolution.",
+      "dan_words": "\"When you're writing these small patches, that's very different than a chore, a bug, or a feature... We're just changing one thing. We want a simple quick fix... We will run into issues. We need a mechanism inside of our workflows to quickly knock them out, ideally out the loop.\"",
+      "misconception": "Fixing the small thing by hand because you obviously could. 'Why didn't you just do that by hand? You're missing the point... we are putting in the effort to build the system that builds the system.'"
+    },
+    {
+      "id": "higher-order-prompt-reuse",
+      "name": "Compositional reuse: /implement as a higher-order prompt",
+      "plain_english": "The patch planner outputs a plan file; the implementor is the same /implement prompt used by chore/bug/feature plans — read the plan, think hard, implement, report with git diff --stat. New workflows increasingly reuse existing prompts as compositional pieces rather than inventing new ones.",
+      "dan_words": "\"We are starting to reuse our prompts. This is a higher order prompt. It takes in a plan... just like our plan from chore, bug or feature... It's going to read the plan, think hard and implement.\"",
+      "misconception": "Writing a bespoke implementor per workflow. One implement prompt, many planners — that's the one-purpose principle applied at the composition level."
+    },
+    {
+      "id": "document-adw",
+      "name": "The document ADW (adw_document.py + /document)",
+      "plain_english": "After review, a documenter agent diffs the branch against origin/main, reads the spec, copies review screenshots into app_docs/assets/, and writes app_docs/feature-{adw_id}-{name}.md from a committed documentation template (Overview, Screenshots, What Was Built, Technical Implementation, How to Use, Configuration, Testing, Notes). It returns exclusively the doc path. Skips gracefully when there's nothing to document (no diff).",
+      "dan_words": "\"Run git diff against main branch to understand the change... you have the git diff, you have your plan. Now you can understand what was implemented... Agentic documentation, agentic review is ultra, ultra powerful.\"",
+      "misconception": "That documentation is for humans only, or optional. In the agentic layer, documentation is feedback for future agents — 'work that engineers just don't do' becomes an automated step that compounds."
+    },
+    {
+      "id": "conditional-documentation",
+      "name": "Conditional documentation — the loop closer",
+      "plain_english": "conditional_docs.md is a lower-level prompt listing docs plus the conditions under which to read them ('Only read the documentation if any one of the conditions match your task'). The document step APPENDS an entry for each new doc; the planning prompts (bug, chore, feature, patch) and prime all read it. Plan → build → test → review → document → back into plan: the complete SDLC feedback loop.",
+      "dan_words": "\"Our agent has agentically updated this file for all future agents referencing this file... guess where you're gonna find this? Inside bug, inside chore, inside feature, inside patch, and even inside our prime command... This is a full, complete loop. Our agents are fully connected... This seals the deal. This connects them all.\"",
+      "misconception": "Dumping all docs into every prompt (context pollution again). Conditional docs load documentation only when the task matches a condition — minimum context, systematized. Note: models must be strong enough to honor the conditional ('if they just come in here and read them — scale up your model')."
+    },
+    {
+      "id": "proof-of-work-review",
+      "name": "Proof of value / the live asset principle",
+      "plain_english": "Whatever you'd personally do to verify a change is what you encode into the review step, and it must produce a hard asset — an image here, but a report, video, or metrics for backend/ML/analytics work. Agents presenting proof means you review from the issue, not from a booted-up app.",
+      "dan_words": "\"Review answers the critical question. Is what we built what we asked for? Even when your agent is wrong, when it presents you with proof that it thinks it's right, you can quickly say yes or no... What you want is a live asset that you can review that proves that what was built is what was asked for.\"",
+      "misconception": "That this lesson only applies to frontend UIs. Dan explicitly generalizes: scikit models, data analytics, rapid prototypes — encode YOUR verification steps for YOUR domain into /review."
+    },
+    {
+      "id": "out-loop-bias",
+      "name": "Out-loop bias: fix the end-to-end portion",
+      "plain_english": "Reduce human-in-the-loop points; prepare for tools and models that keep improving. When something goes wrong in an out-loop system, fix the system that ships end to end — the prompt, the workflow, the agentic layer — not just the artifact that went wrong. In-loop terminal work remains the proving ground for prompts before they run AFK.",
+      "dan_words": "\"They're called out-loop systems for a reason. You want your agent shipping end to end. And if something goes wrong, you fix the end to end portion, not the thing that went wrong... This is the tricky part. And this is the important transition we and I have to make as agentic engineers.\"",
+      "misconception": "Treating every failure as a one-off to hand-fix. The failure class gets encoded into the layer (a better review instruction, a patch workflow, a template tweak) so it never needs you again."
+    }
+  ],
+  "review_pipeline": {
+    "entry": "uv run adws/adw_review.py <issue-number> <adw-id> [--skip-resolution] — adw-id is REQUIRED (state + spec discovery depend on it; no state → hard exit with 'Run adw_plan.py first').",
+    "steps": [
+      "Load ADWState from agents/{adw_id}/adw_state.json; take issue_number from state; post the found state to the issue.",
+      "Validate env (ANTHROPIC_API_KEY, CLAUDE_CODE_PATH), resolve repo from GITHUB_REPO_URL, git checkout the state's branch_name ('you can't review if you don't have work to review and you do work on new branches').",
+      "find_spec_file(): state plan_file → else spec/*.md in git diff origin/main --name-only → else glob spec/issue-{n}-adw-{id}*.md derived from the branch name.",
+      "Init R2Uploader — enabled only when CLOUDFLARE_ACCOUNT_ID + R2 access key/secret + bucket name are all set; public domain defaults to tac-public-imgs.iddagents.com; objects keyed adw/{adw_id}/review/{filename}.",
+      "Retry loop, attempt 1..MAX_REVIEW_RETRY_ATTEMPTS (3; forced to 1 by --skip-resolution): run /review via execute_template as agent 'reviewer'; args [adw_id, spec_file, 'reviewer'].",
+      "Parse the prompt's raw-JSON output into ReviewResult (pydantic); any parse/execution failure synthesizes a blocker-severity ReviewResult so the pipeline fails loudly, not silently.",
+      "upload_and_map_screenshots(): upload result.screenshots + per-issue screenshot_path to R2; fill screenshot_urls (index-aligned) and issue.screenshot_url; save review_screenshots into state for the documentation workflow.",
+      "Post the formatted review comment: '✅ Review Passed' + screenshot gallery, or '❌ Review Issues Found' grouped 🚨 Blockers / ⚠️ Tech Debt / ℹ️ Skippable — always ending with the raw JSON payload in a Review Data block.",
+      "If blockers and resolution allowed: resolve_review_issues() loops over BLOCKER issues only, per-issue agents review_patch_planner_{attempt}_{n} / review_patch_implementor_{attempt}_{n}, each calling create_and_implement_patch(review_change_request = description + suggested resolution, spec, screenshots); commit resolutions ('/review' phase commit via {agent}_committer + /commit), then re-review. If nothing resolved, stop retrying.",
+      "Create review commit (/commit via reviewer_committer), commit, finalize_git_operations (push + create/update PR), save state, print state to stdout for chaining; exit 1 if blockers remain after the loop."
+    ],
+    "review_prompt_contract": {
+      "variables": "adw_id: $1, spec_file: $2, agent_name: $3 (default review_agent), review_image_dir: <abs>/agents/<adw_id>/<agent_name>/review_img/ — variables at the top of the prompt act as information-dense keywords referenced throughout.",
+      "instructions": "git branch for context; git diff origin/main; find + read the spec; IF UI-validatable: use .claude/commands/e2e/test_*.md files as navigation guides ONLY; capture 1-5 numbered screenshots (01_name.png...) of critical paths only, absolute paths, copied into review_image_dir; 'be absolutely sure to take a screen shot of the critical point of the new functionality'; think hard about severity; 'Don't report issues if they are not critical to the feature.'",
+      "setup": "Reads and EXECUTES .claude/commands/prepare_app.md first: reset DB via scripts/reset_db.sh, ensure server+client running in background via nohup sh ./scripts/start.sh (stop via ./scripts/stop_apps.sh).",
+      "output": "'Return ONLY the JSON... We'll immediately run JSON.parse() on the output' — success true only when zero BLOCKING issues; review_summary written like a standup report; review_issues[] with screenshot_path/description/resolution/severity; screenshots[] ALWAYS populated regardless of success."
+    },
+    "quirk_flags": [
+      "review.md line 19 has a path typo: './claude/commands/e2e/test_*.md' (missing the leading dot on .claude) — agents tolerate it because the intent is clear; a student grepping literally will miss.",
+      "The reviewer agent never reads the screenshots it takes (no vision flow, course-era) — the root cause of the demo's missed placement bug and Dan's named improvement: add 'for every image you take, be sure to read it in during the review process' to the prompt, rather than enabling Playwright MCP --vision globally ('I don't like this because this is outside of the ADW')."
+    ]
+  },
+  "patch_workflow": {
+    "entry_points": [
+      "Inside review resolution: automatic for each blocker issue.",
+      "Standalone: uv run adws/adw_patch.py <issue-number> [adw-id] — requires the literal keyword 'adw_patch' in the latest issue comment (comment body becomes the review_change_request) or in the issue body (title + body become the request); otherwise it exits with instructions.",
+      "Out-loop vision: 'out the loop, I just write this and then the web hook triggers the out-loop system to just get the job done.'"
+    ],
+    "mechanics": "create_and_implement_patch() in workflow_ops.py: run /patch (args: adw_id, review_change_request, spec_path or '', agent_name, optional comma-separated issue_screenshots) → response must be a path starting with specs/patch/ and ending .md (validated in code) → implement_plan() runs /implement on the patch file with the provided implementor agent name. adw_patch.py then commits with issue_command '/patch' and finalizes git ops. Branch is created or found via create_or_find_branch (state → existing '-issue-{n}-' branch → classify issue + /generate_branch_name).",
+    "patch_plan_format": "specs/patch/patch-adw-{adw_id}-{descriptive-name}.md with Metadata (adw_id, review_change_request), Issue Summary (original spec / issue / solution), Files to Modify, 2-5 Implementation Steps, Validation commands (from the spec's validation or test.md's Test Execution Sequence), and Patch Scope (lines-of-code estimate, risk level, testing required). 'This is a PATCH - keep the scope minimal... Address only the review_change_request.'",
+    "demo_facts": "Dan's patch: issue #14, comment 'adw_patch — for query results, make sure the download button is just to the left of our hide button'; he first passed the wrong number (15, the PR number) before rerunning with 14; the patch plan landed at specs/patch/patch-adw-490eb6b5-fix-download-button-position.md; commit message 'patch: fix button layout for export feature'; PR #15 updated."
+  },
+  "documentation_loop": {
+    "entry": "uv run adws/adw_document.py <issue-number> <adw-id> — adw-id REQUIRED ('documentation can only be generated after plan/build/test/review workflows').",
+    "steps": [
+      "Load state, checkout state branch, check_for_changes(): git diff origin/main --stat — if empty, post 'no changes detected' and succeed WITHOUT creating docs (documentation_created=false).",
+      "Gather inputs: spec via find_spec_file(); screenshots dir from state review_screenshots (set by adw_review) or fallback agents/{adw_id}/reviewer/review_img.",
+      "Run /document (agent 'documenter') with args [adw_id, spec_path, screenshots_dir]; the prompt diffs against origin/main (--stat, --name-only, per-file for >50-line changes), copies *.png into app_docs/assets/, writes app_docs/feature-{adw_id}-{descriptive-name}.md following the committed Documentation Format, then updates .claude/commands/conditional_docs.md with a new entry + conditions, and returns EXCLUSIVELY the doc path.",
+      "Commit via /commit (documenter_committer), push, update PR; save documentation_path into state; output state for chaining."
+    ],
+    "conditional_docs_committed_baseline": "Four entries ship in the repo: README.md (app/server, app/client, project structure, start/stop commands), app/client/src/style.css (client style changes), .claude/commands/classify_adw.md (adding/removing adws/adw_*.py files), adws/README.md (operating in adws/). The fifth entry seen in the video (app_docs/feature-490eb6b5-one-click-table-exports.md — 'When working with CSV export functionality') was added agentically at runtime and is NOT in the committed repo — students see it appear only after running the document step.",
+    "who_reads_it": "bug.md, chore.md, feature.md, patch.md (in their Relevant Files sections: 'Read .claude/commands/conditional_docs.md to check if your task requires additional documentation... include those documentation files in the plan') and prime.md (reads it at prime time). document.md updates it. That's the plan↔document feedback cycle: 'It's all connected now. This seals the deal.'",
+    "app_docs_vs_ai_docs": "'If you want, you can also throw this in ai_docs. I like to separate these out. AI docs for third party, app docs is for your codebase.'"
+  },
+  "one_purpose_agent_mechanics": {
+    "agent_naming": "Agent names are constants at the top of each workflow file — 'it's a good practice to encode the agent names as constants right at the top of the file so it's super clear what agents are running.' adw_review.py: reviewer, review_patch_planner, review_patch_implementor (suffixed _{iteration}_{issue_number} per resolution attempt); adw_patch.py: patch_planner, patch_implementor; adw_document.py: documenter; plus sdlc_planner, sdlc_implementor, issue_classifier, branch_generator, pr_creator and {agent}_committer variants from earlier lessons.",
+    "one_prompt_per_agent": "Every agent executes exactly one slash-command template via AgentTemplateRequest{agent_name, slash_command, args, adw_id} → execute_template(). Finding any prompt call site is a one-search operation: search 'slash_command=' (14 results in 4 files: adw_document.py, adw_review.py, adw_test.py, workflow_ops.py).",
+    "model_routing": "SLASH_COMMAND_MODEL_MAP in adw_modules/agent.py routes each prompt to a model — opus for /implement, /review, /bug, /feature, /patch; sonnet for /chore, /document, /test, /resolve_failed_test, /test_e2e, /resolve_failed_e2e_test, /classify_issue, /classify_adw, /generate_branch_name, /commit, /pull_request; default sonnet. Concrete proof that per-purpose agents let you tune model per step — the mechanism behind 'you can change the model, you can add thinking mode... and rerun these over and over.'",
+    "execution": "execute_template() → claude -p '<prompt>' --model <mapped> --output-format stream-json --verbose --dangerously-skip-permissions, env-scoped, stdout piped to agents/{adw_id}/{agent_name}/raw_output.jsonl then converted to .json; the last JSONL result message carries session_id, is_error, num_turns, total_cost_usd. 'You can always dial in to the exact agent that's running... see its prompt there and the raw output. This is from the stream call... when it's finished, we format into a nicer JSON object.'",
+    "state_spine": "ADWState at agents/{adw_id}/adw_state.json holds exactly adw_id, issue_number, branch_name, plan_file, issue_class (+ review_screenshots, documentation_path as later phases add them). Workflows validate required state on entry and print state to stdout for pipe-chaining. 'The ADW ID is the thing that chains together the state of all of their work.'",
+    "reporting": "Most ADW code is not logic — it's reporting to the prompt-review system (GitHub issue comments via {adw_id}_{agent}_{message}, formatted with an ADW bot identifier to prevent webhook loops). 'Look at all these hits on the sidebar... Most of this code is just communicating what was done.' PITER callback from TAC-4/5: Prompt, Input, Trigger, Environment, Review — the review system here is GitHub issues, but 'do it your way' (PRs, Jira, any task board)."
+    },
+  "composed_workflows": {
+    "low_level": "adw_plan.py, adw_build.py, adw_test.py (--skip-e2e supported), adw_review.py, adw_document.py, adw_patch.py — standalone uv single-file scripts (PEP 723 inline deps), each runnable alone and chainable via state.",
+    "composers": "adw_plan_build.py, adw_plan_build_test.py, adw_plan_build_test_review.py, adw_plan_build_review.py (skips test — the one Dan runs), adw_plan_build_document.py (skips test AND review; README warns docs will lack screenshots), adw_sdlc.py (all five, test run with --skip-e2e). Composers are dumb subprocess chains: ensure_adw_id() then uv run each phase with the same adw_id, exiting on first failure.",
+    "trigger_drift_bug": "Course-repo drift worth teaching: classify_adw.md (the extraction prompt) lists /adw_plan_build_review and /adw_plan_build_document as valid, but the deterministic allowlists (ADWWorkflow Literal in data_types.py and AVAILABLE_ADW_WORKFLOWS in workflow_ops.py) omit both — extract_adw_info() filters them out, so webhook/cron-triggered runs can select every workflow EXCEPT the two new composers. They are manual-entry-only in this codebase. A perfect worked example of prompt↔code contract drift for the review chapter.",
+    "which_to_run": "Dan on the demo bug: 'we completely skipped plan build test review... This is probably the winning workflow' — the placement bug survived because the test step was skipped; testing and review protect against different failure classes."
+  },
+  "step_by_step_demo": [
+    "(11:20-11:45) Terminal: ls shows tac-1..tac-5; clone the lesson-6 repo (loot box link), cd in, code ., boot claude in YOLO mode with the Opus model.",
+    "(11:45-12:30) Run /install — same all-in-one setup as prior lessons plus one addition at the bottom: Cloudflare R2 env variables for uploading image assets ('a little teaser'). Agent copies env, resets DB from backup.db, starts server+client on a background process.",
+    "(12:30-13:40) Tour the new agentic layer: brand-new adw_review.py, adw_patch.py, adw_document.py plus composers adw_plan_build_review / adw_plan_build_document / adw_plan_build_test_review / adw_sdlc. Open adw_plan_build_review.py: standalone UV single-file scripts chained by the ADW ID + persistent state.",
+    "(13:40-15:30) Read adw_review.py's docstring — find spec from branch, review implementation against spec, capture screenshots of critical functionality, resolve issues if any, post results, push/update PR: 'without even looking at the code... we know exactly what this does.' Work the manual steps: fork/set your own origin so you have GitHub issues + PRs; /start the app; verify five-users query works.",
+    "(15:30-16:47) Create the prompt source — GitHub issue #14 'One Click Table Exports': using adw_plan_build_review, add one-click table export + one-click query-result export as CSV; two new endpoints; download button directly LEFT of the 'x' icon (tables) and directly LEFT of the 'hide' button (query results); appropriate download icon. High-level prompt drifting into mid-level because engineering details matter here; planning templates carry the rest.",
+    "(16:47-17:10) Fire it: uv run adws/adw_plan_build_review.py <path> 14 — no ADW ID passed, one gets created. 'Our agents have now taken over this repository. We shouldn't be doing anything alongside them.'",
+    "(17:10-18:40) While it runs, read the machinery: agents/{adw_id}/ per-agent folders; adw_state.json with adw_id/issue_number/branch/plan_file/issue_class; state validation on entry; most code is logging + reporting to the review system (PITER's R).",
+    "(18:40-23:00) Deep-read the review step: R2Uploader init ('this of course can be any bucket'); run_review fires /review; the prompt's collapsed view — review work against spec, git diff, capture screenshots, report issues or success; variables as on-the-fly information-dense keywords; JSON output contract; ReviewResult/ReviewIssue pydantic types; severity classes skippable/tech_debt/blocker — 'we don't want to block on skippable or tech debt.'",
+    "(23:00-27:30) Resolution machinery: MAX_REVIEW_RETRY_ATTEMPTS=3 cap ('if they can't, they're going to let us know and we hop back in the loop to fix our agentic layer... for the class of issue'); resolve_review_issues loops blockers only; create_and_implement_patch → /patch writes a focused patch plan (like chore/bug/feature, a template meta prompt) → /implement (higher-order prompt, reused) executes it.",
+    "(27:30-31:40) Check progress in agents/{adw_id}/ (build phase → review phase); branch changed under him — 'our agent is in full control over this system'; git diff --stat origin/main shows plan, e2e test generated from the plan template, implementation. R2 upload enabled: public bucket ready.",
+    "(31:41-33:30) Workflow completes: issue comment shows uploaded screenshots. The proof reveals the bug — export arrow present but NOT left of the hide button ('our agent did not obey this properly'). Review summary says all tests passed, one-click export implemented. 'There is work to be done on improving the prompt and the workflow for this review process.'",
+    "(33:30-35:20) /start the app, click through: downloads work (users table CSV, query-result CSV), but placement is wrong. Post-mortem: the test step was SKIPPED (plan_build_review, not plan_build_test_review) — 'the UI test very likely would have caught this'; and the review agent never reads its own screenshots: .mcp.json has no --vision, 'the tokens aren't flowing through the vision capabilities.' Fix belongs in the prompt ('for every image you take, be sure to read it in') not the global MCP config.",
+    "(35:20-37:45) Patch it like you're out-loop: comment on issue 14 containing 'adw_patch' + 'make sure the download button is just to the left of our hide button'; uv run adws/adw_patch.py 14 <adw-id> (after first passing 15 — the PR number — by mistake); patch plan lands in specs/patch/patch-adw-490eb6b5-fix-download-button-position.md; implement runs; refresh → 'Export is now right next to hide.' 'Why didn't you just do that by hand? You're missing the point... build the system that builds the system.'",
+    "(42:30-45:30) Document the feature on the same state: uv run adws/adw_document.py 14 <same-adw-id>. It sees the git diff + spec, writes app_docs/feature-490eb6b5-one-click-table-exports.md (concise breakdown, files changed, how to use, screenshots embedded — note the screenshot still shows the pre-patch layout because review wasn't rerun: another named improvement), copying images to app_docs/assets/.",
+    "(45:30-48:00) The magical part: /document also UPDATES .claude/commands/conditional_docs.md with the new doc + conditions ('When working with CSV export functionality'). Search 'conditional docs' → referenced inside bug, chore, feature, patch, and prime. Plan reads what document wrote: 'This is a full, complete loop... This seals the deal. This connects them all.'",
+    "(48:00-53:30) Zoom out on the issue/PR: a couple of prompts → ~900 lines of engineering work — plan, implementation, generated e2e test, patch, docs, conditional-docs update, PR. Agents present the work with proof; review velocity is the point; encode YOUR verification (report/image/video — a live asset) whatever your domain (scikit models, analytics, prototypes).",
+    "(53:30-57:16) KPI honesty pass: attempts 1→2 (patch), size solid, streak reset, presence ~3 vs the ideal 2 (prompt input + review/merge). Teasers: lesson 7 reveals the secret of Tactical Agentic Coding ('hiding in plain sight'); dangerous-mode ADWs shipping to production for small bugs/chores — 'do not wait to start putting this stuff in your codebase.'"
+  ],
+  "quotes": [
+    { "text": "We nearly arrive at the future where you can run a single prompt that triggers a fleet of agents that ship your work end to end.", "approx_timestamp": "0:28" },
+    { "text": "Testing answers the question, does it work? But review answers the question, is what we built what we asked for?", "approx_timestamp": "2:24" },
+    { "text": "We want attempts down, streak up, size up, presence down.", "approx_timestamp": "3:18" },
+    { "text": "Documentation provides feedback on work done for future agents to reference in their work.", "approx_timestamp": "3:52" },
+    { "text": "The tactic is one agent, one prompt, one purpose.", "approx_timestamp": "4:33" },
+    { "text": "Massive context windows often leads to a distracted, confused, agent. This is context pollution. This is context overloading. This is toxic context.", "approx_timestamp": "4:51" },
+    { "text": "Real engineering requires real developer workflows, not some pie in the sky God model that claims to do it all. And, you know, let me just spoil it for you. They won't. It's not here. It's not coming soon.", "approx_timestamp": "6:21" },
+    { "text": "You give your agent the full 200K, 500K, 1 million tokens... you give your agent all of the space and the opportunity to solve the one problem well.", "approx_timestamp": "7:13" },
+    { "text": "As agentic engineers, we have three constraints: the context window, the complexity of our codebase and the problem we're solving, and lastly our abilities. Specialized agents bypass two out of three of these.", "approx_timestamp": "7:34" },
+    { "text": "Model intelligence is not a constraint. Don't use this as an excuse. It will set you back. This is a losing mindset.", "approx_timestamp": "7:50" },
+    { "text": "The compact command inside of Claude Code... this is a bandaid fix. If your agent is running compact, it is losing information.", "approx_timestamp": "8:06" },
+    { "text": "A focused engineer working on a single task is a productive engineer. Agents are the same... When your agent's performance drops, your performance drops. So let your agents focus.", "approx_timestamp": "8:30" },
+    { "text": "You want to context engineer as little as possible. You want the minimum context in your prompt required to solve the problem.", "approx_timestamp": "8:54" },
+    { "text": "You effectively create evals for the agentic layer of your codebase.", "approx_timestamp": "10:04" },
+    { "text": "Everything comes down to the prompt level. All the ADW surrounding deterministic code is just support for the agents doing the real work.", "approx_timestamp": "20:16" },
+    { "text": "These agents are very agreeable, but they're also just great at engineering... if you ask them to find something, they'll find something. You want to give them the tools to delineate what is important.", "approx_timestamp": "22:26" },
+    { "text": "You don't want your agents bothering you. You want to reduce the number of human in the loop points there are in your workflow.", "approx_timestamp": "24:40" },
+    { "text": "They're called out-loop systems for a reason. You want your agent shipping end to end. And if something goes wrong, you fix the end to end portion, not the thing that went wrong.", "approx_timestamp": "25:10" },
+    { "text": "Why didn't you just do that by hand? You're missing the point... we are putting in the effort to build the system that builds the system.", "approx_timestamp": "37:30" },
+    { "text": "This isn't about you anymore. This is about your agents. It's about teaching your agents how to build on your behalf, so that it can be about you again.", "approx_timestamp": "37:41" },
+    { "text": "Our agents are fully connected, right, from planning to building to testing to reviewing to documenting their work. It's all connected now. This seals the deal. This connects them all.", "approx_timestamp": "47:39" },
+    { "text": "Review answers the critical question: is what we built what we asked for? Even when your agent is wrong, when it presents you with proof that it thinks it's right, you can quickly say yes or no.", "approx_timestamp": "50:50" },
+    { "text": "I'm not blaming the model for this. I'm blaming my skills. I'm blaming the ADWs we have set up right now.", "approx_timestamp": "50:30" },
+    { "text": "What you want is a live asset that you can review that proves that what was built is what was asked for.", "approx_timestamp": "51:51" },
+    { "text": "Ideally, you want two moments of presence: one at the beginning for your prompt input, one at the end for your review and your PR merge.", "approx_timestamp": "56:03" }
+  ],
+  "loot_box_mentions": [
+    "Lesson 6 ships 17 loot notes; the codebase clone link is called out on camera ('link available in your loot box below').",
+    "Codebase: git clone https://github.com/disler/tac-6.git",
+    "Tool doc: Playwright MCP — browser automation for agents (the review step's screenshot mechanism).",
+    "Idea notes distilling the lesson: review vs testing are different questions; SDLC as questions and answers; optimize for agentic KPIs (attempts down, streak up, size up, presence down); documentation creates feedback loops; Tactic #6 one agent one prompt one purpose; avoid context pollution; engineering steps require different context; real engineering requires real developer workflows; specialized agents with focused prompts; free up the context window (200K/500K/1M); three constraints of agentic engineers; let your agents focus; minimum context principle; commit and improve your prompts; create evals for your agentic layer."
+  ],
+  "prerequisites_tools": [
+    "TAC-3/4/5 machinery working: the plan (chore/bug/feature templates), build, and test ADWs — review and document only exist on top of prior work ('plan and build are our essential methods; it's the work that allows the other three steps to even exist')",
+    "A GitHub repository YOU control (fork/point origin at a new repo) so ADWs can use issues and PRs; gh auth login",
+    "GITHUB_REPO_URL exported; optional GITHUB_PAT for a second account",
+    "Claude Code CLI with ANTHROPIC_API_KEY (programmatic/headless billing path) and CLAUDE_CODE_PATH",
+    "Python + uv (all ADWs are uv single-file scripts); Node/npx (Playwright MCP); Bun (app client)",
+    "Playwright MCP configured via the repo's .mcp.json + playwright-mcp-config.json (headless chromium, 1920x1080, video recording dir)",
+    "Optional but demo-visible: Cloudflare R2 account + CLOUDFLARE_ACCOUNT_ID / R2 access key / secret / bucket name (+ optional public domain) so review screenshots render as images on GitHub; without them you get local file paths (upload silently disabled)",
+    "OpenAI or Anthropic API key for the app's own NL→SQL feature (app/server/.env)"
+  ],
+  "what_student_must_internalize": [
+    "The five SDLC questions — plan: what are we building? build: did we make it real? test: does it work? review: is what we built what we planned (prove it)? document: how does it work? A step you can phrase as a question is a step you can hand to a dedicated agent.",
+    "Testing ≠ review. Grouping them is 'a massive mistake, especially in the age of agents' — the demo's misplaced-button bug survived precisely because the test step was skipped and review only checked presence, not placement.",
+    "One agent, one prompt, one purpose — no agent runs more than a single prompt; prompts may be huge (template meta prompts, higher-order prompts), but each agent has exactly one job.",
+    "Why it works: frees the full context window for the one problem; sidesteps context pollution; bypasses two of the three constraints (context window, your abilities) — and model intelligence is not a constraint, that's a losing mindset.",
+    "Compact is a band-aid: if your agent is compacting, it is losing information. Design workflows so no single context has to hold everything.",
+    "Committed prompts are reproducible, improvable, and evaluable: search the slash command, open the file, know exactly what the agent sees; change model/thinking/tool, checkout the pre-run state, rerun — evals for your agentic layer.",
+    "Review must output a typed contract: strict JSON parsed into ReviewResult, severity triage (skippable/tech_debt/blocker), only blockers block, only blockers auto-resolve, retry capped at 3 — and the report always carries proof (1-5 screenshots, publicly hosted).",
+    "Agreeable agents need triage vocabulary: they WILL find something if you ask; the severity classes are templated judgment that keeps nitpicks from blocking releases.",
+    "Patches are a distinct class of change (surgical, minimal, review_change_request-driven) with their own meta prompt — and the implementor is the same reused /implement higher-order prompt. Run the patch workflow even when your hands could fix it faster; you're building the system that builds the system.",
+    "Documentation is two problems: creating docs (from git diff + spec + review screenshots) and knowing when to load them (conditional_docs.md, read by bug/chore/feature/patch/prime and updated by document). That closes the SDLC feedback loop — future planners read what past documenters wrote.",
+    "Out-loop bias: reduce human-in-the-loop points; when something breaks, fix the end-to-end system (prompt/workflow), not just the artifact. When review misses, blame your ADWs and skills, not the model — then encode the fix (e.g., 'read every image you take').",
+    "Ideal presence is 2: prompt input at the start, review + PR merge at the end. Everything in this lesson exists to make those the only two moments you're needed."
+  ],
+  "common_weak_student_failures": [
+    "Merging testing and review ('we have CI, review is redundant') — losing the spec-conformance question entirely; the lesson's own bug is the counterexample.",
+    "Running plan+build+review+document in one long interactive session to 'save tokens' — recreating exactly the context pollution the tactic eliminates, and losing per-step reproducibility.",
+    "Hearing 'one purpose' as 'small prompts' and shrinking templates until they're useless. Purpose is singular; prompts stay industrial (meta prompts, higher-order prompts).",
+    "Skipping the severity contract, then wondering why every run fails review — agreeable agents report SOMETHING; without skippable/tech_debt/blocker triage everything looks blocking.",
+    "Skipping the test ADW because 'review will catch it' — Dan's own demo proves the opposite; plan_build_test_review is 'probably the winning workflow'.",
+    "Hand-fixing the misplaced button instead of running adw_patch — 'you're missing the point'; the system never learns and the fix isn't reproducible.",
+    "Forgetting that adw_review.py and adw_document.py REQUIRE the adw-id (they hard-exit without state), or passing the PR number instead of the issue number — Dan did exactly this on camera (15 vs 14); read the state echo in the issue comments.",
+    "Expecting screenshots to render on GitHub without the Cloudflare R2 env vars (upload silently disables to local paths), or assuming the review agent SAW its screenshots — course-era it never reads them; that's the named improvement.",
+    "Editing conditional_docs.md by hand or treating app_docs as human-only documentation — the loop only closes if the documenter agent maintains the conditional index that planners read.",
+    "Reviewing from inside the app instead of from the presented proof — booting the environment for every review is the old way; the point of hard assets is review-from-the-issue."
+  ],
+  "teach_back_prompt": "Explain to a colleague, without notes: (1) the five SDLC questions and why 'is what we built what we asked for?' is a different question from 'does it work?' — use the export-button bug as evidence (which step was skipped, what review caught, what review itself missed and why the screenshots never entered the agent's context); (2) the full review→patch→document pipeline: where the spec comes from, what the /review JSON contract and severity classes are, when resolution fires and what caps it, how /patch reuses /implement, and what /document writes AND updates; (3) why one agent, one prompt, one purpose beats one god-session — context pollution, the three constraints, and how committed one-purpose prompts become evals; finish by tracing the loop: which five prompts read conditional_docs.md, which prompt writes it, and what that means for the next feature you plan.",
+  "retrieval_questions": [
+    { "q": "State the five SDLC steps as questions.", "a": "Plan: what are we building? Build: did we make it real? Test: does it work? Review: is what we built what we planned (prove it)? Document: how does it work?" },
+    { "q": "What's the difference between testing and reviewing, and why does Dan refuse to group them?", "a": "Testing answers 'does it work?'; review answers 'is what we built what we asked for?' — spec conformance with proof, not functionality and not code quality. Grouping them is 'a massive mistake, especially in the age of agents' because they're different questions needing different specialist agents." },
+    { "q": "What is Tactic #6, and what's the strongest single-sentence evidence it's already in the codebase?", "a": "One agent, one prompt, one purpose. 'No agent runs more than a single prompt' — every ADW phase spawns a named agent that executes exactly one slash-command template and exits." },
+    { "q": "Name the three constraints of agentic engineers and which two the tactic bypasses.", "a": "The context window; the complexity of the codebase + problem; your abilities. Specialized agents bypass the context window (fresh, freed per step) and your abilities (engineering templated into committed prompts). Model intelligence is NOT a constraint — treating it as one is a losing mindset." },
+    { "q": "Why does Dan call compact a band-aid?", "a": "If your agent is running compact, it is losing information — compression is lossy. One-purpose agents get fresh windows instead of compacted ones." },
+    { "q": "What are the three review severity classes, and which ones block?", "a": "skippable, tech_debt, blocker. Only blockers set success=false, and only blockers get auto-resolved by the patch loop." },
+    { "q": "Walk the review resolution loop, including its cap.", "a": "Run /review → parse JSON into ReviewResult → upload screenshots to R2 → post report. If blockers: for each blocker, create a patch plan (/patch) and implement it (/implement), commit, then re-review — up to MAX_REVIEW_RETRY_ATTEMPTS = 3 total attempts. If nothing resolves, stop; if blockers remain at the end, the workflow exits 1 and you fix the agentic layer for that class of issue." },
+    { "q": "Why did the misplaced export button survive review, twice over?", "a": "First, the test step was skipped entirely (plan_build_review, not plan_build_test_review) — the UI test 'very likely would have caught this.' Second, the review agent captures screenshots it never reads: no --vision on Playwright MCP and no read-the-image instruction, so the tokens never flowed through the model's vision capabilities." },
+    { "q": "How do you trigger a standalone patch out-loop, and what makes /patch different from /bug or /feature?", "a": "Comment (or write in the issue body) the keyword 'adw_patch' plus the change request, then run uv run adws/adw_patch.py <issue> [adw-id] (or let the webhook fire it). /patch creates a minimal, surgical plan in specs/patch/ scoped to only the review_change_request — a different class of change than chore/bug/feature — then reuses the same /implement higher-order prompt." },
+    { "q": "What TWO things does the /document prompt produce or modify, and who consumes each?", "a": "It writes app_docs/feature-{adw_id}-{name}.md (with screenshots copied into app_docs/assets/) for humans AND future agents, and it appends an entry to .claude/commands/conditional_docs.md — which bug, chore, feature, patch, and prime read at planning time. That's the plan↔document feedback loop." },
+    { "q": "What is the ADW state file, where does it live, and what fields does it carry?", "a": "agents/{adw_id}/adw_state.json — adw_id, issue_number, branch_name, plan_file, issue_class (review adds review_screenshots; document adds documentation_path). The ADW ID chains the state of all phases together." },
+    { "q": "How does the codebase route models per prompt, and which prompts get the big model?", "a": "SLASH_COMMAND_MODEL_MAP in adw_modules/agent.py: opus for /implement, /review, /bug, /feature, /patch; sonnet for /chore, /document, tests, classification and git ops; default sonnet. Per-purpose agents make per-step model routing (and eval-style reruns) trivial." },
+    { "q": "What's the ideal presence count and what are the two moments?", "a": "Two: one at the beginning for prompt input, one at the end for review and PR merge." },
+    { "q": "What proof does review owe you, and what does that do to your KPIs?", "a": "A hard/live asset proving the work matches the ask — 1-5 screenshots here; a report, video, or metrics for non-UI domains. Proof lets you say yes/no in seconds even when the agent is wrong, which directly increases review velocity (and drives presence down)." }
+  ],
+  "codebase_map": {
+    "repo": "git clone https://github.com/disler/tac-6.git (symlinked locally: tac-6-let-your-agents-focus/codebase → tac/tac-6)",
+    "new_in_tac6_vs_tac5": {
+      "commands": [".claude/commands/review.md", ".claude/commands/patch.md", ".claude/commands/document.md", ".claude/commands/conditional_docs.md", ".claude/commands/prepare_app.md"],
+      "adws": ["adws/adw_review.py", "adws/adw_patch.py", "adws/adw_document.py", "adws/adw_plan_build_review.py", "adws/adw_plan_build_document.py", "adws/adw_plan_build_test_review.py", "adws/adw_sdlc.py"],
+      "modules": ["adws/adw_modules/r2_uploader.py"],
+      "modified": ["adws/adw_modules/agent.py (SLASH_COMMAND_MODEL_MAP grew /review /patch /document routing)", "adws/adw_modules/data_types.py (ReviewIssue, ReviewResult, DocumentationResult; SlashCommand/ADWWorkflow literals extended)", "adws/adw_modules/workflow_ops.py (find_spec_file, create_and_implement_patch)", ".claude/commands/{bug,chore,feature}.md (now read conditional_docs.md)", ".claude/commands/prime.md (reads conditional_docs.md)", ".claude/commands/install.md (Cloudflare R2 mention in Report)", ".env.sample (CLOUDFLARE_* R2 block)"]
+    },
+    "files": [
+      ".claude/commands/review.md",
+      ".claude/commands/patch.md",
+      ".claude/commands/document.md",
+      ".claude/commands/conditional_docs.md",
+      ".claude/commands/prepare_app.md",
+      ".claude/commands/implement.md",
+      ".claude/commands/bug.md",
+      ".claude/commands/chore.md",
+      ".claude/commands/feature.md",
+      ".claude/commands/prime.md",
+      ".claude/commands/install.md",
+      ".claude/commands/start.md",
+      ".claude/commands/commit.md",
+      ".claude/commands/pull_request.md",
+      ".claude/commands/generate_branch_name.md",
+      ".claude/commands/classify_issue.md",
+      ".claude/commands/classify_adw.md",
+      ".claude/commands/test.md",
+      ".claude/commands/test_e2e.md",
+      ".claude/commands/resolve_failed_test.md",
+      ".claude/commands/resolve_failed_e2e_test.md",
+      ".claude/commands/tools.md",
+      ".claude/commands/e2e/ (5 e2e test prompts: basic_query, complex_query, disable_input_debounce, random_query_generator, sql_injection)",
+      ".claude/settings.json",
+      ".claude/hooks/ (7 lifecycle hooks + utils)",
+      ".mcp.json",
+      ".mcp.json.sample",
+      "playwright-mcp-config.json",
+      ".env.sample",
+      "adws/adw_plan.py",
+      "adws/adw_build.py",
+      "adws/adw_test.py",
+      "adws/adw_review.py",
+      "adws/adw_document.py",
+      "adws/adw_patch.py",
+      "adws/adw_plan_build.py",
+      "adws/adw_plan_build_test.py",
+      "adws/adw_plan_build_review.py",
+      "adws/adw_plan_build_document.py",
+      "adws/adw_plan_build_test_review.py",
+      "adws/adw_sdlc.py",
+      "adws/adw_modules/agent.py",
+      "adws/adw_modules/data_types.py",
+      "adws/adw_modules/workflow_ops.py",
+      "adws/adw_modules/state.py",
+      "adws/adw_modules/git_ops.py",
+      "adws/adw_modules/github.py",
+      "adws/adw_modules/r2_uploader.py",
+      "adws/adw_modules/utils.py",
+      "adws/adw_triggers/trigger_cron.py",
+      "adws/adw_triggers/trigger_webhook.py",
+      "adws/adw_tests/ (health_check, sandbox_poc, test_adw_test_e2e, test_agents, test_r2_uploader)",
+      "adws/README.md",
+      "README.md",
+      "app/server/ (FastAPI NL→SQL: server.py, core/{sql_processor,llm_processor,file_processor,sql_security,insights,data_models,constants}, tests/, db/backup.db)",
+      "app/client/ (Vite + TypeScript: src/main.ts, src/api/client.ts, src/style.css, index.html)",
+      "scripts/ (start.sh, stop_apps.sh, reset_db.sh, copy_dot_env.sh, expose_webhook.sh, kill_trigger_webhook.sh, clear_issue_comments.sh, delete_pr.sh)",
+      "specs/ (6 committed example plans from prior lesson runs)"
+    ],
+    "what_each_does": {
+      ".claude/commands/review.md": "The reviewer agent's whole brain: review work against the spec, git diff origin/main, e2e prompts as screenshot navigation guides only, 1-5 numbered screenshots into agents/{adw_id}/{agent}/review_img/ (absolute paths), severity guidelines (skippable/tech_debt/blocker with think-hard guidance), Setup section that executes prepare_app.md, and a strict raw-JSON Report contract (success only reflects blockers; screenshots ALWAYS included). Contains the './claude/commands/e2e' path typo.",
+      ".claude/commands/patch.md": "Template meta prompt producing specs/patch/patch-adw-{adw_id}-{name}.md: minimal targeted plan (metadata, issue summary, files, 2-5 steps, validation from spec or test.md, scope estimate). Reads conditional_docs.md; 'Address only the review_change_request'; returns exclusively the plan path.",
+      ".claude/commands/document.md": "Template meta prompt: analyze git diff origin/main (--stat/--name-only/per-file >50 lines), read spec, copy screenshots to app_docs/assets/, write app_docs/feature-{adw_id}-{descriptive-name}.md per the committed Documentation Format, THEN update conditional_docs.md with the new entry + conditions; returns exclusively the doc path.",
+      ".claude/commands/conditional_docs.md": "The loop-closing lower-level prompt: instructions to read a doc ONLY if a condition matches ('you don't want to excessively read documentation'), plus the doc→conditions index. Ships with 4 entries (README.md, app/client/src/style.css, classify_adw.md, adws/README.md); the documenter appends more at runtime.",
+      ".claude/commands/prepare_app.md": "Shared setup step executed inside /review (and tests): reset DB via scripts/reset_db.sh, ensure server+client run in background via nohup sh ./scripts/start.sh, stop via scripts/stop_apps.sh.",
+      ".claude/commands/implement.md": "The reused higher-order prompt: 'Read the plan, think hard about the plan and implement the plan', then report a bullet summary + git diff --stat. Consumes chore/bug/feature plans AND patch plans.",
+      ".claude/commands/bug.md|chore.md|feature.md": "Planning template meta prompts from TAC-3/4/5, now with the conditional-docs hook in Relevant Files: check conditional_docs.md and pull matching docs into the generated plan.",
+      ".claude/commands/prime.md": "Context priming: git ls-files, README.md, adws/README.md, and conditional_docs.md 'to determine which documentation to read based on the upcoming task.'",
+      ".claude/commands/install.md": "All-in-one onboarding prompt (encode your engineering for you and your team): re-init git, install FE/BE deps, copy env, reset DB, background-start the app — with the new final mention: set Cloudflare env vars if you want public review images.",
+      "adws/adw_review.py": "Review phase workflow (agents: reviewer, review_patch_planner_{i}_{n}, review_patch_implementor_{i}_{n}): state-driven checkout, spec discovery, /review execution, ReviewResult parsing (failure synthesizes a blocker), R2 upload + URL mapping into the result and state, grouped GitHub report with raw JSON payload, blocker-only agentic resolution loop capped at 3 attempts, review commit, push/PR, exit 1 on unresolved blockers.",
+      "adws/adw_patch.py": "Standalone patch workflow (agents: patch_planner, patch_implementor): requires 'adw_patch' keyword in latest comment or issue body, branch create-or-find, create_and_implement_patch, commit as '/patch', push/PR, final state echo.",
+      "adws/adw_document.py": "Documentation phase workflow (agent: documenter): requires adw-id; no-diff → graceful skip; passes [adw_id, spec_path, screenshots_dir] to /document; commits, pushes, updates PR; saves documentation_path to state.",
+      "adws/adw_plan_build_review.py": "Composer: plan → build → review (test skipped; the run Dan demos). Dumb subprocess chain sharing one adw_id.",
+      "adws/adw_plan_build_document.py": "Composer: plan → build → document (skips test AND review; README warns documentation quality is limited without review screenshots).",
+      "adws/adw_plan_build_test_review.py": "Composer: plan → build → test → review — 'probably the winning workflow' per the demo post-mortem.",
+      "adws/adw_sdlc.py": "The complete SDLC composer: plan → build → test (--skip-e2e) → review → document.",
+      "adws/adw_modules/r2_uploader.py": "Cloudflare R2 (S3-compatible boto3) uploader: silently disabled unless all four env vars present; upload_screenshots maps local paths → https://{public_domain}/adw/{adw_id}/review/{filename}; default public domain tac-public-imgs.iddagents.com.",
+      "adws/adw_modules/agent.py": "Claude Code integration: SLASH_COMMAND_MODEL_MAP (per-prompt opus/sonnet routing), execute_template → claude -p with --model, --output-format stream-json, --verbose, --dangerously-skip-permissions; saves prompt + raw_output.jsonl per agent; parses the trailing result message (session_id, is_error, num_turns, total_cost_usd).",
+      "adws/adw_modules/data_types.py": "Pydantic contracts: ReviewIssue (number, screenshot_path, screenshot_url, description, resolution, severity Literal), ReviewResult (success, review_summary, review_issues, screenshots, screenshot_urls), DocumentationResult, ADWStateData, AgentTemplateRequest, SlashCommand + ADWWorkflow literals. NOTE: ADWWorkflow omits adw_plan_build_review/adw_plan_build_document (see trigger_drift_bug).",
+      "adws/adw_modules/workflow_ops.py": "Shared ops: agent name constants, classify_issue, build_plan, implement_plan, generate_branch_name, create_commit, create_pull_request, ensure_adw_id, create_or_find_branch, find_spec_file (state → diff → branch-pattern glob), create_and_implement_patch (validates the returned specs/patch/*.md path, then /implement), AVAILABLE_ADW_WORKFLOWS allowlist.",
+      "adws/adw_modules/state.py": "ADWState: persistent agents/{adw_id}/adw_state.json, load/update/save(+phase note), to_stdout for pipe chaining.",
+      ".mcp.json": "Playwright MCP server config: npx @playwright/mcp@latest --isolated --config ./playwright-mcp-config.json. No --vision flag — the course-era review agent cannot see its own screenshots.",
+      "playwright-mcp-config.json": "Headless chromium at 1920x1080 with video recording to ./videos — the review agent's browser.",
+      ".env.sample": "ANTHROPIC_API_KEY (required), GITHUB_PAT, CLAUDE_CODE_PATH, E2B_API_KEY, CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR, CLOUDFLARED_TUNNEL_TOKEN, and the new CLOUDFLARE_ACCOUNT_ID / R2 ACCESS_KEY_ID / SECRET / BUCKET_NAME / PUBLIC_DOMAIN block for review screenshot hosting.",
+      ".claude/settings.json": "Permission allowlist (mkdir/uv/find/mv/grep/npm/ls/cp/Write/chmod/touch + copy_dot_env.sh), denials (git push --force, rm -rf), and all seven hook events wired to .claude/hooks/*.py loggers.",
+      "app/": "The Natural Language SQL Interface (FastAPI + Vite/TS) — the subject codebase the agents operate on; the export feature gets built into app/client/src/main.ts + client.ts + style.css and app/server/server.py + core/.",
+      "scripts/": "Deterministic support: start.sh/stop_apps.sh/reset_db.sh (used by prepare_app + install), expose_webhook.sh + kill_trigger_webhook.sh (Cloudflare tunnel for out-loop triggers), clear_issue_comments.sh, delete_pr.sh (demo-reset utilities).",
+      "specs/": "Committed example plans from prior lessons' runs (e.g. issue-28 random-query, issue-222 debounce, sql-injection fix) — the spec corpus review runs against; specs/patch/ appears at runtime."
+    },
+    "generated_not_committed": {
+      "agents/{adw_id}/": "Per-run workspace: adw_state.json plus per-agent folders (sdlc_planner, sdlc_implementor, reviewer with review_img/, patch_planner, patch_implementor, documenter, *_committer, issue_classifier, branch_generator) each holding prompts/ and raw_output.jsonl → raw_output.json.",
+      "specs/patch/patch-adw-{adw_id}-{name}.md": "Patch plans created by /patch at runtime (Dan's: patch-adw-490eb6b5-fix-download-button-position.md).",
+      "specs/issue-{n}-adw-{id}-sdlc_planner-{slug}.md": "The feature plan the planner writes (Dan's: issue-14-adw-490eb6b5-sdlc_planner-one-click-table-exports.md).",
+      "app_docs/feature-{adw_id}-{name}.md + app_docs/assets/": "Documentation output + copied screenshots (Dan's: feature-490eb6b5-one-click-table-exports.md).",
+      "conditional_docs.md fifth+ entries": "Appended agentically by the document step (committed file ships with 4 entries).",
+      "logs/, videos/, agents/**": "Session logs from hooks, Playwright recordings, stream outputs."
+    }
+  },
+  "current_practice_gaps": [
+    {
+      "gap": "One-purpose prompts predate native subagents",
+      "why": "TAC-6 implements one-agent-one-prompt-one-purpose as separate headless claude -p processes orchestrated by Python. Modern Claude Code productizes the same tactic: subagents with their own context windows, tools, and system prompts (project .claude/agents/*.md), spawnable in parallel from a main loop — plus background tasks. The tactic's rationale (fresh focused windows per purpose) is unchanged and is now the official mental model for subagent design; the orchestration layer can be native instead of hand-rolled for many cases, while ADW-style external orchestration still wins for deterministic CI/webhook pipelines.",
+      "yt_candidates": ["X2ciJedw2vU"]
+    },
+    {
+      "gap": "'Context pollution' became mainstream context engineering",
+      "why": "Dan's vocabulary (context pollution/overloading/toxic context, minimum context principle) predates the industry's 'context engineering' wave. Current Claude Code adds machinery TAC-6 lacked: auto-compaction control, context editing, /context inspection, CLAUDE.md layering, and explicit guidance that long sessions degrade focus. Dan's 'compact is a band-aid — if your agent is compacting it is losing information' remains true and is now the consensus position; the durable answer is still what the lesson teaches: fresh one-purpose contexts.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "The screenshot-blind reviewer is solved tooling today",
+      "why": "The lesson's sharpest self-critique — screenshots captured but never read ('the tokens aren't flowing through the vision capabilities') — is a period artifact. Current agents read images natively (Claude Code's Read renders PNGs into context; Playwright MCP has vision modes; computer-use agents screenshot-and-look by default). Dan's proposed fix (an in-prompt 'read every image you take during review') is now a one-line standard practice, and the book should teach it as the default review-prompt instruction rather than an optional improvement.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "R2 public bucket is one of several proof-hosting paths now",
+      "why": "Public image URLs for GitHub comments still work exactly as taught (S3-compatible R2 + public domain). Current practice adds alternatives: gh CLI/API attachment uploads, PR review comments with inline images, artifacts from CI runners, and Agent SDK structured outputs carrying artifacts. The lesson's principle — proof must land IN the review system, publicly viewable, zero clicks to verify — transfers unchanged.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Model routing map has drifted model names; the pattern is now first-class",
+      "why": "SLASH_COMMAND_MODEL_MAP hardcodes 'sonnet'/'opus' aliases (course-era Claude 4-class models). The aliases still resolve in Claude Code, but current model families (Claude 4.x → Claude 5 era) and per-agent `model:` frontmatter in subagent definitions make per-purpose model routing a supported feature rather than a hand-rolled dict. The lesson's insight — committed one-purpose prompts let you tune model/thinking per step and rerun as evals — is now also served by real eval harnesses and session-resume/checkpointing.",
+      "yt_candidates": ["6fCqj4xFCZI"]
+    },
+    {
+      "gap": "app_docs/ai_docs/specs taxonomy is Dan's broader 3-folder system",
+      "why": "TAC-6 introduces app_docs (your codebase's docs) alongside ai_docs (third-party docs) and specs (plans) but only mentions the split in passing. Dan's public '3 codebase folders' treatment develops the taxonomy fully and is the natural overlay for the documentation half of this lesson — including why conditional loading (not bulk loading) is the point.",
+      "yt_candidates": ["hGg3nWp7afg"]
+    },
+    {
+      "gap": "Repo drift: the two new composers are invisible to triggers",
+      "why": "Not an ecosystem change — a course-repo accuracy flag the book should carry: classify_adw.md lists /adw_plan_build_review and /adw_plan_build_document, but data_types.ADWWorkflow and workflow_ops.AVAILABLE_ADW_WORKFLOWS omit them, so webhook/cron classification filters both out (extract_adw_info validates against the code allowlist). Manual entry points only. Teach it as a live example of prompt↔code contract drift — exactly the class of bug a review step should catch.",
+      "yt_candidates": []
+    }
+  ],
+  "yt_overlay_candidates": [
+    {
+      "video_id": "X2ciJedw2vU",
+      "title": "RAW Agentic Coding: ZERO to Agent SKILL",
+      "maps_to": "corrects outdated",
+      "include_in_phase1": true,
+      "rationale": "TAC-6 packages one-purpose behavior as .claude/commands/*.md templates launched by Python; current practice packages the same single-purpose expertise as Agent Skills (SKILL.md with frontmatter, discovery, on-demand loading). Direct upgrade path for the lesson's central artifact class — the committed, improvable, one-purpose prompt."
+    },
+    {
+      "video_id": "hGg3nWp7afg",
+      "title": "3 Codebase Folders",
+      "maps_to": "operationalizes tactic",
+      "include_in_phase1": true,
+      "rationale": "The documentation half of TAC-6 writes into app_docs/ and mentions the ai_docs split in one breath; this video is Dan's full treatment of the specs/ai_docs/app_docs taxonomy the document step feeds — the named home for 'how you document and when to include your documentation.'"
+    },
+    {
+      "video_id": "fop_yxV-mPo",
+      "title": "Codebase Singularity",
+      "maps_to": "named hole",
+      "include_in_phase1": false,
+      "rationale": "The 'fleet of agents checking each other's work / codebase runs itself' end-state that TAC-6's completed SDLC loop points at — but TAC-4 already carries this overlay in phase 1, and lesson 7 (ZTE) is its natural chapter. Deferred to avoid duplication."
+    },
+    {
+      "video_id": "6fCqj4xFCZI",
+      "title": "How Claude Code CHANGED Engineering Forever",
+      "maps_to": "named hole",
+      "include_in_phase1": false,
+      "rationale": "Covers the current state of the tool surface (subagents, skills, headless/SDK) that modernizes this lesson's hand-rolled orchestration; already used in phase 1 by TAC-1/TAC-3. Keep as volume-map reference only."
+    }
+  ],
+  "frame_plan": [
+    { "t_seconds": 152, "label": "sdlc-as-questions", "file": "media/frames/tac-6-let-your-agents-focus/t0152-sdlc-as-questions.jpg", "why_for_weak_student": "All five SDLC steps with their questions on one slide — including Review's '(Prove it)'. The lesson's conceptual scaffold.", "diagram_instead": false },
+    { "t_seconds": 278, "label": "tactic-one-agent-one-prompt-one-purpose", "file": "media/frames/tac-6-let-your-agents-focus/t0278-tactic-one-agent-one-prompt-one-purpose.jpg", "why_for_weak_student": "The tactic slide with full definition + five Daily Actions — the image to memorize.", "diagram_instead": false },
+    { "t_seconds": 756, "label": "adws-workflow-files", "file": "media/frames/tac-6-let-your-agents-focus/t0756-adws-workflow-files.png", "why_for_weak_student": "The adws/ tree with review circled — one glance shows what's new (review/patch/document + composers).", "diagram_instead": false },
+    { "t_seconds": 1012, "label": "composed-workflow-script", "file": "media/frames/tac-6-let-your-agents-focus/t1012-composed-workflow-script.png", "why_for_weak_student": "adw_plan_build_review.py's docstring: three standalone phases chained via persistent state — composition explained by the artifact itself.", "diagram_instead": false },
+    { "t_seconds": 1068, "label": "adw-state-json", "file": "media/frames/tac-6-let-your-agents-focus/t1068-adw-state-json.png", "why_for_weak_student": "The 7-line adw_state.json (adw_id, issue 14, branch, plan_file null, /feature) beside the per-agent folders — 'state' demystified.", "diagram_instead": false },
+    { "t_seconds": 1305, "label": "review-prompt-and-types", "file": "media/frames/tac-6-let-your-agents-focus/t1305-review-prompt-and-types.png", "why_for_weak_student": "review.md's JSON Output Structure beside data_types.py's ReviewResult/ReviewIssue — the prompt contract and the pydantic type are one shape.", "diagram_instead": false },
+    { "t_seconds": 1912, "label": "review-screenshot-misplaced-export", "file": "media/frames/tac-6-let-your-agents-focus/t1912-review-screenshot-misplaced-export.png", "why_for_weak_student": "The R2-hosted review proof exposing the bug: Export floating mid-header instead of left of Hide. Proof beats prose.", "diagram_instead": false },
+    { "t_seconds": 2135, "label": "playwright-mcp-vision-gap", "file": "media/frames/tac-6-let-your-agents-focus/t2135-playwright-mcp-vision-gap.png", "why_for_weak_student": ".mcp.json with --vision typed in (then rejected): why the reviewer never saw its own screenshots, and where the fix does NOT belong.", "diagram_instead": false },
+    { "t_seconds": 2190, "label": "patch-workflow-terminal", "file": "media/frames/tac-6-let-your-agents-focus/t2190-patch-workflow-terminal.png", "why_for_weak_student": "adw_patch end to end in one terminal: patch plan path, implement, commit, issue comments, PR update, 'Patch workflow completed successfully.'", "diagram_instead": false },
+    { "t_seconds": 2255, "label": "export-fixed-next-to-hide", "file": "media/frames/tac-6-let-your-agents-focus/t2255-export-fixed-next-to-hide.png", "why_for_weak_student": "The after picture: Export sitting immediately left of Hide. Pairs with t1912 as before/after proof of the review→patch loop.", "diagram_instead": false },
+    { "t_seconds": 2742, "label": "conditional-docs-updated", "file": "media/frames/tac-6-let-your-agents-focus/t2742-conditional-docs-updated.png", "why_for_weak_student": "conditional_docs.md with the agent-appended fifth entry for the new feature doc — the feedback loop caught in the act.", "diagram_instead": false },
+    { "t_seconds": 2815, "label": "bug-md-conditional-docs-loop", "file": "media/frames/tac-6-let-your-agents-focus/t2815-bug-md-conditional-docs-loop.png", "why_for_weak_student": "Search proof that bug/chore/document/feature/patch/prime all reference conditional docs — planning reads what documenting wrote.", "diagram_instead": false }
+  ],
+  "lab": {
+    "setup": [
+      "Clone the course repo: git clone https://github.com/disler/tac-6.git && cd tac-6",
+      "Create YOUR OWN GitHub repo and point origin at it (git remote remove origin; git remote add origin <your-repo>; git push -u origin main) — ADW review/patch/document need issues and PRs you control",
+      "Boot claude, run /install; fill .env from .env.sample (ANTHROPIC_API_KEY required; CLAUDE_CODE_PATH; export GITHUB_REPO_URL) and app/server/.env for the app's NL→SQL keys",
+      "Optional (recommended for the full demo): set the four Cloudflare R2 vars so review screenshots render on GitHub; without them expect local paths in comments — that is not an error",
+      "Sanity: gh auth status; uv --version; the app serves at localhost:5173 after /start"
+    ],
+    "reproduce_dan": [
+      "Create issue 'One Click Table Exports' using Dan's shape: table CSV export + query-result CSV export, two new endpoints, download button directly LEFT of the tables' 'x' icon and LEFT of the query results' 'hide' button, appropriate download icon",
+      "Fire uv run adws/adw_plan_build_review.py <issue#> and DO NOT touch the repo while it runs; watch issue comments and agents/{adw_id}/",
+      "Verify the review report: success flag, review_summary, 1-5 screenshots (R2 URLs or local paths), severity-grouped issues, raw JSON payload",
+      "Inspect the placement in the running app; if your agent nailed it, introduce Dan's deviation deliberately so you can run the patch loop",
+      "Comment 'adw_patch' + a one-line change request on the issue; run uv run adws/adw_patch.py <issue#> <adw-id>; verify specs/patch/ plan, the fix, and the PR update",
+      "Run uv run adws/adw_document.py <issue#> <adw-id>; verify app_docs/feature-{adw_id}-*.md, app_docs/assets/, and the new conditional_docs.md entry"
+    ],
+    "stretch": [
+      "Winning workflow: rerun the whole feature on a fresh issue with adw_plan_build_test_review.py and note which phase catches your planted deviation",
+      "Dan's named improvement: via Claude Code, add 'For every image you take, be sure to read it in during the review process' to review.md; re-run adw_review.py on the same adw-id and compare ReviewResults",
+      "Evals-in-practice: flip /review to a different model in SLASH_COMMAND_MODEL_MAP, git checkout the pre-review state, rerun, and diff the two review JSONs",
+      "One-one-one census: ls agents/{adw_id}/ after the full run and map every agent folder to its slash command and single purpose",
+      "Trigger-drift hunt: prove from classify_adw.md vs data_types.py/workflow_ops.py why a webhook can never launch adw_plan_build_review, then fix it via a /patch issue"
+    ],
+    "pass_criteria": [
+      "Zero application code typed by hand — every change flowed through an ADW or Claude Code",
+      "agents/{adw_id}/adw_state.json shows adw_id, issue_number, branch_name, plan_file, issue_class populated across phases",
+      "Review posted a JSON-backed report with 1-5 screenshots and severity-classified issues; you can state which severities block and what caps the resolution loop (3)",
+      "A patch plan exists under specs/patch/ and its fix is visible in the app + PR",
+      "app_docs doc exists with copied assets AND conditional_docs.md gained its entry agentically (not by hand)",
+      "Oral, no notes: five SDLC questions; testing-vs-review distinction; three constraints + which two the tactic bypasses; why compact is a band-aid; ideal presence count and its two moments"
+    ]
+  },
+  "estimated_print_pages_when_expanded": 48,
+  "confidence_notes": [
+    "All quotes cross-checked between the cleaned transcript (.md) and the 11,594-line VTT; timestamps accurate to ~5s. Auto-caption corrections: 'Peter framework' = PITER (TAC-4), 'yellow mode' = YOLO mode, 'Huffactor agent' = mis-hear around booting the agent, 'AWID' = ADW ID, 'get' = git, 'Outloop/in loop' = out-of-loop/in-loop, 'loop box' = loot box.",
+    "Video duration 3436s (57:16) confirmed via ffprobe; native 1920x1080 @15fps screen recording; all 12 frames extracted at native resolution and visually verified this session.",
+    "Codebase facts verified on disk at tac/tac-6: new-vs-tac-5 file diff (5 commands, 7 ADW scripts, r2_uploader); MAX_REVIEW_RETRY_ATTEMPTS=3; severity Literal; SLASH_COMMAND_MODEL_MAP contents; stream-json + --dangerously-skip-permissions flags; R2 default domain tac-public-imgs.iddagents.com; conditional_docs.md ships with exactly 4 entries; conditional docs referenced by bug/chore/feature/patch/prime (+document updates it); review.md './claude/commands/e2e' typo; classify_adw-vs-allowlist drift (plan_build_review/plan_build_document trigger-invisible).",
+    "Demo-run artifacts (issue #14, PR #15, adw_id 490eb6b5, patch-adw-490eb6b5-fix-download-button-position.md, feature-490eb6b5-one-click-table-exports.md) are Dan's runtime values, read from frames/transcript — they are NOT in the committed repo; students' values will differ.",
+    "Loot box inventory (17 notes) from captured course-notes.md at capture time.",
+    "YT overlay IDs restricted to the orchestration seed pool already oembed-verified in the TAC-1 cross-review (X2ciJedw2vU, hGg3nWp7afg, fop_yxV-mPo, 6fCqj4xFCZI); re-verify resolution before publishing links. Exactly 2 include_in_phase1=true (within the 1-3 cap).",
+    "current_practice_gaps written against Claude Code as of mid-2026 (native subagents, skills, context editing, vision-capable file reads); re-check at publish — this axis moves fast."
+  ]
+}

@@ -1,0 +1,2917 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.000
+What's up engineers? Andy DevDan here.
+
+2
+00:00:02.360 --> 00:00:06.120
+We've got a couple mass releases to
+
+3
+00:00:04.000 --> 00:00:09.160
+cover. Of course, there is the brand new
+
+4
+00:00:06.120 --> 00:00:10.720
+Claude Opus 4.6. It's a fantastic model.
+
+5
+00:00:09.160 --> 00:00:12.400
+What else is there to say? It's beating
+
+6
+00:00:10.720 --> 00:00:14.560
+all the benchmarks. You've already
+
+7
+00:00:12.400 --> 00:00:16.200
+heard, you've already seen this. This is
+
+8
+00:00:14.560 --> 00:00:18.120
+not what I want to focus on here. The
+
+9
+00:00:16.200 --> 00:00:21.320
+real big idea I want to cover with you
+
+10
+00:00:18.120 --> 00:00:23.800
+today is multi-agent orchestration. The
+
+11
+00:00:21.320 --> 00:00:26.160
+game on the field is changing. It's no
+
+12
+00:00:23.800 --> 00:00:29.240
+longer about what the models allow us to
+
+13
+00:00:26.160 --> 00:00:30.920
+do. As of Sonic 4.5, these models can do
+
+14
+00:00:29.240 --> 00:00:32.720
+much more than you and I give them
+
+15
+00:00:30.920 --> 00:00:35.280
+credit for, than you and I really know
+
+16
+00:00:32.720 --> 00:00:38.400
+how to unlock. The true constraint of
+
+17
+00:00:35.280 --> 00:00:41.000
+agentic engineering now is twofold. It's
+
+18
+00:00:38.400 --> 00:00:43.400
+the tools we have available and it's you
+
+19
+00:00:41.000 --> 00:00:45.440
+and I. It is our capabilities. It's our
+
+20
+00:00:43.400 --> 00:00:47.760
+ability to prompt engineer and context
+
+21
+00:00:45.440 --> 00:00:50.840
+engineer the outcomes we're looking for
+
+22
+00:00:47.760 --> 00:00:53.680
+and build them into reusable systems, to
+
+23
+00:00:50.840 --> 00:00:55.880
+build them into powerful agentic layers
+
+24
+00:00:53.680 --> 00:00:57.760
+that you and I can wield. The true
+
+25
+00:00:55.880 --> 00:01:00.520
+limitation is you and I. So, let's take
+
+26
+00:00:57.760 --> 00:01:03.200
+another stab at improving what we can
+
+27
+00:01:00.520 --> 00:01:05.239
+do. Front ends, back ends, scripts, it's
+
+28
+00:01:03.200 --> 00:01:07.640
+too simple for these models. So, what I
+
+29
+00:01:05.239 --> 00:01:10.960
+have here is eight unique applications
+
+30
+00:01:07.640 --> 00:01:12.880
+that I had Claude Opus 4.6 create. I
+
+31
+00:01:10.960 --> 00:01:15.280
+touched none of these, by the way. These
+
+32
+00:01:12.880 --> 00:01:16.680
+were all one-shotted. I like to use E2B,
+
+33
+00:01:15.280 --> 00:01:18.280
+use whatever you want. So, agent
+
+34
+00:01:16.680 --> 00:01:20.080
+sandboxes are very powerful, but once
+
+35
+00:01:18.280 --> 00:01:21.680
+again, this is not exactly what I want
+
+36
+00:01:20.080 --> 00:01:24.000
+to focus on here. We're going to use
+
+37
+00:01:21.680 --> 00:01:26.680
+agent sandboxes as a playground to
+
+38
+00:01:24.000 --> 00:01:29.440
+understand and to really dive into two
+
+39
+00:01:26.680 --> 00:01:31.600
+key big ideas: multi-agent orchestration
+
+40
+00:01:29.440 --> 00:01:33.720
+and multi-agent observability. Once you
+
+41
+00:01:31.600 --> 00:01:36.600
+put these two pieces together, you can
+
+42
+00:01:33.720 --> 00:01:39.561
+do much more with your powerful Claude
+
+43
+00:01:36.600 --> 00:01:41.581
+Code Opus 4.6 agent.
+
+44
+00:01:39.561 --> 00:01:41.581
+>> [music]
+
+45
+00:01:42.160 --> 00:01:45.280
+>> So, first things first, we're going to
+
+46
+00:01:43.360 --> 00:01:47.080
+crack open the terminal. If we create a
+
+47
+00:01:45.280 --> 00:01:48.800
+new Claude Code instance on our
+
+48
+00:01:47.080 --> 00:01:50.920
+multi-agent observability, you'll see
+
+49
+00:01:48.800 --> 00:01:52.960
+that we have a new agent joining the
+
+50
+00:01:50.920 --> 00:01:54.960
+session. And we have that session start
+
+51
+00:01:52.960 --> 00:01:56.880
+hook captured. We have a rocket and
+
+52
+00:01:54.960 --> 00:01:59.080
+we've officially kick off a new session.
+
+53
+00:01:56.880 --> 00:02:00.760
+But, before we touch our new multi-agent
+
+54
+00:01:59.080 --> 00:02:02.600
+orchestration capabilities, we need to
+
+55
+00:02:00.760 --> 00:02:04.320
+boot up Cloud Code in a different way.
+
+56
+00:02:02.600 --> 00:02:06.640
+Close this, and you'll see we got that
+
+57
+00:02:04.320 --> 00:02:08.520
+session end event captured here. And
+
+58
+00:02:06.640 --> 00:02:10.840
+instead of opening this up in a classic
+
+59
+00:02:08.520 --> 00:02:11.760
+terminal, we're going to use tmux. And
+
+60
+00:02:10.840 --> 00:02:13.480
+so, this is going to give us some
+
+61
+00:02:11.760 --> 00:02:14.760
+powerful capabilities, you'll see in a
+
+62
+00:02:13.480 --> 00:02:15.920
+second. The next thing we're going to do
+
+63
+00:02:14.760 --> 00:02:17.600
+is, I just want to make this super
+
+64
+00:02:15.920 --> 00:02:20.120
+clear. I'm going to type which and then
+
+65
+00:02:17.600 --> 00:02:21.680
+cldyo, so you can see this exact command
+
+66
+00:02:20.120 --> 00:02:23.959
+that I'm running. We're going to export
+
+67
+00:02:21.680 --> 00:02:25.720
+the new Cloud Code experimental agent
+
+68
+00:02:23.959 --> 00:02:27.040
+teams feature. Set that to one, we're
+
+69
+00:02:25.720 --> 00:02:29.320
+enabling that feature. So, now we're
+
+70
+00:02:27.040 --> 00:02:30.560
+running Cloud Code inside of a tmux
+
+71
+00:02:29.320 --> 00:02:32.200
+session. You can see we kicked off a
+
+72
+00:02:30.560 --> 00:02:34.400
+brand new agent, and this is where
+
+73
+00:02:32.200 --> 00:02:37.560
+things get interesting. If I type ls,
+
+74
+00:02:34.400 --> 00:02:38.880
+these are the agent sandbox directories
+
+75
+00:02:37.560 --> 00:02:41.240
+that you saw here. We're going to have
+
+76
+00:02:38.880 --> 00:02:43.040
+our agents investigate and break down
+
+77
+00:02:41.240 --> 00:02:44.560
+how we can set up these applications.
+
+78
+00:02:43.040 --> 00:02:46.280
+So, this is going to be our first agent
+
+79
+00:02:44.560 --> 00:02:48.120
+team. Build a new agent team for each
+
+80
+00:02:46.280 --> 00:02:51.040
+code base in this directory. Have an
+
+81
+00:02:48.120 --> 00:02:52.240
+agent summarize and how to set it up.
+
+82
+00:02:51.040 --> 00:02:54.000
+What you're going to see here is really
+
+83
+00:02:52.240 --> 00:02:56.040
+extraordinary. You can see all of our
+
+84
+00:02:54.000 --> 00:02:57.800
+events getting captured. Observability
+
+85
+00:02:56.040 --> 00:02:59.120
+is really important for knowing what you
+
+86
+00:02:57.800 --> 00:03:00.400
+can really do with your tool. You can
+
+87
+00:02:59.120 --> 00:03:02.200
+see here, we're going to start streaming
+
+88
+00:03:00.400 --> 00:03:03.560
+in all of our agent events. Let me make
+
+89
+00:03:02.200 --> 00:03:05.800
+sure that this is stuck to the bottom
+
+90
+00:03:03.560 --> 00:03:08.480
+here. The first thing our agent does is,
+
+91
+00:03:05.800 --> 00:03:10.320
+it creates a task list. We covered this
+
+92
+00:03:08.480 --> 00:03:13.360
+in our previous video. What happens next
+
+93
+00:03:10.320 --> 00:03:15.760
+is extraordinary. So, we're in tmux, and
+
+94
+00:03:13.360 --> 00:03:18.280
+so tmux has panes. Our agent is now
+
+95
+00:03:15.760 --> 00:03:19.800
+opening up brand new panes for each
+
+96
+00:03:18.280 --> 00:03:20.880
+sub-agent that it wants to run. All
+
+97
+00:03:19.800 --> 00:03:22.040
+right, so I'm going to go full screen
+
+98
+00:03:20.880 --> 00:03:23.239
+here, so that we can really take a look
+
+99
+00:03:22.040 --> 00:03:25.400
+at this, and I'm going to downsize this
+
+100
+00:03:23.239 --> 00:03:27.519
+a little bit. can see all eight agents
+
+101
+00:03:25.400 --> 00:03:29.640
+that we kicked off here, okay? So, on
+
+102
+00:03:27.519 --> 00:03:31.800
+the left, our primary agent set up the
+
+103
+00:03:29.640 --> 00:03:34.320
+task list, created a team, and then it
+
+104
+00:03:31.800 --> 00:03:36.680
+assigned a task to each member of the
+
+105
+00:03:34.320 --> 00:03:38.239
+team. And you can see our status lines
+
+106
+00:03:36.680 --> 00:03:40.519
+giving us the agent, looks like we have
+
+107
+00:03:38.239 --> 00:03:41.640
+Haiku agents. You can see our context
+
+108
+00:03:40.519 --> 00:03:44.120
+window, and our agents are going to
+
+109
+00:03:41.640 --> 00:03:45.720
+figure out how to run and summarize each
+
+110
+00:03:44.120 --> 00:03:47.320
+code base, right? And so, if we scroll
+
+111
+00:03:45.720 --> 00:03:49.760
+back here in our agent observability,
+
+112
+00:03:47.320 --> 00:03:52.080
+you can see a lot of work happening. Our
+
+113
+00:03:49.760 --> 00:03:53.880
+Haiku agents are running all the tools
+
+114
+00:03:52.080 --> 00:03:55.480
+they need to accomplish the work and we
+
+115
+00:03:53.880 --> 00:03:57.200
+can dial into an individual agent here
+
+116
+00:03:55.480 --> 00:03:59.120
+if we click this. You can see this is
+
+117
+00:03:57.200 --> 00:04:00.560
+all the tool calls for one of our
+
+118
+00:03:59.120 --> 00:04:03.000
+agents. Looks like this is our primary
+
+119
+00:04:00.560 --> 00:04:04.600
+agent here, right? Opus 4.6. You know,
+
+120
+00:04:03.000 --> 00:04:06.880
+you can see here a lot of work is
+
+121
+00:04:04.600 --> 00:04:09.400
+happening here, guys, right? 160 tool
+
+122
+00:04:06.880 --> 00:04:11.200
+calls within just a minute time span,
+
+123
+00:04:09.400 --> 00:04:12.800
+okay? We are scaling our compute to
+
+124
+00:04:11.200 --> 00:04:14.120
+scale our impact, all right? If we hop
+
+125
+00:04:12.800 --> 00:04:15.840
+back over here, you can see all the
+
+126
+00:04:14.120 --> 00:04:17.280
+panes are gone now. What happened? All
+
+127
+00:04:15.840 --> 00:04:18.440
+of our agents finished, right? They
+
+128
+00:04:17.280 --> 00:04:20.359
+finished their work, so we can go ahead
+
+129
+00:04:18.440 --> 00:04:22.200
+and get out of full screen mode and it's
+
+130
+00:04:20.359 --> 00:04:23.520
+just our primary agent running now. Uh
+
+131
+00:04:22.200 --> 00:04:25.840
+we can go ahead and get rid of their
+
+132
+00:04:23.520 --> 00:04:28.040
+swim lane here. And this is a really
+
+133
+00:04:25.840 --> 00:04:29.600
+powerful capability of multi-agent
+
+134
+00:04:28.040 --> 00:04:31.800
+orchestration. You want to spin up
+
+135
+00:04:29.600 --> 00:04:33.560
+specialized agents that do one thing
+
+136
+00:04:31.800 --> 00:04:35.560
+extraordinarily well, right? They focus
+
+137
+00:04:33.560 --> 00:04:37.120
+on one task and then they finish. So,
+
+138
+00:04:35.560 --> 00:04:39.440
+our primary agent now is just putting
+
+139
+00:04:37.120 --> 00:04:40.919
+together a summary of the work done by
+
+140
+00:04:39.440 --> 00:04:42.560
+the eight agents and, you know, take a
+
+141
+00:04:40.919 --> 00:04:45.040
+look at the context window here. We've
+
+142
+00:04:42.560 --> 00:04:47.120
+only used 31%. So, that means that all
+
+143
+00:04:45.040 --> 00:04:48.919
+of our other agents, they explored eight
+
+144
+00:04:47.120 --> 00:04:50.760
+different code bases and and to be super
+
+145
+00:04:48.919 --> 00:04:52.360
+clear here, guys, these are not just
+
+146
+00:04:50.760 --> 00:04:54.400
+front ends. These are full stack
+
+147
+00:04:52.360 --> 00:04:56.480
+applications, okay? Every single one of
+
+148
+00:04:54.400 --> 00:04:58.520
+these are full stack applications. We
+
+149
+00:04:56.480 --> 00:05:00.280
+can fully interact with these and, you
+
+150
+00:04:58.520 --> 00:05:02.440
+know, these are fully built out. They
+
+151
+00:05:00.280 --> 00:05:04.360
+were one-shotted by Opus. Very powerful
+
+152
+00:05:02.440 --> 00:05:07.200
+capabilities here and none of this
+
+153
+00:05:04.360 --> 00:05:09.520
+matters if you can't first trigger these
+
+154
+00:05:07.200 --> 00:05:11.680
+features and prompt your primary agent
+
+155
+00:05:09.520 --> 00:05:12.919
+to control these powerful workflows and
+
+156
+00:05:11.680 --> 00:05:14.200
+if you have no idea what's going on
+
+157
+00:05:12.919 --> 00:05:15.919
+underneath the hood, right? This is
+
+158
+00:05:14.200 --> 00:05:18.040
+where vibe coders fall apart. They don't
+
+159
+00:05:15.919 --> 00:05:20.240
+actually know what's going on. And so,
+
+160
+00:05:18.040 --> 00:05:21.880
+the engineers, the builders, and even
+
+161
+00:05:20.240 --> 00:05:24.040
+the vibe coders that know what's going
+
+162
+00:05:21.880 --> 00:05:27.080
+on underneath the hood can do so much
+
+163
+00:05:24.040 --> 00:05:28.320
+more. This whole idea that uh engineers
+
+164
+00:05:27.080 --> 00:05:30.840
+are going to be replaced by this
+
+165
+00:05:28.320 --> 00:05:32.840
+technology to me is absurd. And it's
+
+166
+00:05:30.840 --> 00:05:35.880
+because engineers are the best
+
+167
+00:05:32.840 --> 00:05:37.960
+positioned to use agentic technology.
+
+168
+00:05:35.880 --> 00:05:40.640
+So, you can see here that um if I hit
+
+169
+00:05:37.960 --> 00:05:42.720
+control B and left bracket, I'm in
+
+170
+00:05:40.640 --> 00:05:44.640
+scroll mode now. The annoying thing
+
+171
+00:05:42.720 --> 00:05:46.160
+about tmux is that it does change the
+
+172
+00:05:44.640 --> 00:05:48.080
+controls a little bit. I'm in control
+
+173
+00:05:46.160 --> 00:05:50.400
+mode and if I just scroll up, you can
+
+174
+00:05:48.080 --> 00:05:52.880
+see we have summaries for every single
+
+175
+00:05:50.400 --> 00:05:54.920
+agent sandbox application that's stored
+
+176
+00:05:52.880 --> 00:05:57.000
+in my local directory, okay? So, you can
+
+177
+00:05:54.920 --> 00:05:58.720
+see here, nice summary of all eight, and
+
+178
+00:05:57.000 --> 00:06:00.520
+the primary agent knows how to spin them
+
+179
+00:05:58.720 --> 00:06:03.529
+up. Let's push our multi-agent
+
+180
+00:06:00.520 --> 00:06:05.360
+capabilities further.
+
+181
+00:06:03.529 --> 00:06:06.400
+>> [music]
+
+182
+00:06:05.360 --> 00:06:07.320
+>> Here's what we're going to do now. So,
+
+183
+00:06:06.400 --> 00:06:08.800
+I'm going to get out of this mode. I'm
+
+184
+00:06:07.320 --> 00:06:10.280
+just going to hit escape, and we're back
+
+185
+00:06:08.800 --> 00:06:12.840
+in our primary window here. Let's go
+
+186
+00:06:10.280 --> 00:06:15.400
+ahead and actually spin up new agent
+
+187
+00:06:12.840 --> 00:06:16.920
+sandbox instances with each one of these
+
+188
+00:06:15.400 --> 00:06:19.520
+applications, all right? And we'll do it
+
+189
+00:06:16.920 --> 00:06:21.400
+in two teams. We'll have a team of four
+
+190
+00:06:19.520 --> 00:06:22.720
+mount the first four applications, all
+
+191
+00:06:21.400 --> 00:06:24.800
+right? Because we have eight unique
+
+192
+00:06:22.720 --> 00:06:27.280
+applications here, if we run ls. And
+
+193
+00:06:24.800 --> 00:06:29.680
+then we'll have a team of four doing the
+
+194
+00:06:27.280 --> 00:06:31.120
+last set of applications, okay? Let's
+
+195
+00:06:29.680 --> 00:06:31.880
+prompt engineer this properly, all
+
+196
+00:06:31.120 --> 00:06:34.200
+right? We're going to start with the
+
+197
+00:06:31.880 --> 00:06:36.000
+most important piece, build a new agent
+
+198
+00:06:34.200 --> 00:06:37.960
+team. So, we're triggering right, these
+
+199
+00:06:36.000 --> 00:06:40.240
+are information-dense keywords that tell
+
+200
+00:06:37.960 --> 00:06:41.840
+the agent we want a specific set of
+
+201
+00:06:40.240 --> 00:06:44.120
+tools to execute, all right? And then
+
+202
+00:06:41.840 --> 00:06:46.560
+I'll say using agent sandboxes, so this
+
+203
+00:06:44.120 --> 00:06:48.880
+is my agent sandbox skill, and backslash
+
+204
+00:06:46.560 --> 00:06:51.200
+command. This is a special skill that I
+
+205
+00:06:48.880 --> 00:06:54.160
+have to do wacky stuff like this, use
+
+206
+00:06:51.200 --> 00:06:57.200
+the backslash reboot and mount one
+
+207
+00:06:54.160 --> 00:06:59.640
+through four in their own agent sandbox.
+
+208
+00:06:57.200 --> 00:07:01.000
+Be sure to set up every agent. So, part
+
+209
+00:06:59.640 --> 00:07:02.760
+of my workflow when I'm doing rapid
+
+210
+00:07:01.000 --> 00:07:04.840
+prototyping, what I like to do is just
+
+211
+00:07:02.760 --> 00:07:06.840
+build it all in an agent sandbox, like A
+
+212
+00:07:04.840 --> 00:07:08.680
+to B, as you saw here, right? This is an
+
+213
+00:07:06.840 --> 00:07:10.560
+agent sandbox. And then, what I'll do
+
+214
+00:07:08.680 --> 00:07:12.600
+is, if I like one of the versions, I'll
+
+215
+00:07:10.560 --> 00:07:13.800
+copy it down locally, and I have prompts
+
+216
+00:07:12.600 --> 00:07:16.320
+for that, of course. So, what we're
+
+217
+00:07:13.800 --> 00:07:18.080
+going to do now is basically rehost
+
+218
+00:07:16.320 --> 00:07:20.000
+these applications with a specialized
+
+219
+00:07:18.080 --> 00:07:21.320
+agent team. So, I'll fire this off, and
+
+220
+00:07:20.000 --> 00:07:23.120
+you can see here right away, our
+
+221
+00:07:21.320 --> 00:07:25.880
+observability system picked up on that
+
+222
+00:07:23.120 --> 00:07:27.370
+new user prompt submit event, and now
+
+223
+00:07:25.880 --> 00:07:28.200
+things are going to get awesome again.
+
+224
+00:07:27.370 --> 00:07:30.320
+>> [laughter]
+
+225
+00:07:28.200 --> 00:07:31.760
+>> Our agent is going to first run the
+
+226
+00:07:30.320 --> 00:07:33.240
+agent sandbox skill, and it's going to
+
+227
+00:07:31.760 --> 00:07:35.040
+run the backslash command skill, so that
+
+228
+00:07:33.240 --> 00:07:36.840
+it understands what backslash reboot
+
+229
+00:07:35.040 --> 00:07:39.640
+does. And then it's going to actually
+
+230
+00:07:36.840 --> 00:07:41.320
+kick off the reboot for every one of
+
+231
+00:07:39.640 --> 00:07:43.480
+these directories. And so, our agent has
+
+232
+00:07:41.320 --> 00:07:45.440
+figured out all of our tooling, it ran
+
+233
+00:07:43.480 --> 00:07:46.920
+our agent sandbox skill, it ran our
+
+234
+00:07:45.440 --> 00:07:48.880
+backslash command skill, and now it's
+
+235
+00:07:46.920 --> 00:07:51.200
+creating that task list again. And so,
+
+236
+00:07:48.880 --> 00:07:52.960
+the task list is the centralized hub.
+
+237
+00:07:51.200 --> 00:07:55.120
+This is where everything gets kicked off
+
+238
+00:07:52.960 --> 00:07:57.360
+from. There we go. Okay. So, very cool.
+
+239
+00:07:55.120 --> 00:07:59.120
+Now, we're kicking off our agent team.
+
+240
+00:07:57.360 --> 00:08:00.720
+You can see we have that new pane. So,
+
+241
+00:07:59.120 --> 00:08:02.920
+we have our primary agent kicking off
+
+242
+00:08:00.720 --> 00:08:05.000
+the first agent, and this agent is then
+
+243
+00:08:02.920 --> 00:08:06.720
+going to run that skill. So, every
+
+244
+00:08:05.000 --> 00:08:08.240
+single agent has its own context window,
+
+245
+00:08:06.720 --> 00:08:10.080
+right? So, they all need to run the
+
+246
+00:08:08.240 --> 00:08:11.200
+skill, they all need to run the setup
+
+247
+00:08:10.080 --> 00:08:13.600
+commands. You can see it's running
+
+248
+00:08:11.200 --> 00:08:15.880
+through the E2B setup process, and these
+
+249
+00:08:13.600 --> 00:08:17.040
+are all Opus 4.6 agents. But, you can
+
+250
+00:08:15.880 --> 00:08:18.520
+see here, all of our agents are getting
+
+251
+00:08:17.040 --> 00:08:20.040
+kicked off again, and I'll just go ahead
+
+252
+00:08:18.520 --> 00:08:22.120
+and and, you know, downsize this a
+
+253
+00:08:20.040 --> 00:08:23.640
+little bit and go full screen here, so
+
+254
+00:08:22.120 --> 00:08:25.680
+we can get a good picture of what's
+
+255
+00:08:23.640 --> 00:08:27.280
+going on, right? All four Opus agents
+
+256
+00:08:25.680 --> 00:08:29.160
+are running in parallel. They're each
+
+257
+00:08:27.280 --> 00:08:30.800
+going to reboot the application. You
+
+258
+00:08:29.160 --> 00:08:32.719
+know, what we saw here in the beginning,
+
+259
+00:08:30.800 --> 00:08:34.960
+basically we're going to recreate these
+
+260
+00:08:32.719 --> 00:08:37.080
+agent sandbox instances with this new
+
+261
+00:08:34.960 --> 00:08:40.039
+multi-agent orchestration tool. And so,
+
+262
+00:08:37.080 --> 00:08:42.120
+if we hop back to our agent [laughter]
+
+263
+00:08:40.039 --> 00:08:44.280
+observability system, once again, you
+
+264
+00:08:42.120 --> 00:08:46.640
+can see tons and tons of work happening,
+
+265
+00:08:44.280 --> 00:08:48.680
+right? If we dial into one of these swim
+
+266
+00:08:46.640 --> 00:08:50.960
+lanes, we can get a better understanding
+
+267
+00:08:48.680 --> 00:08:53.160
+of the tools and the impact that every
+
+268
+00:08:50.960 --> 00:08:55.400
+agent is creating. And, you know, really
+
+269
+00:08:53.160 --> 00:08:57.400
+importantly here, if we search for our
+
+270
+00:08:55.400 --> 00:09:00.000
+brand new tools, you can see we have
+
+271
+00:08:57.400 --> 00:09:02.080
+these new task list tools. Uh we should
+
+272
+00:09:00.000 --> 00:09:04.640
+see some If we scroll up here, you'll
+
+273
+00:09:02.080 --> 00:09:06.640
+see, right, we have task update, and we
+
+274
+00:09:04.640 --> 00:09:08.560
+have task, right? So, this is kicking
+
+275
+00:09:06.640 --> 00:09:10.600
+off the generalized agent, and you can
+
+276
+00:09:08.560 --> 00:09:13.120
+see here, this is the exact command that
+
+277
+00:09:10.600 --> 00:09:14.760
+was run to kick off a sub-agent,
+
+278
+00:09:13.120 --> 00:09:16.240
+sub-agent that is executing right here.
+
+279
+00:09:14.760 --> 00:09:19.040
+And, the great part about running this
+
+280
+00:09:16.240 --> 00:09:20.640
+in tmux is, of course, the panes. We can
+
+281
+00:09:19.040 --> 00:09:22.200
+continue to zoom out a little bit, so
+
+282
+00:09:20.640 --> 00:09:23.839
+you can get a better view here. Every
+
+283
+00:09:22.200 --> 00:09:25.720
+one of our agents has their own context
+
+284
+00:09:23.839 --> 00:09:27.720
+window, their own model, their own
+
+285
+00:09:25.720 --> 00:09:29.640
+session ID, and you can see they all
+
+286
+00:09:27.720 --> 00:09:32.480
+have their own unique name here as well,
+
+287
+00:09:29.640 --> 00:09:34.600
+right? SBX agent, sandbox agent 1 2 3
+
+288
+00:09:32.480 --> 00:09:36.400
+and 4, right? So, this is fantastic. So,
+
+289
+00:09:34.600 --> 00:09:38.840
+I'm focused in this individual window
+
+290
+00:09:36.400 --> 00:09:41.400
+here. Inside of tmux, we need to hit
+
+291
+00:09:38.840 --> 00:09:42.720
+control B and then left to change our
+
+292
+00:09:41.400 --> 00:09:44.960
+cursor position. What I want to do here
+
+293
+00:09:42.720 --> 00:09:46.360
+is get the the names of the other
+
+294
+00:09:44.960 --> 00:09:47.560
+sandboxes that we didn't kick off. So,
+
+295
+00:09:46.360 --> 00:09:49.120
+I'm just going to ask the primary agent
+
+296
+00:09:47.560 --> 00:09:50.840
+because it's actually not doing anything
+
+297
+00:09:49.120 --> 00:09:52.880
+right now. The primary agent is sitting
+
+298
+00:09:50.840 --> 00:09:55.400
+waiting for events to come back. List
+
+299
+00:09:52.880 --> 00:09:57.200
+sandbox directories we didn't kick off.
+
+300
+00:09:55.400 --> 00:09:59.560
+And you can see here sandbox agent
+
+301
+00:09:57.200 --> 00:10:01.960
+number four has completed its setup.
+
+302
+00:09:59.560 --> 00:10:03.960
+It's pinged a command back to our
+
+303
+00:10:01.960 --> 00:10:05.040
+primary orchestrator agent. So, what I'm
+
+304
+00:10:03.960 --> 00:10:06.120
+going to do here is while this is
+
+305
+00:10:05.040 --> 00:10:08.240
+running, I'm going to go ahead and open
+
+306
+00:10:06.120 --> 00:10:09.920
+up a new terminal and kick these off.
+
+307
+00:10:08.240 --> 00:10:11.720
+Let's see if I got a clean paste out of
+
+308
+00:10:09.920 --> 00:10:13.800
+that. We're not going to kick this off
+
+309
+00:10:11.720 --> 00:10:15.760
+in our flat window, right? We need tmux
+
+310
+00:10:13.800 --> 00:10:17.120
+to get that visualization, to get those
+
+311
+00:10:15.760 --> 00:10:18.600
+multiple panes. So, I'm going to run
+
+312
+00:10:17.120 --> 00:10:20.040
+tmux once again, then I'll boot up
+
+313
+00:10:18.600 --> 00:10:21.920
+Claude code, and then I'll effectively
+
+314
+00:10:20.040 --> 00:10:24.520
+run that exact same prompt. Then what I
+
+315
+00:10:21.920 --> 00:10:26.160
+want to do is get the names of those
+
+316
+00:10:24.520 --> 00:10:28.200
+agents that did not run. So, I'll copy
+
+317
+00:10:26.160 --> 00:10:31.160
+this. And I'm doing a little bit of
+
+318
+00:10:28.200 --> 00:10:32.960
+correction here on another screen. I'm
+
+319
+00:10:31.160 --> 00:10:33.960
+having trouble copying this, and so I'm
+
+320
+00:10:32.960 --> 00:10:36.920
+I'm just going to ask my agent to do
+
+321
+00:10:33.960 --> 00:10:39.400
+this for me. Uh copy the four sandbox
+
+322
+00:10:36.920 --> 00:10:41.400
+directories to my clipboard. Should do a
+
+323
+00:10:39.400 --> 00:10:44.880
+PB copy. There you go. And then I'll
+
+324
+00:10:41.400 --> 00:10:46.200
+just paste this. So, only post these
+
+325
+00:10:44.880 --> 00:10:47.440
+four. There we go. And I'll kick that
+
+326
+00:10:46.200 --> 00:10:49.767
+off. Now, we're going to get the
+
+327
+00:10:47.440 --> 00:10:50.480
+remaining sandboxes kicked up, and
+
+328
+00:10:49.767 --> 00:10:52.120
+>> [laughter]
+
+329
+00:10:50.480 --> 00:10:54.440
+>> I'm sure you may have noticed this, but
+
+330
+00:10:52.120 --> 00:10:56.640
+if I go into scroll mode here and scroll
+
+331
+00:10:54.440 --> 00:10:59.440
+to the top, I have run out of my API
+
+332
+00:10:56.640 --> 00:11:01.800
+usage for today on my Claude Max plan.
+
+333
+00:10:59.440 --> 00:11:02.760
+So, I'm using API billing, and uh yeah,
+
+334
+00:11:01.800 --> 00:11:05.487
+this is going to burn a hole in my
+
+335
+00:11:02.760 --> 00:11:05.760
+wallet. Drop a like, drop a comment
+
+336
+00:11:05.487 --> 00:11:07.640
+>> [laughter]
+
+337
+00:11:05.760 --> 00:11:09.400
+>> uh so that the YouTube algorithm can can
+
+338
+00:11:07.640 --> 00:11:11.160
+pay for some of this API usage. But,
+
+339
+00:11:09.400 --> 00:11:13.920
+I'll hit escape, and I'll go ahead and
+
+340
+00:11:11.160 --> 00:11:15.280
+let this second agent start kicking off
+
+341
+00:11:13.920 --> 00:11:17.000
+this workflow. And so, we're going to
+
+342
+00:11:15.280 --> 00:11:19.200
+see the same thing. And if we look at
+
+343
+00:11:17.000 --> 00:11:21.480
+our agent observability, we can see
+
+344
+00:11:19.200 --> 00:11:23.120
+everything. We can understand everything
+
+345
+00:11:21.480 --> 00:11:24.720
+that our agents are doing top-to-bottom.
+
+346
+00:11:23.120 --> 00:11:26.920
+And if we go ahead and look over here,
+
+347
+00:11:24.720 --> 00:11:28.640
+you can see that we have one more agent
+
+348
+00:11:26.920 --> 00:11:31.000
+finishing up its work, right? Sandbox
+
+349
+00:11:28.640 --> 00:11:33.240
+agent number two is the last one still
+
+350
+00:11:31.000 --> 00:11:35.600
+in progress. So, this is a very powerful
+
+351
+00:11:33.240 --> 00:11:38.120
+feature. We can now observe our agents
+
+352
+00:11:35.600 --> 00:11:40.280
+in a more improved way just with tmux,
+
+353
+00:11:38.120 --> 00:11:42.760
+just by seeing these new panes open up
+
+354
+00:11:40.280 --> 00:11:45.520
+as our primary or orchestrator agent
+
+355
+00:11:42.760 --> 00:11:47.400
+starts to set up and scale up this work.
+
+356
+00:11:45.520 --> 00:11:49.680
+Then, whenever we need to, we can just
+
+357
+00:11:47.400 --> 00:11:52.320
+scale up and create a brand new team.
+
+358
+00:11:49.680 --> 00:11:54.560
+So, here's that second team of agents
+
+359
+00:11:52.320 --> 00:11:56.240
+doing a whole different set of work in a
+
+360
+00:11:54.560 --> 00:11:58.880
+brand new window. All right, so you can
+
+361
+00:11:56.240 --> 00:12:00.120
+see that same process. Go full screen,
+
+362
+00:11:58.880 --> 00:12:02.200
+minimize this a little bit so you can
+
+363
+00:12:00.120 --> 00:12:03.240
+get a better view. We have two teams of
+
+364
+00:12:02.200 --> 00:12:05.720
+agents working and we have an
+
+365
+00:12:03.240 --> 00:12:06.920
+observability system to trace the whole
+
+366
+00:12:05.720 --> 00:12:08.680
+thing. And so, whenever we want to, we
+
+367
+00:12:06.920 --> 00:12:10.000
+can just come in here. It's got all four
+
+368
+00:12:08.680 --> 00:12:11.400
+agents running. It's going to mount
+
+369
+00:12:10.000 --> 00:12:14.080
+these applications. We're going to
+
+370
+00:12:11.400 --> 00:12:15.760
+create a new E2B agent sandbox, upload
+
+371
+00:12:14.080 --> 00:12:17.440
+the app code base, install, get
+
+372
+00:12:15.760 --> 00:12:19.600
+everything set up as if it's a brand new
+
+373
+00:12:17.440 --> 00:12:21.520
+environment. So, we're combining several
+
+374
+00:12:19.600 --> 00:12:23.040
+really, really powerful ideas here that
+
+375
+00:12:21.520 --> 00:12:25.080
+we've been talking about on the channel
+
+376
+00:12:23.040 --> 00:12:26.880
+week after week. We have multi-agent
+
+377
+00:12:25.080 --> 00:12:28.800
+observability, so we know what's going
+
+378
+00:12:26.880 --> 00:12:31.200
+on, so we know how to improve and
+
+379
+00:12:28.800 --> 00:12:33.440
+understand our systems. We have spaces
+
+380
+00:12:31.200 --> 00:12:35.200
+to place our agents so that they can do
+
+381
+00:12:33.440 --> 00:12:37.120
+whatever they need to to accomplish
+
+382
+00:12:35.200 --> 00:12:39.040
+their work without jeopardizing our
+
+383
+00:12:37.120 --> 00:12:41.320
+local machine. And then, of course, we
+
+384
+00:12:39.040 --> 00:12:43.240
+have the new multi-agent orchestration
+
+385
+00:12:41.320 --> 00:12:46.480
+capabilities coming out of Cloud Code on
+
+386
+00:12:43.240 --> 00:12:49.080
+top of a brand new ultra-powerful model
+
+387
+00:12:46.480 --> 00:12:50.760
+that can run long-duration tasks. All
+
+388
+00:12:49.080 --> 00:12:52.640
+right, so we're talking about long
+
+389
+00:12:50.760 --> 00:12:55.240
+threads, we're talking about big
+
+390
+00:12:52.640 --> 00:12:57.240
+threads, and we're handing off more and
+
+391
+00:12:55.240 --> 00:12:59.600
+more work to our agents. That is the
+
+392
+00:12:57.240 --> 00:13:01.720
+theme here. How can you prompt engineer
+
+393
+00:12:59.600 --> 00:13:03.720
+and how can you context engineer with
+
+394
+00:13:01.720 --> 00:13:06.120
+great powerful models to get more
+
+395
+00:13:03.720 --> 00:13:07.800
+engineering work done than ever with
+
+396
+00:13:06.120 --> 00:13:09.839
+confidence, all right? We want to be
+
+397
+00:13:07.800 --> 00:13:12.360
+building systems of trust with our
+
+398
+00:13:09.839 --> 00:13:14.080
+agents. Now, scaling up the model is
+
+399
+00:13:12.360 --> 00:13:15.400
+always going to help with this, but this
+
+400
+00:13:14.080 --> 00:13:16.680
+is not something we're really in control
+
+401
+00:13:15.400 --> 00:13:18.760
+of. Whenever the new model ships,
+
+402
+00:13:16.680 --> 00:13:20.839
+whatever it costs, we are just subjects
+
+403
+00:13:18.760 --> 00:13:23.680
+to that. But, what we can control is the
+
+404
+00:13:20.839 --> 00:13:25.560
+great tooling we use alongside these
+
+405
+00:13:23.680 --> 00:13:26.840
+three powerful capabilities. And so,
+
+406
+00:13:25.560 --> 00:13:28.320
+that's one of the big ideas I wanted to
+
+407
+00:13:26.840 --> 00:13:30.000
+share with you here today. Multi-agent
+
+408
+00:13:28.320 --> 00:13:32.440
+orchestration, multi-agent
+
+409
+00:13:30.000 --> 00:13:34.160
+observability, so you can dial in to
+
+410
+00:13:32.440 --> 00:13:35.440
+anything your agents are doing. And
+
+411
+00:13:34.160 --> 00:13:38.920
+then, of course, we have agent
+
+412
+00:13:35.440 --> 00:13:40.520
+sandboxes, a secure location to place
+
+413
+00:13:38.920 --> 00:13:43.160
+whatever you want to have your agents do
+
+414
+00:13:40.520 --> 00:13:45.080
+at scale, all right? And so, we have two
+
+415
+00:13:43.160 --> 00:13:46.880
+teams of four. To be clear, the agents
+
+416
+00:13:45.080 --> 00:13:48.680
+are running on my device, but the work
+
+417
+00:13:46.880 --> 00:13:50.600
+they're doing is operating off the
+
+418
+00:13:48.680 --> 00:13:52.280
+device. They're using their local
+
+419
+00:13:50.600 --> 00:13:54.400
+agentic capabilities, their local
+
+420
+00:13:52.280 --> 00:13:56.040
+skills, and then they are creating and
+
+421
+00:13:54.400 --> 00:13:57.720
+operating inside their own agent
+
+422
+00:13:56.040 --> 00:13:59.800
+sandboxes. Okay, so our first team is
+
+423
+00:13:57.720 --> 00:14:02.640
+all set up. And if we go into scroll
+
+424
+00:13:59.800 --> 00:14:04.440
+mode here, control B, left bracket, and
+
+425
+00:14:02.640 --> 00:14:07.240
+we do some scrolling, we should be able
+
+426
+00:14:04.440 --> 00:14:08.680
+to see everything set up live. So, let's
+
+427
+00:14:07.240 --> 00:14:10.960
+go ahead and open these up. I'll take
+
+428
+00:14:08.680 --> 00:14:12.800
+these existing windows, these existing
+
+429
+00:14:10.960 --> 00:14:14.800
+sandboxes, I'll just move them up onto
+
+430
+00:14:12.800 --> 00:14:16.800
+my monitor here, and then we should see
+
+431
+00:14:14.800 --> 00:14:18.280
+them open up in this browser window
+
+432
+00:14:16.800 --> 00:14:20.600
+here. We'll take a look at the the brand
+
+433
+00:14:18.280 --> 00:14:21.920
+new tools that allow and enable these
+
+434
+00:14:20.600 --> 00:14:23.200
+workflows in just a second. But, let's
+
+435
+00:14:21.920 --> 00:14:25.000
+go ahead and just get these opened up,
+
+436
+00:14:23.200 --> 00:14:27.240
+so we can see how our agents have done.
+
+437
+00:14:25.000 --> 00:14:28.520
+I'll say, open in Chrome. You can see
+
+438
+00:14:27.240 --> 00:14:30.720
+these sandboxes are going to be alive
+
+439
+00:14:28.520 --> 00:14:32.040
+for 12 hours, all right? And it looks
+
+440
+00:14:30.720 --> 00:14:34.160
+like they did open up in this other
+
+441
+00:14:32.040 --> 00:14:36.960
+window, super annoying, that's fine. I
+
+442
+00:14:34.160 --> 00:14:39.360
+will copy these four newest ones, drag
+
+443
+00:14:36.960 --> 00:14:40.839
+them in. Here we go. So, here's our
+
+444
+00:14:39.360 --> 00:14:43.120
+agentic support. It looks like we're
+
+445
+00:14:40.839 --> 00:14:44.839
+missing some data here, and looks like
+
+446
+00:14:43.120 --> 00:14:46.960
+we're missing data here. Let's see if we
+
+447
+00:14:44.839 --> 00:14:48.640
+got our gallery. Nice. Okay, so we did
+
+448
+00:14:46.960 --> 00:14:50.520
+get some nice information there, and we
+
+449
+00:14:48.640 --> 00:14:52.200
+have our data here. All right, so very
+
+450
+00:14:50.520 --> 00:14:53.280
+cool. And so, we can continue to prompt
+
+451
+00:14:52.200 --> 00:14:54.720
+to resolve these issues. I'm going to go
+
+452
+00:14:53.280 --> 00:14:58.400
+ahead and just give this a shot, and
+
+453
+00:14:54.720 --> 00:15:00.440
+I'll say, data is missing from this, and
+
+454
+00:14:58.400 --> 00:15:03.280
+let's go ahead and go here as well.
+
+455
+00:15:00.440 --> 00:15:05.240
+Basically, our sandboxes were rebooted,
+
+456
+00:15:03.280 --> 00:15:07.160
+but it didn't reboot with the exact same
+
+457
+00:15:05.240 --> 00:15:08.480
+data, or with any data for those two
+
+458
+00:15:07.160 --> 00:15:10.200
+applications. So, we're going to go
+
+459
+00:15:08.480 --> 00:15:11.920
+ahead and have these agents do this
+
+460
+00:15:10.200 --> 00:15:13.320
+work, and what I'll do here is I'm going
+
+461
+00:15:11.920 --> 00:15:14.920
+to stop this, cuz the primary agent
+
+462
+00:15:13.320 --> 00:15:16.520
+started working, right? You saw that.
+
+463
+00:15:14.920 --> 00:15:19.040
+The primary agent's trying to take over.
+
+464
+00:15:16.520 --> 00:15:21.120
+I'll say, spin up a new agent team to do
+
+465
+00:15:19.040 --> 00:15:23.520
+this work for you. Give them all the
+
+466
+00:15:21.120 --> 00:15:25.000
+context they need, skills, Sandbox
+
+467
+00:15:23.520 --> 00:15:26.400
+backslash command. And so I'm just being
+
+468
+00:15:25.000 --> 00:15:28.040
+super verbose there with my prompt
+
+469
+00:15:26.400 --> 00:15:30.080
+engineering with that agent. You can see
+
+470
+00:15:28.040 --> 00:15:32.120
+here our second team finished. So let's
+
+471
+00:15:30.080 --> 00:15:34.440
+see how this team did. Yeah, open all
+
+472
+00:15:32.120 --> 00:15:35.760
+four URLs in Chrome. Okay. So kick these
+
+473
+00:15:34.440 --> 00:15:37.800
+off. All right, so we have these opened
+
+474
+00:15:35.760 --> 00:15:40.320
+up. Let's go ahead and get these dragged
+
+475
+00:15:37.800 --> 00:15:42.960
+and dropped over here. Okay. We have our
+
+476
+00:15:40.320 --> 00:15:45.800
+mission briefings dashboard. We have our
+
+477
+00:15:42.960 --> 00:15:48.960
+portfolio application so we can track
+
+478
+00:15:45.800 --> 00:15:52.320
+our forecast for our portfolio. We have
+
+479
+00:15:48.960 --> 00:15:54.320
+a recipe app and we have a ad dashboard
+
+480
+00:15:52.320 --> 00:15:55.800
+to see how our ads are performing. Nice.
+
+481
+00:15:54.320 --> 00:15:57.440
+So we got all the data for these. So all
+
+482
+00:15:55.800 --> 00:15:59.320
+of these four worked. Love to see that.
+
+483
+00:15:57.440 --> 00:16:01.160
+And the two issues we had with these
+
+484
+00:15:59.320 --> 00:16:04.080
+code bases are getting resolved here
+
+485
+00:16:01.160 --> 00:16:05.920
+with our two agent agent team. So this
+
+486
+00:16:04.080 --> 00:16:08.160
+is an iterative process as well. We're
+
+487
+00:16:05.920 --> 00:16:10.880
+going to want to be firing off ad hoc
+
+488
+00:16:08.160 --> 00:16:12.360
+agent teams to perform specific sets of
+
+489
+00:16:10.880 --> 00:16:14.760
+work. In our previous video where we
+
+490
+00:16:12.360 --> 00:16:16.360
+talked about the task list feature, uh
+
+491
+00:16:14.760 --> 00:16:17.760
+let me go ahead and see if I have that
+
+492
+00:16:16.360 --> 00:16:18.720
+diagram pulled up here. Yeah, so in our
+
+493
+00:16:17.760 --> 00:16:21.320
+previous video we talked about the
+
+494
+00:16:18.720 --> 00:16:22.760
+CloudCode task system where you prompt
+
+495
+00:16:21.320 --> 00:16:25.200
+your primary agent and your primary
+
+496
+00:16:22.760 --> 00:16:26.880
+agent creates a task list that multiple
+
+497
+00:16:25.200 --> 00:16:28.600
+agents, basically an agent team,
+
+498
+00:16:26.880 --> 00:16:30.960
+operates on. This is a very powerful
+
+499
+00:16:28.600 --> 00:16:32.800
+feature that is taken to the next step
+
+500
+00:16:30.960 --> 00:16:34.440
+with the multi-agent orchestration
+
+501
+00:16:32.800 --> 00:16:35.600
+feature that you can now tap into. All
+
+502
+00:16:34.440 --> 00:16:37.040
+right. But the idea here is really,
+
+503
+00:16:35.600 --> 00:16:38.800
+really important. As you're building out
+
+504
+00:16:37.040 --> 00:16:40.400
+real features, as you're scaling up the
+
+505
+00:16:38.800 --> 00:16:43.000
+work you can do with your agents, it's
+
+506
+00:16:40.400 --> 00:16:44.920
+not just about a single agent or even a
+
+507
+00:16:43.000 --> 00:16:46.640
+couple agents or even parallel agents.
+
+508
+00:16:44.920 --> 00:16:48.680
+You want to be building teams that
+
+509
+00:16:46.640 --> 00:16:51.320
+communicate together, that are all
+
+510
+00:16:48.680 --> 00:16:52.960
+driven toward accomplishing one specific
+
+511
+00:16:51.320 --> 00:16:54.839
+goal. Think about building out a
+
+512
+00:16:52.960 --> 00:16:57.520
+feature. That's way too much work,
+
+513
+00:16:54.839 --> 00:16:59.200
+especially as you enter real, legitimate
+
+514
+00:16:57.520 --> 00:17:01.839
+production code bases. Building out a
+
+515
+00:16:59.200 --> 00:17:04.240
+full feature requires organization. It
+
+516
+00:17:01.839 --> 00:17:06.640
+requires communication, right? And so
+
+517
+00:17:04.240 --> 00:17:09.520
+this new agent orchestration feature
+
+518
+00:17:06.640 --> 00:17:11.400
+allows us to really tap into that brand
+
+519
+00:17:09.520 --> 00:17:12.680
+new system, that way of thinking. All
+
+520
+00:17:11.400 --> 00:17:13.920
+right. And And this is what this feature
+
+521
+00:17:12.680 --> 00:17:16.240
+looks like end to end. We're going to
+
+522
+00:17:13.920 --> 00:17:18.360
+create a team. We're going to uh create
+
+523
+00:17:16.240 --> 00:17:19.880
+tasks which spawn agents. They all work
+
+524
+00:17:18.360 --> 00:17:21.640
+in parallel, and then they shut down,
+
+525
+00:17:19.880 --> 00:17:22.959
+and then we delete the team. And we'll
+
+526
+00:17:21.640 --> 00:17:24.439
+look at the tools here in just a second.
+
+527
+00:17:22.959 --> 00:17:26.160
+But, a really important aspect of this
+
+528
+00:17:24.439 --> 00:17:28.800
+is that when the work is done, you want
+
+529
+00:17:26.160 --> 00:17:30.640
+to delete the agents. This forces a good
+
+530
+00:17:28.800 --> 00:17:33.120
+pattern of context engineering where you
+
+531
+00:17:30.640 --> 00:17:34.600
+reset the context and start over. So,
+
+532
+00:17:33.120 --> 00:17:36.240
+you can see here's the agent shutdown
+
+533
+00:17:34.600 --> 00:17:37.640
+process happening from our primary
+
+534
+00:17:36.240 --> 00:17:40.160
+agent. These are shutting down, the
+
+535
+00:17:37.640 --> 00:17:42.120
+tasks are gone, the panes are now gone.
+
+536
+00:17:40.160 --> 00:17:43.840
+And so, apparently, this has fixed the
+
+537
+00:17:42.120 --> 00:17:46.400
+issue. You can see here DB wasn't
+
+538
+00:17:43.840 --> 00:17:48.200
+tagged. We restarted uh both processes
+
+539
+00:17:46.400 --> 00:17:50.240
+were down, so we should be good on these
+
+540
+00:17:48.200 --> 00:17:52.040
+two uh applications. Let's refresh.
+
+541
+00:17:50.240 --> 00:17:53.400
+Still not good there, that's too bad.
+
+542
+00:17:52.040 --> 00:17:55.920
+And let's refresh here. It looks like
+
+543
+00:17:53.400 --> 00:17:57.280
+this one did load its data here. Let me
+
+544
+00:17:55.920 --> 00:17:59.560
+see if that actually worked. Loading
+
+545
+00:17:57.280 --> 00:18:00.720
+pull requests. And still nothing here.
+
+546
+00:17:59.560 --> 00:18:02.000
+All right, so we have issues here. I
+
+547
+00:18:00.720 --> 00:18:03.520
+don't really care about these. You get
+
+548
+00:18:02.000 --> 00:18:06.000
+the point here, right? We got six out of
+
+549
+00:18:03.520 --> 00:18:07.800
+eight sandbox environments spun up in
+
+550
+00:18:06.000 --> 00:18:09.640
+brand new systems. And you know, just to
+
+551
+00:18:07.800 --> 00:18:12.240
+be super clear and transparent, here are
+
+552
+00:18:09.640 --> 00:18:13.480
+the new environments and the new URLs.
+
+553
+00:18:12.240 --> 00:18:15.240
+Here are the old ones. I just want to
+
+554
+00:18:13.480 --> 00:18:16.600
+show that I have these in the These are
+
+555
+00:18:15.240 --> 00:18:18.760
+actually different URLs. All right. So,
+
+556
+00:18:16.600 --> 00:18:20.520
+these are all unique agent sandboxes.
+
+557
+00:18:18.760 --> 00:18:22.400
+And we can be even clearer about this. I
+
+558
+00:18:20.520 --> 00:18:25.640
+have a bunch of these running right now.
+
+559
+00:18:22.400 --> 00:18:27.680
+If I go to a terminal here, and I say um
+
+560
+00:18:25.640 --> 00:18:29.080
+I pass in this skill, we should spin up
+
+561
+00:18:27.680 --> 00:18:30.640
+a new agent for this. We always want to
+
+562
+00:18:29.080 --> 00:18:31.920
+be operating on fresh instances. We
+
+563
+00:18:30.640 --> 00:18:33.680
+don't need tmux for this. It's going to
+
+564
+00:18:31.920 --> 00:18:35.520
+be a single cloud code instance. And I
+
+565
+00:18:33.680 --> 00:18:37.320
+just want to show you all the current
+
+566
+00:18:35.520 --> 00:18:39.120
+running agent sandboxes. So, I'll kick
+
+567
+00:18:37.320 --> 00:18:40.720
+this off. I'll fire off my agent sandbox
+
+568
+00:18:39.120 --> 00:18:42.680
+skill. And I'll just say list all
+
+569
+00:18:40.720 --> 00:18:44.920
+running sandboxes. And so, we should
+
+570
+00:18:42.680 --> 00:18:46.280
+see, I don't know, some 20 or 30
+
+571
+00:18:44.920 --> 00:18:49.400
+sandboxes here. You can see it's
+
+572
+00:18:46.280 --> 00:18:51.520
+validating my EDB key. And then um let's
+
+573
+00:18:49.400 --> 00:18:52.880
+go ahead and see. There we go. Working
+
+574
+00:18:51.520 --> 00:18:54.240
+through some issues. And of course,
+
+575
+00:18:52.880 --> 00:18:56.280
+that's the sandbox list. You can see we
+
+576
+00:18:54.240 --> 00:18:58.080
+have 24 sandboxes. Let's go ahead and
+
+577
+00:18:56.280 --> 00:19:00.440
+get that list. Just to make it super
+
+578
+00:18:58.080 --> 00:19:02.680
+clear here how much compute we're
+
+579
+00:19:00.440 --> 00:19:04.440
+running in parallel. There we go. Looks
+
+580
+00:19:02.680 --> 00:19:06.440
+like that was the command. It's getting
+
+581
+00:19:04.440 --> 00:19:08.760
+the information for each sandbox
+
+582
+00:19:06.440 --> 00:19:10.280
+environment. I'll link a previous video
+
+583
+00:19:08.760 --> 00:19:11.880
+where we talked about how you can set
+
+584
+00:19:10.280 --> 00:19:12.960
+this up and how this really works in the
+
+585
+00:19:11.880 --> 00:19:15.560
+description for you if you're
+
+586
+00:19:12.960 --> 00:19:18.120
+interested. I think agent sandboxes are
+
+587
+00:19:15.560 --> 00:19:20.240
+and will be a big, big, big trend as we
+
+588
+00:19:18.120 --> 00:19:21.920
+scale up what our agents can do on our
+
+589
+00:19:20.240 --> 00:19:23.880
+behalf. You're seeing this with the
+
+590
+00:19:21.920 --> 00:19:26.000
+whole Mac mini craze. As you can see in
+
+591
+00:19:23.880 --> 00:19:27.840
+the background, I have a Mac mini. I've
+
+592
+00:19:26.000 --> 00:19:29.560
+had this thing for a while and was, you
+
+593
+00:19:27.840 --> 00:19:30.960
+know, decent amount ahead of that trend
+
+594
+00:19:29.560 --> 00:19:32.280
+and having my agents run in its own
+
+595
+00:19:30.960 --> 00:19:34.360
+dedicated environment. As you can
+
+596
+00:19:32.280 --> 00:19:36.680
+imagine, I have multiple sandbox
+
+597
+00:19:34.360 --> 00:19:38.360
+environments. One like E2B operating
+
+598
+00:19:36.680 --> 00:19:40.760
+purely in the cloud and then for more
+
+599
+00:19:38.360 --> 00:19:42.080
+personal workflow where, you know,
+
+600
+00:19:40.760 --> 00:19:44.400
+privacy is important, you can have
+
+601
+00:19:42.080 --> 00:19:46.480
+agents run, of course, on your own local
+
+602
+00:19:44.400 --> 00:19:48.080
+devices like everyone is doing with
+
+603
+00:19:46.480 --> 00:19:49.560
+Multibot or Cloudbot or whatever it's
+
+604
+00:19:48.080 --> 00:19:52.320
+called now. But you can see here, you
+
+605
+00:19:49.560 --> 00:19:53.880
+know, I have 24 agent sandboxes running
+
+606
+00:19:52.320 --> 00:19:55.720
+and, you know, you can see I have
+
+607
+00:19:53.880 --> 00:19:56.920
+duplicates of a lot of these things that
+
+608
+00:19:55.720 --> 00:19:58.240
+we've been looking at here, right? So I
+
+609
+00:19:56.920 --> 00:19:59.600
+have multiple versions of this. Just
+
+610
+00:19:58.240 --> 00:20:01.480
+wanted to make this super clear. I have
+
+611
+00:19:59.600 --> 00:20:03.320
+a skill, I have an agent that operates
+
+612
+00:20:01.480 --> 00:20:05.400
+and can manage all of these agent
+
+613
+00:20:03.320 --> 00:20:06.880
+sandboxes at scale. This is going to be
+
+614
+00:20:05.400 --> 00:20:08.080
+really important moving forward. When
+
+615
+00:20:06.880 --> 00:20:10.080
+you're scaling your compute to scale
+
+616
+00:20:08.080 --> 00:20:11.320
+your impact, which is the big theme of
+
+617
+00:20:10.080 --> 00:20:13.560
+everything we're looking at right now.
+
+618
+00:20:11.320 --> 00:20:16.360
+All right? Here we looked at how to spin
+
+619
+00:20:13.560 --> 00:20:18.200
+up teams of agents, okay? And it all
+
+620
+00:20:16.360 --> 00:20:20.560
+comes back to things we talk about on
+
+621
+00:20:18.200 --> 00:20:22.120
+the channel all the time. All these
+
+622
+00:20:20.560 --> 00:20:23.680
+fantastic new tools coming out of the
+
+623
+00:20:22.120 --> 00:20:25.120
+Cloud Code team, all these new
+
+624
+00:20:23.680 --> 00:20:26.600
+capabilities. There is a lot of
+
+625
+00:20:25.120 --> 00:20:28.000
+engineering work they put into this, you
+
+626
+00:20:26.600 --> 00:20:29.760
+know, big shout out to the Cloud Code
+
+627
+00:20:28.000 --> 00:20:32.080
+team, but I do want to say that
+
+628
+00:20:29.760 --> 00:20:34.640
+underneath all of it is a concept we
+
+629
+00:20:32.080 --> 00:20:37.040
+always discuss. It's the core four
+
+630
+00:20:34.640 --> 00:20:38.480
+context model prompt tools. Everything
+
+631
+00:20:37.040 --> 00:20:41.440
+boils down to that, all right?
+
+632
+00:20:38.480 --> 00:20:43.360
+Everything is the core four. Okay? And
+
+633
+00:20:41.440 --> 00:20:45.840
+just quickly, you know, we saw all this
+
+634
+00:20:43.360 --> 00:20:48.080
+work happen. We saw our multi-agent
+
+635
+00:20:45.840 --> 00:20:49.800
+system track all of this and you can see
+
+636
+00:20:48.080 --> 00:20:51.520
+all of these new task tools. Team
+
+637
+00:20:49.800 --> 00:20:54.600
+delete, team create. We have these new
+
+638
+00:20:51.520 --> 00:20:56.560
+task tools. Task create, task get. So
+
+639
+00:20:54.600 --> 00:20:57.960
+what are all the new available tools?
+
+640
+00:20:56.560 --> 00:21:00.120
+Let's go and take a look at this. We
+
+641
+00:20:57.960 --> 00:21:01.720
+have kind of three categories of tools
+
+642
+00:21:00.120 --> 00:21:03.800
+that this, you know, new multi-agent
+
+643
+00:21:01.720 --> 00:21:05.520
+orchestration system gives us. Team
+
+644
+00:21:03.800 --> 00:21:08.200
+management, task management, and
+
+645
+00:21:05.520 --> 00:21:10.120
+communications. Team create task, team
+
+646
+00:21:08.200 --> 00:21:11.960
+delete task has been around for a long
+
+647
+00:21:10.120 --> 00:21:13.480
+time. This is how you kick off an agent
+
+648
+00:21:11.960 --> 00:21:16.160
+in parallel, but then we have all the
+
+649
+00:21:13.480 --> 00:21:17.800
+new task management tools, right? Task
+
+650
+00:21:16.160 --> 00:21:19.360
+create, task list, task get, task
+
+651
+00:21:17.800 --> 00:21:21.440
+update. But the most important one of
+
+652
+00:21:19.360 --> 00:21:23.240
+all probably is the send message. This
+
+653
+00:21:21.440 --> 00:21:24.600
+is how the agents were communicating and
+
+654
+00:21:23.240 --> 00:21:26.840
+after they communicate, after they do
+
+655
+00:21:24.600 --> 00:21:28.160
+all the work as we described here in
+
+656
+00:21:26.840 --> 00:21:29.680
+this workflow, right? This is the kind
+
+657
+00:21:28.160 --> 00:21:31.400
+of the multi-agent orchestration
+
+658
+00:21:29.680 --> 00:21:33.360
+workflow built out with this new tool.
+
+659
+00:21:31.400 --> 00:21:35.440
+It's it's this, right? Create the team,
+
+660
+00:21:33.360 --> 00:21:37.480
+create the tasks, spawn the agents, work
+
+661
+00:21:35.440 --> 00:21:39.760
+in parallel, shut them all down, delete
+
+662
+00:21:37.480 --> 00:21:41.800
+the team. This is the full workflow of
+
+663
+00:21:39.760 --> 00:21:44.320
+the brand new Claude multi-agent
+
+664
+00:21:41.800 --> 00:21:47.280
+capabilities. So, with every new
+
+665
+00:21:44.320 --> 00:21:49.000
+capability, with every new feature
+
+666
+00:21:47.280 --> 00:21:51.360
+coming out of Claude code, coming out of
+
+667
+00:21:49.000 --> 00:21:53.360
+all these agentic coding tools, with
+
+668
+00:21:51.360 --> 00:21:55.720
+every new release of the new model, the
+
+669
+00:21:53.360 --> 00:21:57.720
+question is always the same for you and
+
+670
+00:21:55.720 --> 00:21:59.680
+I, the engineer with our boots on the
+
+671
+00:21:57.720 --> 00:22:02.000
+ground working with this technology
+
+672
+00:21:59.680 --> 00:22:04.320
+every single day. How can we understand
+
+673
+00:22:02.000 --> 00:22:07.200
+the capabilities available to us to
+
+674
+00:22:04.320 --> 00:22:09.440
+accelerate our engineering work. Models
+
+675
+00:22:07.200 --> 00:22:12.080
+will improve, tools will change, and
+
+676
+00:22:09.440 --> 00:22:14.080
+that means that you and I will always be
+
+677
+00:22:12.080 --> 00:22:15.680
+the limitation. It's about what you and
+
+678
+00:22:14.080 --> 00:22:17.520
+I can do. So, with every feature
+
+679
+00:22:15.680 --> 00:22:19.200
+release, make sure you're digging in,
+
+680
+00:22:17.520 --> 00:22:21.040
+make sure you're understanding what's
+
+681
+00:22:19.200 --> 00:22:23.520
+available to you so that you know what
+
+682
+00:22:21.040 --> 00:22:25.520
+you can do. Every engineer is limited by
+
+683
+00:22:23.520 --> 00:22:27.320
+their tools and their knowledge of their
+
+684
+00:22:25.520 --> 00:22:29.440
+tool. So, that's why multi-agent
+
+685
+00:22:27.320 --> 00:22:31.320
+observability is super key. Throughout
+
+686
+00:22:29.440 --> 00:22:34.280
+any point in this workflow, we can jump
+
+687
+00:22:31.320 --> 00:22:37.120
+in here and we can investigate and see
+
+688
+00:22:34.280 --> 00:22:39.160
+the communication, see the tasks between
+
+689
+00:22:37.120 --> 00:22:40.800
+our agents that we kicked off. We see
+
+690
+00:22:39.160 --> 00:22:43.360
+all the events. I'm going to leave my
+
+691
+00:22:40.800 --> 00:22:45.320
+multi-agent observability updated to
+
+692
+00:22:43.360 --> 00:22:47.560
+support all these new tools, link in the
+
+693
+00:22:45.320 --> 00:22:50.400
+description for you, and I'll also link
+
+694
+00:22:47.560 --> 00:22:52.640
+a previous video and my agent sandbox
+
+695
+00:22:50.400 --> 00:22:54.160
+skill for you to play with. Again, link
+
+696
+00:22:52.640 --> 00:22:56.440
+in the description for you if you're
+
+697
+00:22:54.160 --> 00:22:58.560
+interested in taking your agentic coding
+
+698
+00:22:56.440 --> 00:23:00.960
+to the next level, check out tactical
+
+699
+00:22:58.560 --> 00:23:04.120
+agentic coding. This is my take on how
+
+700
+00:23:00.960 --> 00:23:06.480
+you can accelerate far past AI coding
+
+701
+00:23:04.120 --> 00:23:09.000
+and vibe coding with advanced agentic
+
+702
+00:23:06.480 --> 00:23:11.680
+engineering so powerful your code base
+
+703
+00:23:09.000 --> 00:23:13.120
+runs itself. We're seeing multi-agent
+
+704
+00:23:11.680 --> 00:23:15.920
+orchestration come out of the Cloud Code
+
+705
+00:23:13.120 --> 00:23:17.840
+team. We have had this documented and
+
+706
+00:23:15.920 --> 00:23:19.960
+covered inside of this course, inside of
+
+707
+00:23:17.840 --> 00:23:22.320
+Agentic Horizons specifically. We have
+
+708
+00:23:19.960 --> 00:23:24.640
+had working versions of multi-agent
+
+709
+00:23:22.320 --> 00:23:26.400
+orchestration for months now. This is
+
+710
+00:23:24.640 --> 00:23:28.040
+all here. You know, a lot of the ideas
+
+711
+00:23:26.400 --> 00:23:29.760
+we talk about on the channel are taken
+
+712
+00:23:28.040 --> 00:23:30.800
+to the next level inside this course. If
+
+713
+00:23:29.760 --> 00:23:32.120
+you're interested, check this out. I
+
+714
+00:23:30.800 --> 00:23:34.000
+know a lot of engineers on the channel
+
+715
+00:23:32.120 --> 00:23:35.120
+have already checked out this course and
+
+716
+00:23:34.000 --> 00:23:37.000
+you know, to be super clear, there are
+
+717
+00:23:35.120 --> 00:23:38.400
+thousands of engineers that have taken
+
+718
+00:23:37.000 --> 00:23:39.880
+this and then have gotten great value
+
+719
+00:23:38.400 --> 00:23:41.520
+out of this. So, I'll leave this linked
+
+720
+00:23:39.880 --> 00:23:43.120
+in the description if you're interested
+
+721
+00:23:41.520 --> 00:23:45.000
+as well. We're going to be covering
+
+722
+00:23:43.120 --> 00:23:46.680
+multi-agent orchestration a lot as we
+
+723
+00:23:45.000 --> 00:23:49.200
+move forward. It's going to be a big
+
+724
+00:23:46.680 --> 00:23:51.640
+trend because it allows us to do what we
+
+725
+00:23:49.200 --> 00:23:54.320
+always do on this channel, scale our
+
+726
+00:23:51.640 --> 00:23:55.920
+compute to scale our impact. Thanks so
+
+727
+00:23:54.320 --> 00:23:58.120
+much for sticking around. You know where
+
+728
+00:23:55.920 --> 00:24:01.880
+to find me every single Monday. Stay
+
+729
+00:23:58.120 --> 00:24:01.880
+focused and keep building.

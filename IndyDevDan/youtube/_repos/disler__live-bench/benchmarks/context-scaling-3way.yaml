@@ -1,0 +1,105 @@
+# benchmarks/context-scaling-3way.yaml
+# Context size scaling (3-way): Qwen 3.6 35B vs Qwen 3.5 35B vs Gemma 4 26B × MLX 4-bit.
+# 8 charts: prefill/decode/wall/accuracy × M4 Max/M5 Max.
+# X-axis = prompt size (200–32K tokens), bars = model variants.
+# Context: OpenAI GraphWalks (directed graph multi-hop reasoning).
+# ctx_200 and ctx_500 are synthetic; ctx_1k+ are from the HuggingFace dataset.
+# ctx_64k is intentionally disabled for this benchmark run.
+version: 1
+benchmark:
+  session_id: context-scaling-3way
+  title: "Context Scaling (3-way) — GraphWalks"
+  subtitle: "Qwen 3.6 35B vs Qwen 3.5 35B vs Gemma 4 26B · MLX 4-bit · M4 Max vs M5 Max · OpenAI GraphWalks"
+  tags:
+    - { name: "qwen3.5:35b-a3b-nvfp4 · MLX", icons: ["/icons/alibaba.svg", "/icons/apple.svg"] }
+    - { name: "qwen3.6:35b-a3b-nvfp4 · MLX", icons: ["/icons/alibaba.svg", "/icons/apple.svg"] }
+    - { name: "mlx-community/gemma-4-26b-a4b-it-4bit · MLX", icons: ["/icons/google.svg", "/icons/apple.svg"] }
+  charts:
+    # ── Prefill ──
+    - chart_id: prefill_m4
+      title: "Prefill Speed (M4 Max)"
+      subtitle: "prompt processing · tok/s · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Context Size" }
+      y: { label: "Prefill", unit: "tok/s", min: 0 }
+      groups: &ctx_groups
+        - { key: ctx_200, label: "200" }
+        - { key: ctx_500, label: "500" }
+        - { key: ctx_1k,  label: "1K" }
+        - { key: ctx_2k,  label: "2K" }
+        - { key: ctx_4k,  label: "4K" }
+        - { key: ctx_8k,  label: "8K" }
+        - { key: ctx_16k, label: "16K" }
+        - { key: ctx_32k, label: "32K" }
+        # - { key: ctx_64k, label: "64K" }
+      metrics: &model_metrics
+        - { key: qwen35_mlx, label: "Qwen 3.5 35B MLX", color: "#F39C12", icon: "/icons/alibaba.svg" }
+        - { key: qwen36_mlx, label: "Qwen 3.6 35B MLX", color: "#f87171", icon: "/icons/alibaba.svg" }
+        - { key: gemma4_mlx, label: "Gemma 4 26B MLX",  color: "#3498DB", icon: "/icons/google.svg" }
+    - chart_id: prefill_m5
+      title: "Prefill Speed (M5 Max)"
+      subtitle: "prompt processing · tok/s · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Context Size" }
+      y: { label: "Prefill", unit: "tok/s", min: 0 }
+      groups: *ctx_groups
+      metrics: *model_metrics
+    # ── Decode ──
+    - chart_id: decode_m4
+      title: "Decode Speed (M4 Max)"
+      subtitle: "token generation · tok/s · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Context Size" }
+      y: { label: "Decode", unit: "tok/s", min: 0 }
+      groups: *ctx_groups
+      metrics: *model_metrics
+    - chart_id: decode_m5
+      title: "Decode Speed (M5 Max)"
+      subtitle: "token generation · tok/s · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Context Size" }
+      y: { label: "Decode", unit: "tok/s", min: 0 }
+      groups: *ctx_groups
+      metrics: *model_metrics
+    # ── Wall-Clock ──
+    - chart_id: wall_m4
+      title: "Wall-Clock Time (M4 Max)"
+      subtitle: "end-to-end latency · seconds · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Context Size" }
+      y: { label: "Wall time", unit: "s", min: 0 }
+      groups: *ctx_groups
+      metrics: *model_metrics
+    - chart_id: wall_m5
+      title: "Wall-Clock Time (M5 Max)"
+      subtitle: "end-to-end latency · seconds · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Context Size" }
+      y: { label: "Wall time", unit: "s", min: 0 }
+      groups: *ctx_groups
+      metrics: *model_metrics
+    # ── Accuracy (F1) ──
+    - chart_id: accuracy_m4
+      title: "Accuracy (M4 Max)"
+      subtitle: "GraphWalks F1 score · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Context Size" }
+      y: { label: "F1", unit: "", min: 0, max: 1 }
+      groups: *ctx_groups
+      metrics: *model_metrics
+    - chart_id: accuracy_m5
+      title: "Accuracy (M5 Max)"
+      subtitle: "GraphWalks F1 score · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Context Size" }
+      y: { label: "F1", unit: "", min: 0, max: 1 }
+      groups: *ctx_groups
+      metrics: *model_metrics

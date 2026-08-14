@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An agent-systems companion to Multi-Team Agentic Coding / Lead Agents: commander boundaries, Pi orchestration, prompt and permission contracts, lead-worker delegation, verification, and recovery.">
+  <title>Lead Agents — Agent Systems Companion</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <style>
+    :root {
+      --rail-width: 13.25rem;
+      --chapter-max: 72rem;
+      --site-bar-h: 2.45rem;
+      --orch: #3f705d;
+      --orch-wash: #e4efe9;
+      --lead: #946324;
+      --lead-wash: #f5ead7;
+      --worker: #315f78;
+      --worker-wash: #e6eff2;
+      --gate: #6a5677;
+      --gate-wash: #eee8f1;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--ink); }
+    code { overflow-wrap: anywhere; }
+    .skip-link {
+      position: fixed; z-index: 100; top: .4rem; left: .4rem; transform: translateY(-180%);
+      padding: .42rem .68rem; border-radius: var(--radius-sm); background: var(--ink); color: var(--ink-inverse);
+    }
+    .skip-link:focus { transform: none; }
+    .reading-progress { position: fixed; z-index: 90; inset: 0 0 auto; height: 2px; }
+    .reading-progress span { display: block; width: 0; height: 100%; background: var(--accent); }
+
+    .site-bar {
+      position: sticky; z-index: 50; top: 0; min-height: var(--site-bar-h);
+      border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--bg) 94%, transparent);
+      backdrop-filter: blur(10px);
+    }
+    .site-bar__inner {
+      display: flex; align-items: center; gap: .5rem 1rem; width: min(100%, var(--chapter-max));
+      min-height: var(--site-bar-h); margin-inline: auto; padding-inline: .75rem;
+    }
+    .site-bar__brand { color: var(--ink); font-size: var(--text-sm); font-weight: 780; text-decoration: none; }
+    .site-bar__label { color: var(--ink-mute); font-size: var(--text-xs); }
+    .site-bar__links { display: flex; gap: .85rem; margin-left: auto; }
+    .site-bar__links a { color: var(--accent-ink); font-size: var(--text-xs); font-weight: 750; text-decoration: none; }
+
+    .chapter-shell {
+      display: grid; grid-template-columns: var(--rail-width) minmax(0, 1fr); align-items: start;
+      gap: 1.25rem; width: min(calc(100% - 1.25rem), var(--chapter-max)); margin-inline: auto;
+    }
+    .chapter-rail {
+      position: sticky; top: calc(var(--site-bar-h) + 6px); max-height: calc(100vh - var(--site-bar-h) - 12px);
+      overflow-y: auto; padding: .78rem .55rem 1rem 0; border-right: 1px solid var(--border-soft);
+    }
+    .rail-kicker, .section-label, .micro-label {
+      color: var(--accent-ink); font-size: .66rem; font-weight: 820; letter-spacing: .09em; text-transform: uppercase;
+    }
+    .rail-title { margin-top: .18rem; color: var(--ink); font: 650 var(--text-base)/1.22 var(--font-display); }
+    .rail-copy { margin-top: .25rem; color: var(--ink-mute); font-size: .68rem; line-height: 1.42; }
+    .nav-group { margin: .72rem 0 .2rem; color: var(--accent-ink); font-size: .63rem; font-weight: 820; letter-spacing: .08em; text-transform: uppercase; }
+
+    .chapter-main { min-width: 0; padding-bottom: 3rem; }
+    .measure { width: min(100%, 48rem); max-width: 48rem; }
+    .wide { width: min(100%, 58rem); max-width: 58rem; }
+    .lesson-head { padding: 1rem 0 .85rem; border-bottom: 1px solid var(--border); }
+    .lesson-head h1 { margin: .22rem 0 .38rem; font-size: clamp(1.55rem, 3.1vw, 2.08rem); }
+    .dek { max-width: 64ch; color: var(--ink-soft); font-size: .98rem; line-height: 1.5; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: .38rem; margin-top: .62rem; }
+    .meta-chip {
+      padding: .17rem .44rem; border: 1px solid var(--border); border-radius: 999px;
+      background: var(--bg-card); color: var(--ink-soft); font-size: .67rem; font-weight: 680;
+    }
+    .mobile-jump { display: none; margin: .7rem 0; }
+    .mobile-jump summary { cursor: pointer; color: var(--accent-ink); font-size: var(--text-sm); font-weight: 760; }
+    .mobile-jump a { display: inline-block; margin: .3rem .55rem 0 0; font-size: var(--text-xs); }
+
+    .lesson-section { padding-block: 1.18rem; scroll-margin-top: 3.5rem; }
+    .lesson-section + .lesson-section { border-top: 1px solid var(--border-soft); }
+    .lesson-section h2 { margin: .14rem 0 .48rem; font-size: clamp(1.25rem, 2.2vw, 1.56rem); }
+    .lesson-section h3 { margin-top: .88rem; font-size: var(--text-base); }
+    .section-lead { max-width: 68ch; color: var(--ink-soft); font-size: .94rem; line-height: 1.54; }
+    .small { color: var(--ink-mute); font-size: .68rem; }
+
+    .mission-card {
+      position: relative; overflow: hidden; margin-top: .68rem; padding: .88rem 1rem .88rem 3.15rem;
+      border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border)); border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--accent-wash), var(--bg-card)); box-shadow: var(--shadow-card);
+    }
+    .mission-card::before {
+      position: absolute; left: .88rem; top: .8rem; display: grid; place-items: center; width: 1.72rem; height: 1.72rem;
+      border-radius: .46rem; content: "OS"; background: var(--accent); color: var(--ink-inverse); font: 820 .65rem var(--font-mono);
+    }
+    .mission-card p { max-width: 67ch; color: var(--ink-soft); line-height: 1.55; }
+    .mission-card strong { color: var(--ink); }
+    .hook-strip {
+      display: grid; grid-template-columns: auto 1fr; gap: .72rem; align-items: center; margin-top: .7rem;
+      padding: .68rem .78rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-card);
+    }
+    .hook-strip__mark { color: var(--accent-ink); font: 760 1.9rem/1 var(--font-display); }
+    .hook-strip p { color: var(--ink-soft); font-size: .78rem; line-height: 1.48; }
+
+    .cast-table { margin-top: .72rem; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-card); }
+    .cast-table table { min-width: 51rem; }
+    .cast-table th { background: var(--bg-inset); }
+    .cast-table td { font-size: .71rem; line-height: 1.42; vertical-align: top; }
+    .cast-table td:first-child { width: 22%; color: var(--ink); font-weight: 760; }
+    .actor-chip { display: inline-block; margin-top: .14rem; padding: .08rem .34rem; border-radius: 999px; color: var(--accent-ink); background: var(--accent-wash); font-size: .61rem; font-weight: 760; }
+
+    .org-strip { display: grid; grid-template-columns: 1fr auto 1.25fr auto 1.8fr; gap: .38rem; align-items: stretch; margin-top: .68rem; }
+    .org-node { padding: .58rem; border: 1px solid var(--border); border-radius: .52rem; background: var(--bg-card); text-align: center; }
+    .org-node b { display: block; font-size: .71rem; }
+    .org-node small { display: block; margin-top: .12rem; color: var(--ink-mute); font-size: .61rem; line-height: 1.33; }
+    .org-node.orch { border-color: color-mix(in srgb, var(--orch) 46%, var(--border)); background: var(--orch-wash); }
+    .org-node.lead { border-color: color-mix(in srgb, var(--lead) 46%, var(--border)); background: var(--lead-wash); }
+    .org-node.worker { border-color: color-mix(in srgb, var(--worker) 46%, var(--border)); background: var(--worker-wash); }
+    .org-arrow { align-self: center; color: var(--accent-ink); font-weight: 850; }
+
+    .surface-map { margin-top: .72rem; padding: .78rem; border: 1px solid var(--border); border-radius: .86rem; background: var(--bg-inset); box-shadow: var(--shadow-card); }
+    .surface-titlebar { display: flex; justify-content: space-between; gap: .5rem; margin-bottom: .48rem; }
+    .surface-titlebar strong { font-size: .76rem; }
+    .surface-titlebar span { color: var(--accent-ink); font: 720 .62rem/1.3 var(--font-mono); }
+    .surface-lane { display: grid; grid-template-columns: 6.9rem repeat(5, minmax(0, 1fr)); gap: .35rem; }
+    .surface-lane + .surface-lane { margin-top: .4rem; }
+    .surface-lane-label { display: grid; align-content: center; padding: .5rem; border-radius: .48rem; background: var(--ink); color: var(--terminal-ink); font: 800 .61rem/1.33 var(--font-mono); text-transform: uppercase; }
+    .surface-lane-label small { margin-top: .16rem; color: var(--terminal-dot); font: 500 .59rem/1.32 var(--font-body); text-transform: none; }
+    .surface-node { position: relative; min-height: 5.7rem; padding: .48rem; border: 1px solid var(--border); border-radius: .48rem; background: var(--bg-card); }
+    .surface-node:not(:last-child)::after { position: absolute; z-index: 2; right: -.25rem; top: 35%; content: "›"; color: var(--accent-ink); font-weight: 860; }
+    .surface-node b { display: block; margin-bottom: .14rem; color: var(--accent-ink); font: 790 .59rem/1.25 var(--font-mono); text-transform: uppercase; }
+    .surface-node p { color: var(--ink-mute); font-size: .61rem; line-height: 1.36; }
+    .surface-node code { color: var(--ink); font-size: .57rem; }
+    .surface-caption { margin-top: .48rem; color: var(--ink-mute); font-size: .67rem; line-height: 1.42; text-align: center; }
+
+    .loop-board { display: grid; gap: .5rem; margin-top: .72rem; }
+    .loop-lane { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: .58rem; padding: .66rem; border: 1px solid var(--border); border-radius: .72rem; }
+    .loop-lane.in { background: color-mix(in srgb, var(--accent-wash) 58%, var(--bg-card)); }
+    .loop-lane.out { background: var(--orch-wash); }
+    .lane-label { align-self: center; color: var(--ink); font: 820 .65rem/1.3 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+    .lane-label small { display: block; margin-top: .2rem; color: var(--ink-mute); font: 500 .63rem/1.34 var(--font-body); letter-spacing: 0; text-transform: none; }
+    .lane-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .37rem; }
+    .loop-step { position: relative; min-height: 4.75rem; padding: .5rem; border-radius: .48rem; background: var(--bg-card); color: var(--ink-mute); font-size: .63rem; line-height: 1.35; }
+    .loop-step:not(:last-child)::after { position: absolute; z-index: 2; right: -.28rem; top: 34%; content: "›"; color: var(--accent-ink); font-size: 1rem; font-weight: 820; }
+    .loop-step b { display: block; margin-bottom: .14rem; color: var(--ink); font-size: .69rem; }
+    .recovery-band { display: grid; grid-template-columns: 1fr auto 1fr; gap: .42rem; align-items: center; padding: .54rem .68rem; border: 1px dashed var(--accent); border-radius: .5rem; background: var(--accent-wash); color: var(--accent-ink); font: 700 .65rem/1.42 var(--font-mono); text-align: center; }
+    .worked-run { display: grid; grid-template-columns: repeat(5, 1fr); gap: .38rem; margin-top: .58rem; }
+    .worked-run div { padding: .52rem; border: 1px solid var(--border); border-radius: .46rem; background: var(--bg-card); color: var(--ink-soft); font-size: .63rem; line-height: 1.38; }
+    .worked-run b { display: block; margin-bottom: .12rem; color: var(--accent-ink); }
+    .pattern-name { margin-top: .55rem; padding: .56rem .65rem; border-left: 3px solid var(--accent); border-radius: 0 .46rem .46rem 0; background: var(--accent-wash); color: var(--ink-soft); font-size: .69rem; line-height: 1.45; }
+
+    .contracts { display: grid; gap: .65rem; margin-top: .72rem; }
+    .contract-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, .92fr); gap: .72rem; padding: .78rem; border: 1px solid var(--border); border-radius: .7rem; background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .contract-copy h3 { margin: 0; font-size: .84rem; }
+    .contract-copy p { margin-top: .24rem; color: var(--ink-soft); font-size: .72rem; line-height: 1.46; }
+    .contract-path { color: var(--accent-ink) !important; font: 700 .63rem/1.4 var(--font-mono); overflow-wrap: anywhere; }
+    .intent { margin-top: .44rem !important; padding: .48rem .55rem; border-left: 3px solid var(--accent); border-radius: 0 .36rem .36rem 0; background: var(--accent-wash); color: var(--ink) !important; font-size: .67rem !important; }
+    .intent b { color: var(--accent-ink); }
+    .evidence { min-width: 0; align-self: start; overflow: hidden; border: 1px solid var(--terminal-border); border-radius: .56rem; background: var(--terminal-bg); color: var(--terminal-ink); }
+    .evidence-label { display: flex; justify-content: space-between; gap: .4rem; padding: .34rem .5rem; border-bottom: 1px solid var(--terminal-bar); color: var(--terminal-dot); font: 650 .61rem/1.3 var(--font-mono); }
+    .evidence pre { margin: 0; padding: .56rem; border: 0; border-radius: 0; background: transparent; color: inherit; font: .63rem/1.48 var(--font-mono); white-space: pre-wrap; }
+    .tok-key { color: #e9b785; }
+    .tok-string { color: #b9cf9d; }
+    .tok-comment { color: #aa9d8d; font-style: italic; }
+    .tok-var { color: #9dc2da; }
+    .proof-stack { display: grid; gap: .32rem; align-self: start; }
+    .proof-stack div { padding: .48rem .54rem; border-left: 3px solid var(--ok); border-radius: .34rem; background: var(--ok-wash); color: var(--ok); font-size: .65rem; line-height: 1.4; }
+
+    .ops-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(14rem, .7fr); gap: .72rem; margin-top: .72rem; }
+    .ops-steps { counter-reset: ops; display: grid; gap: .42rem; }
+    .ops-step { counter-increment: ops; display: grid; grid-template-columns: 1.68rem 1fr; gap: .5rem; padding: .58rem; border: 1px solid var(--border); border-radius: .56rem; background: var(--bg-card); }
+    .ops-step::before { display: grid; place-items: center; width: 1.48rem; height: 1.48rem; content: counter(ops); border-radius: .4rem; background: var(--accent-wash); color: var(--accent-ink); font: 820 .63rem/1 var(--font-mono); }
+    .ops-step h3 { margin: .04rem 0 .12rem; font-size: .76rem; }
+    .ops-step p { color: var(--ink-soft); font-size: .69rem; line-height: 1.43; }
+    .terminal { margin-top: .28rem; padding: .47rem .55rem; overflow-x: auto; border-radius: .4rem; background: var(--terminal-bg); color: var(--terminal-ink); font: .62rem/1.47 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .readiness { align-self: start; padding: .68rem; border: 1px solid var(--border); border-radius: .62rem; background: var(--bg-inset); }
+    .readiness h3 { margin: 0; color: var(--accent-ink); font-size: .8rem; }
+    .readiness li { color: var(--ink-soft); font-size: .67rem; line-height: 1.42; }
+    .readiness ul { margin-top: .32rem; padding-left: 1rem; }
+    .truth-note { margin-top: .5rem; padding: .53rem .6rem; border: 1px dashed var(--accent); border-radius: .46rem; background: var(--bg-card); color: var(--ink-soft); font-size: .67rem; line-height: 1.44; }
+    .truth-note b { color: var(--accent-ink); }
+
+    .failure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .46rem; margin-top: .7rem; }
+    .failure-card { padding: .62rem; border: 1px solid var(--border); border-radius: .56rem; background: var(--bg-card); }
+    .failure-card b { display: block; color: var(--warn); font-size: .72rem; }
+    .failure-card p { margin-top: .17rem; color: var(--ink-soft); font-size: .67rem; line-height: 1.42; }
+    .failure-card .repair { display: block; margin-top: .26rem; color: var(--ok); font-weight: 760; }
+    .failure-card.wide { grid-column: 1 / -1; background: color-mix(in srgb, var(--accent-wash) 48%, var(--bg-card)); }
+
+    .lab { padding: .86rem !important; border: 2px solid var(--accent) !important; border-radius: .76rem; background: linear-gradient(145deg, var(--bg-card), var(--accent-wash)); box-shadow: var(--shadow-card); }
+    .lab-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: .7rem; }
+    .lab ol { margin-top: .4rem; padding-left: 1.1rem; }
+    .lab li { color: var(--ink-soft); font-size: .7rem; line-height: 1.44; }
+    .pass-list { padding: .62rem; border-radius: .56rem; background: var(--ok-wash); }
+    .pass-list h3, .pass-list li { color: var(--ok); }
+    .pass-list h3 { margin: 0; font-size: .78rem; }
+    .pass-list ul { margin-top: .32rem; padding-left: 1rem; }
+    .pass-list li { font-size: .67rem; line-height: 1.42; }
+    .fail-try { margin-top: .48rem; padding: .52rem .58rem; border: 1px dashed var(--accent); border-radius: .44rem; color: var(--accent-ink); font-size: .66rem; line-height: 1.42; }
+    .lab-branch { display: grid; grid-template-columns: repeat(5, 1fr); gap: .32rem; margin-top: .5rem; }
+    .lab-branch div { padding: .44rem; border-radius: .4rem; background: var(--bg-card); color: var(--ink-soft); font-size: .62rem; line-height: 1.35; text-align: center; }
+    .lab-branch b { display: block; color: var(--accent-ink); }
+
+    .teach-back { padding: .82rem !important; border-radius: .72rem; background: var(--terminal-bg); color: var(--terminal-ink); }
+    .teach-back h2 { color: var(--ink-inverse); }
+    .six-sentences { counter-reset: sentence; display: grid; grid-template-columns: repeat(2, 1fr); gap: .42rem; margin-top: .58rem; }
+    .sentence { counter-increment: sentence; min-height: 3.35rem; padding: .52rem; border: 1px solid var(--terminal-bar); border-radius: .44rem; color: var(--terminal-dot); font-size: .68rem; line-height: 1.4; }
+    .sentence::before { display: inline-block; margin-right: .24rem; content: counter(sentence) "."; color: #e9b785; font: 800 .62rem/1 var(--font-mono); }
+    details summary { cursor: pointer; }
+    details[open] > :not(summary) { animation: reveal .22s ease-out both; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .answer-toggle { margin-top: .52rem; }
+    .answer-toggle summary { color: #e9b785; font-size: .68rem; font-weight: 760; }
+    .model-answer { margin-top: .42rem; padding: .58rem; border-radius: .43rem; background: var(--terminal-bar); color: var(--terminal-dot); font-size: .66rem; line-height: 1.5; }
+    .raw-index { overflow: clip; border: 1px solid var(--border); border-radius: .64rem; background: var(--bg-card); }
+    .raw-index > summary { padding: .66rem .74rem; color: var(--accent-ink); font-size: .73rem; font-weight: 760; }
+    .raw-index pre { max-height: 28rem; margin: 0; padding: .65rem .74rem; overflow: auto; border: 0; border-top: 1px solid var(--border-soft); border-radius: 0; background: var(--bg-inset); color: var(--ink-soft); font: .61rem/1.52 var(--font-mono); white-space: pre; }
+    .chapter-foot { display: flex; justify-content: space-between; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--ink-mute); font-size: .68rem; }
+
+    @media (max-width: 900px) {
+      .chapter-shell { display: block; width: min(calc(100% - 1.25rem), 58rem); }
+      .chapter-rail { display: none; }
+      .mobile-jump { display: block; }
+      .contract-card, .ops-layout, .lab-grid { grid-template-columns: 1fr; }
+      .surface-lane { grid-template-columns: 5.6rem repeat(5, minmax(8.2rem, 1fr)); overflow-x: auto; padding-bottom: .2rem; }
+      .worked-run { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 650px) {
+      .site-bar__label, .site-bar__brand { display: none; }
+      .site-bar__links { width: 100%; margin-left: 0; justify-content: space-between; }
+      .failure-grid, .six-sentences { grid-template-columns: 1fr; }
+      .failure-card.wide { grid-column: auto; }
+      .lane-steps, .worked-run { grid-template-columns: 1fr 1fr; }
+      .loop-step::after { display: none; }
+      .loop-lane { grid-template-columns: 1fr; }
+      .org-strip { grid-template-columns: 1fr; }
+      .org-arrow { transform: rotate(90deg); justify-self: center; }
+      .recovery-band { grid-template-columns: 1fr; }
+      .lab-branch { grid-template-columns: 1fr 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      .site-bar, .chapter-rail, .mobile-jump, .reading-progress { display: none !important; }
+      .chapter-shell { display: block; width: 100%; }
+      .lesson-section { break-inside: avoid; }
+      details > * { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to lesson</a>
+  <div class="reading-progress" aria-hidden="true"><span id="top-progress"></span></div>
+
+  <header class="site-bar">
+    <div class="site-bar__inner">
+      <a class="site-bar__brand" href="../index.html">IndyDevDan Expert Book</a>
+      <span class="site-bar__label">MA-2 · Agent systems companion</span>
+      <nav class="site-bar__links" aria-label="Companion links">
+        <a href="../vol-3-ma/16-lead-agents.html">Chapter</a>
+        <a href="index.html">Code library</a>
+        <a href="../index.html">Hub</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Lesson navigation">
+      <p class="rail-kicker">AGENT SYSTEMS · MA-2</p>
+      <h2 class="rail-title">Lead Agents</h2>
+      <p class="rail-copy">How one commander operates a config-driven, domain-locked team through one interface.</p>
+      <p class="nav-group">Operate the system</p>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#mission"><span class="chapter-nav__n">01</span><span>Agent mission</span></a></li>
+          <li><a href="#cast"><span class="chapter-nav__n">02</span><span>Cast of agents</span></a></li>
+          <li><a href="#surface"><span class="chapter-nav__n">03</span><span>Surface map</span></a></li>
+          <li><a href="#loop"><span class="chapter-nav__n">04</span><span>Control loop</span></a></li>
+          <li><a href="#contracts"><span class="chapter-nav__n">05</span><span>Agent contracts</span></a></li>
+          <li><a href="#operate"><span class="chapter-nav__n">06</span><span>Operate like Dan</span></a></li>
+          <li><a href="#failures"><span class="chapter-nav__n">07</span><span>Agent failures</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">08</span><span>Agent-ops lab</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">09</span><span>Six sentences</span></a></li>
+          <li><a href="#appendix"><span class="chapter-nav__n">10</span><span>Raw index</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="lesson-head measure">
+        <span class="section-label">Agent systems · not source archaeology</span>
+        <h1>Multi-Team Agentic Coding / Lead Agents</h1>
+        <p class="dek">The lesson is not “ten agent Markdown files.” It is an agent operating system: one human command surface, a depth-2 delegation tree, prompts that specialize judgment, runtime gates that constrain action, and a harness that keeps working until it can return evidence.</p>
+        <div class="meta-row" aria-label="Lesson facts">
+          <span class="meta-chip">1 commander interface</span>
+          <span class="meta-chip">3 teams · 10 agents</span>
+          <span class="meta-chip">Opus leads · Sonnet workers</span>
+          <span class="meta-chip">soft rules + hard gates</span>
+          <span class="meta-chip">course-era model IDs</span>
+        </div>
+      </header>
+
+      <details class="mobile-jump">
+        <summary>Jump through the agent OS</summary>
+        <a href="#mission">Mission</a><a href="#surface">Map</a><a href="#loop">Loop</a><a href="#contracts">Contracts</a><a href="#lab">Lab</a>
+      </details>
+
+      <section id="mission" class="lesson-section measure">
+        <span class="section-label">01 · Hook · Agent mission</span>
+        <h2>Stop being the router for every line of work</h2>
+        <div class="mission-card">
+          <p><strong>This lesson trains you to command a team-producing system instead of repeatedly steering one generalist.</strong> You choose the mission, operating config, authority boundaries, and acceptance evidence; the Orchestrator classifies the request, leads decompose it, workers execute inside owned domains, and the harness brings one synthesis back. Your work moves upward—from doing and dispatching to designing an agent OS you can trust, measure, replace, and scale.</p>
+        </div>
+        <div class="hook-strip">
+          <span class="hook-strip__mark" aria-hidden="true">↗</span>
+          <p><strong>Dan’s leverage move:</strong> if you spend the day re-prompting one agent, you are still the orchestrator. Program routing, specialization, memory, and verification into the system so your cognitive load stays flat as capability grows.</p>
+        </div>
+      </section>
+
+      <section id="cast" class="lesson-section wide">
+        <span class="section-label">02 · Picture the actors</span>
+        <h2>The cast: leaders think, workers do, gates refuse</h2>
+        <p class="section-lead">“Agent” is not one role. Each seat receives a different prompt, tool set, writable surface, memory file, and completion obligation.</p>
+        <div class="org-strip" aria-label="Depth-two agent hierarchy">
+          <div class="org-node orch"><b>Human commander</b><small>Intent · limits · acceptance</small></div>
+          <span class="org-arrow" aria-hidden="true">→</span>
+          <div class="org-node orch"><b>Orchestrator</b><small>Classify · route · synthesize</small></div>
+          <span class="org-arrow" aria-hidden="true">→</span>
+          <div class="org-node lead"><b>3 leads → 6 workers</b><small>Plan / Engineering / Validation → specialist execution</small></div>
+        </div>
+        <div class="cast-table">
+          <table>
+            <thead><tr><th>Actor</th><th>Owns</th><th>May touch</th><th>Completion receipt</th></tr></thead>
+            <tbody>
+              <tr><td>Human commander<br><span class="actor-chip">authority owner</span></td><td>Goal, repository, config, credentials, spend, risk, and final acceptance.</td><td><code>/install</code>, <code>just team*</code>, the single chat input, artifacts and logs.</td><td>A judgment: accept, repair the OS, or rerun.</td></tr>
+              <tr><td>Claude Code bootloader<br><span class="actor-chip">system installer</span></td><td>Prerequisite checks, installation, deployment into a chosen codebase, and meta-build commands.</td><td><code>.claude/commands/</code>, <code>meta-pi-agent.md</code>, <code>justfile</code>.</td><td>A runnable team harness or an explicit failed preflight.</td></tr>
+              <tr><td>Pi Orchestrator<br><span class="actor-chip">single interface</span></td><td>Classify, create TillDone work, delegate to one team by default, sequence dependencies, synthesize.</td><td>Repository read access; the expertise directory is writable; <code>delegate</code> and <code>tilldone</code>.</td><td>One decisive user-facing synthesis with work accounted for.</td></tr>
+              <tr><td>Planning / Engineering / Validation leads<br><span class="actor-chip">coordinators</span></td><td>Translate the routed question, consult members, mark shared tasks, synthesize a team position.</td><td>Repository read access, own mental model, member <code>delegate</code>; no <code>bash</code>.</td><td>A team answer—not raw worker chatter.</td></tr>
+              <tr><td>Six specialist workers<br><span class="actor-chip">executors</span></td><td>Product, UX, frontend, backend, QA, or security work exactly assigned by the lead.</td><td><code>read/write/edit/bash/grep/find/ls</code>, limited by each agent’s domain.</td><td>Detailed work, code or validation evidence, and durable learnings.</td></tr>
+              <tr><td>Pi extensions<br><span class="actor-chip">control plane</span></td><td>Config resolution, subprocess spawning, domain gates, depth cap, TUI, logs, costs, TillDone state.</td><td><code>apps/multi-team-chat/extensions/</code> and injected environment contracts.</td><td>Bounded execution, observable state, and explicit errors.</td></tr>
+              <tr><td>Drive + verifier surfaces<br><span class="actor-chip">scripts as agents</span></td><td>Repeatable terminal control and independent inspection of UI, process, logs, and cost.</td><td><code>.claude/skills/drive/</code>, session JSONL, footer, <code>/toggle-workers</code>, API dashboard.</td><td>An observation that can falsify “done.”</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="surface" class="lesson-section wide">
+        <span class="section-label">03 · Agent surface map</span>
+        <h2>The repo is a set of agent interfaces</h2>
+        <p class="section-lead">Ignore the temptation to memorize folders. Follow authority through the surfaces an agent actually reads, invokes, is blocked by, and leaves behind.</p>
+        <figure class="surface-map" aria-labelledby="surface-caption">
+          <div class="surface-titlebar"><strong>Lead Agents · operating surfaces</strong><span>intent flows right → evidence returns left</span></div>
+          <div class="surface-lane">
+            <div class="surface-lane-label">Human lane<small>program the board</small></div>
+            <div class="surface-node"><b>Mission</b><p>One request to one Orchestrator—not six worker prompts.</p></div>
+            <div class="surface-node"><b>Roster</b><p><code>multi-team-config.yaml</code> names teams, paths, colors, routing hints.</p></div>
+            <div class="surface-node"><b>Launch</b><p><code>/install</code>, <code>just team</code>, or <code>just teamc &lt;path&gt;</code>.</p></div>
+            <div class="surface-node"><b>Observe</b><p>Chat bubbles, team tree, TillDone, cost/context footer.</p></div>
+            <div class="surface-node"><b>Accept</b><p>Inspect synthesis, JSONL, filesystem diff, tests, and spend.</p></div>
+          </div>
+          <div class="surface-lane">
+            <div class="surface-lane-label">Agent lane<small>reason and act</small></div>
+            <div class="surface-node"><b>Prompt</b><p>Seat identity + model + tools + skills + domain + placeholders.</p></div>
+            <div class="surface-node"><b>Context</b><p><code>README.md</code>, <code>CLAUDE.md</code>, conversation log, mental model.</p></div>
+            <div class="surface-node"><b>Capability</b><p><code>delegate</code>, <code>tilldone</code>, or worker file/bash tools.</p></div>
+            <div class="surface-node"><b>Gate</b><p>Tool allowlist, path rules, depth cap, expertise line limit.</p></div>
+            <div class="surface-node"><b>Receipt</b><p>Lead synthesis, updated expertise, logs, costs, task state.</p></div>
+          </div>
+          <figcaption id="surface-caption" class="surface-caption">Prompt ≠ permission. Config ≠ execution. UI ≠ proof. The runtime joins those layers; the receipts let the commander check the join.</figcaption>
+        </figure>
+      </section>
+
+      <section id="loop" class="lesson-section wide">
+        <span class="section-label">04 · Plan → act → verify → recover</span>
+        <h2>One human turn opens a nested closed loop</h2>
+        <p class="section-lead">You remain in-loop for mission design and acceptance. During an agent turn, the Orchestrator, leads, and workers run out-of-loop until the hierarchy can return one evidenced answer or a real blocker.</p>
+        <div class="loop-board">
+          <div class="loop-lane in">
+            <div class="lane-label">In-loop<small>commander boundary</small></div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Plan</b>Choose goal, config, writable scope, budget, and pass criteria.</div>
+              <div class="loop-step"><b>Launch</b>Send one message through the Orchestrator interface.</div>
+              <div class="loop-step"><b>Verify</b>Read output, logs, tree, cost, diffs, and tests.</div>
+              <div class="loop-step"><b>Recover</b>Repair prompt, config, gate, or launcher—then relaunch cleanly.</div>
+            </div>
+          </div>
+          <div class="recovery-band"><span>Human owns <strong>why + limits</strong></span><span>⇄</span><span>Agents own <strong>routing + work</strong></span></div>
+          <div class="loop-lane out">
+            <div class="lane-label">Out-of-loop<small>nested agent turn</small></div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Plan</b>Orchestrator classifies, creates TillDone items, selects one team by default.</div>
+              <div class="loop-step"><b>Act</b>Lead reads context and delegates execution to the right specialist.</div>
+              <div class="loop-step"><b>Verify</b>Worker returns evidence; lead synthesizes; tasks and costs update.</div>
+              <div class="loop-step"><b>Recover</b>Denied calls reroute, incomplete tasks trigger a nudge, dependent teams run sequentially.</div>
+            </div>
+          </div>
+        </div>
+        <h3>A worked run · “ping each team lead”</h3>
+        <div class="worked-run" aria-label="Worked multi-team run">
+          <div><b>1 · Commander</b>Types one real README smoke test.</div>
+          <div><b>2 · Orchestrator</b>Targets Planning, Engineering, and Validation.</div>
+          <div><b>3 · Leads</b>Each answers at its coordination tier; workers are unnecessary.</div>
+          <div><b>4 · Harness</b>Streams three lanes, aggregates usage, records JSONL.</div>
+          <div><b>5 · Commander</b>Checks three lead replies, team tree, footer cost, and log.</div>
+        </div>
+        <p class="pattern-name"><strong>Name the pattern:</strong> a <em>narrow-waist, depth-2 hierarchy</em>. One stable commander interface sits above replaceable teams; coordination seats reason, execution seats act, and structural gates keep the layers honest.</p>
+      </section>
+
+      <section id="contracts" class="lesson-section wide">
+        <span class="section-label">05 · Why these files exist for agents</span>
+        <h2>Four contracts make the team operable</h2>
+        <p class="section-lead">These excerpts are evidence of interfaces. The lesson lives in the promises between them, not in a line-by-line tour.</p>
+        <div class="contracts">
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Prompt contract · what the seat is allowed to understand</h3>
+              <p class="contract-path">.pi/multi-team/agents/orchestrator.md · .pi/multi-team/skills/*.md</p>
+              <p>The Orchestrator prompt defines its purpose, runtime placeholders, routing defaults, tools, skills, personal expertise, and the instruction to synthesize. Leads receive the same shape but a member list; workers receive precise execution roles.</p>
+              <p class="intent"><b>Dan’s design intent:</b> specialization is a package, not a persona. Give every seat a job, a memory, a set of behaviors, and a reason to stop.</p>
+            </div>
+            <div class="evidence">
+              <div class="evidence-label"><span>prompt contract</span><span>orchestrator.md</span></div>
+              <pre><span class="tok-key">skills:</span>
+  - <span class="tok-string">active-listener.md</span>
+  - <span class="tok-string">zero-micro-management.md</span>
+  - <span class="tok-string">high-autonomy.md</span>
+<span class="tok-key">tools:</span> <span class="tok-comment"># selected entries</span>
+  - <span class="tok-string">read</span>
+  - <span class="tok-string">delegate</span>
+  - <span class="tok-string">tilldone</span>
+
+<span class="tok-comment"># routing instruction</span>
+Default to ONE team.
+Synthesize into YOUR answer.</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Tool / permission contract · what the seat can actually do</h3>
+              <p class="contract-path">agents/*.md front matter · extensions/domain-enforcer.ts · extensions/lead-delegate.ts</p>
+              <p>A tool name grants a capability; domain rules constrain where it applies. Team leads can read broadly and write only their own expertise; the Orchestrator can write under the expertise directory; workers receive file and bash tools. The enforcer blocks unlisted tools and denied paths; deleting <code>LEAD_MEMBERS_JSON</code> before spawning a worker caps recursion.</p>
+              <p class="intent"><b>Dan’s design intent:</b> make autonomy safe by shrinking blast radius. A soft “delegate, never execute” skill teaches behavior; a hard runtime gate refuses violations.</p>
+            </div>
+            <div class="evidence">
+              <div class="evidence-label"><span>permission contract</span><span>backend-dev.md</span></div>
+              <pre><span class="tok-key">tools:</span>
+  - <span class="tok-string">read</span>
+  - <span class="tok-string">write</span>
+  - <span class="tok-string">edit</span>
+  - <span class="tok-string">bash</span>
+<span class="tok-key">domain:</span>
+  - <span class="tok-key">path:</span> <span class="tok-string">apps/</span>
+    <span class="tok-key">read:</span> <span class="tok-var">true</span>
+    <span class="tok-key">upsert:</span> <span class="tok-var">true</span>
+    <span class="tok-key">delete:</span> <span class="tok-var">true</span></pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Harness / launcher · how the system becomes callable</h3>
+              <p class="contract-path">justfile · apps/multi-team-chat/extensions/multi-team-chat.ts · extensions/modules/subprocess.ts</p>
+              <p>The launcher turns the system into one short command. The extension loads the roster, resolves prompts and shared context, replaces the Pi chat surface, and registers delegation and task tools. Every child is the same <code>pi</code> binary in JSON mode with only three explicit runtime extensions.</p>
+              <p class="intent"><b>Dan’s design intent:</b> package orchestration as a reproducible program. Agents should be replaceable behind a stable command and a stable conversation surface.</p>
+            </div>
+            <div class="evidence">
+              <div class="evidence-label"><span>launcher evidence</span><span>justfile + subprocess.ts</span></div>
+              <pre>just team
+└─ pi -e extensions/multi-team-chat.ts
+
+child seat:
+pi --mode json -p --no-extensions
+  -e domain-enforcer.ts
+  -e lead-delegate.ts
+  -e tilldone-lead.ts
+  --session &lt;agent.jsonl&gt;</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Verification contract · how the commander knows it worked</h3>
+              <p class="contract-path">.pi/multi-team/sessions/&lt;session&gt;/conversation.jsonl · TUI team tree · TillDone · specs/</p>
+              <p>The chat shows routing and tool events; <code>/toggle-workers</code> reveals all ten seats and per-agent cost; TillDone exposes unfinished work; the session log preserves every tier’s messages. The cost-tracking spec is a reminder that even the meter needs verification.</p>
+              <p class="intent"><b>Dan’s design intent:</b> close the loop with receipts that can change the next run. Confidence is not a completion signal.</p>
+            </div>
+            <div class="proof-stack" aria-label="Verification receipts">
+              <div><strong>Route proof</strong> · expected team / lead bubble appears</div>
+              <div><strong>Boundary proof</strong> · forbidden write returns a domain denial</div>
+              <div><strong>Work proof</strong> · TillDone reaches complete and tests/artifacts exist</div>
+              <div><strong>Accounting proof</strong> · team tree, JSONL usage, and provider dashboard agree</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="operate" class="lesson-section wide">
+        <span class="section-label">06 · Operate like Dan</span>
+        <h2>Run the system through its narrow waist</h2>
+        <p class="section-lead">These commands and smoke tests come from the real README and command files. Use the default team first; scale only after you can explain what the smallest run proved.</p>
+        <div class="ops-layout">
+          <div class="ops-steps">
+            <article class="ops-step"><div><h3>Install through the bootloader</h3><p>From Claude Code, run the repository command. It checks <code>claude</code>, <code>pi</code>, Bun, Node, <code>just</code>, provider configuration, roster paths, dependencies, and the optional <code>teams</code> shell alias.</p><pre class="terminal">/install</pre></div></article>
+            <article class="ops-step"><div><h3>List before you spend</h3><p>See the real presets and their agent trees without starting a model conversation.</p><pre class="terminal">just team-list</pre></div></article>
+            <article class="ops-step"><div><h3>Launch the default 3-team system</h3><p>This boots Planning, Engineering, and Validation through the custom Pi extension.</p><pre class="terminal">just team</pre></div></article>
+            <article class="ops-step"><div><h3>Prove the single interface</h3><p>Type <code>ping</code>. The Orchestrator should answer directly because simple questions do not need delegation. Then inspect the footer.</p><pre class="terminal">ping</pre></div></article>
+            <article class="ops-step"><div><h3>Prove lead fan-out</h3><p>Use the README’s second smoke test. Expect three lead replies to bubble into one Orchestrator response.</p><pre class="terminal">ping each team lead</pre></div></article>
+            <article class="ops-step"><div><h3>Expose the whole org chart</h3><p>Toggle workers and check ten rows: one Orchestrator, three leads, six workers. Verify the course-era tiering—Opus on coordination seats, Sonnet on execution seats.</p><pre class="terminal">/toggle-workers</pre></div></article>
+            <article class="ops-step"><div><h3>Inspect the durable receipt</h3><p>Open the newest session directory and read <code>conversation.jsonl</code>. A real delegated run should contain user, Orchestrator, lead, and worker events—not only the final prose.</p></div></article>
+            <article class="ops-step"><div><h3>Change one knob, then relaunch cleanly</h3><p>Use a real preset or custom config. Kill and recreate any Drive/tmux session before retesting so stale processes do not create ghost messages.</p><pre class="terminal">just team-pe
+just teamc .pi/multi-team/engineering-config.yaml</pre></div></article>
+          </div>
+          <aside class="readiness">
+            <h3>Preflight</h3>
+            <ul>
+              <li><code>pi</code>, Bun, Node, Claude Code, and <code>just</code> are installed.</li>
+              <li><code>.env</code> exists with the required provider key; never print or commit it.</li>
+              <li>Every config path resolves to a real agent Markdown file.</li>
+              <li>You understand that a delegated test spends paid tokens.</li>
+              <li>You have an observable pass condition before launch.</li>
+            </ul>
+            <p class="truth-note"><b>Do not confuse the two orchestration layers.</b> <code>just team</code> runs the Pi agent team with <code>delegate</code>/<code>tilldone</code>. <code>/plan-w-team</code>, <code>/build</code>, and <code>just metacc</code> belong to the Claude Code build harness that maintains the system.</p>
+            <p class="truth-note"><b>High-trust boundary.</b> The install/meta recipes use <code>--dangerously-skip-permissions</code>. That broad Claude Code authority is not the same as the per-seat domain gates inside the Pi runtime.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="failures" class="lesson-section wide">
+        <span class="section-label">07 · Common agent failures</span>
+        <h2>Most team failures are operating-system failures</h2>
+        <p class="section-lead">A stronger model cannot rescue a stale launcher, vague routing contract, false permission boundary, or missing receipt.</p>
+        <div class="failure-grid">
+          <article class="failure-card"><b>Mis-prompting · every task fans out</b><p>Delegating greetings or trivial lookups adds latency and spend without specialist value.</p><span class="repair">Repair · preserve “answer simple questions directly; default to one team.”</span></article>
+          <article class="failure-card"><b>Misrouting · the wrong expert gets perfect context</b><p>Everything downstream can be excellent and still answer the wrong question.</p><span class="repair">Repair · sharpen <code>consult-when</code>, inspect route receipts, test classification.</span></article>
+          <article class="failure-card"><b>Soft rule mistaken for permission</b><p>“Delegate, never execute” in a skill can influence behavior but does not itself block a tool call.</p><span class="repair">Repair · pair prompt discipline with tool allowlists and path enforcement.</span></article>
+          <article class="failure-card"><b>Over-permission · maintainer authority leaks</b><p>A <code>--dangerously-skip-permissions</code> bootloader is treated as if every runtime seat were safely scoped.</p><span class="repair">Repair · separate Claude Code authority from Pi seat domains; review install targets and overwrites.</span></article>
+          <article class="failure-card"><b>Bash gate mistaken for a sandbox</b><p>The domain enforcer uses command-pattern heuristics for bash writes/deletes; it is not OS-level isolation.</p><span class="repair">Repair · narrow worker tools and run high-risk work in a real sandbox.</span></article>
+          <article class="failure-card"><b>Missing verify · polished synthesis wins</b><p>No one checks the team tree, JSONL, task state, changed files, tests, or actual provider bill.</p><span class="repair">Repair · define a receipt bundle before spending the first token.</span></article>
+          <article class="failure-card"><b>Stale process · ghost messages</b><p>Drive/tmux reuses a live Pi session or sends another prompt before the Orchestrator is idle.</p><span class="repair">Repair · fully kill and recreate the session; wait for completion.</span></article>
+          <article class="failure-card"><b>Empty expertise mistaken for breakage</b><p>All ten shipped mental-model files start at zero lines.</p><span class="repair">Repair · let each specialist grow codebase-specific memory; do not seed it with stale project facts.</span></article>
+          <article class="failure-card"><b>Horizontal clones mistaken for diversity</b><p><code>team-scale</code> repeats Engineering seats to add capacity, not independent expertise.</p><span class="repair">Repair · use duplicate teams for throughput; new prompts/domains for cognitive diversity.</span></article>
+          <article class="failure-card"><b>Staying in the loop</b><p>The human addresses workers, schedules handoffs, and becomes the coordination bottleneck again.</p><span class="repair">Repair · speak to the Orchestrator; improve the OS between runs.</span></article>
+          <article class="failure-card wide"><b>Reality check · three pieces of drift</b><p>The shipped roster is 3 teams / 10 agents, despite one “2 teams” description line. The shipped Frontend and Backend workers both own broad <code>apps/</code>; the narrower <code>apps/frontend/</code> vs <code>apps/backend/</code> split was a live demo edit. The shipped Orchestrator includes <code>write</code>, <code>edit</code>, and <code>tilldone</code>, which the earlier recording frame did not yet show.</p></article>
+          <article class="failure-card wide"><b>Docs drift is itself an agent failure</b><p><code>.claude/commands/prime.md</code> says <code>just multi</code> launches the system, while the real <code>justfile</code> and README use <code>just team</code>. A priming prompt can be stale; triangulate prompts, executable launchers, and observed runtime behavior.</p></article>
+        </div>
+      </section>
+
+      <section id="lab" class="lesson-section wide lab">
+        <span class="section-label">08 · Lab · Agent operations</span>
+        <h2>Change the roster, not the application</h2>
+        <p class="section-lead">The experiment makes agents visibly replaceable through configuration. Keep the task trivial so you are measuring the operating system, not model brilliance.</p>
+        <div class="lab-grid">
+          <div>
+            <h3>Experiment · prune a team through a real preset</h3>
+            <ol>
+              <li>Run <code>just team-list</code>. Predict the exact rows the Planning + Engineering preset will show.</li>
+              <li>Launch <code>just team-pe</code>. This selects the real <code>.pi/multi-team/planning-and-engineering-config.yaml</code>.</li>
+              <li>Type <code>ping</code>. Confirm the Orchestrator answers directly without delegation.</li>
+              <li>Type <code>ping each team lead</code>. Confirm only Planning Lead and Engineering Lead answer; Validation must not appear.</li>
+              <li>Run <code>/toggle-workers</code>. Count exactly 7 seats: Orchestrator + 2 leads + 4 workers.</li>
+              <li>Open the newest <code>conversation.jsonl</code> and confirm the two lead routes exist while Validation events do not.</li>
+              <li>Stop the process. Launch <code>just team</code> and confirm the default ten-seat roster returns.</li>
+            </ol>
+            <p class="fail-try"><strong>Fail → try:</strong> if Validation still appears, you likely reused a live Pi/tmux session or launched <code>just team</code>. Kill the process, verify the command, and relaunch. If a config fails to load, trust the named path error before blaming the model.</p>
+          </div>
+          <div class="pass-list">
+            <h3>Observable pass criteria</h3>
+            <ul>
+              <li><code>just team-pe</code> shows exactly 7 expected seats.</li>
+              <li>Simple <code>ping</code> stays at the Orchestrator.</li>
+              <li>Lead ping routes to exactly 2 teams.</li>
+              <li>The session JSONL matches the visible routing.</li>
+              <li>No application source was edited.</li>
+              <li><code>just team</code> restores 10 seats afterward.</li>
+            </ul>
+            <h3>Stretch · prove the hard gate</h3>
+            <ul>
+              <li>On a disposable branch, narrow a worker’s <code>domain:</code> in its agent Markdown.</li>
+              <li>Ask the lead to delegate one harmless write outside that path.</li>
+              <li>Pass only if <code>domain-enforcer</code> blocks it and the target remains unchanged.</li>
+              <li>Restore the agent file before the next run.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="lab-branch" aria-label="Lab control loop">
+          <div><b>Predict</b>7-seat tree</div>
+          <div><b>Configure</b>real preset</div>
+          <div><b>Run</b>two pings</div>
+          <div><b>Verify</b>tree + JSONL</div>
+          <div><b>Recover</b>default config</div>
+        </div>
+      </section>
+
+      <section id="teach-back" class="lesson-section wide teach-back">
+        <span class="section-label">09 · Teach-back · close the page</span>
+        <h2>Explain this agent OS in six sentences</h2>
+        <p class="section-lead">Do not look back. One idea per sentence; if you cannot separate prompts from permissions, the model is still fuzzy.</p>
+        <div class="six-sentences">
+          <div class="sentence">The human commander owns …</div>
+          <div class="sentence">The Orchestrator owns …</div>
+          <div class="sentence">Leads differ from workers because …</div>
+          <div class="sentence">The repository makes agents operable through …</div>
+          <div class="sentence">The loop is closed when …</div>
+          <div class="sentence">Dan’s highest-leverage move is …</div>
+        </div>
+        <details class="answer-toggle">
+          <summary>Reveal one strong six-sentence answer</summary>
+          <p class="model-answer">The human commander owns the mission, operating config, risk boundary, spend, and final acceptance. The Orchestrator keeps one interface while classifying work, managing TillDone, routing to the smallest useful team, and synthesizing results. Leads read, coordinate, delegate, and update their own memory, while workers alone receive execution tools and code-writing domains. Prompts, skills, config, injected context, launchers, subprocess extensions, domain gates, sessions, and logs turn general models into an operable team. The loop closes when task state, changed files, tests, routing logs, and trustworthy cost accounting support acceptance or a specific repair. Dan’s leverage move is to program replaceable agents around the code so the human can stop scheduling every action and start improving the system that performs them.</p>
+        </details>
+      </section>
+
+      <section id="appendix" class="lesson-section wide">
+        <span class="section-label">10 · Optional appendix</span>
+        <h2>Raw file index</h2>
+        <p class="section-lead">One audited path per line, no source dumps. The vendored Pi references are included because the meta agent uses them to understand the harness; they are reference substrate, not extra runtime seats.</p>
+        <details class="raw-index">
+          <summary>Expand the 200-file index</summary>
+          <pre>.claude/agents/meta-pi-agent.md
+.claude/commands/build.md
+.claude/commands/install-into-codebase.md
+.claude/commands/install.md
+.claude/commands/plan-w-team.md
+.claude/commands/prime.md
+.claude/skills/drive/SKILL.md
+.claude/skills/drive/app/commands/__init__.py
+.claude/skills/drive/app/commands/fanout.py
+.claude/skills/drive/app/commands/logs.py
+.claude/skills/drive/app/commands/poll.py
+.claude/skills/drive/app/commands/proc.py
+.claude/skills/drive/app/commands/run.py
+.claude/skills/drive/app/commands/screenshot.py
+.claude/skills/drive/app/commands/send.py
+.claude/skills/drive/app/commands/session.py
+.claude/skills/drive/app/main.py
+.claude/skills/drive/app/modules/__init__.py
+.claude/skills/drive/app/modules/errors.py
+.claude/skills/drive/app/modules/output.py
+.claude/skills/drive/app/modules/proc.py
+.claude/skills/drive/app/modules/sentinel.py
+.claude/skills/drive/app/modules/tmux.py
+.claude/skills/drive/app/pyproject.toml
+.claude/skills/drive/app/uv.lock
+.claude/skills/svg-generate/SKILL.md
+.claude/skills/tts-eleven/SKILL.md
+.claude/skills/tts-eleven/scripts/text_to_file.py
+.claude/skills/tts-eleven/scripts/text_to_speech.py
+.env.sample
+.gitignore
+.pi/multi-team/agents/backend-dev.md
+.pi/multi-team/agents/engineering-lead.md
+.pi/multi-team/agents/frontend-dev.md
+.pi/multi-team/agents/orchestrator.md
+.pi/multi-team/agents/planning-lead.md
+.pi/multi-team/agents/product-manager.md
+.pi/multi-team/agents/qa-engineer.md
+.pi/multi-team/agents/security-reviewer.md
+.pi/multi-team/agents/ux-researcher.md
+.pi/multi-team/agents/validation-lead.md
+.pi/multi-team/engineering-config.yaml
+.pi/multi-team/expertise/backend-dev-mental-model.yaml
+.pi/multi-team/expertise/engineering-lead-mental-model.yaml
+.pi/multi-team/expertise/frontend-dev-mental-model.yaml
+.pi/multi-team/expertise/orchestrator-mental-model.yaml
+.pi/multi-team/expertise/planning-lead-mental-model.yaml
+.pi/multi-team/expertise/product-manager-mental-model.yaml
+.pi/multi-team/expertise/qa-engineer-mental-model.yaml
+.pi/multi-team/expertise/security-reviewer-mental-model.yaml
+.pi/multi-team/expertise/ux-researcher-mental-model.yaml
+.pi/multi-team/expertise/validation-lead-mental-model.yaml
+.pi/multi-team/multi-team-config.yaml
+.pi/multi-team/opensource-team-config.yaml
+.pi/multi-team/plan-and-scale-engineering-config.yaml
+.pi/multi-team/planning-and-engineering-config.yaml
+.pi/multi-team/skills/active-listener.md
+.pi/multi-team/skills/conversational-response.md
+.pi/multi-team/skills/high-autonomy.md
+.pi/multi-team/skills/mental-model.md
+.pi/multi-team/skills/precise-worker.md
+.pi/multi-team/skills/zero-micro-management.md
+CLAUDE.md
+LICENSE
+OPUS.md
+README.md
+ai_docs/pi-agent/CHANGELOG.md
+ai_docs/pi-agent/INDEX.md
+ai_docs/pi-agent/README.md
+ai_docs/pi-agent/compaction.md
+ai_docs/pi-agent/custom-provider.md
+ai_docs/pi-agent/development.md
+ai_docs/pi-agent/examples-README.md
+ai_docs/pi-agent/examples-extensions/README.md
+ai_docs/pi-agent/examples-extensions/antigravity-image-gen.ts
+ai_docs/pi-agent/examples-extensions/auto-commit-on-exit.ts
+ai_docs/pi-agent/examples-extensions/bash-spawn-hook.ts
+ai_docs/pi-agent/examples-extensions/bookmark.ts
+ai_docs/pi-agent/examples-extensions/built-in-tool-renderer.ts
+ai_docs/pi-agent/examples-extensions/claude-rules.ts
+ai_docs/pi-agent/examples-extensions/commands.ts
+ai_docs/pi-agent/examples-extensions/confirm-destructive.ts
+ai_docs/pi-agent/examples-extensions/custom-compaction.ts
+ai_docs/pi-agent/examples-extensions/custom-footer.ts
+ai_docs/pi-agent/examples-extensions/custom-header.ts
+ai_docs/pi-agent/examples-extensions/dirty-repo-guard.ts
+ai_docs/pi-agent/examples-extensions/dynamic-tools.ts
+ai_docs/pi-agent/examples-extensions/event-bus.ts
+ai_docs/pi-agent/examples-extensions/file-trigger.ts
+ai_docs/pi-agent/examples-extensions/git-checkpoint.ts
+ai_docs/pi-agent/examples-extensions/handoff.ts
+ai_docs/pi-agent/examples-extensions/hello.ts
+ai_docs/pi-agent/examples-extensions/inline-bash.ts
+ai_docs/pi-agent/examples-extensions/input-transform.ts
+ai_docs/pi-agent/examples-extensions/interactive-shell.ts
+ai_docs/pi-agent/examples-extensions/mac-system-theme.ts
+ai_docs/pi-agent/examples-extensions/message-renderer.ts
+ai_docs/pi-agent/examples-extensions/minimal-mode.ts
+ai_docs/pi-agent/examples-extensions/modal-editor.ts
+ai_docs/pi-agent/examples-extensions/model-status.ts
+ai_docs/pi-agent/examples-extensions/notify.ts
+ai_docs/pi-agent/examples-extensions/permission-gate.ts
+ai_docs/pi-agent/examples-extensions/pirate.ts
+ai_docs/pi-agent/examples-extensions/plan-mode/index.ts
+ai_docs/pi-agent/examples-extensions/preset.ts
+ai_docs/pi-agent/examples-extensions/protected-paths.ts
+ai_docs/pi-agent/examples-extensions/provider-payload.ts
+ai_docs/pi-agent/examples-extensions/qna.ts
+ai_docs/pi-agent/examples-extensions/question.ts
+ai_docs/pi-agent/examples-extensions/questionnaire.ts
+ai_docs/pi-agent/examples-extensions/rainbow-editor.ts
+ai_docs/pi-agent/examples-extensions/reload-runtime.ts
+ai_docs/pi-agent/examples-extensions/rpc-demo.ts
+ai_docs/pi-agent/examples-extensions/rpc-extension-ui.ts
+ai_docs/pi-agent/examples-extensions/sandbox/README.md
+ai_docs/pi-agent/examples-extensions/sandbox/index.ts
+ai_docs/pi-agent/examples-extensions/sandbox/utils.ts
+ai_docs/pi-agent/examples-extensions/send-user-message.ts
+ai_docs/pi-agent/examples-extensions/session-name.ts
+ai_docs/pi-agent/examples-extensions/shutdown-command.ts
+ai_docs/pi-agent/examples-extensions/snake.ts
+ai_docs/pi-agent/examples-extensions/space-invaders.ts
+ai_docs/pi-agent/examples-extensions/ssh.ts
+ai_docs/pi-agent/examples-extensions/status-line.ts
+ai_docs/pi-agent/examples-extensions/subagent/README.md
+ai_docs/pi-agent/examples-extensions/subagent/agents.ts
+ai_docs/pi-agent/examples-extensions/subagent/index.ts
+ai_docs/pi-agent/examples-extensions/summarize.ts
+ai_docs/pi-agent/examples-extensions/system-prompt-header.ts
+ai_docs/pi-agent/examples-extensions/timed-confirm.ts
+ai_docs/pi-agent/examples-extensions/titlebar-spinner.ts
+ai_docs/pi-agent/examples-extensions/todo.ts
+ai_docs/pi-agent/examples-extensions/tool-override.ts
+ai_docs/pi-agent/examples-extensions/tools.ts
+ai_docs/pi-agent/examples-extensions/trigger-compact.ts
+ai_docs/pi-agent/examples-extensions/truncated-tool.ts
+ai_docs/pi-agent/examples-extensions/widget-placement.ts
+ai_docs/pi-agent/examples-sdk/01-minimal.ts
+ai_docs/pi-agent/examples-sdk/02-custom-model.ts
+ai_docs/pi-agent/examples-sdk/03-custom-prompt.ts
+ai_docs/pi-agent/examples-sdk/04-skills.ts
+ai_docs/pi-agent/examples-sdk/05-tools.ts
+ai_docs/pi-agent/examples-sdk/06-extensions.ts
+ai_docs/pi-agent/examples-sdk/07-context-files.ts
+ai_docs/pi-agent/examples-sdk/08-prompt-templates.ts
+ai_docs/pi-agent/examples-sdk/09-api-keys-and-oauth.ts
+ai_docs/pi-agent/examples-sdk/10-settings.ts
+ai_docs/pi-agent/examples-sdk/11-sessions.ts
+ai_docs/pi-agent/examples-sdk/12-full-control.ts
+ai_docs/pi-agent/examples-sdk/README.md
+ai_docs/pi-agent/extension-examples-reference.md
+ai_docs/pi-agent/extensions.md
+ai_docs/pi-agent/json.md
+ai_docs/pi-agent/keybindings.md
+ai_docs/pi-agent/models.md
+ai_docs/pi-agent/owning-the-pi-ui.md
+ai_docs/pi-agent/packages.md
+ai_docs/pi-agent/pi-dev-home.md
+ai_docs/pi-agent/pi-dev-packages.md
+ai_docs/pi-agent/prompt-templates.md
+ai_docs/pi-agent/providers.md
+ai_docs/pi-agent/rendering-internals.md
+ai_docs/pi-agent/rpc.md
+ai_docs/pi-agent/sdk.md
+ai_docs/pi-agent/session.md
+ai_docs/pi-agent/settings.md
+ai_docs/pi-agent/shell-aliases.md
+ai_docs/pi-agent/skills.md
+ai_docs/pi-agent/terminal-setup.md
+ai_docs/pi-agent/termux.md
+ai_docs/pi-agent/themes.md
+ai_docs/pi-agent/tmux.md
+ai_docs/pi-agent/tree.md
+ai_docs/pi-agent/tui.md
+ai_docs/pi-agent/widget-ordering.md
+ai_docs/pi-agent/windows.md
+apps/multi-team-chat/.pi/themes/multi-team-chat.json
+apps/multi-team-chat/bun.lock
+apps/multi-team-chat/extensions/domain-enforcer.ts
+apps/multi-team-chat/extensions/lead-delegate.ts
+apps/multi-team-chat/extensions/modules/config.ts
+apps/multi-team-chat/extensions/modules/domain.ts
+apps/multi-team-chat/extensions/modules/log.ts
+apps/multi-team-chat/extensions/modules/prompt.ts
+apps/multi-team-chat/extensions/modules/subprocess.ts
+apps/multi-team-chat/extensions/modules/theme.ts
+apps/multi-team-chat/extensions/modules/tilldone.ts
+apps/multi-team-chat/extensions/modules/types.ts
+apps/multi-team-chat/extensions/multi-team-chat.ts
+apps/multi-team-chat/extensions/tilldone-lead.ts
+apps/multi-team-chat/package.json
+images/conversation-awareness.svg
+images/multi-team-memory-compounding-3.svg
+images/multi-team-memory-compounding-4.svg
+images/multi-team-orchestration-v2.svg
+images/multi-team-orchestration.svg
+images/setup-flow.svg
+justfile
+specs/fix-worker-cost-tracking.md
+specs/tilldone-multi-team-integration.md</pre>
+        </details>
+      </section>
+
+      <footer class="chapter-foot">
+        <span>MA-2 · Lead Agents · agent-systems lens</span>
+        <a href="../vol-3-ma/16-lead-agents.html">Return to Chapter 16 →</a>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const links = Array.from(document.querySelectorAll('.chapter-nav a'));
+      const sections = links.map((link) => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let framePending = false;
+
+      const updateProgress = () => {
+        if (!topBar) return;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        topBar.style.width = Math.round(value * 100) + '%';
+      };
+
+      const requestUpdate = () => {
+        if (framePending) return;
+        framePending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          framePending = false;
+        });
+      };
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+          links.forEach((link) => {
+            if (link.getAttribute('href') === '#' + visible.target.id) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          });
+        }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+        sections.forEach((section) => observer.observe(section));
+      }
+
+      updateProgress();
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first companion to TAC-8: The Agentic Layer. Learn to separate application and agentic layers, build a minimum viable agentic layer, compose ADWs, orchestrate multi-agent systems, and prioritize agentics.">
+  <title>TAC-8 · The Agentic Layer — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="08-the-agentic-layer.assets.css">
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL I · TAC · CHAPTER 08</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume I · Chapter 8</p>
+      <h2>The Agentic Layer</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation</span></a></li>
+          <li><a href="#prioritize"><span class="chapter-nav__n">01</span><span>Prioritize agentics</span></a></li>
+          <li><a href="#two-layers"><span class="chapter-nav__n">02</span><span>The two layers</span></a></li>
+          <li><a href="#mval"><span class="chapter-nav__n">03</span><span>The MVAL</span></a></li>
+          <li><a href="#gateway"><span class="chapter-nav__n">04</span><span>The gateway</span></a></li>
+          <li><a href="#meta-prompts"><span class="chapter-nav__n">05</span><span>Template meta prompts</span></a></li>
+          <li><a href="#composed-adw"><span class="chapter-nav__n">06</span><span>Composed ADWs</span></a></li>
+          <li><a href="#todone"><span class="chapter-nav__n">07</span><span>Todone</span></a></li>
+          <li><a href="#piter"><span class="chapter-nav__n">08</span><span>Out-loop factories</span></a></li>
+          <li><a href="#aea"><span class="chapter-nav__n">09</span><span>AEA exception</span></a></li>
+          <li><a href="#compression"><span class="chapter-nav__n">10</span><span>The compression</span></a></li>
+          <li><a href="#current-practice"><span class="chapter-nav__n">11</span><span>Current practice</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">12</span><span>Graded lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">13</span><span>Cumulative mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">14</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--layer">
+        <span class="hero__chapter">Tactic #8 · Prioritize Agentics</span>
+        <h1>The Agentic Layer</h1>
+        <p class="hero__dek">Your codebase has an application at its center and a second engineering system wrapped around it. The final TAC lesson is about spending your time on the ring that makes the center increasingly operable by agents.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 63:19</li>
+          <li>Lab · 90–150 min core</li>
+          <li>Course repo · tac/tac-8</li>
+          <li>Level · advanced system builder</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to draw the two layers, build the three-directory minimum, trace an agent call through its output receipts, explain the prompt-to-plan contract inside a composed ADW, operate task- and Notion-triggered agent factories, defend the one-agent exception, and use one daily question to decide where your next engineering hour belongs.</p>
+
+        <div class="ring-stage" role="img" aria-label="Application layer in the center, surrounded by an agentic layer of prompts, plans, workflows, and triggers">
+          <div class="ring-stage__core"><div><strong>Application layer</strong><span>app · data · database · infra · DevOps</span></div></div>
+          <div class="ring-stage__label ring-stage__label--north"><strong>Prompts</strong><span>Reusable instructions and template meta prompts</span></div>
+          <div class="ring-stage__label ring-stage__label--east"><strong>ADWs</strong><span>Deterministic code that calls agents</span></div>
+          <div class="ring-stage__label ring-stage__label--south"><strong>Plans</strong><span>Structured work passed between purposes</span></div>
+          <div class="ring-stage__label ring-stage__label--west"><strong>Triggers</strong><span>Cron · board · webhook · product</span></div>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation</a></li><li><a href="#prioritize">Prioritize agentics</a></li><li><a href="#two-layers">The two layers</a></li><li><a href="#mval">The MVAL</a></li><li><a href="#gateway">The gateway</a></li><li><a href="#meta-prompts">Template meta prompts</a></li><li><a href="#composed-adw">Composed ADWs</a></li><li><a href="#todone">Todone</a></li><li><a href="#piter">Out-loop factories</a></li><li><a href="#aea">AEA exception</a></li><li><a href="#compression">The compression</a></li><li><a href="#current-practice">Current practice</a></li><li><a href="#lab">Graded lab</a></li><li><a href="#mastery">Cumulative mastery</a></li><li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">The app is a good place to start—and a terrible place to stay</h2>
+        <p class="section-lead">The trap at the end of this course is subtle: you can understand every tactic and still spend every week inside application code. TAC-8 turns the entire course into a time-allocation decision. The system around the app is now a first-class product of engineering.</p>
+
+        <p>Picture a familiar workday. You open a feature file, repair a query, add a route, tune a component, and manually run the checks. Every action may be correct. The deadline may even justify it. But when the next similar task arrives, the same human sequence must happen again. The application improved once; the mechanism that improves the application did not.</p>
+        <p>The lesson offers a different unit of progress. A reusable prompt captures how you reason about a class of work. A plan format captures what adequate preparation must contain. An AI Developer Workflow calls a planner, extracts its artifact, calls an implementer, and preserves the outputs. A trigger removes the need for you to dispatch the run. A worktree isolates the run. Feedback loops decide whether the run is trustworthy. Each addition thickens a ring around the application. The ring is not documentation about the app. It is an executable operating layer for the app.</p>
+        <p>TAC-8 makes the idea concrete through five sibling codebases. The application layer changes from hello-world scripts to a sentiment notebook, a task board, a prototype factory, and a Natural Language SQL product. The interesting invariant is the agentic layer wrapped around each one. As the examples scale, the same primitives reappear with more state, isolation, routing, review, and observability.</p>
+
+        <div class="app-map" aria-label="Five tac-8 applications and their teaching roles">
+          <article><strong>app1 · primitives</strong><p>Three-directory minimum, one agent call, slash commands, and a plan→implement composition.</p></article>
+          <article><strong>app2 · Todone</strong><p>A Markdown task board, worktree groups, dependencies, workflow tags, and concurrent agents.</p></article>
+          <article><strong>app3 · task board</strong><p>Present in the repository but intentionally skipped in the lesson and this lab.</p></article>
+          <article><strong>app4 · prototyper</strong><p>Notion as prompt input, specialized planners, isolated environments, and HIL review.</p></article>
+          <article><strong>app5 · AEA</strong><p>Agents inside the application, with SQLite-backed session continuity and parallel chat windows.</p></article>
+        </div>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The chapter’s one-sentence thesis</p>
+          <p>The agentic layer combines deterministic workflow code with non-deterministic agentic prompts, wraps that system around the application, and deserves at least half your engineering time because improvements to it compound across future work.</p>
+        </aside>
+
+        <h3>What you are training</h3>
+        <ul class="learning-objectives">
+          <li><strong>Allocation</strong>Classify a work block as application-layer or agentic-layer work and defend the choice using the lesson’s three exemptions.</li>
+          <li><strong>Construction</strong>Identify the smallest viable ring—<code>adws/</code>, <code>.claude/commands/</code>, and <code>specs/</code>—without cargo-culting the scaled tree.</li>
+          <li><strong>Composition</strong>Trace state and artifacts through a deterministic wrapper around a non-deterministic agent call.</li>
+          <li><strong>Orchestration</strong>Read task states, dependencies, model and workflow routing, claim semantics, and isolated environments.</li>
+          <li><strong>Judgment</strong>Know when review can be removed, when conversational continuity justifies a focused-agent exception, and when an app-layer deadline is legitimate.</li>
+        </ul>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Lab safety and scope</p>
+          <p>Every drill stays in the course repository <code>tac/tac-8</code>. The course ADWs invoke Claude with <code>--dangerously-skip-permissions</code>; inspect each prompt and workflow before running it, keep work inside the disposable clone, and do not copy that bypass into production practice.</p>
+        </aside>
+
+        <p class="source-note"><strong>Frame provenance.</strong> The lesson’s screen capture freezes at about 34:30 while the audio continues. This chapter uses all twelve live full-resolution frames before the defect. The later AEA, PITER→PITE, definition, and final-question beats are rendered as labeled HTML diagrams—not reconstructed screenshots.</p>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="prioritize">
+        <span class="section-number">01</span>
+        <h2 class="section-title">Tactic #8 is a calendar decision</h2>
+        <p class="section-lead">“Prioritize agentics” sounds philosophical until you turn it into a ratio. The starting prescription is concrete: at least half of engineering time belongs to the agentic layer, and the share may be higher while the layer is thin.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The engineer who agrees and never reallocates</h3>
+          <p>An engineer watches seven tactics, appreciates all of them, and returns Monday to the feature queue. Every deadline is treated as an exception. Every repeated manual task is “too small” to template. At week’s end, one more feature exists, but the same human must plan, dispatch, inspect, and repair the next one. The engineer adopted a belief and preserved the old operating model.</p>
+          <p>Tactic #8 is meant to be falsifiable. Look at the week. If application work occupies every block, the tactic was not practiced. The claim is not that application work has no value. The claim is that it feels productive enough to trap you there while others build systems that compound.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the allocation</p>
+          <h3>Two layers, one scarce resource</h3>
+          <div class="layer-map" aria-label="Engineering time split between agentic and application layers">
+            <article class="layer-map__agentic"><h4>Agentic layer · ≥50%</h4><ul><li>Template problem classes</li><li>Build and compose ADWs</li><li>Add triggers and isolation</li><li>Encode validations</li><li>Improve reports and observability</li></ul></article>
+            <article class="layer-map__application"><h4>Application layer · ≤50% starting point</h4><ul><li>Product code and data</li><li>Database and infrastructure</li><li>DevOps and runtime concerns</li><li>Manual tests when necessary</li><li>Deadline work when genuinely necessary</li></ul></article>
+          </div>
+          <p>The ratio is a heuristic from the lesson, not a capacity-planning formula. Its purpose is to prevent the application layer from silently absorbing all available time. During bootstrapping, the ring may deserve more than half because every reusable primitive changes the cost of later work.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the five demonstrations</p>
+          <h3>The repository spends its attention where the tactic points</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-8-the-agentic-layer/t0385-terminal-five-apps.jpg" alt="Terminal listing the five tac-8 application directories" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">6:25</span>The lesson map in one full-width frame: five sibling apps. Their product code differs, while prompts, plans, ADWs, triggers, worktrees, and agent receipts carry the teaching weight.</figcaption>
+          </figure>
+          <p>Dan starts with a deliberately small application, then increases only the sophistication of the surrounding system. app1 proves the three-directory minimum. app2 adds concurrent task pickup and worktree isolation. app4 moves prompt input to Notion and routes by prototype class. app5 places resumable agents inside the product. The progression is a practical argument: if you keep improving only the center, you miss the system that can operate many centers.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Prioritize Agentics</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s term</p><p><strong>Prioritize Agentics</strong> means prioritize the agentic layer and allocate at least half your engineering time to it as a starting point. Dan presents it as the tactic that contains the earlier tactics, from stopping hand-coding through targeting zero-touch engineering.</p></aside>
+          <p>Plain English: when a recurring engineering action can become a prompt, contract, workflow, trigger, isolated environment, or feedback loop, invest in that reusable mechanism. The aim is not automation theater. The aim is to convert your judgment into an asset that can be called repeatedly.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — classify a week</p>
+          <h3>From “build the endpoint” to “close the problem class”</h3>
+          <p>Suppose the week contains five similar implementation chores. The application-layer plan handles each one manually: inspect the repo, draft the change, run checks, and write a report five times. The agentic-layer plan spends an early block improving <code>chore.md</code> so its Plan Format includes the team’s relevant-files rules, ordered tasks, and validation commands; then it runs the composed planner→builder workflow for each chore and inspects the receipts.</p>
+          <p>The second plan may feel slower on task one. It produces a reusable prompt contract, an executable composition, and evidence for all five. That is the lesson’s parabolic-return claim: a small improvement in the ring can return many times its cost across work that follows. The important output of the week is not only five changes; it is a stronger method for the sixth.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — ten-minute allocation audit</p>
+          <h3>Make the ratio visible before changing it</h3>
+          <ol><li>List the last ten engineering work blocks you remember.</li><li>Mark each <strong>A</strong> for application layer or <strong>G</strong> for agentic layer.</li><li>For every A block, note whether it met one of the lesson’s three exemptions: deadline, manual testing, or in-loop prompt verification.</li><li>Circle the most repeated non-exempt application action.</li><li>Name one ring artifact that could absorb it: prompt, plan format, ADW, trigger, worktree rule, output contract, or validation.</li></ol>
+          <p class="fine">Do not optimize the percentage yet. First make the hidden allocation observable.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: using urgency as a permanent exemption</h3>
+          <p><strong>Symptom:</strong> every task is deadline work, so no week contains agentic-layer investment. The shortcut becomes the system.</p>
+          <p><strong>Fix:</strong> accept a genuine deadline block, then schedule a ring-repair block against the repeated manual action it exposed. The tactic does not deny urgent application work; it prevents urgency from erasing the compounding layer indefinitely.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The packaging evolves; the allocation question survives</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract reviewed for mid-2026</p><p>Reusable behavior may now live in Skills, supported agent SDKs, native background agents, hooks, sandbox policies, or managed triggers. Those surfaces can reduce custom glue. They do not decide what your team should encode or whether your calendar funds that work.</p><p class="current-practice__source">Transfer the primitive: spend time making future engineering more callable, observable, isolated, and self-checking.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is Tactic #8, and what starting time allocation does it prescribe?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Prioritize Agentics: prioritize the agentic layer and spend at least half of engineering time on it as a starting point, potentially more while bootstrapping.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is agreeing with the tactic insufficient?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It is a behavioral allocation. If the calendar still contains only application work, the agentic layer does not improve or compound.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does Dan say this tactic compresses?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The other tactics across the course, from stopping hand-coding through targeting zero-touch engineering.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Explain the ≥50% rule to a teammate facing a real deadline. Defend both the legitimate exemption and the follow-up investment that prevents deadline work from becoming permanent manual work.</p><p class="fine">Pass if you speak about time allocation, repeated problem classes, and future compounding—not merely “AI makes us faster.”</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="two-layers">
+        <span class="section-number">02</span>
+        <h2 class="section-title">Draw the boundary before you automate across it</h2>
+        <p class="section-lead">The application layer is everything classical. The agentic layer is the operating ring: deterministic workflow code plus non-deterministic prompts and agents, organized so it can act on the application without becoming indistinguishable from it.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The “automation” folder hidden inside the product</h3>
+          <p>A team places agent scripts beside application routes because the scripts edit those routes. Prompts are copied into issue comments. Generated plans live in chat history. Runs write logs wherever the current process happens to be. When two agents collide, the team blames non-determinism. When a prompt changes, nobody knows which workflow depended on its report. The layer exists in behavior but not in architecture.</p>
+          <p>The separation is not for a tidy file tree. It makes ownership and reuse legible. Product code serves users. Agentic-layer code serves the system that changes product code. Keeping those responsibilities distinct lets the same operating concepts wrap a Python script, notebook, Vue client, database-backed app, or later codebase.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the ring</p>
+          <h3>Old-world guarantees meet new-world judgment</h3>
+          <div class="equation-card" role="img" aria-label="Deterministic ADW code plus non-deterministic agentic prompts equals the agentic layer">
+            <div class="equation-card__term"><strong>Deterministic code</strong><span>IDs · paths · retries · subprocesses · parsers · state</span></div>
+            <div class="equation-card__op">+</div>
+            <div class="equation-card__term"><strong>Agentic prompts</strong><span>Research · plan · build · interpret · report</span></div>
+            <div class="equation-card__op">=</div>
+            <div class="equation-card__term"><strong>The agentic layer</strong><span>An executable ring that operates the application layer</span></div>
+          </div>
+          <p>This is the lesson’s two-ingredient definition, rendered as a diagram because the video is audio-only by the time the definition lands. The deterministic half does not make model output deterministic. It makes invocation, state, boundaries, and receipts explicit around model work.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — thin ring to thick ring</p>
+          <h3>Each app adds one kind of operating power</h3>
+          <p>At the beginning, the ring is three directories: instructions, plans, and executable workflows. app1 adds the gateway and a two-phase composition. app2 adds task state, triggers, routing, and dedicated environments. app4 moves the input and review surfaces outside the coding tool. app5 moves the agent interface inside the application and engineers session continuity. The ring thickens through useful capabilities, not decorative hierarchy.</p>
+          <p>The application layer remains deliberately broad in the lesson: raw app, database, infrastructure, and DevOps all belong there. That broadness is useful. It keeps the diagnostic simple. When you sit down, are you improving the thing users consume, or improving the system that agents use to operate that thing?</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Agentic layer and application layer</h3>
+          <aside class="callout callout--term"><p class="callout__label">Canonical distinction</p><p><strong>Application layer:</strong> the app, database, infrastructure, DevOps, and other classical software. <strong>Agentic layer:</strong> deterministic ADW code combined with non-deterministic agentic prompts and models to operate that application.</p></aside>
+          <p>Do not reduce the agentic layer to “the AI files.” A prompt without a place in a workflow may be useful, but the lesson’s ring includes contracts, scripts, triggers, state, isolation, reports, and checks. Likewise, deterministic code in <code>adws/</code> is not ordinary utility code merely because Python executes predictably. Its responsibility is to compose and control agentic work.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — classify app1</p>
+          <h3>The split is visible in the repository</h3>
+          <div class="layer-map">
+            <article class="layer-map__agentic"><h4>Agentic ring</h4><ul><li><code>.claude/commands/prime.md</code></li><li><code>chore.md</code>, <code>feature.md</code>, <code>implement.md</code></li><li><code>specs/chore-*.md</code></li><li><code>adws/adw_prompt.py</code></li><li><code>adw_chore_implement.py</code></li><li><code>agents/&lt;adw_id&gt;/...</code> receipts</li></ul></article>
+            <article class="layer-map__application"><h4>Application center</h4><ul><li><code>apps/main.py</code></li><li><code>apps/main.ts</code></li><li>the generated <code>apps/main.sh</code> after the lab run</li></ul></article>
+          </div>
+          <p>The generated shell file is application-layer output even though an agent writes it. Layer classification follows responsibility, not authorship. The planner prompt and workflow remain in the ring; the artifact they produce belongs to the app.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — boundary test</p>
+          <h3>Classify by responsibility, not extension</h3>
+          <p>Without revealing the answer, classify each item: <code>tasks.md</code>, <code>tweets_v1.csv</code>, <code>.mcp.json</code>, <code>adw_trigger_cron_todone.py</code>, <code>app/server/main.py</code>, a generated plan, and <code>cc_final_object.json</code>. For each, complete the sentence: “This belongs to the ___ layer because its responsibility is ___.”</p>
+          <p class="fine">Check: task state, triggers, plans, and agent receipts belong to the operating ring; product data and product server code belong to the application. MCP configuration in app4 supports the prototype workflow and is treated as part of that lesson’s agentic operating setup.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: separating folders but not contracts</h3>
+          <p><strong>Symptom:</strong> prompts and scripts live outside <code>apps/</code>, but prompts return free-form text that deterministic code guesses at. The physical boundary looks clean while the behavioral seam is brittle.</p>
+          <p><strong>Fix:</strong> pair directory separation with explicit input and report contracts, stable artifact paths, failure exits, and validation. The ring must be operable, not merely visible.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Keep the conceptual seam even when platforms hide the glue</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026 extract</p><p>Supported SDKs, Skills, hooks, subagents, and scheduled systems may collapse several hand-built files into platform capabilities. Preserve the boundary in your mental model and architecture: reusable operating intelligence still has different change reasons, security needs, and evaluation surfaces from product code.</p><p class="current-practice__source">Same architecture, different packaging.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What are the two ingredients in the agentic-layer definition?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Traditional deterministic workflow code, stored in ADWs, combined with non-deterministic agentic prompts and model behavior.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What belongs under the application layer?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The raw application and classical software concerns such as data, database, infrastructure, and DevOps.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why does a generated application file remain application-layer?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Layer membership follows responsibility, not whether a human or agent authored it. The file serves the product; the workflow that produced it serves the operating ring.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Draw a core and ring from memory. Put six real repository artifacts in the correct place, then explain why the boundary improves reuse, safety, and diagnosis.</p><p class="fine">Pass if you include both ingredients of the ring and avoid defining it as “whatever the AI wrote.”</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="mval">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Start with three directories, not a platform</h2>
+        <p class="section-lead">The Minimum Viable Agentic Layer is intentionally small: prompts, plans, and workflows. Its one rule is compositional rather than technological—use code that can reference files and remain isolated from the application layer.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The scaled tree that never runs</h3>
+          <p>A team sees the production-shaped tree in app1’s README and begins with hooks, trigger daemons, agent databases, worktree managers, type packages, and dashboards. Weeks later the layer can describe itself beautifully but still cannot take one prompt, create one plan, and hand that plan to an implementer. Complexity arrived before a valuable path.</p>
+          <p>The opposite failure is a pile of chat prompts with no reusable location, artifact contract, or executable caller. The MVAL sits between them. It is enough structure to make the ring real and little enough structure to understand end to end.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the three pieces</p>
+          <h3>Atoms, handoff artifacts, and composition</h3>
+          <div class="mval-grid" aria-label="Minimum viable agentic layer components">
+            <article><code>.claude/commands/</code><strong>Prompts</strong><p>Reusable instructions such as <code>/prime</code>, <code>/chore</code>, <code>/feature</code>, and <code>/implement</code>. They encode purpose and report contracts.</p></article>
+            <article><code>specs/</code><strong>Plans</strong><p>Structured artifacts emitted by planning prompts and consumed by higher-order implementation prompts.</p></article>
+            <article><code>adws/</code><strong>Workflows</strong><p>Executable code that creates IDs, calls agents, passes artifacts, handles failure, and preserves receipts.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — read before run</p>
+          <h3>The README makes the invisible boundary explicit</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-8-the-agentic-layer/t0430-app1-readme-mval.jpg" alt="App1 README showing the minimum viable agentic layer tree with specs, Claude commands, and ADWs" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">7:10</span>The full-size source frame names the minimum: <code>specs/</code> for plans, <code>.claude/commands/</code> for prompts, and <code>adws/</code> for executable workflows.</figcaption>
+          </figure>
+          <p>Dan immediately grounds the tree in an in-loop baseline. The agent runs <code>/prime</code>, lists tracked files, reads the repository documentation, and reports what it learned. Then <code>/start</code> runs the tiny applications. The sequence matters: reusable prompts are not abstract assets; they are executable instructions tested interactively before being called outside a chat.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-8-the-agentic-layer/t0515-prime-command-run.jpg" alt="Claude Code running the prime slash command and reading the repository" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">8:35</span><code>/prime</code> is the in-loop baseline: inspect files, read both READMEs, and establish repository context before the chapter introduces headless invocation.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Minimum Viable Agentic Layer</h3>
+          <aside class="callout callout--term"><p class="callout__label">MVAL</p><p>The minimum is <code>adws/</code> + <code>.claude/commands/</code> + <code>specs/</code>. The scripting language is a free choice; the constraint is that it can compose code, reference files, and remain isolated from the application layer.</p></aside>
+          <p>The course uses executable UV Python scripts, but explicitly allows Bun TypeScript or shell. Language loyalty is not the lesson. The durable shape is an instruction library, a handoff-artifact library, and a deterministic composition surface.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — map app1</p>
+          <h3>Five prompts, four top-level workflows, two tiny apps</h3>
+          <div class="tree-card"><pre><code>tac8_app1__agent_layer_primitives/
+├── .claude/commands/
+│   ├── prime.md        # establish codebase context
+│   ├── start.md        # run the application
+│   ├── chore.md        # generate a chore plan
+│   ├── feature.md      # generate a feature plan
+│   └── implement.md    # consume a plan
+├── specs/              # generated and committed plans
+├── adws/
+│   ├── adw_prompt.py
+│   ├── adw_slash_command.py
+│   ├── adw_chore_implement.py
+│   └── adw_sdk_prompt.py
+└── apps/
+    ├── main.py
+    └── main.ts</code></pre></div>
+          <p>The exact inventory comes from the course codebase. It is deliberately inspectable. You can read the prompt that creates a plan, the regex that extracts its path, the higher-order prompt that consumes it, and the output tree produced by each call. That legibility is a feature for both humans and later agents.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — three-directory trace</p>
+          <h3>Follow one task without running it</h3>
+          <ol><li>Open app1’s <code>.claude/commands/chore.md</code>.</li><li>Find its variables, instructions, Plan Format, and Report section.</li><li>Open <code>adws/adw_chore_implement.py</code> and find where <code>/chore</code> is invoked.</li><li>Find <code>extract_plan_path()</code>.</li><li>Find where the extracted path becomes the argument to <code>/implement</code>.</li></ol>
+          <p class="fine">Pass when you can point to all three MVAL directories during one workflow trace.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: copying the destination instead of building the path</h3>
+          <p><strong>Symptom:</strong> you reproduce the scaled tree from the README, including hooks, databases, trigger families, tests, and worktrees, before one prompt→plan→implementation path earns its keep.</p>
+          <p><strong>Fix:</strong> begin with one repeated problem class and the MVAL. Add a component only when a real failure demands it: receipts for diagnosis, a parser for a contract, a trigger for dispatch, a worktree for collision, or a hook for policy.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Commands can become Skills; the three roles remain</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026 extract</p><p>The course stores reusable behavior as slash-command Markdown. Current Claude Code can package reusable expertise as Agent Skills with discovery and trigger guidance. Teach the transparent command form first, then translate the same purpose, constraints, artifact shape, and report contract into the newer package.</p><p class="current-practice__source">Do not confuse improved discovery with improved engineering content.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name the MVAL’s three pieces and their jobs.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>.claude/commands/</code> stores prompts, <code>specs/</code> stores plans, and <code>adws/</code> stores executable workflows that compose agents and artifacts.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the scripting-language rule?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Use any language that can compose code, reference files, and keep the agentic layer isolated from the application layer.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why test <code>/prime</code> and <code>/start</code> in-loop first?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Interactive use validates the reusable instruction and its assumptions before a headless workflow calls it without a conversational safety net.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Teach the MVAL to someone proposing an agent platform. Explain what each directory contributes, what the one language rule protects, and the evidence that should justify adding the next directory.</p><p class="fine">Pass if your explanation starts with a working path rather than a scaled architecture chart.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="gateway">
+        <span class="section-number">04</span>
+        <h2 class="section-title">A script becomes a gateway when it calls an intelligence</h2>
+        <p class="section-lead"><code>adw_prompt.py</code> is the smallest real ADW in the course: one prompt enters, one agent runs, and a managed tree of IDs, retries, streams, final output, and custom summary remains behind.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The wrapper everyone skips is where control begins</h3>
+          <p>A developer sees a Python script that shells out to <code>claude -p</code> and calls it boilerplate. They run the task, read the last line in the terminal, and move on. When the agent later stalls, returns malformed output, or produces an unexpected result, there is no shared answer to basic questions: Which prompt ran? Which model? In which directory? Was it retried? Where is the complete message stream? Which output should a downstream step consume?</p>
+          <p>The agent call is non-deterministic. That makes the surrounding deterministic control more important, not less. The wrapper gives every run an identity and turns an ephemeral terminal event into inspectable artifacts.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — four receipts</p>
+          <h3>Stream → array → final object → summary</h3>
+          <div class="output-chain" aria-label="Agent gateway output files in order">
+            <article><code>cc_raw_output.jsonl</code><strong>Live stream</strong><p>One JSON event per line as the headless Claude process emits it.</p></article>
+            <article><code>cc_raw_output.json</code><strong>Parsed array</strong><p>The stream converted into a JSON array for easier programmatic inspection.</p></article>
+            <article><code>cc_final_object.json</code><strong>Final event</strong><p>The last object from the parsed run, preserved as the final model-side result object.</p></article>
+            <article><code>custom_summary_output.json</code><strong>Workflow view</strong><p>The course script’s own concise metadata and result summary for this invocation.</p></article>
+          </div>
+          <p>These files serve different consumers. The stream is a forensic timeline. The array is easier to traverse. The final object gives a downstream system one terminal result. The custom summary presents the workflow’s interpretation and metadata. Collapsing them into “the log” erases useful distinctions.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — Dan’s exact run</p>
+          <h3>A prompt enters through a visible control panel</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-8-the-agentic-layer/t0810-adw-prompt-gateway-run.jpg" alt="Terminal and code showing adw_prompt.py running with an Inputs panel listing ADW ID, prompt, model, working directory, and output path" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">13:30</span>The gateway mid-flight. The Inputs panel shows the ADW ID, agent name, prompt, model, working directory, and output path for the request to list the ADW files and their purposes.</figcaption>
+          </figure>
+          <p>The course run asks for a concise inventory of the <code>adws</code> directory. The script generates a short ADW ID, names the agent <code>oneoff</code>, chooses the model, resolves the working directory, creates the output path, and calls the shared agent module. The module builds a Claude CLI command using print mode and stream JSON, filters the subprocess environment, and owns retry behavior. The “intelligence” still decides how to inspect and summarize; the script owns how the work is invoked and recorded.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>The gateway into agentic coding</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s term</p><p><strong>The gateway script</strong> is categorically different from ordinary code because it calls an agent. In TAC-8, <code>adw_prompt.py</code> is the smallest example: one prompt plus managed state and observable outputs.</p></aside>
+          <p>The gateway does not have to be a subprocess forever. app1 also includes <code>agent_sdk.py</code> and <code>adw_sdk_prompt.py</code>, pointing toward the supported SDK form. The transferable design is an agent as a callable component with typed or structured inputs, explicit identity, controlled environment, retry policy, and durable output.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — read the invocation contract</p>
+          <h3>What deterministic control does—and does not—guarantee</h3>
+          <div class="command-card"><pre><code>./adws/adw_prompt.py \
+  "list all files in the adws directory and a concise output of their purpose"
+
+# outputs
+agents/&lt;adw_id&gt;/oneoff/
+├── cc_raw_output.jsonl
+├── cc_raw_output.json
+├── cc_final_object.json
+└── custom_summary_output.json</code></pre></div>
+          <p>The wrapper can guarantee the naming scheme, destination, CLI flags, retry count, and conversion steps. It cannot guarantee that the agent’s reasoning is correct. That is why later layers add prompt contracts, validations, review states, and feedback loops. Deterministic control creates a surface on which non-deterministic quality can be measured and improved.</p>
+          <p>The course command includes <code>--dangerously-skip-permissions</code>. Treat that as period-specific demo configuration, not part of the gateway definition. Identity, observability, and explicit invocation transfer. A blanket permission bypass does not.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — output tour</p>
+          <h3>Explain four files in four sentences</h3>
+          <ol><li>Run the exact app1 gateway command inside the course clone.</li><li>Copy the displayed ADW ID.</li><li>Open the four files under <code>agents/&lt;id&gt;/oneoff/</code> in stream-to-summary order.</li><li>Write one sentence for what each contains and one sentence naming the downstream consumer that would prefer it.</li><li>Find the model, prompt, working directory, success state, and any session or usage data available in the outputs.</li></ol>
+          <p class="fine">Pass only if you can distinguish the final object from the custom summary without reading their filenames.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating “success” as evidence of correctness</h3>
+          <p><strong>Symptom:</strong> the subprocess exits successfully and the workflow declares the task trustworthy. Or a downstream step scrapes a human-formatted terminal panel instead of consuming a stable artifact.</p>
+          <p><strong>Fix:</strong> separate transport success from task quality. Preserve machine-readable outputs, validate the final result against the prompt’s contract, and reserve terminal panels for humans. A reliable gateway tells you what happened; it does not make every answer true.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The supported SDK is the grown-up form of the same primitive</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026 extract</p><p>The course intentionally exposes a hand-built CLI wrapper so every control is visible. Current production ADWs can use the Claude Agent SDK for typed messages, sessions, hooks, subagents, and structured outputs. Keep the run identity, output contracts, logging, and explicit failure policy when replacing the subprocess plumbing.</p><p class="current-practice__source">The SDK reduces glue; it does not remove the need for observability.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What state surrounds one gateway call?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A unique ADW ID, named agent, prompt, model, working directory, output directory, retry handling, success/failure state, and the four output artifacts.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">How do <code>cc_final_object.json</code> and <code>custom_summary_output.json</code> differ?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The final-object file preserves the final event from the model stream; the custom summary is the wrapper’s own concise metadata/result view.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does deterministic wrapping fail to guarantee?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It does not guarantee that the agent’s answer or implementation is correct. Quality still needs prompt contracts, validation, and feedback.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Teach the gateway as if you were onboarding an incident responder. Explain which receipt you inspect first for a live timeline, which artifact a downstream step should consume, and why a zero exit code is not enough.</p><p class="fine">Pass if you name all four files and separate invocation reliability from result correctness.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="meta-prompts">
+        <span class="section-number">05</span>
+        <h2 class="section-title">The highest-leverage prompt writes the next prompt</h2>
+        <p class="section-lead">A template meta prompt does not solve one chore directly. It produces a structured plan that encodes how your team researches, sequences, validates, and reports an entire class of chores.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The perfect prompt for yesterday</h3>
+          <p>You write a long instruction that names the exact files, exact implementation, and exact commands for one ticket. The agent succeeds. On the next ticket, almost none of the instruction transfers. You captured an instance, not your engineering method. The prompt saved typing once and created no reusable problem-class asset.</p>
+          <p>The alternative is not a vaguer prompt. It is a more structured one: tell a planning agent how to research, what artifact to create, which sections that artifact must contain, and exactly how to report its path. Then let a higher-order implementer consume the result.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — anatomy of a self-checking plan</p>
+          <h3>The Plan Format is load-bearing</h3>
+          <div class="plan-anatomy" aria-label="Four important parts of the chore plan format">
+            <article><strong>Metadata + description</strong><p>Names the ADW, task class, and requested chore so the artifact has identity and intent.</p></article>
+            <article><strong>Relevant files</strong><p>Records what the planner researched and why those locations matter.</p></article>
+            <article><strong>Step-by-step tasks</strong><p>Creates an ordered implementation path executed from top to bottom.</p></article>
+            <article><strong>Validation commands</strong><p>Ends the plan with executable checks so the workflow can close its own loop.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — generic to specialized</p>
+          <h3><code>chore.md</code> generates the artifact that <code>implement.md</code> executes</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-8-the-agentic-layer/t0610-chore-template-plan-format.jpg" alt="The chore markdown command showing variables, instructions, and the Plan Format" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">10:10</span>The template meta prompt on screen: variables and instructions lead into a rigid Plan Format. It is a prompt that generates another actionable prompt artifact.</figcaption>
+          </figure>
+          <p>Later, app4 narrows the same pattern to a framework-specific problem class. <code>plan_uv_mcp.md</code> specifies a UV package workflow and points the planner at <code>ai_docs/mcp-python-sdk.md</code>. One concise request can then become a detailed MCP implementation plan because the reusable template already carries the technology-specific workflow and documentation context.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-8-the-agentic-layer/t2065-plan-uv-mcp-template.jpg" alt="The specialized plan_uv_mcp command showing UV workflow instructions and MCP SDK documentation reference" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">34:25</span>The last live frame before the capture defect: <code>plan_uv_mcp.md</code> specializes planning with UV initialization steps and a conditional MCP SDK document.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Template meta prompt and higher-order prompt</h3>
+          <aside class="callout callout--term"><p class="callout__label">Two prompt roles</p><p>A <strong>template meta prompt</strong> generates another prompt artifact—a plan—in a specific format with rules and files to read. A <strong>higher-order prompt</strong>, such as <code>/implement</code>, takes that plan as its argument.</p></aside>
+          <p>The distinction matters because it reveals where standards live. The planner template owns research and plan shape. The plan owns task-specific decisions. The higher-order implementer owns faithful execution and reporting. Improving one layer can upgrade many downstream tasks without rewriting every request.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — test the problem class</p>
+          <h3>From generic chore to UV MCP specialization</h3>
+          <p>app1’s <code>/chore</code> works across ordinary maintenance requests. It requires research beginning with the README, replacement of every Plan Format placeholder, a structured file under <code>specs/</code>, and a report that returns the plan path. app4’s <code>/plan_uv_mcp</code> narrows the class. It carries the MCP-oriented workflow, an explicit SDK documentation reference, ordered implementation steps, and validation commands.</p>
+          <p>The specialization test is transfer. Can the template accept a new system-information MCP request it did not enumerate in advance and still produce the right plan shape? If yes, it captured the class. If it only works when the request repeats the original filenames and endpoints, it captured an instance.</p>
+          <div class="command-card"><pre><code>/plan_uv_mcp test0001 \
+  "Create a concise and minimal MCP server that provides system information: memory, cpu, disk"
+
+# expected artifact shape
+specs/plan-*-uv-mcp.md
+  metadata
+  description
+  relevant files
+  ordered tasks
+  validation commands</code></pre></div>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — inspect, predict, compare</p>
+          <h3>Read the contract before generating the plan</h3>
+          <ol><li>Read <code>.claude/commands/plan_uv_mcp.md</code> end to end.</li><li>Predict the generated plan’s filename pattern and required headings.</li><li>Run the in-loop command from the lab.</li><li>Compare the generated file with your prediction.</li><li>Mark every step whose quality came from the reusable template rather than the one-line request.</li></ol>
+          <p class="fine">Pass when you can identify at least the metadata, relevant-files, ordered-task, and validation contributions of the template.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: specificity at the wrong layer</h3>
+          <p><strong>Too generic:</strong> “make a good plan” leaves standards implicit. <strong>Too specific:</strong> the template hard-codes one ticket’s files and solution. <strong>Contract-blind:</strong> the template writes a good plan but reports it in prose that the workflow cannot parse.</p>
+          <p><strong>Fix:</strong> specialize around a durable problem class and its invariants—research sources, plan sections, validation expectations, and report shape—while leaving task-specific choices to the generated plan.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>A Skill can package the template; it cannot choose your standards</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026 extract</p><p>Agent Skills add metadata, discovery, triggering, and team sharing around reusable expertise. The core authoring work remains: define the problem class, specify required context, shape the output, make reports machine-readable, and include validation. Migrate the template’s engineering content, not only its filename.</p><p class="current-practice__source">The course command is the transparent source form of the same reusable behavior.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What makes a template meta prompt different from a good task prompt?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It generates a second prompt artifact—a structured plan—according to reusable rules, context sources, and a fixed format for a problem class.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which two Plan Format sections make the plan self-verifying?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The ordered step-by-step tasks and the validation commands that check the finished work.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is <code>/implement</code> higher-order?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It takes another prompt artifact—the generated plan—as its argument and executes it.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Use one whiteboard example to distinguish task prompt, template meta prompt, generated plan, and higher-order implementer. Then explain how you know whether the template captured a class or an instance.</p><p class="fine">Pass if your class test uses an unanticipated request and your plan ends in executable validation.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="composed-adw">
+        <span class="section-number">06</span>
+        <h2 class="section-title">The glue is where the guarantees live</h2>
+        <p class="section-lead"><code>adw_chore_implement.py</code> composes two focused purposes: a planner writes and reports a plan path; deterministic code extracts that path; a builder receives it. The explicit report contract is the seam.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>Two excellent agents that cannot hand work to each other</h3>
+          <p>A planner produces a thoughtful implementation plan and ends with “I’ve prepared everything you need.” A builder is ready to execute but receives no stable artifact path. A human reads the planner’s prose, finds the file, and pastes it into the next request. The agents are capable; the system is not composed. The human remains the API between them.</p>
+          <p>The fix is not a smarter parser that guesses at arbitrary prose. The fix is an explicit output contract owned by the planning prompt and enforced by the deterministic workflow.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the plan-path contract</p>
+          <h3>Non-deterministic work, deterministic handoff</h3>
+          <div class="contract-flow" aria-label="Chore planning and implementation workflow">
+            <article><strong>Planner agent</strong><p><code>/chore &lt;adw_id&gt; &lt;prompt&gt;</code> researches and writes a plan.</p><code>agent: planner</code></article>
+            <article><strong>Report contract</strong><p>The prompt must return the path to the created <code>specs/chore-*.md</code> file.</p><code>chore.md § Report</code></article>
+            <article><strong>Deterministic parser</strong><p><code>extract_plan_path()</code> regex-extracts the artifact or fails loudly.</p><code>ValueError → exit</code></article>
+            <article><strong>Builder agent</strong><p><code>/implement &lt;plan_path&gt;</code> executes the exact artifact.</p><code>agent: builder</code></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the shell-file demonstration</p>
+          <h3>A deliberately simple task exposes a complete workflow</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-8-the-agentic-layer/t1131-main-sh-implemented.jpg" alt="Terminal showing planning success, implementation phase consuming the plan path, the generated spec, and main.sh in the app tree" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">18:51</span>The composed ADW in one full-width frame: Planning Success reports a spec path; Phase 2 receives that exact path; the generated plan is open; <code>apps/main.sh</code> now exists.</figcaption>
+          </figure>
+          <p>The live request is intentionally overpowered for the work: create a shell version of the main program in <code>apps/*</code>. That choice removes application complexity from the lesson. The point is the control path. One ADW ID connects both phases. The planner and builder receive different names and different purposes. Planning failure aborts implementation. A parse failure exits rather than inventing a path. Per-phase summaries and a workflow summary preserve what happened.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Composed ADW and explicit report contract</h3>
+          <aside class="callout callout--term"><p class="callout__label">Composition</p><p>A <strong>composed ADW</strong> joins focused agent purposes with deterministic code. The prompt’s <strong>Report contract</strong> is a machine-readable promise that lets one phase’s artifact become the next phase’s input.</p></aside>
+          <p>At larger scale, app2 describes the plan-then-build pairing as an architect and an editor. The idea is the same: separate purposes, connect them through a narrow artifact, and preserve the option to improve or replace each purpose independently.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace failure boundaries</p>
+          <h3>Four places the workflow can stop correctly</h3>
+          <ol><li><strong>Planner execution fails:</strong> the script reports Planning Failed and exits before Phase 2.</li><li><strong>Planner succeeds but violates Report:</strong> <code>extract_plan_path()</code> raises because no matching <code>specs/chore-*.md</code> path is present.</li><li><strong>Builder execution fails:</strong> the plan exists, but the implementation phase reports failure and the overall workflow does not claim success.</li><li><strong>Implementation runs but validation fails:</strong> the plan’s validation commands expose task-quality failure even if transport succeeded.</li></ol>
+          <p>This is why explicit code can be better than clever chain syntax for teaching and operations. The branches show what the system believes, which artifact it trusts, and where it refuses to continue.</p>
+          <div class="command-card"><pre><code>./adws/adw_chore_implement.py \
+  "create a .sh version of main in apps/*"
+
+# verify
+specs/chore-&lt;id&gt;-*.md
+apps/main.sh
+agents/&lt;id&gt;/planner/
+agents/&lt;id&gt;/builder/
+agents/&lt;id&gt;/workflow_summary.json</code></pre></div>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — break the contract on paper</p>
+          <h3>Predict the exact failure before touching a file</h3>
+          <p>Imagine changing <code>chore.md</code> so its Report section says only “Summarize the plan.” Predict what <code>adw_chore_implement.py</code> will do after the planner succeeds. Then find the regex patterns in <code>extract_plan_path()</code> and identify one compliant report string. Do not make the breaking change in the course repo for the core lab.</p>
+          <p class="fine">Pass if you predict a parse error before builder invocation and can point to the prompt line that owns the repair.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: invisible coupling</h3>
+          <p><strong>Symptom:</strong> someone “improves” the planning prompt’s tone, changes its report format, and silently breaks the parser. Or the parser becomes permissive enough to accept any Markdown path and hands the wrong artifact to the builder.</p>
+          <p><strong>Fix:</strong> treat prompt reports as versioned interfaces. Keep the contract narrow, validate filename class and existence, fail before the next phase, and test the handoff when editing either side.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Structured outputs strengthen the seam; they do not eliminate it</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026 extract</p><p>Supported SDKs and structured outputs can replace regex extraction with typed result objects. Preserve the same design discipline: the planner must return a declared artifact reference, the orchestrator must validate it, and the implementer must receive only the artifact its purpose requires.</p><p class="current-practice__source">Change the transport from prose to types; keep the contract explicit.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Trace the plan path in one sentence.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>/chore</code> writes and reports a <code>specs/chore-*.md</code> path, deterministic code regex-extracts it, and <code>/implement</code> receives that path as its argument.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why would editing only the Report section break the workflow?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The parser depends on a machine-readable plan path in the report. Removing or reshaping it violates the interface between planner and orchestrator.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why use separate planner and builder agent names?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They represent separate purposes and preserve distinct output trees, making each phase easier to inspect, reproduce, and improve.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Explain the workflow to someone who thinks two agents are automatically a multi-agent system. Show why the narrow report contract and deterministic handoff—not agent count—create composition.</p><p class="fine">Pass if you include the abort paths and distinguish transport success from validation success.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="todone">
+        <span class="section-number">07</span>
+        <h2 class="section-title">A Markdown file can be a multi-agent control plane</h2>
+        <p class="section-lead">Todone turns <code>tasks.md</code> into a two-way task list: people declare work, a five-second trigger finds eligible tasks, agents claim and execute them in isolated worktrees, and the same file receives IDs, commit hashes, and failure reasons.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The task list that only tells humans what to do</h3>
+          <p>A traditional checklist is one-way. You write a task; a human reads it, chooses a branch, runs the work, remembers to update the status, and communicates the result. Adding agents without changing that state model merely gives the human more workers to dispatch. The operator still chooses each task, constructs each environment, and reconciles each result.</p>
+          <p>Todone removes that hidden dispatch loop with intentionally plain machinery. The file carries enough status for a trigger to decide eligibility. Tags route model and workflow. Worktree headings name dedicated environments. Agents update the same task line they claimed. The Markdown is not a toy database accidentally doing orchestration; it is a transparent state machine chosen so the whole control plane remains visible.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the state vocabulary</p>
+          <h3>Five marks define pickup, progress, outcome, and dependency</h3>
+          <div class="task-states" aria-label="Todone task state machine">
+            <article><span class="state">[]</span><strong>Pending</strong><p>Eligible for pickup when its worktree and concurrency rules permit.</p></article>
+            <article><span class="state">[🟡, id]</span><strong>In progress</strong><p>Claimed by a specific ADW; the ID makes the run traceable.</p></article>
+            <article><span class="state">[✅ hash, id]</span><strong>Complete</strong><p>Finished with a real commit hash and associated workflow identity.</p></article>
+            <article><span class="state">[❌, id]</span><strong>Failed</strong><p>Terminal failure with an inline <code>// Failed: reason</code> explanation.</p></article>
+            <article><span class="state">[⏰]</span><strong>Blocked</strong><p>Eligible only after every task above it in the same worktree is ✅.</p></article>
+          </div>
+          <p>The dependency rule is stricter than “wait until the previous task finishes.” Every earlier task in the worktree must be successful. A failed task above a clock blocks it indefinitely. That is a visible safety property, not a scheduler bug.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — ignition, motion, proof</p>
+          <h3>Seven agents start without seven human dispatches</h3>
+          <div class="frame-sequence">
+            <figure class="frame-card">
+              <img src="../media/frames/tac-8-the-agentic-layer/t1320-trigger-seven-tasks.jpg" alt="Tasks markdown and terminal showing Starting 7 Tasks and worktree creation" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">22:00</span>The ignition moment: the task file sits above a “Starting 7 Tasks” panel while the trigger creates dedicated worktrees. Model and workflow tags are visible on the board.</figcaption>
+            </figure>
+            <figure class="frame-card">
+              <img src="../media/frames/tac-8-the-agentic-layer/t1400-tasks-md-in-progress.jpg" alt="Task list showing yellow in-progress markers and terminal showing one agent's build inputs" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">23:20</span>The list becomes two-way: <code>🟡</code> lines carry ADW IDs while one agent’s Build Inputs identify its worktree, model, prompt, and purpose.</figcaption>
+            </figure>
+            <figure class="frame-card">
+              <img src="../media/frames/tac-8-the-agentic-layer/t1540-tasks-rolling-in.jpg" alt="Task list showing completed commit hashes, in-progress work, blocked tasks, and trees directory" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">25:40</span>The full vocabulary in action: completed lines carry commit hashes, other tasks remain in flight, and clock-marked work waits behind its successful predecessors.</figcaption>
+            </figure>
+            <figure class="frame-card">
+              <img src="../media/frames/tac-8-the-agentic-layer/t1720-sparse-checkout-tree.jpg" alt="Separate editor window showing a sparse-checkout worktree containing only the app2 directory" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">28:40</span>Isolation is physical, not rhetorical: the dedicated worktree editor contains only <code>tac8_app2__multi_agent_todone</code> through cone sparse checkout.</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Todone, two-way task list, and double isolation</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s terms</p><p><strong>Todone</strong> is app2’s to-do→to-DONE system. <code>tasks.md</code> is a <strong>two-way task list</strong> because humans declare work and agents write state back. Each agent gets a dedicated Git worktree plus a sparse checkout of only app2—<strong>double isolation</strong>.</p></aside>
+          <p>The trigger is how the human stays out of the loop. It checks the file on a schedule, performs a cheap pending-marker precheck, then delegates parsing to <code>/process_tasks</code>, which must return eligible worktree groups as strict JSON. The trigger creates missing environments and launches task-specific ADWs up to the concurrency cap.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — route with tags</p>
+          <h3>Configuration travels with each task</h3>
+          <div class="routing-grid">
+            <article><strong>Model routing</strong><p><code>{opus}</code> selects the course’s higher model tier for that task; <code>{sonnet}</code> chooses the default-era alternative.</p><code>[] Investigate difficult data drift {opus}</code></article>
+            <article><strong>Workflow routing</strong><p><code>{adw_plan_implement_update_task}</code> chooses the plan→implement→update workflow instead of the quicker build→update path.</p><code>[] Redesign training pipeline {adw_plan_implement_update_task}</code></article>
+          </div>
+          <div class="tree-card"><pre><code># ATL
+## Git Worktree enhance-training-data
+[] Create a positive-only dataset {sonnet}
+[] Add a dataset validation command {opus, adw_plan_implement_update_task}
+[⏰] Document the completed dataset flow
+
+## Git Worktree improve-model
+[] Add an evaluation report
+[] Compare baseline metrics {opus}
+[] Update the application README</code></pre></div>
+          <p>The example matches the repository’s syntax and lab shape while leaving the task content for the learner to author. The essential point is that worktree, dependency, model, and workflow decisions are all declarative inputs to the trigger.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — dry-run the board</p>
+          <h3>Predict eligible work before paying for it</h3>
+          <ol><li>Create two worktree groups with three tasks each.</li><li>Mark the last task in one group <code>[⏰]</code>.</li><li>Add one model tag and one plan-implement workflow tag.</li><li>Run <code>./adws/adw_triggers/adw_trigger_cron_todone.py --once --dry-run</code>.</li><li>Before reading the output, write which tasks should be eligible and which workflow each should route to.</li></ol>
+          <p class="fine">The repository supports <code>--once</code>, <code>--dry-run</code>, <code>--interval</code>, and <code>--max-tasks</code>. Use those controls to cap cost and make behavior inspectable.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: mistaking blocked for broken</h3>
+          <p><strong>Symptom:</strong> a <code>⏰</code> task does nothing, so the learner restarts the trigger, edits the state manually, or blames concurrency. A failed task above it is still present.</p>
+          <p><strong>Fix:</strong> read the worktree group top to bottom. The clock is eligible only when every earlier line is ✅. If an earlier task is ❌, the block is correct. Repair or intentionally redesign the preceding work; do not force the dependent task through.</p>
+          <p>A second failure is one giant task with no tags or dependencies. That uses the file as a queue but fails to practice orchestration. Split by purpose and use configuration where task risk actually differs.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Native parallel agents reduce scaffolding; the state model still matters</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026 extract</p><p>The course launches detached OS processes and coordinates them through Markdown. Current runtimes can offer parallel subagents, background tasks, and worktree-isolated orchestration directly. Todone remains a strong transparent teaching model because eligibility, claim, routing, environment, outcome, and dependency are visible in one file.</p><p class="current-practice__source">Modernize the launcher, not away the state machine.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Recite the full <code>tasks.md</code> state machine.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>[]</code> pending → <code>[🟡, adw_id]</code> in progress → either <code>[✅ commit_hash, adw_id]</code> or <code>[❌, adw_id] // Failed: reason</code>; <code>[⏰]</code> starts only when every task above it in the same worktree is ✅.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What do the two important tags control?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>{opus}</code> changes the model tier; <code>{adw_plan_implement_update_task}</code> changes the workflow from direct build/update to plan/implement/update.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is double isolation?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A dedicated Git worktree for the task group plus sparse checkout containing only the app2 directory.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Trace one tagged task from pending line to committed result. Name the parser, trigger, worktree, ADW selection, state updates, and the manual validation Dan performs before trusting the checkmark.</p><p class="fine">Pass if you explain why a commit hash is stronger than a decorative ✅ and why Dan still inspects an artifact.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="piter">
+        <span class="section-number">08</span>
+        <h2 class="section-title">An out-loop factory needs input, trigger, environment, and review</h2>
+        <p class="section-lead">app4 replaces the Markdown board with Notion, routes prototype classes to specialized planners, claims tasks before launching detached workers, and returns results to a human-in-the-loop review surface. It is PITER made concrete.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The factory that builds the same card twice</h3>
+          <p>A poller queries a board every fifteen seconds. It sees one eligible prototype request and starts an agent. Before that agent finishes, the next poll sees the same unchanged card and starts another. Two worktrees, two costs, and two conflicting results appear. The trigger exists, but the task has no atomic-looking claim transition.</p>
+          <p>Out-loop systems magnify state mistakes. Once humans stop dispatching every run, eligibility, claim, environment, and review must be explicit. app4’s first important action is not planning. It is changing the card to <em>In progress</em> and attaching the new ADW ID so later polls know the task is owned.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — PITER mapped to app4</p>
+          <h3>Four responsibilities around one factory</h3>
+          <div class="piter-grid" aria-label="PITER mapped onto the Notion prototype factory">
+            <article><span class="letter">P</span><strong>Prompt input</strong><p>A Notion card with description, trigger text, and optional <code>{{prototype: type}}</code> tag.</p></article>
+            <article><span class="letter">T</span><strong>Trigger</strong><p>A fifteen-second cron poll, or <code>--once</code> for a controlled teaching run.</p></article>
+            <article><span class="letter">E</span><strong>Environment</strong><p>An isolated worktree under <code>trees/</code>, named by a one-purpose agent.</p></article>
+            <article><span class="letter">R</span><strong>Review</strong><p>Board columns, live status updates, commit result, HIL Review, and <code>continue - ...</code> iteration.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the board becomes the prompt surface</p>
+          <h3>The coding tool is no longer where work begins</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-8-the-agentic-layer/t1835-notion-board-view.jpg" alt="Notion Agentic Prototyper board with prototype cards and an open card showing workflow and prototype tags plus execute" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">30:35</span>The prompt-input surface lives outside the coding tool. The open card carries <code>workflow:plan</code>, <code>prototype:vite_vue</code>, and the execution trigger.</figcaption>
+          </figure>
+          <p>The trigger queries cards in <em>Not started</em> or <em>HIL Review</em>. <code>execute</code> requests a new run; <code>continue - &lt;prompt&gt;</code> carries iteration feedback. Prototype tags route to one of four specialized planning commands: UV script, Vite/Vue, Bun scripts, or UV MCP. A one-purpose naming agent returns only a worktree name. The trigger creates the environment, starts the plan→implement→Notion-update ADW as a detached process, and returns to polling.</p>
+          <p>The lesson’s MCP payoff occurs after the screen freezes, so the source frame cannot show it. The audio-verified sequence reports a generated system-information MCP server, its <code>.mcp.json</code> wiring, and live calls for memory, CPU, and disk information. The teaching claim is not the screenshot. It is that a specialized meta prompt and factory closed a reusable UV MCP problem class from one concise request.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Trigger, claim, route, spawn, review</h3>
+          <aside class="callout callout--term"><p class="callout__label">PITER in operation</p><p>A <strong>trigger</strong> fires an ADW without you. A <strong>claim</strong> changes task state immediately to prevent duplicate pickup. <strong>Routing</strong> maps task tags to a specialized workflow. <strong>Review</strong> returns evidence and iteration control to the board.</p></aside>
+          <p>PITER is not an acronym you place beside an architecture after the fact. It is a diagnostic. If a system cannot say where prompt input lives, what wakes the workflow, where the agent works safely, and how outcomes are reviewed or continued, it is not ready to move out of the loop.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — route one MCP card</p>
+          <h3>One tag chooses a specialized planner</h3>
+          <div class="contract-flow">
+            <article><strong>Notion card</strong><p>Request system information for memory, CPU, and disk.</p><code>{{prototype: uv_mcp}} + execute</code></article>
+            <article><strong>Claim</strong><p>Generate an ADW ID and write <em>In progress</em> before launching work.</p><code>status + adw_id</code></article>
+            <article><strong>Route</strong><p>The prototype flag selects <code>/plan_uv_mcp</code>, then <code>/implement</code>.</p><code>--prototype uv_mcp</code></article>
+            <article><strong>Return</strong><p>Update the Notion task with outcome and commit; move to review or terminal state.</p><code>/update_notion_task</code></article>
+          </div>
+          <p>The detached process is important. <code>subprocess.Popen(..., start_new_session=True)</code> allows multiple prototype workers to continue independently of the monitor’s immediate loop. The board and stored ADW ID, not a parent terminal conversation, become the continuity surface.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — read the factory without Notion</p>
+          <h3>Trace claim → route → spawn in source</h3>
+          <ol><li>Open <code>adws/adw_triggers/adw_trigger_cron_notion_tasks.py</code>.</li><li>Find the eligibility states and execution triggers.</li><li>Find the immediate update to <em>In progress</em> with <code>adw_id</code>.</li><li>Find <code>delegate_task()</code> and the prototype flag.</li><li>Use app4’s README to map <code>uv_mcp</code> to <code>/plan_uv_mcp</code> and <code>continue -</code> to HIL iteration.</li></ol>
+          <p class="fine">The core lab needs no Notion account. It evaluates whether you can trace and explain the real course implementation.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating review as administrative drag</h3>
+          <p><strong>Symptom:</strong> the system marks every completed process Done, or the team removes HIL Review because the agent already committed code. Iteration feedback returns through private chat, outside the factory’s state.</p>
+          <p><strong>Fix:</strong> keep HIL Review and <code>continue - &lt;prompt&gt;</code> as the steering loop until encoded validations and reliability justify dropping review. Review is not merely a column; it is how a human can improve an out-loop result without becoming the dispatcher again.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Managed triggers can replace the poller; the claim invariant stays</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026 extract</p><p>Production triggers may be CI events, webhooks, background agents, or scheduled cloud runs rather than a long-lived local poller. Preserve idempotent eligibility, immediate claim, durable run identity, isolated environment, and a review or feedback surface. A managed scheduler does not repair ambiguous state.</p><p class="current-practice__source">The course poller is a transparent implementation of a durable trigger primitive.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Map PITER onto app4.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Prompt input is the Notion card; Trigger is the fifteen-second poller; Environment is the isolated <code>trees/</code> worktree; Review is the board state, live updates, HIL Review, and continuation prompt.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What prevents two polls from grabbing the same card?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The trigger immediately changes the card to In progress and stores the ADW ID before delegating the task.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">How does <code>{{prototype: uv_mcp}}</code> affect execution?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It routes the task into the full plan→implement→update workflow and selects the specialized <code>/plan_uv_mcp</code> planning command.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Teach app4 as a factory, not a demo. Start at one Notion card, explain the duplicate-pickup hazard, then trace the card through claim, worktree, specialized planner, detached worker, and HIL continuation.</p><p class="fine">Pass if every PITER letter maps to a real course artifact or state transition.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="aea">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Break the focus rule once—and engineer the exception</h2>
+        <p class="section-lead">The course’s reliability rule is one agent, one prompt, one purpose. app5 deliberately breaks “one prompt” for conversational product agents, then supplies the missing mechanism: a persisted Claude session ID resumed across prompts, refreshes, and server restarts.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>Two symmetrical mistakes around continuity</h3>
+          <p>One team sends planning, implementation, debugging, review, and documentation through the same endless agent session. The context window becomes a history of conflicting purposes and stale assumptions. Another team interprets focus as an absolute ban on continuity, so its in-product assistant forgets the conversation after every prompt and cannot survive a refresh. Both teams repeat a rule without understanding the purpose it protects.</p>
+          <p>Focus makes agent behavior easier to reproduce, test, validate, and improve. Conversation is a use case whose purpose itself spans multiple turns. app5 therefore keeps one conversational purpose while resuming the same session deliberately.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the AEA path</p>
+          <h3>Outside the loop moves inside the product</h3>
+          <div class="aea-flow" role="img" aria-label="Two in-product agent windows connect through an AEA server to SQLite and a resumable Claude session">
+            <div class="aea-flow__app"><strong>NLQ application</strong><p>Cmd/Ctrl+P opens a developer console.</p><div class="chat-window"><b>Nexus</b><p>Codebase Q&amp;A in one agent window.</p></div><div class="chat-window"><b>Roon</b><p>A small UI change in parallel.</p></div></div>
+            <div class="aea-flow__arrow">→</div>
+            <div class="aea-flow__server"><strong>AEA server · :8743</strong><p><code>/aea/new_agent</code></p><p><code>/aea/prompt_agent</code></p><p><code>adw_aea_patch.py</code></p><p>First prompt creates a session; later prompts use <code>--resume</code>.</p></div>
+            <div class="aea-flow__arrow">↔</div>
+            <div class="aea-flow__store"><strong>SQLite continuity</strong><p><code>agent_id</code></p><p><code>agent_name</code></p><p><code>cc_session_id</code></p><p>conversation + state</p></div>
+          </div>
+          <p>This is a designed architecture diagram, not a screenshot. The AEA demo occurs in the audio-only region after the capture freezes. Every label comes from app5’s tracked server, patch script, and client console.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — Nexus and Roon</p>
+          <h3>Two agents live beside the product they operate</h3>
+          <p>The demo starts the Natural Language SQL application and a separate AEA server on port 8743. In the product, Cmd+P opens a developer console with commands including <code>/aea</code>, <code>/list</code>, <code>/toggle-view</code>, and <code>/close-all</code>. One new window—Nexus—answers what the codebase is about. A second—Roon—receives a small button-renaming task. They operate concurrently inside the application surface.</p>
+          <p>On first prompt, the server creates an agent record with no Claude session ID. The patch subprocess calls Claude; the returned session ID is stored. On a later prompt, <code>adw_aea_patch.py</code> retrieves that record and adds <code>--resume &lt;cc_session_id&gt;</code>. On page refresh, the client fetches active agent IDs and reconnects the windows. The exception is therefore observable state, not a hand-waved “agent memory” capability.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>AEA — Agent Embedded Application</h3>
+          <aside class="callout callout--term"><p class="callout__label">Rule and exception</p><p><strong>One agent, one prompt, one purpose</strong> protects focused, reproducible, testable contexts. An <strong>Agent Embedded Application</strong> is the sanctioned exception because conversational continuity is part of its one purpose; continuity is implemented with a persisted <code>cc_session_id</code> and <code>--resume</code>.</p></aside>
+          <p>The reframe is memorable: outside the loop is inside the application. The human no longer opens a coding chat to dispatch the agent. The product itself hosts the agent interface and reconnects it to durable server-side state.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace a refresh</p>
+          <h3>Continuity crosses three identities</h3>
+          <ol><li>The client creates or reconnects a durable <code>agent_id</code>.</li><li>The AEA server loads the SQLite row for that agent, including <code>cc_session_id</code> when one exists.</li><li>The server launches <code>adw_aea_patch.py &lt;agent_id&gt; &lt;prompt&gt;</code> as a background subprocess.</li><li>The patch script resumes the Claude session when the stored ID is present and writes the updated response and session data back.</li><li>Client polling fetches the refreshed agent state; after a browser reload, <code>/aea/get_agent_ids</code> lets the UI restore active windows.</li></ol>
+          <p>The browser window ID, application agent ID, and Claude session ID are not interchangeable. The course persists the application identity and maps it to the model-session identity so product continuity can survive UI churn.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — source trace before launch</p>
+          <h3>Prove resume exists in code</h3>
+          <ol><li>Find the <code>aea_agents</code> SQLite schema in <code>adw_trigger_aea_server.py</code>.</li><li>Find the first-prompt and existing-session branches.</li><li>Find where the client restores agent IDs after refresh.</li><li>Find <code>--resume</code> construction in <code>adw_aea_patch.py</code>.</li><li>Explain what would be lost if only browser-local state were kept.</li></ol>
+          <p class="fine">Pass before running the servers. The lab operation should confirm a mechanism you already understand.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: importing conversation into every workflow</h3>
+          <p><strong>Symptom:</strong> because AEA resume works, planning and building workflows start preserving long sessions too. Context accumulates across unrelated purposes, and reproducibility falls.</p>
+          <p><strong>Fix:</strong> require a use-case argument for continuity. If the purpose is a single plan, build, task, review, or report, start fresh and pass only the needed artifact. Resume only where multi-turn continuity is itself part of the product behavior, and persist the identity explicitly.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The hand-built preview became a standard product-agent shape</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026 extract</p><p>Supported agent SDKs now formalize sessions and product embedding that app5 builds from scratch. The course was ahead of its packaging: durable application identity, resumable agent session, server-side state, reconnecting UI, and explicit concurrent windows remain the architecture to understand.</p><p class="current-practice__source">Use current session APIs, but preserve the focused-purpose argument for every resumed thread.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">State the one-agent rule and why it exists.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>One agent, one prompt, one purpose creates focused contexts that are easier to reproduce, test, validate, and improve.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the single sanctioned exception in this lesson?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>app5’s conversational AEA, which needs continuity across prompts and implements it with a stored Claude session ID passed back through <code>--resume</code>.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What survives a page refresh?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The SQLite-backed application agent records, including agent IDs, conversation/state, and their mapped Claude session IDs; the client refetches active IDs and reconnects.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Defend both sides of the rule: explain why a planning agent should not resume forever, then explain why Nexus should. Draw the identity mapping that makes the exception engineered rather than accidental.</p><p class="fine">Pass if you name <code>agent_id</code>, <code>cc_session_id</code>, SQLite, and <code>--resume</code>.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="compression">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Drop the R only after the system earns it</h2>
+        <p class="section-lead">The course closes by compressing eight tactics, twelve leverage points, and four KPIs into one daily question. Zero-touch engineering is not a leap of faith; it is the point where encoded feedback and a reliability streak make human review the bottleneck.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The team that removes review before replacing it</h3>
+          <p>A workflow succeeds twice, so the team changes PITER to PITE by deleting the review step. The plan lacks strong validation commands. The trigger can repeat work, the builder can commit a plausible miss, and no evidence records the quality trend. Review disappeared; feedback did not take its place. The team did not reach zero touch. It reached unobserved risk.</p>
+          <p>The course’s sequence is the opposite. Encode feedback loops first. Track how many attempts a workflow needs, how large a task it can handle, how long its success streak lasts, and how much human presence it consumes. Only when the review adds less value than it costs does dropping the R become rational.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — KPIs and the disappearing R</p>
+          <h3>Measure reliability before changing the operating mode</h3>
+          <div class="kpi-grid" aria-label="Four agentic KPIs">
+            <article><strong>Attempts</strong><span class="kpi-value">↓</span><p>How many runs are needed for a successful outcome?</p></article>
+            <article><strong>Size</strong><span class="kpi-value">↑</span><p>How large a problem can the workflow handle reliably?</p></article>
+            <article><strong>Streak</strong><span class="kpi-value">↑</span><p>How many correct outcomes occur consecutively?</p></article>
+            <article><strong>Presence</strong><span class="kpi-value">→ 0</span><p>How much human attention is required during operation?</p></article>
+          </div>
+          <div class="pite-transform" role="img" aria-label="PITER transforms into PITE after review is replaced by encoded feedback loops">
+            <div class="pite-word"><span>P</span><span>I</span><span>T</span><span>E</span><span class="review">R</span></div>
+            <div class="pite-arrow">→</div>
+            <div class="pite-word"><span>P</span><span>I</span><span>T</span><span>E</span></div>
+            <p class="pite-note"><strong>Prerequisite:</strong> encoded validation + proven reliability streak. The R is replaced, never merely erased.</p>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the course deletes its own complexity</p>
+          <h3>Every tactic folds into one question</h3>
+          <p>The recap walks backward through the system: stop hand-coding; use the Core Four; adopt the agent’s perspective across twelve leverage points; template engineering; stay out of the loop; add feedback loops; keep one agent focused; target zero-touch operation. TAC-8 then asks where the engineer is spending the current block.</p>
+          <div class="question-card" role="img" aria-label="The final question: Am I working on the agentic layer or in the application layer?">
+            <p>Am I working on the agentic layer—or in the application layer?</p>
+            <small>52:39 · audio-verified final-question reveal</small>
+          </div>
+          <p>There are three acceptable reasons to be in the application layer: a real deadline, testing something by hand, or running prompts in-loop to verify that they will work out-loop. The list prevents the question from becoming dogma while keeping the exemptions narrow enough to change behavior.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>The final question, PITER→PITE, and living software</h3>
+          <aside class="callout callout--term"><p class="callout__label">Compression vocabulary</p><p><strong>PITER→PITE</strong> is the transition to zero-touch operation after feedback loops and evidence make review wasteful. The <strong>final question</strong> is the daily allocation check. An agentic engineer operates on <strong>living software</strong> that can keep working while the engineer is away.</p></aside>
+          <p>The closing economic claim follows from the architecture: code and implementation are increasingly commoditized, so value moves toward system design, domain encoding, quality control, and creative problem decomposition. The engineer then encodes those higher-order judgments into the agentic layer too.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — decide whether app2 earned PITE</p>
+          <h3>A checkmark is not a reliability streak</h3>
+          <p>Suppose Todone drains one six-task board. Every line reaches ✅ with a commit hash. That proves one run completed; it does not prove review is useless. Dan still opens the sparse worktree and checks the generated dataset for values that should not appear. That manual validation reveals what the next encoded check should be.</p>
+          <p>After the plan templates contain the right validation commands, the workflows reliably execute them, task states preserve failures honestly, and multiple boards show a strong streak with falling attempts and presence, review may become redundant for that narrow problem class. PITE is therefore earned per dialed-in workflow, not declared for the whole organization at once.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — decision rehearsal</p>
+          <h3>Keep, strengthen, or drop the R</h3>
+          <p>For each case, choose one action and defend it: (a) a new planner produces plausible plans but no validation commands; (b) a data workflow has twenty consecutive passes with machine checks and no useful human corrections; (c) an AEA agent survives refresh but sometimes changes unrelated files; (d) a Notion prototype factory has a clean claim mechanism but vague HIL feedback.</p>
+          <p class="fine">Answers: strengthen review and validation for (a), consider narrow PITE for (b), keep review and tighten purpose/isolation for (c), and improve the review contract for (d).</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: asking the final question only once</h3>
+          <p><strong>Symptom:</strong> the question appears in a course note but not at the start of work blocks. The engineer knows the answer in theory and still spends the month hand-performing the same class of task.</p>
+          <p><strong>Fix:</strong> make the question a daily gate. When the answer is application layer, name the exemption. When no exemption applies, choose the smallest ring improvement that moves the repeated work toward a callable, observable, isolated, self-checking workflow.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Implementation surfaces change faster than the diagnostic</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026 extract</p><p>Models, permission names, agent frameworks, and orchestration surfaces will continue to move. The two-layer distinction, feedback-before-autonomy sequence, problem-class orientation, and daily allocation question remain stable because they govern engineering judgment rather than one tool.</p><p class="current-practice__source">Do not compete with your own encoded best practice by hand; compete through net-new system design.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What must be true before PITER becomes PITE?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Feedback loops must be encoded and a reliability streak must show that human review is no longer adding useful value.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name the four KPIs and directions.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Attempts down, task size up, success streak up, and human presence toward zero.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What are the three acceptable application-layer reasons?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A real deadline, testing something by hand, or running prompts in-loop to verify that they will work out-loop.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Give the two-minute closing lesson without course jargon first. Then add PITER→PITE, the four KPIs, the three exemptions, and the final question. End by naming the next repeated problem class you would encode.</p><p class="fine">Pass if your explanation makes autonomy an evidence-based progression, not a personality trait of the model.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="current-practice">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Current practice: preserve the primitives, upgrade the packaging</h2>
+        <p class="section-lead">TAC-8 ages well because its core is an allocation decision and a system vocabulary. The extract identifies seven course-era packaging gaps. None overturns the two layers, MVAL, prompt contracts, worktree isolation, feedback loops, or final question.</p>
+
+        <div class="progression-grid">
+          <article><strong>Course form</strong><p>Slash-command libraries, hand-built CLI wrappers, blanket permission bypass, local polling loops, detached OS processes, period model names, and a custom AEA server.</p></article>
+          <article><strong>Current form</strong><p>Skills, supported Agent SDKs, permission modes and hooks, sandboxing, managed schedules/webhooks, native parallel agents, and standard session APIs.</p></article>
+          <article><strong>Invariant</strong><p>Explicit purpose, narrow contracts, durable artifacts, observability, isolation, feedback, claim semantics, and measured autonomy.</p></article>
+        </div>
+
+        <div class="practice-grid">
+          <article><strong>Reusable behavior</strong><p>Teach <code>.claude/commands/*.md</code> because it exposes the prompt. Package mature, reusable expertise as Skills when discovery, trigger guidance, and team sharing help.</p></article>
+          <article><strong>Agent calls</strong><p>Study the CLI gateway to understand identity and receipts. Prefer the supported Agent SDK for production typed messages, sessions, hooks, subagents, and structured output.</p></article>
+          <article><strong>Permissions</strong><p>Keep worktree isolation, but replace blanket bypass with scoped permission modes, allow/deny rules, sandboxed tools, and pre/post-use hooks.</p></article>
+          <article><strong>Triggers + parallelism</strong><p>Use CI, webhooks, schedules, background agents, or native fan-out where appropriate. Retain eligibility, claim, concurrency, dependency, and environment rules.</p></article>
+          <article><strong>Period detail</strong><p>Model names, local executable paths, and MCP wiring versions may change. Update them without rewriting the architecture lesson.</p></article>
+          <article><strong>Embedded agents</strong><p>Use current session and product-agent APIs, while preserving durable application identity and an explicit reason for continuity.</p></article>
+        </div>
+
+        <h3>Two approved YouTube extensions</h3>
+        <p>These are the only chapter overlays selected by the extract, keeping the current-practice layer under the three-video maximum.</p>
+        <div class="practice-grid">
+          <article><span class="video-id">fop_yxV-mPo</span><strong>The Codebase Singularity: “My agents run my codebase better than I can”</strong><p>Extends the lesson’s end state: a codebase whose encoded workflows operate more reliably than ad hoc manual practice.</p><a href="https://www.youtube.com/watch?v=fop_yxV-mPo">Watch on YouTube →</a></article>
+          <article><span class="video-id">hGg3nWp7afg</span><strong>Agentic Claude Code: 3 Codebase Folders for TOP 1% AI Coding</strong><p>Slows down the folder-level reasoning behind the minimum viable agentic layer.</p><a href="https://www.youtube.com/watch?v=hGg3nWp7afg">Watch on YouTube →</a></article>
+        </div>
+
+        <aside class="callout callout--warning"><p class="callout__label">Safety translation</p><p>When a course frame or script shows <code>--dangerously-skip-permissions</code>, learn the isolation intent and invocation flow—not the bypass habit. The core lab stays in the cloned course repository. Production work should use current scoped controls.</p></aside>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Graded lab · Build and operate the ring</h2>
+        <p class="section-lead">This lab uses only the tracked TAC-8 course codebase. You will operate four of its five sibling apps, explain the evidence each leaves, and type zero lines of application code by hand. Prompts, plans, task declarations, and ADW glue are the permitted work surface.</p>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Before any agent runs</p>
+          <p>The course ADWs use <code>--dangerously-skip-permissions</code>. Work in a fresh course clone, inspect the exact prompt and ADW you are about to run, verify the current directory, and keep credentials in the sample-derived environment files. If cost is a constraint, use <code>--once</code>, <code>--dry-run</code>, and a smaller <code>--max-tasks</code>; do not fake completion.</p>
+        </aside>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Lab 8.0 · Set up and classify</h3>
+          <p><strong>Time:</strong> 15 minutes · <strong>Purpose:</strong> prove you know which layer you are about to touch.</p>
+          <ol class="lab-box__steps">
+            <li>Use the catalog copy at <code>tac/tac-8</code> or clone the course repository into a fresh TAC workspace and enter it.</li>
+            <li>Verify the required toolbelt with <code>claude --version</code>, <code>uv --version</code>, <code>bun --version</code>, <code>git --version</code>, and <code>git worktree list</code>. Use WSL for the course scripts on Windows.</li>
+            <li>Enter <code>tac8_app1__agent_layer_primitives</code>, copy <code>.env.sample</code> to <code>.env</code>, and set the required key and optional <code>CLAUDE_CODE_PATH</code>.</li>
+            <li>Read app1’s <code>README.md</code> fully. Draw a core-and-ring diagram and place <code>apps/</code>, <code>adws/</code>, <code>specs/</code>, and <code>.claude/commands/</code>.</li>
+            <li>Write the final question at the top of your lab notes. Answer it at every checkpoint.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>You can name both layers and all three MVAL directories without looking.</li><li>Your diagram places <code>apps/</code> in the center and the three MVAL pieces in the ring.</li><li>Your safety note identifies the permission-bypass flag and the disposable-repo boundary.</li></ul></div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Lab 8.1 · Reproduce app1’s primitive path</h3>
+          <p><strong>Time:</strong> 30–40 minutes · <strong>Purpose:</strong> move from an in-loop prompt to an observable, composed out-loop workflow.</p>
+          <h4>A · Establish the in-loop baseline</h4>
+          <ol class="lab-box__steps"><li>Start Claude in app1 and run <code>/prime</code>. Confirm it uses <code>git ls-files</code>, reads the repository documentation, and reports.</li><li>Run <code>/start</code>. Confirm both hello-world applications execute.</li><li>In your notes, explain why testing these prompts in-loop is a valid application-layer exemption: you are verifying prompts that will later run out-loop.</li></ol>
+          <h4>B · Call the gateway</h4>
+          <div class="command-card"><pre><code>./adws/adw_prompt.py \
+  "list all files in the adws directory and a concise output of their purpose"</code></pre></div>
+          <ol class="lab-box__steps"><li>Record the ADW ID, agent name, model, working directory, and output path from the Inputs panel.</li><li>Inspect the four files under <code>agents/&lt;adw_id&gt;/oneoff/</code>.</li><li>For each file, write its content role and likely consumer. Do not write “log” four times.</li></ol>
+          <h4>C · Call a slash command without a chat</h4>
+          <div class="command-card"><pre><code>./adws/adw_slash_command.py /start</code></pre></div>
+          <p>Confirm the same application behavior occurs with no interactive conversation. State what moved out of the loop.</p>
+          <h4>D · Compose planner and builder</h4>
+          <div class="command-card"><pre><code>./adws/adw_chore_implement.py \
+  "create a .sh version of main in apps/*"
+
+sh apps/main.sh</code></pre></div>
+          <p>Verify the generated <code>specs/chore-&lt;id&gt;-*.md</code>, <code>apps/main.sh</code>, planner and builder receipt directories, and <code>workflow_summary.json</code>. Trace the plan path through the Report contract and regex before checking the generated application file.</p>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>Four output files correctly distinguished.</li><li>Headless <code>/start</code> succeeds.</li><li>The exact chore produces a plan and a runnable <code>apps/main.sh</code>.</li><li>You can explain why changing <code>chore.md</code>’s Report section can break deterministic glue.</li></ul></div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Lab 8.2 · Operate app2 Todone</h3>
+          <p><strong>Time:</strong> 30–45 minutes · <strong>Purpose:</strong> prove task state, dependency, routing, and environment isolation under real agent pickup.</p>
+          <ol class="lab-box__steps">
+            <li>Enter <code>tac8_app2__multi_agent_todone</code>, create its local <code>.env</code> from the sample, and read <code>README.md</code>, <code>tasks.md</code>, and the trigger’s help text.</li>
+            <li>Replace the task body with your own <code># ATL</code> board: two worktree groups, three tasks per group, one final <code>[⏰]</code> task, one model-routing tag, and one <code>adw_plan_implement_update_task</code> tag. Keep all work against the existing sentiment-classification course app.</li>
+            <li>Run <code>./adws/adw_triggers/adw_trigger_cron_todone.py --once --dry-run</code>. Compare eligible tasks and routes with your prediction.</li>
+            <li>Run once for real with a cost-appropriate <code>--max-tasks</code>. Watch pending states become <code>🟡</code> with ADW IDs.</li>
+            <li>Run the normal trigger long enough to let the board drain, or repeat controlled <code>--once</code> runs. Do not manually promote the clock-marked task.</li>
+            <li>For every completed line, verify the commit inside its worktree using <code>git -C trees/&lt;name&gt; log --oneline</code>.</li>
+            <li>Open one worktree and prove the sparse checkout contains only <code>tac8_app2__multi_agent_todone</code>.</li>
+            <li>Validate one generated data artifact the way Dan does: define a value that must not appear, search for it, and record the zero-hit proof before trusting ✅.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>State transitions carry real ADW IDs and real commit hashes or honest failure reasons.</li><li>The clock dependency starts only after all earlier tasks in its group reach ✅.</li><li>Model and workflow tags route as predicted.</li><li>One sparse worktree and one application artifact receive independent verification.</li></ul></div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Lab 8.3 · Read app4 as a PITER factory</h3>
+          <p><strong>Time:</strong> 15–25 minutes · <strong>Purpose:</strong> understand specialized routing and claim semantics without requiring a Notion account.</p>
+          <ol class="lab-box__steps">
+            <li>Enter <code>tac8_app4__agentic_prototyping</code>. Read the trigger’s claim→route→spawn path and <code>.claude/commands/plan_uv_mcp.md</code>.</li>
+            <li>Run Claude and execute: <code>/plan_uv_mcp test0001 "Create a concise and minimal MCP server that provides system information: memory, cpu, disk"</code>.</li>
+            <li>Open the generated <code>specs/plan-*-uv-mcp.md</code>. Grade it against metadata, description, relevant files, ordered steps, and validation commands.</li>
+            <li>In the source and README, prove that <code>{{prototype: uv_mcp}}</code> routes to <code>/plan_uv_mcp</code>, and <code>continue - &lt;prompt&gt;</code> is the HIL iteration trigger.</li>
+            <li>Locate the immediate <em>In progress</em> + ADW ID claim transition and explain the duplicate-pickup failure it prevents.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>A real Plan-Format-conformant UV MCP plan exists inside the course app.</li><li>PITER maps to the exact board, poller, <code>trees/</code>, and review states.</li><li>The claim happens before detached delegation in your source trace.</li></ul></div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Lab 8.4 · Verify app5’s AEA exception</h3>
+          <p><strong>Time:</strong> 15–25 minutes · <strong>Purpose:</strong> prove two concurrent in-product agents preserve focused conversational continuity.</p>
+          <ol class="lab-box__steps">
+            <li>Enter <code>tac8_app5__nlq_to_sql_aea</code>. Copy <code>app/server/.env.sample</code> to <code>app/server/.env</code>, add the required keys, install the tracked client/server dependencies, and update the course’s machine-specific <code>CLAUDE_CODE_PATH</code> in <code>scripts/aea_server_start.sh</code>.</li>
+            <li>Run <code>./scripts/start.sh</code>. In another terminal run <code>./scripts/aea_server_start.sh</code>. Confirm the application at <code>http://localhost:5173</code> and AEA server on port 8743.</li>
+            <li>Press Cmd+P on macOS or Ctrl+P elsewhere, run <code>/aea</code>, and ask, “what is this codebase about?”</li>
+            <li>Create a second AEA window and request one small UI change inside this same course application. Do not edit the application by hand.</li>
+            <li>Refresh the page. Verify both agents reconnect with their histories. Record their <code>agent_id</code> values and find stored <code>cc_session_id</code> values in the server’s persisted state.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>Two concurrent AEA windows: one Q&amp;A, one code change.</li><li>Both reconnect after refresh.</li><li>You can trace <code>agent_id</code> → SQLite row → <code>cc_session_id</code> → <code>--resume</code>.</li><li>The code change came through the AEA workflow, not your editor.</li></ul></div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Lab 8.5 · Stretch the course layer safely</h3>
+          <p>Choose one. All work remains inside the TAC-8 course codebase.</p>
+          <ul>
+            <li><strong>New problem class in app1:</strong> create a <code>/bugfix</code> or <code>/docs</code> template meta prompt, wire it to the shared implementer, and prove team standards appear in a generated plan.</li>
+            <li><strong>Blocked-chain proof in app2:</strong> design task one to fail validation and task two as <code>[⏰]</code>; prove the second never starts and the first records an honest reason.</li>
+            <li><strong>Trigger surgery in app2:</strong> change polling and concurrency through supported flags, then add one new workflow tag and ADW route in the course app.</li>
+            <li><strong>Real app4 board:</strong> configure the course app’s Notion MCP and database ID, run one <code>{{prototype: uv_script}}</code> card with <code>--once</code>, and return it to the board’s review flow.</li>
+            <li><strong>AEA restart:</strong> keep the AEA pointed at app5, restart the server, and prove the persisted course-agent conversation reconnects.</li>
+          </ul>
+        </section>
+
+        <h3>Submission checklist</h3>
+        <ul class="lab-checklist">
+          <li>Zero application code typed by hand.</li>
+          <li>Four gateway output files produced and correctly explained.</li>
+          <li>Composed app1 workflow produced a plan, runnable shell application, and two-phase summary.</li>
+          <li>app2 board shows verifiable commits or honest failures, dependency behavior, tag routing, and sparse isolation.</li>
+          <li>app4 produced a valid specialized plan and a correct PITER/claim trace.</li>
+          <li>app5 ran two resumable agents inside the application.</li>
+          <li>Oral check completed without notes: layers, ≥50% rule, MVAL, gateway receipts, report contract, task states and tags, PITER→PITE prerequisite, focused-agent exception, final question, and three exemptions.</li>
+        </ul>
+
+        <h3>Grading rubric · 24 points</h3>
+        <div class="rubric-grid" role="table" aria-label="TAC-8 lab grading rubric">
+          <div class="rubric-head" role="columnheader">Dimension</div><div class="rubric-head" role="columnheader">0 · Missing</div><div class="rubric-head" role="columnheader">1 · Partial</div><div class="rubric-head" role="columnheader">2 · Mastered</div>
+          <div>Layer discipline</div><div>Hand-edited application code</div><div>Mostly stayed in ring; weak classification</div><div>Zero hand code; every checkpoint classified and defended</div>
+          <div>Gateway observability</div><div>No receipts</div><div>Files exist but roles blur</div><div>All four files explained with identity and consumer</div>
+          <div>Prompt contract</div><div>Cannot trace artifact</div><div>Finds plan but misses coupling</div><div>Traces report→regex→implement and predicts failure</div>
+          <div>Todone state</div><div>Board not run</div><div>Runs without dependency/routing proof</div><div>States, tags, commits, block, and isolation all proved</div>
+          <div>PITER factory</div><div>No mapping</div><div>Names letters generically</div><div>Maps real source artifacts and duplicate-claim prevention</div>
+          <div>AEA continuity</div><div>No working agents</div><div>One agent or no resume proof</div><div>Two agents, refresh/restart continuity, full identity trace</div>
+          <div>Feedback judgment</div><div>Drops review by assertion</div><div>Mentions validation</div><div>Uses KPIs, encoded checks, and streak before PITE</div>
+          <div>Teach-back</div><div>Recites terms only</div><div>Explains parts independently</div><div>Connects allocation→MVAL→composition→orchestration→PITE</div>
+          <div>Safety</div><div>Copies bypass practice broadly</div><div>Notes risk after running</div><div>Reads prompts first, scopes repo, and distinguishes production controls</div>
+          <div>Evidence quality</div><div>Claims completion</div><div>Provides screenshots or hashes alone</div><div>Combines receipts, hashes, source trace, validations, and explanation</div>
+          <div>Problem-class thinking</div><div>One-off request only</div><div>Names a class vaguely</div><div>Builds or critiques a reusable class with a transfer test</div>
+          <div>Final question</div><div>Cannot state it</div><div>States it without exemptions</div><div>Uses it daily and names all three legitimate exemptions</div>
+        </div>
+        <p class="fine">Mastery threshold: 20/24, with no zero in safety, layer discipline, or feedback judgment.</p>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">13</span>
+        <h2 class="section-title">Cumulative mastery · retrieve the whole ring</h2>
+        <p class="section-lead">Do this section after the lab and without reopening the chapter. Recognition is not the target. You should be able to reconstruct the architecture, diagnose its failures, and decide where engineering time belongs.</p>
+
+        <h3>Round 1 · Twelve retrieval prompts</h3>
+        <section class="retrieval-quiz">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Define the two layers by responsibility and give Dan’s two-ingredient definition of the ring.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The application layer is classical product software; the agentic layer is deterministic ADW code combined with non-deterministic prompts/models to operate it.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What is the MVAL, and what is the single scripting-language rule?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>adws/</code>, <code>.claude/commands/</code>, and <code>specs/</code>; use any language that composes code, references files, and remains isolated from the application layer.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Name the four app1 gateway receipts in order.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>cc_raw_output.jsonl</code>, <code>cc_raw_output.json</code>, <code>cc_final_object.json</code>, and <code>custom_summary_output.json</code>.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Why is a Plan Format more than Markdown formatting?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It compiles engineering standards into a reusable generated artifact, including research, ordered tasks, and validation that a higher-order prompt can execute.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">5. What exact contract couples <code>/chore</code> to <code>adw_chore_implement.py</code>?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The Report section must return the created <code>specs/chore-*.md</code> path so deterministic code can extract and pass it to <code>/implement</code>.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">6. Recite Todone’s states, dependency rule, and two routing dimensions.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Pending → in progress → complete or failed; a clock waits for every earlier task in its worktree to be ✅; tags route model and workflow.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">7. Why is a worktree plus sparse checkout called double isolation?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The task gets a separate Git working tree and that tree exposes only the target app directory.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">8. Map PITER onto app4 and name the claim invariant.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Notion card, poller, <code>trees/</code>, board review; set In progress plus ADW ID before spawning.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">9. State the focus rule, exception, and resume mechanism.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>One agent, one prompt, one purpose; AEA conversation is the exception; SQLite maps <code>agent_id</code> to <code>cc_session_id</code>, passed through <code>--resume</code>.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">10. What makes it safe to remove the R?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Encoded feedback and a proven reliability streak showing human review has become the bottleneck.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">11. Name the four agentic KPIs and directions.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Attempts down, task size up, success streak up, human presence toward zero.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">12. State the final question and all three application-layer exemptions.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Am I working on the agentic layer or in the application layer? Legitimate app-layer reasons: deadline, manual testing, or in-loop verification of prompts intended for out-loop use.</p></details></div>
+        </section>
+
+        <h3>Round 2 · Diagnose four broken systems</h3>
+        <div class="proof-grid">
+          <article><strong>Broken handoff</strong><p>A planner produces a file but the builder never runs. Diagnose the Report contract, returned filename, regex, file existence, and phase-one success before changing the model.</p></article>
+          <article><strong>Duplicate prototype</strong><p>Two agents start the same Notion card. Inspect whether the In progress + ADW ID claim happened before detached delegation and whether eligibility excludes claimed states.</p></article>
+          <article><strong>Stuck clock</strong><p>A <code>[⏰]</code> task never starts. Read all earlier tasks in that worktree; any non-✅ state, especially ❌, correctly blocks it.</p></article>
+          <article><strong>Forgetful AEA</strong><p>An agent loses history after refresh. Trace active application IDs, SQLite persistence, stored Claude session ID, and the <code>--resume</code> branch.</p></article>
+          <article><strong>Unsafe “ZTE”</strong><p>A team deletes review after two passes. Ask for encoded validations, attempt trend, task-size evidence, success streak, and useful-review rate.</p></article>
+          <article><strong>Thin calendar</strong><p>The team understands every mechanism but spends no time on it. Audit work blocks, name exemptions, and template the most repeated manual problem class.</p></article>
+        </div>
+
+        <h3>Round 3 · Ninety-second teach-back</h3>
+        <div class="teach-back">
+          <p>Without notes, teach this progression:</p>
+          <ol><li>Separate application and agentic responsibilities.</li><li>Start the ring with prompts, plans, and ADWs.</li><li>Make one agent call observable.</li><li>Generate structured plans and hand them across explicit contracts.</li><li>Add triggers, task state, routing, and isolated environments.</li><li>Keep agents focused; resume only when conversation is the purpose.</li><li>Encode feedback, measure reliability, and drop review only when earned.</li><li>Ask the final question every day and allocate at least half your time to the ring.</li></ol>
+          <p class="fine">Mastery sounds causal: each capability solves a failure exposed by the previous layer. A list of folder names is not enough.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">14</span>
+        <h2 class="section-title">Glossary · the course’s operating language</h2>
+        <div class="glossary-grid">
+          <article><h3>Agentic layer</h3><p>Deterministic ADW code plus non-deterministic agentic prompts and models, wrapped around the application to operate it.</p></article>
+          <article><h3>Application layer</h3><p>The classical system: product code, data, database, infrastructure, and DevOps.</p></article>
+          <article><h3>MVAL</h3><p>Minimum Viable Agentic Layer: <code>adws/</code>, <code>.claude/commands/</code>, and <code>specs/</code>.</p></article>
+          <article><h3>ADW</h3><p>AI Developer Workflow: executable composition of deterministic code and agentic work.</p></article>
+          <article><h3>Template meta prompt</h3><p>A reusable prompt that generates another prompt artifact—usually a plan—in a strict format.</p></article>
+          <article><h3>Higher-order prompt</h3><p>A prompt that consumes another prompt or plan as its argument; <code>/implement</code> is the course example.</p></article>
+          <article><h3>Plan Format</h3><p>The required shape of a generated plan, including metadata, relevant files, ordered tasks, and validation commands.</p></article>
+          <article><h3>Report contract</h3><p>A machine-readable output promise joining a non-deterministic agent phase to deterministic orchestration.</p></article>
+          <article><h3>Gateway script</h3><p>The smallest ADW: one agent call plus run identity, environment, retries, and observable outputs.</p></article>
+          <article><h3>Todone</h3><p>app2’s to-do→to-DONE multi-agent task system driven by a two-way Markdown task list.</p></article>
+          <article><h3>Trigger</h3><p>The mechanism that fires an ADW without a person dispatching it: poller, schedule, webhook, CI event, or product server.</p></article>
+          <article><h3>Double isolation</h3><p>A dedicated Git worktree plus sparse checkout containing only the target application directory.</p></article>
+          <article><h3>PITER / PITE</h3><p>Prompt input, Trigger, Environment, Review; drop Review only after feedback loops and reliability evidence make it redundant.</p></article>
+          <article><h3>AEA</h3><p>Agent Embedded Application: an agent interface living inside the product, with durable session continuity where required.</p></article>
+          <article><h3>Problem class</h3><p>A recurring family of work captured by a reusable template or workflow, rather than one task instance.</p></article>
+          <article><h3>Agentic KPIs</h3><p>Attempts ↓, task size ↑, success streak ↑, and human presence → 0.</p></article>
+          <article><h3>Prioritize Agentics</h3><p>Tactic #8: allocate at least half of engineering time to improving the agentic layer as a starting point.</p></article>
+          <article><h3>Final question</h3><p>“Am I working on the agentic layer or in the application layer?”—the daily compression of the course.</p></article>
+        </div>
+
+        <div class="question-card">
+          <p>Build the system that builds the system.</p>
+          <small>Then improve the ring until your best engineering practice is executable.</small>
+        </div>
+
+        <nav class="chapter-pagination" aria-label="Chapter pagination">
+          <a href="07-zte-secret-of-agentic-engineering.html">← Chapter 07 · ZTE Secret of Agentic Engineering</a>
+          <a href="../index.html">Return to the book hub →</a>
+        </nav>
+      </section>
+
+      <footer class="chapter-footer">
+        <p>Volume I · Tactical Agentic Coding · Chapter 08</p>
+        <p>Source-bound to the TAC-8 extract and tracked course codebase.</p>
+      </footer>
+    
+      <p class="code-deep-link"><a href="../code/tac-8-the-agentic-layer.html">Code deep-dive · how Dan built this repo →</a></p>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var topBar = document.getElementById('top-progress');
+      var railBar = document.getElementById('rail-progress');
+      var label = document.getElementById('progress-label');
+      var sections = Array.prototype.slice.call(document.querySelectorAll('.chapter-section[id]'));
+      var links = Array.prototype.slice.call(document.querySelectorAll('.chapter-nav a'));
+      var progressFramePending = false;
+
+      function updateProgress() {
+        var scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        var ratio = scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)) : 0;
+        var value = Math.round(ratio * 100);
+        if (topBar) topBar.style.width = value + '%';
+        if (railBar) railBar.style.width = value + '%';
+        if (label) label.textContent = value + '%';
+        progressFramePending = false;
+      }
+
+      function requestProgressUpdate() {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        window.requestAnimationFrame(updateProgress);
+      }
+
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          var visible = entries.filter(function (entry) { return entry.isIntersecting; }).sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; })[0];
+          if (!visible) return;
+          links.forEach(function (link) {
+            var active = link.getAttribute('href') === '#' + visible.target.id;
+            if (active) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          });
+        }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+        sections.forEach(function (section) { observer.observe(section); });
+      }
+
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+    </main>
+  </div>
+</body>
+</html>

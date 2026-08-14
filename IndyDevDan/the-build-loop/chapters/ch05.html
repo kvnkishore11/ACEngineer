@@ -1,0 +1,134 @@
+<section class="chapter" id="ch05">
+  <div class="wrap wide">
+    <span class="chapnum reveal">05 — Escalation</span>
+    <div class="kicker reveal">complexity should be earned, not assumed</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Every rung has a <em>gate.</em></h2>
+    <p class="lede reveal d2">The ladder is real, but almost everyone climbs it too fast — building the multi-agent system before the single agent is reliable. Each rung below has an explicit condition for stepping onto it.</p>
+
+    <div class="chapnav reveal"><span class="cnl">In this chapter</span>
+      <a href="#ch05-s1"><b>1</b>The rule of three</a>
+      <a href="#ch05-s2"><b>2</b>The prompt skeleton</a>
+      <a href="#ch05-s3"><b>3</b>Agent experts</a>
+      <a href="#ch05-s4"><b>4</b>Going multi-agent</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch05-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Three times marks a pattern</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">The trigger is stated identically in four separate places, which is how you know it is load-bearing.</p>
+        <p><em>"Three time makes a pattern. Three time should trigger your engineering brain. Automate."</em></p>
+        <p>But the second half matters more than the first — <strong>start ugly.</strong> He is explicit that the first version should be almost embarrassing.</p>
+      </div>
+      <div>
+        <div class="quote"><p>"Copy this and literally tell your agent create dot claude slash command slash start and then as a string, just give it exactly what you want in there. Then you can reformat it later. <strong>Start with the bare minimum.</strong>"</p><span class="cite">— TAC-2</span></div>
+      </div>
+    </div>
+
+    <div class="callout idea reveal"><span class="ci">DO IT BY HAND FIRST</span>
+      <span class="cc"><em>"There's that saying, do things that don't scale. This is important so that you understand how to actually solve the problem yourself with your agent."</em> Run the risky thing once manually in a throwaway agent, watch what actually works, <strong>then</strong> encode it. A template written before you've done the job encodes a guess.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch05-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The skeleton he wrote down</h2></div>
+
+    <p class="prose reveal" style="max-width:72ch">This is not inferred from reading his files. It sits inside <code>meta_prompt.md</code> as a literal <em>Specified Format</em> block — the prompt that writes his other prompts. Sixty of 255 files match it exactly; another 35 match it minus the optional <code>Purpose</code>.</p>
+
+    <div class="spread reveal" style="align-items:start">
+      <div>
+        <div class="codecap">the invariant skeleton</div>
+        <div class="code"><pre>---
+allowed-tools: &lt;comma separated&gt;
+description: &lt;how we id this prompt&gt;
+argument-hint: [&lt;first dynamic var&gt;], [&lt;second&gt;]
+model: &lt;or default to 'opus'&gt;
+---
+
+# Purpose
+
+## Variables      &lt;- dynamic ($1,$2) FIRST, then static
+
+## Instructions   &lt;- guardrails, NOT the procedure
+
+## Workflow       &lt;- the numbered procedure
+
+## Report         &lt;- a fenced output template</pre></div>
+      </div>
+      <div class="prose">
+        <p><strong>The order <code>Variables → Workflow → Report</code> holds at 100%</strong> — zero exceptions across the whole corpus.</p>
+        <p>Three rules he states outright:</p>
+        <ul>
+          <li>"Prefer the <code>$1</code>, <code>$2</code>, … over the <code>$ARGUMENTS</code> notation."</li>
+          <li>"If no variables are requested or mentioned, do not create a Variables section."</li>
+          <li>"Do not create any additional sections or headers that are not in the Specified Format."</li>
+        </ul>
+        <p class="note">Instructions are guardrails; Workflow is procedure. In his words, the bullets "aid the workflow but are not part of the workflow itself."</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch05-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Agent experts — the self-improving rung</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 280" role="img" aria-label="The act-learn-reuse loop around an expertise file">
+          <rect x="140" y="18" width="180" height="52" rx="10" class="s-amber-f"/>
+          <text x="230" y="42" text-anchor="middle" class="s-title" font-size="13">expertise.yaml</text>
+          <text x="230" y="60" text-anchor="middle" class="s-label-sm">the mental model · capped</text>
+
+          <path d="M320 44 C 400 44, 420 110, 380 150" class="s-flow"/>
+          <path d="M380 150 l1 -11 -10 5 z" class="s-clay"/>
+
+          <rect x="286" y="152" width="150" height="46" rx="10" class="s-blue-f"/>
+          <text x="361" y="180" text-anchor="middle" class="s-label">/plan → /build</text>
+
+          <path d="M286 196 C 220 226, 150 226, 96 196" class="s-flow"/>
+          <path d="M96 196 l10 -5 -1 11 z" class="s-clay"/>
+          <text x="196" y="240" text-anchor="middle" class="s-label-sm">git diff</text>
+
+          <rect x="24" y="150" width="150" height="46" rx="10" class="s-olive-f"/>
+          <text x="99" y="178" text-anchor="middle" class="s-label">/self-improve</text>
+
+          <path d="M99 148 C 60 110, 70 60, 140 44" class="s-flow"/>
+          <path d="M140 44 l-10 4 1 -11 z" class="s-clay"/>
+
+          <text x="24" y="266" class="s-label-sm">VALIDATE AGAINST CODE · TRIM TO CAP · COMPILE THE YAML</text>
+        </svg>
+        <div class="fcap"><b>Act, learn, reuse.</b> The diff of what the builder just did is the input to the improver.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Build one only where agents <em>keep</em> getting a specific domain wrong. Not for static problems.</p>
+        <p>Four files per domain: <code>expertise.yaml</code> (the mental model), <code>question.md</code> (read-only Q&amp;A), <code>plan.md</code> (loads expertise, delegates to <code>/plan</code>), and <code>self-improve.md</code> (diffs the model against reality and repairs it).</p>
+        <p>Four invariants keep it from degenerating: <strong>code is truth and the yaml is a lens</strong>; memory is bounded by a hard line cap with a repeat-until-under loop; edits are surgical, never work summaries; and the improver is explicitly allowed to do nothing.</p>
+      </div>
+    </div>
+
+    <div class="quote big reveal"><p>Don't directly update this expertise file. Teach your agents how to directly update it.</p><span class="cite" style="display:block;margin-top:10px">— if the knowledge comes out wrong, you fix self-improve.md, never the yaml</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch05-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Going multi-agent</h2></div>
+
+    <div class="callout warn reveal"><span class="ci">THE GATE</span>
+      <span class="cc"><em>"Only use sub agents when you need specialization <strong>and</strong> parallelization. If you don't need to parallelize and you don't need to specialize, just create a reusable prompt."</em> And the readiness test: <em>"If you're losing track of a single agent, you probably aren't yet ready for sub-agents."</em></span></div>
+
+    <p class="prose reveal" style="max-width:74ch">His own systems split into two eras that disagree with each other. The later design won, and it is worth knowing which one you are copying.</p>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ Mar–Apr 2026</span><ul><li>An LLM calls <code>delegate()</code> and decides routing</li><li>Agents message each other</li><li>Orchestration lives in a prompt</li></ul></div>
+      <div class="col good"><span class="clabel">◵ Aug 2026 — the later design</span><ul><li>A Python script owns sequencing</li><li>Agents never talk to each other</li><li><strong>"Agent proposes, code disposes"</strong></li></ul></div>
+    </div>
+
+    <div class="grid grid-2 reveal">
+      <div class="card accent"><span class="cnum">01</span><p class="ctitle">Tier is the tool list</p><p class="cbody">Leads get <code>delegate</code> and no <code>bash</code>. Workers get <code>bash</code> and no <code>delegate</code>. Topology enforced by capability, not by asking nicely.</p></div>
+      <div class="card blue"><span class="cnum">02</span><p class="ctitle">Tools are not a boundary</p><p class="cbody"><code>bash</code> runs <code>git checkout</code> and <code>write</code> reaches any path. You need a separate writes-allowlist enforced in code.</p></div>
+      <div class="card olive"><span class="cnum">03</span><p class="ctitle">A claim is not proof</p><p class="cbody">The final message is an assertion. A gate is the evidence. Failures return to the <em>same session</em> as a correction, never a cold restart.</p></div>
+      <div class="card glow amber"><span class="cnum">04</span><p class="ctitle">Never let an agent edit its grader</p><p class="cbody">The gate "lives outside the project and outside your control." This one is not optional.</p></div>
+    </div>
+
+    <a class="jump reveal" href="#ch06">Next · A worked example &nbsp;→</a>
+  </div>
+</section>

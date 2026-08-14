@@ -1,0 +1,4669 @@
+WEBVTT
+
+1
+00:00:00.160 --> 00:00:04.240
+What's up engineers? Indy Devdan here.
+
+2
+00:00:02.399 --> 00:00:06.400
+It's time to focus. This is going to be
+
+3
+00:00:04.240 --> 00:00:07.759
+a big video and a lot of engineers are
+
+4
+00:00:06.400 --> 00:00:09.200
+going to miss the leverage I'm going to
+
+5
+00:00:07.759 --> 00:00:10.880
+share in this one. I don't want you to
+
+6
+00:00:09.200 --> 00:00:13.440
+be one of them. Your software factory
+
+7
+00:00:10.880 --> 00:00:15.120
+can unlock an unprecedented level of
+
+8
+00:00:13.440 --> 00:00:17.600
+engineering results. But there's a
+
+9
+00:00:15.120 --> 00:00:20.320
+massive roadblock every agentic engineer
+
+10
+00:00:17.600 --> 00:00:22.640
+runs into at some point. A roadblock you
+
+11
+00:00:20.320 --> 00:00:25.199
+might have. Where should your software
+
+12
+00:00:22.640 --> 00:00:27.760
+factory run? Where do your agents plus
+
+13
+00:00:25.199 --> 00:00:30.240
+code actually run? Most engineers
+
+14
+00:00:27.760 --> 00:00:32.239
+allocate a tiny corner of their own
+
+15
+00:00:30.240 --> 00:00:35.200
+computer for their agents, or they lean
+
+16
+00:00:32.239 --> 00:00:37.120
+too heavily on CI/CD or some container.
+
+17
+00:00:35.200 --> 00:00:39.760
+The best engineers aren't doing this.
+
+18
+00:00:37.120 --> 00:00:42.640
+Engineers at big AI labs running the
+
+19
+00:00:39.760 --> 00:00:44.640
+most insane workloads you can imagine do
+
+20
+00:00:42.640 --> 00:00:47.760
+something else because they've realized
+
+21
+00:00:44.640 --> 00:00:49.680
+one simple fact. The more autonomous and
+
+22
+00:00:47.760 --> 00:00:52.559
+secure your agents are, the more they
+
+23
+00:00:49.680 --> 00:00:54.640
+can do for you riskfree. On this
+
+24
+00:00:52.559 --> 00:00:56.960
+channel, across hundreds of agentic
+
+25
+00:00:54.640 --> 00:01:00.000
+engineering videos, you've heard me say
+
+26
+00:00:56.960 --> 00:01:02.960
+scale your compute to scale your impact.
+
+27
+00:01:00.000 --> 00:01:06.159
+Compute applies equally to GPU compute
+
+28
+00:01:02.960 --> 00:01:09.439
+and CPU compute. Old school bare metal.
+
+29
+00:01:06.159 --> 00:01:11.680
+An agent sandbox is the best space to
+
+30
+00:01:09.439 --> 00:01:13.280
+place your agents. [music] Why is that?
+
+31
+00:01:11.680 --> 00:01:15.119
+Why can't we just use a container and
+
+32
+00:01:13.280 --> 00:01:18.080
+call it solved? It's because agent
+
+33
+00:01:15.119 --> 00:01:20.799
+sandboxes give you three key advantages:
+
+34
+00:01:18.080 --> 00:01:23.600
+true isolation, insane scale, and
+
+35
+00:01:20.799 --> 00:01:26.159
+agency. Here's the raw reality of the
+
+36
+00:01:23.600 --> 00:01:28.720
+state of agentic engineering. If you are
+
+37
+00:01:26.159 --> 00:01:30.479
+inside the loop, you are the bottleneck.
+
+38
+00:01:28.720 --> 00:01:32.960
+In this video, I'm going to break down
+
+39
+00:01:30.479 --> 00:01:35.520
+exactly how you can step outside the
+
+40
+00:01:32.960 --> 00:01:38.906
+loop by putting your software factory
+
+41
+00:01:35.520 --> 00:01:43.240
+inside an agent sandbox. Let's put your
+
+42
+00:01:38.906 --> 00:01:43.240
+[music] factory in a box.
+
+43
+00:01:45.439 --> 00:01:49.439
+Here's the tech stack we're going to be
+
+44
+00:01:46.880 --> 00:01:51.200
+using to put our factory inside a box.
+
+45
+00:01:49.439 --> 00:01:53.200
+Don't focus on the tool. Focus on the
+
+46
+00:01:51.200 --> 00:01:55.200
+purpose and choose the best tool you
+
+47
+00:01:53.200 --> 00:01:56.640
+need. Here's the architecture of the
+
+48
+00:01:55.200 --> 00:01:58.479
+system as well. We'll throw this up on
+
+49
+00:01:56.640 --> 00:02:01.200
+the screen. And why did I put the second
+
+50
+00:01:58.479 --> 00:02:03.040
+orchestrator agent inside the sandbox?
+
+51
+00:02:01.200 --> 00:02:05.680
+It'll all make sense as we progress.
+
+52
+00:02:03.040 --> 00:02:08.399
+Let's start with a powerful workflow you
+
+53
+00:02:05.680 --> 00:02:12.440
+can't do on containers on your device.
+
+54
+00:02:08.399 --> 00:02:12.440
+Best of N.
+
+55
+00:02:13.760 --> 00:02:17.680
+We'll boot up Herder. This is my
+
+56
+00:02:15.840 --> 00:02:19.599
+terminal multiplexer of choice for
+
+57
+00:02:17.680 --> 00:02:21.440
+watching agents, kicking off jobs,
+
+58
+00:02:19.599 --> 00:02:23.440
+running arbitrary commands, application
+
+59
+00:02:21.440 --> 00:02:27.360
+directory. And we're going to use claw
+
+60
+00:02:23.440 --> 00:02:28.800
+code fable as our tople orchestrator
+
+61
+00:02:27.360 --> 00:02:30.959
+inside of our software factory. We're
+
+62
+00:02:28.800 --> 00:02:32.560
+going to use pi as our agent SDK. Don't
+
+63
+00:02:30.959 --> 00:02:34.720
+just limit yourself to one agentic
+
+64
+00:02:32.560 --> 00:02:36.400
+coding tool. The tools you use directly
+
+65
+00:02:34.720 --> 00:02:37.920
+limit what you believe is possible.
+
+66
+00:02:36.400 --> 00:02:40.000
+Let's go ahead and kick off the skill
+
+67
+00:02:37.920 --> 00:02:42.239
+that activates our agents understanding.
+
+68
+00:02:40.000 --> 00:02:43.840
+This is going to be SSF, agent, sandbox,
+
+69
+00:02:42.239 --> 00:02:45.599
+orchestrator. I'll break this all down
+
+70
+00:02:43.840 --> 00:02:47.440
+in a second. It understands the skill.
+
+71
+00:02:45.599 --> 00:02:49.760
+It's got all the context primed, ready
+
+72
+00:02:47.440 --> 00:02:51.120
+to go. And it can see that we have one
+
+73
+00:02:49.760 --> 00:02:52.480
+VM running. We're not going to touch
+
+74
+00:02:51.120 --> 00:02:54.640
+this one. We're going to open up brand
+
+75
+00:02:52.480 --> 00:02:56.720
+new VMs. We're going to run the best of
+
+76
+00:02:54.640 --> 00:02:58.800
+end pattern. We're putting our software
+
+77
+00:02:56.720 --> 00:03:00.080
+factories into an agent sandbox. Let me
+
+78
+00:02:58.800 --> 00:03:01.920
+show you exactly what that looks like.
+
+79
+00:03:00.080 --> 00:03:04.560
+I'm going to open up VS Code. I'll grab
+
+80
+00:03:01.920 --> 00:03:05.760
+my demo prompt here. Copy this. Feel
+
+81
+00:03:04.560 --> 00:03:06.959
+free to pause. We're going to break this
+
+82
+00:03:05.760 --> 00:03:09.120
+down in a second. I'm going to paste
+
+83
+00:03:06.959 --> 00:03:11.599
+this in and fire it off. This top level
+
+84
+00:03:09.120 --> 00:03:13.760
+orchestrator agent that operates outside
+
+85
+00:03:11.599 --> 00:03:15.680
+of all of our sandboxes is going to
+
+86
+00:03:13.760 --> 00:03:16.959
+start orchestrating this workflow. If
+
+87
+00:03:15.680 --> 00:03:18.640
+you were here for last week's video
+
+88
+00:03:16.959 --> 00:03:20.159
+where we talked about the super simple
+
+89
+00:03:18.640 --> 00:03:21.760
+software factory, you're going to love
+
+90
+00:03:20.159 --> 00:03:22.800
+what you're going to see next. So, we're
+
+91
+00:03:21.760 --> 00:03:24.640
+running five different agent
+
+92
+00:03:22.800 --> 00:03:27.040
+configurations. Default, Frontier,
+
+93
+00:03:24.640 --> 00:03:28.959
+Deepest, Seek, Open Weights, and Top
+
+94
+00:03:27.040 --> 00:03:31.040
+Speed, each with its own sandbox. And
+
+95
+00:03:28.959 --> 00:03:32.560
+they're all going to solve the same
+
+96
+00:03:31.040 --> 00:03:34.799
+problem. But we're not just launching
+
+97
+00:03:32.560 --> 00:03:36.239
+agents. We're running an AI developer
+
+98
+00:03:34.799 --> 00:03:38.239
+workflow. We're running the full
+
+99
+00:03:36.239 --> 00:03:40.560
+software developer life cycle against
+
+100
+00:03:38.239 --> 00:03:42.000
+our simple application which you're
+
+101
+00:03:40.560 --> 00:03:43.760
+going to see here in a second. But you
+
+102
+00:03:42.000 --> 00:03:46.319
+can see here our orchestrator is kicking
+
+103
+00:03:43.760 --> 00:03:47.680
+off not just agents inside sandboxes.
+
+104
+00:03:46.319 --> 00:03:50.319
+Our agent is building our software
+
+105
+00:03:47.680 --> 00:03:52.319
+factory and placing the entire factory
+
+106
+00:03:50.319 --> 00:03:54.319
+inside our agent sandbox. And this
+
+107
+00:03:52.319 --> 00:03:56.080
+unlocks a lot of really really powerful
+
+108
+00:03:54.319 --> 00:03:57.760
+things. When you use agent sandboxes,
+
+109
+00:03:56.080 --> 00:03:59.760
+you're getting isolation, you're getting
+
+110
+00:03:57.760 --> 00:04:02.159
+scale, and you're getting autonomy.
+
+111
+00:03:59.760 --> 00:04:03.280
+Every single agent owns the computer.
+
+112
+00:04:02.159 --> 00:04:05.280
+They're not just running on a little
+
+113
+00:04:03.280 --> 00:04:07.519
+corner of yours interfering with your
+
+114
+00:04:05.280 --> 00:04:09.439
+work, you interfering with their work.
+
+115
+00:04:07.519 --> 00:04:12.879
+They have everything they need to own
+
+116
+00:04:09.439 --> 00:04:15.680
+the outcome. We are using exe.dev as my
+
+117
+00:04:12.879 --> 00:04:17.359
+primary sandbox tool. One of the best,
+
+118
+00:04:15.680 --> 00:04:19.359
+simplest ways to get started with agent
+
+119
+00:04:17.359 --> 00:04:20.479
+sandboxes. I'll of course link all the
+
+120
+00:04:19.359 --> 00:04:21.919
+resources we're going to talk about
+
+121
+00:04:20.479 --> 00:04:23.919
+throughout this video in the description
+
+122
+00:04:21.919 --> 00:04:25.600
+for you, but their tagline keeps it nice
+
+123
+00:04:23.919 --> 00:04:27.360
+and simple for you. Computers for
+
+124
+00:04:25.600 --> 00:04:29.840
+developers and agents. Durable
+
+125
+00:04:27.360 --> 00:04:31.840
+sandboxes, fast, secure, and sharable.
+
+126
+00:04:29.840 --> 00:04:33.600
+The agent sandbox is a developer device
+
+127
+00:04:31.840 --> 00:04:35.440
+for your agents. Let's just like really
+
+128
+00:04:33.600 --> 00:04:36.880
+atomize everything. Let's say exactly
+
+129
+00:04:35.440 --> 00:04:38.880
+what things are. There's a lot of hype
+
+130
+00:04:36.880 --> 00:04:41.199
+and noise in the AI industry. I try to
+
+131
+00:04:38.880 --> 00:04:43.360
+dehype things as much as possible as
+
+132
+00:04:41.199 --> 00:04:46.080
+complex as something like this is. We're
+
+133
+00:04:43.360 --> 00:04:47.919
+not just throwing a expensive claw opus
+
+134
+00:04:46.080 --> 00:04:50.160
+cloud fable Asian at this. We are
+
+135
+00:04:47.919 --> 00:04:52.160
+understanding what model needs to run
+
+136
+00:04:50.160 --> 00:04:54.320
+where with what code surrounding it.
+
+137
+00:04:52.160 --> 00:04:56.720
+Right? That's the software factory.
+
+138
+00:04:54.320 --> 00:04:59.199
+That's the next step. So this is a lot
+
+139
+00:04:56.720 --> 00:05:01.840
+more powerful than just a skill and an
+
+140
+00:04:59.199 --> 00:05:03.680
+agent and spin up this web app inside of
+
+141
+00:05:01.840 --> 00:05:05.919
+this service. Orchestrating other
+
+142
+00:05:03.680 --> 00:05:08.080
+agents, orchestrating sandboxes does
+
+143
+00:05:05.919 --> 00:05:10.400
+require state-of-the-art intelligence. I
+
+144
+00:05:08.080 --> 00:05:11.759
+always track these models inside of my
+
+145
+00:05:10.400 --> 00:05:13.280
+model stack here. You've probably seen
+
+146
+00:05:11.759 --> 00:05:15.919
+this if you've been with the channel. I
+
+147
+00:05:13.280 --> 00:05:17.120
+delineate between three tiers of models.
+
+148
+00:05:15.919 --> 00:05:19.199
+We have state-of-the-art, we have
+
+149
+00:05:17.120 --> 00:05:20.880
+workhorse, and we have our lightweight
+
+150
+00:05:19.199 --> 00:05:22.720
+models, which are basically the floor.
+
+151
+00:05:20.880 --> 00:05:24.639
+These lightweight models are defined by
+
+152
+00:05:22.720 --> 00:05:26.960
+their ability to be run by previous
+
+153
+00:05:24.639 --> 00:05:28.639
+generation GPU node or directly on your
+
+154
+00:05:26.960 --> 00:05:29.840
+Mac device if you have the unified
+
+155
+00:05:28.639 --> 00:05:31.360
+memory for it. And then we have our
+
+156
+00:05:29.840 --> 00:05:33.199
+workh horses. These are all of the
+
+157
+00:05:31.360 --> 00:05:34.960
+powerful models that aren't quite
+
+158
+00:05:33.199 --> 00:05:36.240
+state-of-the-art. The newest entry which
+
+159
+00:05:34.960 --> 00:05:39.120
+you're going to see here is the brand
+
+160
+00:05:36.240 --> 00:05:41.840
+new Deep Seek V4 Flash0731.
+
+161
+00:05:39.120 --> 00:05:42.560
+This model is absurd for its price.
+
+162
+00:05:41.840 --> 00:05:44.000
+You're going to see a model
+
+163
+00:05:42.560 --> 00:05:46.960
+configuration that we're going to kick
+
+164
+00:05:44.000 --> 00:05:48.720
+off that I call Deepest Seek, which is
+
+165
+00:05:46.960 --> 00:05:50.320
+just V4 Flash models. We're going to see
+
+166
+00:05:48.720 --> 00:05:52.479
+how they compare to a bunch of other
+
+167
+00:05:50.320 --> 00:05:54.000
+model plus harness configurations inside
+
+168
+00:05:52.479 --> 00:05:55.919
+of our software factory. If you're still
+
+169
+00:05:54.000 --> 00:05:57.280
+fixated on models, you are behind.
+
+170
+00:05:55.919 --> 00:05:59.360
+That's not the name of the game anymore.
+
+171
+00:05:57.280 --> 00:06:01.120
+We're entering an age of abundance of
+
+172
+00:05:59.360 --> 00:06:03.840
+compute. And now it's about focusing on
+
+173
+00:06:01.120 --> 00:06:06.160
+what model plus what code do you need to
+
+174
+00:06:03.840 --> 00:06:08.080
+do the job. And the software factory is
+
+175
+00:06:06.160 --> 00:06:09.600
+that system. So our agent is finished.
+
+176
+00:06:08.080 --> 00:06:11.280
+You can see we have the application
+
+177
+00:06:09.600 --> 00:06:13.360
+layer and the agentic layer. Let's go
+
+178
+00:06:11.280 --> 00:06:15.600
+ahead and jump into them. Open these all
+
+179
+00:06:13.360 --> 00:06:17.120
+in Chrome. Let's see what's going on in
+
+180
+00:06:15.600 --> 00:06:19.120
+our system. We're going to open them all
+
+181
+00:06:17.120 --> 00:06:21.360
+up in Chrome. And as you can see, we're
+
+182
+00:06:19.120 --> 00:06:23.280
+working on Inkwell. This is a simple
+
+183
+00:06:21.360 --> 00:06:24.639
+mock application. This is not the
+
+184
+00:06:23.280 --> 00:06:26.880
+important piece. We're using this as a
+
+185
+00:06:24.639 --> 00:06:28.720
+demo. What's important here is our
+
+186
+00:06:26.880 --> 00:06:33.440
+software factories. So, what you're
+
+187
+00:06:28.720 --> 00:06:35.520
+going to see here is 1 2 3 4 five unique
+
+188
+00:06:33.440 --> 00:06:37.360
+software factories running in their own
+
+189
+00:06:35.520 --> 00:06:39.600
+agent sandboxes. So, inside of that
+
+190
+00:06:37.360 --> 00:06:40.880
+prompt, this user interface is like not
+
+191
+00:06:39.600 --> 00:06:42.639
+clear. There's too many buttons. Things
+
+192
+00:06:40.880 --> 00:06:45.280
+are too out in the open. And we want a
+
+193
+00:06:42.639 --> 00:06:46.960
+more unified experience for our Inkwell
+
+194
+00:06:45.280 --> 00:06:49.280
+writing application. Instead of just
+
+195
+00:06:46.960 --> 00:06:51.039
+running this once on one agent or two
+
+196
+00:06:49.280 --> 00:06:52.400
+agents, I'm running them in software
+
+197
+00:06:51.039 --> 00:06:54.400
+factories. We're running the simple
+
+198
+00:06:52.400 --> 00:06:55.759
+software developer life cycle. Again, we
+
+199
+00:06:54.400 --> 00:06:57.440
+covered this last week. The super simple
+
+200
+00:06:55.759 --> 00:06:59.599
+software factory is a key piece of this,
+
+201
+00:06:57.440 --> 00:07:01.759
+but it's not our key focus. We're using
+
+202
+00:06:59.599 --> 00:07:04.639
+this as our observability system into
+
+203
+00:07:01.759 --> 00:07:06.880
+our sandbox. We have discrete URLs for
+
+204
+00:07:04.639 --> 00:07:08.800
+every sandbox. This is our default Asian
+
+205
+00:07:06.880 --> 00:07:11.280
+config. This is our front tier Asian
+
+206
+00:07:08.800 --> 00:07:13.039
+config. This is our deepest seek Asian
+
+207
+00:07:11.280 --> 00:07:15.520
+config. We then have our open weights
+
+208
+00:07:13.039 --> 00:07:17.120
+configuration and then our top speed.
+
+209
+00:07:15.520 --> 00:07:20.080
+And as you can see here, we've opened up
+
+210
+00:07:17.120 --> 00:07:21.919
+two applications for each set. The
+
+211
+00:07:20.080 --> 00:07:23.440
+software factory and the actual
+
+212
+00:07:21.919 --> 00:07:25.680
+application. So you can see we have five
+
+213
+00:07:23.440 --> 00:07:27.520
+unique versions. These are each inside
+
+214
+00:07:25.680 --> 00:07:29.919
+an agent sandbox. If we hop back over to
+
+215
+00:07:27.520 --> 00:07:32.560
+exe.dev, do a refresh, you can actually
+
+216
+00:07:29.919 --> 00:07:34.560
+see all of our sandboxes up plus the one
+
+217
+00:07:32.560 --> 00:07:37.280
+I had up earlier. Okay, so we have five
+
+218
+00:07:34.560 --> 00:07:38.800
+new redesigned agent sandboxes. So
+
+219
+00:07:37.280 --> 00:07:40.800
+again, like really important concept.
+
+220
+00:07:38.800 --> 00:07:42.400
+I'm not giving my agents a corner of my
+
+221
+00:07:40.800 --> 00:07:44.479
+computer. I'm giving them an entire
+
+222
+00:07:42.400 --> 00:07:46.639
+computer to do all the work they need to
+
+223
+00:07:44.479 --> 00:07:48.639
+with isolation, with scale, and
+
+224
+00:07:46.639 --> 00:07:50.240
+autonomy. Let's click into our software
+
+225
+00:07:48.639 --> 00:07:51.759
+factories. You can kind of see our model
+
+226
+00:07:50.240 --> 00:07:53.199
+breakdown here on the left. And we can
+
+227
+00:07:51.759 --> 00:07:54.319
+do this for every one of our versions,
+
+228
+00:07:53.199 --> 00:07:55.520
+right? Let's go ahead and click into
+
+229
+00:07:54.319 --> 00:07:57.199
+everything. Now, we can get an
+
+230
+00:07:55.520 --> 00:07:59.680
+understanding of the models that are
+
+231
+00:07:57.199 --> 00:08:01.599
+running, the agent harnesses that each
+
+232
+00:07:59.680 --> 00:08:03.919
+model is running, the tools available. I
+
+233
+00:08:01.599 --> 00:08:05.759
+want to keep uping the discussion here.
+
+234
+00:08:03.919 --> 00:08:07.759
+It's not just about a single agent
+
+235
+00:08:05.759 --> 00:08:09.840
+anymore. One agent is not enough. just
+
+236
+00:08:07.759 --> 00:08:11.280
+like one prompt was not enough. We then
+
+237
+00:08:09.840 --> 00:08:13.039
+started running sub agents. We then
+
+238
+00:08:11.280 --> 00:08:15.120
+started chaining agents. Maybe you put
+
+239
+00:08:13.039 --> 00:08:16.879
+together your own custom agent harness
+
+240
+00:08:15.120 --> 00:08:18.960
+thanks to great tools like the PI agent
+
+241
+00:08:16.879 --> 00:08:21.360
+harness. Fantastic. At some level you
+
+242
+00:08:18.960 --> 00:08:23.120
+realize that agentic engineering is
+
+243
+00:08:21.360 --> 00:08:25.759
+software engineering. We have a new
+
+244
+00:08:23.120 --> 00:08:28.000
+primitive which is the agent autonomous
+
+245
+00:08:25.759 --> 00:08:30.400
+software and we need to put them inside
+
+246
+00:08:28.000 --> 00:08:32.640
+of our existing developer workflows that
+
+247
+00:08:30.400 --> 00:08:34.800
+we ourselves would run. Hence the term
+
+248
+00:08:32.640 --> 00:08:36.479
+AI developer workflow. We're adding AI
+
+249
+00:08:34.800 --> 00:08:38.479
+to the work you and I used to do as
+
+250
+00:08:36.479 --> 00:08:40.240
+engineers. every single day. So, we have
+
+251
+00:08:38.479 --> 00:08:42.320
+this new tool. We need a new frame of
+
+252
+00:08:40.240 --> 00:08:44.320
+mind to understand how we can really use
+
+253
+00:08:42.320 --> 00:08:45.519
+this in the best way. And spoilers, you
+
+254
+00:08:44.320 --> 00:08:46.880
+know, the whole point of me creating
+
+255
+00:08:45.519 --> 00:08:48.880
+this video and sharing it with you here
+
+256
+00:08:46.880 --> 00:08:51.200
+is that when your agents have their own
+
+257
+00:08:48.880 --> 00:08:52.880
+developer device just like you do, guess
+
+258
+00:08:51.200 --> 00:08:55.440
+what they can do? They can perform and
+
+259
+00:08:52.880 --> 00:08:56.720
+act and even outperform you. That's the
+
+260
+00:08:55.440 --> 00:08:58.560
+whole goal here. A lot of engineers are
+
+261
+00:08:56.720 --> 00:08:59.839
+afraid, you know, of these great models
+
+262
+00:08:58.560 --> 00:09:01.839
+progressing further and further and
+
+263
+00:08:59.839 --> 00:09:03.600
+further. I am not. This is a new tool in
+
+264
+00:09:01.839 --> 00:09:05.440
+your toolbox. Don't run away from the
+
+265
+00:09:03.600 --> 00:09:07.200
+fire. Run into the fire. These agents
+
+266
+00:09:05.440 --> 00:09:08.800
+can do incredible work on your behalf
+
+267
+00:09:07.200 --> 00:09:10.640
+for you, for your business, for your
+
+268
+00:09:08.800 --> 00:09:12.399
+career, for your users, but you have to
+
+269
+00:09:10.640 --> 00:09:14.959
+leverage it. So, inside of every single
+
+270
+00:09:12.399 --> 00:09:16.880
+sandbox, we have placed a set of agent
+
+271
+00:09:14.959 --> 00:09:18.080
+configurations and we built an AI
+
+272
+00:09:16.880 --> 00:09:19.680
+developer workflow that walks through
+
+273
+00:09:18.080 --> 00:09:21.440
+the software developer life cycle and
+
+274
+00:09:19.680 --> 00:09:23.600
+our agents are shipping work on our
+
+275
+00:09:21.440 --> 00:09:25.040
+behalf. Here's a key word without us.
+
+276
+00:09:23.600 --> 00:09:26.800
+The key idea that I really want to
+
+277
+00:09:25.040 --> 00:09:29.040
+communicate here is that if you are in
+
+278
+00:09:26.800 --> 00:09:30.480
+the loop, you are always the bottleneck.
+
+279
+00:09:29.040 --> 00:09:32.480
+Now, there are exceptions to this. If
+
+280
+00:09:30.480 --> 00:09:34.160
+you're doing hands-on agentic coding
+
+281
+00:09:32.480 --> 00:09:35.680
+work that requires you, that requires
+
+282
+00:09:34.160 --> 00:09:37.519
+your expertise and you know a great
+
+283
+00:09:35.680 --> 00:09:39.120
+exception to this is like if you are
+
+284
+00:09:37.519 --> 00:09:40.800
+building the system that builds the
+
+285
+00:09:39.120 --> 00:09:42.399
+system, then of course get in the loop,
+
+286
+00:09:40.800 --> 00:09:44.160
+do the work, go hands-on, prompt back
+
+287
+00:09:42.399 --> 00:09:45.920
+and forth, babysit your agent, you need
+
+288
+00:09:44.160 --> 00:09:47.519
+to do that at some level. But there's a
+
+289
+00:09:45.920 --> 00:09:49.440
+lot of work you might be doing. I know
+
+290
+00:09:47.519 --> 00:09:51.360
+for a fact teams are doing and god
+
+291
+00:09:49.440 --> 00:09:53.519
+forbid we talk about enterprises like
+
+292
+00:09:51.360 --> 00:09:55.279
+there's a ton of work all these sets of
+
+293
+00:09:53.519 --> 00:09:57.680
+engineers are doing that they don't need
+
+294
+00:09:55.279 --> 00:10:00.480
+to be. Why not? because they can have a
+
+295
+00:09:57.680 --> 00:10:02.560
+team of agents do it for them. And not
+
+296
+00:10:00.480 --> 00:10:05.040
+just a team of agents, a team of agents
+
+297
+00:10:02.560 --> 00:10:07.440
+plus code plus engineers. This is our
+
+298
+00:10:05.040 --> 00:10:09.680
+default agent set. This is our frontier
+
+299
+00:10:07.440 --> 00:10:11.519
+agent set. This is our deepest seek
+
+300
+00:10:09.680 --> 00:10:14.160
+agent set. Spoiler, everything's
+
+301
+00:10:11.519 --> 00:10:16.399
+deepseek v4 flash.
+
+302
+00:10:14.160 --> 00:10:18.399
+We're saving an incredible amount of
+
+303
+00:10:16.399 --> 00:10:20.000
+cache of compute. Then we have our open
+
+304
+00:10:18.399 --> 00:10:22.560
+weight. So pure openweight
+
+305
+00:10:20.000 --> 00:10:23.680
+implementation, no closed labs here. At
+
+306
+00:10:22.560 --> 00:10:25.760
+the end, by the way, we're going to
+
+307
+00:10:23.680 --> 00:10:27.360
+compare all the changes made to Inkwell.
+
+308
+00:10:25.760 --> 00:10:28.720
+in each one of these versions. Back to
+
+309
+00:10:27.360 --> 00:10:30.880
+the source. That's why this is called
+
+310
+00:10:28.720 --> 00:10:32.959
+best of end. Say you have a great idea.
+
+311
+00:10:30.880 --> 00:10:35.120
+Say you have multiple directions you
+
+312
+00:10:32.959 --> 00:10:36.560
+want to go or even one single concrete
+
+313
+00:10:35.120 --> 00:10:38.640
+direction. In our example here, we just
+
+314
+00:10:36.560 --> 00:10:40.560
+pass in this one singular prompt. And
+
+315
+00:10:38.640 --> 00:10:43.120
+this is actually running our redesign
+
+316
+00:10:40.560 --> 00:10:45.120
+quiet room. We want a quiet room as our
+
+317
+00:10:43.120 --> 00:10:46.880
+design principle for this application.
+
+318
+00:10:45.120 --> 00:10:49.040
+The current version is cluttered. We
+
+319
+00:10:46.880 --> 00:10:50.800
+want it to be simple and clear. So this
+
+320
+00:10:49.040 --> 00:10:52.959
+is the prompt we pass into every agent
+
+321
+00:10:50.800 --> 00:10:55.440
+sandbox and then into the software
+
+322
+00:10:52.959 --> 00:10:56.800
+factory inside each agent sandbox. As
+
+323
+00:10:55.440 --> 00:10:58.959
+you can see, I'm not just running one
+
+324
+00:10:56.800 --> 00:11:00.800
+agent. I'm running a pipeline of agents
+
+325
+00:10:58.959 --> 00:11:03.120
+plus code. And of course, inside the
+
+326
+00:11:00.800 --> 00:11:04.480
+incoming task, we can dial into all the
+
+327
+00:11:03.120 --> 00:11:06.240
+results here. You know, this is a
+
+328
+00:11:04.480 --> 00:11:07.519
+classic agent observability system.
+
+329
+00:11:06.240 --> 00:11:08.959
+We've talked about these on the channel
+
+330
+00:11:07.519 --> 00:11:10.880
+in the past. You know, you can see the
+
+331
+00:11:08.959 --> 00:11:12.079
+request here. Redesign Inkwell. But
+
+332
+00:11:10.880 --> 00:11:13.360
+then, you know, we can look at the plan
+
+333
+00:11:12.079 --> 00:11:15.120
+workflow. Of course, we can see all the
+
+334
+00:11:13.360 --> 00:11:17.200
+thinking, all the agent calls, the gate
+
+335
+00:11:15.120 --> 00:11:19.920
+passes. We have deterministic gate
+
+336
+00:11:17.200 --> 00:11:22.079
+checks on our nondeterministic systems.
+
+337
+00:11:19.920 --> 00:11:23.680
+JSON error, it fixes JSON error, so on
+
+338
+00:11:22.079 --> 00:11:25.200
+and so forth. Again, we talked about
+
+339
+00:11:23.680 --> 00:11:27.279
+this last week, so check out that video
+
+340
+00:11:25.200 --> 00:11:28.800
+if you want to dig in depth into our
+
+341
+00:11:27.279 --> 00:11:30.800
+super simple software factory that I
+
+342
+00:11:28.800 --> 00:11:32.720
+have fully open sourced. Oh, nice. GLM
+
+343
+00:11:30.800 --> 00:11:34.399
+5.2 review has kicked off here. Love to
+
+344
+00:11:32.720 --> 00:11:36.160
+see that. Pure open weights. In our
+
+345
+00:11:34.399 --> 00:11:38.720
+super simple software factory, we are
+
+346
+00:11:36.160 --> 00:11:40.480
+not just doing lightweight prompts. We
+
+347
+00:11:38.720 --> 00:11:42.240
+are fully in control of the system. What
+
+348
+00:11:40.480 --> 00:11:43.920
+do I mean by that? We are selecting a
+
+349
+00:11:42.240 --> 00:11:45.760
+specific coding agent. Of course, the
+
+350
+00:11:43.920 --> 00:11:47.360
+model, of course, the thinking level, of
+
+351
+00:11:45.760 --> 00:11:49.839
+course, the tools. Oh, what are these
+
+352
+00:11:47.360 --> 00:11:52.000
+tools? These tools came from our custom
+
+353
+00:11:49.839 --> 00:11:53.519
+agent harness. Yes, we are harness
+
+354
+00:11:52.000 --> 00:11:54.800
+engineering inside of our software
+
+355
+00:11:53.519 --> 00:11:56.480
+factory. If you don't have custom
+
+356
+00:11:54.800 --> 00:11:58.000
+harnesses, you can customize and
+
+357
+00:11:56.480 --> 00:12:00.000
+control. You don't have a software
+
+358
+00:11:58.000 --> 00:12:02.560
+factory. The software factory is your
+
+359
+00:12:00.000 --> 00:12:04.320
+full control over the agents and your
+
+360
+00:12:02.560 --> 00:12:06.959
+code. We have a nice simple purpose
+
+361
+00:12:04.320 --> 00:12:09.200
+breaking down what this phase is, which
+
+362
+00:12:06.959 --> 00:12:10.720
+is just the plan phase of this workflow.
+
+363
+00:12:09.200 --> 00:12:12.880
+And then we have a nice description. We
+
+364
+00:12:10.720 --> 00:12:14.399
+have our prompt engineering. Okay, so
+
+365
+00:12:12.880 --> 00:12:16.000
+what is prompt engineering? It's both
+
+366
+00:12:14.399 --> 00:12:17.279
+your system prompt and it's your user
+
+367
+00:12:16.000 --> 00:12:18.560
+prompt. Okay, so on and so forth. I'm
+
+368
+00:12:17.279 --> 00:12:20.240
+not going to download this again. Check
+
+369
+00:12:18.560 --> 00:12:22.000
+out last week's video where we really
+
+370
+00:12:20.240 --> 00:12:23.200
+dive in to the super simple software
+
+371
+00:12:22.000 --> 00:12:24.480
+factory. If you've been with the
+
+372
+00:12:23.200 --> 00:12:26.079
+channel, you're going to notice we're
+
+373
+00:12:24.480 --> 00:12:27.680
+going to start compounding some really
+
+374
+00:12:26.079 --> 00:12:29.200
+heavy-hitting ideas. We're going to lose
+
+375
+00:12:27.680 --> 00:12:30.240
+a lot of engineers. A lot of engineers
+
+376
+00:12:29.200 --> 00:12:31.600
+are going to look at this and just
+
+377
+00:12:30.240 --> 00:12:33.760
+think, I don't need this. I don't need
+
+378
+00:12:31.600 --> 00:12:35.440
+to build this. Insert whatever excuse or
+
+379
+00:12:33.760 --> 00:12:36.480
+lack of focus or whatever. I don't
+
+380
+00:12:35.440 --> 00:12:38.160
+really know. I don't want to judge
+
+381
+00:12:36.480 --> 00:12:39.680
+anyone, but engineers that can focus
+
+382
+00:12:38.160 --> 00:12:41.680
+right now. This is the time to focus
+
+383
+00:12:39.680 --> 00:12:43.360
+because the next leap is available. It's
+
+384
+00:12:41.680 --> 00:12:45.440
+your software factory. And then you can
+
+385
+00:12:43.360 --> 00:12:47.839
+really leverage and scale your software
+
+386
+00:12:45.440 --> 00:12:49.519
+factory by putting your factory in a
+
+387
+00:12:47.839 --> 00:12:51.200
+box. So that's all we're doing here. At
+
+388
+00:12:49.519 --> 00:12:52.880
+a high level architecturally, it's
+
+389
+00:12:51.200 --> 00:12:54.320
+relatively simple. The implementation
+
+390
+00:12:52.880 --> 00:12:55.839
+details do make things a little more
+
+391
+00:12:54.320 --> 00:12:57.839
+complex, but you can see here our
+
+392
+00:12:55.839 --> 00:13:02.320
+default run is running, you know, gem
+
+393
+00:12:57.839 --> 00:13:04.240
+flash, deep flash, GLM52, and GBT Luna.
+
+394
+00:13:02.320 --> 00:13:05.680
+Just a lot of great compute. If you're
+
+395
+00:13:04.240 --> 00:13:07.120
+constantly going back and forth on what
+
+396
+00:13:05.680 --> 00:13:09.200
+model you're using, you're missing the
+
+397
+00:13:07.120 --> 00:13:11.120
+point. You need a model stack, not a
+
+398
+00:13:09.200 --> 00:13:12.959
+single model. Combine compute. Don't
+
+399
+00:13:11.120 --> 00:13:15.519
+select compute. Let's go and look. Of
+
+400
+00:13:12.959 --> 00:13:17.120
+course, our Opus 5 going crazy. 13
+
+401
+00:13:15.519 --> 00:13:19.120
+minutes on the plan phase to be
+
+402
+00:13:17.120 --> 00:13:20.880
+expected. I'm sure this is in high
+
+403
+00:13:19.120 --> 00:13:22.000
+thinking. If we select this, look at our
+
+404
+00:13:20.880 --> 00:13:23.200
+Asian config. Yeah, of course we're in
+
+405
+00:13:22.000 --> 00:13:25.120
+high thinking. Maybe should have dropped
+
+406
+00:13:23.200 --> 00:13:27.760
+that down for this demo. Who cares? Our
+
+407
+00:13:25.120 --> 00:13:31.279
+deepest config. [laughter]
+
+408
+00:13:27.760 --> 00:13:33.279
+All pure DeepSk implementation, saving a
+
+409
+00:13:31.279 --> 00:13:35.360
+ton of cash, using a ton of
+
+410
+00:13:33.279 --> 00:13:37.760
+tokens. Love to see this. Again, we're
+
+411
+00:13:35.360 --> 00:13:38.720
+entering an age of abundant compute. And
+
+412
+00:13:37.760 --> 00:13:40.399
+you know, by the way, we're going to
+
+413
+00:13:38.720 --> 00:13:42.399
+dial into the system a little bit more
+
+414
+00:13:40.399 --> 00:13:44.480
+here. You can see here our top level
+
+415
+00:13:42.399 --> 00:13:46.639
+orchestrator agent has stopped. It's not
+
+416
+00:13:44.480 --> 00:13:49.200
+doing anything. All it did was kick off
+
+417
+00:13:46.639 --> 00:13:50.399
+the orchestrators inside our sandbox. So
+
+418
+00:13:49.200 --> 00:13:51.519
+again, we have this three- tier
+
+419
+00:13:50.399 --> 00:13:52.720
+architecture and there's a reason for
+
+420
+00:13:51.519 --> 00:13:54.000
+that. I'll explain that in a moment. We
+
+421
+00:13:52.720 --> 00:13:56.240
+have this three-tier architecture where
+
+422
+00:13:54.000 --> 00:13:58.720
+we have an outloop orchestrator. We have
+
+423
+00:13:56.240 --> 00:14:00.720
+an in sandbox orchestrator and then we
+
+424
+00:13:58.720 --> 00:14:02.639
+have our software factory. Looks like we
+
+425
+00:14:00.720 --> 00:14:04.639
+have a full fail here. One of our jobs,
+
+426
+00:14:02.639 --> 00:14:06.399
+open weights, completely failed. ChemK3
+
+427
+00:14:04.639 --> 00:14:08.240
+bombed. You can see here we have a nice
+
+428
+00:14:06.399 --> 00:14:09.839
+detail of why this happened. That's
+
+429
+00:14:08.240 --> 00:14:11.360
+okay. This is another reason why best
+
+430
+00:14:09.839 --> 00:14:12.959
+event is so important. It looks like it
+
+431
+00:14:11.360 --> 00:14:14.320
+couldn't get the JSON format out. We
+
+432
+00:14:12.959 --> 00:14:15.680
+could dial into the results. I'm not
+
+433
+00:14:14.320 --> 00:14:17.360
+going to waste your time with this. This
+
+434
+00:14:15.680 --> 00:14:19.440
+is why we use best event. This is why we
+
+435
+00:14:17.360 --> 00:14:21.120
+scaler compute to scaler impact. And
+
+436
+00:14:19.440 --> 00:14:23.040
+what do we have here? This is our top
+
+437
+00:14:21.120 --> 00:14:24.720
+speed. Um, of course, top speed is
+
+438
+00:14:23.040 --> 00:14:26.399
+already done. 14 minutes for this full
+
+439
+00:14:24.720 --> 00:14:28.000
+run. 2 million toes. And look at all of
+
+440
+00:14:26.399 --> 00:14:29.440
+our fast models. If you just care about
+
+441
+00:14:28.000 --> 00:14:33.199
+speed, you want to be looking at Gemini
+
+442
+00:14:29.440 --> 00:14:35.839
+3.6 Flash, DS4 Vlash, 0731, and of
+
+443
+00:14:33.199 --> 00:14:37.040
+course the incredible GBT 5.6 Luna
+
+444
+00:14:35.839 --> 00:14:38.639
+model. We can start looking at our
+
+445
+00:14:37.040 --> 00:14:40.639
+Inkwell applications. Then we'll dive
+
+446
+00:14:38.639 --> 00:14:41.839
+into more of the like heavy technical
+
+447
+00:14:40.639 --> 00:14:44.079
+side of it. Okay, I just want to like
+
+448
+00:14:41.839 --> 00:14:46.079
+really connect with you on the core idea
+
+449
+00:14:44.079 --> 00:14:47.279
+here. Five instances. Looks like one of
+
+450
+00:14:46.079 --> 00:14:49.040
+them failed. Let's go ahead and just
+
+451
+00:14:47.279 --> 00:14:51.120
+like start refreshing. So here's the v1.
+
+452
+00:14:49.040 --> 00:14:53.440
+Let's refresh. There is our updated
+
+453
+00:14:51.120 --> 00:14:56.079
+version. So this is just one sandbox. We
+
+454
+00:14:53.440 --> 00:14:58.399
+have our entire app and our Asian
+
+455
+00:14:56.079 --> 00:15:01.199
+factory and all of our Asian configs and
+
+456
+00:14:58.399 --> 00:15:03.199
+an orchestrator inside this one box. Our
+
+457
+00:15:01.199 --> 00:15:04.880
+agent has a computer. Our agent can do
+
+458
+00:15:03.199 --> 00:15:06.480
+more. It can solve more problems. It is
+
+459
+00:15:04.880 --> 00:15:08.800
+fully autonomous. And guess what? The
+
+460
+00:15:06.480 --> 00:15:10.959
+blast radius is zero. The blast radius
+
+461
+00:15:08.800 --> 00:15:13.120
+is the box. Very, very important stuff.
+
+462
+00:15:10.959 --> 00:15:14.959
+And API keys are completely solved here.
+
+463
+00:15:13.120 --> 00:15:16.800
+You know, for all of our PI coding
+
+464
+00:15:14.959 --> 00:15:18.399
+agents running on the software factory
+
+465
+00:15:16.800 --> 00:15:20.000
+level, they're using an open router
+
+466
+00:15:18.399 --> 00:15:21.040
+provisioned key. Really important
+
+467
+00:15:20.000 --> 00:15:22.560
+concept. It's all going to be here
+
+468
+00:15:21.040 --> 00:15:23.920
+linked in the description for you. But
+
+469
+00:15:22.560 --> 00:15:25.519
+let's keep looking at our versions. So,
+
+470
+00:15:23.920 --> 00:15:26.800
+our default agents put this together.
+
+471
+00:15:25.519 --> 00:15:28.560
+Looks really, really good. We have the
+
+472
+00:15:26.800 --> 00:15:31.440
+title. We can start writing. We feel a
+
+473
+00:15:28.560 --> 00:15:33.360
+lot more focused than our V1. So, here's
+
+474
+00:15:31.440 --> 00:15:35.040
+that V1. We have hotkeys all over the
+
+475
+00:15:33.360 --> 00:15:36.720
+place. It's not clear. I don't feel
+
+476
+00:15:35.040 --> 00:15:38.720
+focused. We have the sidebar open. I'm
+
+477
+00:15:36.720 --> 00:15:41.040
+distracted. But now in this new clear
+
+478
+00:15:38.720 --> 00:15:43.120
+version, I am focused at the same time.
+
+479
+00:15:41.040 --> 00:15:44.880
+We didn't lose our sidebar. We can still
+
+480
+00:15:43.120 --> 00:15:46.399
+do all of our editing and we can do our
+
+481
+00:15:44.880 --> 00:15:48.560
+delete publish. So our actions are
+
+482
+00:15:46.399 --> 00:15:50.720
+there. Total words. Let's go over to our
+
+483
+00:15:48.560 --> 00:15:52.480
+frontier version and let's actually
+
+484
+00:15:50.720 --> 00:15:54.560
+check on this because it might not even
+
+485
+00:15:52.480 --> 00:15:56.320
+be done. Okay. Yeah. So Cammy K3 and our
+
+486
+00:15:54.560 --> 00:15:58.079
+Frontier version is getting to work.
+
+487
+00:15:56.320 --> 00:15:59.920
+This is not complete yet. So refreshing
+
+488
+00:15:58.079 --> 00:16:02.079
+this won't do anything. So let's move
+
+489
+00:15:59.920 --> 00:16:03.920
+on. Deepest seek. [laughter]
+
+490
+00:16:02.079 --> 00:16:05.680
+Let's see how our deepest seek is doing.
+
+491
+00:16:03.920 --> 00:16:07.279
+Very very nice. Uh let's see if we have
+
+492
+00:16:05.680 --> 00:16:09.199
+our sidebar. Good. We don't want to lose
+
+493
+00:16:07.279 --> 00:16:10.959
+anything. Menu at the top right. Very
+
+494
+00:16:09.199 --> 00:16:12.720
+very good. Love the way that looks. We
+
+495
+00:16:10.959 --> 00:16:14.399
+can scale up, scale down. Three words
+
+496
+00:16:12.720 --> 00:16:16.399
+saved. We are just writing we feel
+
+497
+00:16:14.399 --> 00:16:18.480
+focused. Shout out to the Deep Seek
+
+498
+00:16:16.399 --> 00:16:20.399
+engineers. What an incredible model and
+
+499
+00:16:18.480 --> 00:16:22.480
+what insane prices. When we look at
+
+500
+00:16:20.399 --> 00:16:25.519
+artificial analysis, we go to flash.
+
+501
+00:16:22.480 --> 00:16:28.000
+Guess who's at the very bottom of the
+
+502
+00:16:25.519 --> 00:16:31.120
+cost per task benchmark. And guess who's
+
+503
+00:16:28.000 --> 00:16:32.800
+at a decent amount of speed, right? 110.
+
+504
+00:16:31.120 --> 00:16:35.360
+Okay, very good. And guess who's in that
+
+505
+00:16:32.800 --> 00:16:37.279
+workhorse tier? It's Deepseek V4 Flash.
+
+506
+00:16:35.360 --> 00:16:39.199
+Now, I'm super stoked. I'm waiting for
+
+507
+00:16:37.279 --> 00:16:40.480
+two new sets of models to come out. I'm
+
+508
+00:16:39.199 --> 00:16:41.680
+waiting for aside from all the
+
+509
+00:16:40.480 --> 00:16:43.519
+state-of-the-art stuff. You know, I
+
+510
+00:16:41.680 --> 00:16:45.040
+always want Anthropic OpenAI to really
+
+511
+00:16:43.519 --> 00:16:46.320
+push out the state of the art, but aside
+
+512
+00:16:45.040 --> 00:16:48.639
+from that, I'm really paying attention
+
+513
+00:16:46.320 --> 00:16:50.480
+to two models. And comment down below if
+
+514
+00:16:48.639 --> 00:16:52.959
+you are as well. I'm looking for that
+
+515
+00:16:50.480 --> 00:16:54.079
+Deep Seek V4 Pro. Super curious where
+
+516
+00:16:52.959 --> 00:16:55.519
+that's going to land, if we're going to
+
+517
+00:16:54.079 --> 00:16:56.959
+get into that state-of-the-art territory
+
+518
+00:16:55.519 --> 00:16:59.759
+or if that model is just going to be a
+
+519
+00:16:56.959 --> 00:17:01.519
+super economical uh Pro that has
+
+520
+00:16:59.759 --> 00:17:05.360
+improved benchmarks. And I'm also
+
+521
+00:17:01.519 --> 00:17:07.760
+waiting for Quinn 3.830 billion or 50
+
+522
+00:17:05.360 --> 00:17:09.120
+billion or 12 billion. That like 30
+
+523
+00:17:07.760 --> 00:17:10.880
+billion parameter model that they've
+
+524
+00:17:09.120 --> 00:17:12.640
+been putting out has been incredible.
+
+525
+00:17:10.880 --> 00:17:15.280
+Really really excited for that to run on
+
+526
+00:17:12.640 --> 00:17:17.280
+device but also put that on a B300 and
+
+527
+00:17:15.280 --> 00:17:19.360
+that thing is going to run ultra ultra
+
+528
+00:17:17.280 --> 00:17:20.880
+fast or some other sets of nodes. My
+
+529
+00:17:19.360 --> 00:17:23.039
+point is there is that I'm super super
+
+530
+00:17:20.880 --> 00:17:25.360
+excited for that compute to be available
+
+531
+00:17:23.039 --> 00:17:27.600
+because again I'm looking at all these
+
+532
+00:17:25.360 --> 00:17:30.160
+levels. We're constantly trading off
+
+533
+00:17:27.600 --> 00:17:32.400
+three things. Performance, cost, speed.
+
+534
+00:17:30.160 --> 00:17:34.000
+Keep your eye on the ball, but also
+
+535
+00:17:32.400 --> 00:17:35.760
+always move where the ball is going,
+
+536
+00:17:34.000 --> 00:17:37.760
+move where the models are going, and
+
+537
+00:17:35.760 --> 00:17:39.280
+have a plethora of options you can
+
+538
+00:17:37.760 --> 00:17:40.559
+deploy into your software factory. So,
+
+539
+00:17:39.280 --> 00:17:42.240
+back to our factory. This looks good.
+
+540
+00:17:40.559 --> 00:17:44.080
+Deepest seek, incredible model,
+
+541
+00:17:42.240 --> 00:17:46.160
+incredible economics. Like, frankly,
+
+542
+00:17:44.080 --> 00:17:47.600
+stock market crashing economics. If you
+
+543
+00:17:46.160 --> 00:17:49.280
+really start using and really start
+
+544
+00:17:47.600 --> 00:17:50.559
+understanding this model, it's insane
+
+545
+00:17:49.280 --> 00:17:52.320
+what you can do with this. This is a
+
+546
+00:17:50.559 --> 00:17:54.400
+great builder. It's a great worker
+
+547
+00:17:52.320 --> 00:17:56.559
+model. Again, that's why I named these
+
+548
+00:17:54.400 --> 00:17:58.160
+workhorse. It's for your daily 90% of
+
+549
+00:17:56.559 --> 00:18:00.400
+your work. Previous Deep Seek Flash was
+
+550
+00:17:58.160 --> 00:18:02.880
+in that B tier. This is clearly in the A
+
+551
+00:18:00.400 --> 00:18:04.240
+tier. And A tier is like roughly just to
+
+552
+00:18:02.880 --> 00:18:06.799
+have something to benchmark against. The
+
+553
+00:18:04.240 --> 00:18:09.200
+A tier kind of is in this zone here,
+
+554
+00:18:06.799 --> 00:18:11.200
+right? It's in that 50 plus level in the
+
+555
+00:18:09.200 --> 00:18:11.840
+artificial analysis intelligence index.
+
+556
+00:18:11.200 --> 00:18:14.000
+And then of course, your
+
+557
+00:18:11.840 --> 00:18:15.679
+state-of-the-arts are like up here. It's
+
+558
+00:18:14.000 --> 00:18:16.880
+more like this, right? This cut off here
+
+559
+00:18:15.679 --> 00:18:19.039
+is what I consider state-of-the-art.
+
+560
+00:18:16.880 --> 00:18:21.120
+It's like that 56 plus level. But again,
+
+561
+00:18:19.039 --> 00:18:23.600
+that's just rough benchmarking. This is
+
+562
+00:18:21.120 --> 00:18:25.440
+an index and this thing changes. So, you
+
+563
+00:18:23.600 --> 00:18:27.120
+have to be dynamic with comparing your
+
+564
+00:18:25.440 --> 00:18:28.080
+model stack with public benchmarks.
+
+565
+00:18:27.120 --> 00:18:30.000
+Anyway, let's see what else we have
+
+566
+00:18:28.080 --> 00:18:31.760
+here. deepest seek has fully completed.
+
+567
+00:18:30.000 --> 00:18:33.360
+And by the way, once again, this is not
+
+568
+00:18:31.760 --> 00:18:35.360
+just an agent. This is not sub agent
+
+569
+00:18:33.360 --> 00:18:36.880
+delegation. This is not random cloud
+
+570
+00:18:35.360 --> 00:18:38.799
+code/workflows
+
+571
+00:18:36.880 --> 00:18:40.720
+execution where you have really no idea
+
+572
+00:18:38.799 --> 00:18:42.640
+what workflow it shows or why. We have
+
+573
+00:18:40.720 --> 00:18:44.480
+built a software developer life cycle
+
+574
+00:18:42.640 --> 00:18:46.080
+that we have fine-tuned. We've templated
+
+575
+00:18:44.480 --> 00:18:48.000
+our engineering into the software
+
+576
+00:18:46.080 --> 00:18:49.679
+development life cycle. We've added AI
+
+577
+00:18:48.000 --> 00:18:52.400
+to it and we wrapped it in a software
+
+578
+00:18:49.679 --> 00:18:54.799
+factory. And this gives us full control
+
+579
+00:18:52.400 --> 00:18:57.039
+over our engineering, over our products.
+
+580
+00:18:54.799 --> 00:18:58.799
+Be careful how much of your engineering
+
+581
+00:18:57.039 --> 00:19:00.720
+work you're handing off to these AI
+
+582
+00:18:58.799 --> 00:19:02.480
+labs. You're handing off to third-party
+
+583
+00:19:00.720 --> 00:19:04.559
+resources. You're handing off to these
+
+584
+00:19:02.480 --> 00:19:06.640
+all auxiliary tools. Don't outsource
+
+585
+00:19:04.559 --> 00:19:08.880
+your thinking. Stay close to the
+
+586
+00:19:06.640 --> 00:19:10.799
+engineering. This is aic engineering,
+
+587
+00:19:08.880 --> 00:19:12.000
+not vibe coding. Okay? And I say it all
+
+588
+00:19:10.799 --> 00:19:13.760
+the time. I'm going to keep saying it.
+
+589
+00:19:12.000 --> 00:19:16.160
+Vibe coding is not knowing what your
+
+590
+00:19:13.760 --> 00:19:18.320
+system does and not looking. Aentic
+
+591
+00:19:16.160 --> 00:19:22.480
+engineering is knowing what your system
+
+592
+00:19:18.320 --> 00:19:24.160
+does so well you don't have to look. Big
+
+593
+00:19:22.480 --> 00:19:26.000
+difference. like that. It's like a
+
+594
+00:19:24.160 --> 00:19:27.440
+really fine line. If you look at a vibe
+
+595
+00:19:26.000 --> 00:19:29.360
+coder and an agentic engineer, it might
+
+596
+00:19:27.440 --> 00:19:30.960
+look like they're doing the same thing.
+
+597
+00:19:29.360 --> 00:19:32.960
+If you spend a little more time, if you
+
+598
+00:19:30.960 --> 00:19:34.799
+really think about what's happening when
+
+599
+00:19:32.960 --> 00:19:36.640
+an agentic engineer sits down to do
+
+600
+00:19:34.799 --> 00:19:38.559
+work, they're thinking in systems.
+
+601
+00:19:36.640 --> 00:19:40.400
+They're thinking about the hundth and
+
+602
+00:19:38.559 --> 00:19:42.480
+thousandth run of the system. They're
+
+603
+00:19:40.400 --> 00:19:44.880
+thinking in observability, reusability,
+
+604
+00:19:42.480 --> 00:19:46.559
+isolation, scale. So, I hope that makes
+
+605
+00:19:44.880 --> 00:19:48.080
+sense. Again, a lot of engineers, I'm
+
+606
+00:19:46.559 --> 00:19:49.840
+going to lose a lot of my audience here.
+
+607
+00:19:48.080 --> 00:19:51.520
+I know it for a fact. We're at the point
+
+608
+00:19:49.840 --> 00:19:52.960
+in the age of agents where you have to
+
+609
+00:19:51.520 --> 00:19:54.559
+start working for it. So, here we go.
+
+610
+00:19:52.960 --> 00:19:56.240
+Let's see what top speed did. Open
+
+611
+00:19:54.559 --> 00:19:58.160
+weights bombed. Okay, we just go ahead
+
+612
+00:19:56.240 --> 00:20:00.160
+and close that. And then we had our top
+
+613
+00:19:58.160 --> 00:20:01.840
+speed. How does top speed look? Pretty
+
+614
+00:20:00.160 --> 00:20:03.440
+good. Still a little bit noise, although
+
+615
+00:20:01.840 --> 00:20:05.360
+you know, nice hot keys in the footer.
+
+616
+00:20:03.440 --> 00:20:06.960
+We have shortcuts at question mark.
+
+617
+00:20:05.360 --> 00:20:09.440
+Okay, we like to see that. And then we
+
+618
+00:20:06.960 --> 00:20:11.440
+have our nice writing view. And that
+
+619
+00:20:09.440 --> 00:20:13.520
+looks good. We do like that confirmation
+
+620
+00:20:11.440 --> 00:20:15.679
+of saving. And we can scale this up and
+
+621
+00:20:13.520 --> 00:20:17.280
+down. We have some controls here.
+
+622
+00:20:15.679 --> 00:20:20.080
+Overall, really, really good. These
+
+623
+00:20:17.280 --> 00:20:22.000
+workhorse models, Gemini 3.6 Flash, V4,
+
+624
+00:20:20.080 --> 00:20:23.679
+Luna. These fast, relatively cheap
+
+625
+00:20:22.000 --> 00:20:26.080
+models. They can do a lot of the work
+
+626
+00:20:23.679 --> 00:20:28.000
+you're probably doing right now. That is
+
+627
+00:20:26.080 --> 00:20:29.440
+our changes to our live application
+
+628
+00:20:28.000 --> 00:20:31.520
+here. Of course, this is just a mock
+
+629
+00:20:29.440 --> 00:20:33.760
+application. I can't share production
+
+630
+00:20:31.520 --> 00:20:35.760
+code with you, but um you know, I can
+
+631
+00:20:33.760 --> 00:20:37.600
+share open source stuff. I can create uh
+
+632
+00:20:35.760 --> 00:20:39.440
+demos, mocks for you. And you know, the
+
+633
+00:20:37.600 --> 00:20:42.159
+the super simple software factory is the
+
+634
+00:20:39.440 --> 00:20:44.480
+same thing. It is a template for how I'm
+
+635
+00:20:42.159 --> 00:20:46.080
+pulling it in to my products, to my
+
+636
+00:20:44.480 --> 00:20:47.360
+client work, to my production level
+
+637
+00:20:46.080 --> 00:20:48.799
+workloads, then doing a lot of
+
+638
+00:20:47.360 --> 00:20:51.039
+fine-tuning and tweaking. Remember,
+
+639
+00:20:48.799 --> 00:20:52.480
+specialization is your product. The
+
+640
+00:20:51.039 --> 00:20:54.159
+advantage you're going to have is not an
+
+641
+00:20:52.480 --> 00:20:55.440
+out-of-the-box agent. It's a specialized
+
+642
+00:20:54.159 --> 00:20:57.200
+system that does something really,
+
+643
+00:20:55.440 --> 00:20:59.200
+really well at the best economics,
+
+644
+00:20:57.200 --> 00:21:01.039
+right? The best tokconomics. And again,
+
+645
+00:20:59.200 --> 00:21:03.200
+your software factory inside your agent
+
+646
+00:21:01.039 --> 00:21:06.080
+sandbox lets you scale that. It lets you
+
+647
+00:21:03.200 --> 00:21:08.480
+move faster, lets you get out the loop.
+
+648
+00:21:06.080 --> 00:21:10.400
+Best event, fuse the results, move on,
+
+649
+00:21:08.480 --> 00:21:11.679
+hand the work off to your factory. We
+
+650
+00:21:10.400 --> 00:21:13.280
+really dive into the details of the
+
+651
+00:21:11.679 --> 00:21:14.559
+super simple software factory in last
+
+652
+00:21:13.280 --> 00:21:15.840
+week's video. Check that one out. I
+
+653
+00:21:14.559 --> 00:21:17.679
+haven't looked to see how much engineers
+
+654
+00:21:15.840 --> 00:21:19.840
+like that one yet, but that's there. A
+
+655
+00:21:17.679 --> 00:21:21.840
+lot of value in that one and a lot more
+
+656
+00:21:19.840 --> 00:21:23.039
+value in this one. It's hard to follow,
+
+657
+00:21:21.840 --> 00:21:24.559
+but let me break down some of the
+
+658
+00:21:23.039 --> 00:21:26.080
+implementation details for you so that
+
+659
+00:21:24.559 --> 00:21:27.919
+it's easier to follow. I'm still
+
+660
+00:21:26.080 --> 00:21:30.320
+observing this stuff. At any point in
+
+661
+00:21:27.919 --> 00:21:31.760
+time, I can enter these sandboxes and I
+
+662
+00:21:30.320 --> 00:21:33.120
+can enter the orchestration. So, let me
+
+663
+00:21:31.760 --> 00:21:35.280
+show you what I mean. In my demo prompt
+
+664
+00:21:33.120 --> 00:21:36.640
+here, we can get shell access. So, let's
+
+665
+00:21:35.280 --> 00:21:38.400
+get shell access. I'm going to fire this
+
+666
+00:21:36.640 --> 00:21:40.320
+off. And I've got a couple really,
+
+667
+00:21:38.400 --> 00:21:41.919
+really important skills that my
+
+668
+00:21:40.320 --> 00:21:43.520
+orchestrator agent is working off. If
+
+669
+00:21:41.919 --> 00:21:45.039
+you open up cloud skills, you can see
+
+670
+00:21:43.520 --> 00:21:47.440
+here I have four essential skills.
+
+671
+00:21:45.039 --> 00:21:48.880
+Herder sandbox exe.dev super simple
+
+672
+00:21:47.440 --> 00:21:50.320
+software factory and then our super
+
+673
+00:21:48.880 --> 00:21:52.480
+simple software factory orchestrator
+
+674
+00:21:50.320 --> 00:21:54.080
+agent. So this is a composite skill. I
+
+675
+00:21:52.480 --> 00:21:55.679
+don't like to compose my skills. It
+
+676
+00:21:54.080 --> 00:21:57.520
+makes it really hard to change things.
+
+677
+00:21:55.679 --> 00:21:59.760
+You create these nasty dependency
+
+678
+00:21:57.520 --> 00:22:01.600
+graphs. But when things are unified in a
+
+679
+00:21:59.760 --> 00:22:03.200
+single monor repo, you can make an
+
+680
+00:22:01.600 --> 00:22:05.039
+exception to the rule. Our agent is
+
+681
+00:22:03.200 --> 00:22:07.039
+going to use herder, my terminal
+
+682
+00:22:05.039 --> 00:22:08.880
+multiplexer here to kick off this
+
+683
+00:22:07.039 --> 00:22:10.960
+sandbox redesign fleet. Check this out.
+
+684
+00:22:08.880 --> 00:22:13.600
+We have five panes. And now my agent is
+
+685
+00:22:10.960 --> 00:22:15.120
+going to boot up SSH access into every
+
+686
+00:22:13.600 --> 00:22:16.320
+single one of them. There we go. A key
+
+687
+00:22:15.120 --> 00:22:18.640
+idea I've been talking about on the
+
+688
+00:22:16.320 --> 00:22:20.240
+channel over and over is a gentic
+
+689
+00:22:18.640 --> 00:22:21.600
+access. If you want to move at light
+
+690
+00:22:20.240 --> 00:22:24.320
+speed, if you want to move the speed of
+
+691
+00:22:21.600 --> 00:22:25.600
+agents, you need an agent layer wrapping
+
+692
+00:22:24.320 --> 00:22:27.520
+whatever you're trying to do, right?
+
+693
+00:22:25.600 --> 00:22:29.360
+It's that meta layer. It's that building
+
+694
+00:22:27.520 --> 00:22:30.400
+the system that builds the system. You
+
+695
+00:22:29.360 --> 00:22:32.000
+can see here we're in all of our
+
+696
+00:22:30.400 --> 00:22:33.440
+sandboxes, right? Here's our redesign
+
+697
+00:22:32.000 --> 00:22:36.480
+default. Here's the frontier, open
+
+698
+00:22:33.440 --> 00:22:38.159
+weights, top speed, deepest seek, right?
+
+699
+00:22:36.480 --> 00:22:40.000
+It's all here. And then we can Oh, yeah.
+
+700
+00:22:38.159 --> 00:22:42.400
+I don't have any of my hot keys. We can
+
+701
+00:22:40.000 --> 00:22:44.320
+get status. We can get log to see the
+
+702
+00:22:42.400 --> 00:22:46.320
+exact change. Document the equal quiet
+
+703
+00:22:44.320 --> 00:22:48.400
+room redesign. Redesign document blah
+
+704
+00:22:46.320 --> 00:22:50.159
+blah blah. And we can go from there. So
+
+705
+00:22:48.400 --> 00:22:52.400
+this is useful. It's always that same
+
+706
+00:22:50.159 --> 00:22:54.480
+idea in here. I have to do everything
+
+707
+00:22:52.400 --> 00:22:57.520
+manually. So we can go one step further.
+
+708
+00:22:54.480 --> 00:22:59.919
+If we open up code and we go to our
+
+709
+00:22:57.520 --> 00:23:01.760
+third agent access. Let me just show you
+
+710
+00:22:59.919 --> 00:23:03.760
+what this does. I want the exact same
+
+711
+00:23:01.760 --> 00:23:06.159
+thing except I want to talk to the
+
+712
+00:23:03.760 --> 00:23:07.840
+orchestrator inside each running
+
+713
+00:23:06.159 --> 00:23:09.360
+sandbox. So what's that? It's an
+
+714
+00:23:07.840 --> 00:23:11.600
+interactive cloud code on top of the
+
+715
+00:23:09.360 --> 00:23:13.840
+boxes. This is workflow B. Again, I've
+
+716
+00:23:11.600 --> 00:23:15.520
+taught my agent exactly how to do this.
+
+717
+00:23:13.840 --> 00:23:17.280
+So, let's see how it does it. We have a
+
+718
+00:23:15.520 --> 00:23:18.960
+new workspace inside of Herder. Let's go
+
+719
+00:23:17.280 --> 00:23:21.360
+ahead and crack it open. We have a nice
+
+720
+00:23:18.960 --> 00:23:23.840
+grid here. There's the boot up command.
+
+721
+00:23:21.360 --> 00:23:25.120
+We have to trust the system all the
+
+722
+00:23:23.840 --> 00:23:27.039
+time. I'm sure there's some way to
+
+723
+00:23:25.120 --> 00:23:29.039
+bypass this. This is one of the annoying
+
+724
+00:23:27.039 --> 00:23:30.880
+things about cloud code. Yes, I booted
+
+725
+00:23:29.039 --> 00:23:32.080
+it. Just open it for me. Our agent will
+
+726
+00:23:30.880 --> 00:23:33.440
+likely take care of this for us though
+
+727
+00:23:32.080 --> 00:23:35.360
+in each one of the sandboxes. Let's go
+
+728
+00:23:33.440 --> 00:23:38.159
+ahead and see how it does here. And
+
+729
+00:23:35.360 --> 00:23:40.080
+there we go. Great. We have a policy and
+
+730
+00:23:38.159 --> 00:23:42.960
+we're getting that dangerous mode
+
+731
+00:23:40.080 --> 00:23:44.720
+warning. We are operating inside of a
+
+732
+00:23:42.960 --> 00:23:46.880
+sandbox. So, we're doing exactly what
+
+733
+00:23:44.720 --> 00:23:48.720
+the anthropic engineers uh want us to
+
+734
+00:23:46.880 --> 00:23:50.640
+do. And there we go. So, notice here
+
+735
+00:23:48.720 --> 00:23:52.400
+we've connected to an agent that's
+
+736
+00:23:50.640 --> 00:23:53.760
+already ran. This is the three- tier
+
+737
+00:23:52.400 --> 00:23:55.600
+orchestration system. We can run
+
+738
+00:23:53.760 --> 00:23:58.559
+whatever we want to, right? Summarize
+
+739
+00:23:55.600 --> 00:24:01.039
+changes made bullets. Copy that. Fire.
+
+740
+00:23:58.559 --> 00:24:02.480
+Move. Fire. Move. Fire. Move. Fire. And
+
+741
+00:24:01.039 --> 00:24:04.159
+again, I'm doing this by hand. You can
+
+742
+00:24:02.480 --> 00:24:05.600
+always do this with an agent. My whole
+
+743
+00:24:04.159 --> 00:24:06.799
+point here is if you don't measure it,
+
+744
+00:24:05.600 --> 00:24:08.480
+you can't improve. But if you can't
+
+745
+00:24:06.799 --> 00:24:10.480
+touch your boxes, if you can't jump in,
+
+746
+00:24:08.480 --> 00:24:11.840
+you can't actually get anything done.
+
+747
+00:24:10.480 --> 00:24:15.279
+Our agents are kicking off. They're
+
+748
+00:24:11.840 --> 00:24:16.799
+reading the ADW state, the actual agent
+
+749
+00:24:15.279 --> 00:24:18.080
+work that was completed. Again, check
+
+750
+00:24:16.799 --> 00:24:19.440
+out last week's video. There's a whole
+
+751
+00:24:18.080 --> 00:24:21.039
+system around this. Our agents are
+
+752
+00:24:19.440 --> 00:24:22.960
+summarizing what exactly was done in
+
+753
+00:24:21.039 --> 00:24:24.799
+each one of these sandboxes. Let me show
+
+754
+00:24:22.960 --> 00:24:26.159
+you what's going on underneath the hood.
+
+755
+00:24:24.799 --> 00:24:28.000
+This is going to be fully available to
+
+756
+00:24:26.159 --> 00:24:30.000
+you. Link in the description. Although I
+
+757
+00:24:28.000 --> 00:24:31.520
+do a lot of agentic coding for this
+
+758
+00:24:30.000 --> 00:24:33.679
+stuff, it still takes me a lot of time
+
+759
+00:24:31.520 --> 00:24:36.000
+to really build this out, right? and to
+
+760
+00:24:33.679 --> 00:24:37.200
+really make it reusable for you. If you
+
+761
+00:24:36.000 --> 00:24:38.400
+made it this far in the video, if you're
+
+762
+00:24:37.200 --> 00:24:40.000
+getting value out of this, you know,
+
+763
+00:24:38.400 --> 00:24:41.440
+like, subscribe, comment, let the
+
+764
+00:24:40.000 --> 00:24:42.720
+algorithm know you're interested and let
+
+765
+00:24:41.440 --> 00:24:43.840
+me know you're interested so I can keep
+
+766
+00:24:42.720 --> 00:24:45.360
+delivering this type of content. You
+
+767
+00:24:43.840 --> 00:24:47.039
+know, if this video doesn't perform well
+
+768
+00:24:45.360 --> 00:24:48.799
+cuz the ideas are too advanced, it's
+
+769
+00:24:47.039 --> 00:24:51.279
+fine. Like, I'll just dial it back and
+
+770
+00:24:48.799 --> 00:24:53.440
+go to safer, more hype, you know, based
+
+771
+00:24:51.279 --> 00:24:55.039
+stuff. But I think you and other top
+
+772
+00:24:53.440 --> 00:24:56.960
+engineers are interested in this. You
+
+773
+00:24:55.039 --> 00:24:58.799
+want to be on the frontier. You want to
+
+774
+00:24:56.960 --> 00:25:01.600
+do as much as you possibly can do with
+
+775
+00:24:58.799 --> 00:25:03.840
+agents. And also like, you know, I might
+
+776
+00:25:01.600 --> 00:25:05.039
+sound like a super red pill engineer
+
+777
+00:25:03.840 --> 00:25:06.880
+like just trying to maximize
+
+778
+00:25:05.039 --> 00:25:08.880
+productivity, but I think a lot of the
+
+779
+00:25:06.880 --> 00:25:10.480
+value in this technology is that you can
+
+780
+00:25:08.880 --> 00:25:12.240
+just work faster, get everything you
+
+781
+00:25:10.480 --> 00:25:13.840
+want done, and then chill, right? Go
+
+782
+00:25:12.240 --> 00:25:15.120
+back to your life, go back to real life,
+
+783
+00:25:13.840 --> 00:25:16.640
+do your thing. I should probably make
+
+784
+00:25:15.120 --> 00:25:19.039
+that clear on the channel. It's not
+
+785
+00:25:16.640 --> 00:25:21.279
+super important to me what you think of
+
+786
+00:25:19.039 --> 00:25:22.799
+my my philosophy around work life
+
+787
+00:25:21.279 --> 00:25:24.400
+balance, but I just want to mention that
+
+788
+00:25:22.799 --> 00:25:26.480
+a lot of this technology you can use to
+
+789
+00:25:24.400 --> 00:25:28.159
+speed up your work and then chill or
+
+790
+00:25:26.480 --> 00:25:29.760
+speed up your work and get a massive
+
+791
+00:25:28.159 --> 00:25:31.440
+edge in front of your competition. So
+
+792
+00:25:29.760 --> 00:25:33.120
+anyway, factory in a box. Okay, the
+
+793
+00:25:31.440 --> 00:25:34.720
+whole idea here is that you and I are
+
+794
+00:25:33.120 --> 00:25:36.960
+the bottleneck. We want to be building
+
+795
+00:25:34.720 --> 00:25:38.880
+systems that prevent that now. So what
+
+796
+00:25:36.960 --> 00:25:41.039
+we can do, we can take two great pieces
+
+797
+00:25:38.880 --> 00:25:42.320
+of technology. These are compositions
+
+798
+00:25:41.039 --> 00:25:44.559
+that are emerging. We can take
+
+799
+00:25:42.320 --> 00:25:46.159
+sandboxes, throwaway sandboxes that are
+
+800
+00:25:44.559 --> 00:25:48.000
+also permanent if you want to keep them
+
+801
+00:25:46.159 --> 00:25:49.600
+up. This is why exe.dev is so important.
+
+802
+00:25:48.000 --> 00:25:51.360
+A lot of other sandbox providers give
+
+803
+00:25:49.600 --> 00:25:54.480
+you 24 hours. They give you a couple
+
+804
+00:25:51.360 --> 00:25:55.840
+days. Is a VM you own, and you can spin
+
+805
+00:25:54.480 --> 00:25:57.440
+them up and down as much as you want.
+
+806
+00:25:55.840 --> 00:25:59.360
+It's nice and secure. We have SSH
+
+807
+00:25:57.440 --> 00:26:01.760
+access, but then inside of it, we have
+
+808
+00:25:59.360 --> 00:26:03.200
+this factory. We have our Asian factory.
+
+809
+00:26:01.760 --> 00:26:04.799
+Again, check out last week's video, but
+
+810
+00:26:03.200 --> 00:26:06.720
+a lot of that again is going to be super
+
+811
+00:26:04.799 --> 00:26:09.039
+familiar for tactical agent coding
+
+812
+00:26:06.720 --> 00:26:10.720
+members. We have this ADW's directory.
+
+813
+00:26:09.039 --> 00:26:12.799
+It's not just about agents. It's about
+
+814
+00:26:10.720 --> 00:26:14.720
+agents plus code. And then of course we
+
+815
+00:26:12.799 --> 00:26:17.200
+have the actual application. So here we
+
+816
+00:26:14.720 --> 00:26:18.720
+have what are effectively two agentic
+
+817
+00:26:17.200 --> 00:26:20.960
+layers. Really it's just one. And then
+
+818
+00:26:18.720 --> 00:26:23.200
+we have our application layer. The whole
+
+819
+00:26:20.960 --> 00:26:25.520
+idea is that you want to get yourself
+
+820
+00:26:23.200 --> 00:26:27.279
+out the loop. If you are letting your
+
+821
+00:26:25.520 --> 00:26:28.960
+agents run on your computer, even inside
+
+822
+00:26:27.279 --> 00:26:30.960
+of a container, that's only getting you
+
+823
+00:26:28.960 --> 00:26:33.440
+isolation. It's not giving you scale and
+
+824
+00:26:30.960 --> 00:26:35.520
+autonomy. In a sandbox, you get to leave
+
+825
+00:26:33.440 --> 00:26:37.760
+the loop. You get to show up when you
+
+826
+00:26:35.520 --> 00:26:40.000
+want to. As you can see here in Herder,
+
+827
+00:26:37.760 --> 00:26:41.679
+I can still show up into the box. I can
+
+828
+00:26:40.000 --> 00:26:43.360
+still jump in, get things done,
+
+829
+00:26:41.679 --> 00:26:45.440
+understand what's been built inside of
+
+830
+00:26:43.360 --> 00:26:48.080
+every agent box. But the whole idea here
+
+831
+00:26:45.440 --> 00:26:49.520
+is I am out this loop. Great agentic
+
+832
+00:26:48.080 --> 00:26:51.520
+engineering is about showing up at the
+
+833
+00:26:49.520 --> 00:26:53.120
+beginning and the end, the planning, the
+
+834
+00:26:51.520 --> 00:26:54.799
+reviewing, the prompting, and the
+
+835
+00:26:53.120 --> 00:26:56.640
+validating. Uh the more you're in the
+
+836
+00:26:54.799 --> 00:26:58.000
+loop, the more you are the bottleneck.
+
+837
+00:26:56.640 --> 00:26:59.200
+Okay, so that's what this system allows
+
+838
+00:26:58.000 --> 00:27:00.559
+us to do. So we have a couple
+
+839
+00:26:59.200 --> 00:27:02.720
+interesting things happening here. The
+
+840
+00:27:00.559 --> 00:27:05.440
+orchestrator agent, as you can see here,
+
+841
+00:27:02.720 --> 00:27:07.520
+is inside the sandbox. I put an agent in
+
+842
+00:27:05.440 --> 00:27:09.200
+the sandbox. So we have one operating on
+
+843
+00:27:07.520 --> 00:27:10.880
+all the sandboxes. On the outside, we
+
+844
+00:27:09.200 --> 00:27:12.960
+have an agent operating inside the
+
+845
+00:27:10.880 --> 00:27:14.960
+sandbox on the inside. And this allows
+
+846
+00:27:12.960 --> 00:27:16.720
+them to run our super simple software
+
+847
+00:27:14.960 --> 00:27:20.000
+factory system, right? And then we have
+
+848
+00:27:16.720 --> 00:27:22.960
+the actual agents running from our
+
+849
+00:27:20.000 --> 00:27:24.240
+pi.dev instance inside of the individual
+
+850
+00:27:22.960 --> 00:27:26.799
+software factories. And we have a great
+
+851
+00:27:24.240 --> 00:27:28.400
+visual here. Jesus, you can see that our
+
+852
+00:27:26.799 --> 00:27:30.400
+state-of-the-art still churning here.
+
+853
+00:27:28.400 --> 00:27:32.080
+Looks like Kimmy 3 is having a hard
+
+854
+00:27:30.400 --> 00:27:33.840
+time. But anyway, our software factory
+
+855
+00:27:32.080 --> 00:27:36.080
+runs any agent configuration. We're
+
+856
+00:27:33.840 --> 00:27:37.919
+controlling the core 4 on an individual
+
+857
+00:27:36.080 --> 00:27:40.159
+agent basis. We are scaling. We are
+
+858
+00:27:37.919 --> 00:27:41.360
+composing. We are creating compositions.
+
+859
+00:27:40.159 --> 00:27:42.880
+This is what the architecture looks
+
+860
+00:27:41.360 --> 00:27:44.320
+like. Again, this is the like highle
+
+861
+00:27:42.880 --> 00:27:46.320
+architecture, right? We have our out
+
+862
+00:27:44.320 --> 00:27:47.919
+sandbox orchestrator. We have our in
+
+863
+00:27:46.320 --> 00:27:50.640
+sandbox orchestrator. And then we have
+
+864
+00:27:47.919 --> 00:27:52.320
+our ADW agents. The ADWs. Once you have
+
+865
+00:27:50.640 --> 00:27:54.320
+two or more, what you really have is a
+
+866
+00:27:52.320 --> 00:27:56.480
+software factory. Outbox orchestrator
+
+867
+00:27:54.320 --> 00:27:58.640
+runs on my machine. Inbox orchestrator
+
+868
+00:27:56.480 --> 00:28:00.240
+runs on the sandbox virtual machine. And
+
+869
+00:27:58.640 --> 00:28:02.080
+then we have the factory. Again, still
+
+870
+00:28:00.240 --> 00:28:03.679
+in the sandbox virtual machine. Couple
+
+871
+00:28:02.080 --> 00:28:05.039
+key commands are agent ran. I'm not
+
+872
+00:28:03.679 --> 00:28:06.640
+going to go through all the details.
+
+873
+00:28:05.039 --> 00:28:08.799
+We'll be here for a while. But you can
+
+874
+00:28:06.640 --> 00:28:10.960
+imagine there's a setup flow to this. We
+
+875
+00:28:08.799 --> 00:28:12.320
+need to mount, create the sandbox, set
+
+876
+00:28:10.960 --> 00:28:14.240
+it up. We can tear it down whenever we
+
+877
+00:28:12.320 --> 00:28:16.000
+need to. Inside the orchestrator runs
+
+878
+00:28:14.240 --> 00:28:17.039
+whatever a developer workflow we need.
+
+879
+00:28:16.000 --> 00:28:18.640
+Usually, it's going to be the full
+
+880
+00:28:17.039 --> 00:28:20.720
+software developer life cycle or we're
+
+881
+00:28:18.640 --> 00:28:22.080
+fixing a bug or we're doing a hot fix.
+
+882
+00:28:20.720 --> 00:28:24.640
+Whatever it is, that's up for you to
+
+883
+00:28:22.080 --> 00:28:27.039
+decide what's the most valuable chain of
+
+884
+00:28:24.640 --> 00:28:28.960
+agents plus code your developer workflow
+
+885
+00:28:27.039 --> 00:28:31.279
+must run. And then we have our actual
+
+886
+00:28:28.960 --> 00:28:33.520
+ADW agents, which of course there are
+
+887
+00:28:31.279 --> 00:28:35.520
+atoms, there are scouters or planners or
+
+888
+00:28:33.520 --> 00:28:37.679
+builders or testers. This is what most
+
+889
+00:28:35.520 --> 00:28:39.840
+engineers are hyperfixated on and really
+
+890
+00:28:37.679 --> 00:28:41.520
+it's a key piece but a small piece of a
+
+891
+00:28:39.840 --> 00:28:43.600
+bigger picture getting actual
+
+892
+00:28:41.520 --> 00:28:45.679
+engineering work done and being able to
+
+893
+00:28:43.600 --> 00:28:47.600
+step away from the loop. Here's the
+
+894
+00:28:45.679 --> 00:28:49.919
+actual setup process our orchestrator
+
+895
+00:28:47.600 --> 00:28:51.760
+did end to end. So we host and then
+
+896
+00:28:49.919 --> 00:28:53.679
+inside the box we set up an execute
+
+897
+00:28:51.760 --> 00:28:55.679
+where we kick off the agent and then of
+
+898
+00:28:53.679 --> 00:28:57.279
+course we can observe from outside the
+
+899
+00:28:55.679 --> 00:28:59.520
+loop thanks to our observability tool
+
+900
+00:28:57.279 --> 00:29:01.840
+and the actual application hosting from
+
+901
+00:28:59.520 --> 00:29:03.279
+exe.dev my sandboxing tool. And then of
+
+902
+00:29:01.840 --> 00:29:04.480
+course at the end here which you'll see
+
+903
+00:29:03.279 --> 00:29:06.159
+in a moment we're just going to tear it
+
+904
+00:29:04.480 --> 00:29:07.840
+all down. These are ephemeral sandboxes.
+
+905
+00:29:06.159 --> 00:29:09.520
+We spin them up. We do work. We spin
+
+906
+00:29:07.840 --> 00:29:11.840
+them down. Environment variable keys is
+
+907
+00:29:09.520 --> 00:29:13.520
+a big deal right? So in the system this
+
+908
+00:29:11.840 --> 00:29:15.039
+example codebase system. What I'm doing
+
+909
+00:29:13.520 --> 00:29:17.039
+here is showcasing that. What I've done
+
+910
+00:29:15.039 --> 00:29:19.200
+here is used open router's provision key
+
+911
+00:29:17.039 --> 00:29:20.960
+system. I've limited to 50 bucks. And
+
+912
+00:29:19.200 --> 00:29:22.480
+then when I tear down all these I'm
+
+913
+00:29:20.960 --> 00:29:24.640
+going to kill the key. So really
+
+914
+00:29:22.480 --> 00:29:26.640
+powerful way to spin up intelligence.
+
+915
+00:29:24.640 --> 00:29:28.559
+Open router is a great tool for this.
+
+916
+00:29:26.640 --> 00:29:30.159
+And it all creates a result that looks
+
+917
+00:29:28.559 --> 00:29:32.080
+something like this. again with the best
+
+918
+00:29:30.159 --> 00:29:33.600
+event system. Our single prompt fired
+
+919
+00:29:32.080 --> 00:29:36.399
+off in our orchestrator. Orchestrator
+
+920
+00:29:33.600 --> 00:29:38.240
+spun up in sandbox orchestrators to run
+
+921
+00:29:36.399 --> 00:29:39.840
+our ADW system. Whatever model
+
+922
+00:29:38.240 --> 00:29:42.159
+configuration we wanted plus whatever
+
+923
+00:29:39.840 --> 00:29:44.399
+code it needs and then we can pull the
+
+924
+00:29:42.159 --> 00:29:45.919
+best result as you saw here. Not all of
+
+925
+00:29:44.399 --> 00:29:48.240
+our systems finished, but you can
+
+926
+00:29:45.919 --> 00:29:50.000
+imagine your application built in
+
+927
+00:29:48.240 --> 00:29:52.320
+multiple different ways. And this is
+
+928
+00:29:50.000 --> 00:29:54.320
+just one pattern, right? Best event is a
+
+929
+00:29:52.320 --> 00:29:56.320
+great sandboxing pattern for you to
+
+930
+00:29:54.320 --> 00:29:57.520
+explore potential futures you want in
+
+931
+00:29:56.320 --> 00:29:59.600
+your product, in your system, in your
+
+932
+00:29:57.520 --> 00:30:01.360
+application. And best of n gives you the
+
+933
+00:29:59.600 --> 00:30:03.360
+best of some set of results. And of
+
+934
+00:30:01.360 --> 00:30:05.360
+course the great part about that is you
+
+935
+00:30:03.360 --> 00:30:07.279
+can configure your model selection.
+
+936
+00:30:05.360 --> 00:30:09.360
+Every one of these runs is running a
+
+937
+00:30:07.279 --> 00:30:11.760
+different set a different team of
+
+938
+00:30:09.360 --> 00:30:13.919
+agents. A side effect here is as an
+
+939
+00:30:11.760 --> 00:30:15.760
+agentic engineer as you're running these
+
+940
+00:30:13.919 --> 00:30:17.919
+different variants of your software
+
+941
+00:30:15.760 --> 00:30:19.760
+factory. You're just picking up on data.
+
+942
+00:30:17.919 --> 00:30:21.360
+How good is this configuration? Is it
+
+943
+00:30:19.760 --> 00:30:23.520
+getting me the results I need in a
+
+944
+00:30:21.360 --> 00:30:25.120
+cheaper, more efficient way? Do I need a
+
+945
+00:30:23.520 --> 00:30:26.880
+state-of-the-art system? By the way,
+
+946
+00:30:25.120 --> 00:30:29.120
+this is still running. This total
+
+947
+00:30:26.880 --> 00:30:30.480
+workflow has taken almost 45 minutes. I
+
+948
+00:30:29.120 --> 00:30:31.679
+mean, I've been filming for 50 minutes
+
+949
+00:30:30.480 --> 00:30:32.799
+now. This workflow has been running
+
+950
+00:30:31.679 --> 00:30:34.559
+basically the entire time. There's
+
+951
+00:30:32.799 --> 00:30:36.000
+clearly a bug here with Kimmy. So, you
+
+952
+00:30:34.559 --> 00:30:37.840
+know, we'll dismiss this runtime, but
+
+953
+00:30:36.000 --> 00:30:39.919
+you can see here Opus 5 churning up
+
+954
+00:30:37.840 --> 00:30:41.279
+tokens, churning up spend, right? Do you
+
+955
+00:30:39.919 --> 00:30:42.480
+need this? Interesting question. And
+
+956
+00:30:41.279 --> 00:30:44.799
+then, of course, we have our deepest
+
+957
+00:30:42.480 --> 00:30:46.640
+seek doing things the cheapest and one
+
+958
+00:30:44.799 --> 00:30:48.240
+of the fastest. Definitely churning up
+
+959
+00:30:46.640 --> 00:30:49.919
+some tokens though. Here's read, here's
+
+960
+00:30:48.240 --> 00:30:51.679
+right, but getting the job done right in
+
+961
+00:30:49.919 --> 00:30:53.360
+the deepest seek version here, you pay
+
+962
+00:30:51.679 --> 00:30:55.279
+attention to the title, Deepest Seek,
+
+963
+00:30:53.360 --> 00:30:57.360
+and we go over here. This version was
+
+964
+00:30:55.279 --> 00:30:59.279
+good. like I feel a lot more focused.
+
+965
+00:30:57.360 --> 00:31:00.640
+It's a quiet room for me to write in.
+
+966
+00:30:59.279 --> 00:31:02.559
+That's just a nice side effect of
+
+967
+00:31:00.640 --> 00:31:04.080
+running these multiple variants of your
+
+968
+00:31:02.559 --> 00:31:05.039
+software factory. It's not just about
+
+969
+00:31:04.080 --> 00:31:06.320
+understanding the difference of the
+
+970
+00:31:05.039 --> 00:31:08.000
+model. It's about understanding the
+
+971
+00:31:06.320 --> 00:31:10.240
+stack of models plus code and the
+
+972
+00:31:08.000 --> 00:31:11.919
+results and the cost of the results. And
+
+973
+00:31:10.240 --> 00:31:13.679
+ultimately the architecture looks like
+
+974
+00:31:11.919 --> 00:31:16.159
+this. We have the application. We have
+
+975
+00:31:13.679 --> 00:31:17.760
+the agent view outbox orchestrator inbox
+
+976
+00:31:16.159 --> 00:31:20.159
+orchestrator and then our software
+
+977
+00:31:17.760 --> 00:31:22.399
+factory. If you want you absolutely can
+
+978
+00:31:20.159 --> 00:31:24.559
+take your outbox orchestrator, go right
+
+979
+00:31:22.399 --> 00:31:26.080
+to the ADW system, your software factory
+
+980
+00:31:24.559 --> 00:31:28.159
+system. that's fine. Uh you get a little
+
+981
+00:31:26.080 --> 00:31:29.840
+bit less control there because the inbox
+
+982
+00:31:28.159 --> 00:31:31.600
+orchestrator shouldn't really be doing
+
+983
+00:31:29.840 --> 00:31:33.600
+anything but running and kicking off the
+
+984
+00:31:31.600 --> 00:31:35.760
+workflows. The key here is just keeping
+
+985
+00:31:33.600 --> 00:31:37.919
+it simple. Complexity is always going to
+
+986
+00:31:35.760 --> 00:31:39.039
+come as you add another thing. But in
+
+987
+00:31:37.919 --> 00:31:40.240
+reality, you know, it looks like this.
+
+988
+00:31:39.039 --> 00:31:41.519
+We have our software factory inside the
+
+989
+00:31:40.240 --> 00:31:42.799
+sandbox, public port for the
+
+990
+00:31:41.519 --> 00:31:44.399
+application, and then a private port.
+
+991
+00:31:42.799 --> 00:31:45.840
+You have to log into exe.dev. But
+
+992
+00:31:44.399 --> 00:31:48.159
+basically, you get the software factory
+
+993
+00:31:45.840 --> 00:31:49.840
+view. This factory in a box system is
+
+994
+00:31:48.159 --> 00:31:51.200
+going to be available to you. Link in
+
+995
+00:31:49.840 --> 00:31:52.880
+the description. It's going to build on
+
+996
+00:31:51.200 --> 00:31:54.559
+a super simple software factory. I'm
+
+997
+00:31:52.880 --> 00:31:56.799
+going to link that video as well. I
+
+998
+00:31:54.559 --> 00:31:58.320
+skipped over some of those key deeper
+
+999
+00:31:56.799 --> 00:32:00.240
+ideas, but as you can see on the
+
+1000
+00:31:58.320 --> 00:32:02.159
+channel, I'm going to be stacking up all
+
+1001
+00:32:00.240 --> 00:32:04.080
+of these big ideas so that you can scale
+
+1002
+00:32:02.159 --> 00:32:05.840
+your computer, to scale your impact. I'm
+
+1003
+00:32:04.080 --> 00:32:07.600
+building and using these systems because
+
+1004
+00:32:05.840 --> 00:32:09.200
+I need them to get to the next level.
+
+1005
+00:32:07.600 --> 00:32:11.279
+And part of my journey here, part of my
+
+1006
+00:32:09.200 --> 00:32:12.880
+goal is to share them with you. Let me
+
+1007
+00:32:11.279 --> 00:32:14.960
+be super clear about this. I come here
+
+1008
+00:32:12.880 --> 00:32:17.760
+every single week as a secondary, almost
+
+1009
+00:32:14.960 --> 00:32:19.760
+a tertiary goal. All of it comes from my
+
+1010
+00:32:17.760 --> 00:32:21.760
+goal to build living software that works
+
+1011
+00:32:19.760 --> 00:32:24.399
+for me while I sleep. And then my second
+
+1012
+00:32:21.760 --> 00:32:26.559
+and third goal is like democratize this
+
+1013
+00:32:24.399 --> 00:32:28.880
+because as we continue to become more
+
+1014
+00:32:26.559 --> 00:32:31.039
+capable agentic engineers as you can see
+
+1015
+00:32:28.880 --> 00:32:32.640
+and feel this is scary powerful
+
+1016
+00:32:31.039 --> 00:32:34.320
+technology especially when you start
+
+1017
+00:32:32.640 --> 00:32:36.240
+using it properly especially when you
+
+1018
+00:32:34.320 --> 00:32:37.519
+start embedding your engineering into it
+
+1019
+00:32:36.240 --> 00:32:39.440
+it's very very powerful there's going to
+
+1020
+00:32:37.519 --> 00:32:41.600
+be a lot of economic value created a lot
+
+1021
+00:32:39.440 --> 00:32:43.600
+of careers changed and I want that to be
+
+1022
+00:32:41.600 --> 00:32:46.000
+dispersed I want that to be democratized
+
+1023
+00:32:43.600 --> 00:32:47.679
+equally or as equal as we can technology
+
+1024
+00:32:46.000 --> 00:32:49.039
+should not be limited to the lucky few
+
+1025
+00:32:47.679 --> 00:32:51.039
+that's why I come here and I share these
+
+1026
+00:32:49.039 --> 00:32:52.799
+ideas every single week with you. Let's
+
+1027
+00:32:51.039 --> 00:32:54.480
+go full circle. Why are software
+
+1028
+00:32:52.799 --> 00:32:56.559
+factories important? Why is this
+
+1029
+00:32:54.480 --> 00:32:58.559
+valuable for your engineering? Software
+
+1030
+00:32:56.559 --> 00:33:00.240
+factories let you scale your compute to
+
+1031
+00:32:58.559 --> 00:33:02.320
+scale your impact by combining
+
+1032
+00:33:00.240 --> 00:33:04.799
+non-deterministic agents with
+
+1033
+00:33:02.320 --> 00:33:06.480
+deterministic code. You want the best of
+
+1034
+00:33:04.799 --> 00:33:08.880
+both worlds. There will be a point in
+
+1035
+00:33:06.480 --> 00:33:10.480
+time when agentic engineering is just
+
+1036
+00:33:08.880 --> 00:33:12.720
+called software engineering because
+
+1037
+00:33:10.480 --> 00:33:14.960
+agents will be part of the fabric of how
+
+1038
+00:33:12.720 --> 00:33:16.799
+we build software as they are becoming
+
+1039
+00:33:14.960 --> 00:33:18.640
+already today. But right now we need to
+
+1040
+00:33:16.799 --> 00:33:20.000
+clearly delineate we are agentic
+
+1041
+00:33:18.640 --> 00:33:21.519
+engineering. This is not really
+
+1042
+00:33:20.000 --> 00:33:23.919
+traditional software engineering yet.
+
+1043
+00:33:21.519 --> 00:33:25.360
+And we're absolutely not vibe coding. I
+
+1044
+00:33:23.919 --> 00:33:27.200
+know what the system is doing. I could
+
+1045
+00:33:25.360 --> 00:33:28.880
+find the exact file doing the exact
+
+1046
+00:33:27.200 --> 00:33:30.399
+thing. Big difference there. That's why
+
+1047
+00:33:28.880 --> 00:33:32.720
+software factories are important. They
+
+1048
+00:33:30.399 --> 00:33:34.640
+let you compose agents plus code into
+
+1049
+00:33:32.720 --> 00:33:36.720
+the workflows that you used to run
+
+1050
+00:33:34.640 --> 00:33:38.960
+yourself as an engineer to get results
+
+1051
+00:33:36.720 --> 00:33:41.519
+done. We're talking plan, build, test,
+
+1052
+00:33:38.960 --> 00:33:43.120
+review, document. We're talking hot fix.
+
+1053
+00:33:41.519 --> 00:33:45.200
+A production issue comes in. Can you
+
+1054
+00:33:43.120 --> 00:33:46.399
+solve it in record time with your ADW?
+
+1055
+00:33:45.200 --> 00:33:47.760
+We're talking about support requests.
+
+1056
+00:33:46.399 --> 00:33:49.679
+We're talking about a bunch of And
+
+1057
+00:33:47.760 --> 00:33:51.519
+your software factory is the mechanism.
+
+1058
+00:33:49.679 --> 00:33:52.799
+It's the system that lets you do that.
+
+1059
+00:33:51.519 --> 00:33:54.480
+That's why that's important. Why are
+
+1060
+00:33:52.799 --> 00:33:56.960
+agent sandboxes important? They're
+
+1061
+00:33:54.480 --> 00:33:59.200
+important for three reasons. Isolation,
+
+1062
+00:33:56.960 --> 00:34:00.559
+scale, autonomy. Isolate your agents so
+
+1063
+00:33:59.200 --> 00:34:02.240
+they don't blow up your production
+
+1064
+00:34:00.559 --> 00:34:05.919
+system. Right? Strip them of their
+
+1065
+00:34:02.240 --> 00:34:07.360
+ability to access AWS and GCP and insert
+
+1066
+00:34:05.919 --> 00:34:09.200
+the next really important tool. They
+
+1067
+00:34:07.360 --> 00:34:11.359
+give you scale. I use one orchestrator
+
+1068
+00:34:09.200 --> 00:34:14.399
+agent to spin up five sandboxes to spin
+
+1069
+00:34:11.359 --> 00:34:16.000
+up factories of agentic work. A bunch of
+
+1070
+00:34:14.399 --> 00:34:17.919
+stuff happened there. Plan build test
+
+1071
+00:34:16.000 --> 00:34:19.839
+review document. and it happened end
+
+1072
+00:34:17.919 --> 00:34:20.879
+times. Best event is just one pattern.
+
+1073
+00:34:19.839 --> 00:34:22.240
+It's going to be a really popular
+
+1074
+00:34:20.879 --> 00:34:25.040
+important pattern because it lets you
+
+1075
+00:34:22.240 --> 00:34:27.359
+see multiple futures. Scale is very
+
+1076
+00:34:25.040 --> 00:34:29.760
+important. Many of us, just as we have
+
+1077
+00:34:27.359 --> 00:34:32.000
+been for a long time, underestimate the
+
+1078
+00:34:29.760 --> 00:34:34.399
+importance of scale. What happens if you
+
+1079
+00:34:32.000 --> 00:34:36.159
+could just do this 10 times? What about
+
+1080
+00:34:34.399 --> 00:34:37.520
+a 100 times? What could you see? What
+
+1081
+00:34:36.159 --> 00:34:39.679
+could you find? What could you build?
+
+1082
+00:34:37.520 --> 00:34:42.639
+What could you learn if you just threw
+
+1083
+00:34:39.679 --> 00:34:45.119
+more scale at your problem? Sandboxes
+
+1084
+00:34:42.639 --> 00:34:46.879
+are scale for your agents plus code.
+
+1085
+00:34:45.119 --> 00:34:49.280
+Sandboxes give you scale. And of course,
+
+1086
+00:34:46.879 --> 00:34:51.440
+they give you autonomy. Don't just limit
+
+1087
+00:34:49.280 --> 00:34:52.960
+your agents to a little corner on your
+
+1088
+00:34:51.440 --> 00:34:54.320
+computer. You can and should do that
+
+1089
+00:34:52.960 --> 00:34:56.399
+when you're working with your agents on
+
+1090
+00:34:54.320 --> 00:34:58.640
+net new work, specifically building
+
+1091
+00:34:56.399 --> 00:35:00.160
+systems that build systems. I'll just
+
+1092
+00:34:58.640 --> 00:35:02.000
+say this, you know, upfront, right in
+
+1093
+00:35:00.160 --> 00:35:04.079
+your face. If you're using an agent to
+
+1094
+00:35:02.000 --> 00:35:06.320
+directly modify the application layer
+
+1095
+00:35:04.079 --> 00:35:08.000
+code, you are wasting time. There are
+
+1096
+00:35:06.320 --> 00:35:09.440
+very few exceptions to that. I hope that
+
+1097
+00:35:08.000 --> 00:35:11.760
+makes sense to you. I'm not trying to be
+
+1098
+00:35:09.440 --> 00:35:13.440
+a douchebag or talk like I'm above you
+
+1099
+00:35:11.760 --> 00:35:15.920
+or anything like that. I'm saying this
+
+1100
+00:35:13.440 --> 00:35:17.359
+so you understand where the leverage is.
+
+1101
+00:35:15.920 --> 00:35:19.520
+I don't want you to fall behind. So that
+
+1102
+00:35:17.359 --> 00:35:21.520
+is autonomy. Sandboxes give you
+
+1103
+00:35:19.520 --> 00:35:23.280
+isolation, scale, and autonomy. When you
+
+1104
+00:35:21.520 --> 00:35:25.520
+put these two things together, you get
+
+1105
+00:35:23.280 --> 00:35:27.839
+something extraordinary. You get absurd
+
+1106
+00:35:25.520 --> 00:35:30.640
+scale inside your sandboxes. When you
+
+1107
+00:35:27.839 --> 00:35:32.640
+put a factory in a box, you get absurd
+
+1108
+00:35:30.640 --> 00:35:34.079
+scale, absurd leverage. You get really
+
+1109
+00:35:32.640 --> 00:35:36.160
+great isolation because you're going to
+
+1110
+00:35:34.079 --> 00:35:38.000
+want it [laughter] as you build more and
+
+1111
+00:35:36.160 --> 00:35:39.599
+more agents on top of your system. And
+
+1112
+00:35:38.000 --> 00:35:41.040
+of course, you can just scale and solve
+
+1113
+00:35:39.599 --> 00:35:43.680
+many, many, many problems at the same
+
+1114
+00:35:41.040 --> 00:35:45.839
+time while not limiting the agency of
+
+1115
+00:35:43.680 --> 00:35:47.119
+your agents. Okay? Ultimately, you and
+
+1116
+00:35:45.839 --> 00:35:49.440
+I, what are we doing here? We're
+
+1117
+00:35:47.119 --> 00:35:51.200
+preparing for an age of abundant
+
+1118
+00:35:49.440 --> 00:35:53.040
+compute. You see how the landscape is
+
+1119
+00:35:51.200 --> 00:35:54.800
+shifting. You can see these new great
+
+1120
+00:35:53.040 --> 00:35:56.640
+cheap workhorse models. You can see the
+
+1121
+00:35:54.800 --> 00:35:58.160
+intelligence getting passed down the
+
+1122
+00:35:56.640 --> 00:35:59.520
+tier levels. It doesn't matter if you
+
+1123
+00:35:58.160 --> 00:36:01.200
+believe it's right or wrong, it's
+
+1124
+00:35:59.520 --> 00:36:02.880
+happening. And so, what do we do as
+
+1125
+00:36:01.200 --> 00:36:04.640
+engineers? We act like a function. We
+
+1126
+00:36:02.880 --> 00:36:06.400
+take the inputs, we execute, we
+
+1127
+00:36:04.640 --> 00:36:07.599
+synthesize, and we deliver outputs.
+
+1128
+00:36:06.400 --> 00:36:08.880
+That's all we're doing here. taking the
+
+1129
+00:36:07.599 --> 00:36:11.440
+information, make the best decision,
+
+1130
+00:36:08.880 --> 00:36:13.200
+act. This implementation of the factory
+
+1131
+00:36:11.440 --> 00:36:14.640
+in a box is going to be available to
+
+1132
+00:36:13.200 --> 00:36:15.920
+you. Link in the description. I also
+
+1133
+00:36:14.640 --> 00:36:17.680
+highly recommend you check out last
+
+1134
+00:36:15.920 --> 00:36:19.040
+week's video. Super simple software
+
+1135
+00:36:17.680 --> 00:36:20.480
+factory. It's going to be a banger one.
+
+1136
+00:36:19.040 --> 00:36:22.079
+You'll notice once again I didn't
+
+1137
+00:36:20.480 --> 00:36:23.599
+mention loop engineering once. I believe
+
+1138
+00:36:22.079 --> 00:36:24.880
+this is the wrong term, the wrong
+
+1139
+00:36:23.599 --> 00:36:26.560
+phrase. What we really should be
+
+1140
+00:36:24.880 --> 00:36:27.839
+focusing on is the software developer
+
+1141
+00:36:26.560 --> 00:36:29.680
+life cycle. If you haven't seen that,
+
+1142
+00:36:27.839 --> 00:36:31.440
+I'll link that in the description as
+
+1143
+00:36:29.680 --> 00:36:32.640
+well. Take the pieces of everything I'm
+
+1144
+00:36:31.440 --> 00:36:34.560
+sharing with you, merge it with your
+
+1145
+00:36:32.640 --> 00:36:37.119
+own. I don't have all the answers here,
+
+1146
+00:36:34.560 --> 00:36:38.720
+but what I do have is a great direction.
+
+1147
+00:36:37.119 --> 00:36:40.880
+Try to get the leverage of the next
+
+1148
+00:36:38.720 --> 00:36:42.320
+phase of agentic engineering. All right,
+
+1149
+00:36:40.880 --> 00:36:43.680
+these are relatively advanced concepts,
+
+1150
+00:36:42.320 --> 00:36:45.280
+but I don't want you to miss out on the
+
+1151
+00:36:43.680 --> 00:36:46.800
+opportunity to scale up. If you made it
+
+1152
+00:36:45.280 --> 00:36:48.240
+to the end, you know, hats off to you.
+
+1153
+00:36:46.800 --> 00:36:50.240
+Things are going to get more complex
+
+1154
+00:36:48.240 --> 00:36:52.160
+from here because all the low-level
+
+1155
+00:36:50.240 --> 00:36:53.760
+leverage has been sucked up. Everyone's
+
+1156
+00:36:52.160 --> 00:36:54.880
+prompting inside Cloud Code now.
+
+1157
+00:36:53.760 --> 00:36:56.800
+Everyone has a terminal agent.
+
+1158
+00:36:54.880 --> 00:36:58.480
+Everyone's using a co-work tool. The
+
+1159
+00:36:56.800 --> 00:36:59.680
+next level of leverage is going to take
+
+1160
+00:36:58.480 --> 00:37:01.440
+work. It's going to take upfront
+
+1161
+00:36:59.680 --> 00:37:03.200
+investment. But as software engineers,
+
+1162
+00:37:01.440 --> 00:37:04.480
+there's a lot you can do that you don't
+
+1163
+00:37:03.200 --> 00:37:06.240
+realize yet. And that's what I'm going
+
+1164
+00:37:04.480 --> 00:37:07.680
+to be here week after week to help you
+
+1165
+00:37:06.240 --> 00:37:10.400
+unlock. You know where to find me
+
+1166
+00:37:07.680 --> 00:37:14.280
+[music] every single week. Stay focused
+
+1167
+00:37:10.400 --> 00:37:14.280
+and keep building.

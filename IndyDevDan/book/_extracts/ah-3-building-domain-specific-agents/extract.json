@@ -1,0 +1,445 @@
+{
+  "lesson_key": "ah-3-building-domain-specific-agents",
+  "title": "Building Domain-Specific Agents",
+  "course": "AH",
+  "order": 11,
+  "lesson_url": "https://agenticengineer.com/tactical-agentic-coding/course/building-domain-specific-agents",
+  "video": {
+    "file": "ah-3-building-domain-specific-agents/video/ah-3-building-domain-specific-agents.mp4",
+    "duration_seconds": 4030,
+    "duration_display": "1:07:10",
+    "resolution": "1920x1080"
+  },
+  "tactic": {
+    "name": "Build Custom Agents",
+    "one_liner": "When out-of-the-box agents stop fitting your domain, stop renting someone else's agent and build your own: take programmatic control of the core four (context, model, prompt, tools) in code so your compute works for your problems, your edge cases, your codebase — not everyone's.",
+    "why_uncomfortable": "It asks engineers who just learned to love Claude Code to admit the tool they love is built for everyone's codebase, not theirs — and that the gap costs hundreds of hours and millions of tokens as their codebase grows. Worse, it demands you overwrite the system prompt of the best agent on the market ('this is not Claude Code anymore'), throwing away all the work the Claude Code team baked in, and trust that YOUR three-line prompt plus a few tools will serve your domain better than their generalist. Dan repeatedly de-escalates the discomfort: you usually should NOT build a custom agent; extend before you overwrite; never try to out-engineer Claude Code at general engineering. The tactic is a scalpel for the last-mile domain problems, not a hammer for everything."
+  },
+  "mission": "Give you programmatic mastery over agents so you can deploy effective compute anywhere across your stack, products, and engineering lifecycle. By the end you can look at any repeat, domain-specific, or out-of-loop problem and know whether to reach for the out-of-the-box agent, an extended agent, or a complete custom agent — and if custom, build it from a 150-line script up to a multi-agent web application by controlling the core four in code. The deeper mission of the Agentic Horizon: agentic coding is no longer about what YOU can do, it's about what you can teach your agents to do.",
+  "progression_model": {
+    "the_path": "Agentic engineering leads every engineer down one single path: better agents -> more agents -> custom agents. First you learn to prompt- and context-engineer a single agent well (better). Then you scale compute by delegating to subagents and new primary agents (more). Then, only when you hit domain-specific walls out-of-the-box tools can't clear, you go to the bare metal: custom agents.",
+    "better_agents": "Prompt engineering and context engineering a single agent until it performs. This is the foundation the whole Agentic Horizon builds on (RD framework, agentic prompt formats).",
+    "more_agents": "Scale your compute to scale your impact by delegating work to subagents and additional primary agents (multi-agent orchestration).",
+    "custom_agents": "The bare metal. Build agents whose context, model, prompt, and tools you control in code — tailored to your domain-specific problems, protected from calling the wrong tools at the wrong time, and deployable programmatically anywhere (scripts, streams, terminals, UIs, backends)."
+  },
+  "core_concepts": [
+    {
+      "id": "system-prompt-is-everything",
+      "name": "The system prompt is the law of the agent",
+      "plain_english": "The system prompt is the single most important element of a custom agent, with zero exceptions. It is injected before every user prompt, so it multiplies (governs) every single run the agent will ever do. The Pong agent proves it: two tiny changes to a Claude Agent SDK config (model + a 3-line system prompt) turn the world's best coding agent into a thing that replies 'pong' to literally anything. Overwrite the system prompt and you have a new product — same model, entirely different agent.",
+      "dan_words": "\"The system prompt is the most important element of your custom agents, with zero exceptions... The system prompt affects every single user prompt the agent runs, every single one. So all of your work is multiplied by your system prompt.\"",
+      "misconception": "That a custom agent needs lots of code. Pong is ~150 lines and most of it is logging; the behavior-defining change is a 3-line markdown file. The leverage is in the prompt, not the plumbing."
+    },
+    {
+      "id": "not-claude-code-anymore",
+      "name": "Overwrite the system prompt and it's not Claude Code anymore",
+      "plain_english": "The moment you fully replace the system prompt, you have discarded everything the Claude Code team engineered into their agent and created a brand-new product. It might use the same model, but it is not Claude Code. This is powerful and dangerous: you gain total control and lose all the built-in generalist competence. Alternative: you can APPEND to the preset Claude Code system prompt instead of overwriting it — an extension, not a replacement.",
+      "dan_words": "\"This is not the Claude Code product anymore. As soon as you touch the system prompt and once you start dialing into the tools, you change the product, you change the agent... it is important to mention you can append system prompt.\"",
+      "misconception": "That custom always means overwrite. Overwrite is one end of a spectrum; append (extend) is the other, and most engineering work only needs a light extension."
+    },
+    {
+      "id": "core-four-in-code",
+      "name": "Custom agents let you control the core four in code",
+      "plain_english": "The core four — context, model, prompt, tools — are the primitives of every agent (from the 12 leverage points of agentic coding). Out-of-the-box you accept the defaults. A custom agent, via the Claude Agent SDK's options object, lets you set each one explicitly and consistently: which model, what system/user prompts, which tools are allowed or disallowed, what MCP servers and configs load. 'This is quite literally in code, so our agent will always perform this way.' Isolate the core four in any agent config and you understand and can scale your compute.",
+      "dan_words": "\"Whenever you see Claude Code options, isolate the core four. How will the core four be managed given this setup?... Custom agents let you control all of these very quickly and consistently.\"",
+      "misconception": "That the core four is abstract theory. In the SDK it is a concrete options object — every field maps to one of the four, and the user prompt arrives via client.query()."
+    },
+    {
+      "id": "everything-ends-up-in-context",
+      "name": "Everything you give an agent ends up in its context window",
+      "plain_english": "Tools, MCP servers, system prompt, user prompt — all of it consumes space in the agent's 'mind.' The Echo agent proves that even after you add one custom tool, the ~15 baked-in Claude Code tools are STILL loaded (15 extra options the model must consider and pay tokens for). The Calc agent shows the fix: an explicit disallowed_tools list removes those tools entirely — they are no longer even an option, they don't reach the context window. Adopt your agent's perspective; run /context; control the knob.",
+      "dan_words": "\"Everything that's going into your agent winds up in the context window at some point. We have 15 extra tools, 15 extra options that our agent has to choose from... It consumes space in your agent's mind.\"",
+      "misconception": "That setting allowed_tools is enough to keep the context lean. allowed_tools gates what CAN be called; the built-in tool definitions still load unless you disallow them. Disallowing removes them from context entirely."
+    },
+    {
+      "id": "model-selection",
+      "name": "Match the model to the task",
+      "plain_english": "A custom agent explicitly declares its model, so you right-size intelligence to the job. Echo is a trivial transform, so Dan downgrades it to Claude Haiku — cheaper, less intelligent, much faster. Calc and most others use Sonnet (balanced); the SDLC agent offers Opus for the smart planning/review steps. 'It's not the models that are the limitation anymore. It's you and I — our ability to wield better, more, and custom agents.'",
+      "dan_words": "\"We're running Claude Haiku. We have downgraded our model to a cheaper, less intelligent, but much faster model... This is a simple agent. It doesn't need powerful intelligence.\"",
+      "misconception": "That a stronger model is always better. For simple, high-volume, or latency-sensitive tools, a smaller model is the correct engineering choice — and cheaper at scale."
+    },
+    {
+      "id": "custom-tools-and-mcp",
+      "name": "Custom tools and in-memory MCP servers",
+      "plain_english": "You give an agent new capabilities with the @tool decorator (name, description, typed params) and mount them via create_sdk_mcp_server — an entire MCP server built in memory for your agent. The tool's DESCRIPTION tells the agent when/how to use it; inside the tool you are back in deterministic code — do anything, then return the proper format. Custom agents can also tap the existing MCP ecosystem (the QA agent loads the Firecrawl MCP server via an .mcp.json config, ~6k tokens) — you don't have to reinvent tools that already exist.",
+      "dan_words": "\"This builds an entire MCP server in memory for our agent... The description of your tool tells your agent how to use it, in addition to the actual parameters. In the actual arguments, you just pass in a dict and then you do whatever you want to do inside of your tool. Here we step back into traditional deterministic code.\"",
+      "misconception": "That tools are magic. A tool is deterministic code with a good name and description; the model only decides WHEN to call it. If it errors, return that error so the agent can pivot (the 'stdout + tools' leverage point)."
+    },
+    {
+      "id": "query-vs-client",
+      "name": "query() for one-off, ClaudeSDKClient for conversation",
+      "plain_english": "The SDK has two entry points. query() fires a single one-off prompt (Pong). ClaudeSDKClient holds a continuous, multi-turn conversation and is REQUIRED for custom tools (Echo, Calc, and every later agent use it). You keep the thread alive across turns by capturing the session_id from the ResultMessage and passing it back as resume= on the next call.",
+      "dan_words": "\"Query is for one-off prompts and the Claude SDK client is for continuous conversations... Our agent has kept track of the conversation because we're using the Claude SDK client and because we've written multiple query calls.\"",
+      "misconception": "That query() and ClaudeSDKClient are interchangeable. query() cannot use custom tools and does not maintain a conversation; if you need either, you need the client."
+    },
+    {
+      "id": "manage-the-responses",
+      "name": "Manage the primitives of the response stream",
+      "plain_english": "The universal SDK loop is: set options (the core four) -> mount the agent -> query -> manage the responses. Responses stream back as typed message/blocks you parse: AssistantMessage containing TextBlock (the answer), ThinkingBlock (reasoning), ToolUseBlock (a tool call), ToolResultBlock (a tool's return); and ResultMessage (session_id, total_cost_usd, duration, num_turns); plus SystemMessage (e.g. the tool list). If you don't adopt your agent's perspective and log what it's doing, you can't improve it — build observability into every agent.",
+      "dan_words": "\"You set up your options with the Claude Code options — this basically configures your core four — then set up the SDK, then run your prompt, then manage the responses... These might change in the future. The key idea is that you understand how to manage the primitives of your custom agent.\"",
+      "misconception": "That the exact block/message type names are the lesson. Dan explicitly says they may change; the durable skill is understanding the primitives and parsing whatever the stream gives you."
+    },
+    {
+      "id": "static-vs-dynamic-variables",
+      "name": "Static (runtime-locked) vs dynamic system-prompt variables",
+      "plain_english": "The Social Hype agent injects a {NOTIFICATION_CRITERIA} value into its SYSTEM prompt at startup — a 'static variable that is dynamically updated.' It is set once when the agent boots and then frozen for the agent's life, which is exactly right when you want the agent to obey the same law every run. This is different from a true dynamic user-prompt variable ($1 / $ARGUMENTS) that updates on every user prompt. Tri-Copy-Writer does the same with {NUMBER_OF_VERSIONS}.",
+      "dan_words": "\"This is, to be clear, a static variable that is dynamically updated... This updates to whatever my prompt was at runtime when I kick up this agent, and that's it. Not to be confused with true dynamic variables for Claude Code, you would run something like dollar-sign argument or dollar-sign one.\"",
+      "misconception": "That a variable in a system prompt behaves like a per-call template. In a single-boot agent the system-prompt variable is locked at startup; only user-prompt variables change per turn."
+    },
+    {
+      "id": "workflow-in-system-prompt",
+      "name": "Embed the workflow in the system prompt for domain agents",
+      "plain_english": "Controversially, the Social Hype and Ultra Stream agents put a fixed WORKFLOW inside the system prompt. That is correct precisely because they are domain-specific: you KNOW what should happen every single time, so you encode it as law. The generic Claude Code system prompt has no such workflow because it must stay multi-purpose. A domain agent trades generality for a repeatable, guaranteed workflow.",
+      "dan_words": "\"You can embed workflows in your system prompt if you're sure that that is what you want to happen every single time your agent executes... The Claude Code system prompt does not have a workflow like this because it's a generic multi-purpose engineering agent. But we're building a social hype agent — we have a specific use case, a specific domain problem, and we know the workflow.\"",
+      "misconception": "That workflows always belong in user prompts or slash commands. For a single-purpose agent that must do the same thing every run, the system prompt is the right home."
+    },
+    {
+      "id": "hooks-for-governance",
+      "name": "Hooks give custom agents governance and permissions",
+      "plain_english": "The SDK exposes Claude Code's hook system in code (HookMatcher / HookContext on PreToolUse / PostToolUse). The QA agent registers a block_env_files hook that denies any Read whose path contains '.env' by returning permissionDecision: deny — the agent tries, gets blocked, and reports why. The SDLC agents use write-path hooks so the planner can ONLY write to specs/ and the reviewer ONLY to reviews/. Hooks are essential for governance, control, and permissions — especially when you deploy agents for a team so your compute can't destroy your work.",
+      "dan_words": "\"This is how we can tap into the permission system... when we match the read command, block environment variable files. This is essential for governance, for control, for permissions in all of your agents. You can tap into the hook capabilities with your custom agents.\"",
+      "misconception": "That hooks only apply to the main agent. Dan stresses they work for subagents too — the same security boundary covers Task-spawned agents."
+    },
+    {
+      "id": "extend-vs-custom",
+      "name": "Extension agents vs complete custom agents",
+      "plain_english": "There is a spectrum. Extension/extended agents redeploy the Claude Code agent and only APPEND to its system prompt plus a few tweaks (hide tools, add hooks) — the SDLC planner/reviewer do this; the builder uses the pure Claude Code preset with no append at all, because building software IS what Claude Code is for. Complete custom agents OVERWRITE the system prompt (and go further still when they add their own custom tools) — Pong, Echo, Calc, Social, Tri-Copy, and Ultra Stream are complete custom agents. Use the least invasive option that solves your problem.",
+      "dan_words": "\"There are extension agents, or extended agents, and then there are complete custom agents. This is really defined when you overwrite the system prompt, and then defined even further when you start using your own custom tools... You don't always need to blow away the Claude Code system prompt.\"",
+      "misconception": "That custom agents = throwing Claude Code away. For engineering work you usually just extend it: keep the preset, append instructions, hide a couple tools, add a hook."
+    },
+    {
+      "id": "agents-everywhere-form-factors",
+      "name": "Agents deploy in every form factor",
+      "plain_english": "A custom agent is compute you can embed anywhere. This lesson walks the ladder of form factors: one-off CLI script (Pong, Echo), interactive terminal REPL (Calc, QA), CLI-with-args stream handler (Social Hype on a WebSocket firehose), and full web applications where agents are backend API methods and data streamers (Tri-Copy-Writer, Micro SDLC, Ultra Stream). Most engineering agents live in scripts; but UIs are likely where agents get most deployed.",
+      "dan_words": "\"You can also use agents in terminal UIs... you can build up full agents as backend methods and as data streamers. Deploy agents in scripts, data streams, terminals, and UIs.\"",
+      "misconception": "That agents are chat windows. An agent is a callable component; the interface (script, stream, terminal, UI, backend method) is a choice you make per problem."
+    },
+    {
+      "id": "one-agent-produces-anothers-input",
+      "name": "One agent's output is another agent's input",
+      "plain_english": "The Ultra Stream system (Dan's favorite combination) has two agents: a Stream agent that continuously reads a log file and PRODUCES summarized log entries, and an Inspector agent that CONSUMES those produced logs to answer questions and notify teams. There are many untapped multi-agent configurations where agents feed each other — this is the seed of the agentic layer.",
+      "dan_words": "\"You can produce outputs with one agent and have other agents like the inspector agent consume the output as its input from another agent. There's just so many multi-agent configurations that are untapped and unexplored.\"",
+      "misconception": "That multi-agent means agents talking in a chat. Here the handoff is data: one writes structured summaries to a store, the other reads and reasons over them."
+    },
+    {
+      "id": "token-efficient-domain-tools",
+      "name": "Domain tools let an agent beat an insurmountable problem cheaply",
+      "plain_english": "The Ultra Stream stream agent processes a log file that could be far larger than its context window. Instead of dumping the whole file in, its read_stream_file tool uses a subprocess (sed) to pull only 3-5 lines at a time, caches raw lines by index, and the agent summarizes one log per tool call — then calls clear_context to reset its own context window and run indefinitely. This is impossible to do cheaply with a generic agent; the fine-grained, domain-specific tool is what saves the tokens, time, and money.",
+      "dan_words": "\"We are building a specialized agent to operate on a file in a token efficient way... It could be many, many times larger than its context window... We of course have built fine-grained tools to help our agent operate this specific use case. Saving money, saving tokens, saving time. You cannot do this without serious prompt engineering with an out-of-the-box agent.\"",
+      "misconception": "That bigger context windows make this unnecessary. Streaming, chunked reads plus self-managed context let one agent process an effectively unbounded stream that no single context window could hold."
+    },
+    {
+      "id": "when-to-build-custom",
+      "name": "When to build custom (and when NOT to)",
+      "plain_english": "Build a custom agent when you need one of: programmatic agents; solving repeat workflows with agents; solving a domain-specific problem better than anyone with compute; keeping cost down while keeping performance up; permission checks so your compute can't destroy work or is safe to hand to teammates; and above all, wanting to stay OUT of the loop. Do NOT build custom when you're in the loop prompting back and forth (just use Claude Code), when the workflow is generic, when you're exploring/prototyping, when you need an 80%-case generalist, or for short-lived, lightweight, non-repeatable, non-domain tasks. And never try to out-build Claude Code at general engineering — they own agentic coding.",
+      "dan_words": "\"You build custom agents when you want to stay out of the loop... It is natural that if you're pushing compute to its limits, you will end up at custom agents. But for a lot of use cases, out-of-the-box agents are good enough.\"",
+      "misconception": "That reaching custom agents means you must build them everywhere. Custom agents are the endpoint of pushing compute to its limits for specific problems — most work should stay on out-of-the-box or lightly extended agents."
+    }
+  ],
+  "core_four_control": {
+    "context": "Everything the agent sees costs tokens: system prompt, user prompt, every tool definition, every MCP config (the Firecrawl MCP is ~6k tokens). disallowed_tools removes built-in tools from the context entirely (Calc strips all 15). Adopt the agent's perspective; run /context; only load what the domain needs. clear_context (Ultra Stream) lets an agent reset its own window to run forever.",
+    "model": "Declared explicitly per agent. Haiku (claude-3-5-haiku-20241022) for the trivial Echo transform (cheap/fast); Sonnet (claude-sonnet-4-20250514) as the default balanced choice for most agents; Opus (claude-opus-4-1-20250805) offered for the SDLC agent's heavier planning/review. Right-size intelligence to the task and to cost-at-scale.",
+    "prompt": "Two prompts now matter: the SYSTEM prompt (the law — affects every run; overwrite for a custom agent, append to extend) and the USER prompt (arrives via client.query()). System-prompt variables are static (locked at boot, e.g. {NOTIFICATION_CRITERIA}, {NUMBER_OF_VERSIONS}); user-prompt variables are dynamic ($1/$ARGUMENTS). Domain agents may embed the whole workflow in the system prompt.",
+    "tools": "allowed_tools whitelists (including MCP tools by mcp__<server>__<tool>); disallowed_tools blacklists and de-contexts built-ins; @tool + create_sdk_mcp_server add in-memory custom tools; .mcp.json configs load external MCP servers. Inside a tool you are in deterministic code — return the proper content format, and surface errors so the agent can pivot (stdout + tools leverage point).",
+    "why_it_matters": "Custom agents are just the ability to set the core four in code and have the agent perform that way every time, consistently and reproducibly. Isolate the core four in any agent's options and you understand how that agent will behave — and how to scale it. Dan: it's no longer the models that bottleneck us; it's our ability to wield better, more, and custom agents."
+  },
+  "sdk_mechanics": {
+    "package": "claude-agent-sdk (Python; imported as claude_agent_sdk). Formerly the 'Claude Code SDK' / claude_code_sdk — Dan says 'Claude Code SDK' throughout the recording, and the on-screen code still reads ClaudeCodeOptions, but every pyproject.toml and .py file in the shipped repo now imports claude_agent_sdk and ClaudeAgentOptions. Prompt caching is built in, so you save money out of the box.",
+    "universal_flow": "1) Build ClaudeAgentOptions (the core four). 2) Mount the agent (query() OR ClaudeSDKClient). 3) Send the user prompt (client.query(...)). 4) Manage the streamed responses (parse blocks; capture session_id/cost from ResultMessage).",
+    "query_vs_client": "query(prompt, options) -> async iterator, one-off, NO custom tools. ClaudeSDKClient(options) -> async context manager, multi-turn, REQUIRED for custom tools; call client.query() one or more times and iterate client.receive_response().",
+    "message_and_block_types": "AssistantMessage.content = [TextBlock (answer), ThinkingBlock (reasoning, e.g. 'think hard'), ToolUseBlock (name/input), ToolResultBlock (content/is_error)]; ResultMessage (session_id, total_cost_usd, duration_ms, duration_api_ms, num_turns, is_error); SystemMessage (init info incl. tool list). Dan: these may change; learn to parse the primitives.",
+    "session_continuity": "Capture ResultMessage.session_id, pass it back as ClaudeAgentOptions(resume=session_id) to continue a conversation across queries (Calc REPL, QA, Tri-Copy, SDLC).",
+    "hooks": "hooks={'PreToolUse': [HookMatcher(matcher='Read', hooks=[fn]), HookMatcher(hooks=[fn])], 'PostToolUse': [...]}. A hook fn returns {} to allow, or {'hookSpecificOutput': {'hookEventName': 'PreToolUse', 'permissionDecision': 'deny', 'permissionDecisionReason': '...'}} to block. Works for subagents.",
+    "custom_tools": "@tool(name, description, {param: type}) async fn(args: dict) -> {'content': [{'type':'text','text':...}], 'is_error'?: bool}; register via create_sdk_mcp_server(name, version, tools=[...]) and expose with allowed_tools=['mcp__<server>__<tool>'].",
+    "system_prompt_forms": "String -> full overwrite (custom agent). Dict {'type':'preset','preset':'claude_code'} -> pure Claude Code (SDLC builder). Dict {'type':'preset','preset':'claude_code','append': '...'} -> extend Claude Code (SDLC planner/reviewer). External .mcp.json path loads MCP servers.",
+    "other_options_seen": "model, allowed_tools, disallowed_tools, mcp_servers, max_turns (Social Hype=3), cwd (SDLC agents run in the ticket's codebase), permission_mode ('acceptEdits' for planner/reviewer, 'bypassPermissions' for builder), resume."
+  },
+  "the_eight_agents": [
+    {
+      "n": 1,
+      "name": "Pong Agent",
+      "dir": "apps/custom_1_pong_agent",
+      "interface": "CLI script (one-off)",
+      "entrypoint": "uv run python apps/custom_1_pong_agent/pong_agent.py [--prompt \"...\"]",
+      "model": "claude-sonnet-4-20250514",
+      "sdk_surface": "query() one-off; ClaudeAgentOptions(system_prompt, model); parse AssistantMessage/TextBlock + ResultMessage; cost + session-id + duration display.",
+      "prompt_strategy": "FULL overwrite. 3-line PONG_AGENT_SYSTEM_PROMPT.md: 'Always respond with exactly pong to ANY input.'",
+      "tools": "None custom; built-ins present but irrelevant.",
+      "new_concept": "The system prompt is everything; two config changes (model + system prompt) build a whole new product; ~150 lines, mostly logging.",
+      "key_files": ["pong_agent.py", "prompts/PONG_AGENT_SYSTEM_PROMPT.md", "pong_agent.ts (TS parity)"]
+    },
+    {
+      "n": 2,
+      "name": "Echo Agent",
+      "dir": "apps/custom_2_echo_agent",
+      "interface": "CLI script (with optional --follow-up multi-turn)",
+      "entrypoint": "uv run python apps/custom_2_echo_agent/echo_agent.py [\"...\"] [--follow-up]",
+      "model": "claude-3-5-haiku-20241022 (downgraded for speed; sonnet-4 commented alt)",
+      "sdk_surface": "ClaudeSDKClient (required for custom tools); create_sdk_mcp_server in-memory; allowed_tools=['mcp__echo__echo']; ToolUseBlock + TextBlock parsing.",
+      "prompt_strategy": "FULL overwrite. 1-line: 'Use the echo tool when asked.'",
+      "tools": "Custom @tool echo(message, repeat, transform) — uppercase/lowercase/reverse then repeat.",
+      "new_concept": "Custom tool via @tool + in-memory MCP server; model downgrade; query vs ClaudeSDKClient; the 15 built-in Claude Code tools STILL load into context even after adding one custom tool.",
+      "key_files": ["echo_agent.py", "prompts/ECHO_AGENT_SYSTEM_PROMPT.md"]
+    },
+    {
+      "n": 3,
+      "name": "Calculator Agent",
+      "dir": "apps/custom_3_calc_agent",
+      "interface": "Interactive terminal REPL",
+      "entrypoint": "uv run python apps/custom_3_calc_agent/calc_agent.py",
+      "model": "claude-sonnet-4-20250514",
+      "sdk_surface": "ClaudeSDKClient rebuilt each loop with resume=current_session_id for TRUE continuity; explicit disallowed_tools strips all built-ins; cost accumulation.",
+      "prompt_strategy": "FULL overwrite (CALC_AGENT_SYSTEM_PROMPT.md).",
+      "tools": "custom_math_evaluator(expression, precision) [eval() with restricted __builtins__ + math funcs]; custom_unit_converter(value, from_unit, to_unit) [length/weight/temperature].",
+      "new_concept": "disallowed_tools removes tools from context entirely (they aren't even an option); resume-based session continuity; terminal-REPL form factor; built-in prompt caching saves money.",
+      "key_files": ["calc_agent.py", "prompts/CALC_AGENT_SYSTEM_PROMPT.md"]
+    },
+    {
+      "n": 4,
+      "name": "Social Hype Agent",
+      "dir": "apps/custom_4_social_hype_agent",
+      "interface": "CLI with args (keywords + -n notification prompt); real-time stream handler",
+      "entrypoint": "uv run python apps/custom_4_social_hype_agent/social_hype_agent.py <keywords...> -n \"criteria\"",
+      "model": "claude-sonnet-4-20250514, max_turns=3",
+      "sdk_surface": "Bluesky Jetstream WebSocket firehose -> deterministic keyword filter (string contains) -> asyncio.Queue worker -> ClaudeSDKClient per match; submit_analysis + notify tools; disallowed all built-ins.",
+      "prompt_strategy": "FULL overwrite with {NOTIFICATION_CRITERIA} static variable (locked at boot) + embedded WORKFLOW + tool-usage guide.",
+      "tools": "submit_analysis(summary, sentiment, keyword) — structured sentiment; notify(title, message, urgency) — macOS osascript alert + ElevenLabs TTS.",
+      "new_concept": "Data-stream agent form factor; deterministic pre-filter feeds the LLM only matches; static-variable-in-system-prompt vs dynamic user variable; workflow embedded in system prompt for a domain agent.",
+      "key_files": ["social_hype_agent.py", "modules/agent.py", "modules/tools.py", "modules/tts_notifier.py", "modules/utils.py", "prompts/SOCIAL_HYPE_AGENT_SYSTEM_PROMPT.md"]
+    },
+    {
+      "n": 5,
+      "name": "QA Agent",
+      "dir": "apps/custom_5_qa_agent",
+      "interface": "Interactive terminal REPL (codebase Q&A expert)",
+      "entrypoint": "uv run python apps/custom_5_qa_agent/qa_agent.py",
+      "model": "claude-sonnet-4-20250514",
+      "sdk_surface": "ClaudeSDKClient; inline hooks (block_env_files, log_tool_usage) on Pre/PostToolUse; read-only allowed_tools + Firecrawl MCP via .mcp.json.firecrawl_6k; Task subagents for parallel search; ThinkingBlock ('think hard'); custom /qa_agent slash command.",
+      "prompt_strategy": "FULL overwrite with cwd context + agent examples in the system prompt.",
+      "tools": "No new custom tools; allowed Read/Grep/Glob/Task/WebSearch/WebFetch/Bash + firecrawl_scrape/search/crawl; disallowed all write/edit tools.",
+      "new_concept": "Hooks for governance/security (deny Read on .env; hooks cover subagents); a simple agent EXPERT; connecting a custom agent to the MCP ecosystem; parallel Task search; reasoning blocks.",
+      "key_files": ["qa_agent.py", "prompts/QA_AGENT_SYSTEM_PROMPT.md", ".claude/commands/qa_agent.md", ".mcp.json.firecrawl_6k.sample", "test_inline_hooks.py"]
+    },
+    {
+      "n": 6,
+      "name": "Tri-Copy-Writer Agent",
+      "dir": "apps/custom_6_tri_copy_writer",
+      "interface": "Web application (Vue frontend + FastAPI backend)",
+      "entrypoint": "backend: uv run python main.py [-v N]; frontend: npm run dev -> http://127.0.0.1:5173",
+      "model": "claude-sonnet-4-20250514",
+      "sdk_surface": "ClaudeSDKClient behind a FastAPI /copy endpoint; ALL tools disallowed (pure text gen); resume=session_id; JSON response parsed into Pydantic CopyResponse; drag-drop file context wrapped in <content name=\"...\">.",
+      "prompt_strategy": "FULL overwrite with {NUMBER_OF_VERSIONS} static variable set by the -v CLI flag (clamped 1-10).",
+      "tools": "None (tool calling provides no value for this pure-generation use case).",
+      "new_concept": "Agents as backend API methods inside a UI; ONE prompt -> N variations (all in one context window so it can differentiate them); return a concrete response object (Pydantic here, Zod in TS).",
+      "key_files": ["backend/main.py", "prompts/TRI_COPY_WRITER_SYSTEM_PROMPT.md", "frontend/src/App.vue", "frontend/index.html"]
+    },
+    {
+      "n": 7,
+      "name": "Micro SDLC Agent",
+      "dir": "apps/custom_7_micro_sdlc_agent",
+      "interface": "Web application (Vue kanban board + FastAPI + SQLite), WebSocket streaming",
+      "entrypoint": "backend: uv run python main.py; frontend: npm run dev -> 5173",
+      "model": "claude-sonnet-4-20250514 default; claude-opus-4-1-20250805 available (per-ticket)",
+      "sdk_surface": "Three ClaudeSDKClient agents orchestrated by stage (Idle->Plan->Build->Review->Shipped/Errored). cwd=ticket codebase; permission_mode acceptEdits/bypassPermissions; resume; WebSocket streams messages+tool counts to the board.",
+      "prompt_strategy": "Planner: preset claude_code + APPEND instructions + planner_write_hook (Write only to specs/). Builder: PURE preset claude_code (no append) — engineering work uses the engineering agent. Reviewer: preset + APPEND + reviewer_write_hook (Write only to reviews/).",
+      "tools": "Mostly the built-in Claude Code tool set (Read/Write/Edit/Grep/Glob/Bash/TodoWrite/Task); governed by write-path hooks.",
+      "new_concept": "Multi-agent hand-off / micro software development lifecycle in a UI; extend-vs-overwrite in practice; path-restricted write hooks; out-loop review (Peter framework: tickets = prompt input + review system); one agent, one prompt, one purpose (don't let a custom agent auto-compact behind your back).",
+      "key_files": ["backend/main.py", "backend/modules/agent_orchestrator.py", "backend/modules/config.py", "backend/db/database.py", "backend/system_prompts/PLANNER_AGENT_SYSTEM_PROMPT.md", "backend/system_prompts/REVIEWER_AGENT_SYSTEM_PROMPT.md", "backend/user_prompts/PLANNER_AGENT_USER_PROMPT.md", "backend/user_prompts/BUILDER_AGENT_USER_PROMPT.md", "backend/user_prompts/REVIEWER_AGENT_USER_PROMPT.md", "frontend/src/App.vue"]
+    },
+    {
+      "n": 8,
+      "name": "Ultra Stream Agent",
+      "dir": "apps/custom_8_ultra_stream_agent",
+      "interface": "Web application (Vue dual-panel + FastAPI + SQLite), WebSocket streaming",
+      "entrypoint": "backend: uv run python backend/main.py [-f logs.jsonl] [--reset]; frontend: npm run dev -> 5173",
+      "model": "claude-sonnet-4-20250514 (both agents)",
+      "sdk_surface": "Two full custom ClaudeSDKClient agents; each mounts its own create_sdk_mcp_server; disallow all built-ins; self-managed context via clear_context (resets lines_processed_in_session); SQLite persistence; WebSocket to dual-panel UI.",
+      "prompt_strategy": "Both FULL overwrite. Stream: LINES_TO_READ=3-5, MAX_LINES_BEFORE_CONTEXT_CLEAR=50, embedded workflow + examples. Inspector: markdown output + notification decision framework.",
+      "tools": "Stream: read_stream_file (sed subprocess chunk read + raw_log_cache), produce_summarized_log (one per log), create_alert_message, clear_context. Inspector: read_produced_log_entries, find_logs_for_user, notify_engineering_team, notify_support_team (+ 'none').",
+      "new_concept": "Dual-agent stream+inspect (Dan's favorite); one agent PRODUCES output another CONSUMES; token-efficient chunked reading of an effectively unbounded file; an agent that manages its own context window to run indefinitely; fine-grained domain tools beat an insurmountable problem cheaply.",
+      "key_files": ["backend/main.py", "modules/data_types.py", "system_prompts/stream_agent_system_prompt.md", "system_prompts/inspector_agent_system_prompt.md", "generate_sample_data.py", "data/ultra_stream_agent.jsonl", "frontend/src/App.vue"]
+    }
+  ],
+  "step_by_step_demo": [
+    "(0:07-3:20) Thesis: the single path is better -> more -> custom agents. The mismatch problem: out-of-the-box agents are built for everyone's codebase, not yours, costing hundreds of hours and millions of tokens. Custom agents let you pass your domain knowledge to your compute and take one-agent/one-prompt/one-purpose to its limit.",
+    "(3:24-6:45) Pong agent: run pong_agent.py; whatever you type ('hello', 'summarize this codebase', 'king') it replies 'pong'. Open PONG_AGENT_SYSTEM_PROMPT.md — a 3-line overwrite. Two SDK changes (model + system prompt) build a new product. 'This is not Claude Code anymore.' Parse AssistantMessage/TextBlock + ResultMessage; show cost.",
+    "(6:49-13:25) Echo agent: run echo_agent.py; it calls a custom echo tool (reverse/uppercase/repeat). @tool decorator + create_sdk_mcp_server (in-memory MCP). Model downgraded to Haiku. ClaudeSDKClient (not query) enables custom tools and, with --follow-up, multi-turn. Then 'list your available tools' reveals the 15 baked-in Claude Code tools STILL loaded — they cost context.",
+    "(13:30-21:35) Calc agent: interactive REPL. 'list all tools' shows ONLY the two custom tools because a big disallowed_tools block strips every built-in from context. Convert 55F->C, 125m->mm; compare mortgage deals (multi-tool). resume=session_id gives true conversation memory. Sonnet model; consistent prompts/ directory across all agents.",
+    "(21:38-29:45) Social Hype agent: pass keywords + -n notification prompt; it taps the Bluesky firehose WebSocket, deterministically filters ~thousands of messages for keywords, then runs an LLM sentiment analysis (submit_analysis) and fires a macOS alert + TTS (notify) when the criteria match. System prompt carries a static {NOTIFICATION_CRITERIA} variable locked at boot and an embedded workflow.",
+    "(29:49-37:05) QA agent: a codebase Q&A expert REPL. 'list your tools' shows 13 tools incl. the Firecrawl MCP server. 'think hard' surfaces a ThinkingBlock; Task subagents run parallel search. A block_env_files hook DENIES reading .env (the agent tries, gets blocked, reports why) — governance in code. Read-only tool set; /qa_agent slash command.",
+    "(37:08-42:25) Tri-Copy-Writer: a Vue web UI. One prompt ('write a blog post title 30-60 chars') returns SIX variations at once; drag-drop a file for context. Backend is a FastAPI /copy method wrapping ClaudeSDKClient with {NUMBER_OF_VERSIONS} set by -v; ALL tools disallowed; JSON parsed into a Pydantic response object.",
+    "(42:29-50:05) Micro SDLC: a kanban board (Plan->Build->Review->Ship). Create ticket 'update titles', drag to Plan; the Planner agent (preset+append, write-restricted to specs/) plans, hands to the Builder (pure Claude Code preset, bypassPermissions) which edits the app on itself, then the Reviewer (preset+append, write-restricted to reviews/) reviews and it ships — a single out-loop prompt via the Peter framework. Hooks intercept and allow/deny writes live over WebSocket.",
+    "(50:11-1:00:00) Ultra Stream (favorite combo): dual-panel UI. A Stream agent continuously reads a JSONL log file in 3-5 line chunks (sed subprocess), summarizes one log per call with severity, raises alerts, and calls clear_context to reset its own window — operating on a file far bigger than its context. An Inspector agent consumes those produced logs to answer 'list issues 1-3', 'find logs for user X', and to notify engineering/support teams.",
+    "(1:00:00-1:07:11) Decision framework: build custom agents when you need programmatic agents, repeat workflows, domain-specific wins, cost-down/performance-up, permission checks, or to stay out of the loop — otherwise use out-of-the-box/extended agents (and never try to out-build Claude Code at general engineering). Recap: agentic coding is about what we can teach our agents to do; the path is better, more, then custom agents."
+  ],
+  "quotes": [
+    { "text": "Agentic engineering leads every engineer down one single path. Better agents, more agents, and then custom agents.", "approx_timestamp": "0:07" },
+    { "text": "The out-of-the-box agents are incredible, but there's a massive problem with these tools. They're built for everyone's codebase, not yours.", "approx_timestamp": "0:47" },
+    { "text": "This mismatch can cost you hundreds of hours and millions of tokens, scaling as your codebase grows.", "approx_timestamp": "0:56" },
+    { "text": "This is where all the alpha is in engineering. It's in the hard specific problems that most engineers and most agents can't solve out of the box.", "approx_timestamp": "1:05" },
+    { "text": "The system prompt is the most important element of your custom agents, with zero exceptions.", "approx_timestamp": "5:03" },
+    { "text": "The system prompt affects every single user prompt the agent runs, every single one. So all of your work is multiplied by your system prompt.", "approx_timestamp": "5:20" },
+    { "text": "This is not Claude Code anymore. It might be using the same model, but the system prompt is truly what builds the agent.", "approx_timestamp": "6:10" },
+    { "text": "Everything that's going into your agent winds up in the context window at some point... It consumes space in your agent's mind.", "approx_timestamp": "12:10" },
+    { "text": "It's not the models that are the limitation, the bottleneck anymore. It's you and I. It's our ability to wield better agents, more agents, and now custom agents.", "approx_timestamp": "19:42" },
+    { "text": "You can embed workflows in your system prompt if you're sure that that is what you want to happen every single time your agent executes.", "approx_timestamp": "27:38" },
+    { "text": "We have governance and permission checks built into the agent.", "approx_timestamp": "31:33" },
+    { "text": "This is essential for governance, for control, for permissions in all of your agents.", "approx_timestamp": "36:40" },
+    { "text": "You don't always need to blow away the Claude Code system prompt.", "approx_timestamp": "49:57" },
+    { "text": "We are building a specialized agent to operate on a file in a token efficient way.", "approx_timestamp": "55:33" },
+    { "text": "You cannot do this without serious prompt engineering with an out-of-the-box agent.", "approx_timestamp": "58:20" },
+    { "text": "You build custom agents when you want to stay out of the loop.", "approx_timestamp": "1:00:20" },
+    { "text": "In no way do I think you should try to compete with Claude Code... They own agentic coding. They are the best at this.", "approx_timestamp": "1:02:40" },
+    { "text": "Agentic coding is not so much about what we can do anymore. It's about what we can teach our agents to do.", "approx_timestamp": "1:06:52" }
+  ],
+  "prerequisites_tools": [
+    "A terminal + an IDE (Dan uses VS Code)",
+    "Python + UV (Astral) — every agent runs via `uv run`",
+    "Node.js + npm and Bun (for the Vue frontends of agents 6/7/8; Pong ships a TS/Bun parity script)",
+    "Claude Code + the Claude Agent SDK (`claude-agent-sdk`) with a Claude plan or ANTHROPIC_API_KEY (funds for millions of tokens)",
+    "Optional: FIRECRAWL_API_KEY (QA agent MCP), ELEVENLABS_API_KEY (Social Hype TTS), macOS (osascript notifications)",
+    "Recommended prior lessons: TAC 1-8; AH-1 (RD framework / context window mastery) and AH-2 (agentic prompt formats) — the agentic prompt structure appears in every system prompt"
+  ],
+  "what_student_must_internalize": [
+    "The path is fixed: better agents -> more agents -> custom agents. You arrive at custom agents by pushing compute to its limits, not by choice-for-its-own-sake.",
+    "A custom agent is just the core four (context, model, prompt, tools) set in code so the agent performs the same way every time. Isolate the core four in any agent's options to understand it.",
+    "The system prompt is the law: it runs before every user prompt, so it multiplies all the agent's work. Overwriting it creates a new product; appending extends Claude Code.",
+    "Everything you give an agent (tools, MCP configs, prompts) costs context. allowed_tools gates calls; disallowed_tools removes tool definitions from context entirely.",
+    "query() = one-off; ClaudeSDKClient = conversation and the only path to custom tools; resume=session_id maintains continuity.",
+    "Match the model to the task (Haiku/Sonnet/Opus) — the model is rarely the bottleneck now; your ability to wield agents is.",
+    "Prefer the least invasive option: out-of-the-box, then extended (preset + append + a few hooks), then complete custom (overwrite + custom tools). Never try to out-build Claude Code at general engineering.",
+    "Hooks are how custom agents get governance, permissions, and safety — and they cover subagents too.",
+    "Agents deploy in every form factor (script, stream, terminal, backend method, UI); one agent's output can be another agent's input.",
+    "Build custom agents for programmatic, repeat, domain-specific, cost-sensitive, permission-gated, out-of-loop problems — otherwise stay on the generalist."
+  ],
+  "common_weak_student_failures": [
+    "Overwriting the Claude Code system prompt for ordinary engineering work — throwing away a world-class generalist to hand-roll a worse one, when a light append would have done it.",
+    "Assuming allowed_tools keeps context lean; forgetting that the ~15 built-in tools still load unless explicitly disallowed (the Echo agent's exact lesson).",
+    "Reaching for query() with a custom tool and being confused when the tool never fires — custom tools require ClaudeSDKClient.",
+    "Losing conversation memory because they never capture and pass back the ResultMessage.session_id via resume=.",
+    "Treating a system-prompt variable as a per-call template — it's static, locked at boot; only user-prompt variables ($1/$ARGUMENTS) change per turn.",
+    "Building a custom agent for a task that's in-loop, generic, exploratory, or one-off — spending effort where the out-of-the-box agent already wins.",
+    "Shipping an agent with no logging/observability, then being unable to see WHY it misbehaves — never adopting the agent's perspective.",
+    "Skipping hooks/permissions when deploying an agent for teammates, letting compute read secrets or write outside its lane.",
+    "Trying to reproduce/compete with Claude Code as a general engineering agent — the one thing Dan explicitly warns against.",
+    "Over-reading the exact SDK block/message names or the ClaudeCodeOptions/ClaudeAgentOptions naming as the lesson, instead of the durable primitive: set the core four, manage the response stream."
+  ],
+  "teach_back_prompt": "Without notes, teach a colleague: (1) the path 'better -> more -> custom agents' and the one condition that finally justifies going custom; (2) why the system prompt is 'the law' and what concretely changes between OVERWRITING it (Pong) and APPENDING to the claude_code preset (the SDLC planner/reviewer); (3) using the Echo and Calc agents, explain why allowed_tools alone doesn't keep context lean and what disallowed_tools actually does; (4) name the two SDK entrypoints and which one custom tools require and why; and (5) using the Ultra Stream agent, explain how a fine-grained domain tool + self-managed context let one agent process a file bigger than its context window. Finish by stating Dan's rule for when NOT to build a custom agent.",
+  "retrieval_questions": [
+    { "q": "What is the single path every agentic engineer walks?", "a": "Better agents -> more agents -> custom agents." },
+    { "q": "What are the two things the Pong agent changes to become a whole new product?", "a": "The model and the system prompt (a 3-line full overwrite). Everything else is plumbing/logging." },
+    { "q": "Why is the system prompt 'the law' of a custom agent?", "a": "It is injected before every single user prompt, so it governs (multiplies) every run the agent ever does." },
+    { "q": "The Echo agent runs 'list your available tools' and reveals what surprising fact?", "a": "The ~15 built-in Claude Code tools are still loaded even after adding one custom tool — they consume context. allowed_tools gates calls but doesn't unload definitions." },
+    { "q": "How does the Calc agent keep those tools out of the context window?", "a": "An explicit disallowed_tools list removes the built-ins entirely — they aren't even an option and never reach context." },
+    { "q": "query() vs ClaudeSDKClient — when do you need the client?", "a": "query() is one-off with no custom tools; ClaudeSDKClient is for continuous conversations and is REQUIRED for custom tools." },
+    { "q": "How do you keep a conversation alive across SDK calls?", "a": "Capture ResultMessage.session_id and pass it as ClaudeAgentOptions(resume=session_id) on the next query." },
+    { "q": "What is the difference between a static and a dynamic prompt variable here?", "a": "A static variable (e.g. {NOTIFICATION_CRITERIA}, {NUMBER_OF_VERSIONS}) is set once at agent boot and frozen; a dynamic variable ($1/$ARGUMENTS) updates on every user prompt." },
+    { "q": "What does the QA agent's block_env_files hook do, and does it cover subagents?", "a": "On PreToolUse it denies any Read whose path contains '.env' (permissionDecision: deny) and reports why; yes, hooks cover subagents too." },
+    { "q": "Distinguish an extended agent from a complete custom agent.", "a": "Extended = keep the claude_code preset and APPEND (plus tweaks/hooks); complete custom = OVERWRITE the system prompt (and further, add your own custom tools). The SDLC planner/reviewer extend; the builder uses the pure preset; Pong/Echo/Calc/Social/Tri-Copy/Ultra Stream are complete custom." },
+    { "q": "In the SDLC agent, why does the builder use the pure Claude Code preset with no append?", "a": "Building software IS what Claude Code is for — you don't need to overwrite the engineering agent to do engineering work." },
+    { "q": "How does the Ultra Stream stream agent process a log file bigger than its context window?", "a": "read_stream_file uses a sed subprocess to read only 3-5 lines at a time (caching raw lines by index), summarizes one log per tool call, and calls clear_context to reset its own window — running indefinitely, token-efficiently." },
+    { "q": "Name three reasons Dan gives to build a custom agent.", "a": "Any of: programmatic agents; repeat workflows; domain-specific problems solved better than anyone; cost-down while performance-up; permission checks/safety; staying out of the loop." },
+    { "q": "Name two situations where you should NOT build a custom agent.", "a": "Any of: you're in the loop prompting back and forth; the workflow is generic; you're exploring/prototyping; you need an 80%-case generalist; short-lived/lightweight/non-repeatable/non-domain tasks; trying to out-build Claude Code at general engineering." }
+  ],
+  "codebase_map": {
+    "root_files": {
+      "README.md": "Catalog of all eight agents with purpose, interface, capabilities, and run commands, plus Claude Code bash aliases (cld/cldp/uvr...). The map of the whole lesson.",
+      "CLAUDE.md": "Essentially empty (single line) in this repo.",
+      ".env.sample": "ANTHROPIC_API_KEY, OPENAI_API_KEY, ELEVENLABS_API_KEY, REPLICATE_API_TOKEN, GEMINI_API_KEY placeholders.",
+      ".mcp.json.sample / .mcp.json.firecrawl_7k.sample / .mcp.json.playwright_10k.sample / .mcp.json.all_17k.sample": "MCP server configs sized by token cost (Firecrawl ~7k, Playwright ~10k, all ~17k) — the tokens each MCP server adds to context; rename off '.sample' to activate.",
+      "ai_docs/README.md": "Pointers to the exact Anthropic docs the agents are built from — Claude Agent SDK (python/typescript), headless, MCP, sub-agents, slash-commands, hooks, custom-tools, and the SDK MIGRATION GUIDE (the claude_code_sdk -> claude_agent_sdk rename).",
+      ".claude/": "The OUTER codebase's own agentic layer: command-based hooks (dangerous_command_blocker.py, universal_hook_logger.py), output styles, slash commands, TTS/LLM utils — distinct from the in-code SDK hooks inside the agents."
+    },
+    "agents": {
+      "apps/custom_1_pong_agent/": "pong_agent.py (+ .ts), prompts/PONG_AGENT_SYSTEM_PROMPT.md — system-prompt overwrite, query() one-off.",
+      "apps/custom_2_echo_agent/": "echo_agent.py, prompts/ECHO_AGENT_SYSTEM_PROMPT.md — @tool + in-memory MCP, Haiku, ClaudeSDKClient.",
+      "apps/custom_3_calc_agent/": "calc_agent.py, prompts/CALC_AGENT_SYSTEM_PROMPT.md — disallowed_tools, resume continuity, two tools.",
+      "apps/custom_4_social_hype_agent/": "social_hype_agent.py + modules/{agent,tools,tts_notifier,utils}.py, prompts/SOCIAL_HYPE_AGENT_SYSTEM_PROMPT.md, social_hype_results.csv — WebSocket firehose stream agent.",
+      "apps/custom_5_qa_agent/": "qa_agent.py, prompts/QA_AGENT_SYSTEM_PROMPT.md, .claude/commands/qa_agent.md, .mcp.json.firecrawl_6k.sample, test_inline_hooks.py — hooks + Firecrawl MCP + parallel Task search.",
+      "apps/custom_6_tri_copy_writer/": "backend/main.py (FastAPI), prompts/TRI_COPY_WRITER_SYSTEM_PROMPT.md, frontend/ (Vue) — agent as backend method, N variations, Pydantic response.",
+      "apps/custom_7_micro_sdlc_agent/": "backend/main.py, backend/modules/{agent_orchestrator,config}.py, backend/db/database.py, backend/system_prompts/{PLANNER,REVIEWER}_*.md, backend/user_prompts/{PLANNER,BUILDER,REVIEWER}_*.md, frontend/ (Vue kanban), specs/ + reviews/ (generated plans/reviews) — three-agent SDLC with write-path hooks.",
+      "apps/custom_8_ultra_stream_agent/": "backend/main.py, modules/data_types.py, system_prompts/{stream,inspector}_agent_system_prompt.md, generate_sample_data.py, data/ultra_stream_agent.jsonl, frontend/ (Vue dual-panel) — dual stream+inspector agents, chunked reads, self-managed context."
+    },
+    "generated_at_runtime": {
+      "specs/*.md (agent 7)": "Plans written by the Planner agent (restricted to this dir).",
+      "reviews/*.md (agent 7)": "Reviews written by the Reviewer agent (restricted to this dir).",
+      "sdlc.db (agent 7) / ultra_stream.db (agent 8)": "SQLite stores for tickets / produced logs.",
+      "social_hype_results.csv (agent 4)": "Appended analysis rows (timestamp, keywords, sentiment, summary, original text, raw data)."
+    }
+  },
+  "current_practice_gaps": [
+    {
+      "gap": "The SDK was renamed from 'Claude Code SDK' to 'Claude Agent SDK'",
+      "why": "Dan says 'Claude Code SDK' throughout and the on-screen code reads ClaudeCodeOptions, but the shipped repo already imports claude_agent_sdk and ClaudeAgentOptions in every file. The package renamed (claude_code_sdk -> claude-agent-sdk) circa late 2025; the migration guide is even linked in ai_docs. Read the recording's 'Claude Code SDK' as the Claude Agent SDK; install `claude-agent-sdk`.",
+      "yt_candidates": ["6fCqj4xFCZI"]
+    },
+    {
+      "gap": "Course-era model IDs will be stale",
+      "why": "Agents pin claude-sonnet-4-20250514, claude-3-5-haiku-20241022, and claude-opus-4-1-20250805. Current families are newer (e.g. Opus 4.x, Sonnet 5, Haiku 4.5, Fable 5) with different IDs. Dan future-proofs ('if you're operating in the future, hopefully you have something more powerful'). Swap the model strings; the model-selection principle (Haiku for trivial, Sonnet balanced, Opus for hard reasoning) is unchanged.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "SDK message/block shapes may drift",
+      "why": "The exact AssistantMessage/ResultMessage/*Block names and hook payload shape can change between SDK versions. Dan explicitly says 'these might change in the future — the key idea is that you understand how to manage the primitives.' Treat the parsing code as period-accurate; re-check against the current SDK reference before copying verbatim.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "eval()-based math tool is a teaching simplification",
+      "why": "The Calc agent evaluates expressions with eval() under a restricted __builtins__/math namespace. It's fine for the demo but modern practice prefers a real parser (ast.literal_eval or a math grammar) to avoid eval risk. Dan's own framing ('do whatever you want inside your tool, just return the proper format') invites hardening this in production.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Reusable-expertise-as-prompt-files vs first-class Agent Skills",
+      "why": "These agents encode reusable expertise as system_prompts/*.md loaded by Python. Modern Claude Code also ships Agent Skills (SKILL.md with discovery/on-demand loading). Skills and SDK custom agents are complementary: Skills package expertise for the in-loop agent; the SDK is the right tool when you need PROGRAMMATIC control (custom tools, hooks, models, deployment) — which is this lesson's whole point.",
+      "yt_candidates": ["X2ciJedw2vU"]
+    },
+    {
+      "gap": "QA agent MCP config path expects a rename",
+      "why": "qa_agent.py loads .mcp.json.firecrawl_6k, but the file shipped on disk is .mcp.json.firecrawl_6k.sample. Out of the box the MCP config isn't found and the agent gracefully falls back to WebSearch/WebFetch. To use Firecrawl, drop the '.sample' suffix and set FIRECRAWL_API_KEY. A small but real setup gotcha for the lab.",
+      "yt_candidates": []
+    }
+  ],
+  "yt_overlay_candidates": [
+    {
+      "video_id": "6fCqj4xFCZI",
+      "title": "How Claude Code CHANGED Engineering Forever",
+      "maps_to": "named hole",
+      "include_in_phase1": true,
+      "rationale": "The lesson is built entirely on the (renamed) Claude Agent SDK and programmable `claude -p` embedding. This public treatment bridges the recording's course-era SDK naming/UI to the current state of the tool — directly filling the 'SDK renamed / current form factor' gap. Verify the ID resolves before publishing.",
+      "verify_before_publish": true
+    },
+    {
+      "video_id": "X2ciJedw2vU",
+      "title": "RAW Agentic Coding: ZERO to Agent SKILL",
+      "maps_to": "corrects outdated",
+      "include_in_phase1": true,
+      "rationale": "Covers Agent Skills — the modern first-class encoding of reusable expertise that complements (and post-dates) the system_prompts/*.md pattern used throughout this lesson. Maps precisely to the 'reusable-expertise vs Agent Skills' named gap without topic drift. Verify the ID resolves before publishing.",
+      "verify_before_publish": true
+    }
+  ],
+  "frame_plan_note": "See frame-plan.json for the full 12-frame plan with why_for_weak_student. All frames extracted at native 1920x1080 from the lesson MP4 and verified on disk under media/frames/ah-3-building-domain-specific-agents/.",
+  "frame_plan": [
+    { "t_seconds": 18, "label": "the-agentic-path", "file": "media/frames/ah-3-building-domain-specific-agents/t0018-the-agentic-path.jpg", "why_for_weak_student": "The 'Agentic Path' title card (Base -> Better -> More -> Custom) is the whole lesson's scaffold in one image; a weak learner needs the destination named before the eight demos make sense.", "diagram_instead": false },
+    { "t_seconds": 225, "label": "pong-run-session-stats", "file": "media/frames/ah-3-building-domain-specific-agents/t0225-pong-run-session-stats.jpg", "why_for_weak_student": "Terminal proof that 'hello' -> 'pong' with a real Session ID, duration, and $0.003629 cost — the smallest possible agent, made concrete, so 'the system prompt controls everything' lands as observation not claim.", "diagram_instead": false },
+    { "t_seconds": 300, "label": "pong-system-prompt", "file": "media/frames/ah-3-building-domain-specific-agents/t0300-pong-system-prompt.jpg", "why_for_weak_student": "The entire behavior-defining artifact — a 3-line PONG_AGENT_SYSTEM_PROMPT.md — on screen. Shows a weak student that 'custom agent' does not mean 'lots of code'; it means the right system prompt.", "diagram_instead": false },
+    { "t_seconds": 565, "label": "echo-mcp-server-model", "file": "media/frames/ah-3-building-domain-specific-agents/t0565-echo-mcp-server-model.jpg", "why_for_weak_student": "One screen shows create_sdk_mcp_server, allowed_tools=[mcp__echo__echo], and the model line (highlighted) downgraded to claude-3-5-haiku — three core-four moves (tools, MCP, model) in context. Also visibly reads ClaudeCodeOptions, anchoring the SDK-rename note.", "diagram_instead": false },
+    { "t_seconds": 1040, "label": "calc-disallowed-tools", "file": "media/frames/ah-3-building-domain-specific-agents/t1040-calc-disallowed-tools.jpg", "why_for_weak_student": "The full disallowed_tools block (Read/Write/Edit/.../KillShell) plus resume=current_session_id. Makes the abstract 'control your context' concrete: this is HOW you strip the 15 built-in tools out of the agent's mind.", "diagram_instead": false },
+    { "t_seconds": 1360, "label": "social-hype-stream", "file": "media/frames/ah-3-building-domain-specific-agents/t1360-social-hype-stream.jpg", "why_for_weak_student": "A live worked example of a data-stream agent: Match found -> Agent Response summary + positive sentiment -> Tool Called: submit_analysis -> Tool Called: notify (New OpenAI Tech Release, urgency high). Shows the deterministic-filter -> LLM-analysis -> tool-action pipeline end to end.", "diagram_instead": false },
+    { "t_seconds": 1852, "label": "consistent-codebase-architecture", "file": "media/frames/ah-3-building-domain-specific-agents/t1852-consistent-codebase-architecture.jpg", "why_for_weak_student": "The VS Code explorer shows apps/custom_1_pong ... custom_6_tri_copy_writer plus the identical prompts/ + agent.py + README layout inside custom_5_qa_agent — the 'consistent codebase architecture' leverage point made visible: same shape every agent, easy for humans AND agents to read.", "diagram_instead": false },
+    { "t_seconds": 2170, "label": "qa-hook-block-env", "file": "media/frames/ah-3-building-domain-specific-agents/t2170-qa-hook-block-env.jpg", "why_for_weak_student": "The block_env_files hook source: `if '.env' in file_path:` -> SECURITY HOOK panel -> return permissionDecision: 'deny'. A weak student sees exactly how governance/permissions are wired in code, not hand-waved.", "diagram_instead": false },
+    { "t_seconds": 2265, "label": "tri-copy-writer-ui", "file": "media/frames/ah-3-building-domain-specific-agents/t2265-tri-copy-writer-ui.jpg", "why_for_weak_student": "The Vue web UI with SIX copy variations from ONE prompt, a session cost line, and a drag-dropped context file — the 'agents in UIs / one prompt -> N variations' idea shown as a product, not a script. Browser tabs foreshadow agents 7 and 8.", "diagram_instead": false },
+    { "t_seconds": 2565, "label": "micro-sdlc-kanban-board", "file": "media/frames/ah-3-building-domain-specific-agents/t2565-micro-sdlc-kanban-board.jpg", "why_for_weak_student": "The Plan -> Build -> Review -> Ship kanban board with per-agent PLAN/BUILD/REVIEW message+tool counts and SONNET badges — multi-agent orchestration made legible: a weak learner can literally watch work flow between specialized agents.", "diagram_instead": false },
+    { "t_seconds": 2825, "label": "planner-write-hook", "file": "media/frames/ah-3-building-domain-specific-agents/t2825-planner-write-hook.jpg", "why_for_weak_student": "agent_orchestrator.py breadcrumb (run_planner_agent > planner_write_hook) over a live 'Write Request -> Write Allowed to the specs/ plan directory -> Tool Allowed' trace. Shows path-restricted write governance in a real multi-agent run — the payoff of the hook concept.", "diagram_instead": false },
+    { "t_seconds": 3060, "label": "ultra-stream-dual-panel", "file": "media/frames/ah-3-building-domain-specific-agents/t3060-ultra-stream-dual-panel.jpg", "why_for_weak_student": "The flagship dual-agent UI: Inspector Agent (left, with a red HIGH-severity ALERT) beside the Stream Agent (right, live severity-tagged log feed, Logs:7 Index:7). One image captures 'one agent produces, another consumes' plus severity classification and alerting.", "diagram_instead": false }
+  ],
+  "estimated_print_pages_when_expanded": 52,
+  "confidence_notes": [
+    "All quotes cross-checked against the VTT; timestamps accurate to within a few seconds around verified anchors (0:07, 0:47, 0:56, 5:03, 19:42, 27:38, 31:33, 36:06, 49:57, 55:33, 1:06:52, 1:07:04). Transcript is auto-generated: 'Claude Code SDK' is spoken while code reads ClaudeCodeOptions; 'Peter framework' = the out-loop review pattern; 'fire call' = Firecrawl; 'clog code'/'cloud code' = Claude Code; 'UVR' = `uv run`; 'ADW' = AI Developer Workflow.",
+    "codebase_map covers every source file under apps/ (8 agents) plus root docs/configs; SQLite DBs, specs/, reviews/, and social_hype_results.csv are runtime/generated artifacts, documented separately.",
+    "The claude_agent_sdk / ClaudeAgentOptions naming was verified directly: all pyproject.toml depend on `claude-agent-sdk` and all .py files import claude_agent_sdk/ClaudeAgentOptions, while frames (t0565, t1040) still show the older ClaudeCodeOptions on screen — a genuine recorded-vs-current delta, and the SDK migration guide is linked in ai_docs/README.md.",
+    "Model IDs read directly from source: claude-sonnet-4-20250514 (23 refs), claude-opus-4-1-20250805 (agent 7 config + models list), claude-3-5-haiku-20241022 (echo). AVAILABLE_MODELS in config.py confirms Sonnet 4 + Opus 4.1.",
+    "All 12 frames were visually verified this session and confirmed 1920x1080 on disk under media/frames/ah-3-building-domain-specific-agents/. A candidate at ~59:00 for the read_stream_file chunk-reader code landed on B-roll; the token-efficient chunked read is covered by the Ultra Stream code reading and is best rendered as a small annotated code excerpt in the chapter rather than a frame.",
+    "YouTube overlay IDs (6fCqj4xFCZI, X2ciJedw2vU) are carried from the tac-1 seed list because they map cleanly to THIS lesson's two named gaps (SDK current-state; Agent Skills). No videos were downloaded (per brief); verify_before_publish=true on both — confirm each ID resolves and re-check title before shipping the overlay link.",
+    "Loot box: the captured course notes list 24 notes (see nuggets.md), including a direct 'Claude Agent SDK Documentation' link — corroborating that the shipped material already uses the Agent-SDK name even though the spoken track says 'Claude Code SDK'."
+  ]
+}

@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first code deep dive into TAC-3: how Dan turns intent into plans, plans into a typed natural-language SQL application, and changes into evidence.">
+  <title>Code Deep Dive · TAC-3 Success is Planned</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="tac-3-success-is-planned.assets.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to the code lesson</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+
+  <header class="site-bar">
+    <a class="site-bar__home" href="../vol-1-tac/03-success-is-planned.html">← Chapter 03 · Success is Planned</a>
+    <span class="site-bar__meta">CODE DEEP DIVE · TAC-3 · 56 FILES</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Code lesson navigation">
+      <p class="rail-kicker">TAC-3 · Companion</p>
+      <h2>How Dan turns intent into executable work</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of explainer</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#hook"><span class="chapter-nav__n">00</span><span>Hook</span></a></li>
+          <li><a href="#map"><span class="chapter-nav__n">01</span><span>Map of the repo</span></a></li>
+          <li><a href="#tree"><span class="chapter-nav__n">02</span><span>File tree</span></a></li>
+          <li><a href="#walk"><span class="chapter-nav__n">03</span><span>Walk the code</span></a></li>
+          <li><a href="#flow"><span class="chapter-nav__n">04</span><span>End-to-end run</span></a></li>
+          <li><a href="#fails"><span class="chapter-nav__n">05</span><span>Common fails</span></a></li>
+          <li><a href="#ledger"><span class="chapter-nav__n">06</span><span>Every file</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">07</span><span>You try</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">08</span><span>Teach-back</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero">
+        <span class="hero__chapter">Code deep dive · request → plan → implementation → evidence</span>
+        <h1>How Dan makes success plannable</h1>
+        <p class="hero__dek">The application is only half the architecture. Around it, Dan built a small planning machine: task-specific prompt templates turn vague intent into a durable spec, then a separate implementation prompt turns that spec into code and a report.</p>
+        <ul class="hero__meta" aria-label="Repository facts">
+          <li>56 real files</li>
+          <li>6,604 logical lines</li>
+          <li>4 planning templates</li>
+          <li>34 collected tests</li>
+          <li>Vite + FastAPI + SQLite</li>
+        </ul>
+        <p class="hero__promise"><strong>Your target:</strong> explain both loops—the engineering loop that creates the code and the runtime loop that answers a data question—and name the real file that owns every handoff.</p>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Code lesson contents</summary>
+          <ol>
+            <li><a href="#hook">Hook</a></li>
+            <li><a href="#map">Map of the repo</a></li>
+            <li><a href="#tree">File tree</a></li>
+            <li><a href="#walk">Walk the code</a></li>
+            <li><a href="#flow">End-to-end run</a></li>
+            <li><a href="#fails">Common fails</a></li>
+            <li><a href="#ledger">Every file</a></li>
+            <li><a href="#lab">You try</a></li>
+            <li><a href="#teach-back">Teach-back</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="hook">
+        <span class="section-number">00 · HOOK</span>
+        <h2 class="section-title">The most consequential code is Markdown</h2>
+        <p class="section-lead">A weak request asks an agent to “add a feature.” Dan’s templates ask the agent to research first, preserve repository patterns, name files, order tasks, define tests, and spell out validation before implementation begins.</p>
+
+        <div class="hook-grid">
+          <article class="soft-card">
+            <p class="card-kicker">Unplanned ask</p>
+            <h3>Intent disappears into a session</h3>
+            <p>The agent must infer scope, architecture, acceptance criteria, and proof at the same time it edits. Every missing decision becomes variance.</p>
+          </article>
+          <article class="soft-card">
+            <p class="card-kicker">Templated plan</p>
+            <h3>Intent becomes a reviewable artifact</h3>
+            <p><code>bug.md</code>, <code>chore.md</code>, and <code>feature.md</code> compile different work types into a stable <code>specs/*.md</code> shape.</p>
+          </article>
+        </div>
+
+        <blockquote>The plan is not paperwork after the thinking. In this repo, the plan is the interface between thinking and building.</blockquote>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The mental model</p>
+          <p>Treat each planning command like a function: it accepts an argument through <code>$ARGUMENTS</code>, combines it with repository constraints and an output schema, and returns a spec that another fresh agent can execute.</p>
+        </aside>
+
+        <h3>Why the demo app matters</h3>
+        <p>The natural-language SQL app gives planning something concrete to control. It has browser state, HTTP contracts, two LLM providers, a database, security boundaries, lifecycle scripts, and tests. A vague change can cross many seams; a good plan names them before code moves.</p>
+      </section>
+
+
+      <section class="chapter-section" id="map">
+        <span class="section-number">01 · DIAGRAM</span>
+        <h2 class="section-title">Map of the repo</h2>
+        <p class="section-lead">There are two connected systems. The clay lane builds software. The green lane runs the software. The checked-in spec is the bridge: it records what the builder intended before the runtime files existed.</p>
+
+        <figure class="diagram repo-map">
+          <div class="diagram__canvas repo-map__canvas">
+            <div class="map-lane" role="img" aria-label="Planning lane from task intent through a task-specific command and spec to implementation and validation evidence">
+              <div class="map-lane__label">Engineering control loop</div>
+              <div class="map-node map-node--intent"><strong>Intent</strong><span>bug, chore, or feature request</span></div>
+              <div class="map-node map-node--template"><strong>Plan template</strong><span><code>.claude/commands/</code><br>research rules + exact output shape</span></div>
+              <div class="map-node map-node--plan"><strong>Durable spec</strong><span><code>specs/*.md</code><br>files, ordered tasks, tests, acceptance, commands</span></div>
+              <div class="map-node map-node--implement"><strong>Implement</strong><span>separate prompt consumes the plan</span></div>
+              <div class="map-node map-node--evidence"><strong>Evidence</strong><span>tests + <code>git diff --stat</code> report</span></div>
+            </div>
+            <div class="map-lane" role="img" aria-label="Runtime lane from browser through FastAPI and core processors to SQLite and LLM providers">
+              <div class="map-lane__label">Application data loop</div>
+              <div class="map-node map-node--browser"><strong>Browser</strong><span><code>index.html</code> + <code>main.ts</code><br>upload, query, render</span></div>
+              <div class="map-node map-node--route"><strong>HTTP boundary</strong><span>Vite proxy → <code>server.py</code><br>Pydantic shapes each response</span></div>
+              <div class="map-node map-node--core"><strong>Core modules</strong><span>file · LLM · SQL · insights<br>small testable responsibilities</span></div>
+              <div class="map-node map-node--edges"><strong>External state</strong><span>SQLite database + OpenAI or Anthropic API</span></div>
+            </div>
+            <div class="map-legend"><span>Engineering artifacts</span><span>Runtime boundaries</span></div>
+          </div>
+          <figcaption>The upper loop reduces implementation ambiguity; the lower loop moves user data. Tests and mirrored contracts make both loops inspectable.</figcaption>
+        </figure>
+
+        <div class="principle-grid">
+          <article class="soft-card"><p class="card-kicker">Control plane</p><h3>Markdown sets policy</h3><p>The commands define what to read, what to ignore, which questions to answer, and what proof must exist.</p></article>
+          <article class="soft-card"><p class="card-kicker">Data plane</p><h3>Code moves values</h3><p>A browser <code>File</code> becomes bytes, a DataFrame, a SQLite table, schema text, generated SQL, row dictionaries, and JSON.</p></article>
+        </div>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Why this design</p>
+          <p>The planning side is text-first so humans can review and agents can consume it. The runtime side uses a thin vertical slice—vanilla TypeScript, FastAPI, focused Python modules, SQLite—so ownership stays visible. The same preference drives both halves: explicit seams beat hidden magic.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="tree">
+        <span class="section-number">02 · FILE TREE</span>
+        <h2 class="section-title">Find the owner before reading the body</h2>
+        <p class="section-lead">Start from the kind of question you have. Planning behavior lives under <code>.claude/</code>. Runtime orchestration lives in <code>server.py</code> and <code>main.ts</code>. Core transformations live in one module each. Proof mirrors those modules under <code>tests/core/</code>.</p>
+
+        <nav class="file-tree" aria-label="Repository file tree with jump links">
+          <ul>
+            <li class="branch"><strong>tac-3/</strong>
+              <ul>
+                <li class="branch"><a href="#planning-templates">.claude/commands/</a> <span class="muted">plan, implement, prime, install, start, inspect tools</span></li>
+                <li><a href="#agent-policy">.claude/settings.json</a> <span class="muted">allowed and denied operations</span></li>
+                <li><a href="#project-docs">README.md + ai_docs/</a> <span class="muted">local project and provider context</span></li>
+                <li class="branch"><a href="#client-shell">app/client/</a>
+                  <ul>
+                    <li><a href="#client-shell">index.html</a> <span class="muted">static DOM contract</span></li>
+                    <li><a href="#client-main">src/main.ts</a> <span class="muted">events, state, rendering</span></li>
+                    <li><a href="#client-contract">src/api/client.ts + src/types.d.ts</a> <span class="muted">typed HTTP seam</span></li>
+                    <li><a href="#client-style">src/style.css</a> <span class="muted">visual states and layout</span></li>
+                    <li><a href="#client-support">config + sample data</a> <span class="muted">build, proxy, reproducible inputs</span></li>
+                  </ul>
+                </li>
+                <li class="branch"><a href="#server-routes">app/server/</a>
+                  <ul>
+                    <li><a href="#server-routes">server.py</a> <span class="muted">HTTP orchestration and lifecycle</span></li>
+                    <li><a href="#data-models">core/data_models.py</a> <span class="muted">validated contracts</span></li>
+                    <li><a href="#file-processor">core/file_processor.py</a> <span class="muted">file bytes → SQLite</span></li>
+                    <li><a href="#llm-processor">core/llm_processor.py</a> <span class="muted">schema + question → SQL</span></li>
+                    <li><a href="#sql-processor">core/sql_processor.py</a> <span class="muted">schema discovery + guarded execution</span></li>
+                    <li><a href="#insights">core/insights.py</a> <span class="muted">column statistics</span></li>
+                    <li><a href="#tests">tests/</a> <span class="muted">deterministic feedback loops</span></li>
+                  </ul>
+                </li>
+                <li><a href="#operations">scripts/</a> <span class="muted">environment and two-process lifecycle</span></li>
+                <li><a href="#feature-spec">specs/init_nlq_to_sql_to_table.md</a> <span class="muted">749-line implementation blueprint</span></li>
+                <li><a href="#secondary-files">root + marker files</a> <span class="muted">environment, ignores, empty extension points</span></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="contrast-grid">
+          <article class="soft-card"><p class="card-kicker">Read vertically</p><h3>Follow one use case</h3><p>For a query: textarea → API wrapper → FastAPI route → schema reader → provider router → SQL guard → response → DOM table.</p></article>
+          <article class="soft-card"><p class="card-kicker">Read temporally</p><h3>Follow one change</h3><p>Request → task template → spec → implementation prompt → changed files → validation commands → diff report.</p></article>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="walk">
+        <span class="section-number">03 · WALK THE CODE</span>
+        <h2 class="section-title">Open one responsibility at a time</h2>
+        <p class="section-lead">These walkthroughs separate real shipped behavior from planned intent. Each names the file’s job, traces control or data, and calls out the beginner mistake most likely to blur the seam.</p>
+
+        <div class="file-tools">
+          <p>20 collapsible walkthroughs · exact checked-in paths</p>
+          <div class="button-row">
+            <button class="tiny-button" id="expand-files" type="button">Expand all</button>
+            <button class="tiny-button" id="collapse-files" type="button">Collapse all</button>
+          </div>
+        </div>
+
+        <details class="file-card" id="planning-templates" open>
+          <summary><span class="file-card__path">.claude/commands/bug.md · chore.md · feature.md</span><span class="file-card__role">planning compiler · 216 lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> Three task-specific commands turn a short request into a plan under <code>specs/</code>. They share a skeleton—research, relevant files, ordered tasks, validation, notes—but add the questions appropriate to each kind of work.</p>
+            <ul class="annotation-list">
+              <li><code>bug 1–18</code><span>Demands reproduction, root-cause analysis, surgical scope, and regression prevention before any fix is described.</span></li>
+              <li><code>chore 1–24</code><span>Keeps the lighter work type simple while still requiring repository research and an exact completion check.</span></li>
+              <li><code>feature 1–29</code><span>Adds existing-pattern research, extensibility, dependency notes, and a larger cross-client/server file scope.</span></li>
+              <li><code>$ARGUMENTS</code><span>Is the input slot. The command is reusable because the policy stays fixed while the task changes.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>.claude/commands/bug.md</span><span>output schema excerpt</span></div>
+              <pre><code class="language-markdown">## Steps to Reproduce
+&lt;list exact steps to reproduce the bug&gt;
+
+## Root Cause Analysis
+&lt;analyze and explain the root cause of the bug&gt;
+
+## Step by Step Tasks
+IMPORTANT: Execute every step in order, top to bottom.</code></pre>
+            </div>
+            <p><strong>Why three files?</strong> A bug plan must explain causality; a feature plan must explain value, design, acceptance, and integration; a chore does not need that ceremony. One universal mega-template would either omit important questions or burden every small change.</p>
+            <aside class="callout callout--warning"><p class="callout__label">Beginner trap</p><p>The templates’ “Relevant Files” sections are planning boundaries, not a complete repository map. They intentionally tell the planning agent what to ignore for that task.</p></aside>
+          </div>
+        </details>
+
+        <details class="file-card" id="implementation-command">
+          <summary><span class="file-card__path">.claude/commands/implement.md</span><span class="file-card__role">plan consumer · 12 logical lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> This is the second stage. It does not ask the agent to rediscover the work; it receives the reviewed plan through <code>$ARGUMENTS</code>, implements it, then reports a concise summary and diff statistics.</p>
+            <div class="code-shell">
+              <div class="code-label"><span>.claude/commands/implement.md</span><span>complete control shape</span></div>
+              <pre><code class="language-markdown"># Implement the following plan
+Follow the `Instructions` to implement the `Plan` then `Report` the completed work.
+
+## Instructions
+- Read the plan, think hard about the plan and implement the plan.
+
+## Plan
+$ARGUMENTS
+
+## Report
+- Summarize the work you've just done in a concise bullet point list.
+- Report the files and total lines changed with `git diff --stat`</code></pre>
+            </div>
+            <p><strong>Why split planner and builder?</strong> The plan can be inspected, corrected, or handed to a fresh context before edits begin. That separation converts a transient conversation into a durable interface.</p>
+            <p><strong>Subtle detail.</strong> The file displays 12 logical lines but <code>wc -l</code> reports 11 because its last line has no newline terminator.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="support-commands">
+          <summary><span class="file-card__path">.claude/commands/install.md · prime.md · start.md · tools.md</span><span class="file-card__role">context + operations · 23 lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> These tiny commands remove repeated setup ambiguity. <code>prime.md</code> reads the tracked tree and README; <code>install.md</code> composes priming with dependency installation and environment copying; <code>start.md</code> launches the app with a 300-second budget; <code>tools.md</code> asks the agent to expose its built-in capability surface.</p>
+            <ul class="annotation-list">
+              <li><code>prime 1–8</code><span>Bootstraps repository context from two high-signal sources instead of reading random files.</span></li>
+              <li><code>install 1–11</code><span>Reuses <code>prime.md</code>, then installs both stacks and calls the environment-copy script.</span></li>
+              <li><code>start 1</code><span>Delegates lifecycle behavior to the checked-in shell script rather than reproducing it in prose.</span></li>
+              <li><code>tools 1–3</code><span>Produces a typed inventory of tools; it does not grant tools that the runtime lacks.</span></li>
+            </ul>
+            <p><strong>Why this design.</strong> Composition keeps command files small. The shell script remains the executable source of truth; the prompt only points at it.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="agent-policy">
+          <summary><span class="file-card__path">.claude/settings.json</span><span class="file-card__role">tool policy · 23 logical lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> The settings file pre-allows common local setup and navigation operations while explicitly denying force-push variants and recursive deletion.</p>
+            <div class="code-shell">
+              <div class="code-label"><span>.claude/settings.json</span><span>guardrail excerpt</span></div>
+              <pre><code class="language-json">{
+  "permissions": {
+    "allow": ["Bash(uv:*)", "Bash(npm:*)", "Write"],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(rm -rf:*)"
+    ]
+  }
+}</code></pre>
+            </div>
+            <p><strong>Why this design.</strong> Planning says what should happen; permissions bound how the agent may act. They are separate leverage points.</p>
+            <p><strong>Beginner trap.</strong> This is a narrow list, not a complete security sandbox. A deny pattern is only as strong as the host’s matching and enforcement.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="feature-spec">
+          <summary><span class="file-card__path">specs/init_nlq_to_sql_to_table.md</span><span class="file-card__role">implementation blueprint · 749 lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> The spec records the stack, MVP flow, proposed architecture, dependency choices, Python/TypeScript contracts, backend responsibilities, UI behavior, state ideas, commands, proxy, phases, and visual system.</p>
+            <ul class="annotation-list">
+              <li><code>1–18</code><span>Defines the smallest valuable loop: upload CSV/JSON, ask a question, generate SQL, render rows.</span></li>
+              <li><code>21–82</code><span>Sketches a more componentized target than the shipped client. It is design intent, not proof that those paths exist.</span></li>
+              <li><code>112–289</code><span>Pairs backend models with browser interfaces. Those names largely survive into the implementation.</span></li>
+              <li><code>291–366</code><span>Defines the route and core-function seams before their bodies are written.</span></li>
+              <li><code>635–749</code><span>Limits delivery to Phase 1 and gives the interface a calm, restrained visual vocabulary.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>specs/init_nlq_to_sql_to_table.md</span><span>the invariant</span></div>
+              <pre><code class="language-markdown">**MVP Core Flow:**
+1. User drags/drops .json or .csv file → Convert to SQLite table
+2. User types "show me users who signed up last week"
+   → AI generates SQL → Execute query → Render table</code></pre>
+            </div>
+            <aside class="callout callout--warning"><p class="callout__label">Plan versus reality</p><p>The committed client is intentionally flatter than the proposed structure, and several planned behaviors—pagination, sorting, query history, and an insights panel—are not wired into the UI. A plan is a map of intent; the file tree is the evidence of delivery.</p></aside>
+          </div>
+        </details>
+
+        <details class="file-card" id="project-docs">
+          <summary><span class="file-card__path">README.md · ai_docs/anthropic_quick_start.md · ai_docs/openai_quick_start.md</span><span class="file-card__role">local context · 654 lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> The README owns project-local truth: setup, lifecycle, usage, commands, structure, endpoints, security claims, and troubleshooting. The two quickstarts place provider examples beside the code so an agent has a nearby integration reference.</p>
+            <ul class="annotation-list">
+              <li><code>README 19–79</code><span>Explains installation, environment files, combined startup, and manual startup.</span></li>
+              <li><code>README 81–110</code><span>Teaches the user flow and gives backend/frontend development commands.</span></li>
+              <li><code>README 112–147</code><span>Indexes runtime ownership, endpoint paths, and intended security posture.</span></li>
+              <li><code>ai_docs/</code><span>Captures course-era SDK guidance. The pinned lockfiles and implementation remain the authority for this repository.</span></li>
+            </ul>
+            <p><strong>Why this design.</strong> A fresh planning agent begins at <code>README.md</code>; local third-party references reduce blind API guessing. Because provider APIs age, these snapshots should not be presented as current recommendations.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="client-shell">
+          <summary><span class="file-card__path">app/client/index.html</span><span class="file-card__role">static DOM contract · 91 lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> The HTML file declares every element that <code>main.ts</code> later locates: query textarea, action buttons, hidden results section, table list, upload modal, sample buttons, drop zone, and hidden file input.</p>
+            <ul class="annotation-list">
+              <li><code>14–26</code><span>Creates the primary query interaction. IDs are the imperative TypeScript API.</span></li>
+              <li><code>28–44</code><span>Provides initially hidden results and the database-backed table catalog.</span></li>
+              <li><code>46–86</code><span>Declares modal sample choices and manual drag/drop upload.</span></li>
+              <li><code>89–90</code><span>Loads <code>/src/main.ts</code> as an ES module; Vite handles the development transform.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>app/client/index.html</span><span>DOM seam</span></div>
+              <pre><code class="language-html">&lt;textarea id="query-input" rows="4" autofocus&gt;&lt;/textarea&gt;
+&lt;button id="query-button" class="primary-button"&gt;Query&lt;/button&gt;
+&lt;button id="upload-data-button" class="secondary-button"&gt;Upload Data&lt;/button&gt;
+
+&lt;section id="results-section" style="display: none;"&gt;
+  &lt;div id="sql-display"&gt;&lt;/div&gt;
+  &lt;div id="results-container"&gt;&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+            </div>
+            <p><strong>Beginner trap.</strong> There is no component framework discovering these elements. If an ID changes here but not in <code>main.ts</code>, the cast may satisfy TypeScript while the browser still receives <code>null</code>.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="client-main">
+          <summary><span class="file-card__path">app/client/src/main.ts</span><span class="file-card__role">browser orchestration · 415 lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> One flat module owns startup, event listeners, uploads, schema refresh, query submission, result/table DOM construction, modal state, deletion, type icons, and sample loading.</p>
+            <ul class="annotation-list">
+              <li><code>4–14</code><span>Creates two in-memory variables, then wires the app after <code>DOMContentLoaded</code>.</span></li>
+              <li><code>17–52</code><span>Reads the textarea, disables the button, posts a typed query, renders the response, and restores the control.</span></li>
+              <li><code>55–106</code><span>Normalizes browse and drag/drop events into one <code>handleFileUpload</code> path.</span></li>
+              <li><code>108–158</code><span>Refetches schema after mutations and displays query text, generated SQL, errors, empty state, or a table.</span></li>
+              <li><code>160–261</code><span>Uses safe <code>textContent</code> when constructing result rows and current-table cards.</span></li>
+              <li><code>306–415</code><span>Owns modal behavior, DELETE calls, type glyphs, and sample-file fetch/upload.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>app/client/src/main.ts:21–43</span><span>query event</span></div>
+              <pre><code class="language-typescript">queryButton.addEventListener('click', async () =&gt; {
+  const query = queryInput.value.trim();
+  if (!query) return;
+
+  queryButton.disabled = true;
+  try {
+    const response = await api.processQuery({
+      query,
+      llm_provider: 'openai'
+    });
+    displayResults(response, query);
+    queryInput.value = '';
+  } catch (error) {
+    displayError(error instanceof Error ? error.message : 'Query failed');
+  } finally {
+    queryButton.disabled = false;
+    queryButton.textContent = 'Query';
+  }
+});</code></pre>
+            </div>
+            <p><strong>Why one module?</strong> For an MVP, the entire event-to-render path is visible without a framework or state library. The cost is concentration: UI growth will make this file the first likely refactor seam.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="client-contract">
+          <summary><span class="file-card__path">app/client/src/api/client.ts · app/client/src/types.d.ts</span><span class="file-card__role">typed HTTP boundary · 159 lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> <code>client.ts</code> centralizes URL selection, <code>fetch</code>, HTTP status handling, JSON parsing, and five typed API methods. <code>types.d.ts</code> declares the browser-side shapes that mirror Pydantic models.</p>
+            <ul class="annotation-list">
+              <li><code>client 3–6</code><span>Uses the Vite proxy in development and a direct port-8000 URL otherwise.</span></li>
+              <li><code>client 8–33</code><span>Provides the generic <code>apiRequest&lt;T&gt;</code> transport wrapper.</span></li>
+              <li><code>client 35–79</code><span>Names upload, query, schema, insights, and health operations.</span></li>
+              <li><code>types 1–80</code><span>Defines request/response contracts globally, including string timestamps for JSON-serialized Python datetimes.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>app/client/src/api/client.ts</span><span>typed transport</span></div>
+              <pre><code class="language-typescript">async function apiRequest&lt;T&gt;(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise&lt;T&gt; {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+}</code></pre>
+            </div>
+            <p><strong>Beginner trap.</strong> The generic promises a type to TypeScript; it does not validate response JSON at runtime. The actual validator is FastAPI/Pydantic on the server side.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="client-style">
+          <summary><span class="file-card__path">app/client/src/style.css</span><span class="file-card__role">visual state machine · 484 lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> The stylesheet supplies the app’s palette, layout, cards, buttons, tables, drag state, loading spinner, error treatment, modal, samples, and table metadata tags.</p>
+            <ul class="annotation-list">
+              <li><code>1–38</code><span>Defines the visual tokens and 1200px outer container.</span></li>
+              <li><code>55–133</code><span>Styles query input and the enabled, hover, disabled, and secondary button states.</span></li>
+              <li><code>135–205</code><span>Makes results readable and horizontally scrollable; table headers remain sticky.</span></li>
+              <li><code>207–346</code><span>Styles current tables, schema chips, delete affordance, spinner, and errors.</span></li>
+              <li><code>348–484</code><span>Builds the upload modal, sample cards, and divider.</span></li>
+            </ul>
+            <p><strong>Why this design.</strong> Visual states correspond directly to classes toggled by <code>main.ts</code>. The UI remains inspectable: <code>.dragover</code>, <code>.loading</code>, and <code>.error-message</code> each name a visible program state.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="client-support">
+          <summary><span class="file-card__path">app/client config · public/sample-data/</span><span class="file-card__role">10 support files · 1,330 lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> The support files make the browser application installable, type-checkable, proxied, and demoable without finding external data.</p>
+            <ul class="annotation-list">
+              <li><code>package.json</code><span>Declares only TypeScript and Vite, with <code>dev</code>, <code>build</code>, and <code>preview</code> scripts.</span></li>
+              <li><code>.gitignore</code><span>Excludes client logs, dependencies, builds, local files, and editor state.</span></li>
+              <li><code>package-lock.json</code><span>Pins the npm dependency graph; it is reproducibility data, not hand-authored application behavior.</span></li>
+              <li><code>tsconfig.json</code><span>Uses strict, no-emit bundler mode and several unused/import safety checks.</span></li>
+              <li><code>vite.config.ts</code><span>Proxies <code>/api</code> to <code>http://localhost:8000</code> during development.</span></li>
+              <li><code>users.json</code><span>Twenty user records; wired to the Users sample button.</span></li>
+              <li><code>products.csv</code><span>Thirty-two products; wired to the Product Inventory sample button.</span></li>
+              <li><code>orders_(32).csv</code><span>Thirty-two orders; checked in but not wired to a sample button in <code>index.html</code>.</span></li>
+              <li><code>vite.svg</code><span>One-line Vite logo used as the browser icon; <code>vite-env.d.ts</code> imports Vite’s ambient types.</span></li>
+            </ul>
+            <p><strong>Why sample files?</strong> They make the happy path reproducible and teach schema inference across JSON, numeric CSV columns, dates, spaces, quotes, and punctuation-heavy filenames.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="server-routes">
+          <summary><span class="file-card__path">app/server/server.py</span><span class="file-card__role">HTTP orchestrator · 259 logical lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> This is the real backend entry point. It loads environment variables, creates the FastAPI app, configures local CORS, ensures the database directory exists, exposes six endpoints, logs success/failure, and starts Uvicorn when executed directly.</p>
+            <ul class="annotation-list">
+              <li><code>1–50</code><span>Loads dependencies, constructs the app, permits the Vite origin, records startup time, and creates <code>db/</code> relative to the process working directory.</span></li>
+              <li><code>52–89</code><span>Validates an upload suffix, reads bytes, delegates CSV/JSON conversion, and shapes <code>FileUploadResponse</code>.</span></li>
+              <li><code>91–128</code><span>Discovers schema, asks the selected provider for SQL, executes it, times execution, and returns rows.</span></li>
+              <li><code>130–167</code><span>Transforms the internal schema dictionary into Pydantic table and column models.</span></li>
+              <li><code>169–220</code><span>Exposes statistics and health endpoints.</span></li>
+              <li><code>222–255</code><span>Validates a table identifier, checks existence with a parameter, then drops the table and commits.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>app/server/server.py:91–117</span><span>query orchestration</span></div>
+              <pre><code class="language-python">@app.post("/api/query", response_model=QueryResponse)
+async def process_natural_language_query(request: QueryRequest) -&gt; QueryResponse:
+    schema_info = get_database_schema()
+    sql = generate_sql(request, schema_info)
+
+    start_time = datetime.now()
+    result = execute_sql_safely(sql)
+    execution_time = (datetime.now() - start_time).total_seconds() * 1000
+
+    if result['error']:
+        raise Exception(result['error'])
+
+    return QueryResponse(
+        sql=sql,
+        results=result['results'],
+        columns=result['columns'],
+        row_count=len(result['results']),
+        execution_time_ms=execution_time
+    )</code></pre>
+            </div>
+            <p><strong>Why thin routes?</strong> HTTP concerns stay here; transformations stay in core modules that tests can call without running a web server.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="data-models">
+          <summary><span class="file-card__path">app/server/core/data_models.py</span><span class="file-card__role">validated contracts · 82 logical lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> Pydantic models define upload, query, schema, insight, and health request/response shapes. FastAPI uses them for input validation, output serialization, and generated API docs.</p>
+            <ul class="annotation-list">
+              <li><code>5–15</code><span>Models upload output: sanitized table name, schema, count, samples, optional error.</span></li>
+              <li><code>17–29</code><span>Constrains providers to two string literals and defines query results plus timing.</span></li>
+              <li><code>31–50</code><span>Represents the table catalog as nested tables and columns.</span></li>
+              <li><code>52–71</code><span>Models optional column selection and statistical results.</span></li>
+              <li><code>73–82</code><span>Defines health state and supplies API version <code>1.0.0</code> as a default.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>app/server/core/data_models.py</span><span>cross-language contract</span></div>
+              <pre><code class="language-python">class QueryRequest(BaseModel):
+    query: str = Field(..., description="Natural language query")
+    llm_provider: Literal["openai", "anthropic"] = "openai"
+    table_name: Optional[str] = None
+
+class QueryResponse(BaseModel):
+    sql: str
+    results: List[Dict[str, Any]]
+    columns: List[str]
+    row_count: int
+    execution_time_ms: float
+    error: Optional[str] = None</code></pre>
+            </div>
+            <p><strong>Beginner trap.</strong> Matching names in Python and TypeScript are a manual contract. The repository has no generator that keeps the two files synchronized.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="file-processor">
+          <summary><span class="file-card__path">app/server/core/file_processor.py</span><span class="file-card__role">bytes → SQLite table · 139 logical lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> This module turns uploaded bytes into a replaceable SQLite table and returns enough metadata for the client to refresh immediately.</p>
+            <ul class="annotation-list">
+              <li><code>8–27</code><span>Removes a file extension, replaces every unsafe table-name character with <code>_</code>, fixes an invalid first character, and supplies <code>table</code> when empty.</span></li>
+              <li><code>29–47</code><span>Reads CSV bytes through pandas, normalizes spaces/hyphens in column names, and writes with <code>if_exists='replace'</code>.</span></li>
+              <li><code>49–75</code><span>Reads SQLite metadata, five sample rows, and the total count, then returns a plain dictionary.</span></li>
+              <li><code>80–108</code><span>Decodes JSON, requires a non-empty array, creates a DataFrame, and uses the same replace semantics.</span></li>
+              <li><code>110–139</code><span>Repeats metadata/sample/count extraction and wraps failures with format-specific context.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>app/server/core/file_processor.py:8–27</span><span>identifier boundary</span></div>
+              <pre><code class="language-python">def sanitize_table_name(table_name: str) -&gt; str:
+    if '.' in table_name:
+        table_name = table_name.rsplit('.', 1)[0]
+
+    sanitized = re.sub(r'[^a-zA-Z0-9_]', '_', table_name)
+    if sanitized and not sanitized[0].isalpha() and sanitized[0] != '_':
+        sanitized = '_' + sanitized
+    if not sanitized:
+        sanitized = 'table'
+    return sanitized</code></pre>
+            </div>
+            <p><strong>Why pandas plus SQLite?</strong> Pandas handles input parsing and type inference; SQLite gives every uploaded dataset a common query surface. The tradeoff is memory use: the full upload becomes a DataFrame before persistence.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="llm-processor">
+          <summary><span class="file-card__path">app/server/core/llm_processor.py</span><span class="file-card__role">question → SQL · 157 logical lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> The module formats live database schema for a prompt, calls OpenAI or Anthropic, strips optional Markdown fences, and routes requests based on available API keys.</p>
+            <ul class="annotation-list">
+              <li><code>8–63</code><span>Validates the OpenAI key, creates a low-temperature <code>gpt-4.1-mini</code> chat completion, then cleans the SQL string.</span></li>
+              <li><code>65–119</code><span>Implements the same contract with Anthropic <code>claude-3-haiku-20240307</code>.</span></li>
+              <li><code>121–137</code><span>Turns tables, columns, types, and row counts into compact prompt text.</span></li>
+              <li><code>139–157</code><span>Prefers any configured OpenAI key, then Anthropic, and only uses the request field when neither key is present.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>app/server/core/llm_processor.py:139–157</span><span>actual provider policy</span></div>
+              <pre><code class="language-python">def generate_sql(request: QueryRequest, schema_info: Dict[str, Any]) -&gt; str:
+    openai_key = os.environ.get("OPENAI_API_KEY")
+    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
+
+    if openai_key:
+        return generate_sql_with_openai(request.query, schema_info)
+    elif anthropic_key:
+        return generate_sql_with_anthropic(request.query, schema_info)
+
+    if request.llm_provider == "openai":
+        return generate_sql_with_openai(request.query, schema_info)
+    return generate_sql_with_anthropic(request.query, schema_info)</code></pre>
+            </div>
+            <p><strong>Why provider functions share a contract.</strong> The route never needs SDK-specific response parsing. The provider seam returns one cleaned SQL string.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="sql-processor">
+          <summary><span class="file-card__path">app/server/core/sql_processor.py</span><span class="file-card__role">schema + guarded execution · 100 logical lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> One function executes generated SQL after a blocklist check; the other introspects every SQLite table and returns columns plus row counts for prompts and the schema endpoint.</p>
+            <ul class="annotation-list">
+              <li><code>5–9</code><span>Defines ten mutation/attachment keywords that generated SQL must not contain.</span></li>
+              <li><code>11–24</code><span>Uppercases the whole query and rejects the first dangerous substring found.</span></li>
+              <li><code>26–52</code><span>Executes through <code>sqlite3.Row</code>, fetches all rows, and converts them to JSON-ready dictionaries.</span></li>
+              <li><code>61–97</code><span>Discovers tables through <code>sqlite_master</code>, then asks SQLite for each table’s columns and count.</span></li>
+              <li><code>54–59, 99–100</code><span>Return error data instead of raising, so callers decide how to surface failure.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>app/server/core/sql_processor.py:16–24</span><span>current guard</span></div>
+              <pre><code class="language-python">sql_upper = sql_query.upper()
+for keyword in DANGEROUS_KEYWORDS:
+    if keyword in sql_upper:
+        return {
+            'results': [],
+            'columns': [],
+            'error': f"Dangerous SQL keyword '{keyword}' detected. Only SELECT queries are allowed."
+        }</code></pre>
+            </div>
+            <aside class="callout callout--warning"><p class="callout__label">Security boundary, not a proof</p><p>The message says “Only SELECT,” but the implementation checks substrings; it does not parse SQL or require the first statement to be <code>SELECT</code>. This is an MVP guard and an excellent place for plan-first hardening.</p></aside>
+          </div>
+        </details>
+
+        <details class="file-card" id="insights">
+          <summary><span class="file-card__path">app/server/core/insights.py</span><span class="file-card__role">column statistics · 83 logical lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> Given a table and optional columns, this module calculates distinct and null counts, numeric min/max/average, and five most-common values.</p>
+            <ul class="annotation-list">
+              <li><code>5–20</code><span>Reads schema and defaults to every discovered column.</span></li>
+              <li><code>23–42</code><span>Filters requested columns and creates a base <code>ColumnInsight</code>.</span></li>
+              <li><code>44–59</code><span>Adds aggregates only for SQLite numeric affinity strings.</span></li>
+              <li><code>61–80</code><span>Adds a frequency distribution, closes the connection, and returns model instances.</span></li>
+            </ul>
+            <p><strong>Design status.</strong> The server exposes <code>POST /api/insights</code> and the API client wraps it, but <code>main.ts</code> never calls <code>api.generateInsights</code>. The seam is implemented below the UI and remains dormant.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="tests">
+          <summary><span class="file-card__path">app/server/tests/core/ + tests/assets/</span><span class="file-card__role">34 tests + 4 fixtures · 659 lines</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> The tests mirror three core modules. They use real parsing and in-memory SQLite while mocking only provider SDK calls and environment variables.</p>
+            <ul class="annotation-list">
+              <li><code>test_file_processor.py</code><span>Seven collected tests cover CSV/JSON happy paths, header cleanup, malformed CSV, invalid JSON shape, and empty arrays.</span></li>
+              <li><code>test_llm_processor.py</code><span>Sixteen tests cover both SDK call shapes, Markdown cleanup, missing keys, API errors, schema formatting, and provider routing priority.</span></li>
+              <li><code>test_sql_processor.py</code><span>Eleven tests execute SELECTs, empty results, errors, schema discovery, and every dangerous keyword.</span></li>
+              <li><code>tests/assets/</code><span>Small fixtures make expected rows, inferred types, cleaned headers, booleans, and malformed field counts visible.</span></li>
+              <li><code>__init__.py</code><span>Two zero-byte files mark test package boundaries; they contain no behavior.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>app/server/tests/core/test_llm_processor.py</span><span>external edge mocked</span></div>
+              <pre><code class="language-python">@patch('core.llm_processor.OpenAI')
+def test_generate_sql_with_openai_success(self, mock_openai_class):
+    mock_client = MagicMock()
+    mock_openai_class.return_value = mock_client
+    mock_response = MagicMock()
+    mock_response.choices[0].message.content = "SELECT * FROM users WHERE age &gt; 25"
+    mock_client.chat.completions.create.return_value = mock_response
+
+    with patch.dict(os.environ, {'OPENAI_API_KEY': 'test-key'}):
+        result = generate_sql_with_openai(query_text, schema_info)
+        assert result == "SELECT * FROM users WHERE age &gt; 25"</code></pre>
+            </div>
+            <p><strong>Why this test shape.</strong> SQLite behavior stays real and fast; nondeterministic network calls stay behind mocks. A planner can name one narrow test file per changed core responsibility.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="operations">
+          <summary><span class="file-card__path">scripts/ · app/server/pyproject.toml · lockfiles</span><span class="file-card__role">reproducibility + lifecycle</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> The shell scripts and manifests make the planned application runnable in a repeatable local environment.</p>
+            <ul class="annotation-list">
+              <li><code>copy_dot_env.sh</code><span>Copies the previous lesson’s server environment file after checking that it exists.</span></li>
+              <li><code>start.sh</code><span>Finds the project root, requires the server environment, starts backend then frontend, checks child PIDs, prints URLs, and traps exit signals.</span></li>
+              <li><code>stop_apps.sh</code><span>Kills matching start scripts and force-kills listeners on ports 5173 and 8000.</span></li>
+              <li><code>pyproject.toml</code><span>Pins seven runtime packages and pytest as the dev extra; Python support is declared as 3.10+.</span></li>
+              <li><code>uv.lock</code><span>Pins 780 lines of Python resolution metadata across supported interpreter markers.</span></li>
+              <li><code>package-lock.json</code><span>Pins 1,023 lines of Node resolution metadata for Vite and TypeScript’s dependency graph.</span></li>
+            </ul>
+            <div class="code-shell">
+              <div class="code-label"><span>scripts/start.sh:42–62</span><span>two-process startup</span></div>
+              <pre><code class="language-bash">cd "$PROJECT_ROOT/app/server"
+uv run python server.py &amp;
+BACKEND_PID=$!
+
+sleep 3
+if ! kill -0 $BACKEND_PID 2&gt;/dev/null; then
+    echo -e "${RED}Backend failed to start!${NC}"
+    exit 1
+fi
+
+cd "$PROJECT_ROOT/app/client"
+npm run dev &amp;
+FRONTEND_PID=$!</code></pre>
+            </div>
+            <p><strong>Why the working-directory change matters.</strong> Server modules open <code>db/database.db</code> with a relative path. The script’s <code>cd app/server</code> is part of the runtime contract, not cosmetic shell setup.</p>
+          </div>
+        </details>
+
+        <details class="file-card" id="secondary-files">
+          <summary><span class="file-card__path">root metadata · app/server/main.py · marker files</span><span class="file-card__role">support + honest boundaries</span></summary>
+          <div class="file-body">
+            <p><strong>Purpose.</strong> The remaining files either configure the environment, prevent generated state from being committed, preserve scaffold metadata, or mark future extension directories.</p>
+            <ul class="annotation-list">
+              <li><code>.env.sample</code><span>Declares the two optional provider keys with empty values; the server copy uses placeholder text.</span></li>
+              <li><code>.gitignore</code><span>Excludes secrets, Python/Node output, SQLite state, IDE files, logs, and worktrees.</span></li>
+              <li><code>app/client/.gitignore</code><span>Contains the Vite template’s Node, build, editor, and local-file exclusions.</span></li>
+              <li><code>app/server/.python-version</code><span>Selects Python 3.12 locally, while <code>pyproject.toml</code> declares compatibility from 3.10.</span></li>
+              <li><code>app/server/main.py</code><span>Is a six-line “Hello from server!” scaffold. <code>server.py</code>, not this file, starts the FastAPI application.</span></li>
+              <li><code>core/__init__.py</code><span>Contains a one-line package comment.</span></li>
+              <li><code>adws/README.md</code> and <code>agents/README.md</code><span>Are zero-byte markers. The baseline repo does not yet implement those layers.</span></li>
+            </ul>
+            <p><strong>Why document emptiness?</strong> An empty directory marker is architecture intent, not shipped capability. Saying so prevents a reader—or an agent—from treating a placeholder as evidence.</p>
+          </div>
+        </details>
+      </section>
+      <section class="chapter-section" id="flow">
+        <span class="section-number">04 · END-TO-END FLOW</span>
+        <h2 class="section-title">How a run works—both meanings of “run”</h2>
+        <p class="section-lead">The course lesson is about the engineering run; the demo app has its own runtime run. Keep them separate, then notice how the plan’s file list predicts the runtime boundaries the builder must touch.</p>
+
+        <div class="flow-group">
+          <h3>A. An engineering run: feature request to evidence</h3>
+          <div class="flow-line"><span class="flow-line__n">01</span><div class="flow-line__body"><strong>A human invokes a task-specific planning command.</strong><p>The feature text enters <code>.claude/commands/feature.md</code> through <code>$ARGUMENTS</code>.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">02</span><div class="flow-line__body"><strong>The planner reads before proposing.</strong><p>The template starts at <code>README.md</code>, then limits research to real client, server, and script paths.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">03</span><div class="flow-line__body"><strong>The template forces decisions into named sections.</strong><p>User story, problem, solution, relevant files, phases, ordered tasks, tests, edge cases, acceptance criteria, commands, and dependency notes become reviewable text.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">04</span><div class="flow-line__body"><strong>The planner writes a durable spec.</strong><p>The output lands under <code>specs/</code>. It can outlive the context that created it and be corrected without touching code.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">05</span><div class="flow-line__body"><strong>A fresh builder consumes the plan.</strong><p><code>.claude/commands/implement.md</code> receives the spec, performs the ordered work, and runs the specified validation.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">06</span><div class="flow-line__body"><strong>The builder reports evidence.</strong><p>The final response summarizes changes and uses <code>git diff --stat</code> to expose file and line scope. Tests answer “does it work?”; the diff answers “what moved?”</p></div></div>
+        </div>
+
+        <div class="flow-group">
+          <h3>B. An application run: question to rows</h3>
+          <div class="flow-line"><span class="flow-line__n">01</span><div class="flow-line__body"><strong>Data becomes queryable.</strong><p><code>main.ts</code> wraps an uploaded browser file in <code>FormData</code>; <code>server.py</code> awaits its bytes; <code>file_processor.py</code> parses a DataFrame and replaces a SQLite table.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">02</span><div class="flow-line__body"><strong>The client refreshes server truth.</strong><p>After upload, <code>loadDatabaseSchema()</code> calls <code>GET /api/schema</code> and renders the complete current catalog.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">03</span><div class="flow-line__body"><strong>The question crosses the typed HTTP boundary.</strong><p>The click handler sends <code>{ query, llm_provider: 'openai' }</code> through <code>api.processQuery</code>; Pydantic constructs <code>QueryRequest</code>.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">04</span><div class="flow-line__body"><strong>Live schema becomes model context.</strong><p><code>get_database_schema()</code> reads every table and column; <code>format_schema_for_prompt()</code> serializes that structure beside the user’s question.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">05</span><div class="flow-line__body"><strong>The provider returns a SQL string.</strong><p><code>generate_sql()</code> chooses a provider from configured keys, the provider function calls its SDK, and Markdown fences are stripped.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">06</span><div class="flow-line__body"><strong>The SQL gate checks, executes, and shapes rows.</strong><p><code>execute_sql_safely()</code> runs the blocklist, executes SQLite, uses <code>sqlite3.Row</code>, and returns dictionaries plus column names.</p></div></div>
+          <div class="flow-line"><span class="flow-line__n">07</span><div class="flow-line__body"><strong>The browser renders explicit output.</strong><p><code>QueryResponse</code> serializes SQL, results, columns, count, and timing; <code>displayResults()</code> shows the query and SQL, then builds cells with <code>textContent</code>.</p></div></div>
+        </div>
+
+        <aside class="callout callout--why"><p class="callout__label">The connection</p><p>A useful plan follows the same boundaries as a runtime value. If a feature changes “provider choice,” a strong plan names the browser input, TypeScript contract, Pydantic model, router, tests, and verification—not just <code>llm_processor.py</code>.</p></aside>
+      </section>
+
+      <section class="chapter-section" id="fails">
+        <span class="section-number">05 · COMMON FAILS</span>
+        <h2 class="section-title">Where a reasonable first reading goes wrong</h2>
+        <p class="section-lead">These are not reasons to dismiss the MVP. They are the exact places where planning earns its keep: the checked-in code makes the gap concrete enough to reproduce, scope, and test.</p>
+
+        <div class="risk-table" role="region" aria-label="Common failures and fixes" tabindex="0">
+          <table>
+            <thead><tr><th>Failure</th><th>What the code really does</th><th>How to reason or plan</th></tr></thead>
+            <tbody>
+              <tr><td>Reading the spec as the tree</td><td>The 749-line spec proposes a deeper client structure and behaviors that the committed MVP flattens or omits.</td><td>Use the spec for intent and the current file inventory for truth. Mark planned-only behavior explicitly.</td></tr>
+              <tr><td>Believing the provider field chooses the provider</td><td><code>generate_sql()</code> uses any OpenAI key first, then Anthropic. The request preference matters only when neither key exists—at which point the selected SDK raises for its missing key.</td><td>Trace the branch conditions, then align UI wording, routing policy, and routing tests in one plan.</td></tr>
+              <tr><td>Equating a keyword blocklist with “SELECT only”</td><td>The guard rejects substrings like <code>UPDATE</code> anywhere, but does not require a SELECT AST or a single read-only statement.</td><td>Write acceptance cases first: valid SELECT, blocked PRAGMA, blocked mutation, keyword inside a harmless identifier, multiple statements.</td></tr>
+              <tr><td>Assuming TypeScript casts prove DOM existence</td><td><code>getElementById(...) as HTMLButtonElement</code> silences a compiler concern; a missing ID is still <code>null</code> at runtime.</td><td>Treat HTML IDs and TypeScript selectors as a manual contract and verify the page in a browser.</td></tr>
+              <tr><td>Missing repeated event listeners</td><td>Every successful query calls <code>displayResults()</code>, which adds another click listener to the same results toggle. After two queries, one click can toggle twice and appear to do nothing.</td><td>Initialize stable controls once or assign <code>onclick</code>; add a browser-level reproduction to the bug plan.</td></tr>
+              <tr><td>Trusting all <code>innerHTML</code> assignments equally</td><td>Result cells use <code>textContent</code>, but <code>displayResults()</code> interpolates the user query and model SQL into <code>innerHTML</code>.</td><td>Plan a DOM-safe rendering change and test markup-like input rather than assuming model output is harmless.</td></tr>
+              <tr><td>Running the server from any directory</td><td><code>db/database.db</code> is relative. <code>scripts/start.sh</code> changes into <code>app/server</code> before launch; an alternate working directory changes the database location.</td><td>Use the supported lifecycle script or plan a path anchored to <code>server.py</code>.</td></tr>
+              <tr><td>Calling the backend fully async</td><td>The FastAPI route is <code>async</code>, but the provider SDK calls and SQLite work are synchronous inside it.</td><td>For concurrency work, measure first and plan the blocking boundary explicitly.</td></tr>
+              <tr><td>Assuming every implemented endpoint has UI</td><td>Insights and health have server routes and API methods; <code>main.ts</code> never invokes them.</td><td>Distinguish backend seam completion from end-to-end feature completion.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <aside class="callout callout--tactic"><p class="callout__label">A planning question that catches most of these</p><p>“What observable behavior proves this at every boundary?” That question forces a plan to name input, branch, output, test layer, and regression check.</p></aside>
+      </section>
+
+      <section class="chapter-section" id="ledger">
+        <span class="section-number">06 · EVERY FILE</span>
+        <h2 class="section-title">Complete 56-file job ledger</h2>
+        <p class="section-lead">Every eligible checked-in file appears once below. Lockfiles and data fixtures are summarized by role; zero-byte markers are named as empty. No planned-only path is promoted to a real file.</p>
+
+        <div class="ledger" role="region" aria-label="Complete repository file ledger" tabindex="0">
+          <table>
+            <thead><tr><th>Real path</th><th>Job</th></tr></thead>
+            <tbody>
+              <tr class="group-row"><td colspan="2">Agent planning and policy</td></tr>
+              <tr><td>.claude/commands/bug.md</td><td>Compiles a bug description into reproduction, root cause, surgical tasks, regression tests, and validation.</td></tr>
+              <tr><td>.claude/commands/chore.md</td><td>Compiles maintenance work into a concise researched task plan.</td></tr>
+              <tr><td>.claude/commands/feature.md</td><td>Compiles feature intent into value, architecture, phases, tests, acceptance, and validation.</td></tr>
+              <tr><td>.claude/commands/implement.md</td><td>Consumes a plan, asks for implementation, and requires a summary plus diff statistics.</td></tr>
+              <tr><td>.claude/commands/install.md</td><td>Composes priming, dependency installation, and environment copying.</td></tr>
+              <tr><td>.claude/commands/prime.md</td><td>Bootstraps agent context from tracked files and the README.</td></tr>
+              <tr><td>.claude/commands/start.md</td><td>Delegates application launch to <code>scripts/start.sh</code> with a time budget.</td></tr>
+              <tr><td>.claude/commands/tools.md</td><td>Requests a typed inventory of built-in development tools.</td></tr>
+              <tr><td>.claude/settings.json</td><td>Allows common local operations and denies force-push plus recursive deletion patterns.</td></tr>
+
+              <tr class="group-row"><td colspan="2">Repository context and markers</td></tr>
+              <tr><td>.env.sample</td><td>Root template for OpenAI and Anthropic environment variables.</td></tr>
+              <tr><td>.gitignore</td><td>Excludes secrets, generated dependencies/output, SQLite state, IDE files, logs, and worktrees.</td></tr>
+              <tr><td>README.md</td><td>Project-local source for setup, usage, architecture, endpoints, commands, and troubleshooting.</td></tr>
+              <tr><td>adws/README.md</td><td>Zero-byte marker for a future agentic development workflow area.</td></tr>
+              <tr><td>agents/README.md</td><td>Zero-byte marker for a future agents area.</td></tr>
+              <tr><td>ai_docs/anthropic_quick_start.md</td><td>Local course-era Anthropic SDK and prompting reference.</td></tr>
+              <tr><td>ai_docs/openai_quick_start.md</td><td>Local course-era OpenAI API reference covering text, vision, tools, streaming, and agents.</td></tr>
+
+              <tr class="group-row"><td colspan="2">Browser application</td></tr>
+              <tr><td>app/client/.gitignore</td><td>Vite template exclusions for dependencies, builds, logs, local files, and editor state.</td></tr>
+              <tr><td>app/client/index.html</td><td>Static DOM skeleton for query, results, tables, and upload modal.</td></tr>
+              <tr><td>app/client/package-lock.json</td><td>Exact npm dependency resolution for the client toolchain.</td></tr>
+              <tr><td>app/client/package.json</td><td>Vite/TypeScript scripts and direct development dependencies.</td></tr>
+              <tr><td>app/client/public/sample-data/orders_(32).csv</td><td>Thirty-two-order CSV fixture; available publicly but not wired to a sample button.</td></tr>
+              <tr><td>app/client/public/sample-data/products.csv</td><td>Thirty-two-product CSV fixture wired to the Product Inventory sample button.</td></tr>
+              <tr><td>app/client/public/sample-data/users.json</td><td>Twenty-user JSON fixture wired to the Users sample button.</td></tr>
+              <tr><td>app/client/public/vite.svg</td><td>One-line Vite logo used as the page icon.</td></tr>
+              <tr><td>app/client/src/api/client.ts</td><td>Generic fetch wrapper and typed upload, query, schema, insights, and health methods.</td></tr>
+              <tr><td>app/client/src/main.ts</td><td>Browser startup, events, in-memory state, API calls, DOM rendering, modal, samples, and deletion.</td></tr>
+              <tr><td>app/client/src/style.css</td><td>Application palette, layouts, interaction states, tables, modal, and feedback styles.</td></tr>
+              <tr><td>app/client/src/types.d.ts</td><td>Ambient TypeScript request/response contracts mirroring Pydantic models.</td></tr>
+              <tr><td>app/client/src/vite-env.d.ts</td><td>Imports Vite client environment type declarations.</td></tr>
+              <tr><td>app/client/tsconfig.json</td><td>Strict no-emit TypeScript configuration for bundler mode.</td></tr>
+              <tr><td>app/client/vite.config.ts</td><td>Development proxy from <code>/api</code> to the FastAPI server.</td></tr>
+
+              <tr class="group-row"><td colspan="2">Backend application</td></tr>
+              <tr><td>app/server/.env.sample</td><td>Server-local provider-key template with placeholder values.</td></tr>
+              <tr><td>app/server/.python-version</td><td>Selects Python 3.12 for local tooling.</td></tr>
+              <tr><td>app/server/core/__init__.py</td><td>One-line core-package marker.</td></tr>
+              <tr><td>app/server/core/data_models.py</td><td>Pydantic contracts for upload, query, schema, insights, and health.</td></tr>
+              <tr><td>app/server/core/file_processor.py</td><td>Sanitizes identifiers and converts CSV/JSON bytes into replaceable SQLite tables.</td></tr>
+              <tr><td>app/server/core/insights.py</td><td>Computes distinct, null, numeric, and frequency statistics by column.</td></tr>
+              <tr><td>app/server/core/llm_processor.py</td><td>Formats schema prompts, calls two provider SDKs, cleans SQL, and routes by API-key availability.</td></tr>
+              <tr><td>app/server/core/sql_processor.py</td><td>Discovers schema and performs blocklist-guarded SQLite execution.</td></tr>
+              <tr><td>app/server/main.py</td><td>Unused six-line hello-world scaffold; not the FastAPI entry point.</td></tr>
+              <tr><td>app/server/pyproject.toml</td><td>Python project metadata, exact runtime dependencies, and pytest dev extra.</td></tr>
+              <tr><td>app/server/server.py</td><td>FastAPI app, middleware, routes, response orchestration, logging, and Uvicorn launch.</td></tr>
+
+              <tr class="group-row"><td colspan="2">Backend tests and fixtures</td></tr>
+              <tr><td>app/server/tests/__init__.py</td><td>Zero-byte test-package marker.</td></tr>
+              <tr><td>app/server/tests/assets/column_names.csv</td><td>Headers with spaces and hyphens for column-normalization tests.</td></tr>
+              <tr><td>app/server/tests/assets/invalid.csv</td><td>Inconsistent field-count fixture for CSV parser failure.</td></tr>
+              <tr><td>app/server/tests/assets/test_products.json</td><td>Three-product JSON array spanning numeric, string, and boolean values.</td></tr>
+              <tr><td>app/server/tests/assets/test_users.csv</td><td>Four-user CSV for schema, row-count, and sample assertions.</td></tr>
+              <tr><td>app/server/tests/core/__init__.py</td><td>Zero-byte marker for the mirrored core-test package.</td></tr>
+              <tr><td>app/server/tests/core/test_file_processor.py</td><td>Seven converter tests using real fixtures and in-memory SQLite.</td></tr>
+              <tr><td>app/server/tests/core/test_llm_processor.py</td><td>Sixteen provider, prompt, cleanup, error, and routing tests with mocked SDKs.</td></tr>
+              <tr><td>app/server/tests/core/test_sql_processor.py</td><td>Eleven real in-memory SQL, guard, error, and schema tests.</td></tr>
+              <tr><td>app/server/uv.lock</td><td>Exact Python dependency resolution and platform/interpreter artifacts.</td></tr>
+
+              <tr class="group-row"><td colspan="2">Operations and plan</td></tr>
+              <tr><td>scripts/copy_dot_env.sh</td><td>Copies the prior lesson’s server environment file after an existence check.</td></tr>
+              <tr><td>scripts/start.sh</td><td>Validates environment, starts both services, verifies PIDs, prints URLs, and traps cleanup.</td></tr>
+              <tr><td>scripts/stop_apps.sh</td><td>Stops matching startup processes and force-kills listeners on development ports.</td></tr>
+              <tr><td>specs/init_nlq_to_sql_to_table.md</td><td>749-line plan for stack, contracts, flows, implementation phases, and visual system.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">07 · YOU TRY</span>
+        <h2 class="section-title">Lab: make “SELECT only” true for one narrow scope</h2>
+        <p class="section-lead">Plan the behavior before changing the gate. You will modify one function, prove the new rule with direct checks, then run the existing regression suite.</p>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Modify one policy in <code>execute_sql_safely()</code></h3>
+
+          <h4>1. Write the tiny plan first</h4>
+          <ul>
+            <li><strong>Problem:</strong> the error message promises SELECT-only execution, but a statement such as <code>PRAGMA table_info(users)</code> passes the current keyword blocklist.</li>
+            <li><strong>Acceptance:</strong> leading whitespace and case-insensitive SELECT work; PRAGMA is rejected before SQLite; existing dangerous-keyword tests still pass.</li>
+            <li><strong>Non-goal:</strong> do not add a SQL parser or support <code>WITH</code> queries in this beginner lab.</li>
+            <li><strong>Relevant file:</strong> only <code>app/server/core/sql_processor.py</code>.</li>
+          </ul>
+
+          <h4>2. Add the read-only entry check</h4>
+          <p>Inside <code>execute_sql_safely</code>, normalize surrounding whitespace and reject queries whose first token is not <code>SELECT</code>. The module already imports <code>re</code>.</p>
+
+          <div class="code-shell">
+            <div class="code-label"><span>shape of the change</span><span>app/server/core/sql_processor.py</span></div>
+            <pre><code class="language-python">sql_upper = sql_query.strip().upper()
+
+if not re.match(r'^SELECT\b', sql_upper):
+    return {
+        'results': [],
+        'columns': [],
+        'error': 'Only SELECT queries are allowed.'
+    }
+
+for keyword in DANGEROUS_KEYWORDS:
+    # keep the existing guard and return shape</code></pre>
+          </div>
+
+          <h4>3. Verify from the server directory</h4>
+          <div class="code-shell">
+            <div class="code-label"><span>deterministic checks</span><span>no provider key needed</span></div>
+            <pre><code class="language-bash">cd app/server
+mkdir -p db  # server.py normally creates this runtime directory
+
+uv run python -c "from core.sql_processor import execute_sql_safely as e; assert e('  select 1 AS ok')['results'][0]['ok'] == 1"
+
+uv run python -c "from core.sql_processor import execute_sql_safely as e; assert 'Only SELECT' in e('PRAGMA table_info(users)')['error']"
+
+uv run pytest</code></pre>
+          </div>
+
+          <div class="verify-grid" aria-label="Lab verification layers">
+            <div><strong>Behavior</strong><span>A whitespace-prefixed lowercase SELECT still returns one row.</span></div>
+            <div><strong>Boundary</strong><span>PRAGMA is rejected before a database result can be returned.</span></div>
+            <div><strong>Regression</strong><span>All 34 existing tests pass; no LLM network call is involved.</span></div>
+          </div>
+
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <ul>
+              <li>You changed one function in one real file.</li>
+              <li>Both direct commands exit with status 0.</li>
+              <li>Pytest reports all 34 collected tests passing.</li>
+              <li>You can state the intentional limitation: CTEs beginning with <code>WITH</code> are rejected by this narrow rule.</li>
+            </ul>
+          </div>
+        </section>
+
+        <aside class="callout callout--why"><p class="callout__label">Stretch after green</p><p>Turn the two direct checks into named tests in <code>tests/core/test_sql_processor.py</code>. Then write a feature plan for read-only CTE support. Notice how the non-goal from the small lab becomes the problem statement for the next planned increment.</p></aside>
+      </section>
+
+      <section class="chapter-section" id="teach-back">
+        <span class="section-number">08 · TEACH-BACK</span>
+        <h2 class="section-title">Explain the repo without saying “the agent handles it”</h2>
+        <p class="section-lead">Name the input, the file, the handoff, and the evidence. If your explanation uses “then it processes the data,” reopen the relevant flow.</p>
+
+        <div class="teach-back">
+          <h3>Your 90-second explanation</h3>
+          <ol>
+            <li>Why are there separate bug, chore, and feature planning templates?</li>
+            <li>What exactly crosses from a planning command into an implementation command?</li>
+            <li>Which parts of the 749-line spec are clearly visible in the shipped architecture, and which remain intent?</li>
+            <li>How does an uploaded browser <code>File</code> become a named SQLite table?</li>
+            <li>How does live schema information reach the model prompt?</li>
+            <li>What determines provider routing in the code—not in the type name or UI request?</li>
+            <li>Where is SQL checked, executed, timed, serialized, and rendered?</li>
+            <li>Why can the core tests be deterministic without provider credentials?</li>
+            <li>What does <code>scripts/start.sh</code> contribute beyond convenience?</li>
+            <li>Name one gap that deserves a bug plan and one dormant seam that deserves a feature plan.</li>
+          </ol>
+          <details>
+            <summary>Reveal the answer spine</summary>
+            <p>Work types need different questions; <code>$ARGUMENTS</code> becomes a durable spec; the spec’s MVP, contracts, modules, proxy, and visual direction shipped while deeper components, pagination, history, sorting, and UI insights did not; <code>handleFileUpload</code> sends multipart data, the route reads bytes, the converter sanitizes and calls <code>DataFrame.to_sql</code>; <code>get_database_schema</code> feeds <code>format_schema_for_prompt</code>; configured keys give OpenAI first priority; <code>execute_sql_safely</code> guards and runs, the route times and models, and <code>displayResults</code> renders; provider SDKs are mocked while parsing and SQLite remain real; the start script establishes the working directory and owns both child processes. The repeated toggle listener is a bug-plan candidate; the unconsumed insights API is a feature-plan candidate.</p>
+          </details>
+        </div>
+
+        <section class="retrieval-quiz">
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">Why is <code>specs/init_nlq_to_sql_to_table.md</code> more than documentation?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It is an executable handoff contract: it constrains architecture, names seams and models, orders work, and supplies validation commands a separate builder can follow.</p></details>
+          </div>
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">Why does the client refetch schema after upload and deletion?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>SQLite and the server remain the catalog source of truth. Refetching returns the whole normalized state after replace or delete semantics.</p></details>
+          </div>
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">What is the difference between a typed boundary and a validated boundary here?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>TypeScript describes expected JSON to the compiler, but Pydantic validates and serializes actual HTTP data at runtime. The two definitions are manually synchronized.</p></details>
+          </div>
+        </section>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">IndyDevDan Expert Book · Code companion</p>
+        <div class="chapter-footer__nav">
+          <a href="../vol-1-tac/03-success-is-planned.html">← Return to Chapter 03</a>
+          <a href="../index.html">Book hub →</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    (() => {
+      if (window.hljs) window.hljs.highlightAll();
+
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const navLinks = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = navLinks
+        .map(link => document.querySelector(link.getAttribute('href')))
+        .filter(Boolean);
+      let framePending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const ratio = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(ratio * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestProgress = () => {
+        if (framePending) return;
+        framePending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          framePending = false;
+        });
+      };
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (!visible) return;
+        navLinks.forEach(link => {
+          const active = link.getAttribute('href') === `#${visible.target.id}`;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-18% 0px -68% 0px' });
+
+      sections.forEach(section => observer.observe(section));
+      window.addEventListener('scroll', requestProgress, { passive: true });
+      window.addEventListener('resize', requestProgress);
+      updateProgress();
+
+      const fileCards = [...document.querySelectorAll('.file-card')];
+      document.getElementById('expand-files').addEventListener('click', () => {
+        fileCards.forEach(card => { card.open = true; });
+      });
+      document.getElementById('collapse-files').addEventListener('click', () => {
+        fileCards.forEach(card => { card.open = false; });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An agent-systems companion to Multi-Agent Orchestration: the human commander, O-agent, managed agents, prompts, permissions, harness, observability, and closed loops.">
+  <title>Multi-Agent Orchestration: The O-Agent · Agent Systems Companion</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <style>
+    html { scroll-padding-top: 3.5rem; }
+    body { background: var(--bg); color: var(--ink); }
+    .skip-link { position: fixed; left: .7rem; top: -5rem; z-index: 999; padding: .55rem .75rem; background: var(--ink); color: var(--ink-inverse); }
+    .skip-link:focus { top: .7rem; }
+    .reading-progress { position: fixed; inset: 0 auto auto 0; z-index: 1000; width: 0; height: 3px; background: var(--accent); }
+
+    .site-bar {
+      position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between;
+      gap: .75rem; min-height: 2.5rem; border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 93%, transparent); backdrop-filter: blur(12px);
+    }
+    .site-brand { display: flex; align-items: center; gap: .52rem; min-width: 0; color: var(--ink); text-decoration: none; }
+    .site-brand-mark { display: grid; place-items: center; width: 1.65rem; height: 1.65rem; border-radius: 50%; background: var(--accent); color: var(--ink-inverse); font: 800 var(--text-xs)/1 var(--font-mono); }
+    .site-brand-copy { display: grid; line-height: 1.04; }
+    .site-brand-copy strong { font-size: var(--text-xs); letter-spacing: .08em; }
+    .site-brand-copy span { color: var(--ink-mute); font-size: var(--text-xs); }
+    .site-links { display: flex; align-items: center; justify-content: flex-end; gap: .18rem; }
+    .site-links a { padding: .28rem .48rem; border-radius: 999px; color: var(--ink-soft); text-decoration: none; font-size: var(--text-xs); font-weight: 750; }
+    .site-links a:hover { color: var(--accent-ink); background: var(--accent-wash); }
+
+    .mobile-toc { display: none; }
+    .mobile-toc details { overflow: clip; border: 1px solid var(--border); border-radius: .55rem; background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .mobile-toc summary { color: var(--accent-ink); font-weight: 750; }
+    .mobile-toc ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .2rem .7rem; margin: 0; padding: .25rem .75rem .65rem 2rem; }
+    .mobile-toc a { color: var(--ink-soft); font-size: var(--text-xs); text-decoration: none; }
+    .mobile-toc a:hover { color: var(--accent-ink); }
+
+    .chapter-shell { display: grid; grid-template-columns: 13.5rem minmax(0, 1fr); align-items: start; gap: 1.25rem; width: min(calc(100% - 1.25rem), 72rem); margin-inline: auto; }
+    .chapter-rail { position: sticky; top: 3rem; max-height: calc(100vh - 3.3rem); overflow-y: auto; padding: .8rem .55rem 1rem 0; border-right: 1px solid var(--border-soft); }
+    .chapter-rail-label { margin-bottom: .55rem; color: var(--accent-ink); font: 800 var(--text-xs)/1.2 var(--font-mono); letter-spacing: .11em; text-transform: uppercase; }
+    .chapter-rail a { display: grid; grid-template-columns: 1.25rem 1fr; gap: .25rem; padding: .28rem .38rem; border-radius: .35rem; color: var(--ink-mute); text-decoration: none; font-size: var(--text-xs); line-height: 1.25; }
+    .chapter-rail a span { color: var(--accent-ink); font: 700 var(--text-xs)/1.55 var(--font-mono); }
+    .chapter-rail a:hover, .chapter-rail a[aria-current="true"] { color: var(--accent-ink); background: var(--accent-wash); }
+    .chapter-main { min-width: 0; padding-bottom: 3rem; }
+    .chapter-main > section { margin: 0; padding-block: 1.2rem; scroll-margin-top: 3.4rem; }
+    .chapter-main > section + section { border-top: 1px solid var(--border-soft); }
+    .eyebrow { margin-bottom: .36rem; color: var(--accent-ink); font: 800 var(--text-xs)/1.3 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+    h1 { max-width: 22ch; margin: 0; font-size: clamp(var(--text-xl), 3vw, var(--text-2xl)); line-height: 1.08; }
+    h2 { margin: 0 0 .5rem; font-size: clamp(var(--text-lg), 2.2vw, var(--text-xl)); }
+    h3 { margin: 0 0 .35rem; font-size: var(--text-base); }
+    .section-lede { max-width: 70ch; margin-bottom: .85rem; color: var(--ink-soft); font-size: var(--text-base); line-height: 1.52; }
+    .small-note { color: var(--ink-mute); font-size: var(--text-xs); line-height: 1.45; }
+    .path { color: var(--accent-ink); font: 650 var(--text-xs)/1.35 var(--font-mono); overflow-wrap: anywhere; }
+
+    .mission-card { position: relative; overflow: hidden; margin-top: .8rem !important; padding: 1rem 1.1rem 1.05rem !important; border: 1px solid var(--border); border-radius: 1rem; background: radial-gradient(circle at 95% 5%, var(--accent-wash), transparent 32%), var(--bg-card); box-shadow: var(--shadow-card); }
+    .mission-card::after { position: absolute; right: -.2rem; bottom: -.25rem; content: "O-AGENT"; color: color-mix(in srgb, var(--accent) 8%, transparent); font: 900 var(--text-3xl)/1 var(--font-mono); pointer-events: none; transform: rotate(-2deg); }
+    .mission-card > * { position: relative; z-index: 1; }
+    .mission-copy { max-width: 70ch; margin-top: .62rem; color: var(--ink-soft); font-size: var(--text-base); line-height: 1.55; }
+    .mission-formula { display: inline-flex; flex-wrap: wrap; gap: .35rem; margin-top: .7rem; padding: .48rem .62rem; border-radius: .55rem; background: var(--terminal-bg); color: var(--terminal-ink); font: 650 var(--text-xs)/1.42 var(--font-mono); }
+    .hook-note { margin-top: .65rem; max-width: 68ch; padding-left: .7rem; border-left: 3px solid var(--accent); color: var(--accent-ink); font-size: var(--text-xs); line-height: 1.45; }
+
+    .cast-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: .82rem; background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .cast-table { min-width: 46rem; }
+    .cast-table th { background: var(--bg-inset); color: var(--accent-ink); font: 800 var(--text-xs)/1.3 var(--font-mono); text-transform: uppercase; }
+    .cast-table td { color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.42; }
+    .cast-table td:first-child { width: 22%; color: var(--ink); font-weight: 750; }
+    .cast-table td:nth-child(3) { width: 29%; }
+    .role-chip { display: inline-block; margin-top: .16rem; padding: .08rem .35rem; border-radius: 999px; background: var(--accent-wash); color: var(--accent-ink); font-size: var(--text-xs); font-weight: 750; }
+    .scale-strip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .38rem; margin-top: .62rem; }
+    .scale-step { position: relative; min-height: 4.4rem; padding: .52rem; border: 1px solid var(--border); border-radius: .52rem; background: var(--bg-card); }
+    .scale-step:not(:last-child)::after { position: absolute; right: -.29rem; top: 32%; z-index: 2; content: "›"; color: var(--accent-ink); font-size: var(--text-base); font-weight: 800; }
+    .scale-step b { display: block; color: var(--ink); font: 780 var(--text-xs)/1.25 var(--font-mono); }
+    .scale-step span { display: block; margin-top: .2rem; color: var(--ink-mute); font-size: var(--text-xs); line-height: 1.34; }
+    .scale-step:last-child { border-color: var(--accent); background: var(--accent-wash); }
+
+    .surface-map { padding: .82rem; border: 1px solid var(--border); border-radius: .9rem; background: var(--bg-inset); box-shadow: var(--shadow-card); }
+    .surface-titlebar { display: grid; grid-template-columns: 1fr auto; gap: .5rem; align-items: center; margin-bottom: .5rem; }
+    .surface-titlebar strong { font-size: var(--text-xs); }
+    .surface-titlebar span { color: var(--accent-ink); font: 700 var(--text-xs)/1.3 var(--font-mono); }
+    .surface-lane { display: grid; grid-template-columns: 7.1rem repeat(4, minmax(0, 1fr)); gap: .4rem; align-items: stretch; }
+    .surface-lane + .surface-lane { margin-top: .42rem; }
+    .surface-lane-label { display: grid; align-content: center; padding: .55rem; border-radius: .5rem; background: var(--ink); color: var(--terminal-ink); font: 800 var(--text-xs)/1.35 var(--font-mono); text-transform: uppercase; }
+    .surface-lane-label small { margin-top: .15rem; color: var(--terminal-dot); font: 500 var(--text-xs)/1.3 var(--font-body); text-transform: none; }
+    .surface-node { position: relative; min-height: 5.7rem; padding: .55rem; border: 1px solid var(--border); border-radius: .5rem; background: var(--bg-card); }
+    .surface-node:not(:last-child)::after { position: absolute; right: -.28rem; top: 35%; z-index: 2; content: "›"; color: var(--accent-ink); font-weight: 850; }
+    .surface-node b { display: block; margin-bottom: .16rem; color: var(--accent-ink); font: 790 var(--text-xs)/1.25 var(--font-mono); text-transform: uppercase; }
+    .surface-node p { color: var(--ink-mute); font-size: var(--text-xs); line-height: 1.36; }
+    .surface-node code { color: var(--ink); font-size: var(--text-xs); overflow-wrap: anywhere; }
+    .cwd-boundary { margin-top: .52rem; padding: .52rem .62rem; border: 1px dashed var(--accent); border-radius: .52rem; background: var(--accent-wash); color: var(--accent-ink); font-size: var(--text-xs); line-height: 1.44; }
+    .surface-caption { margin-top: .5rem; color: var(--ink-mute); font-size: var(--text-xs); line-height: 1.43; text-align: center; }
+
+    .loop-board { display: grid; gap: .58rem; }
+    .loop-lane { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: .62rem; padding: .68rem; border: 1px solid var(--border); border-radius: .75rem; }
+    .loop-lane.in { background: color-mix(in srgb, var(--accent-wash) 58%, var(--bg-card)); }
+    .loop-lane.out { background: var(--ok-wash); }
+    .lane-label { align-self: center; color: var(--ink); font: 820 var(--text-xs)/1.3 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+    .lane-label small { display: block; margin-top: .2rem; color: var(--ink-mute); font: 500 var(--text-xs)/1.35 var(--font-body); letter-spacing: 0; text-transform: none; }
+    .lane-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .38rem; }
+    .loop-step { position: relative; min-height: 4.7rem; padding: .52rem; border-radius: .5rem; background: var(--bg-card); color: var(--ink-mute); font-size: var(--text-xs); line-height: 1.35; }
+    .loop-step:not(:last-child)::after { position: absolute; right: -.29rem; top: 34%; z-index: 2; content: "›"; color: var(--accent-ink); font-size: var(--text-base); font-weight: 800; }
+    .loop-step b { display: block; margin-bottom: .15rem; color: var(--ink); font-size: var(--text-xs); }
+    .recovery-band { display: grid; grid-template-columns: 1fr auto 1fr; gap: .45rem; align-items: center; padding: .56rem .7rem; border: 1px dashed var(--accent); border-radius: .52rem; background: var(--accent-wash); color: var(--accent-ink); font: 700 var(--text-xs)/1.42 var(--font-mono); text-align: center; }
+    .open-loop { color: var(--warn); }
+    .closed-loop { color: var(--ok); }
+    .piter { display: grid; grid-template-columns: repeat(4, 1fr); gap: .42rem; margin-top: .58rem; }
+    .piter div { padding: .55rem; border: 1px solid var(--border); border-radius: .5rem; background: var(--bg-card); color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.38; }
+    .piter b { display: block; color: var(--accent-ink); font: 790 var(--text-xs)/1.3 var(--font-mono); }
+
+    .worked-run { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(14rem, .72fr); gap: .76rem; }
+    .run-track { counter-reset: run; display: grid; gap: .42rem; }
+    .run-step { counter-increment: run; display: grid; grid-template-columns: 1.65rem 1fr; gap: .5rem; padding: .58rem; border: 1px solid var(--border); border-radius: .56rem; background: var(--bg-card); }
+    .run-step::before { display: grid; place-items: center; width: 1.48rem; height: 1.48rem; content: counter(run); border-radius: 50%; background: var(--accent); color: var(--ink-inverse); font: 800 var(--text-xs)/1 var(--font-mono); }
+    .run-step h3 { margin-top: .04rem; font-size: var(--text-xs); }
+    .run-step p { margin-top: .12rem; color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.43; }
+    .run-step .receipt { display: inline-block; margin-top: .22rem; padding: .1rem .35rem; border-radius: 999px; background: var(--ok-wash); color: var(--ok); font-size: var(--text-xs); font-weight: 750; }
+    .commander-card { align-self: start; position: sticky; top: 3.2rem; padding: .76rem; border-radius: .68rem; background: var(--ink); color: var(--terminal-ink); }
+    .commander-card h3 { color: var(--ink-inverse); }
+    .commander-card p, .commander-card li { color: var(--terminal-dot); font-size: var(--text-xs); line-height: 1.45; }
+    .commander-card ul { margin-top: .35rem; padding-left: 1rem; }
+    .pattern-name { margin-top: .58rem; padding: .58rem .68rem; border-left: 3px solid var(--accent); border-radius: 0 .48rem .48rem 0; background: var(--accent-wash); color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.46; }
+
+    .contracts { display: grid; gap: .68rem; }
+    .contract-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, .92fr); gap: .76rem; padding: .8rem; border: 1px solid var(--border); border-radius: .72rem; background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .contract-copy p { margin-top: .25rem; color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.47; }
+    .contract-path { color: var(--accent-ink) !important; font: 700 var(--text-xs)/1.38 var(--font-mono); overflow-wrap: anywhere; }
+    .intent { margin-top: .46rem !important; padding: .5rem .57rem; border-left: 3px solid var(--accent); border-radius: 0 .38rem .38rem 0; background: var(--accent-wash); color: var(--ink) !important; font-size: var(--text-xs) !important; }
+    .intent b { color: var(--accent-ink); }
+    .evidence { min-width: 0; align-self: start; overflow: hidden; border: 1px solid var(--terminal-border); border-radius: .58rem; background: var(--terminal-bg); color: var(--terminal-ink); }
+    .evidence-label { display: flex; justify-content: space-between; gap: .4rem; padding: .35rem .52rem; border-bottom: 1px solid var(--terminal-bar); color: var(--terminal-dot); font: 650 var(--text-xs)/1.3 var(--font-mono); }
+    .evidence pre { margin: 0; padding: .58rem; border: 0; border-radius: 0; background: transparent; color: inherit; font: var(--text-xs)/1.48 var(--font-mono); white-space: pre-wrap; }
+    .tok-heading { color: color-mix(in srgb, var(--accent-wash) 80%, var(--ink-inverse)); font-weight: 750; }
+    .tok-key { color: color-mix(in srgb, var(--teach-wash) 75%, var(--ink-inverse)); }
+    .tok-string { color: color-mix(in srgb, var(--ok-wash) 75%, var(--ink-inverse)); }
+    .tok-comment { color: var(--terminal-dot); font-style: italic; }
+    .proof-stack { display: grid; gap: .34rem; }
+    .proof-stack div { padding: .5rem .56rem; border-left: 3px solid var(--ok); border-radius: .35rem; background: var(--ok-wash); color: var(--ok); font-size: var(--text-xs); line-height: 1.4; }
+
+    .ops-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(14rem, .7fr); gap: .75rem; }
+    .ops-steps { counter-reset: ops; display: grid; gap: .43rem; }
+    .ops-step { counter-increment: ops; display: grid; grid-template-columns: 1.7rem 1fr; gap: .52rem; padding: .6rem; border: 1px solid var(--border); border-radius: .58rem; background: var(--bg-card); }
+    .ops-step::before { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; content: counter(ops); border-radius: .42rem; background: var(--accent-wash); color: var(--accent-ink); font: 820 var(--text-xs)/1 var(--font-mono); }
+    .ops-step h3 { margin-top: .05rem; font-size: var(--text-xs); }
+    .ops-step p { margin-top: .14rem; color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.43; }
+    .terminal { margin-top: .3rem; padding: .48rem .56rem; overflow-x: auto; border-radius: .42rem; background: var(--terminal-bg); color: var(--terminal-ink); font: var(--text-xs)/1.48 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .readiness { align-self: start; padding: .7rem; border: 1px solid var(--border); border-radius: .64rem; background: var(--bg-inset); }
+    .readiness h3 { color: var(--accent-ink); }
+    .readiness li { color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.42; }
+    .readiness ul { margin-top: .34rem; padding-left: 1rem; }
+    .truth-note { margin-top: .52rem; padding: .55rem .62rem; border: 1px dashed var(--accent); border-radius: .48rem; background: var(--bg-card); color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.45; }
+    .truth-note b { color: var(--accent-ink); }
+
+    .failure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .48rem; }
+    .failure-card { padding: .64rem; border: 1px solid var(--border); border-radius: .58rem; background: var(--bg-card); }
+    .failure-card b { display: block; color: var(--warn); font-size: var(--text-xs); }
+    .failure-card p { margin-top: .18rem; color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.42; }
+    .failure-card .repair { display: block; margin-top: .28rem; color: var(--ok); font-weight: 750; }
+    .failure-card.wide { grid-column: 1 / -1; background: color-mix(in srgb, var(--accent-wash) 48%, var(--bg-card)); }
+
+    .lab { padding: .9rem !important; border: 2px solid var(--accent) !important; border-radius: .78rem; background: linear-gradient(145deg, var(--bg-card), var(--accent-wash)); box-shadow: var(--shadow-card); }
+    .lab-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: .72rem; }
+    .lab ol { margin-top: .42rem; padding-left: 1.12rem; }
+    .lab li { color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.45; }
+    .lab code { font-size: var(--text-xs); overflow-wrap: anywhere; }
+    .pass-list { padding: .64rem; border-radius: .58rem; background: var(--ok-wash); }
+    .pass-list h3, .pass-list li { color: var(--ok); }
+    .pass-list ul { margin-top: .34rem; padding-left: 1rem; }
+    .pass-list li { font-size: var(--text-xs); line-height: 1.42; }
+    .fail-try { margin-top: .5rem; padding: .54rem .6rem; border: 1px dashed var(--accent); border-radius: .46rem; color: var(--accent-ink); font-size: var(--text-xs); line-height: 1.43; }
+    .lab-branch { display: grid; grid-template-columns: repeat(5, 1fr); gap: .34rem; margin-top: .52rem; }
+    .lab-branch div { padding: .45rem; border-radius: .42rem; background: var(--bg-card); color: var(--ink-soft); font-size: var(--text-xs); line-height: 1.35; text-align: center; }
+    .lab-branch b { display: block; color: var(--accent-ink); }
+
+    .teach-back { padding: .86rem !important; border-radius: .74rem; background: var(--terminal-bg); color: var(--terminal-ink); }
+    .teach-back h2 { color: var(--ink-inverse); }
+    .six-sentences { counter-reset: sentence; display: grid; grid-template-columns: repeat(2, 1fr); gap: .43rem; margin-top: .62rem; }
+    .sentence { counter-increment: sentence; min-height: 3.45rem; padding: .54rem; border: 1px solid var(--terminal-bar); border-radius: .46rem; color: var(--terminal-dot); font-size: var(--text-xs); line-height: 1.4; }
+    .sentence::before { display: inline-block; margin-right: .25rem; content: counter(sentence) "."; color: color-mix(in srgb, var(--accent-wash) 80%, var(--ink-inverse)); font: 800 var(--text-xs)/1 var(--font-mono); }
+    details summary { cursor: pointer; }
+    details[open] > :not(summary) { animation: reveal .22s ease-out both; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .answer-toggle { margin-top: .54rem; }
+    .answer-toggle summary { color: color-mix(in srgb, var(--accent-wash) 80%, var(--ink-inverse)); font-size: var(--text-xs); font-weight: 750; }
+    .model-answer { margin-top: .44rem; padding: .6rem; border-radius: .45rem; background: var(--terminal-bar); color: var(--terminal-dot); font-size: var(--text-xs); line-height: 1.5; }
+
+    .raw-index { overflow: clip; border: 1px solid var(--border); border-radius: .65rem; background: var(--bg-card); }
+    .raw-index > summary { padding: .68rem .76rem; color: var(--accent-ink); font-size: var(--text-xs); font-weight: 750; }
+    .index-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .52rem; padding: .6rem; border-top: 1px solid var(--border); }
+    .index-group { padding: .54rem; border-radius: .48rem; background: var(--bg-inset); }
+    .index-group h3 { color: var(--accent-ink); font-size: var(--text-xs); }
+    .index-group ul { margin: 0; padding-left: 1rem; }
+    .index-group li { margin: .17rem 0; color: var(--ink-mute); font-size: var(--text-xs); line-height: 1.35; break-inside: avoid; }
+    .index-group code { color: var(--ink); font-size: var(--text-xs); overflow-wrap: anywhere; }
+    .source-note { margin-top: .52rem; color: var(--ink-mute); font-size: var(--text-xs); line-height: 1.43; }
+    .page-footer { padding: .8rem 0 1.8rem; border-top: 1px solid var(--border); color: var(--ink-mute); font-size: var(--text-xs); }
+
+    @media (max-width: 960px) {
+      .mobile-toc { position: sticky; top: 2.6rem; z-index: 90; display: block; width: min(100% - 1.2rem, 58rem); margin: .55rem auto 0; }
+      .chapter-shell { grid-template-columns: 1fr; width: min(100% - 1.2rem, 58rem); }
+      .chapter-rail { display: none; }
+      .surface-lane { grid-template-columns: repeat(2, 1fr); }
+      .surface-lane-label { grid-column: 1 / -1; }
+      .surface-node::after { display: none; }
+    }
+    @media (max-width: 700px) {
+      .site-brand-copy span { display: none; }
+      .site-links a { padding-inline: .32rem; }
+      .scale-strip, .piter, .lab-branch { grid-template-columns: repeat(2, 1fr); }
+      .loop-lane, .contract-card, .worked-run, .ops-layout, .failure-grid, .lab-grid, .six-sentences, .index-groups { grid-template-columns: 1fr; }
+      .lane-steps { grid-template-columns: repeat(2, 1fr); }
+      .recovery-band { grid-template-columns: 1fr; }
+      .commander-card { position: static; }
+      .failure-card.wide { grid-column: auto; }
+    }
+    @media (max-width: 460px) {
+      .site-brand-copy strong { font-size: var(--text-xs); }
+      .site-links a { font-size: var(--text-xs); }
+      .mobile-toc ol { grid-template-columns: 1fr; }
+      .surface-lane, .scale-strip, .lane-steps, .piter, .lab-branch { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+    @media print {
+      .site-bar, .chapter-rail, .reading-progress { display: none !important; }
+      .chapter-shell { display: block !important; width: auto !important; }
+      .chapter-main > section { break-inside: auto; }
+      .contract-card, .failure-card, .run-step, .ops-step, .lab { break-inside: avoid; }
+    }
+  </style>
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#mission">Skip to lesson</a>
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-bar" aria-label="Book navigation">
+    <a class="site-brand" href="../index.html">
+      <span class="site-brand-mark">AS</span>
+      <span class="site-brand-copy"><strong>AGENT SYSTEMS</strong><span>IndyDevDan companion</span></span>
+    </a>
+    <nav class="site-links" aria-label="Companion links">
+      <a href="../vol-2-ah/12-multi-agent-orchestration-the-o-agent.html">Chapter</a>
+      <a href="index.html">Code library</a>
+      <a href="../index.html">Book hub</a>
+    </nav>
+  </header>
+
+  <div class="mobile-toc">
+    <details>
+      <summary>Agent systems contents</summary>
+      <ol>
+        <li><a href="#mission">Agent mission</a></li>
+        <li><a href="#cast">Cast of agents</a></li>
+        <li><a href="#surface">Surface map</a></li>
+        <li><a href="#loop">Control loop</a></li>
+        <li><a href="#worked-run">Worked run</a></li>
+        <li><a href="#contracts">Four contracts</a></li>
+        <li><a href="#operate">Operate like Dan</a></li>
+        <li><a href="#failures">Common failures</a></li>
+        <li><a href="#lab">Agent ops lab</a></li>
+        <li><a href="#teach-back">Teach-back</a></li>
+        <li><a href="#appendix">Raw index</a></li>
+      </ol>
+    </details>
+  </div>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="On this page">
+      <p class="chapter-rail-label">AH · 04</p>
+      <a href="#mission"><span>00</span>Agent mission</a>
+      <a href="#cast"><span>01</span>Cast of agents</a>
+      <a href="#surface"><span>02</span>Surface map</a>
+      <a href="#loop"><span>03</span>Control loop</a>
+      <a href="#worked-run"><span>04</span>Worked run</a>
+      <a href="#contracts"><span>05</span>Four contracts</a>
+      <a href="#operate"><span>06</span>Operate like Dan</a>
+      <a href="#failures"><span>07</span>Common failures</a>
+      <a href="#lab"><span>08</span>Agent ops lab</a>
+      <a href="#teach-back"><span>09</span>Teach-back</a>
+      <a href="#appendix"><span>10</span>Raw index</a>
+    </aside>
+
+    <main id="main-content" class="chapter-main">
+      <section id="mission" class="mission-card" aria-labelledby="mission-title">
+        <p class="eyebrow">Agentic Horizon · Multi-Agent Orchestration</p>
+        <h1 id="mission-title">Command the system, not every worker.</h1>
+        <p class="mission-copy">This lesson trains you to operate a fleet through one thin O-agent: the human commander chooses the outcome, working directory, risk boundary, and acceptance evidence; the orchestrator translates intent into agent lifecycle calls; focused primary agents do the engineering; and hooks, persistence, diffs, costs, and a reviewer decide whether the system can stop or must recover. The codebase is a reference operating system around agents—not a web-app tour.</p>
+        <div class="mission-formula" aria-label="Agent orchestration formula">one interface + CRUD for agents + observability → controllable compute</div>
+        <p class="hook-note"><strong>The hook:</strong> three agents can run in parallel while your attention remains serial. The O-agent is leverage only when it removes you as the message bus and keeps verification able to change the next move.</p>
+      </section>
+
+      <section id="cast" aria-labelledby="cast-title">
+        <p class="eyebrow">01 · Who acts?</p>
+        <h2 id="cast-title">The conductor owns coordination; specialists own the work</h2>
+        <p class="section-lede">The easiest orchestration failure is role collapse: the human becomes a polling script, or the O-agent becomes the builder. Dan’s system separates authority, routing, execution, and evidence so each actor stays small and replaceable.</p>
+        <div class="cast-wrap">
+          <table class="cast-table">
+            <thead><tr><th>Actor</th><th>Owns</th><th>Must not absorb</th></tr></thead>
+            <tbody>
+              <tr><td>Human commander<br><span class="role-chip">authority</span></td><td>Outcome, acceptable cost, <code>--cwd</code>, risk tolerance, named acceptance evidence, and final escalation decisions.</td><td>Polling every terminal, copying every handoff, or rescuing a worker by silently doing its task.</td></tr>
+              <tr><td>Orchestrator Agent<br><span class="role-chip">meta-agent</span></td><td>Analyze, plan the fleet, create, command, monitor, interrupt, report cost, read logs, and archive agents through eight management tools.</td><td>Implementation detail. Its prompt says command-level agents do writing, editing, and testing.</td></tr>
+              <tr><td>Managed primary agents<br><span class="role-chip">persistent workers</span></td><td>A named role, model, prompt, working directory, session ID, task history, and durable artifacts. They can be re-commanded.</td><td>Fleet strategy or authority outside the mounted working directory and tool surface.</td></tr>
+              <tr><td>Task subagents<br><span class="role-chip">nested delegation</span></td><td>Short parallel searches or specialist calls initiated inside a managed agent when <code>Task</code> is allowed.</td><td>The identity of the primary agent. A template promoted through <code>create_agent</code> is a primary agent, not this nested form.</td></tr>
+              <tr><td>Planner · Builder · Reviewer<br><span class="role-chip">phase specialists</span></td><td>Planner writes a spec, builder implements from it, reviewer reads the prompt and diff then emits a risk-tiered PASS/FAIL report.</td><td>A single blended “do everything and approve yourself” context.</td></tr>
+              <tr><td>Stateless summarizer<br><span class="role-chip">cheap helper agent</span></td><td><code>single_agent_prompt.py</code> runs one-off Haiku queries that compress hook and response events into short summaries.</td><td>Session memory or correctness judgments. Its launcher is stateless, but <code>bypassPermissions</code> does not explicitly deny tools; toollessness is intended, not enforced.</td></tr>
+              <tr><td>Harness + observer scripts<br><span class="role-chip">deterministic</span></td><td>FastAPI triggering, SDK launch, sleep/check cadence, hooks, Postgres records, WebSocket delivery, file diffs, ports, and process startup.</td><td>Probabilistic planning. These mechanics make agent work visible and repeatable.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="scale-strip" role="group" aria-label="Agent scale ladder from base to orchestrated">
+          <div class="scale-step"><b>Base</b><span>One capable general agent.</span></div>
+          <div class="scale-step"><b>Better</b><span>Improve its core four.</span></div>
+          <div class="scale-step"><b>More</b><span>Add independent compute.</span></div>
+          <div class="scale-step"><b>Custom</b><span>Program focused roles.</span></div>
+          <div class="scale-step"><b>Orchestrated</b><span>Scale the interface that commands them.</span></div>
+        </div>
+        <p class="small-note">Dan’s ordering is the point: orchestration comes after you can build useful custom agents and observe them. Ten vague agents are not a fleet; they are ten simultaneous ambiguities.</p>
+      </section>
+
+      <section id="surface" aria-labelledby="surface-title">
+        <p class="eyebrow">02 · Agent surface map</p>
+        <h2 id="surface-title">The fleet sees a mounted operating surface</h2>
+        <p class="section-lede">Read from the agent’s perspective. “The repository” is too vague. The real world is the prompt, tools, project settings, working directory, session state, lifecycle methods, and evidence mounted by the harness.</p>
+        <figure class="surface-map">
+          <div class="surface-titlebar"><strong>O-agent operating ring</strong><span>interfaces, not file trivia</span></div>
+          <div class="surface-lane">
+            <div class="surface-lane-label">Program<small>what behavior means</small></div>
+            <div class="surface-node"><b>Commander input</b><p>Cmd+K or chat → <code>POST /send_chat</code>. One outcome enters.</p></div>
+            <div class="surface-node"><b>System prompt</b><p><code>orchestrator_agent_system_prompt.md</code> defines the meta-role and eight-tool vocabulary.</p></div>
+            <div class="surface-node"><b>Templates</b><p><code>.claude/agents/*.md</code> packages role + model + tool list.</p></div>
+            <div class="surface-node"><b>Workflow prompts</b><p><code>.claude/commands/orch_*.md</code> programs sequence, cadence, completion, and reports.</p></div>
+          </div>
+          <div class="surface-lane">
+            <div class="surface-lane-label">Mount<small>what can act</small></div>
+            <div class="surface-node"><b>Launcher</b><p><code>start_be.sh</code> → FastAPI → <code>OrchestratorService</code> → <code>ClaudeSDKClient</code>.</p></div>
+            <div class="surface-node"><b>Permission</b><p><code>allowed_tools</code>, <code>disallowed_tools</code>, <code>permission_mode</code>, MCP servers, and hooks.</p></div>
+            <div class="surface-node"><b>Fleet tools</b><p>Eight <code>mcp__mgmt__*</code> calls create, command, inspect, interrupt, cost, and archive.</p></div>
+            <div class="surface-node"><b>Worker context</b><p>Own prompt + model + <code>cwd</code> + session resume + project settings.</p></div>
+          </div>
+          <div class="surface-lane">
+            <div class="surface-lane-label">Observe<small>what changes the branch</small></div>
+            <div class="surface-node"><b>Lifecycle hooks</b><p>Pre/PostToolUse, prompt, Stop, SubagentStop, and PreCompact become events.</p></div>
+            <div class="surface-node"><b>Persistent memory</b><p>Postgres stores agents, prompts, logs, chat, sessions, tokens, and costs.</p></div>
+            <div class="surface-node"><b>Review surface</b><p>WebSocket → Pinia → filters, status, context, consumed/produced files, and diffs.</p></div>
+            <div class="surface-node"><b>Recovery</b><p>Re-command, compact, interrupt, replace, bounded repair, or return authority.</p></div>
+          </div>
+          <div class="cwd-boundary"><strong><code>--cwd</code> is a capability boundary.</strong> The custom registry resolves templates at <code>&lt;cwd&gt;/.claude/agents/</code>; slash-command discovery resolves <code>&lt;cwd&gt;/.claude/commands/</code>; every managed agent receives that working directory. Start from <code>apps/orchestrator_3_stream</code> and the inner fleet toolkit appears. Point elsewhere and you mount a different agent OS.</div>
+          <figcaption class="surface-caption">The model is replaceable. The operating ring—prompt, tools, cwd, state, evidence, and recovery—is the system you are actually engineering.</figcaption>
+        </figure>
+      </section>
+
+      <section id="loop" aria-labelledby="loop-title">
+        <p class="eyebrow">03 · Control loop</p>
+        <h2 id="loop-title">Out of the loop does not mean out of control</h2>
+        <p class="section-lede">In-loop work asks the commander to make the next move. Out-of-loop work encodes that move in a harness and returns only on completion, a failed gate, or a bounded escalation. Both use plan → act → verify → recover; the difference is who carries the loop.</p>
+        <div class="loop-board" role="group" aria-label="In-loop and out-of-loop control loops for the O-agent lesson">
+          <div class="loop-lane in">
+            <div class="lane-label">In loop<small>chat + one worker</small></div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Plan</b>Human chooses the next prompt and watches the conversation.</div>
+              <div class="loop-step"><b>Act</b>One agent answers or calls a bounded tool.</div>
+              <div class="loop-step"><b>Verify</b>Human reads the response and decides if it is enough.</div>
+              <div class="loop-step"><b>Recover</b>Human rephrases, supplies context, or stops.</div>
+            </div>
+          </div>
+          <div class="loop-lane out">
+            <div class="lane-label">Out of loop<small>O-agent + fleet</small></div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Plan</b>O-agent selects roles; workflow prompt declares phases and receipts.</div>
+              <div class="loop-step"><b>Act</b>Primary agents run in separate resumable contexts.</div>
+              <div class="loop-step"><b>Verify</b>Hooks prove completion; tests, diffs, and reviewer verdict judge results.</div>
+              <div class="loop-step"><b>Recover</b>Re-command/replace the worker, re-review, compact, or escalate.</div>
+            </div>
+          </div>
+          <div class="recovery-band"><span class="open-loop">Report FAIL and stop = open loop</span><span>← verdict routes the next move →</span><span class="closed-loop">Repair → re-verify → accept/escalate = closed loop</span></div>
+        </div>
+        <div class="piter" aria-label="PITER mapping for this lesson">
+          <div><b>P · Prompt input</b>Cmd+K message states the desired result.</div>
+          <div><b>T · Trigger</b>FastAPI starts <code>process_user_message()</code> with <code>asyncio.create_task</code>.</div>
+          <div><b>E · Environment</b><code>cwd</code>, project settings, templates, tools, database, and running processes.</div>
+          <div><b>R · Review</b>EventStream, status, costs, file ledger, diffs, tests, and reviewer verdict.</div>
+        </div>
+        <p class="small-note">PITER is the lesson’s conceptual mapping, not a string in the repository. The real mechanics are prompt input → HTTP trigger → mounted environment → observability review.</p>
+      </section>
+
+      <section id="worked-run" aria-labelledby="worked-title">
+        <p class="eyebrow">04 · One worked agent run</p>
+        <h2 id="worked-title">Plan → build → review without becoming the workflow engine</h2>
+        <p class="section-lede">The climax workflow is encoded in <code>apps/orchestrator_3_stream/.claude/commands/orch_plan_w_scouts_build_review.md</code>. The orchestration is mostly prompt-driven: the O-agent follows a reusable recipe and uses management tools plus <code>Bash(sleep 15)</code>.</p>
+        <div class="worked-run">
+          <div class="run-track">
+            <article class="run-step"><div><h3>Commander states one outcome</h3><p>Use Cmd+K and invoke the workflow with a concrete change and acceptance criteria. The commander does not pick files for every worker.</p><span class="receipt">receipt · one prompt</span></div></article>
+            <article class="run-step"><div><h3>O-agent creates three primary agents up front</h3><p>A dynamic planner gets a custom system prompt; the builder uses <code>build-agent</code>; the verifier uses <code>review-agent</code>. Each receives its own persisted session.</p><span class="receipt">receipt · 3 create_agent calls</span></div></article>
+            <article class="run-step"><div><h3>Planner explores and writes a spec</h3><p>The O-agent commands the planner, then sleeps and checks status until a response event is followed by a Stop hook. It reads the resulting path, not the planner’s whole hidden context.</p><span class="receipt">receipt · spec path + response → Stop</span></div></article>
+            <article class="run-step"><div><h3>Builder receives the artifact handoff</h3><p>The next prompt names the original outcome, plan path, target files, and implementation approach. The builder edits and runs the checks it was given.</p><span class="receipt">receipt · diff + tool events + validation output</span></div></article>
+            <article class="run-step"><div><h3>Reviewer compares request, plan, and diff</h3><p>The review template is analysis-only. It uses git evidence, writes a risk-tiered report, and ends PASS or FAIL.</p><span class="receipt">receipt · review report + verdict</span></div></article>
+            <article class="run-step"><div><h3>Commander reviews the system, not every token</h3><p>Inspect the final artifacts, event order, costs, context bars, and verdict. Keep agents for follow-up or archive them when the artifact—not the personality—is what matters.</p><span class="receipt">receipt · accept, recover, or escalate</span></div></article>
+          </div>
+          <aside class="commander-card">
+            <h3>Your job during the run</h3>
+            <ul>
+              <li>Protect the outcome and acceptance criteria.</li>
+              <li>Watch whether roles remain separate.</li>
+              <li>Use evidence, not confident prose, to judge progress.</li>
+              <li>Intervene on a failed gate, runaway cost, wrong <code>cwd</code>, or missing authority decision.</li>
+              <li>Do not hand-carry planner context into the builder; pass the artifact path.</li>
+            </ul>
+          </aside>
+        </div>
+        <div class="pattern-name"><strong>Name the pattern: single interface + primary-agent lifecycle + observable artifact relay.</strong> A subagent template is “pulled up a level” when <code>create_agent(subagent_template=...)</code> gives it a name, session, card, cost, and re-promptable lifecycle. The O-agent stays thin by reducing and delegating; concrete files carry the work between roles.</div>
+      </section>
+
+      <section id="contracts" aria-labelledby="contracts-title">
+        <p class="eyebrow">05 · Why these files exist for agents</p>
+        <h2 id="contracts-title">Four contracts make the fleet operable</h2>
+        <p class="section-lede">The snippets below are contract evidence, not a source tour. Each answers one operating question: what may the agent understand, what may it do, how is it mounted, and what counts as evidence?</p>
+
+        <div class="contracts">
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Prompt contract · what the O-agent is allowed to understand</h3>
+              <p class="contract-path">apps/orchestrator_3_stream/backend/prompts/orchestrator_agent_system_prompt.md</p>
+              <p>The full overwrite names a meta-agent, gives it an eight-tool vocabulary, teaches compacting and monitoring, and draws the crucial boundary: it may use Bash for information or debugging, but command-level agents do the heavy lifting.</p>
+              <p>The <code>{{SUBAGENT_MAP}}</code> placeholder is filled at runtime from <code>&lt;cwd&gt;/.claude/agents/*.md</code>. The prompt therefore becomes an inventory of currently mountable workers instead of a hard-coded fleet.</p>
+              <p class="intent"><b>Dan’s design intent:</b> keep coordination knowledge centralized and implementation knowledge delegated, so the O-agent’s context remains small while worker contexts stay focused.</p>
+            </div>
+            <div class="evidence" aria-label="Orchestrator prompt excerpt">
+              <div class="evidence-label"><span>prompt evidence</span><span>full overwrite</span></div>
+              <pre><span class="tok-heading">You are the **Orchestrator Agent**</span> —
+a meta-agent that manages other Agents.
+
+<span class="tok-comment"># Boundary near the end of the prompt</span>
+Let your command level agents do the heavy
+lifting (writing, editing, testing, etc.).</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Tool and permission contract · capability is explicit</h3>
+              <p class="contract-path">apps/orchestrator_3_stream/backend/modules/orchestrator_service.py · agent_manager.py · .claude/agents/*.md</p>
+              <p>The O-agent receives exactly eight qualified management tools plus Bash, Read, SlashCommand, and Skill. Managed agents receive a prompt, model, <code>cwd</code>, hook set, allowlist, denylist, and <code>acceptEdits</code> mode.</p>
+              <p>Template frontmatter is a compact capability declaration: the fast scout says <code>tools: Read, Glob, Grep</code>; the builder adds Write, Edit, and Bash; the reviewer can write reports but is instructed not to fix code.</p>
+              <p class="intent"><b>Dan’s design intent:</b> tools are part of the program. A role is credible only when its tool surface supports the work and denies accidental scope.</p>
+            </div>
+            <div class="evidence" aria-label="Tool contract excerpt">
+              <div class="evidence-label"><span>settings evidence</span><span>O-agent allowlist</span></div>
+              <pre><span class="tok-key">allowed_tools</span> = [
+  <span class="tok-string">"mcp__mgmt__create_agent"</span>,
+  <span class="tok-string">"mcp__mgmt__command_agent"</span>,
+  <span class="tok-string">"mcp__mgmt__check_agent_status"</span>,
+  <span class="tok-string">"mcp__mgmt__delete_agent"</span>,
+  <span class="tok-string">"... four more mgmt tools ..."</span>,
+  <span class="tok-string">"Bash"</span>, <span class="tok-string">"Read"</span>,
+  <span class="tok-string">"SlashCommand"</span>, <span class="tok-string">"Skill"</span>
+]</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Harness and launcher · how the agent becomes a running system</h3>
+              <p class="contract-path">apps/orchestrator_3_stream/start_be.sh · backend/main.py · modules/orchestrator_service.py · modules/agent_manager.py</p>
+              <p>The shell launcher chooses <code>--cwd</code> and optional <code>--session</code>. FastAPI constructs one orchestrator and one scoped AgentManager. The service mounts the eight Python tools as an in-memory MCP server; the manager starts managed agents in the background and resumes their stored sessions.</p>
+              <p><code>POST /send_chat</code> returns immediately after scheduling work. Results travel back through WebSocket events, so the browser is an observer and control surface rather than the agent runtime.</p>
+              <p class="intent"><b>Dan’s design intent:</b> make agents callable infrastructure. A prompt becomes a trigger; a working directory becomes an environment; session IDs and Postgres make workers replaceable across interactions.</p>
+            </div>
+            <div class="evidence" aria-label="Launcher excerpt">
+              <div class="evidence-label"><span>launcher evidence</span><span>README path</span></div>
+              <pre><span class="tok-comment"># start_be.sh ultimately runs:</span>
+uv run python main.py \
+  --cwd <span class="tok-string">"$WORKING_DIR"</span> \
+  <span class="tok-string">$SESSION_ARGS</span>
+
+<span class="tok-comment"># main.py dispatches without blocking HTTP:</span>
+asyncio.create_task(
+  service.process_user_message(...)
+)</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>Verification contract · completion is not correctness</h3>
+              <p class="contract-path">backend/modules/command_agent_hooks.py · frontend/src/components/event-rows/FileChangesDisplay.vue · .claude/agents/review-agent.md</p>
+              <p>A response followed by a Stop hook answers “did this run finish?” It does not answer “is the change right?” Correctness evidence comes from validation commands, produced-file diffs, consumed-file context, git review, and a PASS/FAIL verdict tied to the original request.</p>
+              <p>The observer plane persists raw events, adds short Haiku summaries, broadcasts through WebSocket, and exposes filters by agent, tool, response, thinking, hook, level, and regex. You can open a produced file directly in the editor.</p>
+              <p class="intent"><b>Dan’s design intent:</b> measure the fleet closely enough to improve and scale it. Verification is useful only when its evidence can route the system backward.</p>
+            </div>
+            <div class="proof-stack" aria-label="Verification receipts">
+              <div><strong>Execution receipt</strong><br>response event → Stop hook</div>
+              <div><strong>Behavior receipt</strong><br>real command output, test, build, or browser evidence</div>
+              <div><strong>Change receipt</strong><br>Consumed / Produced ledger + inline git diff</div>
+              <div><strong>Decision receipt</strong><br>review report with risk tiers and PASS / FAIL</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="operate" aria-labelledby="operate-title">
+        <p class="eyebrow">06 · Operate like Dan</p>
+        <h2 id="operate-title">Bring up the agent OS, then command one interface</h2>
+        <p class="section-lede">These are the real top-level README entrypoints. Setup matters because an O-agent without keys, schema, working directory, or observability is merely a prompt that cannot close its loop.</p>
+        <div class="ops-layout">
+          <div class="ops-steps">
+            <article class="ops-step"><div><h3>Prepare the required environment</h3><p>From <code>agentic-horizon/multi-agent-orchestration</code>, create the real env file and set <code>ANTHROPIC_API_KEY</code> plus <code>DATABASE_URL</code>.</p><div class="terminal">cp .env.sample .env
+code .env</div></div></article>
+            <article class="ops-step"><div><h3>Copy configuration to the application surfaces</h3><p>The root README explicitly copies the env into both app directories.</p><div class="terminal">cp .env apps/orchestrator_3_stream/.env
+cp .env apps/orchestrator_db/.env</div></div></article>
+            <article class="ops-step"><div><h3>Build the persistent evidence plane</h3><p>The migration runner needs <code>psql</code> and applies migrations 0 through 8, producing the six tables used for orchestrator, fleet, prompts, events, system logs, and chat.</p><div class="terminal">uv run apps/orchestrator_db/run_migrations.py</div></div></article>
+            <article class="ops-step"><div><h3>Start the backend from the intended working directory</h3><p>Running the launcher here makes <code>apps/orchestrator_3_stream</code> the default <code>cwd</code>, which exposes its seven templates and orchestration commands.</p><div class="terminal">cd apps/orchestrator_3_stream
+./start_be.sh
+# http://127.0.0.1:9403</div></div></article>
+            <article class="ops-step"><div><h3>Start the observer UI in terminal two</h3><p>The README uses Bun for first-time install, then calls the app launcher.</p><div class="terminal">cd apps/orchestrator_3_stream/frontend
+bun install
+cd ..
+./start_fe.sh
+# http://127.0.0.1:5175</div></div></article>
+            <article class="ops-step"><div><h3>Prove the harness before spending fleet tokens</h3><p>Open <code>http://127.0.0.1:5175</code>. Confirm the connection indicator, empty agent list, event stream, and O-agent chat. The health endpoint is <code>http://127.0.0.1:9403/health</code>.</p></div></article>
+            <article class="ops-step"><div><h3>Run the smallest lifecycle, then scale</h3><p>Use the README’s first interaction: “Create an agent called alice for Python development,” then “Tell alice to create a simple FastAPI hello world app.” Watch create, command, response, Stop, file evidence, cost, and status before attempting the three-agent workflow.</p></div></article>
+            <article class="ops-step"><div><h3>Resume deliberately or remount deliberately</h3><p>The launcher accepts <code>--session</code> and <code>--cwd</code>. Resume preserves the O-agent’s conversation; changing cwd changes the codebase, templates, commands, and blast radius the fleet can see.</p><div class="terminal">./start_be.sh --session sess_abc123...
+./start_be.sh --cwd /path/to/project</div></div></article>
+          </div>
+          <aside class="readiness">
+            <h3>Ready means observable</h3>
+            <ul>
+              <li>Postgres migrations report success.</li>
+              <li>Backend is on 9403; frontend is on 5175.</li>
+              <li><code>/get_orchestrator</code> returns cwd, templates, slash commands, and eight tools.</li>
+              <li>The event stream receives lifecycle events.</li>
+              <li>A produced file shows a diff and opens in the editor.</li>
+              <li>Each managed agent shows model, tokens, cost, and status.</li>
+            </ul>
+            <div class="truth-note"><b>Trust executable source over stale prose.</b> The inner <code>CLAUDE.md</code> still says backend port 8002; <code>config.py</code>, <code>start_be.sh</code>, frontend services, and the top README agree on 9403. The O-agent prompt also documents an older Haiku alias while <code>config.py</code> and <code>agent_manager.py</code> resolve to Haiku 4.5.</div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="failures" aria-labelledby="failures-title">
+        <p class="eyebrow">07 · Common agent failures</p>
+        <h2 id="failures-title">Misconfiguration turns leverage back into supervision</h2>
+        <p class="section-lede">Agent failures are often operating-system failures: the wrong role, capability surface, working directory, receipt, or recovery branch. Diagnose the ring before blaming the model.</p>
+        <div class="failure-grid">
+          <article class="failure-card"><b>1 · Mis-prompted conductor</b><p><strong>Symptom:</strong> the O-agent reads, edits, and tests the feature itself. Its context becomes the project’s junk drawer.<span class="repair">Repair:</span> restore the meta-role boundary and command a focused primary agent with a concrete artifact.</p></article>
+          <article class="failure-card"><b>2 · More agents, no decomposition</b><p><strong>Symptom:</strong> workers overlap, contradict, or all inspect the same files. Compute rises; synthesis ownership disappears.<span class="repair">Repair:</span> give each agent one prompt, one purpose, and one result. Name the artifact handoff.</p></article>
+          <article class="failure-card"><b>3 · Wrong cwd, wrong agent OS</b><p><strong>Symptom:</strong> templates or commands are missing, agents edit the wrong project, or the UI lists a different capability palette.<span class="repair">Repair:</span> treat <code>--cwd</code> as an authority decision; verify it in <code>/get_orchestrator</code> before dispatch.</p></article>
+          <article class="failure-card"><b>4 · Tool name without a mounted server</b><p><strong>Symptom:</strong> the Playwright or Firecrawl template advertises MCP tools that do not exist at runtime.<span class="repair">Repair:</span> activate and verify the optional <code>.mcp.json.sample</code> servers, or choose a template whose real tools are mounted.</p></article>
+          <article class="failure-card"><b>5 · Completion mistaken for correctness</b><p><strong>Symptom:</strong> response → Stop is treated as PASS. The workflow reports success without running the plan’s validation commands.<span class="repair">Repair:</span> separate execution receipt from behavioral receipt and reviewer decision.</p></article>
+          <article class="failure-card"><b>6 · Reviewer writes a report into a void</b><p><strong>Symptom:</strong> the shipped plan/build/review workflow reports FAIL and stops; no repair or re-review is encoded.<span class="repair">Repair:</span> add a bounded verdict branch: FAIL → builder repair → reviewer re-check → accept or escalate.</p></article>
+          <article class="failure-card"><b>7 · Human stays in the loop</b><p><strong>Symptom:</strong> you manually ask every agent if it is done and relay every response.<span class="repair">Repair:</span> let the workflow’s prompt-driven sleep/check cadence carry monitoring; review artifacts and exceptions.</p></article>
+          <article class="failure-card"><b>8 · Observability without consequence</b><p><strong>Symptom:</strong> costs, context pressure, tool errors, and diffs are visible, but nothing changes course.<span class="repair">Repair:</span> attach thresholds and branches: compact at pressure, interrupt runaway work, reject bad diffs, replace a blocked worker.</p></article>
+          <article class="failure-card wide"><b>Source-audit warning · template permissions widen on re-command</b><p>Creation honors a template’s <code>tools</code> frontmatter. The current <code>command_agent()</code> resume path rebuilds <code>ClaudeAgentOptions</code> with the comprehensive default allowlist instead of the original template allowlist. A “read-only” scout is therefore prompt-bounded after creation, not reliably tool-bounded on later commands. Treat this as a real harness gap: persist the effective allowlist with the agent and reuse it on resume before claiming least privilege.</p></article>
+        </div>
+      </section>
+
+      <section id="lab" class="lab" aria-labelledby="lab-title">
+        <p class="eyebrow">08 · Agent ops lab · close the verifier loop</p>
+        <h2 id="lab-title">Make FAIL change the next move</h2>
+        <p class="section-lede">Change the agent system, not Vue or FastAPI business logic. You will reprogram the orchestration prompt so reviewer evidence routes backward through one bounded repair pass.</p>
+        <div class="lab-grid">
+          <div>
+            <h3>Work only in the workflow contract</h3>
+            <p class="path">apps/orchestrator_3_stream/.claude/commands/orch_plan_w_scouts_build_review.md</p>
+            <ol>
+              <li><strong>Baseline the open loop.</strong> Find the Review Complete and Final Report instructions. Write one sentence describing what currently happens after a FAIL: it is reported, but no repair command or re-review is required.</li>
+              <li><strong>Add a bound.</strong> Define <code>MAX_REPAIR_PASSES: 1</code> in Variables. A closed loop without a cap can oscillate and burn tokens.</li>
+              <li><strong>Add a verdict branch.</strong> If review is PASS, continue to the final report. If FAIL and the repair count is below the cap, command the existing builder with the review report path, exact blocker/high-risk findings, original task, and plan path.</li>
+              <li><strong>Reuse the real completion contract.</strong> Sleep 15 seconds and call <code>check_agent_status</code> until the repair run shows a response followed by Stop.</li>
+              <li><strong>Re-verify independently.</strong> Command the existing reviewer to inspect the new diff and prior report. Monitor it to response → Stop and record its new PASS/FAIL verdict.</li>
+              <li><strong>Escalate honestly.</strong> If the second verdict still fails, stop autonomous repair and report the unresolved findings to the human. Do not silently declare success.</li>
+              <li><strong>Test the prompt surface.</strong> Restart the backend from <code>apps/orchestrator_3_stream</code>, confirm the command remains visible in the Cmd+K palette, and ask the O-agent to explain the command’s PASS and FAIL routes before running it on a small documentation-only task.</li>
+              <li><strong>Review the trace.</strong> Filter the EventStream to builder and reviewer. Verify the sequence and inspect cost, tool calls, Stop hooks, produced report, and final decision.</li>
+            </ol>
+            <div class="lab-branch" aria-label="Desired closed-loop branch">
+              <div><b>Review 1</b>PASS or FAIL</div>
+              <div><b>FAIL</b>send report</div>
+              <div><b>Repair</b>same builder</div>
+              <div><b>Review 2</b>independent check</div>
+              <div><b>Stop</b>accept or escalate</div>
+            </div>
+            <p class="fail-try"><strong>Expected first failure:</strong> adding “retry on FAIL” without a pass limit, artifact path, completion signal, or escalation rule creates a vague recursive prompt. Fix the contract until every branch names its input, actor, receipt, and terminal condition.</p>
+          </div>
+          <aside class="pass-list">
+            <h3>Observable pass criteria</h3>
+            <ul>
+              <li>Only the orchestration command changes.</li>
+              <li><code>MAX_REPAIR_PASSES: 1</code> is explicit and used.</li>
+              <li>PASS skips repair; FAIL routes the review artifact to the existing builder.</li>
+              <li>Repair and re-review each require response → Stop.</li>
+              <li>The same independent reviewer performs the second check.</li>
+              <li>A second FAIL escalates to the commander; it cannot loop again.</li>
+              <li>The command remains discoverable under the intended <code>cwd</code>.</li>
+              <li>EventStream evidence shows review → repair → re-review when the FAIL branch is exercised.</li>
+              <li>The final report distinguishes completed execution from accepted correctness.</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section id="teach-back" class="teach-back" aria-labelledby="teach-title">
+        <p class="eyebrow">09 · Retrieval</p>
+        <h2 id="teach-title">Explain the agent OS in six sentences without looking</h2>
+        <p class="section-lede">Cover one idea per sentence. If you cannot fill a box, return to the surface map or control loop—not the raw source.</p>
+        <div class="six-sentences">
+          <div class="sentence">The human commander owns…</div>
+          <div class="sentence">The O-agent is thin because…</div>
+          <div class="sentence"><code>--cwd</code> changes capability by…</div>
+          <div class="sentence">A managed primary agent differs from a Task subagent because…</div>
+          <div class="sentence">Hooks, Postgres, WebSocket, and the UI together provide…</div>
+          <div class="sentence">A closed loop reacts to reviewer FAIL by…</div>
+        </div>
+        <details class="answer-toggle">
+          <summary>Reveal a six-sentence model answer</summary>
+          <ol class="model-answer">
+            <li>The human commander owns the outcome, working directory, risk, cost boundary, and acceptance evidence, not the manual relay between every worker.</li>
+            <li>The O-agent stays thin because its overwritten prompt and eight management tools make it coordinate primary agents while delegating implementation.</li>
+            <li>The <code>--cwd</code> value mounts the project, agent templates, slash-command workflows, and file authority that the fleet can see.</li>
+            <li>A managed primary agent has its own name, prompt, model, resumable session, cost, card, and artifacts, while a Task subagent is nested inside another agent’s run.</li>
+            <li>Hooks, Postgres, WebSocket, and the observer UI turn prompts, tool calls, status, costs, consumed files, produced diffs, and Stop events into reviewable receipts.</li>
+            <li>A closed loop routes a FAIL report through a bounded repair and independent re-review, then accepts or returns authority to the human.</li>
+          </ol>
+        </details>
+      </section>
+
+      <section id="appendix" aria-labelledby="appendix-title">
+        <p class="eyebrow">10 · Optional appendix</p>
+        <h2 id="appendix-title">Raw agent-interface index</h2>
+        <p class="section-lede">One line per agent-facing file. This is a lookup surface, not the lesson’s reading order.</p>
+        <details class="raw-index">
+          <summary>Expand the source-grounded interface index</summary>
+          <div class="index-groups">
+            <div class="index-group"><h3>Root operating layer</h3><ul>
+              <li><code>README.md</code> — canonical setup, run, architecture, tools, tests, and troubleshooting.</li>
+              <li><code>CLAUDE.md</code> — repository rules for real DB/SDK tests, UV, env loading, model/schema sync, and commits.</li>
+              <li><code>.env.sample</code> — required keys plus ports, models, cwd, limits, CORS, and IDE configuration.</li>
+              <li><code>.mcp.json.sample</code> — optional Playwright, Neon, and Firecrawl MCP mounts.</li>
+              <li><code>playwright-mcp-config.json</code> — Chromium, viewport, and video settings for browser verification.</li>
+              <li><code>.claude/settings.json</code> — project status line and lifecycle command hooks.</li>
+              <li><code>.claude/status_lines/status_line_main.py</code> — interactive Claude Code status renderer.</li>
+              <li><code>.claude/hooks/pre_tool_use.py</code> — blocks dangerous recursive remove commands and records pre-tool events.</li>
+              <li><code>.claude/hooks/post_tool_use.py</code> — records tool completion events.</li>
+              <li><code>.claude/hooks/send_event.py</code> — forwards project hook telemetry to the configured observer endpoint.</li>
+              <li><code>.claude/hooks/user_prompt_submit.py</code> — records prompts and agent/session metadata.</li>
+              <li><code>.claude/hooks/stop.py</code> — records main-session completion.</li>
+              <li><code>.claude/hooks/subagent_stop.py</code> — records nested-agent completion and optional notification.</li>
+              <li><code>.claude/hooks/pre_compact.py</code> — available backup hook; root settings forwards PreCompact through <code>send_event.py</code> instead.</li>
+              <li><code>.claude/hooks/session_start.py</code> — available session-start script, not wired in root settings.</li>
+              <li><code>ai_docs/README.md</code> — URL inventory for agent-loadable Claude/SDK documentation.</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Fleet templates</h3><ul>
+              <li><code>apps/orchestrator_3_stream/.claude/agents/scout-report-suggest-fast.md</code> — Haiku, Read/Glob/Grep scout.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/agents/scout-report-suggest.md</code> — Sonnet, Read/Glob/Grep scout.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/agents/build-agent.md</code> — Sonnet single-file implementation specialist.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/agents/review-agent.md</code> — analysis-only diff reviewer with risk tiers and PASS/FAIL.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/agents/meta-agent.md</code> — Opus agent-definition generator.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/agents/docs-scraper.md</code> — Haiku documentation scraper.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/agents/playwright-validator.md</code> — browser validator with screenshot report.</li>
+              <li><code>.claude/agents/build-agent.md</code> — root-layer duplicate of the builder template.</li>
+              <li><code>.claude/agents/scout-report-suggest-fast.md</code> — root-layer duplicate of the fast scout.</li>
+              <li><code>.claude/agents/scout-report-suggest.md</code> — root-layer duplicate of the Sonnet scout.</li>
+              <li><code>.claude/agents/meta-agent.md</code> — root-layer meta-agent definition.</li>
+              <li><code>.claude/agents/docs-scraper.md</code> — root-layer docs scraper.</li>
+              <li><code>.claude/agents/playwright-validator.md</code> — root-layer browser validator.</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Programmable workflows</h3><ul>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/orch_one_shot_agent.md</code> — create → command → monitor → archive lifecycle.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/orch_scout_and_build.md</code> — read-only scout → builder artifact relay.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/orch_plan_w_scouts_build_review.md</code> — planner → builder → reviewer orchestration prompt.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/t_metaprompt_workflow.md</code> — generator for new custom slash-command prompts.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/plan.md</code> — structured implementation-plan generator.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/build.md</code> — implement a plan and validate before stopping.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/build_in_parallel.md</code> — file-level build-agent fan-out.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/plan_w_scouters.md</code> — parallel scout-assisted planning.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/parallel_subagents.md</code> — nested Task-agent fan-out.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/question.md</code> — read-only project question contract.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/prime.md</code> — base project context loader.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/prime_3.md</code> — orchestrator-app-specific context loader.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/prime_cc.md</code> — Claude Code layer context loader.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/quick-plan.md</code> — tool-restricted planning command.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/load_ai_docs.md</code> — documentation ingestion workflow.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/load_bundle.md</code> — context-bundle loader.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/find_and_summarize.md</code> — scoped source summarizer.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/commands/all_tools.md</code> — visible tool inventory prompt.</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Meta-prompt skill</h3><ul>
+              <li><code>apps/orchestrator_3_stream/.claude/skills/meta-prompt/SKILL.md</code> — grammar for generating reusable slash-command workflows.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/skills/meta-prompt/PROMPT_TEMPLATE.md</code> — fill-in command skeleton.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/skills/meta-prompt/examples/README.md</code> — pattern chooser for sample commands.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/skills/meta-prompt/examples/orch_one_shot_agent.md</code> — lifecycle example.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/skills/meta-prompt/examples/orch_scout_and_build.md</code> — multiphase example.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/skills/meta-prompt/examples/plan.md</code> — plan-writing example.</li>
+              <li><code>apps/orchestrator_3_stream/.claude/skills/meta-prompt/examples/question.md</code> — restricted read-only example.</li>
+              <li><code>.claude/skills/meta-agent/SKILL.md</code> — root skill for generating subagent definitions.</li>
+              <li><code>.claude/skills/meta-agent/templates/subagent-template.md</code> — root agent-definition template.</li>
+              <li><code>.claude/skills/meta-agent/examples.md</code> — root agent-definition examples.</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Backend agent harness</h3><ul>
+              <li><code>apps/orchestrator_3_stream/start_be.sh</code> — cwd/session-aware backend launcher on 9403.</li>
+              <li><code>apps/orchestrator_3_stream/start_fe.sh</code> — frontend launcher on 5175.</li>
+              <li><code>apps/orchestrator_3_stream/CLAUDE.md</code> — app-local agent instructions; contains stale port references.</li>
+              <li><code>apps/orchestrator_3_stream/README.md</code> — detailed application run and architecture guide; some sections are stale.</li>
+              <li><code>apps/orchestrator_3_stream/backend/main.py</code> — FastAPI trigger, startup, endpoints, and WebSocket surface.</li>
+              <li><code>apps/orchestrator_3_stream/backend/pyproject.toml</code> — Python and Claude Agent SDK dependency contract.</li>
+              <li><code>apps/orchestrator_3_stream/backend/prompts/orchestrator_agent_system_prompt.md</code> — full O-agent identity and workflow contract.</li>
+              <li><code>apps/orchestrator_3_stream/backend/prompts/event_summarizer_system_prompt.md</code> — one-sentence summary role.</li>
+              <li><code>apps/orchestrator_3_stream/backend/prompts/event_summarizer_user_prompt.md</code> — event summary input grammar.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/config.py</code> — ports, paths, models, cwd, limits, and env loading.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/orchestrator_service.py</code> — O-agent options, MCP mount, hooks, streaming, session, and cost.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/agent_manager.py</code> — eight tools plus create/command/resume lifecycle.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/subagent_loader.py</code> — template discovery at <code>&lt;cwd&gt;/.claude/agents</code>.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/subagent_models.py</code> — validated template frontmatter models.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/slash_command_parser.py</code> — command frontmatter and discovery.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/command_agent_hooks.py</code> — managed-agent lifecycle and file-tracking hooks.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/orchestrator_hooks.py</code> — O-agent tool/Stop hooks.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/hooks.py</code> — legacy/orphan hook implementation.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/single_agent_prompt.py</code> — stateless Haiku summarizer launcher.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/event_summarizer.py</code> — compatibility re-export for summarization.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/file_tracker.py</code> — consumed/produced registry and git diff summaries.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/database.py</code> — asyncpg persistence and soft-archive lifecycle.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/orch_database_models.py</code> — app-local Pydantic database models.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/websocket_manager.py</code> — real-time event broadcast hub.</li>
+              <li><code>apps/orchestrator_3_stream/backend/modules/logger.py</code> — rotating file and Rich console logs.</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Observer + verification plane</h3><ul>
+              <li><code>apps/orchestrator_3_stream/frontend/package.json</code> — Vue/Vite dependencies and dev/build/preview scripts.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/vite.config.ts</code> — frontend host/port and env loading.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/App.vue</code> — three-column command/observe layout.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/stores/orchestratorStore.ts</code> — fleet, chat, event, status, and cost state.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/services/chatService.ts</code> — chat HTTP and WebSocket event routing.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/services/agentService.ts</code> — active-agent loading.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/services/eventService.ts</code> — persisted event-history loading.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/services/fileService.ts</code> — one-click IDE open request.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/components/GlobalCommandInput.vue</code> — Cmd+K input and capability palette.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/components/AgentList.vue</code> — model, context, status, cost, and event-count cards.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/components/EventStream.vue</code> — unified observer feed.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/components/FilterControls.vue</code> — agent/category/tool/level/regex filters.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/components/OrchestratorChat.vue</code> — O-agent interaction and context/cost display.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/components/event-rows/FileChangesDisplay.vue</code> — consumed/produced files, diff, and open-in-IDE.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/composables/useEventStreamFilter.ts</code> — filter and regex implementation.</li>
+              <li><code>apps/orchestrator_3_stream/frontend/src/types.d.ts</code> — frontend mirror of agent, event, file, and chat contracts.</li>
+              <li><code>apps/orchestrator_3_stream/backend/tests/test_database.py</code> — real PostgreSQL persistence tests.</li>
+              <li><code>apps/orchestrator_3_stream/backend/tests/test_agent_events.py</code> — live agent-event WebSocket listener.</li>
+              <li><code>apps/orchestrator_3_stream/backend/tests/test_websocket_raw.py</code> — raw WebSocket event debugger.</li>
+              <li><code>apps/orchestrator_3_stream/backend/tests/test_display.py</code> — Rich live event display.</li>
+              <li><code>apps/orchestrator_3_stream/backend/tests/README.md</code> — verification-script usage.</li>
+            </ul></div>
+
+            <div class="index-group"><h3>Persistent state interface</h3><ul>
+              <li><code>apps/orchestrator_db/README.md</code> — schema, migration, and model workflow.</li>
+              <li><code>apps/orchestrator_db/models.py</code> — canonical Pydantic data models.</li>
+              <li><code>apps/orchestrator_db/run_migrations.py</code> — ordered idempotent migration launcher.</li>
+              <li><code>apps/orchestrator_db/sync_models.py</code> — canonical-model distribution script.</li>
+              <li><code>apps/orchestrator_db/migrations/0_orchestrator_agents.sql</code> — orchestrator state.</li>
+              <li><code>apps/orchestrator_db/migrations/1_agents.sql</code> — managed-agent registry and scoped names.</li>
+              <li><code>apps/orchestrator_db/migrations/2_prompts.sql</code> — task prompt history.</li>
+              <li><code>apps/orchestrator_db/migrations/3_agent_logs.sql</code> — hook and response evidence.</li>
+              <li><code>apps/orchestrator_db/migrations/4_system_logs.sql</code> — application-level evidence.</li>
+              <li><code>apps/orchestrator_db/migrations/5_indexes.sql</code> — observer-query indexes.</li>
+              <li><code>apps/orchestrator_db/migrations/6_functions.sql</code> — timestamp function.</li>
+              <li><code>apps/orchestrator_db/migrations/7_triggers.sql</code> — automatic update triggers.</li>
+              <li><code>apps/orchestrator_db/migrations/8_orchestrator_chat.sql</code> — human/O-agent/agent conversation log.</li>
+              <li><code>apps/orchestrator_db/migrations/README.md</code> — ordered migration documentation.</li>
+            </ul></div>
+          </div>
+        </details>
+        <p class="source-note">Audit scope: the full lesson tree was inventoried. Prompts, templates, commands, skills, settings, hooks, launchers, backend agent options, persistence, observer UI, tests, generated agent artifacts, and supplied extracts were inspected directly. Lockfiles, model weights, caches, runtime logs, and generated reference documents were treated as artifacts rather than teaching prose. The sibling chapter supplied the conceptual spine; this page narrows the lens to the operating system around the code.</p>
+      </section>
+
+      <footer class="page-footer">Agent Systems companion · AH-4 · Source-grounded against <code>agentic-horizon/multi-agent-orchestration</code>.</footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const progress = document.getElementById('reading-progress');
+      const railLinks = [...document.querySelectorAll('.chapter-rail a')];
+      const sections = railLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+
+      const update = () => {
+        const max = document.documentElement.scrollHeight - innerHeight;
+        if (progress) progress.style.width = `${max > 0 ? Math.min(100, scrollY / max * 100) : 0}%`;
+        const active = sections.reduce((nearest, section) => {
+          const distance = Math.abs(section.getBoundingClientRect().top - 120);
+          return distance < nearest.distance ? { section, distance } : nearest;
+        }, { section: sections[0], distance: Number.POSITIVE_INFINITY }).section;
+        railLinks.forEach(link => link.setAttribute('aria-current', link.getAttribute('href') === `#${active?.id}` ? 'true' : 'false'));
+      };
+
+      addEventListener('scroll', update, { passive: true });
+      addEventListener('resize', update);
+      update();
+    })();
+  </script>
+</body>
+</html>

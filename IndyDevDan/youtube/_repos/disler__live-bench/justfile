@@ -1,0 +1,318 @@
+set dotenv-load
+
+LB_BACKEND_PORT  := "8787"
+LB_FRONTEND_PORT := "5787"
+
+# Prepend Homebrew's bin and bun's bin so frontend recipes always resolve a
+# working `bun` regardless of which shell launched `just`. Frontend tooling
+# was switched from pnpm → bun to dodge nvm's broken corepack signing-keys
+# shim. Affects every recipe in this file (just exports rendered globals to
+# recipe shells).
+export PATH := env_var('HOME') + "/.bun/bin:/opt/homebrew/bin:" + env_var('PATH')
+
+default:
+    @just --list
+
+# ── port management ────────────────────────────────────
+# Kill any process holding either live-bench port. No-op if nothing's listening.
+free-ports:
+    @echo "Freeing live-bench ports {{LB_BACKEND_PORT}} and {{LB_FRONTEND_PORT}}..."
+    -@lsof -ti:{{LB_BACKEND_PORT}}  2>/dev/null | xargs -r kill -9 2>/dev/null || true
+    -@lsof -ti:{{LB_FRONTEND_PORT}} 2>/dev/null | xargs -r kill -9 2>/dev/null || true
+
+# Show what's holding the live-bench ports (debug helper).
+ports:
+    @printf "backend  port {{LB_BACKEND_PORT}}: %s\n" "$(lsof -ti:{{LB_BACKEND_PORT}}  2>/dev/null || echo free)"
+    @printf "frontend port {{LB_FRONTEND_PORT}}: %s\n" "$(lsof -ti:{{LB_FRONTEND_PORT}} 2>/dev/null || echo free)"
+
+# ── dev ────────────────────────────────────────────────
+# Both services bind 0.0.0.0 so they're reachable from other devices on the
+# LAN. Clients connect via the host's actual IP (see `just lan-ip`).
+
+# Boot the backend; clears its port first so re-running is safe.
+backend:
+    -@lsof -ti:{{LB_BACKEND_PORT}} 2>/dev/null | xargs -r kill -9 2>/dev/null || true
+    cd apps/backend && uv run uvicorn live_bench_server.main:app --reload --host 0.0.0.0 --port {{LB_BACKEND_PORT}}
+
+# Boot the frontend; clears its port first so re-running is safe.
+frontend:
+    -@lsof -ti:{{LB_FRONTEND_PORT}} 2>/dev/null | xargs -r kill -9 2>/dev/null || true
+    cd apps/frontend && bun run dev --host 0.0.0.0 --port {{LB_FRONTEND_PORT}} --strictPort
+
+# Start backend (8787) + frontend (5787) together via mprocs.
+# If mprocs is not installed, run `just backend` and `just frontend` in two terminals.
+serve: free-ports
+    mprocs "just backend" "just frontend"
+
+# Print the LAN IP + URLs so you know what to point other devices at.
+lan-ip:
+    #!/usr/bin/env bash
+    ip=$(ipconfig getifaddr en0 2>/dev/null || echo "unknown")
+    echo "LAN IP:    $ip"
+    echo "Dashboard: http://$ip:{{LB_FRONTEND_PORT}}"
+    echo "Backend:   http://$ip:{{LB_BACKEND_PORT}}"
+    echo ""
+    echo "On the benchmark machine, set:"
+    echo "  LIVE_BENCH_SERVER=http://$ip:{{LB_BACKEND_PORT}}"
+
+# ── cli convenience ────────────────────────────────────
+# Requires: just install-cli
+
+ping:
+    live-bench ping
+
+list:
+    live-bench list
+
+show SESSION:
+    live-bench show {{SESSION}}
+
+reset SESSION:
+    live-bench reset {{SESSION}} --yes
+
+# Reset all benchmark sessions at once.
+reset-all: mock-reset bench-qg-reset bench-ctx-reset bench-pi-reset bench-qg3-reset bench-ctx3-reset bench-pi3-reset
+
+# ── one-shot ingest ────────────────────────────────────
+emit SESSION GROUP METRIC VALUE:
+    live-bench emit {{SESSION}} --group {{GROUP}} --metric {{METRIC}} --value {{VALUE}}
+
+complete SESSION GROUP:
+    live-bench complete {{SESSION}} --group {{GROUP}}
+
+# ── tests ──────────────────────────────────────────────
+test-backend:
+    cd apps/backend && uv run pytest
+
+test-cli:
+    cd apps/cli && uv run pytest
+
+test-frontend:
+    cd apps/frontend && bun run test
+
+test: test-backend test-cli test-frontend
+
+# ── build ──────────────────────────────────────────────
+build-frontend:
+    cd apps/frontend && bun run build
+
+# Install frontend deps via bun (run after package.json changes).
+install-frontend:
+    cd apps/frontend && bun install
+
+# Install the live-bench CLI globally via uv tool so it's available as `live-bench` anywhere.
+install-cli:
+    cd apps/cli && uv tool install --editable . --force
+
+# ── mock-test (quick UI validation with fake data + metadata) ────
+mock: _ensure-server
+    uv run apps/benchmarks/mock-test/run.py --reset
+
+# Start backend + frontend in background if not already running.
+_ensure-server:
+    #!/usr/bin/env bash
+    # Backend
+    if curl -sf http://127.0.0.1:{{LB_BACKEND_PORT}}/healthz >/dev/null 2>&1; then
+        echo "Backend already running on :{{LB_BACKEND_PORT}}"
+    else
+        echo "Starting backend on :{{LB_BACKEND_PORT}}..."
+        (cd apps/backend && uv run uvicorn live_bench_server.main:app --host 0.0.0.0 --port {{LB_BACKEND_PORT}} &>/tmp/lb-backend.log) &
+        for i in $(seq 1 10); do
+            sleep 0.5
+            curl -sf http://127.0.0.1:{{LB_BACKEND_PORT}}/healthz >/dev/null 2>&1 && break
+        done
+        echo "Backend ready"
+    fi
+    # Frontend
+    if curl -sf http://127.0.0.1:{{LB_FRONTEND_PORT}}/ >/dev/null 2>&1; then
+        echo "Frontend already running on :{{LB_FRONTEND_PORT}}"
+    else
+        echo "Starting frontend on :{{LB_FRONTEND_PORT}}..."
+        (cd apps/frontend && bun run dev --host 0.0.0.0 --port {{LB_FRONTEND_PORT}} --strictPort &>/tmp/lb-frontend.log) &
+        for i in $(seq 1 10); do
+            sleep 0.5
+            curl -sf http://127.0.0.1:{{LB_FRONTEND_PORT}}/ >/dev/null 2>&1 && break
+        done
+        echo "Frontend ready"
+    fi
+
+mock-reset:
+    live-bench reset mock-test --yes
+
+# ── qwen35-vs-gemma4 benchmark ───────────────────────────────────
+# 4-way raw inference: Qwen 3.5 vs Gemma 4 × GGUF vs MLX
+# 6 charts: prefill/decode/wall × M4/M5 (side-by-side per hardware)
+# Run on the M4 machine:  just bench-qg-m4
+# Run on the M5 machine:  just bench-qg-m5
+
+bench-qg-m4 *FLAGS: bench-nuke
+    uv run apps/benchmarks/qwen35-vs-gemma4/bench.py --hw m4 {{FLAGS}}
+
+bench-qg-m5 *FLAGS: bench-nuke
+    uv run apps/benchmarks/qwen35-vs-gemma4/bench.py --hw m5 {{FLAGS}}
+
+bench-qg-smoke-m4: bench-nuke
+    uv run apps/benchmarks/qwen35-vs-gemma4/bench.py --hw m4 --smoke
+
+bench-qg-smoke-m5: bench-nuke
+    uv run apps/benchmarks/qwen35-vs-gemma4/bench.py --hw m5 --smoke
+
+# Kill ALL benchmark processes + unload ALL Ollama models from VRAM.
+bench-nuke:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    echo "Killing benchmark processes..."
+    pkill -f "bench.py --hw" 2>/dev/null || true
+    pkill -f "bench.py" 2>/dev/null || true
+    pkill -f "_mlx_runner.py" 2>/dev/null || true
+    pkill -f "mlx-community/" 2>/dev/null || true
+    pkill -f ".mlx-venv/bin/python" 2>/dev/null || true
+    pkill -f "_pi_runner.py" 2>/dev/null || true
+    echo "Unloading Ollama and MLX models from VRAM..."
+    ollama stop qwen3.5:35b 2>/dev/null || true
+    ollama stop qwen3.5:35b-a3b-nvfp4 2>/dev/null || true
+    ollama stop qwen3.5:35b-a3b-coding-nvfp4 2>/dev/null || true
+    ollama stop qwen3.6:35b-a3b 2>/dev/null || true
+    ollama stop qwen3.6:35b-a3b-nvfp4 2>/dev/null || true
+    ollama stop gemma4:26b 2>/dev/null || true
+    echo "done"
+
+bench-qg-reset: bench-nuke
+    live-bench reset qwen35-vs-gemma4 --yes
+
+# ── context-scaling benchmark ──────────────────────────────────────
+# Context size scaling: Gemma 4 vs Qwen 3.5 MLX · GraphWalks · 200-64K tokens.
+# 8 charts: prefill/decode/wall/accuracy × M4/M5 (side-by-side per hardware)
+# Run on the M4 machine:  just bench-ctx-m4
+# Run on the M5 machine:  just bench-ctx-m5
+
+bench-ctx-m4 *FLAGS: bench-nuke
+    uv run apps/benchmarks/context-scaling/bench.py --hw m4 {{FLAGS}}
+
+bench-ctx-m5 *FLAGS: bench-nuke
+    uv run apps/benchmarks/context-scaling/bench.py --hw m5 {{FLAGS}}
+
+bench-ctx-smoke-m4: bench-nuke
+    uv run apps/benchmarks/context-scaling/bench.py --hw m4 --smoke
+
+bench-ctx-smoke-m5: bench-nuke
+    uv run apps/benchmarks/context-scaling/bench.py --hw m5 --smoke
+
+bench-ctx-reset:
+    live-bench reset context-scaling --yes
+
+# Extract GraphWalks fixtures (one-time, requires internet).
+bench-ctx-extract:
+    uv run apps/benchmarks/context-scaling/extract_fixtures.py
+
+# ── pi-coding-agent benchmark ────────────────────────────────────
+# Pi coding agent: 6 tasks × 4 models, 4 chart types × M4/M5.
+# Measures wall time, correctness, token efficiency, and tool calls.
+# Run on the M4 machine:  just bench-pi-m4
+# Run on the M5 machine:  just bench-pi-m5
+
+bench-pi-m4 *FLAGS: bench-nuke
+    uv run apps/benchmarks/pi-coding-agent/bench.py --hw m4 {{FLAGS}}
+
+bench-pi-m5 *FLAGS: bench-nuke
+    uv run apps/benchmarks/pi-coding-agent/bench.py --hw m5 {{FLAGS}}
+
+bench-pi-smoke-m4: bench-nuke
+    uv run apps/benchmarks/pi-coding-agent/bench.py --hw m4 --smoke
+
+bench-pi-smoke-m5: bench-nuke
+    uv run apps/benchmarks/pi-coding-agent/bench.py --hw m5 --smoke
+
+bench-pi-reset:
+    live-bench reset pi-coding-agent --yes
+
+# ── qwen36-vs-qwen35-vs-gemma4 benchmark (3-way raw inference) ───
+# 6-way: Qwen 3.6 vs Qwen 3.5 vs Gemma 4 × GGUF vs MLX.
+# Prereq on benchmark machine:
+#   ollama pull qwen3.6:35b-a3b && ollama pull qwen3.6:35b-a3b-nvfp4
+
+bench-qg3-m4 *FLAGS: bench-nuke
+    uv run apps/benchmarks/qwen36-vs-qwen35-vs-gemma4/bench.py --hw m4 {{FLAGS}}
+
+bench-qg3-m5 *FLAGS: bench-nuke
+    uv run apps/benchmarks/qwen36-vs-qwen35-vs-gemma4/bench.py --hw m5 {{FLAGS}}
+
+bench-qg3-smoke-m4: bench-nuke
+    uv run apps/benchmarks/qwen36-vs-qwen35-vs-gemma4/bench.py --hw m4 --smoke
+
+bench-qg3-smoke-m5: bench-nuke
+    uv run apps/benchmarks/qwen36-vs-qwen35-vs-gemma4/bench.py --hw m5 --smoke
+
+bench-qg3-reset: bench-nuke
+    live-bench reset qwen36-vs-qwen35-vs-gemma4 --yes
+
+# ── context-scaling-3way benchmark (3-way context scaling) ───────
+# 3-way: Qwen 3.6 MLX vs Qwen 3.5 MLX vs Gemma 4 MLX on GraphWalks.
+
+bench-ctx3-m4 *FLAGS: bench-nuke
+    uv run apps/benchmarks/context-scaling-3way/bench.py --hw m4 {{FLAGS}}
+
+bench-ctx3-m5 *FLAGS: bench-nuke
+    uv run apps/benchmarks/context-scaling-3way/bench.py --hw m5 {{FLAGS}}
+
+bench-ctx3-smoke-m4: bench-nuke
+    uv run apps/benchmarks/context-scaling-3way/bench.py --hw m4 --smoke
+
+bench-ctx3-smoke-m5: bench-nuke
+    uv run apps/benchmarks/context-scaling-3way/bench.py --hw m5 --smoke
+
+bench-ctx3-reset:
+    live-bench reset context-scaling-3way --yes
+
+# ── pi-coding-agent-3way benchmark (3-way coding agent) ──────────
+# 5-way: Qwen 3.6 GGUF/MLX vs Qwen 3.5 GGUF/MLX vs Gemma 4 GGUF, 6 tasks.
+
+bench-pi3-m4 *FLAGS: bench-nuke
+    uv run apps/benchmarks/pi-coding-agent-3way/bench.py --hw m4 {{FLAGS}}
+
+bench-pi3-m5 *FLAGS: bench-nuke
+    uv run apps/benchmarks/pi-coding-agent-3way/bench.py --hw m5 {{FLAGS}}
+
+bench-pi3-smoke-m4: bench-nuke
+    uv run apps/benchmarks/pi-coding-agent-3way/bench.py --hw m4 --smoke
+
+bench-pi3-smoke-m5: bench-nuke
+    uv run apps/benchmarks/pi-coding-agent-3way/bench.py --hw m5 --smoke
+
+bench-pi3-reset:
+    live-bench reset pi-coding-agent-3way --yes
+
+# ── 3way combined (run all three 3-way benchmarks sequentially) ────
+# Runs raw-inference → context-scaling → pi-coding-agent. ADDITIVE —
+# emits only to the hardware's chart IDs (*_m4 or *_m5), so running m5
+# after m4 (or vice versa) adds bars without wiping the other machine's
+# data. Call `just bench-3way-reset` first if you want a clean slate.
+# Wall-clock on M4 Max: ~70 min. On M5 Max: expected ~45-55 min.
+
+bench-3way-m4: bench-nuke
+    uv run apps/benchmarks/qwen36-vs-qwen35-vs-gemma4/bench.py --hw m4
+    uv run apps/benchmarks/context-scaling-3way/bench.py --hw m4
+    uv run apps/benchmarks/pi-coding-agent-3way/bench.py --hw m4
+
+bench-3way-m5: bench-nuke
+    uv run apps/benchmarks/qwen36-vs-qwen35-vs-gemma4/bench.py --hw m5
+    uv run apps/benchmarks/context-scaling-3way/bench.py --hw m5
+    uv run apps/benchmarks/pi-coding-agent-3way/bench.py --hw m5
+
+# Wipe all three 3-way sessions (both M4 and M5 data across all charts).
+bench-3way-reset: bench-qg3-reset bench-ctx3-reset bench-pi3-reset
+
+# ── ping (quick 4-model smoke test) ──────────────────────────────────
+# Runs all 4 models back-to-back with a simple prompt. Reports prefill,
+# decode, and wall time per model. Use to compare M4 vs M5 at a glance.
+
+bench-ping PROMPT="Explain what a hash table is in one sentence.":
+    uv run apps/benchmarks/ping/run.py --prompt "{{PROMPT}}"
+
+# ── claude code ───────────────────────────────────────────────────────
+# Start an interactive Claude Code session pre-loaded with project context.
+p:
+    git pull origin main
+
+prime:
+    claude --dangerously-skip-permissions --model opus "/prime"

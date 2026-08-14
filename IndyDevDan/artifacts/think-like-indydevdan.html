@@ -1,0 +1,1433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Think Like IndyDevDan — Agentic Layer Operating Manual</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+:root{
+  --paper:#f4efe4; --paper-2:#ece4d4; --paper-3:#e3d9c5;
+  --surface:#fbf8f1; --card:#fdfbf5; --card-2:#f6f0e2;
+  --ink:#211d18; --ink-2:#4b443b; --ink-dim:#7d7568; --ink-faint:#a59c8c;
+  --clay:#c75b39; --clay-2:#d97757; --clay-soft:rgba(199,91,57,.10); --clay-line:rgba(199,91,57,.32);
+  --blue:#2f6f9f; --blue-soft:rgba(47,111,159,.10);
+  --olive:#5f7138; --olive-soft:rgba(95,113,56,.12);
+  --plum:#6e4a86; --plum-soft:rgba(110,74,134,.10);
+  --amber:#c1882a; --amber-soft:rgba(193,136,42,.12);
+  --rose:#b1556c; --rose-soft:rgba(177,85,108,.10);
+  --serif:'Fraunces','Iowan Old Style',Georgia,serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --sh:0 4px 16px rgba(60,45,25,.10);
+  --sh-lg:0 18px 44px rgba(60,45,25,.16);
+  --rail:268px; --header-h:118px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--sans);
+  font-size:15.5px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(60,45,25,.028) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+::selection{background:var(--clay-soft);color:var(--clay)}
+a{color:var(--clay);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;padding:0}
+code,pre,kbd{font-family:var(--mono)}
+/* header */
+#top{
+  position:sticky;top:0;z-index:100;background:linear-gradient(180deg,rgba(251,248,241,.97),rgba(244,239,228,.94));
+  backdrop-filter:blur(12px);border-bottom:1.5px solid var(--paper-3);
+  box-shadow:0 8px 28px rgba(60,45,25,.06);
+}
+.top-inner{max-width:1440px;margin:0 auto;padding:14px 22px 0}
+.brandrow{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .mark{
+  width:38px;height:38px;border-radius:10px;flex:none;
+  background:linear-gradient(140deg,var(--clay-2),var(--clay));color:#fff;
+  display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:20px;
+  box-shadow:var(--sh);
+}
+.brand .bt{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.15;letter-spacing:-.01em}
+.brand .bs{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-dim)}
+.searchbox{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--paper-3);
+  border-radius:999px;padding:7px 14px;min-width:220px;flex:1;max-width:360px}
+.searchbox input{border:0;outline:0;background:transparent;width:100%;font:inherit;font-size:13.5px;color:var(--ink)}
+.searchbox span{font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:.08em}
+.meta-pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:100px;
+  border:1.5px solid var(--paper-3);color:var(--ink-2);background:var(--surface)}
+.pill.clay{border-color:var(--clay-line);color:var(--clay);background:var(--clay-soft)}
+.pill.blue{border-color:rgba(47,111,159,.3);color:var(--blue);background:var(--blue-soft)}
+.pill.olive{border-color:rgba(95,113,56,.3);color:var(--olive);background:var(--olive-soft)}
+.pill.plum{border-color:rgba(110,74,134,.3);color:var(--plum);background:var(--plum-soft)}
+.pill.amber{border-color:rgba(193,136,42,.3);color:var(--amber);background:var(--amber-soft)}
+/* tabs */
+.tabbar{display:flex;gap:2px;overflow-x:auto;padding-bottom:0;scrollbar-width:thin;
+  margin:0 -4px;padding-left:4px;padding-right:4px}
+.tabbar::-webkit-scrollbar{height:4px}
+.tab{
+  flex:none;padding:11px 14px 13px;font-size:12.5px;font-weight:500;color:var(--ink-dim);
+  border-bottom:2.5px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s;
+  letter-spacing:.01em;position:relative;
+}
+.tab:hover{color:var(--ink)}
+.tab.active{color:var(--clay);border-bottom-color:var(--clay);font-weight:600}
+.tab .tn{font-family:var(--mono);font-size:9px;color:var(--ink-faint);margin-right:6px;font-weight:500}
+.tab.active .tn{color:var(--clay)}
+/* layout */
+.shell{display:grid;grid-template-columns:var(--rail) 1fr;max-width:1440px;margin:0 auto;min-height:calc(100vh - var(--header-h))}
+#side{
+  position:sticky;top:var(--header-h);height:calc(100vh - var(--header-h));
+  overflow-y:auto;padding:22px 16px 40px 22px;border-right:1.5px solid var(--paper-3);
+  background:linear-gradient(180deg,var(--surface),var(--paper));
+}
+#side .side-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);margin:14px 6px 8px}
+#side .side-label:first-child{margin-top:0}
+.side-nav{display:flex;flex-direction:column;gap:2px}
+.side-nav a{
+  display:block;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--ink-2);
+  line-height:1.3;transition:background .12s,color .12s;
+}
+.side-nav a:hover{background:var(--card-2);color:var(--ink)}
+.side-nav a.active{background:var(--clay-soft);color:var(--clay);font-weight:500}
+.side-quote{margin-top:22px;padding:14px;border-radius:12px;background:var(--card);border:1.5px solid var(--paper-3);
+  font-family:var(--serif);font-size:13.5px;line-height:1.45;color:var(--ink-2);font-style:italic}
+.side-quote b{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--clay);font-style:normal;margin-bottom:8px;font-weight:600}
+main{padding:28px 36px 100px;min-width:0}
+.panel{display:none;animation:in .35s cubic-bezier(.2,.7,.2,1)}
+.panel.active{display:block}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* typography */
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--clay);display:inline-flex;align-items:center;gap:9px;margin-bottom:14px}
+.kicker::before{content:"";width:22px;height:1.5px;background:var(--clay-line)}
+h1.display{font-family:var(--serif);font-weight:600;letter-spacing:-.022em;line-height:1.05;
+  font-size:clamp(32px,4.5vw,52px);margin:0 0 16px}
+h1.display em{color:var(--clay);font-style:italic}
+.lede{font-family:var(--serif);font-size:clamp(17px,1.8vw,21px);line-height:1.5;color:var(--ink-2);
+  max-width:62ch;margin:0 0 22px}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(22px,2.4vw,30px);letter-spacing:-.015em;
+  margin:40px 0 12px;line-height:1.15;scroll-margin-top:calc(var(--header-h) + 16px)}
+h2 em{color:var(--clay);font-style:italic}
+h3{font-family:var(--serif);font-weight:600;font-size:clamp(17px,1.6vw,20px);margin:28px 0 10px;scroll-margin-top:calc(var(--header-h) + 16px)}
+h4{font-family:var(--sans);font-weight:600;font-size:14.5px;margin:18px 0 8px}
+p{margin:0 0 14px;color:var(--ink-2);max-width:72ch}
+p strong,li strong{color:var(--ink);font-weight:600}
+ul,ol{margin:0 0 16px;padding-left:1.25em;color:var(--ink-2);max-width:72ch}
+li{margin:0 0 7px}
+.prose-wide p,.prose-wide ul,.prose-wide ol{max-width:none}
+/* cards */
+.grid{display:grid;gap:14px;margin:18px 0 22px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{
+  background:var(--card);border:1.5px solid var(--paper-3);border-radius:14px;padding:16px 18px;
+  box-shadow:0 1px 2px rgba(60,45,25,.04);
+}
+.card.accent-clay{border-color:var(--clay-line);background:linear-gradient(160deg,var(--card),var(--clay-soft))}
+.card.accent-blue{border-color:rgba(47,111,159,.25);background:linear-gradient(160deg,var(--card),var(--blue-soft))}
+.card.accent-olive{border-color:rgba(95,113,56,.25);background:linear-gradient(160deg,var(--card),var(--olive-soft))}
+.card.accent-plum{border-color:rgba(110,74,134,.25);background:linear-gradient(160deg,var(--card),var(--plum-soft))}
+.card.accent-amber{border-color:rgba(193,136,42,.28);background:linear-gradient(160deg,var(--card),var(--amber-soft))}
+.card .ct{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:6px}
+.card h4{margin:0 0 6px;font-size:15px}
+.card p{margin:0;font-size:13.5px;line-height:1.5}
+.card .num{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--clay);line-height:1;margin-bottom:6px}
+/* callouts */
+.quote{
+  border-left:3px solid var(--clay);padding:12px 18px;margin:20px 0;
+  background:var(--clay-soft);border-radius:0 12px 12px 0;
+  font-family:var(--serif);font-size:17px;line-height:1.45;color:var(--ink);font-style:italic;
+}
+.quote cite{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--clay);font-style:normal;margin-top:8px;font-weight:500}
+.callout{padding:14px 16px;border-radius:12px;margin:16px 0;border:1.5px solid var(--paper-3);background:var(--card-2)}
+.callout.warn{border-color:rgba(193,136,42,.35);background:var(--amber-soft)}
+.callout.good{border-color:rgba(95,113,56,.3);background:var(--olive-soft)}
+.callout.danger{border-color:rgba(177,85,108,.3);background:var(--rose-soft)}
+.callout .ct{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+/* tables */
+.table-wrap{overflow-x:auto;margin:16px 0 22px;border-radius:12px;border:1.5px solid var(--paper-3);background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-dim);padding:11px 14px;border-bottom:1.5px solid var(--paper-3);background:var(--surface)}
+td{padding:10px 14px;border-bottom:1px solid var(--paper-2);vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:0}
+td strong{color:var(--ink)}
+/* code */
+pre{
+  background:#1c1813;color:#efe7d8;border-radius:12px;padding:16px 18px;overflow-x:auto;
+  font-size:12.5px;line-height:1.55;margin:14px 0 20px;box-shadow:var(--sh);
+}
+pre .c{color:#8a8070} pre .k{color:#d97757} pre .s{color:#8ab87a} pre .p{color:#9bb8d4}
+code.inline{font-size:12.5px;background:var(--card-2);border:1px solid var(--paper-3);padding:1px 6px;border-radius:5px;color:var(--ink)}
+/* tree */
+.tree{font-family:var(--mono);font-size:12px;line-height:1.55;background:#1c1813;color:#cfc4b0;
+  border-radius:12px;padding:16px 18px;overflow-x:auto;margin:14px 0 20px}
+.tree .d{color:#d97757} .tree .f{color:#8ab87a} .tree .c{color:#6e6558}
+/* checklist */
+.check{list-style:none;padding:0;margin:12px 0 20px;max-width:70ch}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--paper-2)}
+.check li::before{content:"";width:16px;height:16px;flex:none;margin-top:2px;border-radius:4px;
+  border:1.5px solid var(--clay-line);background:var(--clay-soft)}
+/* timeline */
+.tl{position:relative;padding-left:22px;margin:18px 0}
+.tl::before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:var(--paper-3)}
+.tl .item{position:relative;margin:0 0 16px}
+.tl .item::before{content:"";position:absolute;left:-19px;top:6px;width:10px;height:10px;border-radius:50%;
+  background:var(--clay);border:2px solid var(--paper)}
+.tl .when{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--clay)}
+.tl h4{margin:2px 0 4px}
+/* diagram */
+.diagram{background:var(--card);border:1.5px solid var(--paper-3);border-radius:14px;padding:18px;margin:16px 0 22px;overflow-x:auto}
+.diagram svg{display:block;margin:0 auto;max-width:100%}
+/* tactics */
+.tactic{display:grid;grid-template-columns:72px 1fr;gap:14px;padding:16px;border-radius:14px;
+  border:1.5px solid var(--paper-3);background:var(--card);margin:0 0 12px}
+.tactic .n{font-family:var(--serif);font-size:32px;font-weight:600;color:var(--clay);line-height:1}
+.tactic .meta{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:4px}
+.tactic h3{margin:0 0 6px;font-size:18px}
+.tactic p{margin:0 0 8px;font-size:13.5px}
+.tactic .quotes{font-family:var(--serif);font-style:italic;font-size:13.5px;color:var(--ink-2);border-top:1px solid var(--paper-2);padding-top:8px;margin-top:4px}
+/* highlight search */
+mark.hit{background:rgba(193,136,42,.45);color:inherit;padding:0 2px;border-radius:2px}
+/* footer */
+.foot{margin-top:48px;padding-top:18px;border-top:1.5px solid var(--paper-3);
+  font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:.06em;line-height:1.7}
+.kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--paper-3);background:var(--card);
+  padding:1px 6px;border-radius:4px;color:var(--ink-dim)}
+/* responsive */
+@media (max-width:980px){
+  .shell{grid-template-columns:1fr}
+  #side{display:none}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  main{padding:20px 16px 80px}
+  .tactic{grid-template-columns:48px 1fr}
+}
+@media (max-width:640px){
+  .brand .bt{font-size:15px}
+  .searchbox{max-width:100%;min-width:0}
+}
+/* print */
+@media print{
+  #top,#side{display:none}
+  .shell{display:block}
+  .panel{display:block!important;page-break-after:always}
+}
+
+</style>
+</head>
+<body>
+<header id="top">
+  <div class="top-inner">
+    <div class="brandrow">
+      <div class="brand">
+        <div class="mark">I</div>
+        <div>
+          <div class="bt">Think Like IndyDevDan</div>
+          <div class="bs">Agentic layer · operating manual</div>
+        </div>
+      </div>
+      <div class="searchbox">
+        <span>FIND</span>
+        <input id="q" type="search" placeholder="Search all tabs…  (press /)" autocomplete="off"/>
+      </div>
+      <div class="meta-pills">
+        <span class="pill clay">12 tabs</span>
+        <span class="pill">[ ] cycle</span>
+      </div>
+    </div>
+    <nav class="tabbar" role="tablist">
+      <button class="tab active" data-tab="overview" type="button"><span class="tn">01</span>Overview</button><button class="tab" data-tab="think" type="button"><span class="tn">02</span>Think Like Dan</button><button class="tab" data-tab="tactics" type="button"><span class="tn">03</span>8 Tactics</button><button class="tab" data-tab="layer" type="button"><span class="tn">04</span>★ Agentic Layer</button><button class="tab" data-tab="tac8" type="button"><span class="tn">05</span>TAC-8 Apps</button><button class="tab" data-tab="horizon" type="button"><span class="tn">06</span>Horizon AH</button><button class="tab" data-tab="ma" type="button"><span class="tn">07</span>Multi-Agent</button><button class="tab" data-tab="youtube" type="button"><span class="tn">08</span>YouTube</button><button class="tab" data-tab="patterns" type="button"><span class="tn">09</span>Patterns</button><button class="tab" data-tab="practice" type="button"><span class="tn">10</span>Practice Plan</button><button class="tab" data-tab="anti" type="button"><span class="tn">11</span>Antipatterns</button><button class="tab" data-tab="vocab" type="button"><span class="tn">12</span>Vocabulary</button>
+    </nav>
+  </div>
+</header>
+<div class="shell">
+  <aside id="side"></aside>
+  <main>
+    <section class="panel active" id="panel-overview" data-panel="overview">
+
+<span class="kicker">Fleet synthesis · TAC · AH · MA · YouTube · Code</span>
+<h1 class="display">Think, build, and ship<br>like <em>IndyDevDan</em></h1>
+<p class="lede">An extensive operating manual distilled from 18 course lessons, 50+ YouTube videos, TAC-8’s five agentic architectures, MA multi-agent systems, and every prior analysis in this corpus — with the <strong>agentic layer</strong> as the center of gravity.</p>
+
+<div class="meta-pills" style="margin-bottom:22px">
+  <span class="pill clay">18 lessons</span>
+  <span class="pill blue">56 YT videos</span>
+  <span class="pill olive">5 TAC-8 apps</span>
+  <span class="pill plum">12 tabs</span>
+  <span class="pill amber">Fleet of 4 agents</span>
+</div>
+
+<h2 id="ov-thesis">Thesis: what “like him” actually means</h2>
+
+<div class="quote">You are not becoming a better prompt typer. You become a <em>commander of compute</em> who ships via an <strong>agentic layer</strong> wrapped around application code. AI coding helps you type. Agentic engineering builds systems that plan, act, verify, and improve while you stay out of the loop.<cite>Fleet synthesis · council brief</cite></div>
+<p>Dan’s public + paid teaching repeatedly returns to seven moves:</p>
+<ol>
+  <li><strong>Stop coding as primary work</strong> — commander of compute; AI coding ≠ agentic coding.</li>
+  <li><strong>Tactics stack (TAC 1–8)</strong> — planned success → AFK → close loops → focus → ZTE → agentic layer.</li>
+  <li><strong>Context + prompt formats as leverage (AH)</strong> — R&amp;D framework, seven prompt levels.</li>
+  <li><strong>Specialized / multi-agent / experts / layers</strong> — O-Agent, Act–Learn–Reuse, class/grade map.</li>
+  <li><strong>Codebases as agent OS surfaces</strong> — hooks, skills, tasks, sandboxes, observability, verifiers.</li>
+  <li><strong>Sharp demo repos</strong> — one control surface per public repo.</li>
+  <li><strong>Software factory / ADW framing</strong> — workflows of code+agents, not “loop engineering” rebrand.</li>
+</ol>
+
+
+
+<h2 id="ov-map">Corpus map (what this artifact covers)</h2>
+
+<div class="grid g3">
+  <div class="card accent-clay"><div class="ct">Volume I</div><h4>TAC 1–8</h4><p>Tactical Agentic Coding. 8 tactics from Stop Coding → Prioritize Agentics. Source: <code class="inline">dojo/ai_docs/tac.md</code>, course folders, deep-dives.</p></div>
+  <div class="card accent-blue"><div class="ct">Volume II</div><h4>Agentic Horizon</h4><p>AH-1…6: context, prompts, custom agents, O-Agent, experts, layer grades. Path to Codebase Singularity.</p></div>
+  <div class="card accent-plum"><div class="ct">Volume III</div><h4>MA + YouTube</h4><p>CEO / Lead / UI / Verifier on Pi harness. 56 YT videos clustered into 11 themes. Trust &amp; scale.</p></div>
+</div>
+<div class="grid g2">
+  <div class="card accent-olive"><div class="ct">Code</div><h4>Agentic layer in the wild</h4><p><code class="inline">tac/tac-8/</code> five apps · <code class="inline">adws/</code> · <code class="inline">.claude/commands/</code> · hooks · worktrees · full SDLC ISO/ZTE in app5.</p></div>
+  <div class="card accent-amber"><div class="ct">Practice</div><h4>Become him</h4><p>28-day plan, study/author rituals, KPIs (Size↑ Attempts↓ Streak↑ Presence↓), transfer checklist — not vanity video-watching.</p></div>
+</div>
+
+
+
+<h2 id="ov-stack">Mental model: the stack</h2>
+
+<div class="diagram">
+<svg viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+  <rect x="40" y="30" width="640" height="220" rx="16" fill="#fdfbf5" stroke="#c8bca3" stroke-width="1.5"/>
+  <rect x="60" y="48" width="600" height="70" rx="12" fill="rgba(199,91,57,.12)" stroke="rgba(199,91,57,.35)"/>
+  <text x="360" y="78" text-anchor="middle" font-family="Fraunces,serif" font-size="18" fill="#c75b39" font-weight="600">AGENTIC LAYER</text>
+  <text x="360" y="100" text-anchor="middle" font-size="12" fill="#4b443b">adws/ · .claude/commands · specs/ · hooks · agents/ · skills · trees/</text>
+  <rect x="90" y="140" width="540" height="88" rx="12" fill="rgba(47,111,159,.10)" stroke="rgba(47,111,159,.3)"/>
+  <text x="360" y="175" text-anchor="middle" font-family="Fraunces,serif" font-size="18" fill="#2f6f9f" font-weight="600">APPLICATION LAYER</text>
+  <text x="360" y="198" text-anchor="middle" font-size="12" fill="#4b443b">apps/ · src/ · DB · DevOps · product runtime</text>
+  <text x="360" y="238" text-anchor="middle" font-size="11" fill="#7d7568" font-family="JetBrains Mono,monospace">YOU OPERATE THE AGENTIC LAYER → IT OPERATES THE APPLICATION</text>
+</svg>
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th>Phase</th><th>What it is</th><th>Formula</th></tr></thead>
+<tbody>
+<tr><td><strong>Phase 1 — AI coding</strong></td><td>Vibe / assist</td><td>Context + Model + Prompt → code</td></tr>
+<tr><td><strong>Phase 2 — Agentic coding</strong></td><td>Long tool chains, autonomy</td><td><strong>Core Four:</strong> Context + Model + Prompt + <em>Tools</em></td></tr>
+<tr><td><strong>Your role</strong></td><td>Commander of compute</td><td>Build systems that build systems</td></tr>
+<tr><td><strong>Irreplaceable engineer</strong></td><td>Replaces self with judgment encoded in layer</td><td>Agents ship <em>your</em> way</td></tr>
+</tbody></table></div>
+
+
+
+<h2 id="ov-question">The single guiding question (TAC-8 oil)</h2>
+
+<div class="callout good"><div class="ct">Daily filter · every hour</div>
+<p style="margin:0;font-family:var(--serif);font-size:20px;color:var(--ink)"><em>Am I working on the agentic layer or the application layer?</em></p>
+</div>
+<p>As a starting point, <strong>≥50% of engineering time</strong> should land on the agentic layer. The more you invest, the more problem <em>classes</em> agents solve on your behalf. Value is parabolic: thin at first, then thick and compounding.</p>
+
+
+
+<h2 id="ov-existing">Related artifacts already in this repo</h2>
+
+<ul>
+  <li><code class="inline">artifacts/junior-indy-field-guide.html</code> — assimilation field guide (chapter style)</li>
+  <li><code class="inline">artifacts/indy-mind-gameplan.html</code> — course-to-expertise game plan</li>
+  <li><code class="inline">artifacts/agentic-dojo/</code> — 28-chapter dojo book</li>
+  <li><code class="inline">dojo/</code> — playable lessons 01–12 with solutions</li>
+  <li><code class="inline">output/</code> — rules, patterns, transcript deep-dives, templates</li>
+  <li><code class="inline">book/</code> — multi-volume HTML book pipeline</li>
+</ul>
+<p class="small">This artifact is the <strong>synthesis cockpit</strong>: how he thinks + how the layer is coded + how you practice. Use <span class="kbd">[</span> <span class="kbd">]</span> to switch tabs, <span class="kbd">/</span> to search.</p>
+
+
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · overview</div>
+</section>
+<section class="panel" id="panel-think" data-panel="think">
+
+<span class="kicker">Cognitive OS</span>
+<h1 class="display">How Dan <em>thinks</em></h1>
+<p class="lede">Identity, thinking patterns, decision questions, demo session structure, and teaching voice — the software of the mind before the software of the layer.</p>
+
+<h2 id="th-identity">Identity shift</h2>
+
+<div class="grid g2">
+  <div class="card"><div class="ct">Before</div><h4>Coder in the loop</h4><p>Writes code, debugs by hand, tests by clicking, documents later, measures output in lines typed.</p></div>
+  <div class="card accent-clay"><div class="ct">After</div><h4>Commander of compute</h4><p>Designs units of work, encodes judgment into templates/ADWs, closes loops, reviews outcomes — not every tool call.</p></div>
+</div>
+<div class="table-wrap"><table>
+<thead><tr><th>Role</th><th>Daily identity statement</th></tr></thead>
+<tbody>
+<tr><td><strong>Commander of compute</strong></td><td>“I don’t write the feature; I design the unit of work agents execute.”</td></tr>
+<tr><td><strong>Agentic-layer engineer</strong></td><td>“I improve the system that improves the application.”</td></tr>
+<tr><td><strong>Template engineer</strong></td><td>“If I did it three times, it becomes a command.”</td></tr>
+<tr><td><strong>Loop closer</strong></td><td>“No autonomous step without observable validation.”</td></tr>
+<tr><td><strong>Out-of-loop operator</strong></td><td>“PITER is how work runs while I’m AFK.”</td></tr>
+<tr><td><strong>Specializer</strong></td><td>“One agent, one prompt, one purpose — or I re-scope.”</td></tr>
+<tr><td><strong>Verifier</strong></td><td>“Spend tokens to save time: atomic claims, independent check.”</td></tr>
+<tr><td><strong>Teacher-builder</strong></td><td>“Small sharp repos that teach one control surface.”</td></tr>
+</tbody></table></div>
+<div class="quote">I am not the coder in the loop. I design problem classes, encode judgment into the agentic layer, close feedback loops, and review outcomes.<cite>Daily identity · practice OS</cite></div>
+
+
+
+<h2 id="th-patterns">15 recurring thinking patterns</h2>
+
+<div class="grid g2">
+  <div class="card"><h4>1. Problem classes, not one-offs</h4><p>Template the class (<code class="inline">/chore</code> <code class="inline">/bug</code> <code class="inline">/feature</code>), not the ticket.</p></div>
+  <div class="card"><h4>2. Three-times rule</h4><p>Once = novel. Twice = maybe. Three times = automate into slash command / ADW <em>now</em>.</p></div>
+  <div class="card"><h4>3. In-loop → out-loop (gray, progressive)</h4><p>Prototype in chat; promote to script/trigger. Don’t live in chat.</p></div>
+  <div class="card"><h4>4. Fresh agents always</h4><p>Free context; force reusable prompts; enable AFK. One agent, one task, one mission.</p></div>
+  <div class="card"><h4>5. Prioritize agentics</h4><p>≥50% time on the ring. Application work is often the distraction.</p></div>
+  <div class="card"><h4>6. Fix the system</h4><p>Failed run → improve template/ADW/validators, not the one PR by hand.</p></div>
+  <div class="card"><h4>7. KPIs as north star</h4><p>Size↑ Attempts↓ Streak↑ Presence↓. Broken streak → missing leverage point.</p></div>
+  <div class="card"><h4>8. IDKs</h4><p>Types, “think hard”, model_set, issue tags — dense steering with few tokens.</p></div>
+  <div class="card"><h4>9. Plan is the prompt</h4><p>Meta-prompt writes plan; HOP implements plan path. Great planning = great prompting.</p></div>
+  <div class="card"><h4>10. Own the pipeline</h4><p>Cloud agents are generic. Your templates encode <em>your</em> engineering.</p></div>
+  <div class="card"><h4>11. Proof over vibes</h4><p>Screenshots (read back), tests as law, issue comments, ADW JSONL logs.</p></div>
+  <div class="card"><h4>12. Compose primitives</h4><p>SDLC is one molecule. Atoms: prompt, template, ADW step, validator, trigger.</p></div>
+  <div class="card"><h4>13. Belief update</h4><p>Invest until streaks prove classes. Limiting belief about “my codebase” is fatal.</p></div>
+  <div class="card"><h4>14. Minimum context</h4><p>R&amp;D: reduce &amp; delegate. Specialization over god-agent. Compact is a bandaid.</p></div>
+  <div class="card"><h4>15. Autonomy ladder</h4><p>Chores → bugs → features → ZTE. ZTE only after ~90% confidence streak.</p></div>
+</div>
+
+
+
+<h2 id="th-decisions">Decision framework (table on the wall)</h2>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Question</th><th>When</th></tr></thead>
+<tbody>
+<tr><td><strong>Agentic layer or application layer?</strong></td><td>Every hour (meta-filter)</td></tr>
+<tr><td>Who should handle this — me or an agent/ADW?</td><td>Task intake</td></tr>
+<tr><td>What <em>problem class</em> is this?</td><td>Routing BFC / patch / domain</td></tr>
+<tr><td>In-loop, out-loop, or ZTE?</td><td>Autonomy for this class</td></tr>
+<tr><td>Which of the 12 leverage points is weak?</td><td>After multi-attempt / broken streak</td></tr>
+<tr><td>Request → Validation → Resolution present?</td><td>Before claiming done</td></tr>
+<tr><td>Fresh agent? One prompt? One purpose?</td><td>Before long sessions</td></tr>
+<tr><td>PITER complete?</td><td>Before AFK claim</td></tr>
+<tr><td>Does review still add value?</td><td>ZTE gate</td></tr>
+<tr><td>Three-times → template now?</td><td>After repetition</td></tr>
+<tr><td>Minimum context for this agent?</td><td>Prompt design</td></tr>
+<tr><td>Base or heavy model_set?</td><td>Compute allocation</td></tr>
+</tbody></table></div>
+<p><strong>Golden formula:</strong> Presence↓ + Streak↑ + Size↑ + Attempts↓ = win.</p>
+
+
+
+<h2 id="th-session">How he builds (typical demo / session)</h2>
+
+<ol>
+  <li><strong>Clone real course repo / open real app</strong> — not toy slides; live NL→SQL etc.</li>
+  <li><strong>Setup /install</strong> — env, deps, agent-facing structure already present.</li>
+  <li><strong>Show end-state first</strong> when possible (issue→PR while teaching guts).</li>
+  <li><strong>In-loop only for discovery</strong> — <code class="inline">/prime</code>, one closed-loop experiment, inspect stdout.</li>
+  <li><strong>Template the class</strong> — meta-prompt writes <code class="inline">specs/</code>; never ad-hoc forever.</li>
+  <li><strong>Fresh agent implements</strong> — <code class="inline">/implement</code> or ADW step; YOLO only in isolated env.</li>
+  <li><strong>Validators in the prompt</strong> — request/validate/resolve; re-run full stack on fail.</li>
+  <li><strong>Promote to ADW</strong> — <code class="inline">adw_*.py</code>, health_check, classify, state.json, logs under <code class="inline">agents/&lt;adw-id&gt;/</code>.</li>
+  <li><strong>Wire PITER</strong> — issue/Notion/tasks.md + webhook/cron + dedicated box/worktree + PR/board review.</li>
+  <li><strong>Compose</strong> — plan_build_test_review_document[_ship]; ISO parallel on worktrees.</li>
+  <li><strong>Post-mortem on system</strong> — miss → fix template/review prompt, not blame model.</li>
+  <li><strong>Score KPIs</strong> — then decide whether class is ready for ZTE.</li>
+</ol>
+<p><strong>Codebase authoring style:</strong> small sharp control surfaces; clear entry points; verbose names; files &lt;~1000 lines; mirrored tests; agent docs tree; separated client/server; prompts versioned in repo.</p>
+
+
+
+<h2 id="th-voice">Voice fingerprint & pedagogy</h2>
+
+<div class="grid g3">
+  <div class="card"><div class="ct">Persona mix</div><h4>Urgent prophet + patient teacher</h4><p>Plus excited builder, frustrated visionary, caring mentor.</p></div>
+  <div class="card"><div class="ct">Rhythm</div><h4>“Okay? Right? Check this out.”</h4><p>Double intensifiers: “very, very powerful.” Action: “Let’s go ahead and…”</p></div>
+  <div class="card"><div class="ct">Scaffold</div><h4>Metaphor → demo → you try → philosophy</h4><p>“Imagine a ring around your codebase…” then live code, then handoff, then why it matters.</p></div>
+</div>
+<h3>Core mantras (drumbeat)</h3>
+<ul>
+  <li><strong>Build the system that builds the system</strong></li>
+  <li><strong>One agent, one prompt, one purpose</strong></li>
+  <li><strong>Prioritize your agentic layer</strong></li>
+  <li><strong>Stay out the loop</strong></li>
+  <li><strong>Am I on agentic or application layer?</strong></li>
+  <li><strong>The plan is the prompt</strong></li>
+  <li><strong>You don’t fix the issue — you fix the system</strong></li>
+  <li><strong>A focused agent is a performant agent</strong></li>
+</ul>
+
+
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · think</div>
+</section>
+<section class="panel" id="panel-tactics" data-panel="tactics">
+
+<span class="kicker">TAC 1–8</span>
+<h1 class="display">The eight <em>tactics</em></h1>
+<p class="lede">Each tactic is a permanent primitive. Together they form the autonomy ladder from “stop typing” to “prioritize the ring.”</p>
+
+<h2 id="tac-ladder">Autonomy ladder</h2>
+<div class="diagram">
+<svg viewBox="0 0 720 160" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c75b39"/><stop offset="100%" stop-color="#2f6f9f"/></linearGradient></defs>
+  <rect x="20" y="60" width="680" height="12" rx="6" fill="url(#g)"/>
+  <g font-family="JetBrains Mono,monospace" font-size="10" fill="#4b443b" text-anchor="middle">
+    <circle cx="50" cy="66" r="8" fill="#c75b39"/><text x="50" y="100">Stop</text>
+    <circle cx="140" cy="66" r="8" fill="#c75b39"/><text x="140" y="100">Perspective</text>
+    <circle cx="230" cy="66" r="8" fill="#c1882a"/><text x="230" y="100">Template</text>
+    <circle cx="320" cy="66" r="8" fill="#c1882a"/><text x="320" y="100">AFK</text>
+    <circle cx="410" cy="66" r="8" fill="#5f7138"/><text x="410" y="100">Loops</text>
+    <circle cx="500" cy="66" r="8" fill="#5f7138"/><text x="500" y="100">Focus</text>
+    <circle cx="590" cy="66" r="8" fill="#2f6f9f"/><text x="590" y="100">ZTE</text>
+    <circle cx="680" cy="66" r="8" fill="#6e4a86"/><text x="680" y="100">Agentics</text>
+  </g>
+  <text x="360" y="30" text-anchor="middle" font-family="Fraunces,serif" font-size="14" fill="#211d18">In-loop  →  Out-loop (PITER)  →  ZTE (PITE)  →  Thick layer</text>
+</svg>
+</div>
+
+<div class="tactic" id="tac-1"><div class="n">1</div><div>
+  <div class="meta">Stop Coding · Hello Agentic Coding</div>
+  <h3>Hands are no longer the best tool for writing code</h3>
+  <p><strong>Primitives:</strong> Core Four; agentic prompt (tool-chain); programmable <code class="inline">claude -p</code>; ADW teased.</p>
+  <p><strong>How he codes:</strong> Zero hand-typed app code. Show AI prompt vs agentic prompt (branch → write → run → commit → report); same via shell/Bun/Python headless.</p>
+  <div class="quotes">“Engineering was never about writing code.” · “If you’re still typing code, you have no chance of keeping up.” · “To become an irreplaceable engineer, you will replace yourself.”</div>
+</div></div>
+
+<div class="tactic" id="tac-2"><div class="n">2</div><div>
+  <div class="meta">Adopt Your Agent’s Perspective · 12 Leverage Points</div>
+  <h3>Brilliant but blind — give it what you would need</h3>
+  <p><strong>Primitives:</strong> 12 leverage points (Core Four + stdout, types, docs, tests, architecture, plans, templates, ADWs); KPIs Size↑ Attempts↓ Streak↑ Presence↓; IDKs; Phase-2 SDLC Plan/Code/Test/Review/Document.</p>
+  <p><strong>How he codes:</strong> Make codebase agent-operable first; <code class="inline">/prime</code>; fix bugs via agent watching live server stdout.</p>
+  <div class="quotes">“Your agent is brilliant, but blind.” · “It’s not about what you can do anymore — what you can teach your agents.” · “Three time makes a pattern.”</div>
+</div></div>
+
+<div class="tactic" id="tac-3"><div class="n">3</div><div>
+  <div class="meta">Template Your Engineering · Success is Planned</div>
+  <h3>The plan is the prompt — encode problem classes</h3>
+  <p><strong>Primitives:</strong> Meta-prompt; HOP <code class="inline">/implement &lt;plan&gt;</code>; <code class="inline">/chore</code> <code class="inline">/bug</code> <code class="inline">/feature</code>; <code class="inline">specs/</code>; “Think hard.”</p>
+  <p><strong>How he codes:</strong> High-level intent → template writes plan → <strong>new terminal/fresh agent</strong> implements → validate. Two prompts ship a chore.</p>
+  <div class="quotes">“The plan is the prompt.” · “Success is planned.” · “One agent, one task, one mission.”</div>
+</div></div>
+
+<div class="tactic" id="tac-4"><div class="n">4</div><div>
+  <div class="meta">Stay Out The Loop · AFK Agents</div>
+  <h3>PITER systems you own — not generic cloud agents</h3>
+  <p><strong>Primitives:</strong> PITER (Prompt, Trigger, Environment, Review); ADW = code + prompts + agents; issue classifier; health check; <code class="inline">adw_plan_build</code>; agentic layer dirs first named.</p>
+  <p><strong>How he codes:</strong> GitHub issue → webhook → dedicated env → planner → builder → PR + live issue comments. No ad-hoc prompt strings in code.</p>
+  <div class="quotes">“Stay out the loop.” · “You don’t fix the issue — you fix the system that caused the issue.” · “Own your agentic pipelines.”</div>
+</div></div>
+
+<div class="tactic" id="tac-5"><div class="n">5</div><div>
+  <div class="meta">Always Add Feedback Loops · Close the Loops</div>
+  <h3>Request → Validation → Resolution until green</h3>
+  <p><strong>Primitives:</strong> Closed-loop anatomy; hierarchy ruff → pytest → compile → tsc → build → Playwright; resolver agents; tests as rule of law.</p>
+  <p><strong>How he codes:</strong> Bake Validation Commands into every plan; intentional breakage → agent loops validators; e2e as markdown with <code class="inline">verify</code> IDKs.</p>
+  <div class="quotes">“Engineers that test with their agents win. Full stop.” · “Let the code write itself.” · “Tests should be the rule of law.”</div>
+</div></div>
+
+<div class="tactic" id="tac-6"><div class="n">6</div><div>
+  <div class="meta">One Agent, One Prompt, One Purpose · Focus</div>
+  <h3>Kill context pollution; complete SDLC with proof</h3>
+  <p><strong>Primitives:</strong> Review vs Test; severity skippable / tech_debt / blocker; screenshots must be <em>read</em>; <code class="inline">app_docs/</code> vs <code class="inline">ai_docs/</code>; conditional docs; composed ADWs.</p>
+  <p><strong>How he codes:</strong> Fresh agent per step; compose by ADW ID; miss → fix template (not blame model).</p>
+  <div class="quotes">“One agent, one prompt, one purpose.” · “Isn’t more context better? This is not true.” · “I’m not blaming the model… I’m blaming the ADWs.”</div>
+</div></div>
+
+<div class="tactic" id="tac-7"><div class="n">7</div><div>
+  <div class="meta">Target Zero Touch Engineering · The Secret</div>
+  <h3>Drop review when it adds no value; compose primitives</h3>
+  <p><strong>Primitives:</strong> In→Out→ZTE; ISO worktrees; model sets; <code class="inline">adw_sdlc_iso</code> / <code class="inline">adw_sdlc_zte_iso</code>; secret = composable primitives for any problem class (not SDLC religion).</p>
+  <p><strong>How he codes:</strong> Parallel issues on one machine; ZTE only for high-confidence classes; ship = merge after closed loops + review proof.</p>
+  <div class="quotes">“Not about the SDLC… composable agentic primitives.” · “I parallelized myself across five features.” · “Primitives are the atoms of agentic engineering.”</div>
+</div></div>
+
+<div class="tactic" id="tac-8"><div class="n">8</div><div>
+  <div class="meta">Prioritize Agentics · The Agentic Layer</div>
+  <h3>Meta-tactic: majority time on the ring</h3>
+  <p><strong>Primitives:</strong> Agentic vs application; MV layer = <code class="inline">adws/</code> + prompts + <code class="inline">specs/</code>; gateway <code class="inline">adw_prompt</code>; many shapes (see TAC-8 Apps tab).</p>
+  <p><strong>How he codes:</strong> Start gateway; chain chore→implement; grow ring thickness; daily time split ≥50% agentics.</p>
+  <div class="quotes">“Am I working on the agentic layer or the application layer?” · “Build the system that builds the system.” · “When the agents arrived… we started orchestrating intelligence.”</div>
+</div></div>
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · tactics</div>
+</section>
+<section class="panel" id="panel-layer" data-panel="layer">
+
+<span class="kicker">★ Center of gravity</span>
+<h1 class="display">The <em>agentic layer</em></h1>
+<p class="lede">Everything outside application source that teaches compute how to operate the app. Dan’s edge is not “more prompting” — it’s this ring: prompts + plans + uv scripts that shell Claude (or Pi), compose via state/stdout, and thicken along real problem classes.</p>
+
+<h2 id="ly-def">Definition</h2>
+<div class="quote">The combination of traditional <strong>deterministic code</strong> stored in your ADWs directory… with the new <strong>non-deterministic agentic technology</strong>… a <strong>ring around your codebase</strong> — at first thin, then thicker as you scale agentics in.<cite>TAC-8 / AH-6</cite></div>
+<div class="table-wrap"><table>
+<thead><tr><th>Layer</th><th>Lives in</th><th>Owns</th></tr></thead>
+<tbody>
+<tr><td><strong>Agentic</strong></td><td><code class="inline">adws/</code> <code class="inline">.claude/</code> <code class="inline">specs/</code> <code class="inline">agents/</code> <code class="inline">ai_docs/</code> <code class="inline">trees/</code> hooks skills triggers</td><td>prompts, workflows, isolation, observability, safety</td></tr>
+<tr><td><strong>Application</strong></td><td><code class="inline">apps/</code> <code class="inline">app/</code> product DB FE/BE</td><td>product runtime only</td></tr>
+</tbody></table></div>
+<p>Canonical source: <code class="inline">tac/tac-8/tac8_app1__agent_layer_primitives/README.md</code></p>
+
+<h2 id="ly-mval">Minimum Viable Agentic Layer</h2>
+<p>Exactly three ingredients, isolated from app:</p>
+<pre><span class="c"># Minimum Viable Agentic Layer</span>
+specs/                          <span class="c"># Plans for agents to follow</span>
+.claude/commands/               <span class="c"># Agentic prompts (slash commands)</span>
+  chore.md  implement.md  prime.md  feature.md  bug.md
+adws/                           <span class="c"># Deterministic orchestration</span>
+  adw_modules/agent.py          <span class="c"># Shell-out to claude -p</span>
+  adw_prompt.py                 <span class="c"># Gateway: raw prompt</span>
+  adw_chore_implement.py        <span class="c"># Chain: plan → implement</span>
+  adw_slash_command.py
+</pre>
+<div class="callout good"><div class="ct">Thinnest working ADW</div>
+<p style="margin:0">Those three + a gateway that can chain chore → implement. Thinnest <em>grade</em> (AH C1G1): <code class="inline">/prime</code> + memory alone.</p></div>
+
+<h2 id="ly-anatomy">Anatomy of a thick layer</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Path</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code class="inline">.claude/commands/*.md</code></td><td>Slash-command prompts (templates / HOPs). <code class="inline">/chore</code>, <code class="inline">/implement</code>.</td></tr>
+<tr><td><code class="inline">.claude/hooks/*.py</code></td><td>Deterministic event scripts — safety + telemetry.</td></tr>
+<tr><td><code class="inline">.claude/settings.json</code></td><td>Hook registration, permissions.</td></tr>
+<tr><td><code class="inline">.claude/agents/*.md</code></td><td>Subagents (frontmatter: name, tools, model).</td></tr>
+<tr><td><code class="inline">.claude/skills/*/SKILL.md</code></td><td>Reusable capability packs (AH/MA era).</td></tr>
+<tr><td><code class="inline">adws/adw_*.py</code></td><td>Top-level ADW entry (uv single-file). Gateway + compositions.</td></tr>
+<tr><td><code class="inline">adws/adw_modules/</code></td><td>Shared: agent.py, types, git/github, state, worktrees.</td></tr>
+<tr><td><code class="inline">adws/adw_triggers/</code></td><td>Cron / webhook / custom invokers.</td></tr>
+<tr><td><code class="inline">specs/</code></td><td>Plans agents write and implement.</td></tr>
+<tr><td><code class="inline">agents/{adw_id}/{name}/</code></td><td>Observability: jsonl, summaries, state.</td></tr>
+<tr><td><code class="inline">trees/</code></td><td>Isolated git worktrees for parallel agents.</td></tr>
+<tr><td><code class="inline">ai_docs/</code> · <code class="inline">app_docs/</code></td><td>Agent-facing refs · feature docs from diffs.</td></tr>
+<tr><td><code class="inline">tasks.md</code></td><td>File-as-UI task board (TAC-8 app2).</td></tr>
+</tbody></table></div>
+
+<h2 id="ly-gateway">Gateway script pattern</h2>
+<p><strong>Core move:</strong> deterministic Python shells to Claude CLI. Never bury prompts as ad-hoc strings.</p>
+<pre><span class="c"># Essential command shape (adw_modules/agent.py)</span>
+cmd = [CLAUDE_PATH, <span class="s">"-p"</span>, request.prompt]
+cmd.extend([<span class="s">"--model"</span>, request.model])
+cmd.extend([<span class="s">"--output-format"</span>, <span class="s">"stream-json"</span>])
+cmd.append(<span class="s">"--verbose"</span>)
+<span class="k">if</span> request.dangerously_skip_permissions:
+    cmd.append(<span class="s">"--dangerously-skip-permissions"</span>)
+subprocess.run(cmd, stdout=output_f, env=get_safe_subprocess_env(), cwd=working_dir)
+</pre>
+<div class="table-wrap"><table>
+<thead><tr><th>Script</th><th>Role</th></tr></thead>
+<tbody>
+<tr><td><code class="inline">adw_prompt.py</code></td><td>Raw prompt string → one agent</td></tr>
+<tr><td><code class="inline">adw_slash_command.py</code></td><td><code class="inline">/command</code> + args → execute_template</td></tr>
+<tr><td><code class="inline">adw_chore_implement.py</code></td><td>Phase1 /chore → regex plan path → Phase2 /implement</td></tr>
+<tr><td><code class="inline">adw_*_iso.py</code></td><td>Worktree-isolated phase + state.json</td></tr>
+<tr><td><code class="inline">adw_plan_build_*_iso.py</code></td><td>Composition: subprocess chain only</td></tr>
+</tbody></table></div>
+<p><strong>uv single-file header (always):</strong></p>
+<pre>#!/usr/bin/env -S uv run --script
+<span class="c"># /// script</span>
+<span class="c"># requires-python = ">=3.10"</span>
+<span class="c"># dependencies = ["pydantic", "python-dotenv", "click", "rich"]</span>
+<span class="c"># ///</span>
+</pre>
+<p><strong>Observability contract:</strong> every run gets 8-char <code class="inline">adw_id</code>; outputs under <code class="inline">agents/{adw_id}/{agent_name}/cc_raw_output.jsonl</code>.</p>
+
+<h2 id="ly-compose">Composition rules (how primitives nest)</h2>
+<pre>L0  Prompt file (.claude/commands/*.md)     <span class="c"># one purpose</span>
+L1  execute_template / adw_slash_command    <span class="c"># one agent run</span>
+L2  Phase ADW (adw_plan_iso, adw_build_iso) <span class="c"># state + git + github</span>
+L3  Chain ADW (adw_plan_build_test_iso)     <span class="c"># subprocess composition</span>
+L4  Trigger (cron/webhook/tasks.md/Notion)  <span class="c"># external event → L3</span>
+L5  Orchestrator (AH) / CEO board (MA)      <span class="c"># agents that launch ADWs</span>
+</pre>
+<ol>
+  <li><strong>One agent, one prompt, one purpose</strong> — planner ≠ builder ≠ tester; separate agent_name dirs.</li>
+  <li><strong>Stdout is a leverage point</strong> — chore must return parseable plan path; tests return JSON for fan-out.</li>
+  <li><strong>Plan is the prompt</strong> — implement is basically “read plan; execute; report.”</li>
+  <li><strong>State file chains phases</strong> — <code class="inline">adw_state.json</code> holds branch, plan_file, ports, worktree.</li>
+  <li><strong>Tags/IDKs route thickness</strong> — <code class="inline">{opus}</code>, prototype tags, etc.</li>
+  <li><strong>Isolation before parallelism</strong> — worktrees + port ranges.</li>
+  <li><strong>Feedback loops close with code</strong> — hooks block bad tools; validate gates; resolve_failed re-enters.</li>
+  <li><strong>Specialize per codebase</strong> — don’t build generic layers; duplicate and specialize.</li>
+</ol>
+
+<h3>Real command anatomy (from app1)</h3>
+<pre><span class="c"># .claude/commands/implement.md — intentionally tiny HOP</span>
+# Implement the following plan
+## Instructions
+- Read the plan, think hard about the plan and implement the plan.
+## Plan
+$ARGUMENTS
+## Report
+- Summarize work as bullet list
+- Report files + lines with `git diff --stat`
+</pre>
+<pre><span class="c"># .claude/commands/prime.md</span>
+# Prime
+## Run
+git ls-files
+## Read
+README.md
+adws/README.md
+## Report
+Summarize your understanding of the codebase.
+</pre>
+<pre><span class="c"># .claude/commands/chore.md — template meta-prompt skeleton</span>
+# Chore Planning
+## Variables
+adw_id: $1
+prompt: $2
+## Instructions
+- Create plan in specs/chore-{adw_id}-{name}.md
+- Research starting with README.md
+- Replace every &lt;placeholder&gt; in Plan Format
+## Codebase Structure
+- (teach the tree)
+## Plan Format
+(fenced markdown template)
+</pre>
+
+<h2 id="ly-progress">Thickness timeline</h2>
+<div class="tl">
+  <div class="item"><div class="when">TAC-1</div><h4>Raw programmable prompt</h4><p><code class="inline">tac/tac-1/programmable/</code></p></div>
+  <div class="item"><div class="when">TAC-2–3</div><h4>Scaffolds + plan-is-prompt</h4><p>Empty adws/, agents/, specs/, ai_docs/; BFC templates</p></div>
+  <div class="item"><div class="when">TAC-4</div><h4>Real ADW: issue → PR</h4><p><code class="inline">adw_plan_build.py</code>, classify, health check</p></div>
+  <div class="item"><div class="when">TAC-5</div><h4>Test loop + resolvers</h4><p>adw_modules/, adw_triggers/</p></div>
+  <div class="item"><div class="when">TAC-6</div><h4>Review, patch, document</h4><p>Composed plan_build_*</p></div>
+  <div class="item"><div class="when">TAC-7</div><h4>ISO + ZTE + parallel</h4><p>Worktrees, *_iso, ship</p></div>
+  <div class="item"><div class="when">TAC-8</div><h4>Layer as product — 5 shapes</h4><p>MVAL → multi → obs → Notion → full AEA</p></div>
+  <div class="item"><div class="when">AH C1–C3</div><h4>Grades to singularity</h4><p>prime → experts → out-loop → orchestrator runs ADWs</p></div>
+  <div class="item"><div class="when">MA</div><h4>Org of agents</h4><p>CEO/Lead/UI/Verifier on Pi harness</p></div>
+</div>
+
+<h2 id="ly-checklist">How to code like him on the layer</h2>
+<ul class="check">
+  <li>Create only <code class="inline">adws/</code>, <code class="inline">.claude/commands/</code>, <code class="inline">specs/</code> first — zero app code in them.</li>
+  <li>Write <code class="inline">/prime</code> (Run/Read/Report) before anything clever.</li>
+  <li>Write template meta-prompts that emit fixed Plan Format into specs/.</li>
+  <li>Write HOP <code class="inline">/implement</code> that only takes a plan path.</li>
+  <li>Build <code class="inline">agent.py</code> that shells <code class="inline">claude -p … --output-format stream-json</code>, filters env, retries, logs under agents/.</li>
+  <li>Add gateway <code class="inline">adw_prompt.py</code> then <code class="inline">adw_slash_command.py</code>.</li>
+  <li>Chain with stdout parsing (plan path), not shared memory.</li>
+  <li>Add validation commands in every plan; later automate as adw_test + resolvers.</li>
+  <li>Add triggers only after manual gateway works.</li>
+  <li>Add worktrees before parallel fan-out.</li>
+  <li>Add hooks for safety and observability (block first, summarize second).</li>
+  <li>Specialize prompts to problem classes.</li>
+  <li>Measure time: ≥ half of engineering on the layer.</li>
+  <li>Ask daily: agentic layer or application layer?</li>
+</ul>
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · layer</div>
+</section>
+<section class="panel" id="panel-tac8" data-panel="tac8">
+
+<span class="kicker">TAC-8 · five architectures</span>
+<h1 class="display">Five ways to shape<br>the <em>same</em> layer</h1>
+<p class="lede">TAC-8’s secret demo: there is no one-size-fits-all agentic layer. Same primitives, five product shapes. Study all five; steal the shape that matches your problem class.</p>
+<p>Base path: <code class="inline">tac/tac-8/</code></p>
+
+<h2 id="a1">App1 — Agent Layer Primitives (MVAL)</h2>
+<div class="card accent-clay" style="margin-bottom:14px"><div class="ct">Thinnest real ADW stack</div>
+<p style="margin:0">No hooks, no triggers, no worktrees, no GitHub. Pure gateway + chore→implement chain. <strong>Start here.</strong></p></div>
+<div class="tree">
+<span class="d">tac8_app1__agent_layer_primitives/</span>
+├── <span class="d">.claude/commands/</span>  <span class="c">chore · feature · implement · prime · start</span>
+├── <span class="d">adws/</span>
+│   ├── <span class="f">adw_prompt.py</span> <span class="f">adw_slash_command.py</span> <span class="f">adw_chore_implement.py</span>
+│   └── <span class="d">adw_modules/</span> <span class="f">agent.py</span> <span class="f">agent_sdk.py</span>
+├── <span class="d">specs/</span> <span class="c">chore-*.md (agent-written)</span>
+└── <span class="d">apps/</span> <span class="c">main.py · main.ts  ← application stub only</span>
+</div>
+<p><strong>Workflow:</strong> human/CLI → gateway → 1–2 agents → specs/ + app edits + agents/{id}/ logs.</p>
+
+<h2 id="a2">App2 — Multi-Agent ToDone (file board)</h2>
+<p><code class="inline">tasks.md</code> is the two-way prompt UI. Cron claims tasks, marks in-progress, worktree, plan/build, update with ✅/❌ + commit hash.</p>
+<ul>
+  <li>Status emojis: <code class="inline">[] [🟡] [✅] [❌] [⏰]</code> = control plane</li>
+  <li>Tag-driven routing: <code class="inline">{opus, adw_plan_implement_update_task}</code></li>
+  <li>Trigger: <code class="inline">adw_triggers/adw_trigger_cron_todone.py</code></li>
+</ul>
+
+<h2 id="a3">App3 — Out-Loop Multi-Agent Task Board (observability)</h2>
+<p>Same multi-agent pattern as app2, plus full hooks + Vue/Bun observability product. Hooks POST events → SQLite → WebSocket → UI. The app layer <em>is</em> the observability product; agentic layer still at repo root.</p>
+<div class="tree">
+<span class="d">.claude/</span>
+├── <span class="d">commands/</span>
+├── <span class="d">hooks/</span>  <span class="c">pre/post_tool_use, stop, subagent_stop, send_event…</span>
+└── <span class="f">settings.json</span>
+<span class="d">apps/client</span> + <span class="d">apps/server</span>  <span class="c">← observability product</span>
+</div>
+
+<h2 id="a4">App4 — Agentic Prototyping (Notion + tags)</h2>
+<p>External board (Notion) + prototype tags like <code class="inline">{{prototype: uv_mcp}}</code> route to specialized plan templates. Template meta-prompts solve whole problem classes (UV MCP servers, Vite Vue, Bun scripts). deep_specs/ for heavy architecture.</p>
+
+<h2 id="a5">App5 — NLQ-to-SQL AEA (full SDLC / ZTE)</h2>
+<p>The thick end: ~30 commands, full ISO pipeline, GitHub issue → classify → worktree + ports → plan → build → test (JSON) → fan-out resolvers → review → document → optional ZTE ship. Playwright MCP. Exception to 1-1-1: in-app agents can continue sessions by session ID (<code class="inline">/aea</code>).</p>
+<div class="tree">
+<span class="d">adws/</span>
+├── <span class="f">adw_*_iso.py</span>              <span class="c">plan/build/test/review/document/patch/ship</span>
+├── <span class="f">adw_plan_build_*_iso.py</span>   <span class="c">compositions</span>
+├── <span class="f">adw_sdlc_iso.py</span> | <span class="f">adw_sdlc_zte_iso.py</span>
+├── <span class="d">adw_modules/</span>  <span class="c">agent, state, git_ops, github, worktree_ops…</span>
+└── <span class="d">adw_triggers/</span>  <span class="c">cron, webhook, aea_server</span>
+</div>
+<div class="callout"><div class="ct">Study order</div>
+<p style="margin:0">App1 (feel the gateway) → App2 (file control plane) → App3 (hooks/obs) → App4 (external board + classes) → App5 (full factory). Port App1 to your repo this week.</p></div>
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · tac8</div>
+</section>
+<section class="panel" id="panel-horizon" data-panel="horizon">
+
+<span class="kicker">Agentic Horizon · AH 1–6</span>
+<h1 class="display">From tactics to<br><em>ecosystems</em></h1>
+<p class="lede">TAC = use agents. AH = architect agent ecosystems. Spine: Core Four · R&amp;D · one agent/one purpose · system that builds the system · trust &amp; scale · ZTE.</p>
+
+<div class="tactic" id="ah-1"><div class="n">1</div><div>
+  <div class="meta">R&amp;D Framework · Context Window Mastery</div>
+  <h3>Only two moves: Reduce and Delegate</h3>
+  <p>Context is scarce temporal attention. 12 techniques: measure /context, purposeful MCP, prime ≫ CLAUDE.md, output styles, sub-agents, planner/builder, clear+prime not compact, context bundles, one purpose, system-prompt control, background primaries, experts preview.</p>
+  <div class="quotes">“A focused agent is a performant agent.” · “What gets measured gets managed.” · “If you aren’t managing context, you’re vibe coding.”</div>
+</div></div>
+
+<div class="tactic" id="ah-2"><div class="n">2</div><div>
+  <div class="meta">Seven Levels of Agentic Prompt Formats</div>
+  <h3>Prompt = fundamental unit of engineering</h3>
+  <p><strong>Stakeholder trifecta:</strong> you, team, agents. Levels: (1) High-level (2) Workflow <strong>[S-tier]</strong> (3) Control flow (4) Delegation (5) Higher-order (6) Template meta (7) Self-improving + Expertise. Pattern: Input → Workflow → Output.</p>
+  <div class="quotes">“The high-level prompt is a great place to start. It’s a terrible place to end.” · “Three times marks a pattern.”</div>
+</div></div>
+
+<div class="tactic" id="ah-3"><div class="n">3</div><div>
+  <div class="meta">Building Domain-Specific Agents</div>
+  <h3>Better → more → custom</h3>
+  <p>OOTB agents are for everyone’s codebase. System prompt is the law. Ladder: Pong → Echo → Calc → QA → Tri-copy → Micro SDLC → UltraStream. disallowed_tools, overwrite vs append, hooks for safety.</p>
+  <div class="quotes">“Agentic coding is about what we can teach our agents to do.”</div>
+</div></div>
+
+<div class="tactic" id="ah-4"><div class="n">4</div><div>
+  <div class="meta">O-Agent · Multi-Agent Orchestration</div>
+  <h3>Single interface over a fleet</h3>
+  <p><strong>Three pillars:</strong> Orchestrator · CRUD agents · Observability. Agents = deletable single-purpose resources; produce concrete assets; scout→build→review via sleep/poll. Never does the work itself; tails logs only.</p>
+  <div class="quotes">“Treat your agents as deletable temporary resources.” · “If you lose track of your agents, you lose control of results.”</div>
+</div></div>
+
+<div class="tactic" id="ah-5"><div class="n">5</div><div>
+  <div class="meta">Agent Experts</div>
+  <h3>Act → Learn → Reuse</h3>
+  <p>Agents forget ⇒ they don’t learn. Expert = self-improving template meta-prompt. Structure: <code class="inline">.claude/commands/experts/&lt;domain&gt;/{expertise.yaml, question, plan, self-improve, plan_build_improve}</code>. Expertise = mental model, <em>not</em> source of truth (code is). Deploy first on high-risk domains (billing #1).</p>
+  <div class="quotes">“One executes and forgets; the other executes and learns.”</div>
+</div></div>
+
+<div class="tactic" id="ah-6"><div class="n">6</div><div>
+  <div class="meta">Building Agentic Layers · Codebase Singularity</div>
+  <h3>Grade yourself; climb one grade</h3>
+  <p>Singularity = agents run codebase better than you. Class/grade map:</p>
+  <ul>
+    <li><strong>C1 in-loop:</strong> G1 prime → G2 plans/ai_docs/subagents → G3 skills/MCP → G4 closed loops → G5 BFC templates → G6 chains → G7 experts</li>
+    <li><strong>C2 out-loop:</strong> webhooks → ADWs (code + agents)</li>
+    <li><strong>C3 orchestrated:</strong> O-Agent → orchestrator workflows → orchestrator runs ADWs</li>
+  </ul>
+  <div class="quotes">“You want your agentic layer operating your codebase and you operate the agentic layer.”</div>
+</div></div>
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · horizon</div>
+</section>
+<section class="panel" id="panel-ma" data-panel="ma">
+
+<span class="kicker">Multi-Agent extras · Trust &amp; scale</span>
+<h1 class="display">CEO · Lead · UI · <em>Verifier</em></h1>
+<p class="lede">Four lessons on a customized Pi harness. Theme of 2026: <strong>trust and scale</strong>. Hierarchy of thinking: CEO decides → Lead coordinates → UI operates product → Verifier buys trust with tokens for time.</p>
+
+<h2 id="ma-arc">The arc</h2>
+<div class="diagram">
+<svg viewBox="0 0 720 120" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+  <rect x="20" y="30" width="150" height="60" rx="10" fill="rgba(199,91,57,.12)" stroke="#c75b39"/>
+  <text x="95" y="55" text-anchor="middle" font-size="13" font-weight="600" fill="#c75b39">CEO</text>
+  <text x="95" y="72" text-anchor="middle" font-size="10" fill="#4b443b">decisions</text>
+  <text x="185" y="65" font-size="18" fill="#a59c8c">→</text>
+  <rect x="210" y="30" width="150" height="60" rx="10" fill="rgba(47,111,159,.12)" stroke="#2f6f9f"/>
+  <text x="285" y="55" text-anchor="middle" font-size="13" font-weight="600" fill="#2f6f9f">LEAD</text>
+  <text x="285" y="72" text-anchor="middle" font-size="10" fill="#4b443b">3-tier teams</text>
+  <text x="375" y="65" font-size="18" fill="#a59c8c">→</text>
+  <rect x="400" y="30" width="150" height="60" rx="10" fill="rgba(95,113,56,.12)" stroke="#5f7138"/>
+  <text x="475" y="55" text-anchor="middle" font-size="13" font-weight="600" fill="#5f7138">UI</text>
+  <text x="475" y="72" text-anchor="middle" font-size="10" fill="#4b443b">product ops</text>
+  <text x="565" y="65" font-size="18" fill="#a59c8c">→</text>
+  <rect x="590" y="30" width="110" height="60" rx="10" fill="rgba(110,74,134,.12)" stroke="#6e4a86"/>
+  <text x="645" y="55" text-anchor="middle" font-size="13" font-weight="600" fill="#6e4a86">VERIFY</text>
+  <text x="645" y="72" text-anchor="middle" font-size="10" fill="#4b443b">trust</text>
+</svg>
+</div>
+
+<h2 id="ma-ceo">MA-1 · CEO Agents</h2>
+<p><strong>Thesis:</strong> Uncertainty in → memo out. CEO + adversarial board (Revenue, Architect, Compounder, Product, Contrarian, Moonshot). Brief requires Situation / Stakes / Constraints / Key Question. Time+budget constraints engine. Expertise stacks across briefs. One-shot: <code class="inline">ceo begin</code>.</p>
+<div class="quote">“It’s not just you making key decisions anymore… it’s you, your team, and a country of geniuses in a data center.”</div>
+
+<h2 id="ma-lead">MA-2 · Lead Agents</h2>
+<p><strong>Thesis:</strong> One agent is not enough. Three-tier: orchestrator → leads → workers. Domain locking (holy grail for mid/large codebases). Mental models grow. Zero micromanagement skill. Opus thinkers / Sonnet workers. Cognitive input stays flat as agent count grows.</p>
+<div class="quote">“You stopped using agents that forget and you started using agent experts.”</div>
+
+<h2 id="ma-ui">MA-3 · UI Agents</h2>
+<p>Same hierarchy aimed at a product domain — infinite brand-consistent UIs. Till-done lists; parallel gen teams; orchestrator as prompt engineer; resilience when models fail.</p>
+
+<h2 id="ma-ver">MA-4 · Verifier Agent</h2>
+<p><strong>Thesis:</strong> Attack the review constraint. Second agent is an un-promptable observer. Decompose builder output into <strong>atomic claims</strong>; prove each with read-only tools + one allowed bash; max 3 loops → human. Stack domain verifiers. AND models not OR (verifier ≠ builder model).</p>
+<div class="quote">“Spend tokens to save time.” · trust = unattended correct chain length</div>
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · ma</div>
+</section>
+<section class="panel" id="panel-youtube" data-panel="youtube">
+
+<span class="kicker">Public teaching · 56 videos</span>
+<h1 class="display">YouTube as the<br><em>frontier log</em></h1>
+<p class="lede">Course = canonical spine. YouTube = evolving frontier. Cluster into themes; steal tactics, don’t binge bake-offs.</p>
+
+<h2 id="yt-themes">Eleven themes</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>#</th><th>Theme</th><th>Transferable tactics</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Observability</strong></td><td>Hooks → bus → SQLite/WS → UI; cheap model summarize; if you can’t see it you can’t improve it</td></tr>
+<tr><td>2</td><td><strong>Hooks &amp; damage control</strong></td><td>Exit-code contracts; patterns.yaml; harden prompt-hooks to deterministic; bash lockdown ladder</td></tr>
+<tr><td>3</td><td><strong>Sub-agents &amp; meta-agents</strong></td><td>Description = routing; sub reports to primary; meta-agent generates agents</td></tr>
+<tr><td>4</td><td><strong>Prompt ladder</strong></td><td>Purpose/Variables/Workflow/Report; HOP; living plans</td></tr>
+<tr><td>5</td><td><strong>Context &amp; anti-MCP bloat</strong></td><td>R&amp;D; prime over memory; CLI/scripts/skills &gt; MCP when tokens matter</td></tr>
+<tr><td>6</td><td><strong>Skills composition</strong></td><td>Skill→subagent→command→justfile; progressive disclosure</td></tr>
+<tr><td>7</td><td><strong>Custom agents &amp; SDK</strong></td><td>System prompt builds product; file-drop UI; PITER</td></tr>
+<tr><td>8</td><td><strong>Orchestration &amp; fleets</strong></td><td>CRUD agents; flat comms; delete when done; cmux/tmux</td></tr>
+<tr><td>9</td><td><strong>Sandboxes &amp; threads</strong></td><td>Isolation; best-of-n; stop-hook loops; thread scoreboard</td></tr>
+<tr><td>10</td><td><strong>Experts, layers, trust</strong></td><td>Act/Learn/Reuse; grade layer; trust = unattended chain length</td></tr>
+<tr><td>11</td><td><strong>Harness, factory, ZTE</strong></td><td>Own harness (Pi); ADWs; risk-tiered compute; engineers only at plan+review ends</td></tr>
+</tbody></table></div>
+
+<h2 id="yt-timeline">Evolution of his thinking</h2>
+<div class="tl">
+  <div class="item"><div class="when">Jul–Aug 2025</div><h4>Hooks → observability → sub-agents</h4><p>“See everything”; agent = model+tools+loop; meta-agent</p></div>
+  <div class="item"><div class="when">Sep–Oct 2025</div><h4>Patterns → R&amp;D context → 7 levels → custom SDK</h4><p>Leave chat; prompt as unit; better→more→custom</p></div>
+  <div class="item"><div class="when">Nov–Dec 2025</div><h4>O-Agent → beyond-MCP → skills → experts → singularity</h4><p>Fleet CRUD; Act/Learn/Reuse; class/grade layer</p></div>
+  <div class="item"><div class="when">Jan–Feb 2026</div><h4>Damage control → threads → Pi</h4><p>Trust without trust; own harness</p></div>
+  <div class="item"><div class="when">Mar–May 2026</div><h4>CEO/Lead/UI · verifier · bash lockdown</h4><p>Decisions as agents; un-promptable review</p></div>
+  <div class="item"><div class="when">Jun–Aug 2026</div><h4>Software factory · planf3 · cmux · ADWs</h4><p>Build factories not features; ZTE north star</p></div>
+</div>
+<p><strong>Arc in one line:</strong> control surfaces (hooks) → reusable intelligence (prompts/skills) → specialized memory (experts) → multi-agent hierarchy → owned harness + factory that ships while you sleep.</p>
+
+<h2 id="yt-demos">How he ships demos</h2>
+<div class="grid g2">
+  <div class="card"><h4>One control surface</h4><p>Repo teaches ONE idea (hooks, verifier, beyond-mcp 4-ways…)</p></div>
+  <div class="card"><h4>Sharp demo</h4><p>Working system in first commit; README = video companion + mermaid + just Quick Start</p></div>
+  <div class="card"><h4>Agent OS layout</h4><p>Root = .claude/.pi, specs/, ai_docs/, justfile; runtimes in apps/</p></div>
+  <div class="card"><h4>/prime everywhere</h4><p>Never cold-start agents</p></div>
+  <div class="card"><h4>uv single-file scripts</h4><p>Hooks, validators, tools as portable atoms</p></div>
+  <div class="card"><h4>Delete culture</h4><p>Agents and code as temporary; best code is no code</p></div>
+</div>
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · youtube</div>
+</section>
+<section class="panel" id="panel-patterns" data-panel="patterns">
+
+<span class="kicker">Pattern library</span>
+<h1 class="display">Patterns that<br><em>compose</em></h1>
+<p class="lede">Learn in order. Each stage: introduction → refinement → integration → automation → self-improvement. Do not jump to multi-agent before closed loops on a single specialized unit.</p>
+
+<h2 id="pt-arch">Architectural patterns</h2>
+<div class="grid g2">
+  <div class="card accent-clay"><h4>Agentic Layer Pattern</h4><p>Separate AI-driven development from application code. Evolution: TAC-1 basic .claude → TAC-4 adws → TAC-7 worktrees → Horizon multi-agent.</p></div>
+  <div class="card"><h4>Command as Component</h4><p>Markdown commands: Instructions / Variables / Process / Report. Version controllable, composable.</p></div>
+  <div class="card"><h4>Agent Pipeline</h4><p>classify → plan → implement → test → PR. Tracking ID throughout.</p></div>
+  <div class="card"><h4>Worktree Isolation</h4><p>Parallel agents, clean sandboxes, port ranges.</p></div>
+  <div class="card"><h4>Multi-Architecture</h4><p>TAC-8’s five shapes — pick by problem class.</p></div>
+  <div class="card"><h4>O-Agent / Fleet CRUD</h4><p>create / command / status / delete; produce concrete assets.</p></div>
+</div>
+
+<h2 id="pt-prompt">Prompting patterns</h2>
+<ul>
+  <li><strong>Structured template</strong> — Context / Requirements / Constraints / Output Format</li>
+  <li><strong>Meta-prompt</strong> — prompt that builds a prompt (plan formats)</li>
+  <li><strong>Higher-order prompt</strong> — prompt that takes a plan/prompt path as argument</li>
+  <li><strong>Closed-loop prompt</strong> — Request → Validation → Resolution</li>
+  <li><strong>Self-improving prompt</strong> — Expertise section that agents update</li>
+  <li><strong>Seven levels</strong> — climb; don’t stay at high-level forever</li>
+</ul>
+
+<h2 id="pt-workflow">Workflow patterns</h2>
+<ul>
+  <li><strong>PITER</strong> — Prompt input, Trigger, Environment, Review</li>
+  <li><strong>ADW</strong> — deterministic code wrapping non-deterministic agents</li>
+  <li><strong>Planner/builder split</strong> — separate windows; builder gets only plan path</li>
+  <li><strong>Builder–verifier</strong> — produce vs independently check</li>
+  <li><strong>Act–Learn–Reuse</strong> — agent experts</li>
+  <li><strong>ZTE</strong> — drop Review node when streak proves class</li>
+</ul>
+
+<h2 id="pt-stack">Learn order (dojo 01–12 aligned)</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Stage</th><th>Patterns</th><th>Done-when</th></tr></thead>
+<tbody>
+<tr><td>0 Mindset</td><td>Stop coding · commander</td><td>Redesign work before code</td></tr>
+<tr><td>1 Prompt unit</td><td>Purpose/workflow/report · programmatic</td><td>Lesson 01</td></tr>
+<tr><td>2 Context</td><td>/prime · CLAUDE.md · legibility</td><td>Lessons 02–03</td></tr>
+<tr><td>3 Templates</td><td>BFC · plan-is-prompt · HOP</td><td>Lessons 04–05</td></tr>
+<tr><td>4 Loops</td><td>Hooks · validators</td><td>Lesson 06</td></tr>
+<tr><td>5 AFK/ADW</td><td>PITER · plan→build→test→PR</td><td>Lesson 07</td></tr>
+<tr><td>6 Specialize</td><td>Sub-agents · custom agent</td><td>Lessons 08–09</td></tr>
+<tr><td>7 Scale</td><td>O-Agent · R&amp;D · worktrees</td><td>Lesson 10</td></tr>
+<tr><td>8 Memory</td><td>Experts Act–Learn–Reuse</td><td>Lesson 11</td></tr>
+<tr><td>9 Trust</td><td>Verifier · ZTE · quality gates</td><td>Lesson 12 + TAC-7</td></tr>
+<tr><td>10 Frontier</td><td>CEO/Lead/UI · factory</td><td>MA after 0–9</td></tr>
+</tbody></table></div>
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · patterns</div>
+</section>
+<section class="panel" id="panel-practice" data-panel="practice">
+
+<span class="kicker">Become him · operating system</span>
+<h1 class="display">Practice, don’t<br><em>consume</em></h1>
+<p class="lede">Transfer is proven only when you reproduce, adapt, and create — not when you can quote slogans. Course spine · YT frontier · project outcomes as proof.</p>
+
+<h2 id="pr-loop">Daily / weekly operating loop</h2>
+<h3>Daily (45–90 min + real work)</h3>
+<ol>
+  <li><strong>Problem class</strong> — What class beyond this ticket?</li>
+  <li><strong>Human constraint</strong> — Where am I still the bottleneck?</li>
+  <li><strong>Core Four</strong> — Context, model, prompt, tools for this purpose.</li>
+  <li><strong>Focused unit</strong> — One agent, one prompt, one purpose — or split.</li>
+  <li><strong>Feedback loop</strong> — What evidence self-corrects?</li>
+  <li><strong>Out-loop path</strong> — Trigger + environment + review boundary?</li>
+  <li><strong>Reusable learning</strong> — Promote win to command/skill/expert.</li>
+</ol>
+<p><strong>EOD (10 min):</strong> log AFK minutes, loops closed, agentic-layer files touched, one promotion.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Day</th><th>Focus</th></tr></thead>
+<tbody>
+<tr><td>Mon</td><td>One lesson packet (claims + vocab + golden path)</td></tr>
+<tr><td>Tue</td><td>Reproduce lab / dojo offline checks</td></tr>
+<tr><td>Wed</td><td>Author or extend agentic layer on <em>your</em> repo</td></tr>
+<tr><td>Thu</td><td>AFK attempt: PITER on one problem class</td></tr>
+<tr><td>Fri</td><td>Verify + critique failure modes</td></tr>
+<tr><td>Sat</td><td>Transfer project: one control surface only</td></tr>
+<tr><td>Sun</td><td>Act–Learn–Reuse; retire stale tips</td></tr>
+</tbody></table></div>
+
+<h2 id="pr-study">Study ritual for a Dan codebase (60–90 min)</h2>
+<ol>
+  <li><strong>Map layers (10)</strong> — agentic vs app dirs</li>
+  <li><strong>Find the one control surface (5)</strong> — what is this repo teaching?</li>
+  <li><strong>Read the agentic prompt (10)</strong> — Purpose / Workflow / Report</li>
+  <li><strong>Trace runtime (15)</strong> — script → command → agent → stdout/JSONL</li>
+  <li><strong>Golden path (15)</strong> — safest runnable path</li>
+  <li><strong>Core Four audit (10)</strong></li>
+  <li><strong>Steal one transfer (10)</strong> — 5 lines: class → artifact → loop</li>
+  <li><strong>Critique (5)</strong> — costs, when not to use</li>
+</ol>
+<div class="callout good"><div class="ct">Exit ticket</div>
+<p style="margin:0">“This repo’s control surface is X; I will port Y; the loop is Z.”</p></div>
+
+<h2 id="pr-author">Author ritual for a Dan-style repo</h2>
+<ul class="check">
+  <li>Split layers: agentic vs src/</li>
+  <li>CLAUDE.md + /prime (READ/RUN/REPORT)</li>
+  <li>Commands as components with Variables + Workflow + Report</li>
+  <li>Stdout is a leverage point</li>
+  <li>Closed loop — never “trust the model”</li>
+  <li>uv single-file scripts preferred</li>
+  <li>JSONL or logs for sessions</li>
+  <li>Mock mode for CI</li>
+  <li>README: Idea · What · Golden path · Done-when · Level-up</li>
+  <li>No mega-framework — second surface = second repo</li>
+  <li>Verifier or quality gate before “done”</li>
+</ul>
+
+<h2 id="pr-28">28-day practice plan</h2>
+<div class="grid g2">
+  <div class="card accent-clay"><div class="ct">Week 1</div><h4>Prompt &amp; context unit</h4>
+    <p>D1–2: agentic prompt · D3–4: /prime · D5–6: leverage points · D7: study ritual.</p>
+    <p><strong>Ship:</strong> agentic skeleton on a real project.</p></div>
+  <div class="card accent-amber"><div class="ct">Week 2</div><h4>Templates &amp; loops</h4>
+    <p>D8–9: plan-is-prompt · D10–11: HOP implement · D12–13: close-the-loop · D14: real BFC.</p>
+    <p><strong>Ship:</strong> plan-is-prompt + one validator hook.</p></div>
+  <div class="card accent-olive"><div class="ct">Week 3</div><h4>AFK &amp; specialization</h4>
+    <p>D15–16: ADW · D17–18: subagents · D19–20: custom agent · D21: PITER sketch.</p>
+    <p><strong>Ship:</strong> ADW for one class; semi-AFK once.</p></div>
+  <div class="card accent-plum"><div class="ct">Week 4</div><h4>Orchestrate, learn, trust</h4>
+    <p>D22–23: O-Agent · D24–25: expert · D26–27: verifier · D28: one-control-surface repo.</p>
+    <p><strong>Ship:</strong> sharp repo + metrics log.</p></div>
+</div>
+<p>Dojo path: <code class="inline">IndyDevDan/dojo/lessons/</code>. Named labs when stuck: tac-3, tac-4, tac-5, tac-7, ah-3, ah-4, ah-5, ma-4.</p>
+
+<h2 id="pr-metrics">Metrics of progress</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>KPI</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><strong>AFK hours</strong></td><td>Work without babysitting</td></tr>
+<tr><td><strong>Closed loops / week</strong></td><td>Validated request→resolve cycles</td></tr>
+<tr><td><strong>Agent-operable surfaces</strong></td><td>Hooks, commands, typed stdout, primes</td></tr>
+<tr><td><strong>Problem classes automated</strong></td><td>Distinct BFC/ADW pipelines you own</td></tr>
+<tr><td><strong>Promote rate</strong></td><td>Wins → reusable command/skill/expert</td></tr>
+<tr><td><strong>Context discipline</strong></td><td>R&amp;D applied; overflow ↓</td></tr>
+<tr><td><strong>Verifier coverage</strong></td><td>Claims checked independently</td></tr>
+<tr><td><strong>ZTE readiness</strong></td><td>Stages with gates, not hope</td></tr>
+</tbody></table></div>
+<p><strong>Vanity (ignore):</strong> videos finished, model comparisons, cloning folder names, “sounds like Dan.”</p>
+
+<h2 id="pr-transfer">Transfer checklist (TAC core)</h2>
+<ul class="check">
+  <li>Default verb is <em>orchestrate</em>, not <em>implement</em></li>
+  <li>Daily: % time agentic vs application (target ≥50% agentics)</li>
+  <li>Track Size / Attempts / Streak / Presence every serious run</li>
+  <li>adws/, .claude/commands/, specs/ isolated from app</li>
+  <li>/prime, /start, /chore, /bug, /feature, /implement</li>
+  <li>Gateway adw_prompt → chained adw_chore_implement</li>
+  <li>Validation Commands in every plan + one e2e path</li>
+  <li>Three-times → automate</li>
+  <li>Fresh agent per SDLC step</li>
+  <li>Failures fix templates/ADWs</li>
+  <li>Chores AFK first → bugs → features</li>
+  <li>Presence 2 stable before Presence 1 (ZTE)</li>
+</ul>
+<div class="quote">You become IndyDevDan when your <strong>default move</strong> is system design for agents — not better chat.<cite>Practice OS</cite></div>
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · practice</div>
+</section>
+<section class="panel" id="panel-anti" data-panel="anti">
+
+<span class="kicker">What he rails against</span>
+<h1 class="display">Antipatterns &amp;<br><em>failure modes</em></h1>
+<p class="lede">Cargo cult familiarity is the enemy. Optimize for metabolism: encode → act → learn → verify.</p>
+
+<h2 id="an-mind">Mindset traps</h2>
+<ul>
+  <li>Still typing / clinging to coder identity</li>
+  <li>Vibe coding without tests, plans, templates</li>
+  <li>Babysitting multi-turn in-loop as the end state</li>
+  <li>Limiting belief (“won’t work on <em>my</em> codebase”)</li>
+  <li>Blaming the model first — blame skills and ADWs</li>
+  <li>Premature ZTE without streak/confidence</li>
+</ul>
+
+<h2 id="an-arch">Architecture antipatterns</h2>
+<div class="grid g2">
+  <div class="card accent-amber"><h4>The Monolithic Agent</h4><p>One giant agent does everything → context overload, undebuggable. <strong>Fix:</strong> specialize.</p></div>
+  <div class="card accent-amber"><h4>The Tangled Layer</h4><p>Mixing agentic and application code. <strong>Fix:</strong> strict ring outside src/.</p></div>
+  <div class="card accent-amber"><h4>God-agent / max context</h4><p>Pollution; compact as bandaid. <strong>Fix:</strong> R&amp;D, fresh agents, one purpose.</p></div>
+  <div class="card accent-amber"><h4>Ad-hoc prompt strings in code</h4><p>Unversioned, unimprovable. <strong>Fix:</strong> commands in .claude/commands/.</p></div>
+</div>
+
+<h2 id="an-ops">Operations antipatterns</h2>
+<ul>
+  <li>Outsourcing the agentic layer to generic cloud agents for your domain</li>
+  <li>Fixing symptoms (hand-edit one failure) instead of templates</li>
+  <li>Bad agentic code — swallowed errors, no stdout, hidden failures</li>
+  <li>One-off fixes instead of class solutions</li>
+  <li>Skipping validation / e2e while claiming AFK or ZTE</li>
+  <li>Review without proof (screenshots not read)</li>
+  <li>Infinite agent loops without depth limits / fail-fast</li>
+</ul>
+
+<h2 id="an-cargo">Cargo cult vs real transfer</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Cargo cult</th><th>Real transfer</th></tr></thead>
+<tbody>
+<tr><td>Copy .claude/ tree, never run checks</td><td>Offline checks fail until green</td></tr>
+<tr><td>Name things ADW/ZTE without PITER</td><td>Trigger, env, review actually exist</td></tr>
+<tr><td>Monolithic “do everything” agent</td><td>One purpose; R&amp;D to specialists</td></tr>
+<tr><td>Dump whole repo into context</td><td>Reduce &amp; Delegate; prime essentials</td></tr>
+<tr><td>Watch all videos; ship nothing</td><td>Golden path + novel adapt same week</td></tr>
+<tr><td>Impersonate Dan’s voice</td><td>Indy-inspired systems, original artifacts</td></tr>
+<tr><td>Fake expertise (“I summarized TAC”)</td><td>Six gates on unfamiliar work</td></tr>
+</tbody></table></div>
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · anti</div>
+</section>
+<section class="panel" id="panel-vocab" data-panel="vocab">
+
+<span class="kicker">Shared language</span>
+<h1 class="display">Vocabulary &amp;<br><em>mantras</em></h1>
+<p class="lede">Speak these until they feel native. Shared language is half the transfer.</p>
+
+<h2 id="vb-core">Must-speak glossary (40)</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>Agentic engineering</td><td>Systems where agents develop software, not just assist</td></tr>
+<tr><td>Agentic layer</td><td>.claude/, adws/, hooks, skills — outside src/</td></tr>
+<tr><td>Application layer</td><td>Product code the end user ships</td></tr>
+<tr><td>Core Four</td><td>Context · Model · Prompt · Tools</td></tr>
+<tr><td>One agent, one prompt, one purpose</td><td>Specialization rule</td></tr>
+<tr><td>In-loop vs out-of-loop</td><td>Babysitting vs AFK execution</td></tr>
+<tr><td>AFK agent</td><td>Runs without your presence</td></tr>
+<tr><td>PITER</td><td>Prompt · Trigger · Environment · Review</td></tr>
+<tr><td>ADW</td><td>Agentic Development Workflow</td></tr>
+<tr><td>ZTE</td><td>Zero-Touch Engineering / Execution</td></tr>
+<tr><td>Command as component</td><td>Markdown: Instructions/Variables/Process/Report</td></tr>
+<tr><td>/prime</td><td>RUN · READ · REPORT bootstrap</td></tr>
+<tr><td>Leverage points</td><td>Make code agent-legible (stdout, types…)</td></tr>
+<tr><td>Plan is the prompt</td><td>Plan is the implementable artifact</td></tr>
+<tr><td>HOP</td><td>Higher-order prompt (takes plan path)</td></tr>
+<tr><td>BFC</td><td>Bug / Feature / Chore templates</td></tr>
+<tr><td>Closed loop</td><td>Request → Validate → Resolve</td></tr>
+<tr><td>R&amp;D</td><td>Reduce &amp; Delegate (context)</td></tr>
+<tr><td>IDK</td><td>Information Dense Keyword</td></tr>
+<tr><td>Worktree isolation</td><td>Parallel agent sandboxes</td></tr>
+<tr><td>Seven prompt levels</td><td>Static → … → self-improving</td></tr>
+<tr><td>O-Agent</td><td>Orchestrator: create/command/status/delete</td></tr>
+<tr><td>Agent expert</td><td>Act–Learn–Reuse + expertise.yaml</td></tr>
+<tr><td>Verifier agent</td><td>Atomic claims, independent check</td></tr>
+<tr><td>Builder–verifier</td><td>Produce vs independently check</td></tr>
+<tr><td>MAO</td><td>Multi-agent orchestration</td></tr>
+<tr><td>MCP</td><td>Model Context Protocol</td></tr>
+<tr><td>Observability</td><td>If unmeasured, unimproved</td></tr>
+<tr><td>Problem class</td><td>Repeatable class, not one-off ticket</td></tr>
+<tr><td>KPIs</td><td>Size↑ Attempts↓ Streak↑ Presence↓</td></tr>
+<tr><td>ISO (worktree)</td><td>Isolated parallel workflows</td></tr>
+<tr><td>Gateway script</td><td>adw_prompt — entry to the layer</td></tr>
+<tr><td>Meta-prompt</td><td>Prompt that builds a prompt</td></tr>
+<tr><td>Conditional docs</td><td>Plans pull domain docs automatically</td></tr>
+<tr><td>Context bundle</td><td>Reusable focused context package</td></tr>
+<tr><td>Reset–prime</td><td>Clear polluted context; re-prime</td></tr>
+<tr><td>Software factory</td><td>Prompt in → code+agents → artifact out</td></tr>
+<tr><td>Codebase singularity</td><td>Agents run codebase better than you</td></tr>
+<tr><td>Transfer</td><td>Adapt pattern to your stack</td></tr>
+<tr><td>Irreplaceable engineer</td><td>Replaces self via encoded judgment</td></tr>
+</tbody></table></div>
+
+<h2 id="vb-mantras">Mantras wall</h2>
+<div class="grid g2">
+  <div class="card accent-clay"><h4>Build the system that builds the system</h4></div>
+  <div class="card accent-blue"><h4>One agent. One prompt. One purpose.</h4></div>
+  <div class="card accent-olive"><h4>Prioritize your agentic layer</h4></div>
+  <div class="card accent-plum"><h4>Stay out the loop</h4></div>
+  <div class="card accent-amber"><h4>The plan is the prompt</h4></div>
+  <div class="card"><h4>You don’t fix the issue — you fix the system</h4></div>
+  <div class="card"><h4>A focused agent is a performant agent</h4></div>
+  <div class="card"><h4>Am I on agentic or application layer?</h4></div>
+  <div class="card"><h4>Three times makes a pattern</h4></div>
+  <div class="card"><h4>Principles over tools</h4></div>
+  <div class="card"><h4>To become irreplaceable, replace yourself</h4></div>
+  <div class="card"><h4>Reduce and Delegate</h4></div>
+</div>
+
+<div class="foot">IndyDevDan corpus synthesis · Fleet of 4 research agents · Sources: TAC/AH/MA distillates, tac-8 code, output/ analyses, youtube/_council_brief · vocab</div>
+</section>
+
+  </main>
+</div>
+<script>
+(function(){
+  const tabs = [...document.querySelectorAll('.tab')];
+  const panels = [...document.querySelectorAll('.panel')];
+  const side = document.getElementById('side');
+  const search = document.getElementById('q');
+
+  const sideMaps = {
+    overview: [
+      ['#ov-thesis','Thesis'],
+      ['#ov-map','Corpus Map'],
+      ['#ov-stack','The Stack'],
+      ['#ov-question','Guiding Question'],
+      ['#ov-existing','Related Artifacts'],
+    ],
+    think: [
+      ['#th-identity','Identity Shift'],
+      ['#th-patterns','15 Thinking Patterns'],
+      ['#th-decisions','Decision Framework'],
+      ['#th-session','How He Builds'],
+      ['#th-voice','Voice & Pedagogy'],
+    ],
+    tactics: [
+      ['#tac-ladder','Autonomy Ladder'],
+      ['#tac-1','TAC-1 Stop Coding'],
+      ['#tac-2','TAC-2 Perspective'],
+      ['#tac-3','TAC-3 Templates'],
+      ['#tac-4','TAC-4 AFK'],
+      ['#tac-5','TAC-5 Loops'],
+      ['#tac-6','TAC-6 Focus'],
+      ['#tac-7','TAC-7 ZTE'],
+      ['#tac-8','TAC-8 Prioritize'],
+    ],
+    layer: [
+      ['#ly-def','Definition'],
+      ['#ly-mval','Minimum Viable'],
+      ['#ly-anatomy','Anatomy Table'],
+      ['#ly-gateway','Gateway Scripts'],
+      ['#ly-compose','Composition Rules'],
+      ['#ly-progress','Thickness Timeline'],
+      ['#ly-checklist','Code Like Him'],
+    ],
+    tac8: [
+      ['#a1','App1 Primitives'],
+      ['#a2','App2 Task Board'],
+      ['#a3','App3 Observability'],
+      ['#a4','App4 Prototyping'],
+      ['#a5','App5 Full SDLC'],
+    ],
+    horizon: [
+      ['#ah-1','AH-1 R&D Context'],
+      ['#ah-2','AH-2 Prompt Levels'],
+      ['#ah-3','AH-3 Custom Agents'],
+      ['#ah-4','AH-4 O-Agent'],
+      ['#ah-5','AH-5 Experts'],
+      ['#ah-6','AH-6 Layers / Grades'],
+    ],
+    ma: [
+      ['#ma-arc','The Arc'],
+      ['#ma-ceo','CEO Agents'],
+      ['#ma-lead','Lead Agents'],
+      ['#ma-ui','UI Agents'],
+      ['#ma-ver','Verifier'],
+    ],
+    youtube: [
+      ['#yt-themes','11 Themes'],
+      ['#yt-timeline','Evolution Timeline'],
+      ['#yt-demos','How He Ships Demos'],
+    ],
+    patterns: [
+      ['#pt-arch','Architectural'],
+      ['#pt-prompt','Prompting'],
+      ['#pt-workflow','Workflow'],
+      ['#pt-stack','Learn Order'],
+    ],
+    practice: [
+      ['#pr-loop','Daily/Weekly Loop'],
+      ['#pr-study','Study Ritual'],
+      ['#pr-author','Author Ritual'],
+      ['#pr-28','28-Day Plan'],
+      ['#pr-metrics','Metrics'],
+      ['#pr-transfer','Transfer Checklist'],
+    ],
+    anti: [
+      ['#an-mind','Mindset Traps'],
+      ['#an-arch','Architecture'],
+      ['#an-ops','Operations'],
+      ['#an-cargo','Cargo Cult vs Real'],
+    ],
+    vocab: [
+      ['#vb-core','Core 40'],
+      ['#vb-mantras','Mantras'],
+    ],
+  };
+
+  const sideQuotes = {
+    overview: "Build the system that builds the system.",
+    think: "Am I working on the agentic layer or the application layer?",
+    tactics: "To become an irreplaceable engineer, you will replace yourself.",
+    layer: "The agentic layer is a ring around your codebase — thin at first, then thicker.",
+    tac8: "Focus on the primitives, not the tool.",
+    horizon: "There are only two ways to manage your context window: reduce and delegate.",
+    ma: "Trust and scale. Uncertainty in, decisions out.",
+    youtube: "Principles over tools. Tools will change. Principles never change.",
+    patterns: "Three times makes a pattern — automate immediately.",
+    practice: "Improve the application — and improve the system that improves the application.",
+    anti: "You don't fix the issue — you fix the system that caused the issue.",
+    vocab: "One agent. One prompt. One purpose.",
+  };
+
+  function activate(id, pushHash){
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+    panels.forEach(p => p.classList.toggle('active', p.id === 'panel-'+id));
+    renderSide(id);
+    if(pushHash !== false) {
+      try { history.replaceState(null,'','#'+id); } catch (e) {}
+    }
+    try { window.scrollTo(0, 0); } catch (e) {}
+  }
+
+  function renderSide(id){
+    const items = sideMaps[id] || [];
+    const q = sideQuotes[id] || '';
+    const jump = tabs.map(t => {
+      const label = t.textContent.replace(/^\d+\s*/, '').trim();
+      return '<a href="#'+t.dataset.tab+'" data-tab-jump="'+t.dataset.tab+'">'+label+'</a>';
+    }).join('');
+    const nav = items.map(([h,l]) =>
+      '<a href="'+h+'" data-anchor="'+h.slice(1)+'">'+l+'</a>'
+    ).join('');
+    side.innerHTML =
+      '<div class="side-label">On this tab</div>' +
+      '<nav class="side-nav">'+nav+'</nav>' +
+      '<div class="side-quote"><b>Mantra</b>'+q+'</div>' +
+      '<div class="side-label">Jump</div>' +
+      '<nav class="side-nav">'+jump+'</nav>';
+    side.querySelectorAll('[data-tab-jump]').forEach(a => {
+      a.addEventListener('click', e => { e.preventDefault(); activate(a.dataset.tabJump); });
+    });
+    side.querySelectorAll('[data-anchor]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const el = document.getElementById(a.dataset.anchor);
+        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    });
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.tab)));
+
+  let initial = 'overview';
+  try {
+    const h = (location.hash || '#overview').slice(1).split('/')[0];
+    if (document.getElementById('panel-'+h)) initial = h;
+  } catch (e) {}
+  activate(initial, false);
+
+  window.addEventListener('hashchange', () => {
+    const id = location.hash.slice(1).split('/')[0];
+    if(document.getElementById('panel-'+id)) activate(id, false);
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.target.matches('input,textarea')) return;
+    const ids = tabs.map(t => t.dataset.tab);
+    const cur = tabs.findIndex(t => t.classList.contains('active'));
+    if(e.key === ']' || (e.key === 'ArrowRight' && e.altKey)){
+      e.preventDefault(); activate(ids[(cur+1)%ids.length]);
+    }
+    if(e.key === '[' || (e.key === 'ArrowLeft' && e.altKey)){
+      e.preventDefault(); activate(ids[(cur-1+ids.length)%ids.length]);
+    }
+    if(e.key === '/' && !e.metaKey && !e.ctrlKey){
+      e.preventDefault(); search.focus();
+    }
+  });
+
+  let tmr;
+  search.addEventListener('input', () => {
+    clearTimeout(tmr);
+    tmr = setTimeout(() => {
+      const q = search.value.trim().toLowerCase();
+      document.querySelectorAll('mark.hit').forEach(m => {
+        const p = m.parentNode; p.replaceChild(document.createTextNode(m.textContent), m); p.normalize();
+      });
+      if(q.length < 2) return;
+      for(const panel of panels){
+        if(panel.textContent.toLowerCase().includes(q)){
+          const id = panel.id.replace('panel-','');
+          activate(id);
+          const walker = document.createTreeWalker(panel, NodeFilter.SHOW_TEXT, null);
+          const nodes = [];
+          while(walker.nextNode()){
+            if(walker.currentNode.parentElement && walker.currentNode.parentElement.closest('script,style')) continue;
+            if(walker.currentNode.nodeValue.toLowerCase().includes(q)) nodes.push(walker.currentNode);
+          }
+          let first;
+          nodes.slice(0,40).forEach(n => {
+            const text = n.nodeValue;
+            const idx = text.toLowerCase().indexOf(q);
+            if(idx < 0) return;
+            const frag = document.createDocumentFragment();
+            if(idx > 0) frag.appendChild(document.createTextNode(text.slice(0,idx)));
+            const mark = document.createElement('mark'); mark.className='hit'; mark.textContent=text.slice(idx, idx+q.length);
+            frag.appendChild(mark);
+            if(idx+q.length < text.length) frag.appendChild(document.createTextNode(text.slice(idx+q.length)));
+            n.parentNode.replaceChild(frag, n);
+            if(!first) first = mark;
+          });
+          if(first) first.scrollIntoView({behavior:'smooth', block:'center'});
+          break;
+        }
+      }
+    }, 220);
+  });
+})();
+
+</script>
+</body>
+</html>

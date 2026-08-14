@@ -1,0 +1,104 @@
+# benchmarks/pi-coding-agent-3way.yaml
+# Pi coding agent benchmark (3-way): 6 tasks × 5 models, 4 chart types × M4/M5.
+# Measures wall time, correctness score, token efficiency, and tool calls.
+# Tasks: T1 Hello → T2 Fibonacci → T3 CSV → T4 Stack+Tests → T5 CLI → T6 Package
+# Models: Qwen 3.5 GGUF, Qwen 3.5 MLX, Qwen 3.6 GGUF, Qwen 3.6 MLX, Gemma 4 GGUF
+version: 1
+benchmark:
+  session_id: pi-coding-agent-3way
+  title: "Pi Coding Agent (3-way) — Task Completion"
+  subtitle: "Qwen 3.6 vs Qwen 3.5 vs Gemma 4 · GGUF vs MLX · 6 Coding Tasks · M4 Max vs M5 Max"
+  tags:
+    - { name: "qwen3.5:35b · GGUF", icons: ["/icons/alibaba.svg", "/icons/ollama.svg", "/icons/pi.svg"] }
+    - { name: "qwen3.5:35b-a3b-nvfp4 · MLX", icons: ["/icons/alibaba.svg", "/icons/apple.svg", "/icons/pi.svg"] }
+    - { name: "qwen3.6:35b-a3b · GGUF", icons: ["/icons/alibaba.svg", "/icons/ollama.svg", "/icons/pi.svg"] }
+    - { name: "qwen3.6:35b-a3b-nvfp4 · MLX", icons: ["/icons/alibaba.svg", "/icons/apple.svg", "/icons/pi.svg"] }
+    - { name: "gemma4:26b · GGUF", icons: ["/icons/google.svg", "/icons/ollama.svg", "/icons/pi.svg"] }
+  charts:
+    # ── Wall Time ──
+    - chart_id: wall_m4
+      title: "Wall-Clock Time (M4 Max)"
+      subtitle: "end-to-end agent execution · seconds · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Task" }
+      y: { label: "Time", unit: "s", min: 0 }
+      groups: &task_groups
+        - { key: t1, label: "T1 Hello" }
+        - { key: t2, label: "T2 Fibonacci" }
+        - { key: t3, label: "T3 CSV" }
+        - { key: t4, label: "T4 Stack+Tests" }
+        - { key: t5, label: "T5 CLI Tool" }
+        - { key: t6, label: "T6 Package" }
+      metrics: &model_metrics
+        - { key: qwen35_gguf, label: "Qwen 3.5 GGUF", color: "#f59e0b", icon: "/icons/alibaba.svg" }
+        - { key: qwen35_mlx,  label: "Qwen 3.5 MLX",  color: "#fbbf24", icon: "/icons/alibaba.svg" }
+        - { key: qwen36_gguf, label: "Qwen 3.6 GGUF", color: "#ef4444", icon: "/icons/alibaba.svg" }
+        - { key: qwen36_mlx,  label: "Qwen 3.6 MLX",  color: "#f87171", icon: "/icons/alibaba.svg" }
+        - { key: gemma4_gguf, label: "Gemma 4 GGUF",  color: "#3b82f6", icon: "/icons/google.svg" }
+    - chart_id: wall_m5
+      title: "Wall-Clock Time (M5 Max)"
+      subtitle: "end-to-end agent execution · seconds · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Task" }
+      y: { label: "Time", unit: "s", min: 0 }
+      groups: *task_groups
+      metrics: *model_metrics
+    # ── Correctness ──
+    - chart_id: score_m4
+      title: "Correctness (M4 Max)"
+      subtitle: "verification checks passed / total · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Task" }
+      y: { label: "Pass Rate", unit: "", min: 0, max: 1 }
+      groups: *task_groups
+      metrics: *model_metrics
+    - chart_id: score_m5
+      title: "Correctness (M5 Max)"
+      subtitle: "verification checks passed / total · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Task" }
+      y: { label: "Pass Rate", unit: "", min: 0, max: 1 }
+      groups: *task_groups
+      metrics: *model_metrics
+    # ── Total Tokens ──
+    - chart_id: tokens_m4
+      title: "Total Tokens (M4 Max)"
+      subtitle: "input + output tokens across all turns · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Task" }
+      y: { label: "Tokens", unit: "", min: 0 }
+      groups: *task_groups
+      metrics: *model_metrics
+    - chart_id: tokens_m5
+      title: "Total Tokens (M5 Max)"
+      subtitle: "input + output tokens across all turns · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Task" }
+      y: { label: "Tokens", unit: "", min: 0 }
+      groups: *task_groups
+      metrics: *model_metrics
+    # ── Tool Calls ──
+    - chart_id: tools_m4
+      title: "Tool Calls (M4 Max)"
+      subtitle: "number of tool invocations · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Task" }
+      y: { label: "Calls", unit: "", min: 0 }
+      groups: *task_groups
+      metrics: *model_metrics
+    - chart_id: tools_m5
+      title: "Tool Calls (M5 Max)"
+      subtitle: "number of tool invocations · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Task" }
+      y: { label: "Calls", unit: "", min: 0 }
+      groups: *task_groups
+      metrics: *model_metrics

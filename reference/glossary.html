@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>visual-plan — Glossary</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+  :root{
+    --paper:#FAF8F4; --ink:#2A2520; --muted:#6E655A; --line:#E4DCD0;
+    --clay:#9A5B3F; --clay-soft:#F0E3D8; --accent:#3C6E63;
+    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;
+    -webkit-font-smoothing:antialiased;padding:3rem 1.25rem 5rem}
+  .wrap{max-width:780px;margin:0 auto}
+  .kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--clay);margin-bottom:.6rem}
+  h1{font-family:var(--serif);font-weight:600;font-size:2.1rem;line-height:1.1;margin-bottom:.4rem;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:.95rem;margin-bottom:2.2rem;max-width:60ch}
+  dl{border-top:1px solid var(--line)}
+  .row{display:grid;grid-template-columns:200px 1fr;gap:1.2rem;padding:1.05rem 0;border-bottom:1px solid var(--line)}
+  dt{font-family:var(--mono);font-size:.82rem;font-weight:500;color:var(--clay);padding-top:.1rem;word-break:break-word}
+  dd{font-size:.92rem;color:var(--ink)}
+  dd .layer{display:inline-block;font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;
+    padding:.12rem .45rem;border-radius:3px;margin-left:0;vertical-align:middle}
+  .local{background:var(--clay-soft);color:var(--clay)}
+  .remote{background:#E2ECE9;color:var(--accent)}
+  dd b{color:var(--ink);font-weight:600}
+  code{font-family:var(--mono);font-size:.85em;background:#F2EBE1;padding:.08em .35em;border-radius:3px}
+  .legend{display:flex;gap:1.2rem;margin:1.4rem 0 0;font-size:.78rem;color:var(--muted);flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:.4rem}
+  .dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+  footer{margin-top:2.5rem;font-size:.8rem;color:var(--muted);font-family:var(--mono)}
+  a{color:var(--clay)}
+  @media (max-width:560px){.row{grid-template-columns:1fr;gap:.3rem}dt{padding-top:0}}
+  @media print{body{background:#fff;padding:0}.row{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Reference · visual-plan nomenclature</div>
+  <h1>Glossary</h1>
+  <p class="sub">The vocabulary of the <code>/visual-plan</code> skill. Each term tagged by which layer
+  owns it — the editable local prompt, or the remote MCP engine you don't control.</p>
+
+  <div class="legend">
+    <span><i class="dot local"></i> LOCAL — editable files on your disk</span>
+    <span><i class="dot remote"></i> REMOTE — owned by plan.agent-native.com</span>
+  </div>
+
+  <dl style="margin-top:1.6rem">
+    <div class="row"><dt>SKILL.md</dt><dd><span class="layer local">local</span> &nbsp;The 460-line policy document. Pure instructions to the agent: when to gate, which mode, which remote tool to call, the quality bars. The skill's <b>brain</b>, not its hands.</dd></div>
+    <div class="row"><dt>reference core</dt><dd><span class="layer local">local</span> &nbsp;On-demand quality bars (<code>wireframe.md</code>, <code>canvas.md</code>, <code>document-quality.md</code>, <code>exemplar.md</code>). Loaded only when the agent is about to author that thing — progressive disclosure.</dd></div>
+    <div class="row"><dt>SHARED-CORE</dt><dd><span class="layer local">local</span> &nbsp;HTML-comment markers (<code>&lt;!-- SHARED-CORE:... START --&gt;</code>) marking blocks synced word-for-word with <code>/visual-recap</code>. Edit inside them and <code>skills update</code> may clobber it.</dd></div>
+    <div class="row"><dt>agent-native-skill.json</dt><dd><span class="layer local">local</span> &nbsp;Manifest. Binds skill → remote <code>mcpUrl</code>, stores a <code>contentHash</code>, and the <code>updateCommand</code>. The tether to upstream.</dd></div>
+    <div class="row"><dt>Plan MCP connector</dt><dd><span class="layer remote">remote</span> &nbsp;The hosted server (<code>plan</code> / legacy <code>agent-native-plans</code>) that registers every real tool. If it loads zero tools, it didn't finish connecting — reconnect, don't fall back to inline.</dd></div>
+    <div class="row"><dt>block / block catalog</dt><dd><span class="layer remote">remote</span> &nbsp;The typed content units (diagram, data-model, api-endpoint, diff, file-tree, code, annotated-code, callout, columns, question-form…). Authoritative list comes from <code>get-plan-blocks</code> — never memorized.</dd></div>
+    <div class="row"><dt>canvas</dt><dd><span class="layer remote">remote</span> &nbsp;The top visual surface holding static UI mockups. Source of truth for screens under discussion. Lives in <code>content.canvas</code>.</dd></div>
+    <div class="row"><dt>artboard</dt><dd><span class="layer remote">remote</span> &nbsp;One frame on the canvas. Its <code>surface</code> preset (browser / desktop / mobile / popover / panel) locks footprint & aspect — you never set width/height.</dd></div>
+    <div class="row"><dt>wireframe</dt><dd><span class="layer remote">remote</span> &nbsp;The HTML mockup inside an artboard. You write plain semantic HTML + <code>--wf-*</code> tokens; the renderer owns theme, font, and the rough.js sketch overlay.</dd></div>
+    <div class="row"><dt>prototype</dt><dd><span class="layer remote">remote</span> &nbsp;The functional, clickable version of the same flow (<code>content.prototype</code>). Canvas = inspectable static; prototype = operable.</dd></div>
+    <div class="row"><dt>annotation</dt><dd><span class="layer remote">remote</span> &nbsp;Plain-text designer note anchored to a frame by <code>targetId</code> + <code>placement</code>. Never a bordered card; never a box around a frame.</dd></div>
+    <div class="row"><dt>mode</dt><dd><span class="layer remote">remote</span> &nbsp;Which create-tool runs: <code>create-visual-plan</code> (doc-first), <code>create-ui-plan</code>, <code>create-prototype-plan</code>, <code>create-plan-design</code>, <code>create-visual-questions</code>.</dd></div>
+    <div class="row"><dt>anchor</dt><dd><span class="layer remote">remote</span> &nbsp;Where a comment points. Frames: document %, element %, board pixels, or wireframe <code>targetNodeId</code>/<code>targetNodePath</code>. Read before acting on feedback.</dd></div>
+    <div class="row"><dt>resolutionTarget</dt><dd><span class="layer remote">remote</span> &nbsp;The ONLY routing signal on a comment: act on <code>agent</code>, treat <code>human</code> as context. <code>@mentions</code> never route.</dd></div>
+    <div class="row"><dt>local-files mode</dt><dd><span class="layer local">local</span> &nbsp;Privacy path. <code>AGENT_NATIVE_PLANS_MODE=local-files</code> → write <code>plans/&lt;slug&gt;/*.mdx</code>, preview locally, zero DB writes. Keeps the engine, drops the hosting.</dd></div>
+    <div class="row"><dt>MDX folder</dt><dd><span class="layer local">local</span> &nbsp;The portable source form of a plan: <code>plan.mdx</code> + optional <code>canvas.mdx</code> / <code>prototype.mdx</code> + <code>.plan-state.json</code>. Git-friendly.</dd></div>
+  </dl>
+
+  <footer>
+    visual-plan glossary · verified from source 2026-06-16 ·
+    back to <a href="../lessons/0001-visual-plan-architecture-and-customization.html">Lesson 01</a>
+  </footer>
+</div>
+</body>
+</html>

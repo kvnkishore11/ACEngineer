@@ -1,0 +1,631 @@
+<section class="chapter" id="ch23">
+<div class="wrap wide">
+<span class="chapnum reveal">23 — The Vault · Videos 28–36</span>
+<div class="kicker reveal">the vault · indydevdan · jan–mar 2026 · the specialization era</div>
+<h2 class="title reveal d1" style="max-width:26ch">Specialize everything — then make your agents <em>prove their work</em>.</h2>
+<p class="lede reveal d2">Nine videos where the 2026 thesis hardens: validation buys trust, task systems organize teams, the stack goes four layers deep, CLIs beat MCP — and the harness itself becomes yours to own.</p>
+<div class="pillrow reveal d2"><span class="pill clay">videos 28–36</span><span class="pill blue">self-validation</span><span class="pill olive">task system</span><span class="pill plum">4-layer stack</span><span class="pill amber">CLIs over MCP</span></div>
+
+<div class="chapnav reveal"><span class="cnl">In this chapter</span>
+<a href="#ch23-s1"><b>1</b>Hooks in Prompts</a>
+<a href="#ch23-s2"><b>2</b>The /install Prompt</a>
+<a href="#ch23-s3"><b>3</b>Task System Teams</a>
+<a href="#ch23-s4"><b>4</b>Teams in tmux</a>
+<a href="#ch23-s5"><b>5</b>The 4-Layer Stack</a>
+<a href="#ch23-s6"><b>6</b>Pi</a>
+<a href="#ch23-s7"><b>7</b>Stripe's Minions</a>
+<a href="#ch23-s8"><b>8</b>Mac Mini Agents</a>
+<a href="#ch23-s9"><b>9</b>The Library</a>
+<a href="#ch23-s10"><b>10</b>Throughlines</a>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal" id="ch23-s1"><span class="sn">1</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Hooks Inside Prompts: The Self-Validating Agent</h2></div>
+<div class="kicker reveal">yt-28 · "The Claude Code Feature Senior Engineers KEEP MISSING" · 27:29 · jan 19, 2026</div>
+
+<div class="spread reveal d1" style="align-items:start">
+<div class="prose">
+<p class="lead-in">Claude Code now runs hooks <em>inside</em> skills, subagents, and slash commands — specialized agents whose validation is deterministic and guaranteed to run. Validation buys trust; trust buys back your time.</p>
+<ul>
+<li>"If you want your agents to accomplish loads of valuable work on your behalf, they must be able to validate their work."</li>
+<li>The release everyone missed: hooks in the <strong>front matter</strong> of prompts, subagents, and skills — PreToolUse, PostToolUse, Stop.</li>
+<li>The pattern: a PostToolUse hook on Read/Edit/Write runs a validator (a pandas CSV check); on failure it returns "Resolve this CSV error in &lt;path&gt;" plus the errors — the agent self-heals immediately.</li>
+<li>"A focused agent with one purpose outperforms an unfocused agent with many purposes." A 20-line CSV-edit prompt isn't overkill — it's the point, over tens to millions of runs.</li>
+<li>Validation must be <em>hyper-focused on the purpose of that prompt</em> — specialized checks, not generic linting.</li>
+<li>You can prompt "validate your work with X" — but a hook is a <strong>guarantee</strong>. It always runs: the closed-loop prompt without prompt engineering.</li>
+<li>Rule of thumb: PostToolUse validates the one file just touched (you get the path); Stop runs global validators over everything at the end.</li>
+</ul>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 460 300" role="img" aria-label="Self-validating agent loop: an edit fires a PostToolUse hook, a validator passes or feeds the error straight back to the agent">
+<rect x="24" y="36" width="168" height="58" rx="10" class="s-clay-f"/>
+<text x="108" y="60" text-anchor="middle" class="s-title" font-size="13">agent</text>
+<text x="108" y="78" text-anchor="middle" class="s-label-sm">edits the CSV</text>
+<path d="M192 65 H 254" class="s-flow"/>
+<path d="M254 65 l-9 -6 0 12 z" class="s-clay"/>
+<rect x="256" y="36" width="180" height="58" rx="10" class="s-blue-f"/>
+<text x="346" y="60" text-anchor="middle" class="s-title" font-size="13">PostToolUse hook</text>
+<text x="346" y="78" text-anchor="middle" class="s-label-sm">fires on Edit · Write · Read</text>
+<path d="M346 94 V 146" class="s-flow"/>
+<path d="M346 148 l-6 -9 12 0 z" class="s-clay"/>
+<rect x="256" y="150" width="180" height="58" rx="10" class="s-plum-f"/>
+<text x="346" y="174" text-anchor="middle" class="s-title" font-size="13">validator script</text>
+<text x="346" y="192" text-anchor="middle" class="s-label-sm">uv run · pandas · own log file</text>
+<path d="M346 208 V 248" class="s-flow"/>
+<path d="M346 250 l-6 -9 12 0 z" class="s-clay"/>
+<rect x="262" y="252" width="168" height="40" rx="10" class="s-olive-f"/>
+<text x="346" y="277" text-anchor="middle" class="s-label">pass → log ✓ → trust</text>
+<path d="M256 179 H 108 V 102" class="s-line" style="stroke-dasharray:5 5"/>
+<path d="M108 100 l-6 9 12 0 z" class="s-clay"/>
+<text x="118" y="132" class="s-label-sm">fail: "Resolve this CSV</text>
+<text x="118" y="146" class="s-label-sm">error in &lt;path&gt;" + errors</text>
+</svg>
+<div class="fcap"><b>The closed loop.</b> The failure message re-enters the agent's context automatically — no human, no re-prompt.</div>
+</div>
+</div>
+
+<div class="spread rev reveal d2" style="align-items:start">
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>disler/agentic-finance-review</strong> — a multi-agent monthly-finance pipeline (/review_finances) where every step — CSV categorize, merge accounts, normalize, generative-UI HTML — carries its own embedded validator hook; plus a parallel one-agent-per-CSV subagent demo.</span></div>
+<div class="tag-list" style="margin-top:14px"><span class="t">hooks in front matter</span><span class="t">PostToolUse / Stop</span><span class="t">uv + pandas validators</span><span class="t">Opus 4.5</span><span class="t">AGP prompt template</span><span class="t">generative-UI report</span><span class="t">claude -p --settings</span></div>
+</div>
+<div class="prose">
+<ul>
+<li>Keep validators in <span class="mono">.claude/hooks/validators/</span>; each writes its own log file. "You want proof that these things ran."</li>
+<li>"Merge slash commands and skills — they're the same thing. It's a prompt." Every abstraction boils down to the Core Four: context, model, prompt, tools.</li>
+<li>Prompts give the base; subagents add parallelization + context isolation; skills, same idea — the hook pattern extends to all three.</li>
+<li>Do the agentic layer by hand: "slow down and do it by hand." Reusable prompt formats mean you and your agents never think about structure again.</li>
+<li>Read the docs yourself: "Don't delegate learning to your agents… that is how you begin the self-deprecation process."</li>
+<li>Bonus: <span class="mono">claude -p --settings &lt;json&gt;</span> passes an entire settings file — hooks included — into a headless primary agent.</li>
+</ul>
+</div>
+</div>
+
+<div class="spread reveal d3" style="align-items:start">
+<div>
+<h4>Run the drill</h4>
+<ol class="steps">
+<li><h4>Validator first</h4><p>Write .claude/hooks/validators/csv_single_validator.py — print "Resolve this CSV error in &lt;path&gt;: &lt;issues&gt;" on failure.</p></li>
+<li><h4>Wire the command</h4><p>Create /csv-edit with front-matter tools (Read/Write/Edit/Search) and a PostToolUse hook on Edit|Write|Read calling the validator via uv run.</p></li>
+<li><h4>Prove the pass</h4><p>Run on a valid CSV; confirm the log shows a pass.</p></li>
+<li><h4>Break it</h4><p>Delete a closing quote, rerun — watch the agent detect and fix it before reporting.</p></li>
+<li><h4>Fan out</h4><p>Clone the front matter into a subagent; one agent per CSV file, in parallel.</p></li>
+</ol>
+</div>
+<div>
+<div class="callout ok"><span class="ci">DONE WHEN</span><span class="cc">The agent autonomously repairs a corrupted CSV with <strong>zero extra prompting</strong>, and validator logs prove every parallel edit was checked.</span></div>
+<div class="quote" style="margin-top:16px"><p>"Agents plus code beats agents. That's what self-validation is. That's the closed-loop prompt."</p><span class="cite">— why Ralph-Wiggum-style techniques work</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal blue" id="ch23-s2"><span class="sn">2</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The /install Prompt Every Codebase Deserves</h2></div>
+<div class="kicker reveal">yt-29 · "One Prompt Every AGENTIC Codebase Should Have (For Engineering Teams)" · 22:36 · jan 26, 2026</div>
+
+<div class="spread reveal d1" style="align-items:start">
+<div class="prose">
+<p class="lead-in">Every codebase should ship a standardized <strong>/install</strong> (and maintenance) prompt: the new setup hook for deterministic scripts, an agentic prompt for intelligence and interactivity. Because "you can tell how great an engineering team is by the time it takes for a new engineer to run the project locally."</p>
+<ul>
+<li>The 15-years, 50+ codebases heuristic: great teams onboard with "one link to one doc… and a few commands"; most burn 1–2 days of pair programming and Slack archaeology.</li>
+<li>"Agents when combined with code beats either alone" — the whole video is one instantiation of this.</li>
+<li>The new <strong>setup hook</strong> (<span class="mono">claude --init</span>, plus a maintenance matcher) runs <em>before</em> session start — installs, migrations, periodic upkeep you don't want every session. It doesn't appear in the hooks lifecycle diagram.</li>
+<li>The script alone "is not that novel… raw deterministic code, it's not that valuable." Value appears when a prompt wraps it: run /prime, run the init hook, read its log, write an install-results doc, report — and resolve second- and third-order failures.</li>
+<li><strong>/install --hil</strong> branches into interactive Q&amp;A — database fresh or keep? full or minimal? env-var guided setup? — pair-programming onboarding replaced by an agent, ~4 questions at a time.</li>
+<li>The justfile as launchpad: "you, your team, and your agents don't need to remember or look up flags more than once." Recipes like <span class="mono">just cli</span> and <span class="mono">just clmm</span> encode every Claude CLI flag permutation.</li>
+</ul>
+</div>
+<div>
+<div class="compare">
+<div class="col bad"><span class="clabel">◴ onboarding, most teams</span>
+<ul><li>1–2 days of pair programming</li><li>Slack archaeology + stale READMEs</li><li>every engineer relearns the flags</li><li>failures fixed by whoever is around</li></ul></div>
+<div class="col good"><span class="clabel">◵ onboarding, agentic</span>
+<ul><li>"one link to one doc… a few commands"</li><li>setup hook installs, prompt verifies</li><li>justfile remembers every flag once</li><li>failures matched to a problem:/solution: runbook</li></ul></div>
+</div>
+<div class="callout idea" style="margin-top:16px"><span class="ci">2026 THEME</span><span class="cc">Declared this episode: <strong>increase the trust we have in our agents.</strong></span></div>
+</div>
+</div>
+
+<div class="spread rev reveal d2" style="align-items:start">
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>disler/install-and-maintain</strong> — a mock full-stack app demonstrating the setup/maintenance hooks, the justfile launchpad, and the one-shot plus interactive install prompts.</span></div>
+<div class="tag-list" style="margin-top:14px"><span class="t">setup hook (--init / maintenance)</span><span class="t">just</span><span class="t">/prime</span><span class="t">/install + /install-hil</span><span class="t">uv / npm / SQLite mock stack</span><span class="t">install-results logs</span></div>
+</div>
+<div class="prose">
+<ul>
+<li>Encode recurring failures back into the prompt: a "Common issues" section of <strong>problem: / solution:</strong> pairs — "If you encounter exactly any of the following issues, follow the steps to resolve them." The prompt becomes a living runbook.</li>
+<li>"When you have to update something, you don't look at the docs. You look at the script and this prompt." It's "a living document that executes."</li>
+<li>Maintenance, same pattern: dependency updates, migrations, artifact cleanup, security and dead-code checks — deterministic hook first, agent validation on top.</li>
+<li>This is where agent sandboxes tie in: a standardized install spins the codebase up on any new machine or sandbox with one command.</li>
+<li>Mintlify independently pitched "a standard for LLM executables" — "I don't think we need a standard. It's just the idea that matters."</li>
+</ul>
+</div>
+</div>
+
+<div class="spread reveal d3" style="align-items:start">
+<div>
+<h4>Run the drill</h4>
+<ol class="steps">
+<li><h4>Hook it</h4><p>Add a setup hook to .claude/settings.json with init and maintenance matchers pointing at scripts that install deps and log to a file.</p></li>
+<li><h4>Wrap it</h4><p>Write /install: run /prime, read the setup log, resolve failures, write install_results.md, report.</p></li>
+<li><h4>Make it interactive</h4><p>Add a --hil branch asking 3–4 setup questions (db mode, install depth, env vars).</p></li>
+<li><h4>Launchpad</h4><p>Put just cli / just install / just maintain recipes in a justfile.</p></li>
+<li><h4>Re-onboard yourself</h4><p>Delete your env and deps, then rebuild with one command.</p></li>
+</ol>
+</div>
+<div>
+<div class="callout ok"><span class="ci">DONE WHEN</span><span class="cc">A fresh clone reaches a running app via a single <strong>just</strong> command with the agent reporting success or failure — and one deliberately broken step is auto-resolved via the "Common issues" section.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal olive" id="ch23-s3"><span class="sn">3</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Task System: Teams, Not Todos</h2></div>
+<div class="kicker reveal">yt-30 · "Claude Code Task System: ANTI-HYPE Agentic Coding (Advanced)" · 28:26 · feb 2, 2026</div>
+
+<div class="spread reveal d1" style="align-items:start">
+<div class="prose">
+<p class="lead-in">The under-the-radar task system — task_create, task_update, task_list, task_get — lets you reliably build <em>teams</em> of agents. Its real power unlocks inside a template metaprompt, <strong>/plan_w_team</strong>: self-validation, team orchestration, and templating in one.</p>
+<ul>
+<li>"More agents, more autonomy, and more compute doesn't always mean better outcomes. What we want is more organized agents that communicate toward a common goal."</li>
+<li>Three components: <strong>self-validation</strong> (Stop hooks: validate_new_file — right type, right dir — and validate_file_contains — required sections), <strong>orchestration</strong>, <strong>templating</strong>.</li>
+<li>Template metaprompt = "a prompt that generates another prompt in a very specific, highly vetted, consistent format." Sounds fancy; isn't. It teaches agents to build like you would.</li>
+<li>Every generated task gets an <em>owner</em> — a named team member — plus dependency blockers, so tasks run in order and parallelize where possible.</li>
+<li>"Task update is the big one" — how subagents and the primary communicate. Superior to the old to-do list + ad hoc Task calls: tasks block and depend, events ping back, no bash sleep loops.</li>
+<li>Minimal viable team: <strong>builder + validator</strong>. "Have an agent build the thing and then have another agent validate the thing." 2× compute per task to buy trust.</li>
+<li>Layered validation: the builder carries micro-validation (PostToolUse on Write/Edit → ruff + ty on Python); the validator is the macro check.</li>
+</ul>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 460 280" role="img" aria-label="Plan-with-team: a template metaprompt feeds the task system, which dispatches an owned builder task gated by a validator task">
+<rect x="24" y="30" width="172" height="58" rx="10" class="s-clay-f"/>
+<text x="110" y="54" text-anchor="middle" class="s-title" font-size="13">/plan_w_team</text>
+<text x="110" y="72" text-anchor="middle" class="s-label-sm">template metaprompt</text>
+<path d="M196 59 H 254" class="s-flow"/>
+<path d="M254 59 l-9 -6 0 12 z" class="s-clay"/>
+<rect x="258" y="30" width="178" height="58" rx="10" class="s-amber-f"/>
+<text x="347" y="54" text-anchor="middle" class="s-title" font-size="13">task system</text>
+<text x="347" y="72" text-anchor="middle" class="s-label-sm">owners · blockers · task_update</text>
+<path d="M300 88 L 134 140" class="s-flow"/>
+<path d="M132 142 l4 -11 7 9 z" class="s-clay"/>
+<path d="M380 88 V 140" class="s-flow"/>
+<path d="M380 142 l-6 -9 12 0 z" class="s-clay"/>
+<rect x="36" y="146" width="180" height="64" rx="10" class="s-blue-f"/>
+<text x="126" y="170" text-anchor="middle" class="s-title" font-size="13">builder</text>
+<text x="126" y="187" text-anchor="middle" class="s-label-sm">micro: PostToolUse →</text>
+<text x="126" y="200" text-anchor="middle" class="s-label-sm">ruff + ty on every write</text>
+<rect x="288" y="146" width="148" height="64" rx="10" class="s-olive-f"/>
+<text x="362" y="172" text-anchor="middle" class="s-title" font-size="13">validator</text>
+<text x="362" y="192" text-anchor="middle" class="s-label-sm">macro: pass / fail only</text>
+<path d="M216 178 H 282" class="s-flow"/>
+<path d="M282 178 l-9 -6 0 12 z" class="s-clay"/>
+<text x="230" y="248" text-anchor="middle" class="s-label">2× compute per task — the price of trust</text>
+</svg>
+<div class="fcap"><b>The minimal viable team.</b> One agent builds, another validates; the task system carries owners, blockers, and status between them.</div>
+</div>
+</div>
+
+<div class="spread rev reveal d2" style="align-items:start">
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>disler/claude-code-hooks-mastery</strong> — the hooks-education repo, updated live by an agent team (new hooks: session_end, permission_request, setup, post_tool_use_failure + README updates); contains /plan_w_team and the team agents.</span></div>
+<div class="tag-list" style="margin-top:14px"><span class="t">task_create / update / list / get</span><span class="t">Stop-hook validators</span><span class="t">template metaprompts</span><span class="t">builder / validator agents</span><span class="t">sub-agent TTS stop hooks</span><span class="t">Opus</span><span class="t">ruff + ty (Astral)</span></div>
+</div>
+<div class="prose">
+<ul>
+<li>Teams live in <span class="mono">.claude/agents/team/</span>; the plan step says "identify team members from .claude/agents/team or use general-purpose."</li>
+<li>The orchestration prompt is a second input — a high-level prompt ("one builder and one validator per hook") guiding how the planner composes the team. A HOP-like pattern.</li>
+<li>Self-critique: "I missed an opportunity — every validator agent could have fired claude -p to validate the log file." Tighter loops are always available.</li>
+<li>The two constraints of agentic coding are <strong>planning and reviewing</strong> — this system attacks planning.</li>
+<li>Anti-hype vs Moltbot/Clawbot/OpenClaw: fine if you know what's underneath; dangerous otherwise. "This entire feature set is just tools and prompts" — portable to any harness.</li>
+<li>The path, recapped: base agent → better agent → more agents → custom agents → orchestrator agent.</li>
+</ul>
+</div>
+</div>
+
+<div class="spread reveal d3" style="align-items:start">
+<div>
+<h4>Run the drill</h4>
+<ol class="steps">
+<li><h4>Team dir</h4><p>Create .claude/agents/team/builder.md (PostToolUse lint hooks) and validator.md (reports pass/fail only).</p></li>
+<li><h4>Metaprompt</h4><p>Write /plan_w_team: inputs = user prompt + orchestration prompt; owned step-by-step tasks; a plan template with embedded per-task prompts.</p></li>
+<li><h4>Gate the plan</h4><p>Add Stop hooks validate_new_file (spec .md in specs/) and validate_file_contains (required sections like "Team Orchestration").</p></li>
+<li><h4>Real chore</h4><p>Run it on something real ("document + implement missing X"); execute the plan in a fresh agent.</p></li>
+<li><h4>Watch the flow</h4><p>Builders parallelize, validators gate, blocked tasks unblock.</p></li>
+</ol>
+</div>
+<div>
+<div class="callout ok"><span class="ci">DONE WHEN</span><span class="cc">The plan file passes both validators automatically, and the executed plan lands verifiable diffs — each build task followed by a validation task that <strong>actually checked it</strong>.</span></div>
+<div class="quote" style="margin-top:16px"><p>"Don't work on the application anymore. Work on the agents that build the application for you."</p><span class="cite">— yt-30</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal plum" id="ch23-s4"><span class="sn">4</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Agent Teams in tmux: You Are the Bottleneck</h2></div>
+<div class="kicker reveal">yt-31 · "Claude Code Multi-Agent Orchestration with Opus 4.6, Tmux and Agent Sandboxes" · 24:02 · feb 9, 2026</div>
+
+<div class="spread reveal d1" style="align-items:start">
+<div class="prose">
+<p class="lead-in">With Opus 4.6, the experimental agent-teams feature, tmux panes, and agent sandboxes, the model is no longer the constraint — "the true limitation is you and I." Learn orchestration and observability to scale compute into impact.</p>
+<ul>
+<li>"It's no longer about what the models allow us to do. As of Sonnet 4.5, these models can do much more than you and I give them credit for." The constraint: tools, plus our prompt and context engineering.</li>
+<li>Enable with <span class="mono">export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</span> and run Claude <em>inside tmux</em> — the orchestrator opens a pane per teammate, each with its own context window, model, session ID, and name.</li>
+<li>The magic trigger phrase: "build a new agent team…" — information-dense keywords that tell the agent which toolset to reach for.</li>
+<li>The task list is "the centralized hub — this is where everything gets kicked off from."</li>
+<li>Three tool categories: <strong>team management</strong> (team_create, team_delete), <strong>task management</strong> (task_create, task_list, task_get, task_update), <strong>communications</strong> (send_message — "the most important one of all").</li>
+<li>The primary sits idle waiting for events; keep prompting it mid-run ("list sandbox directories we didn't kick off").</li>
+<li>Iterative ad hoc teams: when 2 of 8 rebooted apps lost data, Dan stopped the primary from doing the work itself — "spin up a new agent team to do this work for you. Give them all the context they need."</li>
+</ul>
+</div>
+<div>
+<div class="quote big"><p>The model is no longer the constraint. The true limitation is you and I.</p><span class="cite" style="display:block;margin-top:10px">— the thesis of the Opus 4.6 era</span></div>
+<div class="callout" style="margin-top:16px"><span class="ci">REPO</span><span class="cc"><strong>disler/agent-sandbox-skill</strong> — lets an agent create, reboot, and list E2B sandboxes and mount app codebases into them; demonstrates teams-of-teams rehosting eight one-shotted full-stack apps.</span></div>
+<div class="callout idea" style="margin-top:16px"><span class="ci">LIFECYCLE</span><span class="cc">create team → create tasks (spawn agents) → work in parallel → shut down agents → delete team. "Delete the agents — reset the context and start over."</span></div>
+</div>
+</div>
+
+<div class="stats reveal d2">
+<div class="stat"><div class="sv">31%</div><div class="sl">orchestrator context used while 8 teammates worked</div></div>
+<div class="stat blue"><div class="sv">8</div><div class="sl">Haiku teammates, one per full-stack codebase</div></div>
+<div class="stat plum"><div class="sv">24</div><div class="sl">concurrent E2B sandboxes, 12-hour lifetimes</div></div>
+<div class="stat amber"><div class="sv">160</div><div class="sl">tool calls per minute on the dashboard</div></div>
+<div class="stat olive"><div class="sv">6/8</div><div class="sl">sandboxes fully worked — the honest state of the art</div></div>
+</div>
+
+<div class="spread rev reveal d3" style="align-items:start">
+<div>
+<div class="tag-list"><span class="t">Opus 4.6 + Haiku teammates</span><span class="t">agent-teams env flag</span><span class="t">tmux panes</span><span class="t">task system + send_message</span><span class="t">E2B sandboxes</span><span class="t">observability dashboard</span><span class="t">agent-sandbox skill</span><span class="t">Mac mini cameo</span></div>
+</div>
+<div class="prose">
+<ul>
+<li>Observability is first-class: a hook-event dashboard with swim lanes per agent, 160 tool calls a minute visible. "Every engineer is limited by their tools and their knowledge of their tools."</li>
+<li>Agents run locally; the work happens off-device in E2B sandboxes — "spaces to place your agents" so they can't jeopardize your machine.</li>
+<li>Mixed results, normalized: 6 of 8 sandboxes fully worked. That's the honest state of the art.</li>
+<li>Everything still reduces to the Core Four. "This is not new — open source has had this — but they standardized it and made it accessible through the best agentic coding tool. That's worth learning."</li>
+</ul>
+</div>
+</div>
+
+<div class="spread reveal d4" style="align-items:start">
+<div>
+<h4>Run the drill</h4>
+<ol class="steps">
+<li><h4>Flag + tmux</h4><p>Export the agent-teams flag, start tmux, launch Claude Code inside it.</p></li>
+<li><h4>Trigger the team</h4><p>"Build a new agent team — one agent per subdirectory in ./apps; each summarizes the app and how to run it."</p></li>
+<li><h4>Inspect</h4><p>Watch panes spawn; verify per-agent context windows; inspect task_create / task_update calls via hooks or transcript.</p></li>
+<li><h4>Poke the orchestrator</h4><p>Mid-run, ask the idle primary a question — prove it's event-driven, not busy-waiting.</p></li>
+<li><h4>Teardown</h4><p>Agents shut down, panes close, team deleted — orchestrator context still small.</p></li>
+</ol>
+</div>
+<div>
+<div class="callout ok"><span class="ci">DONE WHEN</span><span class="cc">You get a merged summary from N parallel teammates while the orchestrator stays under ~40% context — and you can name the exact team, task, and message tools that fired.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal amber" id="ch23-s5"><span class="sn">5</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Four Layers: Skills, Subagents, Commands, Justfile</h2></div>
+<div class="kicker reveal">yt-32 · "My 4-Layer Claude Code Playwright CLI Skill (Agentic Browser Automation)" · 27:15 · feb 16, 2026</div>
+
+<div class="spread reveal d1" style="align-items:start">
+<div class="prose">
+<p class="lead-in">Don't stop at skills. Stack four layers — skills for capability, subagents for scale, commands for orchestration, a justfile for reusability — and automate two whole classes of work: browser automation and agentic UI testing.</p>
+<ul>
+<li>"You want to be using CLIs, not MCP servers. MCP servers chew up your tokens, and they're very rigid… CLIs give us the massive benefit: we can build on top of them in our own opinionated way." Playwright CLI over Playwright MCP.</li>
+<li>Two core technologies: <span class="mono">claude --chrome</span> reuses your real browser session — great for personal automation, but <strong>cannot run in parallel</strong>; the Playwright CLI is headless by default with parallel sessions and persistent named profiles for login state — great for scaled UI testing.</li>
+<li>Agentic UI testing = user stories as tiny files (name, URL, workflow steps); agents execute them like a real user and screenshot every step — "a trail of success and a trail of failure." No "sea of testing configuration for your Jest/Vitest."</li>
+<li>Swap the URL to staging or prod to re-target the whole suite; have agents write new user stories on the fly. "At the drop of a dime" test creation is the edge over deterministic UI frameworks.</li>
+<li><strong>/ui-review</strong> creates an agent team and <em>teaches the orchestrator how to prompt each subagent</em> ("for each task call, use this prompt") — meta prompt engineering, downward.</li>
+<li>The HOP pattern — <strong>higher-order prompt</strong>: /hop_automate takes another prompt file as its argument ("a function that takes a function"), wrapping any stored workflow like amazon_add_to_cart.md in consistent parse → load → execute machinery. Consistent pieces in the HOP, details in the LOP.</li>
+<li>The Amazon demo: a 20-minute fully autonomous shopping run that "walked right up to the doorstep of the purchase" and stopped as instructed — Opus 4.6 instruction adherence praised, the risk acknowledged.</li>
+</ul>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 460 320" role="img" aria-label="The four-layer stack: skills at the base, subagents above, commands orchestrating, and the justfile on top">
+<rect x="110" y="244" width="300" height="56" rx="10" class="s-clay-f"/>
+<text x="260" y="268" text-anchor="middle" class="s-title" font-size="13">skills</text>
+<text x="260" y="286" text-anchor="middle" class="s-label-sm">raw capability — wrap the CLI</text>
+<rect x="110" y="180" width="300" height="56" rx="10" class="s-blue-f"/>
+<text x="260" y="204" text-anchor="middle" class="s-title" font-size="13">subagents</text>
+<text x="260" y="222" text-anchor="middle" class="s-label-sm">scale — parallelism + context isolation</text>
+<rect x="110" y="116" width="300" height="56" rx="10" class="s-plum-f"/>
+<text x="260" y="140" text-anchor="middle" class="s-title" font-size="13">commands / prompts</text>
+<text x="260" y="158" text-anchor="middle" class="s-label-sm">orchestration — "the API layer"</text>
+<rect x="110" y="52" width="300" height="56" rx="10" class="s-amber-f"/>
+<text x="260" y="76" text-anchor="middle" class="s-title" font-size="13">justfile</text>
+<text x="260" y="94" text-anchor="middle" class="s-label-sm">reusability — "functions for your commands"</text>
+<path d="M70 300 V 60" class="s-flow"/>
+<path d="M70 58 l-6 9 12 0 z" class="s-clay"/>
+<text x="52" y="180" text-anchor="middle" class="s-label-sm" transform="rotate(-90 52 180)">build upward</text>
+<text x="260" y="30" text-anchor="middle" class="s-label">one command fans out a whole testing team</text>
+</svg>
+<div class="fcap"><b>The 4-layer stack.</b> Capability at the bottom, one-word ergonomics at the top — each layer multiplies the one beneath it.</div>
+</div>
+</div>
+
+<div class="spread rev reveal d2" style="align-items:start">
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>disler/bowser</strong> — the four-layer browser-automation and UI-testing system: 2 skills (playwright-browser, claude-browser), 3 agents (playwright-browser, claude-browser, bowser-qa), orchestration commands (/ui_review, /hop_automate + stored workflows), and a justfile on top.</span></div>
+<div class="tag-list" style="margin-top:14px"><span class="t">claude --chrome</span><span class="t">Playwright CLI</span><span class="t">skills / subagents / commands</span><span class="t">agent teams for story validation</span><span class="t">justfile (j alias)</span><span class="t">user-story file format</span><span class="t">screenshots as evidence</span><span class="t">Opus 4.6</span></div>
+</div>
+<div class="prose">
+<ul>
+<li>"Code is fully commoditized. Anyone can generate code. That is not an advantage anymore. What is an advantage is your specific solution to the problem you're solving — all the way down to how you write your skills."</li>
+<li>"Everyone is just spamming skills right now… subagents got a massive buff and will be a centerpiece as agent orchestration becomes the primary paradigm."</li>
+<li>Bowser is a <em>mold</em>: solve the class of problem once, template it, deploy it into every codebase, specialize per repo — user stories dir, commands, and all.</li>
+<li>The closing warning: "Don't outsource learning how to build with the most important technology of our lifetime… If you're always using plugins and someone else's prompts, you'll be limited by what everyone else can do." And prompt injection is one of the most dangerous vulnerabilities for browser agents.</li>
+</ul>
+</div>
+</div>
+
+<div class="spread reveal d3" style="align-items:start">
+<div>
+<h4>Run the drill</h4>
+<ol class="steps">
+<li><h4>Skill layer</h4><p>Write a playwright-browser skill wrapping the Playwright CLI with your defaults (headless, named sessions).</p></li>
+<li><h4>Agent layer</h4><p>Create a bowser-qa subagent: parse story → step through → screenshot each step → report pass/fail → close browser.</p></li>
+<li><h4>Stories</h4><p>Add 2–3 user-story .md files (name, URL, steps) against a site you know — or localhost.</p></li>
+<li><h4>Command layer</h4><p>Write /ui_review: discover stories, spawn one teammate per story with an explicit embedded prompt, collect results.</p></li>
+<li><h4>Justfile layer</h4><p>Top it with just ui-review; run twice to prove repeatability.</p></li>
+</ol>
+</div>
+<div>
+<div class="callout ok"><span class="ci">DONE WHEN</span><span class="cc">One command fans out parallel story agents, every step has a screenshot on disk, and a deliberately broken story reports <strong>FAIL with visual evidence</strong>.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal" id="ch23-s6"><span class="sn">6</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Pi: The Harness That Is Yours</h2></div>
+<div class="kicker reveal">yt-33 · "The Pi Coding Agent: The ONLY REAL Claude Code COMPETITOR" · 51:36 · feb 23, 2026</div>
+
+<div class="spread reveal d1" style="align-items:start">
+<div class="prose">
+<p class="lead-in">Pi, by Mario Zechner, is the open-source, unopinionated, customizable-to-the-core counterattack to Claude Code — for engineers who want to own every layer of their tool and hedge against Claude Code's profit-driven drift.</p>
+<ul>
+<li>"Every single engineer is limited by the tools they use, because the tools you use shape what you believe is possible. When's the last time you asked yourself: how is my agentic coding tool limiting me?"</li>
+<li>The hot take: "Claude Code got cancer" — success forces growth toward the masses and profit motives over its original mid/senior-engineer niche.</li>
+<li>Philosophy, side by side: CC ships great defaults; Pi says "If I don't need it, it won't be built." CC's system prompt is ~10,000 tokens; Pi's is ~200 — "let the model cook." CC has five safety modes; Pi calls security in agentic coding "mostly theater" and runs YOLO by default. CC prioritizes Anthropic models; Pi is any-model (Sonnet, Haiku, GLM, MiniMax, Gemini Flash, Qwen…), any auth.</li>
+<li>Pi ships just <strong>four tools</strong>: read, write, edit, bash. No subagents, no task list, no MCP ("you can just call the skill via a script or CLI"). Everything else is a TypeScript <strong>extension</strong>, and extensions stack: <span class="mono">pi -e focus -e footer -e subagents</span>.</li>
+<li>Demonstrated extensions: pure-focus blank UI, custom footer, component-loader, purpose widget, tool counter, 13 themes with a cycle keybinding, a DIY /sub subagent system, damage-control hooks (rm -rf blocked), and <strong>till-done</strong>.</li>
+<li>Till-done: a hook-enforced task list — tools are <em>blocked</em> until the agent registers a task, items must be marked done, and clearing the list needs human approval. "Not to-do — till done."</li>
+<li>The till-done insight: harness control compensates for model weakness — Haiku completes multi-step work reliably when the harness forces the loop.</li>
+</ul>
+</div>
+<div>
+<div class="quote big"><p>There are many coding agents, but this one is mine.</p><span class="cite" style="display:block;margin-top:10px">— Pi's catchphrase, repeated like a mantra</span></div>
+<div class="callout" style="margin-top:16px"><span class="ci">REPO</span><span class="cc"><strong>disler/pi-vs-claude-code</strong> — the three-tier demo: stackable extensions (focus, footer, loader, widget, ~700-line till-done, subagents, damage control, themes), agent-teams YAML, chains, and the Pi meta-agent with 8 experts.</span></div>
+<div class="callout idea" style="margin-top:16px"><span class="ci">STRATEGY</span><span class="cc">"Bet big on the leader (Claude Code), hedge with open source." Dan's split: ~80% CC / 20% Pi. Enterprise: no debate — Claude Code. <strong>"Think in ANDs, not ORs."</strong></span></div>
+</div>
+</div>
+
+<div class="spread rev reveal d2" style="align-items:start">
+<div>
+<div class="tag-list"><span class="t">Pi (pi.dev)</span><span class="t">TypeScript extension SDK</span><span class="t">widgets / hooks / footers / themes</span><span class="t">agents.md (falls back to claude.md)</span><span class="t">any-model: GLM-5, MiniMax, Gemini 3 Flash, Qwen</span><span class="t">justfile demo tiers</span><span class="t">CC comparison matrix</span></div>
+</div>
+<div class="prose">
+<ul>
+<li>Tier 2 — orchestration as an extension: agent teams (scout, planner, builder, reviewer, documenter, red-team) from a YAML file; chains and pipelines (triple-scout recon; plan → build → review); /system-select swaps the system prompt to <em>become</em> any specialist mid-session.</li>
+<li>Tier 3 — meta-agents: a Pi meta-agent with eight domain "experts" queried in parallel to generate new Pi agents to spec. "You want to be building agents that build agents."</li>
+<li>25+ hooks, tool overrides (replace read/write/edit/bash), custom in-loop tool registration ("you can't do this in Claude Code — you'd need a skill or MCP"), keybindings, footers, themes — "customize everything down to the text color."</li>
+<li>Pi powers OpenClaw (ex-Moltbot/Clawbot). Mario Zechner is one of only three engineers Dan sponsors on GitHub.</li>
+<li>"You can't get ahead of the curve by doing what everyone else is doing… There are no winners yet — only experimenters, thinkers, builders, and then everyone following them."</li>
+</ul>
+</div>
+</div>
+
+<div class="spread reveal d3" style="align-items:start">
+<div>
+<h4>Run the drill</h4>
+<ol class="steps">
+<li><h4>Baseline</h4><p>Install Pi; run vanilla pi and confirm the 4-tool, ~200-token-prompt baseline.</p></li>
+<li><h4>Stack tier 1</h4><p>Clone the repo; run stacks like pi -e footer -e theme-cycler; read one extension's TypeScript end to end.</p></li>
+<li><h4>Bend till-done</h4><p>Add one custom rule (block git commit until all tasks done) and prove the block fires.</p></li>
+<li><h4>Non-Anthropic team</h4><p>Run the agent-team extension with a scout → builder task on a small repo, on a non-Anthropic model.</p></li>
+<li><h4>Ship your own</h4><p>Write one tiny extension — say, a widget showing elapsed session time.</p></li>
+</ol>
+</div>
+<div>
+<div class="callout ok"><span class="ci">DONE WHEN</span><span class="cc">Your custom extension loads stacked with two others, and you can explain the hook lifecycle it plugs into <strong>without reading the docs again</strong>.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal blue" id="ch23-s7"><span class="sn">7</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Stripe's Minions: Vibe Coding Is Already Dead</h2></div>
+<div class="kicker reveal">yt-34 · "I Studied Stripe's AI Agents... Vibe Coding Is Already Dead" · 40:31 · mar 2, 2026</div>
+
+<div class="spread reveal d1" style="align-items:start">
+<div class="prose">
+<p class="lead-in">Stripe's "minions" — fully unattended Slack-to-production-PR coding agents on a hundreds-of-millions-LOC Ruby codebase — prove that serious-stakes engineering is agentic engineering, not vibe coding. Their agentic layer is a blueprint, literally, you can steal from.</p>
+<ul>
+<li>The numbers: 1,300 merged PRs a week, zero human-written code, $1.9T total volume, homegrown Ruby libraries LLMs have never seen. "Do you think Stripe can afford to vibe code?"</li>
+<li>The layer, piece by piece: triggers (CLI + web UI + Slack @devbox), a warm dev-box pool (pre-warmed EC2 sandboxes, ready in 10s, full Stripe code and services preloaded, no human permission checks), a custom harness forked from Block's <strong>Goose</strong>, the <strong>blueprint engine</strong>, conditional rules files, the <strong>toolshed</strong>, CI (3M tests, selectively run), GitHub PR review.</li>
+<li>Why build their own: "Vibe coding a prototype from scratch is fundamentally different from contributing to Stripe's codebase." Specialization is how you win — "your tooling and your code must also be specialized."</li>
+<li><strong>Blueprints</strong> = workflows designed in code: agent steps interleaved with deterministic nodes (linters, git, config, push). "Agents plus code beats agents alone, and agents plus code beats code alone." TAC members know this as an ADW — an AI Developer Workflow. Blueprint steps also constrain tools and system prompt per step: easy subagent context engineering.</li>
+<li>Deterministic steps stay deterministic: "Adding an agent to specific steps actually makes the whole system worse, more brittle, and more expensive."</li>
+<li>Context at scale: no unconditional global rules — cursor-style .rules MDC files with glob front matter, "almost exclusively scoped to specific subdirectories, automatically attached as the agent traverses the file system."</li>
+<li>The <strong>toolshed</strong>: a centralized internal MCP server — a meta-tool to discover and select among ~500 MCP tools without token explosion. "A tool that unlocks tools." Net-new, even to Dan.</li>
+</ul>
+</div>
+<div>
+<div class="quote big"><p>Agentic engineering is knowing what will happen in your system so well you don't need to look. Vibe coding is not knowing and not looking.</p><span class="cite" style="display:block;margin-top:10px">— the definitions, canonical form</span></div>
+<div class="callout" style="margin-top:16px"><span class="ci">SOURCE</span><span class="cc">No public repo — a blog-analysis video. Primary source: <strong>Stripe's engineering posts on Minions</strong> (parts 1 &amp; 2, by Alistair Gray et al.).</span></div>
+</div>
+</div>
+
+<div class="stats reveal d2">
+<div class="stat"><div class="sv">1,300</div><div class="sl">merged minion PRs per week</div></div>
+<div class="stat blue"><div class="sv">$1.9T</div><div class="sl">total volume — ~1.6% of global GDP</div></div>
+<div class="stat plum"><div class="sv">3M</div><div class="sl">CI tests, selectively run</div></div>
+<div class="stat olive"><div class="sv">0</div><div class="sl">human-written lines in minion PRs</div></div>
+<div class="stat amber"><div class="sv">8/10</div><div class="sl">Dan's score for the system</div></div>
+</div>
+
+<div class="spread rev reveal d3" style="align-items:start">
+<div>
+<div class="tag-list"><span class="t">Stripe Minions</span><span class="t">Block's Goose (forked)</span><span class="t">EC2 dev boxes</span><span class="t">blueprint engine (ADW analog)</span><span class="t">scoped .rules files</span><span class="t">toolshed meta-MCP (~500 tools)</span><span class="t">Slack / web / CLI triggers</span><span class="t">GitHub PRs</span></div>
+<div class="callout idea" style="margin-top:16px"><span class="ci">NORTH STAR</span><span class="cc"><strong>ZTE — zero-touch engineering, prompt to production (P2P).</strong> "The value is in the journey of the question: what would it take to trust your system to ship without human oversight?" Prediction: in 2026 a tens-of-millions-revenue company blogs about shipping P2P with ZTE.</span></div>
+</div>
+<div class="prose">
+<ul>
+<li>In-loop vs out-loop: engineers show up "at the beginning and the end — during planning and during review, and ideally not once in the middle." Minions are out-loop; Claude Code and Cursor stay in-loop. Spend 50%+ of your time building the system of agents that builds your application.</li>
+<li>Dev-box logic: "If you want your agent to perform like you, give it the tools and environment you have." Worktrees and containers "fall apart at certain scales" — eventually each agent needs its own device. Engineers run half a dozen boxes in parallel.</li>
+<li>"Shift feedback left" — catch issues as early, and as locally, as possible; CI is the safety net.</li>
+<li>Behind the 8/10, two critiques: capping minions at two CI feedback rounds — "has anyone ever said to you: solve this problem, you have two attempts?" — and it's not truly end-to-end; there's still a review step.</li>
+<li>Meta-agentics everywhere: prompts that create prompts, agents that build agents, tools that select tools — "it's not about what you can do anymore, it's about what you can teach your agents to do for you."</li>
+</ul>
+</div>
+</div>
+
+<div class="spread reveal d4" style="align-items:start">
+<div>
+<h4>Internalize, don't build</h4>
+<ol class="steps">
+<li><h4>The blueprint principle</h4><p>Interleave deterministic code nodes with agent nodes — never give an agent a step code can do.</p></li>
+<li><h4>The toolshed pattern</h4><p>At tool and rule scale, build the thing that selects the thing: scoped rules, tool routers, meta-agentics.</p></li>
+<li><h4>In-loop → out-loop → ZTE</h4><p>Keep asking what it would take to remove the review step for one low-risk task class.</p></li>
+</ol>
+</div>
+<div>
+<div class="callout idea"><span class="ci">WATCH &amp; ABSORB</span><span class="cc">No repo, no build — a study session. The deliverable is the mental model: <strong>blueprints, scoped rules, the toolshed, and the ZTE question.</strong></span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal olive" id="ch23-s8"><span class="sn">8</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Give Your Agent a Whole Device</h2></div>
+<div class="kicker reveal">yt-35 · "Mac Mini Agents: OpenClaw is a NIGHTMARE... Use these SKILLS instead" · 26:21 · mar 9, 2026</div>
+
+<div class="spread reveal d1" style="align-items:start">
+<div class="prose">
+<p class="lead-in">OpenClaw and the clawbots are vibe-coded security nightmares — but their core insight is right: agents deserve whole devices, not terminals. Build the minimal professional version yourself: an HTTP-triggered Claude agent on a Mac mini, two skills, four small CLIs.</p>
+<ul>
+<li>"The open claw, nano claw, and claw variants were an absolute nightmare… they exposed the worst of vibe coding at scale: buy a Mac mini, set up a claw, generate vulnerable slop code, share it with the world, and get prompt injected."</li>
+<li>The bright side: claws "pushed vibe coders and engineers to give their agents more autonomy. When you increase your agents' autonomy, you increase your own."</li>
+<li>"Our agents are stuck in the terminal. They're stuck in a box." The unlock: the agent uses the terminal to reach the GUI.</li>
+<li>The skills teach usage — the steer skill is ~130 lines: know your screens, focus-then-verify, run an observation loop.</li>
+<li>A YAML job system scales to multiple Macs; <span class="mono">j jobs</span> and <span class="mono">j job &lt;id&gt;</span> give observable job state. Trigger from anywhere: <span class="mono">just send "&lt;prompt&gt;"</span>.</li>
+<li>Demo 1: one prompt → the agent researches the new M5 MacBooks, writes a markdown report, and <strong>AirDrops</strong> it to Dan's MacBook.</li>
+<li>Demo 2: a spec-driven task — update claude-code-hooks-mastery with new hooks, screenshot visual proof per hook, summarize in TextEdit, commit to a new branch, push, AirDrop the proof bundle. It spun up its own agent team and terminals to do it.</li>
+</ul>
+</div>
+<div>
+<div class="grid grid-2">
+<div class="card accent"><p class="ctitle">listen</p><p class="cbody">HTTP job server running on the agent's device.</p></div>
+<div class="card blue"><p class="ctitle">direct</p><p class="cbody">Client CLI to submit and query jobs from anywhere.</p></div>
+<div class="card plum"><p class="ctitle">steer</p><p class="cbody">Swift CLI for macOS GUI control — accessibility trees, OCR, clicks, typing.</p></div>
+<div class="card olive"><p class="ctitle">drive</p><p class="cbody">Opinionated tmux wrapper — the agent spawns, reads, and writes terminals.</p></div>
+</div>
+<div class="callout" style="margin-top:16px"><span class="ci">REPO</span><span class="cc"><strong>disler/mac-mini-agent</strong> — the minimal claw alternative: 4 CLIs, 2 skills, an install command for a dev box, and the driving user prompt. Deployable to any macOS device; a Windows port is feasible.</span></div>
+</div>
+</div>
+
+<div class="spread rev reveal d2" style="align-items:start">
+<div>
+<div class="tag-list"><span class="t">Mac mini (+ M5 lineup hype)</span><span class="t">Claude Code in tmux</span><span class="t">listen / direct / steer / drive</span><span class="t">Python + Swift</span><span class="t">YAML job queue</span><span class="t">justfile triggers</span><span class="t">AirDrop as agent→human notify</span><span class="t">spec prompts</span><span class="t">macOS accessibility / OCR</span></div>
+</div>
+<div class="prose">
+<ul>
+<li>Time-boxing lives in the spec: "If you work longer than 5 minutes, wrap it up and send what you have. Periodically check by comparing to your start time." The agent audibly self-monitors — "it's 8 minutes, let me wrap up efficiently."</li>
+<li>Proof-of-work is a first-class deliverable: screenshots and logs grouped in a folder — trust through evidence, not vibes.</li>
+<li>"This is my agent's device. I'm never going to touch it. If something's wrong, I'm not going to fix it myself — I'm going to teach my agent how to do it." Template your engineering; build the system that builds the system.</li>
+<li>"If you want your agent to perform like you do, they must have the tools you have. The only way to truly get that experience is to give them their own device." Stripe's dev-box idea, carried forward.</li>
+<li>Harness-agnostic: Claude, Pi, Gemini, Codex — "the interesting part really isn't your agent harness anymore, it's the systems of agents that you're building."</li>
+<li>Karpathy cosign: claws are a security nightmare; prompt injection is Dan's top concern; claws "install packages very, very aggressively." And: "Agents are and will run everything. So it's very important to know how this stuff works."</li>
+</ul>
+</div>
+</div>
+
+<div class="spread reveal d3" style="align-items:start">
+<div>
+<h4>Run the drill <span class="small">(needs a second Mac or VM)</span></h4>
+<ol class="steps">
+<li><h4>Install</h4><p>Clone mac-mini-agent onto a spare Mac; run the install command; start j listen.</p></li>
+<li><h4>First job</h4><p>From your main machine: j send "write your favorite OOP pillar to a file and AirDrop it to me" — verify the HTTP → tmux → Claude flow.</p></li>
+<li><h4>Read the source</h4><p>Read the steer skill and drive wrapper before granting anything else.</p></li>
+<li><h4>Spec it</h4><p>Write a spec — tasks + deliverable + 5-minute timebox + screenshot proof — and send it as a job.</p></li>
+<li><h4>Observe remotely</h4><p>Query j jobs / j job &lt;id&gt; mid-run instead of watching the screen.</p></li>
+</ol>
+</div>
+<div>
+<div class="callout ok"><span class="ci">DONE WHEN</span><span class="cc">A one-line command from machine A produces a <strong>proof-of-work bundle</strong> — files plus screenshots — delivered back from machine B with zero manual intervention on the agent device.</span></div>
+<div class="quote" style="margin-top:16px"><p>"It's not about what you can do anymore, it's about what you can teach your agents to do for you."</p><span class="cite">— the recurring line of the era</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal plum" id="ch23-s9"><span class="sn">9</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Library: A Package Manager for Agentics</h2></div>
+<div class="kicker reveal">yt-36 · "The Library Meta-Skill: How I Distribute PRIVATE Skills, Agents and Prompts" · 26:32 · mar 16, 2026</div>
+
+<div class="spread reveal d1" style="align-items:start">
+<div class="prose">
+<p class="lead-in">Across 10+ codebases, multiple devices, and multiple agents, your private skills, agents, and prompts rot into out-of-sync duplicates. Manage them with <strong>the library</strong>: a pure-agentic meta-skill plus one YAML reference catalog — a package manager for agentics, no code required.</p>
+<ul>
+<li>The audience gate: "If you're an engineer working on one to two repos, this doesn't matter at all. If you install skills or plugins from the public internet without reviewing them, this video is not for you either."</li>
+<li>The problem: "endless skills everywhere — out of sync, duplicated, hard to coordinate" across repos, teammates, and each teammate's agents.</li>
+<li>The shape: a <strong>meta-skill</strong> — "a skill that unlocks other skills, agents, and prompts." Stripe's toolshed idea, broadened from tools to all agentics.</li>
+<li>The catalog is references, not copies: library.yaml points at private or public GitHub repos or local paths — "think package.json / pyproject… staying synced is super simple because there's one source of truth."</li>
+<li>The workflow: <strong>build → catalog → distribute → use.</strong> Build natively in the value-generating repo ("don't interrupt the flow"), then library add a pointer.</li>
+<li>Cookbook organization: one file per command inside the skill dir — "individual agentic workflows the skill describes when to use."</li>
+<li>Privacy stance: "Your top-notch skills, agents, and prompts should absolutely be private… we need a way to distribute this privately." Two repos: the library (public template) vs the engineer library (the actual private artifacts).</li>
+</ul>
+</div>
+<div>
+<div class="quote big"><p>This is a pure agent application. There is no code associated with this. The application is the skill.</p><span class="cite" style="display:block;margin-top:10px">— plus a prediction: "we're going to see a lot of pure agentic solutions this year"</span></div>
+<div class="callout" style="margin-top:16px"><span class="ci">REPO</span><span class="cc"><strong>disler/the-library</strong> — the public template: a blank library.yaml and the /library skill with add / use / push / list / search / sync cookbooks. Fork it and build your own private catalog.</span></div>
+<div class="tag-list" style="margin-top:14px"><span class="t">library add</span><span class="t">library use</span><span class="t">library push</span><span class="t">library list</span><span class="t">library search</span><span class="t">library sync</span></div>
+</div>
+</div>
+
+<div class="spread rev reveal d2" style="align-items:start">
+<div>
+<div class="tag-list"><span class="t">the-library meta-skill (/library)</span><span class="t">library.yaml catalog</span><span class="t">private GitHub repos</span><span class="t">cookbook-per-command layout</span><span class="t">meta-agentics suite</span><span class="t">Claude Code + Pi</span><span class="t">Qwen 3.5 / Gemini flash-lite / Sonnet 4.6</span><span class="t">Mac mini agent device</span><span class="t">justfile</span></div>
+<div class="callout idea" style="margin-top:16px"><span class="ci">MENTAL MODEL</span><span class="cc"><strong>Skills = raw capabilities; agents = scale and parallelism; prompts = orchestration of the two; justfile on top.</strong> "A lot of people are overkilling skills."</span></div>
+</div>
+<div class="prose">
+<ul>
+<li>The API surface: <strong>add</strong> (catalog an existing artifact), <strong>use</strong> (install locally or globally), <strong>push</strong> (send an edit back to the source repo), <strong>list</strong>, <strong>search</strong>, <strong>sync</strong> (pulls latest from source repos, not just the catalog).</li>
+<li>The demo spans harnesses and models: catalog the meta-agentics suite (meta-agent, meta-prime, meta-prompt, meta-skill), install locally then globally, install on the Mac mini device, generate a prompt with Qwen 3.5 via Pi, edit a skill with Gemini flash-lite, then library push on Sonnet 4.6 lands the change back — "freshly updated right from our agent device."</li>
+<li>Meta-agentics: "These are the skills that build the skills… if you don't have these at the ready, definitely build this out." Build your own, so your ~800-line meta-prompt encodes <em>your</em> format identically on every device, human- or agent-operated.</li>
+<li>Versioning is deliberately absent — latest-only, "very much like a package system for prompts, skills, and agents."</li>
+<li>The closing path: base → better → more → custom → orchestrator agents. The orchestrator needs your agentics organized in one place to operate whole devices and domains for you.</li>
+</ul>
+</div>
+</div>
+
+<div class="spread reveal d3" style="align-items:start">
+<div>
+<h4>Run the drill</h4>
+<ol class="steps">
+<li><h4>Clone the template</h4><p>Clone the-library into ~/.claude/skills/library/; keep the blank library.yaml.</p></li>
+<li><h4>Catalog</h4><p>In a real repo: /library add &lt;skill-name&gt; from &lt;repo-url&gt; for 2–3 skills or prompts you actually reuse.</p></li>
+<li><h4>Install</h4><p>In a fresh temp dir: /library use &lt;name&gt; install locally; verify with tree .claude.</p></li>
+<li><h4>Go cross-harness</h4><p>Install one globally; confirm it loads in a different harness (Pi or another agent) too.</p></li>
+<li><h4>Round-trip</h4><p>Edit the installed copy, /library push &lt;name&gt;, confirm the source repo received the commit.</p></li>
+</ol>
+</div>
+<div>
+<div class="callout ok"><span class="ci">DONE WHEN</span><span class="cc">The same skill installs identically on two machines or harnesses from one YAML file — and a round-trip edit lands back in the source repo <strong>without you touching git manually</strong>.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal amber" id="ch23-s10"><span class="sn">10</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Throughlines: What Videos 28–36 Add Up To</h2></div>
+<div class="kicker reveal">the spine of the specialization era · six threads through all nine videos</div>
+
+<div class="grid grid-3" style="margin-top:22px">
+<div class="card accent reveal d1"><span class="cnum">01</span><p class="ctitle">Trust is the 2026 theme</p><p class="cbody">Every technique — hooks, validators, teams, observability, proof-of-work — exists to increase trust in agents so you can hand off more.</p></div>
+<div class="card blue reveal d2"><span class="cnum">02</span><p class="ctitle">Agents + code beats either alone</p><p class="cbody">Hook validators (28), setup hooks + prompts (29), builder/validator pairs (30), Stripe blueprints (34).</p></div>
+<div class="card olive reveal d2"><span class="cnum">03</span><p class="ctitle">Specialization all the way down</p><p class="cbody">Focused agents (28), specialized teams (30, 31), your own skills — not plugins (32), your own harness (33), Stripe's whole stack (34).</p></div>
+<div class="card plum reveal d3"><span class="cnum">04</span><p class="ctitle">The layered stack</p><p class="cbody">Skills (capability) → subagents (scale) → prompts/commands (orchestration) → justfile (reusability), with meta-agentics and the library distributing it all.</p></div>
+<div class="card amber reveal d3"><span class="cnum">05</span><p class="ctitle">In-loop → out-loop → ZTE</p><p class="cbody">From terminal babysitting to triggered agents on their own devices and sandboxes — prompt-to-production, zero-touch engineering as the North Star.</p></div>
+<div class="card accent reveal d4"><span class="cnum">06</span><p class="ctitle">Don't outsource learning</p><p class="cbody">Read the docs, write the foundational prompts by hand — know what your agents are doing so well you don't have to look.</p></div>
+</div>
+
+<a class="jump reveal" href="#ch24">Next · Videos 37–45 &nbsp;&rarr;</a>
+</div>
+</section>

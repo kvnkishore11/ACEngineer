@@ -1,0 +1,184 @@
+<section class="chapter" id="ch17">
+  <div class="wrap wide">
+    <span class="chapnum reveal">17 — Vol III · Lesson 2</span>
+    <div class="kicker reveal">multi-agent · ma-2 · lead agents</div>
+    <h2 class="title reveal d1" style="max-width:26ch">One agent is not enough — go <em>multi-team</em>.</h2>
+    <p class="lede reveal d2">The step past Claude Code is multi-team agentic coding: a three-tier system of specialized agent experts that remember, stay locked to their part of the codebase, and are all driven through one chat interface — so your cognitive input stays flat as the agent count grows.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">orchestrator → leads → workers</span><span class="pill blue">domain locking</span><span class="pill olive">agent experts</span><span class="pill plum">zero micromanagement</span><span class="pill amber">trust &amp; scale</span></div>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch17-s1"><b>1</b>The Idea</a>
+      <a href="#ch17-s2"><b>2</b>The Nuggets</a>
+      <a href="#ch17-s3"><b>3</b>What Dan Did</a>
+      <a href="#ch17-s4"><b>4</b>The Workout</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch17-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Idea</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 920 330" role="img" aria-label="Three-tier hierarchy: you talk to one orchestrator, which delegates to team leads, which delegate to domain-locked workers">
+        <rect x="20" y="24" width="150" height="44" rx="10" class="s-card"/>
+        <text x="95" y="43" text-anchor="middle" class="s-title">YOU</text>
+        <text x="95" y="59" text-anchor="middle" class="s-label-sm">one chat interface</text>
+        <path d="M170 46 H 322" class="s-flow"/><path d="M330 46 l-8 -6 0 12 z" class="s-clay"/>
+        <rect x="332" y="22" width="256" height="48" rx="10" class="s-clay-f"/>
+        <text x="460" y="43" text-anchor="middle" class="s-title">ORCHESTRATOR</text>
+        <text x="460" y="60" text-anchor="middle" class="s-label-sm">Opus · thinks, plans, delegates</text>
+        <text x="640" y="96" class="s-label-sm">delegate — the one tool that defines the hierarchy</text>
+        <path d="M400 70 L 176 116" class="s-flow" style="fill:none"/><path d="M168 118 l10 -4 -3 11 z" class="s-clay"/>
+        <path d="M460 70 V 112" class="s-flow"/><path d="M460 120 l-6 -9 12 0 z" class="s-clay"/>
+        <path d="M520 70 L 744 116" class="s-flow" style="fill:none"/><path d="M752 118 l-10 -4 3 11 z" class="s-clay"/>
+        <rect x="56" y="120" width="220" height="44" rx="10" class="s-blue-f"/>
+        <text x="166" y="139" text-anchor="middle" class="s-label">PLANNING LEAD</text>
+        <text x="166" y="156" text-anchor="middle" class="s-label-sm">Opus · reads all, changes nothing</text>
+        <rect x="350" y="120" width="220" height="44" rx="10" class="s-olive-f"/>
+        <text x="460" y="139" text-anchor="middle" class="s-label">ENGINEERING LEAD</text>
+        <text x="460" y="156" text-anchor="middle" class="s-label-sm">Opus · thinker, coordinator</text>
+        <rect x="644" y="120" width="220" height="44" rx="10" class="s-plum-f"/>
+        <text x="754" y="139" text-anchor="middle" class="s-label">VALIDATION LEAD</text>
+        <text x="754" y="156" text-anchor="middle" class="s-label-sm">Opus · never executes</text>
+        <text x="166" y="196" text-anchor="middle" class="s-label-sm">a pure thinker — "the lead cannot do work"</text>
+        <path d="M420 164 L 396 204" class="s-line"/><path d="M500 164 L 546 204" class="s-line"/>
+        <path d="M714 164 L 700 204" class="s-line"/><path d="M794 164 L 830 204" class="s-line"/>
+        <rect x="330" y="208" width="134" height="40" rx="9" class="s-olive-f"/>
+        <text x="397" y="226" text-anchor="middle" class="s-label-sm">FRONT-END DEV</text>
+        <text x="397" y="241" text-anchor="middle" class="s-label-sm">Sonnet</text>
+        <rect x="480" y="208" width="134" height="40" rx="9" class="s-olive-f"/>
+        <text x="547" y="226" text-anchor="middle" class="s-label-sm">BACK-END DEV</text>
+        <text x="547" y="241" text-anchor="middle" class="s-label-sm">Sonnet</text>
+        <rect x="634" y="208" width="134" height="40" rx="9" class="s-plum-f"/>
+        <text x="701" y="226" text-anchor="middle" class="s-label-sm">QA ENGINEER</text>
+        <text x="701" y="241" text-anchor="middle" class="s-label-sm">Sonnet</text>
+        <rect x="784" y="208" width="130" height="40" rx="9" class="s-plum-f"/>
+        <text x="849" y="226" text-anchor="middle" class="s-label-sm">SECURITY REVIEW</text>
+        <text x="849" y="241" text-anchor="middle" class="s-label-sm">Sonnet</text>
+        <text x="397" y="272" text-anchor="middle" class="s-label-sm">writes front-end/ only</text>
+        <text x="547" y="272" text-anchor="middle" class="s-label-sm">writes back-end/ only</text>
+        <text x="460" y="308" text-anchor="middle" class="s-label">10 specialized agents · every one reads the conversation log · every one loads its own expertise</text>
+      </svg>
+      <div class="fcap"><b>The three-tier architecture.</b> "You are just talking to the orchestrator, the orchestrator delegates to the teams, and the teams delegate to their workers." Thinkers get the best models; workers "just need to follow instructions and execute."</div>
+    </div>
+
+    <div class="spread reveal d1" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Multi-team agentic coding means "specialized teams of agents to outperform the normal distribution of results."</p>
+        <p>The three default teams map to <strong>the three key nodes of building software: planning, engineering, and validation</strong>. Discipline comes from a handful of small parts: a shared <strong>zero-micromanagement skill</strong> ("You're a leader — delegate, never execute"), an <strong>active-listener skill</strong> ("read the conversation log before every response") installed in all 10 agents, a <strong>conversational-response skill</strong> deliberately withheld from workers ("we want our builders to be very, very verbose and very detail-oriented"), and the <strong>delegate tool</strong> — which orchestrator and leads have and workers don't.</p>
+        <p><strong>Domain locking</strong> is the enforcement layer: front-matter rules for "what the agents can and cannot do and where they can and cannot go" — per-path read/update/delete. Planners read everything, change nothing. "No one should be touching the DevOps files and folders except the DevOps agent — this is like the holy grail of operating mid-to-large-size codebases." And every agent is an <strong>agent expert</strong>: it loads a personal expertise file at boot and updates it after work — "a working mental model about how things work, and this grows over time" — governed only by a ~77-line mental-model skill. Dan never touches the files.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 250" role="img" aria-label="Chart: your cognitive input stays flat while work shipped rises as specialized agents are added">
+          <path d="M50 40 V 200 H 430" class="s-line"/>
+          <text x="240" y="230" text-anchor="middle" class="s-label-sm">specialized agents → 1 … 10</text>
+          <path d="M90 200 V 205" class="s-line"/><path d="M170 200 V 205" class="s-line"/>
+          <path d="M250 200 V 205" class="s-line"/><path d="M330 200 V 205" class="s-line"/><path d="M410 200 V 205" class="s-line"/>
+          <path d="M50 168 H 430" class="s-flow" style="fill:none"/>
+          <text x="240" y="158" text-anchor="middle" class="s-label-sm">your cognitive input — flat</text>
+          <path d="M50 192 C 180 186 300 130 430 58" class="s-line" style="stroke-width:2;fill:none"/>
+          <text x="308" y="96" class="s-label-sm">work shipped</text>
+          <text x="308" y="112" class="s-label-sm">scales with the team</text>
+        </svg>
+        <div class="fcap"><b>The scaling claim.</b> "Your cognitive input into the system… doesn't need to increase as you increase the total number of specialized agents" — the chat interface plus a single orchestrator is what makes customization scale.</div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch17-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Nuggets</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big"><p>"I am not spending enough tokens, you are not spending enough tokens, and you are wasting time doing things the old way — and now the old way is one agentic coding tool in the terminal, prompting back and forth."</p><span class="cite" style="display:block;margin-top:10px">— the quote of the lesson</span></div>
+      <div class="prose">
+        <p class="lead-in">Dan is blunt about the economics.</p>
+        <p>"If you're a cost min-maxer and you care about saving money over getting results, this video is not for you." The stance: "We are not afraid to spend to win here. We're not afraid to give our agents all the relevant context they need." And to the $8-per-session objection: "You're thinking about right now. You're not thinking far enough into the future. Models will improve, costs are going down."</p>
+      </div>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal"><span class="cnum">01</span><p class="ctitle">The premise</p><p class="cbody">"One agent is not enough."</p></div>
+      <div class="card blue reveal d1"><span class="cnum">02</span><p class="ctitle">Experts, not amnesiacs</p><p class="cbody">"You stopped using agents that forget and you started using agent experts."</p></div>
+      <div class="card olive reveal d2"><span class="cnum">03</span><p class="ctitle">Blocks are features</p><p class="cbody">A lead stepping out of its domain and getting blocked "might seem like an annoyance or a waste of tokens, but it's actually very valuable" — the block routes work to the right specialist.</p></div>
+      <div class="card plum reveal d1"><span class="cnum">04</span><p class="ctitle">Where the ball is going</p><p class="cbody">"Always be thinking about where the ball is going, not where it is." Three converging trends: rising intelligence + bigger context windows, agent expertise, customizable agent harnesses.</p></div>
+      <div class="card amber reveal d2"><span class="cnum">05</span><p class="ctitle">Multi-perspective answers</p><p class="cbody">Ask all teams one question and you get consensus and split recommendations surfaced — "a multi-perspective answer."</p></div>
+      <div class="card accent reveal d3"><span class="cnum">06</span><p class="ctitle">Everyone hears everything</p><p class="cbody">Every agent can see the conversation (session JSONL) — "every agent is aware of the conversation happening."</p></div>
+      <div class="card blue reveal d2"><span class="cnum">07</span><p class="ctitle">Leads never build</p><p class="cbody">"The lead cannot do work. It is a thinker. It's a planner. It's a coordinator."</p></div>
+      <div class="card olive reveal d3"><span class="cnum">08</span><p class="ctitle">The edge moved</p><p class="cbody">"The way that you're building your agentic coding system is the edge now."</p></div>
+      <div class="card plum reveal d4"><span class="cnum">09</span><p class="ctitle">Tier your models</p><p class="cbody">Leads and orchestrator on Opus, workers on Sonnet — tune the tier-to-model mapping; "if you're going all out, you'll make everything the top best possible model."</p></div>
+      <div class="card amber reveal d3"><span class="cnum">10</span><p class="ctitle">Compounding memory</p><p class="cbody">"Every time I boot this up, my agent teams, down to the individual workers, has a stacking, compounding set of memory."</p></div>
+      <div class="card accent reveal d4"><span class="cnum">11</span><p class="ctitle">Let go</p><p class="cbody">"You can't have your fingers on everything… You have to let go. You have to teach your agents to operate as you would." The mental-model file is the prime example.</p></div>
+      <div class="card blue reveal d5"><span class="cnum">12</span><p class="ctitle">Guidelines, not shackles</p><p class="cbody">Don't be over-rigid with agent experts — give guidelines (a 77-line skill) and let them maintain their own mental model.</p></div>
+      <div class="card olive reveal d4"><span class="cnum">13</span><p class="ctitle">Experts beat generics</p><p class="cbody">"Agent experts will always outperform a generic agent" — the same reason you trust the engineer who's done it over and over.</p></div>
+      <div class="card plum reveal d5"><span class="cnum">14</span><p class="ctitle">Specific beats sprawling</p><p class="cbody">"This isn't just Claude capturing memory with everything you've ever said to it over years. That's not going to go well. What is going to go well is specialized agents that have specific purposes."</p></div>
+      <div class="card amber reveal d6"><span class="cnum">15</span><p class="ctitle">Input stays flat</p><p class="cbody">Your cognitive input doesn't need to grow with agent count — the single-orchestrator chat interface is what makes customization scale.</p></div>
+    </div>
+
+    <div class="spread reveal d1" style="align-items:center;margin-top:26px">
+      <div class="callout idea"><span class="ci">NEXT-GEN IDEAS</span><span class="cc">A <strong>meta agent / meta team</strong> to fine-tune the team itself; team-based reusable prompts ("plan, build, validate — one of the oldest workflows known to agentic engineers"); and <strong>read-only expertise</strong> (<span class="mono">updatable: false</span>) for opinionated knowledge — billing, migrations — no agent may corrupt.</span></div>
+      <div class="quote big"><p>"Can you build systems that build systems on your behalf?"</p><span class="cite" style="display:block;margin-top:10px">— the question the whole lesson builds to</span></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch17-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What Dan Did</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">Dan re-engineered the Pi harness into a chat room with agent teams.</p>
+        <p>The footer shows orchestrator, leads, context, and total cost; <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/toggle workers</span> reveals the full roster — 10 specialized agents. Teams are <strong>config, not code</strong>: "At any point in time we can just copy our config, change up the teams, and specialize how we need." To prove it, he killed the validation team in the YAML and relaunched.</p>
+        <p>The working codebase was a <strong>prompt-complexity classifier</strong> that routes user prompts to high/medium/low-tier models — "You don't want to pay for intelligence that you don't need" — biased toward high as the safe default. <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">j predict "summarize this code base"</span> returned <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">medium</span> with confidences.</p>
+      </div>
+      <div>
+        <div class="codecap">multi-team config — teams are one YAML edit away</div>
+        <div class="code"><pre><span class="k">orchestrator:</span> agents/orchestrator.md
+<span class="k">teams:</span>
+  - name: planning
+    lead: agents/planning-lead.md
+  - name: engineering
+    lead: agents/engineering-lead.md
+    members: [agents/front-end-dev.md, agents/back-end-dev.md]
+  - name: validation      <span class="cm"># kill or add a team by editing one file</span>
+    lead: agents/validation-lead.md
+    members: [agents/qa-engineer.md, agents/security-reviewer.md]</pre></div>
+        <div class="codecap" style="margin-top:14px">a worker's domain block — the holy grail</div>
+        <div class="code reveal d1"><pre><span class="k">domain:</span>
+  read:   [<span class="s">"**/*"</span>]           <span class="cm"># see everything</span>
+  update: [<span class="s">"front-end/**"</span>]   <span class="cm"># write only your own directory</span>
+  delete: [<span class="s">"front-end/**"</span>]</pre></div>
+      </div>
+    </div>
+
+    <ol class="steps reveal d1">
+      <li><h4>Climb the demo ladder</h4><p><span class="mono">ping</span> (orchestrator ping-pong) → "ping each team lead" (two-layer fan-out and compose) → "have engineering present tree structure of the most important files" — the engineering lead hits a domain wall, then <strong>delegates</strong> to the front-end and back-end devs. Three tiers live on screen.</p></li>
+      <li><h4>Ask all teams one question</h4><p>"What are two additional scikit-learn classifiers we can test against?" Planner, engineer, and validator teams each delegate internally; the orchestrator synthesizes: LinearSVC + CalibratedClassifierCV unanimous, ComplementNB/SGD split noted.</p></li>
+      <li><h4>Run the classic workflow in one prompt</h4><p>"Plan, engineer, and then validate — add just commands to test both models (<span class="mono">just prompt both</span>)." The plan lead reads all context first, the back-end dev builds, and the QA engineer finds issues the security reviewer missed ("ship it, no issues" vs QA's findings — different context windows, different perspectives). The orchestrator composes. About 18 minutes of team work.</p></li>
+      <li><h4>Verify through the hierarchy</h4><p>New just commands (<span class="mono">predict both</span>, <span class="mono">train both</span>, head-to-head eval on the holdout set) — the orchestrator can't run them, so it delegates to the engineering lead, who delegates to the back-end dev.</p></li>
+      <li><h4>Walk the internals</h4><p>The multi-team YAML (teams/leads/members as paths to system prompts plus a team color); orchestrator front matter (expertise, max lines 10,000, skills); shared vs withheld skills; the domain blocks; runtime-injected variables (session dir, conversation log, teams from YAML); session storage of every tool call and each agent's fully-templated system prompt — and the back-end dev's ~5,000-token self-maintained mental model.</p></li>
+    </ol>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch17-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Workout</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="callout"><span class="ci">GOAL</span><span class="cc">Stand up a three-tier <strong>orchestrator → leads → workers</strong> team over a real small codebase, with domain locking and per-agent persistent mental models, driven through a single chat entry point.</span></div>
+      <div class="callout"><span class="ci">PREREQUISITES</span><span class="cc">A codebase with at least two separable domains (e.g. <span class="mono">frontend/</span> + <span class="mono">backend/</span>, or <span class="mono">src/</span> + <span class="mono">tests/</span>); Pi (or Claude Code with subagents as the limited fallback); <span class="mono">just</span>.</span></div>
+    </div>
+
+    <ol class="steps reveal d1">
+      <li><h4>Write the team config</h4><p><span class="mono">multi-team.yaml</span>: one <span class="mono">orchestrator</span> (best model) and two teams — <span class="mono">engineering</span> (lead + <span class="mono">backend-dev</span> + <span class="mono">frontend-dev</span> workers) and <span class="mono">validation</span> (lead + <span class="mono">qa-engineer</span>) — each entry a name plus a path to a system-prompt <span class="mono">.md</span>.</p></li>
+      <li><h4>Write the shared skills</h4><p>Small markdown files: <span class="mono">zero-micromanagement.md</span> ("You're a leader — delegate, never execute"), <span class="mono">active-listener.md</span> ("Read the conversation log before every response"), <span class="mono">conversational-response.md</span> (orchestrator/leads only), <span class="mono">mental-model.md</span> (~75 lines: when to read, when to update, how to structure, max lines).</p></li>
+      <li><h4>Set the front matter</h4><p>Per agent: <span class="mono">model</span> (Opus-tier for orchestrator/leads, Sonnet-tier for workers), <span class="mono">skills</span>, <span class="mono">expertise</span> (path to its mental-model file), <span class="mono">tools</span> (only orchestrator/leads get <span class="mono">delegate</span>; only workers get write/edit/bash), and <span class="mono">domain</span> (workers: read <span class="mono">**/*</span>, upsert/delete only their own directory; leads: read-only everywhere plus their expertise dir).</p></li>
+      <li><h4>Enforce domains in code</h4><p>A tool-call hook (Pi hooks or a Claude Code PreToolUse hook): no matching rule = deny; the blocked message should say who to delegate to.</p></li>
+      <li><h4>Run the ladder</h4><p><span class="mono">ping</span> → "ping each team lead" → "have engineering present tree structure of the most important files" — confirm the lead delegates instead of executing.</p></li>
+      <li><h4>Ship one feature in one prompt</h4><p>"Plan, engineer, and then validate: &lt;small real feature&gt;. Add just commands to test it." Watch plan → build → validate flow through the tiers.</p></li>
+      <li><h4>Let expertise grow</h4><p>Run 3+ sessions; inspect each agent's mental-model file growing; never edit the files yourself.</p></li>
+    </ol>
+
+    <div class="callout ok reveal d2"><span class="ci">DONE WHEN</span><span class="cc">A lead attempting a file write gets blocked and delegates instead; the front-end worker cannot modify backend files (hard block, not just prompt); one prompt to the orchestrator produces planned + built + validated work with a composed summary; and the mental-model files contain content you didn't write after session 3.</span></div>
+    <div class="callout idea reveal d3"><span class="ci">LEVEL UP</span><span class="cc">Add a read-only expertise file (<span class="mono">updatable: false</span>) for a "billing"-style sensitive domain; add a team-based reusable <span class="mono">plan-build-validate</span> prompt; swap one worker to a different vendor's model via config; build a meta-agent whose job is critiquing and tuning the team's own prompts and skills.</span></div>
+
+    <a class="jump reveal" href="#ch18">Next · UI Agents &nbsp;&rarr;</a>
+  </div>
+</section>

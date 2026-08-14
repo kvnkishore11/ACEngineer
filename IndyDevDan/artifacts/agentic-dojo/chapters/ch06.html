@@ -1,0 +1,268 @@
+<section class="chapter" id="ch06">
+  <div class="wrap wide">
+    <span class="chapnum reveal">06 — Vol I · Tactic 5</span>
+    <div class="kicker reveal">tac-5 · always add feedback loops</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Close the loops, and <em>the code writes itself</em>.</h2>
+    <p class="lede reveal d2">Your work is useless unless it's tested — and testing is now your agents' job. Encode every way you'd validate production-ready work into commands and tools, structure prompts as request → validate → resolve, and your agents self-correct until the work is provably done.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">Tactic 5</span><span class="pill blue">feedback loops</span><span class="pill olive">Playwright MCP</span><span class="pill plum">adw_test</span></div>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch06-s1"><b>1</b>The Idea</a>
+      <a href="#ch06-s2"><b>2</b>The Nuggets</a>
+      <a href="#ch06-s3"><b>3</b>What Dan Did</a>
+      <a href="#ch06-s4"><b>4</b>The Workout</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch06-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Idea</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Tactic #5: <strong>Always Add Feedback Loops</strong>. "Your work, my work, any engineer's work is useless unless it's tested."</p>
+        <p><strong>Closing the loop</strong> means "letting your agent operate on work, calling a command or tool to get feedback on the success of the work… your agent continues to build until the feedback is positive. When you do this, <em>you let the code write itself</em>."</p>
+        <p>Every closed-loop prompt has three parts: <strong>Request → Validation → Resolution</strong>. "This prompt instructs the agent to validate itself." Linters, unit tests, builds, Playwright browser tests — anything you would run by hand becomes a loop your agent runs for you.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 480 300" role="img" aria-label="Closed feedback loop: request, validate, resolve, done">
+          <rect x="182" y="38" width="178" height="194" rx="14" class="s-line" stroke-dasharray="6 6"/>
+          <text x="271" y="28" text-anchor="middle" class="s-label-sm">the closed loop</text>
+          <rect x="20" y="50" width="130" height="56" rx="10" class="s-clay-f"/>
+          <text x="85" y="74" text-anchor="middle" class="s-title" font-size="13">1 · request</text>
+          <text x="85" y="92" text-anchor="middle" class="s-label-sm">do the work</text>
+          <path d="M150 78 H 188" class="s-flow"/><path d="M196 78 l-9 -6 0 12 z" class="s-clay"/>
+          <rect x="196" y="50" width="150" height="56" rx="10" class="s-blue-f"/>
+          <text x="271" y="74" text-anchor="middle" class="s-title" font-size="13">2 · validate</text>
+          <text x="271" y="92" text-anchor="middle" class="s-label-sm">ruff · pytest · build · e2e</text>
+          <path d="M346 78 H 386" class="s-flow"/><path d="M394 78 l-9 -6 0 12 z" class="s-clay"/>
+          <text x="368" y="68" text-anchor="middle" class="s-label-sm">pass</text>
+          <rect x="394" y="50" width="70" height="56" rx="10" class="s-olive-f"/>
+          <text x="429" y="76" text-anchor="middle" class="s-title" font-size="13">done</text>
+          <text x="429" y="93" text-anchor="middle" class="s-label-sm">proven</text>
+          <path d="M246 106 V 154" class="s-flow"/><path d="M246 162 l-6 -9 12 0 z" class="s-clay"/>
+          <text x="234" y="138" text-anchor="end" class="s-label-sm">fail</text>
+          <rect x="196" y="162" width="150" height="56" rx="10" class="s-amber-f"/>
+          <text x="271" y="186" text-anchor="middle" class="s-title" font-size="13">3 · resolve</text>
+          <text x="271" y="204" text-anchor="middle" class="s-label-sm">fix, then re-run all</text>
+          <path d="M300 162 V 114" class="s-flow"/><path d="M300 106 l-6 9 12 0 z" class="s-clay"/>
+          <text x="310" y="138" text-anchor="start" class="s-label-sm">re-run</text>
+          <text x="240" y="266" text-anchor="middle" class="s-label">the agent loops until feedback is positive —</text>
+          <text x="240" y="284" text-anchor="middle" class="s-label">the code writes itself</text>
+        </svg>
+        <div class="fcap"><b>Anatomy of a closed-loop prompt.</b> Request → Validation → Resolution — the agent cycles until every validator passes, with no human diagnosis in between.</div>
+      </div>
+    </div>
+
+    <div class="quote reveal d1"><p>"Given a unit of valuable work that's production ready, how would you, the engineer, test and validate this work? If you can answer this for every class of work and encode the answers into a command or tool call, you will fly while other engineers run."</p><span class="cite">— the core validation question</span></div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal d1"><span class="cnum">01</span>
+        <p class="ctitle">Three loops, one vocabulary</p>
+        <p class="cbody"><strong>In-loop</strong> = you prompting back and forth. <strong>Out-loop</strong> = a high-level prompt through the PITER system on an isolated machine. <strong>Closing the loop</strong> = the agent's own execute–validate–reflect cycle.</p></div>
+      <div class="card blue reveal d2"><span class="cnum">02</span>
+        <p class="ctitle">The hierarchy of trust</p>
+        <p class="cbody">"The ultimate test will always be your users. The next best test used to be you. Now the next best test is an army of agents validating your entire codebase with regression tests and, most importantly, end-to-end tests."</p></div>
+      <div class="card olive reveal d3"><span class="cnum">03</span>
+        <p class="ctitle">Tests as rule of law</p>
+        <p class="cbody">"What's more important, the code or your tests? The answer should be your tests. Your tests should be the rule of law in your codebase."</p></div>
+      <div class="card plum reveal d2"><span class="cnum">04</span>
+        <p class="ctitle">Playwright MCP</p>
+        <p class="cbody">Browser control as a validation tool: open the browser, type, click, screenshot, read the images back, verify results — your agent clicks through the feature so you never have to.</p></div>
+      <div class="card amber reveal d3"><span class="cnum">05</span>
+        <p class="ctitle">The e2e test file</p>
+        <p class="cbody">A markdown prompt: test name, test steps, <em>verify</em> IDK statements, success criteria — run through a HOP with preconditions (reset DB, ports, screenshot directory) and a JSON output format.</p></div>
+      <div class="card accent reveal d4"><span class="cnum">06</span>
+        <p class="ctitle">Validation, templated</p>
+        <p class="cbody">The chore / bug / feature plan formats include a <strong>Validation Commands</strong> section by default — plus "if this bug affects UI or user interactions, create an end-to-end test."</p></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch06-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Nuggets</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big"><p>"Now engineers that test with their agents win. Full stop, zero exceptions."</p>
+        <span class="cite" style="display:block;margin-top:10px">— quote of the lesson</span></div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 480 260" role="img" aria-label="Stacked validators building confidence from ruff to e2e">
+          <path d="M20 210 H 460" class="s-line"/>
+          <rect x="25" y="165" width="58" height="45" rx="6" class="s-clay-f"/>
+          <rect x="95" y="140" width="58" height="70" rx="6" class="s-blue-f"/>
+          <rect x="165" y="115" width="58" height="95" rx="6" class="s-olive-f"/>
+          <rect x="235" y="90" width="58" height="120" rx="6" class="s-plum-f"/>
+          <rect x="305" y="65" width="58" height="145" rx="6" class="s-amber-f"/>
+          <rect x="375" y="40" width="58" height="170" rx="6" class="s-clay-f"/>
+          <text x="54" y="228" text-anchor="middle" class="s-label-sm">ruff</text>
+          <text x="124" y="228" text-anchor="middle" class="s-label-sm">pytest</text>
+          <text x="194" y="228" text-anchor="middle" class="s-label-sm">compile</text>
+          <text x="264" y="228" text-anchor="middle" class="s-label-sm">tsc</text>
+          <text x="334" y="228" text-anchor="middle" class="s-label-sm">build</text>
+          <text x="404" y="228" text-anchor="middle" class="s-label-sm">e2e</text>
+          <path d="M40 148 C 160 118 300 68 424 26" class="s-flow" fill="none"/>
+          <path d="M430 24 l-13 1 5 11 z" class="s-clay"/>
+          <text x="440" y="16" text-anchor="end" class="s-label">confidence</text>
+          <text x="240" y="252" text-anchor="middle" class="s-label">each closed loop stacks certainty</text>
+        </svg>
+        <div class="fcap"><b>"We're stacking the confidence."</b> Each loop — ruff → pytest → compile → tsc → build → e2e — adds certainty, so you stop second-guessing.</div>
+      </div>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal d1"><span class="cnum">01</span>
+        <p class="ctitle">The waste of clicking</p>
+        <p class="cbody">"You probably opened the browser and clicked through your new feature. What a waste of time."</p></div>
+      <div class="card blue reveal d2"><span class="cnum">02</span>
+        <p class="ctitle">Tests × executions</p>
+        <p class="cbody">"The value of tests is multiplied by the number of agent executions that occur in your codebase."</p></div>
+      <div class="card olive reveal d3"><span class="cnum">03</span>
+        <p class="ctitle">One tool call away</p>
+        <p class="cbody">"Everything is one tool call away. Tools are just functions and functions can do anything."</p></div>
+      <div class="card plum reveal d2"><span class="cnum">04</span>
+        <p class="ctitle">Hand off more</p>
+        <p class="cbody">"Hand off more responsibility to your agents, not less." Your agent has more agency with self-validating loops.</p></div>
+      <div class="card amber reveal d3"><span class="cnum">05</span>
+        <p class="ctitle">Fresh agents, always</p>
+        <p class="cbody">"Always run fresh agents… no context pollution." One agent per loop, every time.</p></div>
+      <div class="card accent reveal d4"><span class="cnum">06</span>
+        <p class="ctitle">Resolve, then re-verify</p>
+        <p class="cbody">"It's not good enough to resolve once if that resolution causes something else to break — rerun every validation step top to bottom."</p></div>
+    </div>
+
+    <div class="spread reveal d1" style="align-items:start">
+      <div class="prose">
+        <h4>On scale and mindset</h4>
+        <ul>
+          <li>"Our most valuable contribution is the experience we create for our users."</li>
+          <li>"Have your agents test on your behalf like you never could, at scales you never will achieve. This is the gift of generative AI."</li>
+          <li>"With every passing set of tests, you free your context window and you stop second-guessing."</li>
+          <li>"Test, let your agents scale your success. Same game, different day, new tools, exponential impact."</li>
+          <li>"Testing at its core is simple: did it do what you designed it to do, and did it break anything else along the way?"</li>
+          <li>"We will be the ones prompting the errors" — as models improve, your validators catch <em>your</em> mistakes.</li>
+          <li>"Lean into the future. Don't lean into the present, don't lean into the past."</li>
+        </ul>
+      </div>
+      <div class="prose">
+        <h4>On moving out of the loop</h4>
+        <ul>
+          <li>"We want end-to-end agents, not in-loop agents… we don't want to be babysitting."</li>
+          <li>"Everything starts with a single prompt. Everything starts in the loop, and then slowly move it out the loop."</li>
+          <li>"One agent running here, one agent running there" — parallel issue-fixing is normal once loops are closed.</li>
+          <li>The in-loop limitation: "You're pretty much limited to one agent unless you're conscious about everything that you're changing" — no worktrees yet.</li>
+          <li>"When you're setting up your ADW to test, you might point this at staging or even a production test account."</li>
+          <li>"Engineers that test with their agents win" is a scaling law, not a slogan — the loop count compounds.</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch06-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What Dan Did</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <ol class="steps">
+        <li><h4>Clone and install</h4><p><span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">git clone disler/tac-5</span>, then <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/install</span> — which now resets the SQLite DB and copies both app and tac-4 <span class="mono">.env</span> files.</p></li>
+        <li><h4>Fired the big one first</h4><p>GitHub issue "adw_plan_build_test feature — create a new button (generate random NL query)" → webhook → the dedicated agent box ran the full plan-build-test pipeline in the background for the whole lesson.</p></li>
+        <li><h4>Closed loop v1 — linter</h4><p>Prompt: update <span class="mono">@sql_processor</span> to comment out validation + "validate your work with: ruff check." Ruff flagged the unused import via stdout; the agent fixed and re-ran until clean.</p></li>
+        <li><h4>Closed loop v2 — three validators</h4><p>Remove the insights endpoint + move <span class="mono">load_dotenv</span>; validate with ruff, <span class="mono">uv run pytest</span>, and <span class="mono">python -m py_compile</span>. Ruff caught import-order, pytest caught the previously commented-out validation — fixed without any memory of the prior session. All three loops closed.</p></li>
+        <li><h4>Closed loop v3 — full-stack + browser</h4><p>A reusable validation prompt: backend checks, frontend checks (<span class="mono">tsc --noEmit</span>, <span class="mono">bun run build</span>), then Playwright MCP — open the local URL, screenshot before, type a query, screenshot after, read both images, verify the NL query returned exactly 7 results. Dan verified the screenshots himself by re-running the query manually.</p></li>
+        <li><h4>Caught a side effect</h4><p>Via <span class="mono">git status</span>: tests had written junk tables to the "production" SQLite DB — bookmarked as the next bug.</p></li>
+        <li><h4>Templated the feedback loops</h4><p>The <span class="mono">/bug</span> meta prompt now bakes Validation Commands into every plan, plus the conditional e2e-test instruction. Ran <span class="mono">/bug 111</span> (run tests in memory) → plan with sqlite3 checks, targeted pytest, before/after table diffs → <span class="mono">/implement</span> in a fresh agent. Ran <span class="mono">/bug 222</span> in parallel (disable input while running + debounce) — its plan included a new e2e test file with test steps, verify statements, and success criteria.</p></li>
+        <li><h4>Walked adw_test.py, then traced a failure</h4><p><span class="mono">/test</span> returns standardized JSON so failures fan out to isolated resolver agents with retry parameters; <span class="mono">/test_e2e</span> is a HOP looping every e2e file with preconditions and screenshot output. Traced a failed run on the agent box by ADW ID through <span class="mono">agents/</span> + <span class="mono">logs/</span> — root cause was an Anthropic API 500, not the workflow.</p></li>
+        <li><h4>Reviewed the finished PR</h4><p>The new "generate random query" button worked in the agent's environment — with one noted UI nit: the motivation for the review step in TAC-6.</p></li>
+      </ol>
+      <div>
+        <div class="codecap">closed loop v1 — the three-part prompt</div>
+        <div class="code reveal d1"><pre><span class="cm"># Request</span>
+Update @sql_processor: comment out the validation logic.
+
+<span class="cm"># Validation</span>
+Validate your work with: ruff check
+
+<span class="cm"># Resolution</span>
+If there are any issues, resolve them and re-run
+the validation until it passes clean.</pre></div>
+        <div class="codecap">closed loop v2 — run in order, top to bottom</div>
+        <div class="code reveal d2"><pre>1. ruff check
+2. uv run pytest
+3. python -m py_compile
+
+<span class="cm"># If any step fails: stop, resolve immediately,</span>
+<span class="cm"># then rerun EVERY validation step.</span></pre></div>
+        <div class="callout warn reveal d3"><span class="ci">CAUGHT</span>
+          <span class="cc">A single <strong>git status</strong> exposed the side effect the loops missed — junk tables in the live DB. The fix wasn't manual: it became <strong>/bug 111</strong>, "tests are writing junk data to the live database — run tests in memory."</span></div>
+        <p class="note reveal d4">Every loop above ran in YOLO mode with a fresh agent — no context carried between sessions.</p>
+      </div>
+    </div>
+
+    <div class="fig reveal d1">
+      <svg class="draw" viewBox="0 0 920 240" role="img" aria-label="adw_test pipeline from issue to PR with resolver fan-out">
+        <text x="426" y="12" text-anchor="middle" class="s-label-sm">one fresh resolver agent per failure · retry cap</text>
+        <rect x="300" y="20" width="80" height="30" rx="6" class="s-card"/>
+        <text x="340" y="39" text-anchor="middle" class="s-label-sm">fail #1</text>
+        <rect x="386" y="20" width="80" height="30" rx="6" class="s-card"/>
+        <text x="426" y="39" text-anchor="middle" class="s-label-sm">fail #2</text>
+        <rect x="472" y="20" width="80" height="30" rx="6" class="s-card"/>
+        <text x="512" y="39" text-anchor="middle" class="s-label-sm">fail #3</text>
+        <path d="M426 96 L 344 54" class="s-line"/>
+        <path d="M426 96 L 426 54" class="s-line"/>
+        <path d="M426 96 L 508 54" class="s-line"/>
+        <rect x="16" y="96" width="120" height="54" rx="10" class="s-clay-f"/>
+        <text x="76" y="119" text-anchor="middle" class="s-title" font-size="12">fetch issue</text>
+        <text x="76" y="137" text-anchor="middle" class="s-label-sm">gh issue view</text>
+        <path d="M136 123 H 158" class="s-flow"/><path d="M166 123 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="166" y="96" width="150" height="54" rx="10" class="s-blue-f"/>
+        <text x="241" y="119" text-anchor="middle" class="s-title" font-size="12">/test → JSON</text>
+        <text x="241" y="137" text-anchor="middle" class="s-label-sm">standardized results</text>
+        <path d="M316 123 H 338" class="s-flow"/><path d="M346 123 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="346" y="96" width="160" height="54" rx="10" class="s-amber-f"/>
+        <text x="426" y="119" text-anchor="middle" class="s-title" font-size="12">resolver agents</text>
+        <text x="426" y="137" text-anchor="middle" class="s-label-sm">/resolve_failed_test</text>
+        <path d="M506 123 H 528" class="s-flow"/><path d="M536 123 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="536" y="96" width="150" height="54" rx="10" class="s-plum-f"/>
+        <text x="611" y="119" text-anchor="middle" class="s-title" font-size="12">/test_e2e HOP</text>
+        <text x="611" y="137" text-anchor="middle" class="s-label-sm">loops e2e files</text>
+        <path d="M686 123 H 708" class="s-flow"/><path d="M716 123 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="716" y="96" width="80" height="54" rx="10" class="s-olive-f"/>
+        <text x="756" y="127" text-anchor="middle" class="s-title" font-size="12">report</text>
+        <path d="M796 123 H 818" class="s-flow"/><path d="M826 123 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="826" y="96" width="84" height="54" rx="10" class="s-clay-f"/>
+        <text x="868" y="121" text-anchor="middle" class="s-title" font-size="12">commit</text>
+        <text x="868" y="139" text-anchor="middle" class="s-label-sm">push · PR</text>
+        <path d="M426 150 C 426 200, 245 200, 245 158" class="s-line" fill="none" stroke-dasharray="5 5"/>
+        <path d="M245 152 l-6 9 12 0 z" class="s-clay"/>
+        <text x="336" y="212" text-anchor="middle" class="s-label-sm">after resolving: rerun every validation step</text>
+      </svg>
+      <div class="fcap"><b>adw_test, the testing ADW.</b> Fetch issue → run the full suite via <span class="mono">/test</span> returning standardized JSON → per-failure isolated resolver agents in a retry loop → e2e HOP → report → commit → push/PR.</div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch06-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Workout</h2></div>
+
+    <div class="grid grid-2">
+      <div class="callout reveal"><span class="ci">GOAL</span>
+        <span class="cc">Convert your manual verification ritual into <strong>closed loops an agent runs</strong>, including one browser-level e2e test.</span></div>
+      <div class="callout reveal d1"><span class="ci">PREREQS</span>
+        <span class="cc">TAC-3/4 setup; a linter, a test runner, and a build command in your repo; <strong>Playwright MCP</strong> configured in <span class="mono">.mcp.json</span>.</span></div>
+    </div>
+
+    <ol class="steps reveal d1">
+      <li><h4>Take your validation inventory</h4><p>Write down every step you personally take to verify a change ships — lint, tests, build, click-through. This is your validation inventory.</p></li>
+      <li><h4>Write one closed-loop prompt</h4><p>Request (one small refactor) + Validation (<span class="mono">ruff check</span> or equivalent) + Resolution ("if any issues, fix and re-run until clean"). Run it; watch the loop close.</p></li>
+      <li><h4>Scale to three validators</h4><p>Linter + unit tests + compile/build, with the instruction: "run in order top to bottom; if any step fails, stop, resolve immediately, then rerun EVERY validation step."</p></li>
+      <li><h4>Add the browser</h4><p>A validation prompt that starts your app, opens it via Playwright MCP, screenshots before/after a scripted interaction, and verifies a precise expected result.</p></li>
+      <li><h4>Bake validation into your templates</h4><p>Add a "Validation Commands" section to your <span class="mono">/chore</span>, <span class="mono">/bug</span>, <span class="mono">/feature</span> plan formats, plus "if this affects UI, create an e2e test file" with a test-steps / verify / success-criteria format.</p></li>
+      <li><h4>Prove the template carries its own validators</h4><p>Run one <span class="mono">/bug</span> through plan → implement and confirm the generated plan validates itself.</p></li>
+    </ol>
+
+    <div class="grid grid-2">
+      <div class="callout ok reveal"><span class="ci">DONE WHEN</span>
+        <span class="cc">An intentionally broken change gets fully repaired by the agent with <strong>zero human diagnosis</strong>, and one e2e screenshot pair proves a UI behavior.</span></div>
+      <div class="callout idea reveal d1"><span class="ci">LEVEL UP</span>
+        <span class="cc">Build <span class="mono">adw_test.py</span> — run all tests, emit JSON results, spawn one fresh resolver agent per failure with a retry cap, then commit and PR the fixes.</span></div>
+    </div>
+
+    <a class="jump reveal" href="#ch07">Next · Let Your Agents Focus &nbsp;&rarr;</a>
+  </div>
+</section>

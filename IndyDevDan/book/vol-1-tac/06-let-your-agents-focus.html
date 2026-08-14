@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first companion to TAC-6: Let Your Agents Focus. Learn one-agent-one-prompt-one-purpose, spec review, typed proof, patch loops, conditional documentation, and focused agent contexts.">
+  <title>TAC-6 · Let Your Agents Focus — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="06-let-your-agents-focus.assets.css">
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL I · TAC · CHAPTER 06</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume I · Chapter 6</p>
+      <h2>Let Your Agents Focus</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation</span></a></li>
+          <li><a href="#five-questions"><span class="chapter-nav__n">01</span><span>Five questions</span></a></li>
+          <li><a href="#review-not-test"><span class="chapter-nav__n">02</span><span>Review ≠ test</span></a></li>
+          <li><a href="#one-one-one"><span class="chapter-nav__n">03</span><span>One · one · one</span></a></li>
+          <li><a href="#minimum-context"><span class="chapter-nav__n">04</span><span>Minimum context</span></a></li>
+          <li><a href="#committed-evals"><span class="chapter-nav__n">05</span><span>Committed evals</span></a></li>
+          <li><a href="#review-adw"><span class="chapter-nav__n">06</span><span>Review ADW</span></a></li>
+          <li><a href="#patch-loop"><span class="chapter-nav__n">07</span><span>Patch loop</span></a></li>
+          <li><a href="#document-loop"><span class="chapter-nav__n">08</span><span>Document loop</span></a></li>
+          <li><a href="#blame-layer"><span class="chapter-nav__n">09</span><span>Blame the layer</span></a></li>
+          <li><a href="#scoreboard"><span class="chapter-nav__n">10</span><span>KPI scoreboard</span></a></li>
+          <li><a href="#current-practice"><span class="chapter-nav__n">11</span><span>Current practice</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">12</span><span>Graded lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">13</span><span>Mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">14</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--focus">
+        <span class="hero__chapter">Tactic #6 · One Agent, One Prompt, One Purpose</span>
+        <h1>Let Your Agents Focus</h1>
+        <p class="hero__dek">Complete the software lifecycle with dedicated review and document agents, then give every step a fresh context, a committed prompt, a narrow contract, and one question to answer well.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 57:16</li>
+          <li>Lab · 90–120 min</li>
+          <li>Course repo · tac/tac-6</li>
+          <li>Level · advanced system builder</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to state the five SDLC questions, defend review as distinct from testing, trace the typed review → patch → document machinery, diagnose context pollution, run the course workflow without hand-editing application code, and teach why a focused fleet is more improvable than one heroic session.</p>
+        <div class="focus-hero" role="img" aria-label="Three cards reading one agent, one prompt, one purpose">
+          <article><strong>One agent</strong><p>A fresh worker with a clean window and a named role.</p></article>
+          <article><strong>One prompt</strong><p>A committed, versioned instruction that can be rerun.</p></article>
+          <article><strong>One purpose</strong><p>One lifecycle question, one output contract, one way to improve.</p></article>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation</a></li><li><a href="#five-questions">Five questions</a></li><li><a href="#review-not-test">Review is not testing</a></li><li><a href="#one-one-one">One · one · one</a></li><li><a href="#minimum-context">Minimum context</a></li><li><a href="#committed-evals">Committed prompts become evals</a></li><li><a href="#review-adw">Review ADW</a></li><li><a href="#patch-loop">Patch loop</a></li><li><a href="#document-loop">Document loop</a></li><li><a href="#blame-layer">Blame the layer</a></li><li><a href="#scoreboard">KPI scoreboard</a></li><li><a href="#current-practice">Current practice</a></li><li><a href="#lab">Graded lab</a></li><li><a href="#mastery">Mastery</a></li><li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">A working feature can still be the wrong feature</h2>
+        <p class="section-lead">The lesson opens after planning, building, and testing already work. The remaining gap is not more code generation. It is disciplined judgment: proving that the implementation matches the request, preserving how it works, and feeding that knowledge into the next planning agent.</p>
+
+        <p>Imagine an issue that asks for one-click CSV exports. The agent adds the endpoints. Clicking Export downloads a correct CSV. Functional testing has something legitimate to celebrate. Yet the issue also asked for the Export control to sit directly left of Hide. The implementation places it in the middle of the header. Nothing crashes. The download works. The result is still not what was requested.</p>
+        <p>That small placement error is the hinge for this entire chapter. It proves that “works” and “matches the specification” are different predicates. It also proves that evidence can help even when an agent misjudges its own evidence: the reviewer uploads a screenshot, the human sees the mismatch quickly, and a patch workflow repairs it. Then a document agent turns the finished branch into an application document and adds a condition telling future planning agents when to read it.</p>
+        <p>The architecture is deliberately legible. Separate uv scripts run separate prompt templates. A tiny JSON state file carries the ADW ID, issue, branch, plan, and issue class. Strict output types sit beside prompt contracts. Severity categories encode release judgment. A retry cap prevents an endless self-repair loop. The lesson does not ask you to trust an all-purpose intelligence. It asks you to design a system in which each agent answers one question and leaves receipts.</p>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The chapter’s one-sentence thesis</p>
+          <p>A fresh focused context per lifecycle question beats one polluted god-session, and committed one-purpose prompts make each answer reproducible, reviewable, and improvable.</p>
+        </aside>
+
+        <h3>What you are training</h3>
+        <ul class="learning-objectives">
+          <li><strong>Separation</strong>Give plan, build, test, review, and document distinct questions instead of blending them into one vague “do the work” session.</li>
+          <li><strong>Context discipline</strong>Supply the minimum context required for one purpose, then start the next phase with a fresh window.</li>
+          <li><strong>Proof</strong>Turn review into typed, severity-triaged evidence attached to the issue and pull request.</li>
+          <li><strong>Repair</strong>Route misses through a surgical patch workflow so the system—not your reflexes—learns to build on your behalf.</li>
+          <li><strong>Memory</strong>Generate application documentation and conditionally load it for future work without bulk-polluting every prompt.</li>
+        </ul>
+
+        <h3>The course system you will study</h3>
+        <p>The source of truth is the tracked <code>tac-6</code> course repository. New lesson machinery includes <code>adws/adw_review.py</code>, <code>adws/adw_patch.py</code>, <code>adws/adw_document.py</code>, new composed workflows, <code>.claude/commands/review.md</code>, <code>patch.md</code>, <code>document.md</code>, <code>conditional_docs.md</code>, <code>prepare_app.md</code>, and an optional Cloudflare R2 uploader. The application is the same Natural Language SQL system wrapped by a more complete agentic layer.</p>
+        <p>Dan’s on-camera run uses issue #14, PR #15, and ADW ID <code>490eb6b5</code>. Those values are evidence from his run, not constants in the committed repository and not values you should copy into commands. Your issue, pull request, and ADW ID will differ.</p>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Prime directive for the lab</p>
+          <p>Type zero lines of application code by hand. If the agent puts the button in the wrong place, do not rescue the artifact in <code>app/client/src/main.ts</code> or the stylesheet. Improve or invoke the workflow that owns the failure.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="five-questions">
+        <span class="section-number">01</span>
+        <h2 class="section-title">The SDLC is five questions</h2>
+        <p class="section-lead">A lifecycle stage becomes delegable when its responsibility can be stated as a question with observable evidence. TAC-6 completes the set by adding review and document as first-class answers.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>Three green stages, two unanswered questions</h3>
+          <p>Your planner created a detailed specification. Your implementer made the change real. Your test agent showed that the behavior runs. The pull request is still hard to approve because nobody has compared the finished artifact with the exact request, and the next agent will have to rediscover how the feature works. The workflow stopped where the code stopped, not where engineering stopped.</p>
+          <p>This is a common automation trap: shipping machinery is optimized around producing code, so non-code responsibilities become optional human cleanup. TAC-6 refuses that boundary. Review and documentation are not aftercare. They are lifecycle stages with their own prompts, scripts, artifacts, and failure policies.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — question-shaped SDLC</p>
+          <h3>One stage, one question, one executable boundary</h3>
+          <div class="question-pipeline" aria-label="Five SDLC stages and their questions">
+            <article><b>Plan</b><p>What are we building?</p><code>adw_plan.py</code></article>
+            <article><b>Build</b><p>Did we make it real?</p><code>adw_build.py</code></article>
+            <article><b>Test</b><p>Does it work?</p><code>adw_test.py</code></article>
+            <article><b>Review</b><p>Is it what we asked for? <strong>Prove it.</strong></p><code>adw_review.py</code></article>
+            <article><b>Document</b><p>How does it work?</p><code>adw_document.py</code></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the lesson’s scaffold</p>
+          <h3>The fifth question changes the first</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-6-let-your-agents-focus/t0152-sdlc-as-questions.jpg" alt="Course slide titled SDLC as Questions listing Plan, Build, Test, Review, and Document with each stage's question" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">2:32</span>The complete scaffold. Review alone carries “Prove it,” while Document asks how the finished change works so later agents can plan from accumulated knowledge.</figcaption>
+          </figure>
+          <p>Read the arrows in both directions. Forward, an issue becomes a plan, implementation, test evidence, conformance proof, and documentation. Backward, the documenter adds a conditional entry that a future planner reads when the next task matches. The endpoint is therefore not a pile of Markdown. It is a loop back into planning.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>SDLC as questions and answers</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s term</p><p><strong>SDLC as questions</strong> means every lifecycle step owns a distinct engineering uncertainty. The stage is complete only when its artifact answers that question.</p></aside>
+          <p>The wording is diagnostic. If two stages answer the same question, their boundaries are unclear. If an important question has no stage, the system depends on hidden human labor. “Run all checks” is not a useful stage definition; “does it work?” is. “Look it over” is vague; “does it match the request, and where is the proof?” is operational.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — read the composers</p>
+          <h3>A composed workflow is a sentence made of questions</h3>
+          <p><code>adws/adw_plan_build_review.py</code> is explicit: it runs Plan, Build, and Review, says that tests are skipped, and chains the scripts through <code>adw_state.json</code>. <code>adws/adw_sdlc.py</code> calls all five phases in order. The orchestration is intentionally unglamorous: run one process, stop if it fails, then call the next.</p>
+          <pre><code># The complete course pipeline, paraphrased from adw_sdlc.py
+adw_plan.py(issue, adw_id)
+adw_build.py(issue, adw_id)
+adw_test.py(issue, adw_id, "--skip-e2e")
+adw_review.py(issue, adw_id)
+adw_document.py(issue, adw_id)</code></pre>
+          <p>Notice what composition does not do. It does not merge the agents’ conversation histories. Persistent state carries dense identifiers and artifact paths; the next purpose starts with its own prompt. Separation lives at the process and context boundary while continuity lives in state.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — question audit</p>
+          <h3>Find the hole in one workflow you already own</h3>
+          <ol><li>Write the start and end of one recurring engineering workflow.</li><li>List each named stage without looking at this chapter.</li><li>Turn every stage into a question.</li><li>Circle duplicate questions and questions answered only by a human’s memory.</li><li>Add exactly one missing stage and name the artifact that would prove its answer.</li></ol>
+          <p class="fine">Pass when every stage has a unique question and a durable artifact. A meeting, intuition, or “the agent said it was done” is not durable evidence.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating five labels as ceremony</h3>
+          <p>Teams can copy the words Plan, Build, Test, Review, and Document while leaving the same generic agent responsible for all five in one long session. The board now has more columns, but the agent still drags every assumption, false start, test log, and implementation detail through the whole task.</p>
+          <p><strong>Fix:</strong> give each label a question, fresh invocation, prompt file, output contract, and failure boundary. The value comes from separation that the system can enforce, not from the vocabulary alone.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The implementation surface can change; the five questions remain</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract verified for mid-2026</p><p>The course expresses each question as a headless process and slash-command template. Current native agent and Skill surfaces can hold the same boundaries. Keep the question, context, evidence, and failure contract even if the launcher changes.</p><p class="current-practice__source">Durable primitive: separate lifecycle uncertainties. Period detail: how each worker is spawned.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <h3>Close the section, then answer cold</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">State the five lifecycle questions in order.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>What are we building? Did we make it real? Does it work? Is what we built what we asked for—prove it? How does it work?</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What crosses phase boundaries if conversation history does not?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Persistent state and durable artifacts: ADW ID, issue, branch, plan file, issue class, specs, test results, review evidence, and documentation.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Teach the five-stage lifecycle to a teammate using only questions. Then explain why Review carries “Prove it” and why Document points back toward Plan.</p><p class="fine">Pass if your listener can identify a workflow hole without needing the names of Dan’s scripts.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="review-not-test">
+        <span class="section-number">02</span>
+        <h2 class="section-title">Review is not testing</h2>
+        <p class="section-lead">Testing asks whether behavior works. Review asks whether the built artifact matches the requested artifact. Green tests can support review, but they cannot silently replace the specification.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The CSV downloads perfectly from the wrong place</h3>
+          <p>Dan’s issue asks for one-click table and query-result exports, two endpoints, an appropriate icon, and precise button placement. The implementation produces valid downloads. A functional test can click Export, receive data, and pass. Yet the query-result control floats away from Hide instead of sitting directly to its left. The feature works and violates the issue at the same time.</p>
+          <p>If your definition of done is “tests are green,” the mismatch ships. If your definition is “a reviewer glanced at the code,” it may still ship. The requested layout is visible in the running product, so the strongest review evidence is a picture of the critical path compared against the placement language in the spec.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — two predicates</p>
+          <h3>Passing one gate does not imply passing the other</h3>
+          <div class="comparison" aria-label="Testing and review compared">
+            <article class="comparison__card"><div class="comparison__head"><h3>Testing</h3><p>Does it work?</p></div><div class="comparison__body"><ul><li>Exercise behavior</li><li>Detect functional regression</li><li>Return pass/fail evidence</li><li>Example: CSV endpoint returns a valid file</li></ul></div></article>
+            <article class="comparison__card comparison__card--agentic"><div class="comparison__head"><h3>Review</h3><p>Is it what we asked for?</p></div><div class="comparison__body"><ul><li>Read the specification</li><li>Inspect the implementation and critical paths</li><li>Return conformance proof</li><li>Example: Export is directly left of Hide</li></ul></div></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the screenshot tells on the report</p>
+          <h3>The reviewer misses; its evidence still raises review velocity</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-6-let-your-agents-focus/t1912-review-screenshot-misplaced-export.png" alt="Review screenshot showing the Export button in the middle of the Query Results header instead of beside Hide" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">31:52</span>The agent-produced proof exposes the mismatch in seconds: Export sits mid-header while Hide remains at the far right.</figcaption>
+          </figure>
+          <p>This is an important mixed result. The review agent reports success, so its judgment is wrong. The proof transport is useful, so the human sees the problem quickly. Mature system review can hold both facts: one component failed, another reduced the cost of detecting that failure. The correct response is not “screenshots are useless” or “the model is useless.” It is to trace which layer did and did not carry the requirement.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Spec-conformance review and review velocity</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s distinction</p><p><strong>Testing</strong> establishes that the functionality works. <strong>Review</strong> establishes that the functionality is what was requested. Proof makes the second judgment fast enough to perform consistently.</p></aside>
+          <p>Review velocity is not the speed at which an agent says “looks good.” It is the speed at which a responsible human can reach a high-confidence yes or no. A live asset—a screenshot, report, video, or other hard artifact—moves the decision surface to the reviewer instead of sending the reviewer on a scavenger hunt.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — read review.md as a boundary</p>
+          <h3>Navigation guides are not tests</h3>
+          <p><code>.claude/commands/review.md</code> instructs the reviewer to read the branch diff and spec, prepare the application, use matching <code>e2e/test_*.md</code> files only as navigation guides, take one to five numbered screenshots, and compare critical paths against requirements. It explicitly says the step is not testing.</p>
+          <p>The contract also narrows the work away from general code-quality review. The purpose is request conformance. Architecture, style, and correctness concerns may be handled by other prompts and tools, but letting this reviewer re-litigate every engineering dimension would consume its focused window and blur the release decision.</p>
+          <aside class="source-note"><strong>Course quirk worth noticing:</strong> <code>review.md</code> refers to <code>./claude/commands/e2e</code>, missing the leading dot in <code>.claude</code>. The intent is readable, but the path is not exact. Treat this as a live example of why prompt text and code contracts deserve review too.</aside>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — split one acceptance criterion</p>
+          <h3>Write one test and one review proof for the same feature</h3>
+          <ol><li>Choose a visible behavior in the course app.</li><li>Write a testing assertion that proves the behavior executes.</li><li>Write a review assertion that proves the result matches the request.</li><li>Name the smallest artifact that lets a human verify the review assertion.</li><li>Explain why the first assertion cannot prove the second.</li></ol>
+          <p class="fine">Example shape: “download returns CSV” versus “download control is immediately left of Hide”; response assertion versus targeted screenshot.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure at both extremes</h3>
+          <p><strong>CI equals review:</strong> a valid download masks a layout violation. <strong>Review equals everything:</strong> one agent is asked to retest, critique architecture, inspect style, search for security problems, judge UX, and compare the spec. Its purpose becomes “be smart about the whole repository,” which is not a usable contract.</p>
+          <p><strong>Fix:</strong> keep predicates separate. Let testing prove behavior. Let review compare request and artifact. Add another focused stage if a different engineering uncertainty matters enough to own.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Make image reading part of the default review contract</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract verified for mid-2026</p><p>The course reviewer captures images but does not put their visual content back into its reasoning context. The extract’s current-practice treatment makes “read every image you take” a default prompt line. Keep the failure story because the durable lesson is to encode proof consumption, not merely proof production.</p><p class="current-practice__source">Modern tooling changes the mechanics; it does not collapse testing and review into one question.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why did review have work after the CSV download succeeded?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The feature violated a placement requirement in the spec. Functional success answered “does it work?” but not “is it what we asked for?”</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does review use the e2e Markdown files for?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Only as navigation guides for where to capture critical screenshots, not as tests.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Explain the export-button failure to someone who believes green CI means the feature is done. Use the two questions, one testing artifact, and one review artifact.</p><p class="fine">Pass if they can invent a new example where behavior succeeds but the requested form is wrong.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="one-one-one">
+        <span class="section-number">03</span>
+        <h2 class="section-title">One agent, one prompt, one purpose</h2>
+        <p class="section-lead">The tactic is a structural commitment: every step receives a fresh agent, exactly one committed prompt, and one question-shaped purpose. Singular purpose does not imply a tiny or easy prompt.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The god-session that remembers everything except the goal</h3>
+          <p>A single session reads the issue, explores the repository, debates three plan options, implements one, sees noisy test logs, makes repairs, summarizes a diff, opens a browser, captures screenshots, writes docs, and prepares a pull request. The window contains an impressive amount of information. It also contains abandoned ideas, obsolete file states, tool noise, and instructions for responsibilities that conflict.</p>
+          <p>When the reviewer reaches the placement requirement, its attention competes with everything that came before. The session is large, but the purpose is weak. TAC-6 takes the controversial opposite position: build a fleet of small workers around durable artifacts instead of asking one worker to preserve perfect attention across the lifecycle.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the tactic</p>
+          <h3>Repeat the boundary until it becomes architecture</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-6-let-your-agents-focus/t0278-tactic-one-agent-one-prompt-one-purpose.jpg" alt="Tactic slide titled One Agent, One Prompt, One Purpose with five daily actions" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">4:38</span>The memorization frame: dedicated agents per workflow step, focused prompts, freed context windows, committed prompts, and individual performance improvement.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the file tree becomes the cast</p>
+          <h3>Low-level workers compose without sharing a mind</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-6-let-your-agents-focus/t0756-adws-workflow-files.png" alt="VS Code explorer showing review, patch, document, and composed ADW workflow files" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">12:36</span>The lesson’s cast is visible as files: standalone review, patch, and document workflows plus composers that arrange them.</figcaption>
+          </figure>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-6-let-your-agents-focus/t1012-composed-workflow-script.png" alt="adw_plan_build_review.py open with a docstring listing Plan, Build, Review and persistent state chaining" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">16:52</span>The composer is deterministic glue. It starts separate programs and passes continuity through persistent state rather than a mega-context.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>One · one · one</h3>
+          <aside class="callout callout--term"><p class="callout__label">Tactic #6</p><p><strong>One agent, one prompt, one purpose</strong>: no agent runs a second prompt. The prompt can still be a large template meta prompt or higher-order prompt. Focus describes responsibility, not prompt length.</p></aside>
+          <p>This nuance prevents the most tempting misread. A review prompt may contain setup, variables, diff instructions, screenshot policy, severity guidelines, and an explicit JSON contract. That is substantial work. It is still one purpose because every instruction exists to answer spec conformance with proof.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — census the agents</p>
+          <h3>Names, commands, and purposes line up</h3>
+          <div class="agent-cast" aria-label="Review workflow agent roles">
+            <article><h4>Reviewer</h4><p>Compares implementation with the spec and returns typed evidence.</p><code>/review</code></article>
+            <article><h4>Patch planner</h4><p>Turns one blocking change request into a minimal patch plan.</p><code>/patch</code></article>
+            <article><h4>Patch implementor</h4><p>Executes that plan through the shared implementation prompt.</p><code>/implement</code></article>
+          </div>
+          <p>At the top of <code>adw_review.py</code>, the roles are declared as constants: reviewer, review patch planner, and review patch implementor. <code>run_review()</code> constructs one <code>AgentTemplateRequest</code> for <code>/review</code>. The patch helper constructs one request for <code>/patch</code>, validates its returned path, then calls the reusable <code>/implement</code>. The same agent does not plan and implement simply because both steps concern the same blocker.</p>
+          <p>A repository search for <code>slash_command=</code> is the tactic’s mechanical audit. The extract records 14 call sites in four files. Each call is a boundary where you can ask: is this invocation named for one responsibility, does it run one prompt, and does its output feed a durable next step?</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — one-one-one census</p>
+          <h3>Map the run artifacts back to purposes</h3>
+          <ol><li>After the lab run, list directories under <code>agents/{adw_id}/</code>.</li><li>For each named agent, locate its saved prompt.</li><li>Write the single purpose beside the slash command.</li><li>Flag any purpose containing “and” that names a second lifecycle question.</li><li>Confirm that continuity comes from files or state, not an agent receiving a second prompt.</li></ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: tiny prompts or a hidden mega-session</h3>
+          <p><strong>Tiny-prompt cargo cult:</strong> useful setup, evidence rules, and schema instructions are removed to make the prompt look “focused.” The agent’s purpose stays singular but its execution becomes under-specified. <strong>Hidden mega-session:</strong> plan, build, and review are sent as sequential messages to the same interactive context to “save tokens.” The labels survive while the polluted window returns.</p>
+          <p><strong>Fix:</strong> judge focus by the question and output contract. Keep every instruction needed to answer that question well. Start a fresh worker when the question changes.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The course exposes the primitive; newer surfaces package it</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract verified for mid-2026</p><p>The course uses separate headless processes and per-agent folders. The extract maps the same tactic to native subagents and Skills with isolated context, tools, and system prompts. External orchestration remains useful for deterministic CI or webhook pipelines; native workers make interactive fan-out more direct.</p><p class="current-practice__source">The implementation changed. The reason for the boundary did not.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the strongest one-sentence proof that the tactic is real in this repository?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No agent runs more than one prompt; each named invocation has one slash command and one output purpose.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does “one purpose” not mean?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It does not mean the prompt is small or the work is simple. A single-purpose prompt can be large and demanding.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Use reviewer → patch planner → implementor to teach the tactic. Explain why three agents are not needless fragmentation and why one large review prompt can still be focused.</p><p class="fine">Pass if your explanation names fresh context, a durable handoff, and one output contract per agent.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="minimum-context">
+        <span class="section-number">04</span>
+        <h2 class="section-title">Minimum context beats maximum context</h2>
+        <p class="section-lead">Every token is another variable the agent must reason about. The goal is not to starve a worker; it is to give one purpose the minimum complete context and withhold unrelated lifecycle history.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The window gets bigger while attention gets worse</h3>
+          <p>You paste the issue, architecture notes, whole repository map, two previous chat transcripts, test output, screenshots, documentation, and rejected implementation ideas into the reviewer “so it knows everything.” The requirement is somewhere inside. So are hundreds of irrelevant alternatives. The agent must decide which facts remain live and which were superseded before it can compare the product with the spec.</p>
+          <p>More capacity delays the visible failure; it does not remove the cognitive burden. Dan calls the result context pollution, context overloading, and toxic context: the worker becomes distracted, confused, or detached from the original task even though the information is technically present.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — one polluted room, five clean rooms</p>
+          <h3>Preserve continuity in artifacts, not noise</h3>
+          <div class="window-study" aria-label="One overloaded context compared with five fresh contexts">
+            <article class="window-study__polluted"><h4>One god-window</h4><p>Every phase, false start, tool log, and responsibility competes.</p><div class="token-cloud"><span>issue</span><span>repo</span><span>rejected plan</span><span>diff</span><span>logs</span><span>tests</span><span>screens</span><span>docs</span><span>old state</span><span>patches</span><span>PR</span></div></article>
+            <article class="window-study__fresh"><h4>Five fresh windows</h4><p>Each receives its prompt, dense identifiers, relevant artifacts, and one question.</p><div class="fresh-windows"><div>Plan<br><small>issue + codebase</small></div><div>Build<br><small>spec + repo</small></div><div>Test<br><small>behavior + checks</small></div><div>Review<br><small>spec + diff + proof</small></div><div>Document<br><small>diff + spec + assets</small></div></div></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — a seven-line handoff</p>
+          <h3>The ADW ID carries continuity without carrying the whole conversation</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-6-let-your-agents-focus/t1068-adw-state-json.png" alt="Small adw_state.json file showing ADW ID, issue number, branch name, plan file, and issue class beside per-agent folders" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">17:48</span>The chaining mechanism is deliberately small: dense state points each focused phase toward the right branch and artifacts.</figcaption>
+          </figure>
+          <p>The state file shown during planning contains the ADW ID, issue number, branch name, plan file, and issue class. As phases finish, those fields become a compact routing packet. The reviewer can load state, check out the right branch, and find the spec. It does not need the planner’s internal conversation. The course code <em>tries</em> to add <code>review_screenshots</code> to this state, but <code>ADWState.update()</code> filters everything except the five core fields. The documenter therefore falls back to <code>agents/{adw_id}/reviewer/review_img</code> when local screenshots exist. That mismatch is a real state-contract bug, not a sixth field to memorize.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Context pollution and the minimum context principle</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s terms</p><p><strong>Context pollution</strong> is degraded focus caused by an overloaded window. The <strong>minimum context principle</strong> says to context-engineer as little as possible while still giving the agent everything required to solve its one problem.</p></aside>
+          <p>Minimum does not mean arbitrary omission. A reviewer needs the spec, relevant diff, a running app when visual proof applies, and an output contract. It does not need the planner’s discarded alternatives or the implementer’s full tool trace. Context engineering is as much subtraction and routing as collection.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — two context filters</p>
+          <h3>Variables compress; conditional docs gate</h3>
+          <p>The prompt templates declare variables such as <code>adw_id: $1</code>, <code>spec_file: $2</code>, and a computed review-image directory. These information-dense keywords are referenced throughout the prompt. They keep a stable instruction file reusable while the workflow injects only the run-specific state.</p>
+          <p><code>conditional_docs.md</code> applies the same principle to repository knowledge. It tells planning agents to read a document only when one of its conditions matches the task. The committed baseline has four entries: the root README, client stylesheet, ADW classifier prompt, and ADW README. It is an index with gates, not a command to bulk-load every document.</p>
+          <div class="constraint-row" aria-label="Three constraints and which specialized agents bypass">
+            <article><strong>Context window</strong><p>Bypassed per step by a fresh window.</p></article>
+            <article><strong>Your abilities</strong><p>Reduced by templating repeatable judgment.</p></article>
+            <article><strong>Codebase + problem complexity</strong><p>Still real; decomposition does not erase the problem.</p></article>
+          </div>
+          <p>Dan names those three constraints and deliberately excludes model intelligence. Specialized agents bypass two of three: they free the window and encode more of the engineer’s reusable skill into prompts. They do not make a hard codebase simple.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — context budget</p>
+          <h3>Design the reviewer’s smallest complete packet</h3>
+          <ol><li>Write the exact question the reviewer owns.</li><li>List the artifacts without which the answer would be guesswork.</li><li>List three tempting artifacts that belong to another phase.</li><li>Replace raw history with one dense identifier or file path where possible.</li><li>State the rule that would load one application document only when relevant.</li></ol>
+          <p class="fine">Pass if removing one more item would make the review incomplete, while adding a discarded plan or full chat log would not improve the contract.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: cargo-culting context or surviving on compact</h3>
+          <p><strong>Everything everywhere:</strong> every document and transcript enters every phase “to be safe.” <strong>Compression dependence:</strong> one long session is repeatedly compacted so work can continue. Dan treats compact as a band-aid because compression necessarily loses information; it manages the symptom of a bloated session.</p>
+          <p><strong>Fix:</strong> start fresh when the purpose changes. Carry durable artifacts, not conversation residue. Use conditional indexes and explicit variables to pull only the knowledge the current question needs.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Context engineering has more controls, not a different objective</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract verified for mid-2026</p><p>Newer context inspection, layering, editing, and compaction controls make long sessions easier to manage. The extract still treats fresh one-purpose contexts as the durable answer to long-session degradation. Tools can expose pollution; architecture prevents much of it.</p><p class="current-practice__source">Use current controls, but grade every context item by relevance to the one purpose.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name the three constraints and the two specialized agents bypass.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Context window, codebase-plus-problem complexity, and your abilities. Fresh specialized agents bypass the context-window and personal-ability constraints; complexity remains.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is compact a band-aid in this lesson?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It compresses an already overloaded session and loses information. A fresh context per purpose avoids dragging the pollution forward.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Draw one large window and five small windows. Teach what crosses between the small ones, what stays behind, and why a larger capacity does not remove relevance decisions.</p><p class="fine">Pass if you can defend both an included item and an intentionally withheld item for the review phase.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="committed-evals">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Committed prompts become evals</h2>
+        <p class="section-lead">A one-purpose prompt is not only an instruction. Once it is committed and the run state is reproducible, it becomes an experimental surface: change one variable, rerun the same step, and compare typed outcomes.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>Prompt improvement that evaporates with the chat</h3>
+          <p>A reviewer misses a requirement. You add a clarifying sentence in the live conversation, rerun from an unknown state, and get a better answer. The session ends. Nobody can say which instruction changed, whether the better result came from a different diff, or how to reproduce it next week. The improvement exists only as memory and luck.</p>
+          <p>This is prompt archaeology: digging through chat history for the sentence that seemed to help. It is the opposite of engineering. A workflow step becomes evaluable only when its instruction and starting state survive the run.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the smallest eval loop</p>
+          <h3>Stable input, one changed knob, comparable output</h3>
+          <div class="artifact-chain" aria-label="Prompt evaluation loop">
+            <article><strong>1 · Restore</strong><p>Return to the pre-review branch state.</p><code>git checkout …</code></article>
+            <article><strong>2 · Change one</strong><p>Edit prompt, model, thinking, or tool policy.</p><code>review.md</code></article>
+            <article><strong>3 · Rerun</strong><p>Use the same issue and ADW state.</p><code>adw_review.py</code></article>
+            <article><strong>4 · Compare</strong><p>Diff the typed review results and proof.</p><code>ReviewResult</code></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the prompt and type nearly share a contract</p>
+          <h3>A visible seam invites comparison—and exposes drift</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-6-let-your-agents-focus/t1305-review-prompt-and-types.png" alt="Split editor showing review.md output structure beside ReviewIssue and ReviewResult Pydantic models" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">21:45</span>The object fields in the prompt example line up with the Pydantic models, creating a comparable record—though the prompt’s separate “JSON array” instruction contradicts its object example.</figcaption>
+          </figure>
+          <p>The course also routes models by purpose in <code>adws/adw_modules/agent.py</code>: review and patch use <code>opus</code>; document uses <code>sonnet</code>; other commands have their own entries. The aliases are period detail, but the experimental seam is durable. You can change the model for one slash command without changing every stage.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Evals for the agentic layer</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s idea</p><p><strong>Agentic-layer evals</strong> compare the behavior of a committed workflow step from a reproducible state. Git preserves the prompt and code; typed artifacts preserve the outcome.</p></aside>
+          <p>The lesson names both an explicit and a passive form. Explicitly, restore, change one knob, rerun, and compare. Passively, observe recurring misses and successes while using the workflow in-loop; your operational experience begins to form an evaluation set. In both cases, the prompt must live somewhere more durable than a disappearing context window.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — evaluate screenshot reading</p>
+          <h3>Turn the lesson’s miss into a controlled test</h3>
+          <ol><li>Preserve the branch state in which Export is misplaced.</li><li>Run <code>uv run adws/adw_review.py &lt;issue#&gt; &lt;adw-id&gt; --skip-resolution</code> and save the returned review data.</li><li>Through the agentic workflow, add the instruction that every captured image must be read during review.</li><li>Restore the same pre-review state.</li><li>Rerun with the same issue, spec, and ADW ID, then compare success, issues, severities, screenshots, and summary.</li></ol>
+          <p>The comparison is not perfect experimental science: model calls remain non-deterministic. It is still far better than changing the prompt and the code state simultaneously. The point is to make behavior changes inspectable and repeatable enough to learn.</p>
+          <pre><code>SLASH_COMMAND_MODEL_MAP = {
+  "/review": "opus",
+  "/document": "sonnet",
+  "/patch": "opus",
+  # other one-purpose routes omitted
+}</code></pre>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — write an eval card</p>
+          <h3>Specify before you spend the run</h3>
+          <p>Create a four-line eval card for the reviewer:</p>
+          <ul><li><strong>Frozen input:</strong> issue, branch commit, spec path, ADW state.</li><li><strong>One changed variable:</strong> exact prompt sentence or model route.</li><li><strong>Observable outputs:</strong> blocker detection, screenshot use, summary, artifact paths.</li><li><strong>Decision:</strong> keep, revert, or gather another run.</li></ul>
+          <p class="fine">Pass if a teammate can reproduce the comparison without reading your original conversation.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: changing the prompt, state, and success rule together</h3>
+          <p>A different model is tried on a different feature after the prompt and screenshot tool have also changed. The second result looks better, but the causal story is unknowable. Another failure is judging only the final boolean: two reviews both pass, while one supplies clear proof and the other supplies vague screenshots.</p>
+          <p><strong>Fix:</strong> freeze the branch and request, change one knob, and compare the complete typed contract plus its hard assets. Record the change in git so the evaluation remains attached to the behavior it tested.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Purpose-level routing is increasingly first-class</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract verified for mid-2026</p><p>Current agent definitions can carry model selection and isolated instructions directly, and dedicated eval harnesses can supplement git-based comparisons. Keep the course’s transparent loop because it shows the minimum ingredients: committed prompt, reproducible state, one changed variable, typed outcome.</p><p class="current-practice__source">Model names drift. Per-purpose routing and comparison survive.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which two properties make a workflow step evaluable?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A committed prompt and reproducible starting state, with a comparable output contract.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name three knobs you could change one at a time.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The prompt instruction, model route, thinking mode, or agentic tool.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Teach the difference between “I improved the prompt” and “I evaluated a prompt change.” Include the frozen state, one knob, typed result, and git history.</p><p class="fine">Pass if your learner can explain why a better-looking second run is insufficient when three variables changed.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="review-adw">
+        <span class="section-number">06</span>
+        <h2 class="section-title">The review ADW is a typed proof machine</h2>
+        <p class="section-lead">The review workflow turns a broad instruction—compare the implementation with the specification—into a stateful pipeline with typed output, visual evidence, severity triage, loud parse failure, bounded repair, and issue/PR reporting.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>“Looks good” cannot drive the next step</h3>
+          <p>An agent writes a thoughtful paragraph: the feature seems aligned, the code appears clean, and there may be a small UI concern. Downstream code now has to infer whether the release should block, whether a patch should be planned, which screenshot shows the problem, and how many issues exist. A prose review may be useful to a human and unusable to an automated lifecycle.</p>
+          <p>The course makes the decision surface explicit. Success is a boolean with one meaning: no blockers. Issues have numbered identities, descriptions, resolutions, screenshots, and one of three severities. Parse failure becomes a blocker instead of an accidental pass. The workflow can safely branch because judgment has a schema.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — prompt contract meets code contract</p>
+          <h3>The fields align; one top-level instruction does not</h3>
+          <div class="contract-map" aria-label="Review prompt JSON structure mapped to Pydantic types">
+            <article class="contract-map__pane"><h4>review.md · output</h4><pre><code>{
+  "success": boolean,
+  "review_summary": string,
+  "review_issues": [{
+    "review_issue_number": number,
+    "screenshot_path": string,
+    "issue_description": string,
+    "issue_resolution": string,
+    "issue_severity": string
+  }],
+  "screenshots": [string]
+}</code></pre></article>
+            <div class="contract-map__arrow" aria-hidden="true">↔</div>
+            <article class="contract-map__pane"><h4>data_types.py · input</h4><pre><code>class ReviewIssue(BaseModel):
+  review_issue_number: int
+  screenshot_path: str
+  screenshot_url: Optional[str]
+  issue_description: str
+  issue_resolution: str
+  issue_severity: Literal[
+    "skippable",
+    "tech_debt",
+    "blocker"
+  ]
+
+class ReviewResult(BaseModel):
+  success: bool
+  review_summary: str
+  review_issues: List[ReviewIssue]
+  screenshots: List[str]</code></pre></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — follow the main method</p>
+          <h3>State in, proof out, blockers back through the loop</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-6-let-your-agents-focus/t1305-review-prompt-and-types.png" alt="Review prompt output fields displayed beside the ReviewIssue and ReviewResult Pydantic models" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">21:45</span>The reviewer’s intended machine boundary is visible in one frame: prompt fields on the left, typed consumers on the right, including the three severity values.</figcaption>
+          </figure>
+          <p>The workflow requires both issue number and ADW ID. It loads <code>agents/{adw_id}/adw_state.json</code>, trusts the state’s issue number when available, checks out the recorded branch, verifies environment variables, fetches repository context, and locates the spec. The spec search is layered: state first, then diff, then a branch-pattern glob.</p>
+          <p>An <code>R2Uploader</code> is initialized for screenshot hosting. The reviewer runs through <code>/review</code>, which prepares the app, reads the spec and diff, follows critical paths, and returns JSON. The code parses that response into <code>ReviewResult</code>. Screenshots and issue screenshots are uploaded when R2 is configured, and public URLs are attached to the result.</p>
+          <p>The next handoff contains an instructive code bug. <code>adw_review.py</code> calls <code>state.update(review_screenshots=…)</code> and logs that the URLs were saved. But <code>ADWState.update()</code> accepts only <code>adw_id</code>, issue number, branch, plan file, and issue class; <code>save()</code> serializes only those fields. The screenshot URLs are silently discarded. <code>adw_document.py</code> then sees no screenshot state and uses its local <code>review_img</code> directory fallback if that directory exists.</p>
+          <p>The formatted issue comment groups blockers, tech debt, and skippable findings with distinct markers and appends the raw JSON. If blockers exist and resolution is enabled, only blockers enter <code>create_and_implement_patch()</code>. The implementation is reviewed again, at most three attempts. Git operations are finalized and the process exits unsuccessfully if blockers remain.</p>
+          <aside class="source-note"><strong>Second prompt↔code drift:</strong> <code>review.md</code> says “Return ONLY the JSON array,” then shows a top-level object that <code>ReviewResult</code> expects. The object fields align; the array/object instruction does not. Loud parse failure contains the risk, but the prompt should be repaired.</aside>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Severity guidelines as templated judgment</h3>
+          <aside class="callout callout--term"><p class="callout__label">Review contract</p><p><strong>Skippable</strong> and <strong>tech debt</strong> are release-visible but non-blocking. A <strong>blocker</strong> harms expected function or user experience and must be addressed immediately. Only blockers make <code>success=false</code> and enter automatic resolution.</p></aside>
+          <p>Dan motivates the categories with a behavioral observation: agents are agreeable and good at finding things when asked. Without triage, a diligent reviewer can turn every nit into a release stop. Severity is not decorative metadata. It is the template’s encoded decision policy.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace three failure policies</p>
+          <h3>Every guardrail answers a specific pathology</h3>
+          <div class="severity-board" aria-label="Review severity rules">
+            <article><span class="severity">skippable</span><p>Record it. Do not block or auto-resolve.</p></article>
+            <article><span class="severity">tech_debt</span><p>Record future cost. Do not block or auto-resolve.</p></article>
+            <article><span class="severity">blocker</span><p>Set failure, patch, re-review, and stop after three attempts.</p></article>
+          </div>
+          <p><strong>Malformed output:</strong> if agent execution fails or JSON parsing throws, <code>run_review()</code> synthesizes a failed <code>ReviewResult</code> containing a blocker. The pipeline fails loud. <strong>Over-eager findings:</strong> the three severities prevent every issue from blocking. <strong>Infinite self-repair:</strong> <code>MAX_REVIEW_RETRY_ATTEMPTS = 3</code> caps the patch-and-review loop.</p>
+          <p><strong>Proof transport failure:</strong> R2 screenshot hosting is optional. Without all four Cloudflare values, the uploader disables and local paths remain. That is degraded presentation, not a reason to fabricate success or crash the review. The evidence policy and hosting path are separate concerns.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — classify before revealing</p>
+          <h3>Apply the release policy to four findings</h3>
+          <ol><li>The Export button works but violates the issue’s exact placement and harms the requested interaction.</li><li>A non-critical label could be slightly clearer.</li><li>The implementation creates a maintainability cost that does not block current behavior.</li><li>The reviewer returns Markdown around invalid JSON.</li></ol>
+          <p>Assign a severity or pipeline behavior to each, then reveal.</p>
+          <details class="retrieval-quiz__a"><summary>Reveal classification</summary><p>Placement violation: blocker in the lesson’s review framing. Minor label: skippable. Maintainability cost: tech debt. Invalid JSON: synthesized blocker because the typed contract could not be trusted.</p></details>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: removing the “bureaucracy”</h3>
+          <p>A team simplifies the workflow by accepting free-form prose, removing severities, and letting repair continue until success. The result looks flexible and becomes impossible to govern. Prose must be heuristically parsed, nitpicks trigger patches, and a stubborn failure consumes unbounded runs.</p>
+          <p><strong>Fix:</strong> preserve the typed boundary, triage vocabulary, loud failure, and retry cap. Simplify implementation only after you can state which pathology each removed guardrail used to contain.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Proof hosting can vary; proof-in-review cannot</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract verified for mid-2026</p><p>The R2 path still works, while issue/PR attachments, CI artifacts, or structured agent outputs can also carry images and reports. Preserve the outcome: proof lands in the review surface, is easy to inspect, and remains linked to the typed decision.</p><p class="current-practice__source">Storage is replaceable. The review contract is the asset.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which severities block and auto-resolve?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Only <code>blocker</code>. Skippable and tech debt remain visible without blocking.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What happens on parse failure, and what caps repair?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Parse failure becomes a synthetic blocker-severity ReviewResult; resolution is capped at three attempts.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why does review require the ADW ID?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It needs prior state to locate the branch, plan/spec, issue identity, and artifacts created by earlier phases.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Does <code>review_screenshots</code> survive in the tracked state file?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. The reviewer tries to save it, but <code>ADWState.update()</code> filters it out and <code>save()</code> serializes only five core fields. The documenter relies on its local <code>review_img</code> fallback.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Walk a malformed review response from agent output to release stop. Then walk a tech-debt finding through the same pipeline and explain why it does not patch automatically.</p><p class="fine">Pass if you mention schema parsing, synthetic blocker, grouping, resolution filter, and retry cap.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="patch-loop">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Patch the miss without reclaiming the keyboard</h2>
+        <p class="section-lead">A review finding becomes a separate problem class: one surgical request, one minimal plan, the shared implementor, validation, commit, and pull-request update. The smallness of the fix is the reason to train the system, not a reason to bypass it.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>Your hands are faster for ten seconds—and slower forever</h3>
+          <p>The Export button needs a tiny layout nudge. You know the likely file. Opening the editor and moving it feels obviously efficient. Yet a hand-fix teaches neither the reviewer nor the patch machinery. The next misplaced control reaches the same human bottleneck, and no committed plan records the intended scope or validation.</p>
+          <p>Dan refuses the shortcut because the lesson is about the system that builds the system. Local speed is not the only unit. Reproducibility, out-loop operation, and reusable repair behavior matter more than winning one ten-second race.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — surgical workflow</p>
+          <h3>One review change request becomes one patch artifact</h3>
+          <div class="artifact-chain" aria-label="Patch workflow artifacts">
+            <article><strong>Trigger</strong><p>Issue comment contains literal <code>adw_patch</code> plus request.</p></article>
+            <article><strong>Plan</strong><p>Two to five steps under <code>specs/patch/</code>.</p></article>
+            <article><strong>Implement</strong><p>Shared <code>/implement</code> executes only the patch plan.</p></article>
+            <article><strong>Receipts</strong><p>Commit, issue comments, visible fix, existing PR updated.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — one terminal contains the loop</p>
+          <h3>Plan, implement, report, and update the existing PR</h3>
+          <div class="frame-sequence">
+            <figure class="frame-card">
+              <img src="../media/frames/tac-6-let-your-agents-focus/t2190-patch-workflow-terminal.png" alt="Terminal showing patch plan creation, implementation commit, issue comments, pull request update, and successful completion" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">36:30</span>The entire out-loop patch leaves receipts: a plan under <code>specs/patch/</code>, implementor commit, issue update, existing PR, and completion message.</figcaption>
+            </figure>
+            <figure class="frame-card">
+              <img src="../media/frames/tac-6-let-your-agents-focus/t2255-export-fixed-next-to-hide.png" alt="Natural Language SQL app after patch showing Export immediately beside Hide" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">37:35</span>The after proof: Export now sits immediately left of Hide, matching the issue’s placement request.</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Patch as a distinct problem class</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s term</p><p>A <strong>patch</strong> changes one thing. Its planner addresses only the <code>review_change_request</code>, writes a minimal plan, estimates lines and risk, and borrows validation from the original spec or test prompt.</p></aside>
+          <p>Patch is not a smaller synonym for bug, chore, or feature planning. It begins after a specific gap is known. That permits a narrower prompt and smaller plan while keeping implementation and verification disciplined.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — read the reuse seam</p>
+          <h3>The planner is specialized; the implementor is shared</h3>
+          <p><code>.claude/commands/patch.md</code> requires a filename shaped like <code>specs/patch/patch-adw-{adw_id}-{descriptive-name}.md</code>, two to five focused steps, one to five validation commands or checks, a lines-of-code estimate, and risk level. It repeatedly says to address only the review change request.</p>
+          <p><code>create_and_implement_patch()</code> in <code>workflow_ops.py</code> constructs the <code>/patch</code> request, includes optional spec and screenshot context, validates the returned patch path, then sends that plan to <code>implement_plan()</code>. The same <code>/implement</code> higher-order prompt used by other planned work now executes a different concrete artifact. This is composition without context merging.</p>
+          <div class="command-card"><code>uv run adws/adw_patch.py &lt;issue-number&gt; &lt;adw-id&gt;</code></div>
+          <p>Pass the issue number, not the pull-request number. Dan briefly passes 15 instead of issue 14 on camera. The workflow’s state echo in issue comments is the check that helps catch the identity mismatch before you blame the tool.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — write the trigger, not the CSS</p>
+          <h3>Phrase a minimal out-loop request</h3>
+          <p>On the issue, write a comment with the literal keyword <code>adw_patch</code> and one observable correction: make the download button sit immediately left of Hide. Before running, predict:</p>
+          <ul><li>the patch-plan directory and filename prefix,</li><li>the maximum number of implementation steps,</li><li>which prompt performs implementation,</li><li>which visible proof will show success, and</li><li>which identifier must remain the same across review, patch, and document.</li></ul>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: hand-fix, over-scope, or wrong identity</h3>
+          <p><strong>Hand-fix:</strong> the artifact improves and the layer does not. <strong>Over-scope:</strong> the patch planner cleans nearby code or redesigns the header, increasing risk and review burden. <strong>Wrong identity:</strong> a PR number is passed where the workflow expects the issue, separating the repair from its state.</p>
+          <p><strong>Fix:</strong> route through the issue, use the existing ADW ID, repeat only the observed change request, inspect the generated plan for minimal scope, and verify the state echo before continuing.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Surgical repair remains a useful agent boundary</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract verified for mid-2026</p><p>Whether a patch is launched by external workflow, native subagent, or background task, preserve the class: one observed deviation, minimal plan, bounded implementation, explicit validation, and evidence returned to the same review surface.</p><p class="current-practice__source">The course’s trigger is literal and transparent; the repair contract is the transferable design.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">How is the standalone patch triggered and run?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>An issue comment or body contains the literal <code>adw_patch</code> and change request, then <code>uv run adws/adw_patch.py &lt;issue#&gt; &lt;adw-id&gt;</code> runs the workflow.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which prompt implements the patch plan?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The shared <code>/implement</code> higher-order prompt.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why not make the tiny change by hand?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A hand-fix repairs only the artifact. The workflow run teaches and proves the system that must repair future artifacts out-loop.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Defend the full patch workflow to a skeptical senior engineer who can fix the layout in ten seconds. Use two time horizons: this artifact and the next hundred similar misses.</p><p class="fine">Pass if you mention minimal scope, reproducibility, shared implementation, state continuity, and proof—not merely “automation is good.”</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="document-loop">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Documentation closes the lifecycle loop</h2>
+        <p class="section-lead">The document step solves two problems together: preserve how the completed feature works, then teach future agents when that knowledge is relevant. The second artifact turns documentation from a shelf into a feedback path.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The perfect document that no agent knows to read</h3>
+          <p>A feature ships with a careful Markdown guide. The file sits under <code>app_docs/</code>. Six weeks later, a planning agent modifies the same export area without reading it because nothing in the planning prompt points to that file. Alternatively, every prompt loads every document “just in case,” and the repository’s growing memory becomes context pollution.</p>
+          <p>Documentation quality is only half the system. The other half is retrieval policy: a future worker needs a compact condition that says when to pull the deeper artifact. TAC-6 makes the documenter responsible for both.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — write once, conditionally retrieve</p>
+          <h3>The final stage points back to the first</h3>
+          <div class="loop-system" aria-label="Plan build test review document loop back to plan">
+            <div>Plan</div><div>Build</div><div>Test</div><div>Review</div><div>Document</div><div>Conditional entry → next plan</div>
+          </div>
+          <p>The loop is not semantic decoration. <code>document.md</code> writes the application document and appends an entry to <code>.claude/commands/conditional_docs.md</code>. The bug, chore, feature, patch, and prime prompts read that index while preparing future work.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — watch the fifth entry appear</p>
+          <h3>Documentation becomes a routing instruction</h3>
+          <div class="frame-sequence">
+            <figure class="frame-card">
+              <img src="../media/frames/tac-6-let-your-agents-focus/t2742-conditional-docs-updated.png" alt="conditional_docs.md showing four baseline entries and a new one-click table exports app document with read conditions" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">45:42</span>The documenter has appended the fifth entry: future agents should read the export feature document when working with CSV export functionality.</figcaption>
+            </figure>
+            <figure class="frame-card">
+              <img src="../media/frames/tac-6-let-your-agents-focus/t2815-bug-md-conditional-docs-loop.png" alt="Search results showing conditional_docs referenced by bug, chore, document, feature, patch, and prime command files" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">46:55</span>Search proves the return path. Document writes the index; five planning or orientation prompts read it. The sixth reference is the documenter itself.</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Conditional documentation and the agentic-layer feedback loop</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s terms</p><p><strong>Conditional documentation</strong> pairs each document path with read-me-when conditions. The <strong>agentic-layer feedback loop</strong> exists when documentation produced at the end becomes relevant context for planning at the beginning.</p></aside>
+          <p>The repository also distinguishes homes. <code>app_docs/</code> explains this application and its implemented features. <code>ai_docs/</code> is for third-party material. <code>specs/</code> holds plans. The classification reduces search ambiguity and lets prompts target a knowledge class instead of scanning a generic docs pile.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace both outputs</p>
+          <h3>One document request changes two durable artifacts</h3>
+          <p><code>adw_document.py</code> requires the issue number and ADW ID because documentation depends on prior branch, spec, and review state. It checks out the recorded branch and runs <code>git diff origin/main --stat</code>. When no changes exist, it reports a graceful no-op rather than inventing documentation. When changes exist, it finds the spec and review screenshot directory, then calls one documenter with <code>[adw_id, spec_path, screenshots_dir]</code>.</p>
+          <p><code>document.md</code> inspects changed files, examines significant diffs, reads the spec, copies provided PNG proof into <code>app_docs/assets/</code>, and writes <code>app_docs/feature-{adw_id}-{descriptive-name}.md</code>. Its committed template includes Overview, Screenshots, What Was Built, Technical Implementation, How to Use, Configuration, Testing, and Notes.</p>
+          <p>Then the same one-purpose documenter reads <code>conditional_docs.md</code> and adds a path with conditions. That second mutation is still part of the singular purpose: make the completed feature understandable to humans and retrievable by future agents.</p>
+          <div class="artifact-chain" aria-label="Documentation outputs and consumers">
+            <article><strong>Input</strong><code>diff + spec + review assets</code></article>
+            <article><strong>Feature document</strong><code>app_docs/feature-{id}-*.md</code></article>
+            <article><strong>Retrieval index</strong><code>conditional_docs.md</code></article>
+            <article><strong>Future readers</strong><code>bug · chore · feature · patch · prime</code></article>
+          </div>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — write a retrieval condition</p>
+          <h3>Make the condition specific enough to save context</h3>
+          <p>Without copying the course’s runtime output, draft three conditions for an export feature document:</p>
+          <ul><li>one based on the user-visible feature area,</li><li>one based on related implementation work, and</li><li>one based on a troubleshooting situation.</li></ul>
+          <p>Reject vague conditions such as “when working on the app.” That would load the document almost everywhere and defeat conditional retrieval. Pass when a planner can decide yes or no from the task description.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: human-only docs, bulk-loaded docs, or a human indexer</h3>
+          <p><strong>Human-only:</strong> the guide is readable but no planning prompt knows it exists. <strong>Bulk-loaded:</strong> all application knowledge enters every task. <strong>Human indexer:</strong> an engineer must remember to update conditional docs after the document agent runs, leaving a single point of failure at the loop’s most important seam.</p>
+          <p><strong>Fix:</strong> make the documenter own both the deep artifact and its retrieval entry. Keep conditions narrow. Verify with a repository search that planning prompts actually consult the index.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The three-folder taxonomy makes the retrieval boundary clearer</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract verified for mid-2026</p><p>The extract maps this lesson to Dan’s fuller <code>specs/</code>, <code>ai_docs/</code>, and <code>app_docs/</code> treatment. The operational rule remains: plans, third-party knowledge, and application knowledge have different homes; agents load the relevant class conditionally.</p><p class="current-practice__source">The index pattern depends on agent strength, so verify retrieval behavior instead of assuming the condition was followed.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What two artifacts does the document step create or modify?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>An <code>app_docs/feature-{adw_id}-*.md</code> application document, including copied assets when available, and a new entry in <code>conditional_docs.md</code>.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which five prompts read the conditional index?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Bug, chore, feature, patch, and prime.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the baseline count before the lesson run?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Exactly four committed entries; the documenter’s export entry makes the fifth in Dan’s demonstrated run.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Teach the whole plan-to-document-to-plan cycle in one breath. Then explain why copying docs into every prompt would break the same minimum-context principle the loop is meant to support.</p><p class="fine">Pass if you name the writer, index mutation, five readers, matching condition, and next planning step.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="blame-layer">
+        <span class="section-number">09</span>
+        <h2 class="section-title">When an agent misses, blame the layer</h2>
+        <p class="section-lead">The review system declares success while its own screenshot shows failure. Dan’s response is the chapter’s transferable posture: trace the requirement end to end, locate the broken handoff, and encode the repair where that responsibility belongs.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The model is an easy target and a useless repair location</h3>
+          <p>The issue contains the placement requirement. The generated plan carries it. The implementation violates it. The reviewer produces a screenshot showing the violation and still reports success. Saying “the model failed” is emotionally satisfying and operationally empty. It does not tell you which prompt, workflow choice, tool flow, or evidence contract to change.</p>
+          <p>The opposite mistake is just as costly: silently move the button by hand and merge. The artifact improves, the review prompt remains blind, and the same failure class is ready to repeat.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — trace the requirement</p>
+          <h3>Do not guess which link broke</h3>
+          <div class="artifact-chain" aria-label="Requirement trace from issue through plan implementation and review">
+            <article><strong>Issue</strong><p>Placement present?</p><code>yes</code></article>
+            <article><strong>Plan</strong><p>Requirement carried?</p><code>yes</code></article>
+            <article><strong>Implementation</strong><p>Placement obeyed?</p><code>no</code></article>
+            <article><strong>Review</strong><p>Evidence read?</p><code>captured, not visually consumed</code></article>
+          </div>
+          <p>This trace rules out vague blame. The request did not disappear between issue and plan. The implementation missed it, and the chosen workflow did not include the test step that might have caught it. The reviewer also failed to reason over the images it captured.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the rejected global fix</p>
+          <h3>Put the correction inside the responsible ADW</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-6-let-your-agents-focus/t2135-playwright-mcp-vision-gap.png" alt="MCP configuration with a vision flag temporarily added while diagnosing why the reviewer did not inspect screenshots" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">35:35</span>Dan considers <code>--vision</code> in global MCP configuration, then rejects that placement because the fix belongs inside the review workflow’s instruction.</figcaption>
+          </figure>
+          <p>The camera captures a useful moment of design judgment. A global configuration change might make image use possible, but it does not express the reviewer’s responsibility. The chosen correction is prompt-level: for every image taken, read it during review. Now the behavior is versioned with the one-purpose review contract and can be evaluated from the same state.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Fix the end-to-end portion, not the thing that went wrong</h3>
+          <aside class="callout callout--term"><p class="callout__label">System posture</p><p><strong>Blame the layer, not the model.</strong> Trace the failure through issue, plan, workflow selection, prompt, tool use, artifact, and review. Encode the failure class in the owning layer.</p></aside>
+          <p>“Blame” here means responsibility that leads to a change you control. The model may have produced the incorrect judgment, but the agentic layer chose the context, prompt, tools, evidence flow, and stage sequence. Those are the design surfaces the engineer can improve.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — two causes, one better workflow</p>
+          <h3>The miss was architectural, not mysterious</h3>
+          <p><strong>Cause one:</strong> the demo launched <code>adw_plan_build_review.py</code>, whose docstring states that testing is skipped. Dan identifies <code>adw_plan_build_test_review.py</code> as the likely winning workflow because the UI test may have caught the placement issue before review.</p>
+          <p><strong>Cause two:</strong> the review prompt instructed the agent to take screenshots, but the workflow did not ensure that their visual content flowed into reasoning. The evidence reached the human but not the reviewer’s decision. The correction belongs in <code>review.md</code>, not as an ad hoc global flag.</p>
+          <p><strong>Secondary lesson:</strong> documentation later uses the review screenshots. Because the patch runs after the original review and the review is not rerun on camera, a copied screenshot can be stale. Artifact lineage matters. A complete repair should refresh proof after the fix so documentation describes the final state.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — failure-class worksheet</p>
+          <h3>Move from complaint to owned change</h3>
+          <ol><li>State the expected result and observed result.</li><li>Prove whether the expectation exists in the issue.</li><li>Prove whether it survives into the plan.</li><li>Name the workflow phases that did and did not run.</li><li>Show which evidence the reviewer produced and which it consumed.</li><li>Write the smallest prompt, workflow, or template change that prevents the class.</li><li>Describe the rerun that would prove the layer improved.</li></ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: model blame, artifact rescue, or global configuration drift</h3>
+          <p><strong>Model blame</strong> points at a component you cannot directly repair. <strong>Artifact rescue</strong> hides the failure and preserves the flawed system. <strong>Global drift</strong> changes broad configuration for one workflow-specific responsibility, making behavior harder to version and reason about.</p>
+          <p><strong>Fix:</strong> keep the correction as close as possible to the owning purpose. A review-consumes-its-images instruction belongs in the review prompt. A missing lifecycle question belongs in the composer. A recurring application fact belongs in conditional documentation.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The specific vision gap has moved; the repair posture has not</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract verified for mid-2026</p><p>Current agents can read images through native file-reading or vision-capable browser/computer tools. Treat screenshot consumption as baseline review behavior. Keep the course failure because it teaches the timeless move: convert a miss into a versioned instruction or workflow correction, then rerun.</p><p class="current-practice__source">The old gap may be solved by tooling; the end-to-end trace remains essential.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What were the two root causes for the missed placement bug?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The chosen composer skipped testing, and the review workflow captured screenshots without ensuring their visual content was read into the reviewer’s reasoning.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Where did Dan choose to put the image-reading fix?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>In the review prompt’s instructions, not global <code>.mcp.json</code> configuration.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Retell the miss without using the phrase “the model failed.” Walk issue → plan → workflow selection → screenshot production → screenshot consumption → prompt repair → rerun.</p><p class="fine">Pass if your explanation ends with a testable layer change, not a moral about intelligence.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="scoreboard">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Presence, proof, and the honest scoreboard</h2>
+        <p class="section-lead">The lesson closes by grading the run, including its dents. KPIs are diagnostic instruments: attempts reveal misses, presence reveals human relay work, streak reveals repeatability, and size reveals the unit of delegated engineering.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>A shipped feature can still expose a weak system</h3>
+          <p>The export feature reaches a pull request with implementation, tests, review images, a patch, and documentation. It is tempting to report only success. But the feature needed a second ADW to fix placement, the streak reset, and the human intervened beyond the ideal two moments. Hiding those costs would hide exactly where the system should improve.</p>
+          <p>The KPI frame prevents outcome bias. A good final artifact does not prove a good lifecycle. A poor first artifact does not make the system worthless if the proof and repair loop reduce detection and recovery cost. Score the process that produced the result.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — lesson-end scorecard</p>
+          <h3>Read every number as a prompt-improvement clue</h3>
+          <div class="kpi-board" aria-label="Agentic coding KPI scorecard for the lesson demo">
+            <article><h4>Attempts</h4><span class="kpi-value">1 → 2</span><p>The patch added a run. Find the miss that forced it.</p></article>
+            <article><h4>Size</h4><span class="kpi-value">~900 LOC</span><p>Two endpoints, two UI surfaces, tests, plan, and docs in the demonstrated scope.</p></article>
+            <article><h4>Streak</h4><span class="kpi-value">reset to 1</span><p>One prompt did not carry the feature cleanly through.</p></article>
+            <article><h4>Presence</h4><span class="kpi-value">~3</span><p>Input, issue spotting/patch, and final review versus an ideal of two.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — proof makes the extra presence cheap</p>
+          <h3>The review system carries the problem to the human</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-6-let-your-agents-focus/t1912-review-screenshot-misplaced-export.png" alt="Review evidence on the issue showing Export separated from Hide in the Query Results header" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">31:52</span>This proof asset buys review velocity even though the agent’s verdict is wrong: the human can reject the placement at a glance instead of reconstructing the run.</figcaption>
+          </figure>
+          <p>The human presence count is not ideal, yet the intervention is efficient. The review images expose the misplaced control directly on the issue. Dan does not reconstruct the application state from logs or inspect every changed line to discover the defect. The proof surface delivers the critical path, and the patch workflow delivers the repair receipts.</p>
+          <p>The lesson generalizes beyond frontend work. A model classifier can produce evaluation metrics or a report. A data-analysis workflow can produce a chart or comparison table. A rapid prototype can produce a live artifact or video. The form changes; the review step should embed whatever hard evidence lets a human decide whether the result is what was asked for.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Agentic proof of value, live assets, and ideal presence</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s terms</p><p><strong>Agentic proof of value</strong> is hard evidence carried to the review surface. A <strong>live asset</strong> makes the result directly inspectable. Ideal <strong>presence</strong> is two human moments: prompt input at the beginning and review/PR merge at the end.</p></aside>
+          <p>Ideal does not mean abolishing judgment. It concentrates human attention where it has highest leverage. The engineer frames the work and makes the consequential acceptance decision. The system carries the intermediate transitions and evidence.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — convert KPI movement into backlog</p>
+          <h3>Every dent suggests an owned improvement</h3>
+          <div class="proof-strip" aria-label="KPI diagnosis examples">
+            <article><h4>Attempts rose</h4><p>Add image consumption to review and choose the composer that includes test.</p></article>
+            <article><h4>Presence rose</h4><p>Move placement detection into proof-aware review rather than human browsing.</p></article>
+            <article><h4>Streak broke</h4><p>Rerun the same class after the layer changes; do not declare recovery from one lucky pass.</p></article>
+          </div>
+          <p>Size is the counterweight. The lesson’s work is not reduced to a one-line CSS correction. The demonstrated branch includes two endpoints, two user surfaces, tests, a plan, documentation, and approximately 900 lines of engineering change. A larger delegated unit can justify substantial workflow machinery, but a large number does not excuse weak conformance.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — score your lab run</p>
+          <h3>Count without flattering yourself</h3>
+          <ol><li>Count attempts from initial workflow through every patch.</li><li>Estimate size from <code>git diff --stat origin/main</code> and name the artifacts included.</li><li>State whether this run extends or resets your success streak.</li><li>Count every moment your judgment or relay was required.</li><li>For each excess attempt or presence, name the owning prompt or workflow improvement.</li></ol>
+          <p class="fine">Do not game attempts by refusing to patch or presence by ignoring a visible defect. Metrics serve the artifact and user, not the other way around.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: vanity metrics and false zeroes</h3>
+          <p>A team keeps attempts at one by shipping the first answer, or reports presence as zero because the reviewer never looked. Another team celebrates a huge diff while hiding a spec miss. The numbers improve and the engineering degrades.</p>
+          <p><strong>Fix:</strong> bind metrics to a correct, reviewed unit. Count the repair honestly. Use upward movement as a pointer to system work. A metric is valuable when it causes a better prompt, workflow, proof asset, or boundary.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Proof quality matters more as execution gets cheaper</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · extract verified for mid-2026</p><p>As agent launch and background execution become easier, raw output volume grows. The lesson’s scoreboard becomes more important, not less: evaluate reviewed units, attempts, streak, and human presence. Require proof that reaches the decision surface.</p><p class="current-practice__source">The extract treats live assets and ideal presence as durable principles.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is ideal presence, and at which two moments?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Two: prompt input at the beginning, then review and pull-request merge at the end.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What should an increase in attempts cause?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A diagnosis and improvement of the prompt or workflow whose miss forced the extra attempt.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name three possible hard proof assets.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>An image, video, report, metrics artifact, chart, or live application surface.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p>Present the lesson’s scorecard without defending it. For each KPI, state the observed value, what it reveals, and one layer improvement.</p><p class="fine">Pass if your listener understands why a correct final button does not erase the extra attempt.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="current-practice">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Current practice: keep the tactic, modernize the wrapper</h2>
+        <p class="section-lead">The extract identifies seven course-era gaps. None overturns the lesson’s spine. Use the transparent course machinery to learn the primitive, then map it to the current surface you operate.</p>
+
+        <div class="comparison" aria-label="Course-era and current practice compared">
+          <article class="comparison__card"><div class="comparison__head"><h3>Course system</h3><p>Every moving part is visible.</p></div><div class="comparison__body"><ul><li>Separate headless <code>claude -p</code> processes</li><li>Python orchestration and per-agent folders</li><li>Prompt-level model map</li><li>Screenshot paths optionally uploaded to R2</li><li>Image capture without guaranteed visual consumption</li></ul></div></article>
+          <article class="comparison__card comparison__card--agentic"><div class="comparison__head"><h3>Current mapping</h3><p>The same boundaries can be productized.</p></div><div class="comparison__body"><ul><li>Native subagents or Skills for interactive focus</li><li>External workflows retained for deterministic triggers</li><li>Purpose-level model and tool policy</li><li>Several artifact-hosting paths</li><li>Image reading treated as default review behavior</li></ul></div></article>
+        </div>
+
+        <h3>Two phase-one video overlays</h3>
+        <p>The extract approves exactly two current-practice videos for this chapter, within the required one-to-three cap. They deepen the tactic without replacing the course evidence.</p>
+        <div class="practice-grid">
+          <article><span class="video-id">YouTube · X2ciJedw2vU</span><h4>RAW Agentic Coding: ZERO to Agent SKILL</h4><p>Maps the committed one-purpose prompt to the current Skill/subagent surface. Use it after you can explain the course’s hand-rolled boundary.</p><a href="https://www.youtube.com/watch?v=X2ciJedw2vU">Watch the current-practice overlay →</a></article>
+          <article><span class="video-id">YouTube · hGg3nWp7afg</span><h4>3 Codebase Folders</h4><p>Develops the <code>specs/</code>, <code>ai_docs/</code>, and <code>app_docs/</code> taxonomy that the document workflow feeds.</p><a href="https://www.youtube.com/watch?v=hGg3nWp7afg">Watch the current-practice overlay →</a></article>
+        </div>
+        <aside class="source-note"><strong>Publishing note from the extract:</strong> the IDs and titles were supplied by the orchestration seed pool and previously oEmbed-verified, but the extract pass did not fetch the videos. Re-verify availability and title match at publication time.</aside>
+
+        <h3>One live repository drift to investigate</h3>
+        <p><code>.claude/commands/classify_adw.md</code> lists <code>/adw_plan_build_review</code> and <code>/adw_plan_build_document</code> as valid. The runtime <code>ADWWorkflow</code> Literal and <code>AVAILABLE_ADW_WORKFLOWS</code> omit both. <code>extract_adw_info()</code> validates classifier output against the runtime allowlist, so webhook or cron classification filters those two composers out even though manual scripts exist.</p>
+        <p>This is not a dated feature. It is a live prompt-to-code contract drift and an ideal stretch exercise: ask the system to prove why the trigger cannot launch those composers, patch the contract, and add evidence. The lesson’s own architecture contains the kind of mismatch its review discipline should catch.</p>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Graded lab · Focused agents complete the SDLC</h2>
+        <p class="section-lead">Run the real TAC-6 review, patch, and document workflows against a GitHub repository you control. The lab is operational: you will spend real model tokens, create issue/PR artifacts, inspect the live app, and keep your hands off application code.</p>
+
+        <aside class="callout callout--warning"><p class="callout__label">Scope and cost</p><p>Work only in the TAC-6 course codebase. Budget 90–120 minutes and a higher token cost than earlier labs: the full plan → build → review run uses an Opus-routed reviewer, followed by patch and document runs. Stop before starting if you cannot fund the complete loop; an abandoned half-run does not test the tactic.</p></aside>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Checkpoint 0 · Own the review surface <span class="fine">15 min</span></h3>
+          <ol class="lab-box__steps">
+            <li>Clone the lesson repository and enter it: <code>git clone https://github.com/disler/tac-6.git &amp;&amp; cd tac-6</code>.</li>
+            <li>Create a GitHub repository you control. Remove the course remote, add your remote as <code>origin</code>, and push <code>main</code>. Review, patch, and document report through issues and pull requests, so ownership is functional context.</li>
+            <li>Verify <code>gh auth status</code> and <code>uv --version</code>.</li>
+            <li>Boot Claude Code and run <code>/install</code>. Fill the root <code>.env</code> from <code>.env.sample</code> with <code>ANTHROPIC_API_KEY</code>, <code>CLAUDE_CODE_PATH</code>, and <code>GITHUB_REPO_URL</code>. Configure <code>app/server/.env</code> for the app’s own Natural-Language-to-SQL provider.</li>
+            <li>Optionally configure the four Cloudflare R2 values. Without them, expect local screenshot paths in comments; the uploader’s silent disable is intentional.</li>
+            <li>Run <code>/start</code>, open <code>localhost:5173</code>, and execute the five-users query to confirm the application works before the agentic run.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>Your owned remote is <code>origin</code>.</li><li>The GitHub CLI, uv, Claude Code, and app are available.</li><li>You can explain why issue and PR ownership is part of review/patch/document, not administrative setup.</li></ul></div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Checkpoint 1 · Plan → build → review <span class="fine">25 min</span></h3>
+          <ol class="lab-box__steps">
+            <li>Create an issue titled <strong>One Click Table Exports</strong>.</li>
+            <li>Ask for CSV export for tables and query results, two new endpoints, an appropriate download icon, and precise placement: the control directly left of the table’s <code>x</code> and directly left of the query results’ Hide control.</li>
+            <li>Launch <code>uv run adws/adw_plan_build_review.py &lt;issue#&gt;</code>. Do not supply an ADW ID for the initial run; one will be created.</li>
+            <li>Hands off. Do not edit, change branches, or run a parallel workflow while this course composer owns the checkout.</li>
+            <li>Watch <code>agents/{adw_id}/</code> and the issue comments. Inspect <code>adw_state.json</code> as issue, branch, plan file, and issue class populate.</li>
+            <li>When review posts, inspect the success flag, standup-style summary, one-to-five numbered screenshots or local paths, severity groups, and raw JSON.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>A branch and pull request exist from the workflow.</li><li>The issue carries a JSON-backed review report.</li><li>You can point from the ADW ID to state, agent folders, branch, plan, and review evidence.</li></ul></div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Checkpoint 2 · Read the review contract <span class="fine">15 min</span></h3>
+          <ol class="lab-box__steps">
+            <li>Open <code>.claude/commands/review.md</code> beside <code>adws/adw_modules/data_types.py</code>.</li>
+            <li>Map every prompt output field to <code>ReviewResult</code> or <code>ReviewIssue</code>.</li>
+            <li>Find <code>Literal["skippable", "tech_debt", "blocker"]</code> and <code>MAX_REVIEW_RETRY_ATTEMPTS = 3</code>.</li>
+            <li>Locate the code path that synthesizes a blocker when agent execution or JSON parsing fails.</li>
+            <li>Explain why e2e Markdown files are navigation guides, not tests, in this prompt.</li>
+            <li>Compare the prompt’s “JSON array” sentence with its object example and the <code>ReviewResult</code> parser. Record the contradiction as a prompt↔code drift.</li>
+            <li>Spot the <code>./claude/commands/e2e</code> path typo and record it as prompt/code accuracy evidence; do not silently rewrite unrelated lesson files.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Cold-answer gate</h4><p>Without notes: which severities block, which auto-resolve, what caps resolution, what parse failure becomes, and what review asks that testing does not.</p></div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Checkpoint 3 · Run the patch out-loop <span class="fine">20 min</span></h3>
+          <ol class="lab-box__steps">
+            <li>Inspect the controls in the running app. If your implementation already matches the exact placement, use Claude Code—not your editor—to introduce the demonstrated deviation so the repair loop has a real blocker.</li>
+            <li>On the issue, comment with the literal keyword <code>adw_patch</code> and one observable request: the download control must sit directly left of Hide.</li>
+            <li>Run <code>uv run adws/adw_patch.py &lt;issue#&gt; &lt;adw-id&gt;</code>. Use the issue number, not the PR number.</li>
+            <li>Verify a plan appears under <code>specs/patch/patch-adw-{adw_id}-*.md</code>. Inspect that it contains two-to-five focused steps, validation, scope estimate, and risk.</li>
+            <li>Verify the app shows the corrected placement, a patch commit exists, issue comments report progress, and the existing pull request updates.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>One-sentence gate</h4><p>Explain why a full workflow is justified for a change you could hand-fix in ten seconds. Your answer must include system learning, reproducibility, and future out-loop repair.</p></div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Checkpoint 4 · Document and close the loop <span class="fine">15 min</span></h3>
+          <ol class="lab-box__steps">
+            <li>On the same state, run <code>uv run adws/adw_document.py &lt;issue#&gt; &lt;adw-id&gt;</code>.</li>
+            <li>Verify <code>app_docs/feature-{adw_id}-*.md</code> exists and follows the feature-document shape.</li>
+            <li>Verify screenshots were copied into <code>app_docs/assets/</code> when local PNG inputs were available.</li>
+            <li>Verify <code>.claude/commands/conditional_docs.md</code> gained one agent-written entry. The committed baseline has four entries.</li>
+            <li>Search <code>conditional_docs</code> and prove that bug, chore, feature, patch, and prime read the index while document writes it.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>One-breath gate</h4><p>Document writes the feature guide and appends its conditions; five planning/orientation prompts read the index; a future matching task loads the guide without loading every guide.</p></div>
+        </section>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Checkpoint 5 · Stretch drills <span class="fine">15–40 min</span></h3>
+          <ol class="lab-box__steps">
+            <li><strong>Winning workflow:</strong> on a fresh issue, use <code>adw_plan_build_test_review.py</code>. Record whether test or review catches the planted placement deviation.</li>
+            <li><strong>Read your proof:</strong> through Claude Code, add the review instruction that every captured image must be read. Rerun review on the same pre-review state and compare <code>ReviewResult</code> records.</li>
+            <li><strong>Purpose eval:</strong> change only the review model route, restore pre-review state, rerun, and compare typed outcomes. Treat course-era aliases as local code facts, not universal recommendations.</li>
+            <li><strong>Agent census:</strong> map every <code>agents/{adw_id}/</code> folder to one slash command and one purpose. Confirm no agent ran a second prompt.</li>
+            <li><strong>Trigger drift:</strong> compare <code>classify_adw.md</code> with <code>ADWWorkflow</code> and <code>AVAILABLE_ADW_WORKFLOWS</code>. Prove why the two new composers cannot launch through classifier-driven triggers, then repair through an agentic patch if time permits.</li>
+          </ol>
+        </section>
+
+        <h3>Submission checklist</h3>
+        <ul class="lab-checklist">
+          <li>Zero application-code lines were typed by hand.</li>
+          <li><code>adw_state.json</code> shows the five key fields populated across phases.</li>
+          <li>The issue contains a JSON-backed review with one-to-five screenshots or expected local paths and severity-classified findings.</li>
+          <li>You can state the blocker and retry policies without notes.</li>
+          <li>A minimal patch plan exists and the corrected placement is visible in the app and PR.</li>
+          <li>An application document exists, assets were handled, and conditional documentation changed agentically.</li>
+          <li>You can state all five SDLC questions, the test/review distinction, three constraints, compact’s limitation, and ideal presence.</li>
+        </ul>
+
+        <h3>Grading rubric · 12 points</h3>
+        <div class="rubric-grid" role="table" aria-label="Lab grading rubric">
+          <div class="rubric-head" role="columnheader">Dimension</div><div class="rubric-head" role="columnheader">0 · Missing</div><div class="rubric-head" role="columnheader">1 · Partial</div><div class="rubric-head" role="columnheader">2 · Mastery</div>
+          <div role="rowheader"><strong>Focused execution</strong></div><div>Hand-edited app or mixed runs.</div><div>ADW used with unclear boundaries.</div><div>Zero hand edits; serialized one-purpose phases.</div>
+          <div role="rowheader"><strong>State trace</strong></div><div>No ADW evidence.</div><div>Can find state but not explain it.</div><div>Traces ID through branch, plan, agents, issue, and PR.</div>
+          <div role="rowheader"><strong>Review contract</strong></div><div>No typed report.</div><div>Report exists; policy recall weak.</div><div>Explains schema, severities, parse failure, and cap.</div>
+          <div role="rowheader"><strong>Patch loop</strong></div><div>Hand-fix or no correction.</div><div>Patch runs; scope or proof incomplete.</div><div>Minimal plan, shared implementor, visible fix, PR receipt.</div>
+          <div role="rowheader"><strong>Document loop</strong></div><div>No app document.</div><div>Document exists without proven retrieval path.</div><div>Doc + assets + agentic index entry + five readers proven.</div>
+          <div role="rowheader"><strong>Teach-back</strong></div><div>Cannot state core distinctions.</div><div>Recognizes terms with notes.</div><div>Cold explanation connects focus, proof, repair, memory, and KPIs.</div>
+        </div>
+        <aside class="callout callout--why"><p class="callout__label">Score interpretation</p><p><strong>11–12:</strong> ready to operate and teach. <strong>8–10:</strong> repeat the lowest checkpoint and answer its cold gate. <strong>0–7:</strong> redraw the five questions, rerun review-contract tracing, then perform the patch without touching application code.</p></aside>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">13</span>
+        <h2 class="section-title">Cumulative mastery</h2>
+        <p class="section-lead">Answer before opening any details. Recognition earns half credit; a correct explanation tied to a course artifact earns full credit.</p>
+
+        <h3>Round 1 · Questions and focus</h3>
+        <section class="retrieval-quiz">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. State all five SDLC questions in order and name the one that demands proof.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Plan—what are we building? Build—did we make it real? Test—does it work? Review—is it what we asked for, prove it? Document—how does it work? Review demands proof.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What does one-agent-one-prompt-one-purpose prohibit, and what does it allow?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It prohibits one agent running multiple prompts or owning multiple lifecycle questions. It allows a large, sophisticated prompt that does substantial work for one purpose.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Define the minimum context principle operationally.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Give the worker every artifact needed for its one question, withhold unrelated phase history, and carry continuity through dense state and durable files.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Name the three constraints, the two specialized agents bypass, and the excluded non-constraint.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Context window, codebase-plus-problem complexity, and your abilities. Specialized agents bypass window and personal-ability constraints. Model intelligence is deliberately not treated as a constraint or excuse.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">5. Why is compact a band-aid rather than the tactic?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It compresses an overloaded context and loses information. Fresh purpose-specific windows prevent irrelevant history from accumulating.</p></details></div>
+        </section>
+
+        <h3>Round 2 · Review and repair</h3>
+        <section class="retrieval-quiz">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">6. The CSV download succeeds. Why can review still fail?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Testing proved behavior; review compares the finished artifact with all requested requirements, including exact control placement.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">7. Name every ReviewIssue severity and the release behavior of each.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Skippable: visible, non-blocking. Tech debt: visible future cost, non-blocking. Blocker: success false, immediate patch-and-review resolution.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">8. What happens if review output cannot be parsed?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The code creates a failed ReviewResult with a synthetic blocker describing the parse failure, so the pipeline fails loud.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">9. What caps review resolution and why?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Three attempts. The cap prevents an agentic repair loop from continuing indefinitely.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">10. How does a patch plan differ from a feature plan?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It starts from one known review change request, addresses only that issue, uses two-to-five focused steps, and includes bounded validation, scope, and risk.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">11. Which prompt implements a patch, and what does that prove about composition?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The shared <code>/implement</code> prompt. Specialized planners can produce common plan artifacts consumed by a reusable implementor without merging contexts.</p></details></div>
+        </section>
+
+        <h3>Round 3 · State, memory, and evals</h3>
+        <section class="retrieval-quiz">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">12. Why do review and document require the ADW ID, and does that state persist screenshot URLs?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They depend on prior state to locate the issue, branch, spec/plan, and issue class. Screenshot URLs do not persist because the state object filters that field; document falls back to the local review-image directory.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">13. What two durable outputs make documentation a loop?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The application feature document and an appended conditional-doc entry that directs future agents to it when task conditions match.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">14. Which prompts read conditional documentation?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Bug, chore, feature, patch, and prime; document is the writer.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">15. Distinguish <code>specs/</code>, <code>ai_docs/</code>, and <code>app_docs/</code>.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Specifications/plans, third-party knowledge, and documentation about the application’s own implementation.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">16. What makes a prompt change evaluable?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A committed prompt, reproducible starting state, one changed variable, and a comparable typed result plus proof artifacts.</p></details></div>
+        </section>
+
+        <h3>Round 4 · System judgment</h3>
+        <section class="retrieval-quiz">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">17. Give both causes of the missed button placement and the chosen repair location.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The composer skipped testing, and review captured images without consuming their visual content. The image-reading correction belongs in <code>review.md</code>; the fuller composer includes test.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">18. What does “blame the layer” require before changing anything?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Trace the expectation through issue, plan, chosen phases, prompt, tool/evidence flow, implementation, and review so the change lands at the owning boundary.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">19. What is ideal presence, and how did the demo differ?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Ideal presence is two: input and final review/merge. The demo was roughly three because a human spotted the issue and initiated or checked the patch before final review.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">20. Explain the classifier-trigger drift.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The classifier prompt lists plan-build-review and plan-build-document, but the runtime Literal and allowlist omit them. Runtime validation filters those outputs, so classifier-driven webhook/cron paths cannot launch the composers.</p></details></div>
+        </section>
+
+        <aside class="callout callout--why"><p class="callout__label">Scoring</p><p><strong>18–20:</strong> ready to operate and teach. <strong>14–17:</strong> revisit the source file behind every miss and rerun the matching lab checkpoint. <strong>0–13:</strong> redraw five questions, trace <code>adw_review.py</code> from main, then perform the patch and document loops again.</p></aside>
+
+        <h3>Capstone teach-back · seven minutes</h3>
+        <div class="teach-back"><p>Without notes, teach the chapter as one causal chain:</p><ol><li>Five questions require five focused stages.</li><li>Fresh context prevents cross-stage pollution.</li><li>Committed prompts and state make steps evaluable.</li><li>Typed review turns proof into a governed decision.</li><li>Patch routes a miss through the system instead of your hands.</li><li>Document writes memory and the conditions for retrieving it.</li><li>KPIs reveal where the layer still requires improvement.</li></ol><p class="fine">Expert pass: your listener can predict why the screenshot-blind reviewer passed, locate the prompt-level correction, and explain why conditional docs do not violate minimum context.</p></div>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">14</span>
+        <h2 class="section-title">TAC-6 glossary</h2>
+        <p class="section-lead">Use these narrow definitions when reviewing a workflow or teaching the tactic. Each term maps to a demonstrated prompt, script, artifact, or decision rule.</p>
+        <dl class="glossary">
+          <div><dt>One agent, one prompt, one purpose</dt><dd>Tactic #6: one fresh named agent runs exactly one prompt to answer one lifecycle question. Prompt size and task difficulty may still be large.</dd></div>
+          <div><dt>SDLC as questions</dt><dd>Plan, build, test, review, and document expressed as five distinct uncertainties with executable answers.</dd></div>
+          <div><dt>Review</dt><dd>Spec-conformance work asking whether the implementation is what was requested and requiring hard proof.</dd></div>
+          <div><dt>Testing</dt><dd>Behavioral verification asking whether the implementation works. It supports but does not replace review.</dd></div>
+          <div><dt>Review velocity</dt><dd>How quickly a responsible human can reach a high-confidence accept/reject decision from the provided evidence.</dd></div>
+          <div><dt>Context pollution</dt><dd>Degraded agent focus caused by unrelated, stale, superseded, or cross-purpose information occupying the same context.</dd></div>
+          <div><dt>Minimum context principle</dt><dd>Supply the minimum complete context needed for one purpose and withhold irrelevant lifecycle history.</dd></div>
+          <div><dt>Three constraints</dt><dd>Context-window capacity, codebase-plus-problem complexity, and the engineer’s abilities. Specialized agents bypass the first and reduce dependence on the third.</dd></div>
+          <div><dt>Committed prompt</dt><dd>A version-controlled instruction file whose changes can be reviewed, restored, and compared across runs.</dd></div>
+          <div><dt>Agentic-layer eval</dt><dd>A comparison that restores a reproducible workflow state, changes one purpose-level variable, reruns, and compares typed outputs and proof.</dd></div>
+          <div><dt>ReviewResult</dt><dd>The Pydantic contract containing success, summary, issue list, screenshot paths, and uploaded screenshot URLs.</dd></div>
+          <div><dt>Severity classes</dt><dd><code>skippable</code>, <code>tech_debt</code>, and <code>blocker</code>. Only blockers prevent success and enter automatic resolution.</dd></div>
+          <div><dt>Loud parse failure</dt><dd>Conversion of an unparseable review response into a synthetic blocker instead of silent success or missing data.</dd></div>
+          <div><dt>Patch</dt><dd>A minimal problem class addressing one known review change request through a focused plan and shared implementor.</dd></div>
+          <div><dt>Conditional documentation</dt><dd>An index of document paths and task conditions that tells agents when deeper repository knowledge should be read.</dd></div>
+          <div><dt>app_docs</dt><dd>Documentation about the application’s own implemented behavior and architecture.</dd></div>
+          <div><dt>ai_docs</dt><dd>Third-party or external technical documentation needed by agents.</dd></div>
+          <div><dt>specs</dt><dd>Concrete planning artifacts, including focused patch plans under <code>specs/patch/</code>.</dd></div>
+          <div><dt>Agentic-layer feedback loop</dt><dd>The connection in which the documenter updates conditional retrieval and future planning agents read matching application knowledge.</dd></div>
+          <div><dt>Blame the layer</dt><dd>Trace a failure through controllable workflow surfaces and encode the repair in the owning prompt, composer, contract, or documentation path.</dd></div>
+          <div><dt>Agentic proof of value</dt><dd>A hard artifact—such as an image, video, report, metric, or live surface—delivered to the review system.</dd></div>
+          <div><dt>Live asset</dt><dd>Directly inspectable proof that reduces the work required to validate what the agent built.</dd></div>
+          <div><dt>Presence</dt><dd>Human intervention moments per shipped unit. The lesson’s ideal is two: prompt input and final review/merge.</dd></div>
+          <div><dt>ADW ID</dt><dd>The run identifier tying issue, branch, plan, per-agent artifacts, review proof, patch, and documentation to shared persistent state.</dd></div>
+          <div><dt>Trigger drift</dt><dd>A mismatch in which classifier prompt vocabulary includes workflows omitted from runtime types or allowlists, preventing trigger-driven launch.</dd></div>
+        </dl>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">Volume I · Tactical Agentic Coding</p>
+        <div class="chapter-footer__nav"><a href="../index.html">← Book hub</a><span class="fine">Next: TAC-7 · ZTE Secret of Agentic Engineering (pending)</span></div>
+      </footer>
+    
+      <p class="code-deep-link"><a href="../code/tac-6-let-your-agents-focus.html">Code deep-dive · how Dan built this repo →</a></p>
+    </main>
+  </div>
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => { updateProgress(); progressFramePending = false; });
+      };
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+          const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+          links.forEach(link => {
+            const active = link.getAttribute('href') === `#${visible.target.id}`;
+            if (active) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          });
+        }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+        sections.forEach(section => observer.observe(section));
+      }
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+</body>
+</html>

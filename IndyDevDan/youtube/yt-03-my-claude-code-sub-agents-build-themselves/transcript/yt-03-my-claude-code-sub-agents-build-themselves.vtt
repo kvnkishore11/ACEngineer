@@ -1,0 +1,3369 @@
+WEBVTT
+
+1
+00:00:00.320 --> 00:00:04.799
+Welcome back engineers. Indie Dev Dan
+
+2
+00:00:02.639 --> 00:00:06.799
+here. Imagine starting your day. You of
+
+3
+00:00:04.799 --> 00:00:09.360
+course open up the terminal. You fire up
+
+4
+00:00:06.799 --> 00:00:10.960
+Claude Code. Then you kick off a single
+
+5
+00:00:09.360 --> 00:00:13.040
+prompt/cook
+
+6
+00:00:10.960 --> 00:00:15.440
+that does the work it used to take you
+
+7
+00:00:13.040 --> 00:00:18.240
+hours in minutes. You're able to
+
+8
+00:00:15.440 --> 00:00:21.119
+accomplish this with Claude Code sub
+
+9
+00:00:18.240 --> 00:00:24.320
+aents. You've created workflows of
+
+10
+00:00:21.119 --> 00:00:26.800
+specialized agents that do one thing and
+
+11
+00:00:24.320 --> 00:00:30.160
+do it extraordinarily well. You can see
+
+12
+00:00:26.800 --> 00:00:33.600
+I have this agent called meta agent. My
+
+13
+00:00:30.160 --> 00:00:36.320
+agents are building my agents. Code is a
+
+14
+00:00:33.600 --> 00:00:39.040
+commodity. Your fine-tuned prompts can
+
+15
+00:00:36.320 --> 00:00:42.000
+be valuable. And now your cloud code sub
+
+16
+00:00:39.040 --> 00:00:44.879
+aents can yield extreme value for your
+
+17
+00:00:42.000 --> 00:00:48.000
+engineering if you know how to avoid the
+
+18
+00:00:44.879 --> 00:00:50.079
+big two mistakes engineers are making
+
+19
+00:00:48.000 --> 00:00:52.239
+with sub aents. In this video, we're
+
+20
+00:00:50.079 --> 00:00:55.039
+going to break down how to build
+
+21
+00:00:52.239 --> 00:00:57.360
+effective cloud code sub aents. We'll of
+
+22
+00:00:55.039 --> 00:00:59.520
+course use this powerful meta agent to
+
+23
+00:00:57.360 --> 00:01:01.680
+build new agents. But before we get
+
+24
+00:00:59.520 --> 00:01:04.239
+there, sub agents have serious
+
+25
+00:01:01.680 --> 00:01:06.240
+trade-offs and pitfalls you should know
+
+26
+00:01:04.239 --> 00:01:08.479
+about so you don't waste your
+
+27
+00:01:06.240 --> 00:01:10.720
+engineering time and tokens. Let's
+
+28
+00:01:08.479 --> 00:01:13.680
+understand how to take our agentic
+
+29
+00:01:10.720 --> 00:01:17.560
+coding to the next level with clawed
+
+30
+00:01:13.680 --> 00:01:17.560
+code sub aents.
+
+31
+00:01:23.360 --> 00:01:28.320
+So, first things first, what are claw
+
+32
+00:01:25.759 --> 00:01:31.360
+code sub aents? I can almost guarantee
+
+33
+00:01:28.320 --> 00:01:33.600
+you sub agents don't work like you think
+
+34
+00:01:31.360 --> 00:01:36.079
+they work. Let me explain. Here's what
+
+35
+00:01:33.600 --> 00:01:38.560
+the flow of claw code agents look like
+
+36
+00:01:36.079 --> 00:01:41.360
+end to end. Starts out with your prompt.
+
+37
+00:01:38.560 --> 00:01:43.600
+Your primary agent then prompts your sub
+
+38
+00:01:41.360 --> 00:01:46.079
+agents. Your sub agents then do their
+
+39
+00:01:43.600 --> 00:01:48.799
+work autonomously and then this is
+
+40
+00:01:46.079 --> 00:01:51.280
+important. They report back to your
+
+41
+00:01:48.799 --> 00:01:54.320
+primary agent and your primary agent
+
+42
+00:01:51.280 --> 00:01:57.360
+reports back to you. The flow of
+
+43
+00:01:54.320 --> 00:01:59.920
+information here is absolutely critical.
+
+44
+00:01:57.360 --> 00:02:02.560
+You prompt your primary agent and then
+
+45
+00:01:59.920 --> 00:02:05.759
+your primary agent prompts individual
+
+46
+00:02:02.560 --> 00:02:09.200
+sub aents based on your original prompt.
+
+47
+00:02:05.759 --> 00:02:12.720
+Your sub agents respond not to you, they
+
+48
+00:02:09.200 --> 00:02:14.560
+respond to your primary agent. Okay?
+
+49
+00:02:12.720 --> 00:02:17.920
+Many engineers are going to miss this
+
+50
+00:02:14.560 --> 00:02:20.319
+fact and this changes the way you write
+
+51
+00:02:17.920 --> 00:02:23.440
+your sub agent prompts. Let's break down
+
+52
+00:02:20.319 --> 00:02:26.239
+exactly what claude code sub agents look
+
+53
+00:02:23.440 --> 00:02:29.040
+like. So inside this codebase, we have a
+
+54
+00:02:26.239 --> 00:02:31.200
+simple hello world agent prompt. You can
+
+55
+00:02:29.040 --> 00:02:33.920
+of course see this is operating inside
+
+56
+00:02:31.200 --> 00:02:36.640
+of the brand new agents directory. We
+
+57
+00:02:33.920 --> 00:02:39.200
+have a new agentic directory to focus
+
+58
+00:02:36.640 --> 00:02:41.360
+on. So, we'll get to the important meta
+
+59
+00:02:39.200 --> 00:02:44.560
+agent in a moment. Let's start simple
+
+60
+00:02:41.360 --> 00:02:46.160
+and understand what sub aent prompts
+
+61
+00:02:44.560 --> 00:02:48.560
+look like. We'll open up a new shell
+
+62
+00:02:46.160 --> 00:02:51.040
+here. Fire up claude in yellow mode. And
+
+63
+00:02:48.560 --> 00:02:53.920
+you'll notice here in the description,
+
+64
+00:02:51.040 --> 00:02:57.040
+if they say hi claude or high CC or high
+
+65
+00:02:53.920 --> 00:03:00.239
+claude code, use this agent. Hi CC. And
+
+66
+00:02:57.040 --> 00:03:01.920
+now cloud code immediately finds this
+
+67
+00:03:00.239 --> 00:03:03.599
+agent, right? It finds the description
+
+68
+00:03:01.920 --> 00:03:05.599
+for this agent and kicks it off. You
+
+69
+00:03:03.599 --> 00:03:07.760
+have your agent name. This is its unique
+
+70
+00:03:05.599 --> 00:03:10.239
+ID. The description, which is very
+
+71
+00:03:07.760 --> 00:03:12.720
+important. This communicates to your
+
+72
+00:03:10.239 --> 00:03:14.720
+primary agent when it should call this
+
+73
+00:03:12.720 --> 00:03:16.319
+agent tools. So, you can specify
+
+74
+00:03:14.720 --> 00:03:17.280
+specific tools available.
+
+75
+00:03:16.319 --> 00:03:19.360
+>> Sub agent complete
+
+76
+00:03:17.280 --> 00:03:20.560
+>> and the color which you can see right
+
+77
+00:03:19.360 --> 00:03:22.400
+here. You can see we have a nice
+
+78
+00:03:20.560 --> 00:03:24.000
+formatted response there. That natural
+
+79
+00:03:22.400 --> 00:03:26.159
+language text to speech by the way
+
+80
+00:03:24.000 --> 00:03:28.239
+that's set up with cloud code hooks on
+
+81
+00:03:26.159 --> 00:03:29.920
+the stop event. But if we look at this
+
+82
+00:03:28.239 --> 00:03:31.680
+format, there's something really
+
+83
+00:03:29.920 --> 00:03:34.000
+important here. And we're coming up on
+
+84
+00:03:31.680 --> 00:03:35.680
+the first big mistake engineers are
+
+85
+00:03:34.000 --> 00:03:37.599
+making when using clutter code sub
+
+86
+00:03:35.680 --> 00:03:39.280
+aents. If we open up this prompt here,
+
+87
+00:03:37.599 --> 00:03:43.120
+you can see we have a classic markdown
+
+88
+00:03:39.280 --> 00:03:45.680
+format, purpose and report. The first
+
+89
+00:03:43.120 --> 00:03:47.920
+mistake engineers make is not
+
+90
+00:03:45.680 --> 00:03:51.440
+understanding that what you're writing
+
+91
+00:03:47.920 --> 00:03:54.879
+here is the system prompt of your sub
+
+92
+00:03:51.440 --> 00:03:56.720
+agent. Okay? This is not the prompt for
+
+93
+00:03:54.879 --> 00:03:58.560
+your agent. Okay? It's the system
+
+94
+00:03:56.720 --> 00:04:00.000
+prompt. This is important. It might not
+
+95
+00:03:58.560 --> 00:04:02.159
+seem like an important detail, but it
+
+96
+00:04:00.000 --> 00:04:03.920
+changes the way you write the prompt and
+
+97
+00:04:02.159 --> 00:04:05.840
+it changes what information is
+
+98
+00:04:03.920 --> 00:04:08.080
+available. That's a big mistake. But
+
+99
+00:04:05.840 --> 00:04:09.760
+even bigger is this. Notice how I have
+
+100
+00:04:08.080 --> 00:04:11.920
+this section here. And remember in our
+
+101
+00:04:09.760 --> 00:04:14.400
+diagram here, remember who your sub
+
+102
+00:04:11.920 --> 00:04:17.359
+agents are responding to. It's not you.
+
+103
+00:04:14.400 --> 00:04:19.199
+It's your primary agent. Okay? This
+
+104
+00:04:17.359 --> 00:04:20.720
+report, this response format is going to
+
+105
+00:04:19.199 --> 00:04:23.040
+be really important. You can see here
+
+106
+00:04:20.720 --> 00:04:24.880
+I'm explicitly having the sub agent
+
+107
+00:04:23.040 --> 00:04:27.520
+communicate to the primary agent. I'm
+
+108
+00:04:24.880 --> 00:04:29.759
+saying Claude, respond to the user with
+
+109
+00:04:27.520 --> 00:04:31.919
+this message. And guess what happened?
+
+110
+00:04:29.759 --> 00:04:33.759
+Look at the response. Hi there. How can
+
+111
+00:04:31.919 --> 00:04:35.040
+I help you? Did you know Nvidia blah
+
+112
+00:04:33.759 --> 00:04:37.759
+blah blah blah blah. Right? We had it
+
+113
+00:04:35.040 --> 00:04:40.800
+research some random uh tech news.
+
+114
+00:04:37.759 --> 00:04:43.440
+Right? This is the sub agent prompt
+
+115
+00:04:40.800 --> 00:04:45.680
+format. We have variable declaration at
+
+116
+00:04:43.440 --> 00:04:48.400
+the top. The cracked cloud code team is
+
+117
+00:04:45.680 --> 00:04:50.080
+going to tweak, improve, add to these as
+
+118
+00:04:48.400 --> 00:04:52.720
+time goes on. They're probably going to
+
+119
+00:04:50.080 --> 00:04:54.639
+add the model here at some point. We
+
+120
+00:04:52.720 --> 00:04:55.840
+have our system prompt, right? And you
+
+121
+00:04:54.639 --> 00:04:56.880
+can see this right in the docs. If you
+
+122
+00:04:55.840 --> 00:04:59.120
+don't believe me, you can always just
+
+123
+00:04:56.880 --> 00:05:01.520
+open up the docs, search system, and you
+
+124
+00:04:59.120 --> 00:05:04.320
+can see what we're actually writing here
+
+125
+00:05:01.520 --> 00:05:06.400
+is the system prompt. To be super clear,
+
+126
+00:05:04.320 --> 00:05:08.000
+this is not the user prompt. Okay, when
+
+127
+00:05:06.400 --> 00:05:09.520
+you're writing uh let's open up the
+
+128
+00:05:08.000 --> 00:05:13.360
+prime command. When we have something
+
+129
+00:05:09.520 --> 00:05:15.759
+like this slashp prime, this runs right
+
+130
+00:05:13.360 --> 00:05:18.080
+into our primary agent. This is a
+
+131
+00:05:15.759 --> 00:05:21.039
+prompt, right? A user prompt that goes
+
+132
+00:05:18.080 --> 00:05:23.440
+right into the context window of our
+
+133
+00:05:21.039 --> 00:05:25.680
+primary agent. Okay, our agents
+
+134
+00:05:23.440 --> 00:05:27.520
+directory is very different. This is a
+
+135
+00:05:25.680 --> 00:05:29.520
+system prompt. We're defining the top
+
+136
+00:05:27.520 --> 00:05:31.360
+level functionality. These prompts are
+
+137
+00:05:29.520 --> 00:05:33.039
+going to look similar, but it's
+
+138
+00:05:31.360 --> 00:05:35.440
+important to delineate, right? You can
+
+139
+00:05:33.039 --> 00:05:38.080
+pass variables into this. This is a
+
+140
+00:05:35.440 --> 00:05:39.840
+system prompt. This is not what triggers
+
+141
+00:05:38.080 --> 00:05:41.280
+what's actually done. And so, you know,
+
+142
+00:05:39.840 --> 00:05:43.360
+again, just to bring this up, if you
+
+143
+00:05:41.280 --> 00:05:45.759
+understand this, you're going to perform
+
+144
+00:05:43.360 --> 00:05:47.520
+very well with your sub agents, and
+
+145
+00:05:45.759 --> 00:05:49.840
+you're going to be avoiding the top two
+
+146
+00:05:47.520 --> 00:05:52.240
+mistakes engineers make with cloud code
+
+147
+00:05:49.840 --> 00:05:55.039
+sub agents. You don't prompt your sub
+
+148
+00:05:52.240 --> 00:05:57.600
+agents. You can write a prompt for your
+
+149
+00:05:55.039 --> 00:05:59.440
+primary agent to prompt your sub agents,
+
+150
+00:05:57.600 --> 00:06:01.919
+but you're communicating with your
+
+151
+00:05:59.440 --> 00:06:04.080
+primary cloud code agent, right? The top
+
+152
+00:06:01.919 --> 00:06:06.800
+level agent. We'll call this the primary
+
+153
+00:06:04.080 --> 00:06:09.199
+agent. It's cloud code that prompts your
+
+154
+00:06:06.800 --> 00:06:10.560
+sub agents, right? It is delegating. You
+
+155
+00:06:09.199 --> 00:06:13.199
+really want to be thinking about your
+
+156
+00:06:10.560 --> 00:06:16.960
+cloud code sub aents as tools of
+
+157
+00:06:13.199 --> 00:06:19.759
+delegation for your primary agent. And
+
+158
+00:06:16.960 --> 00:06:21.600
+this is why the big three is so
+
+159
+00:06:19.759 --> 00:06:23.039
+important. Okay, we we cover this all
+
+160
+00:06:21.600 --> 00:06:25.120
+the time on the channel. This isn't
+
+161
+00:06:23.039 --> 00:06:27.039
+going away anytime soon. In fact, it's
+
+162
+00:06:25.120 --> 00:06:29.759
+only going to become more important as
+
+163
+00:06:27.039 --> 00:06:33.280
+we scale up our agent coding to multi-
+
+164
+00:06:29.759 --> 00:06:36.639
+aent systems, right? Context, model,
+
+165
+00:06:33.280 --> 00:06:38.560
+prompt, and specifically the flow of the
+
+166
+00:06:36.639 --> 00:06:40.960
+context, model, and prompt between
+
+167
+00:06:38.560 --> 00:06:42.319
+different agents. Okay, this is super
+
+168
+00:06:40.960 --> 00:06:43.440
+important. Okay, so I think you get the
+
+169
+00:06:42.319 --> 00:06:44.800
+point. I don't need to keep harping on
+
+170
+00:06:43.440 --> 00:06:46.400
+this. This is just really important. If
+
+171
+00:06:44.800 --> 00:06:49.120
+you make these mistakes, this will
+
+172
+00:06:46.400 --> 00:06:52.080
+eventually go ary, right? especially as
+
+173
+00:06:49.120 --> 00:06:57.240
+you start scaling up what you can do
+
+174
+00:06:52.080 --> 00:06:57.240
+with chains of sub agents,
+
+175
+00:06:59.599 --> 00:07:02.880
+right? So, we're just getting started
+
+176
+00:07:00.720 --> 00:07:05.120
+here. You can chain the call and
+
+177
+00:07:02.880 --> 00:07:06.880
+responses and call and responses, right?
+
+178
+00:07:05.120 --> 00:07:09.280
+It's funny that we started out prompt
+
+179
+00:07:06.880 --> 00:07:10.479
+chaining years ago and now we're still
+
+180
+00:07:09.280 --> 00:07:12.240
+prompt chaining. We're just prompt
+
+181
+00:07:10.479 --> 00:07:14.960
+chaining with bigger compositional
+
+182
+00:07:12.240 --> 00:07:17.360
+units. You and I, the user, prompt the
+
+183
+00:07:14.960 --> 00:07:19.199
+primary agent. They can then run tasks
+
+184
+00:07:17.360 --> 00:07:21.039
+and then based on the prompt they come
+
+185
+00:07:19.199 --> 00:07:23.199
+back into the primary agent and you can
+
+186
+00:07:21.039 --> 00:07:24.960
+have your agent keep cooking, right? It
+
+187
+00:07:23.199 --> 00:07:27.039
+can keep doing important work for you.
+
+188
+00:07:24.960 --> 00:07:29.120
+So you can fire off another set of sub
+
+189
+00:07:27.039 --> 00:07:31.520
+aents. And so this is the true flow.
+
+190
+00:07:29.120 --> 00:07:33.440
+Your sub aents are responding to your
+
+191
+00:07:31.520 --> 00:07:35.520
+primary agent. And if you're doing
+
+192
+00:07:33.440 --> 00:07:36.960
+powerful multi- aent orchestration,
+
+193
+00:07:35.520 --> 00:07:38.479
+which you will be pretty soon here, if
+
+194
+00:07:36.960 --> 00:07:40.000
+you're watching the Dev Dan channel,
+
+195
+00:07:38.479 --> 00:07:42.080
+make sure you're subscribed and you
+
+196
+00:07:40.000 --> 00:07:44.400
+comment to stay plugged in to key
+
+197
+00:07:42.080 --> 00:07:47.360
+engineering information like this. You
+
+198
+00:07:44.400 --> 00:07:50.000
+can tell um I don't just copy and paste
+
+199
+00:07:47.360 --> 00:07:52.319
+the documentation. Um you know,
+
+200
+00:07:50.000 --> 00:07:55.120
+everyone's using this. I think cool,
+
+201
+00:07:52.319 --> 00:07:58.400
+that's good. Use this. But um read the
+
+202
+00:07:55.120 --> 00:07:59.759
+documentation, guys. Like really read
+
+203
+00:07:58.400 --> 00:08:01.039
+through this stuff. It's important.
+
+204
+00:07:59.759 --> 00:08:02.800
+Okay? This is the most important
+
+205
+00:08:01.039 --> 00:08:04.960
+technology of the year, probably over
+
+206
+00:08:02.800 --> 00:08:07.039
+the next few years, right? Agents are
+
+207
+00:08:04.960 --> 00:08:08.319
+how you win as an engineer. Understand
+
+208
+00:08:07.039 --> 00:08:11.360
+what they really do, right? Don't
+
+209
+00:08:08.319 --> 00:08:13.680
+offload all the cognitive work to your
+
+210
+00:08:11.360 --> 00:08:15.599
+agents, right? understand the most
+
+211
+00:08:13.680 --> 00:08:16.960
+important technology. Okay? And to be
+
+212
+00:08:15.599 --> 00:08:19.520
+super clear, there's nothing more
+
+213
+00:08:16.960 --> 00:08:21.759
+important right now than agents. And the
+
+214
+00:08:19.520 --> 00:08:22.879
+leading agent is Claude Code. If you've
+
+215
+00:08:21.759 --> 00:08:24.720
+been following the channel, you already
+
+216
+00:08:22.879 --> 00:08:27.120
+know this. You've been listening to me
+
+217
+00:08:24.720 --> 00:08:28.400
+glaze the team and glaze the the
+
+218
+00:08:27.120 --> 00:08:30.080
+product. You know, really communicate
+
+219
+00:08:28.400 --> 00:08:32.159
+the value of this, right? But it but
+
+220
+00:08:30.080 --> 00:08:34.000
+it's all for a reason. I focus on the
+
+221
+00:08:32.159 --> 00:08:35.919
+signal that every engineer has a
+
+222
+00:08:34.000 --> 00:08:37.279
+superpower. Every engineer is super
+
+223
+00:08:35.919 --> 00:08:39.519
+super good. They're cracked at
+
+224
+00:08:37.279 --> 00:08:42.320
+something. One of my key abilities is to
+
+225
+00:08:39.519 --> 00:08:45.279
+focus on the signal and cancel out the
+
+226
+00:08:42.320 --> 00:08:48.000
+noise. Okay? I can focus I can focus
+
+227
+00:08:45.279 --> 00:08:50.480
+directly on the signal of where the
+
+228
+00:08:48.000 --> 00:08:53.279
+valuable information is. Truly, there's
+
+229
+00:08:50.480 --> 00:08:55.360
+no other way I could show up here for
+
+230
+00:08:53.279 --> 00:08:58.240
+you every week with something valuable
+
+231
+00:08:55.360 --> 00:08:59.920
+if I wasn't constantly just obsessed and
+
+232
+00:08:58.240 --> 00:09:01.360
+passionate about finding the signal.
+
+233
+00:08:59.920 --> 00:09:02.880
+Okay, this, you know, again, this is
+
+234
+00:09:01.360 --> 00:09:05.200
+super powerful. Copy it, throw it into
+
+235
+00:09:02.880 --> 00:09:06.720
+an LLM, but don't offload deep
+
+236
+00:09:05.200 --> 00:09:08.880
+understanding, right? You're basically
+
+237
+00:09:06.720 --> 00:09:11.360
+just vibe coding then. Okay. Deeply
+
+238
+00:09:08.880 --> 00:09:14.320
+understand your tools so that you can do
+
+239
+00:09:11.360 --> 00:09:16.160
+more, better, faster, cheaper, so on and
+
+240
+00:09:14.320 --> 00:09:17.920
+so forth. Okay. Anyway, where were we?
+
+241
+00:09:16.160 --> 00:09:19.600
+Um, we were talking about chaining. Yes.
+
+242
+00:09:17.920 --> 00:09:21.120
+So, this is super important, right? If
+
+243
+00:09:19.600 --> 00:09:24.160
+you want to scale up, you need to
+
+244
+00:09:21.120 --> 00:09:25.839
+understand the information flow. Okay.
+
+245
+00:09:24.160 --> 00:09:27.440
+We're not just prompting a chat
+
+246
+00:09:25.839 --> 00:09:29.680
+interface anymore. We're not just
+
+247
+00:09:27.440 --> 00:09:32.000
+dealing with one context model prompt
+
+248
+00:09:29.680 --> 00:09:33.680
+agent system. We're dealing with multi-
+
+249
+00:09:32.000 --> 00:09:35.760
+aent systems. Okay? And there's a reason
+
+250
+00:09:33.680 --> 00:09:38.399
+I put out that multi- aent observability
+
+251
+00:09:35.760 --> 00:09:40.480
+video. I knew this was coming. It's
+
+252
+00:09:38.399 --> 00:09:42.080
+here. Okay, multi- aent systems are
+
+253
+00:09:40.480 --> 00:09:45.839
+here. The best engineers, the most
+
+254
+00:09:42.080 --> 00:09:47.760
+cracked seniors. We're scaling up hard.
+
+255
+00:09:45.839 --> 00:09:49.120
+Okay, compute, compute, compute,
+
+256
+00:09:47.760 --> 00:09:50.880
+compute. And you can see it here. This
+
+257
+00:09:49.120 --> 00:09:53.360
+is just a simple flow, right? You prompt
+
+258
+00:09:50.880 --> 00:09:55.680
+your agent, hit fire sub aents, collect
+
+259
+00:09:53.360 --> 00:09:58.160
+results. Okay, then the next step in
+
+260
+00:09:55.680 --> 00:10:00.640
+that custom/comand is going to be great,
+
+261
+00:09:58.160 --> 00:10:02.320
+collect the results, fire off more sub
+
+262
+00:10:00.640 --> 00:10:04.080
+aents that, you know, create a concrete
+
+263
+00:10:02.320 --> 00:10:06.000
+solution. This is all fantastic. Let's
+
+264
+00:10:04.080 --> 00:10:08.240
+actually use this. I did mention I'm
+
+265
+00:10:06.000 --> 00:10:10.640
+going to share my meta agent with you.
+
+266
+00:10:08.240 --> 00:10:12.000
+I've built uh 50 probably 100 plus
+
+267
+00:10:10.640 --> 00:10:14.240
+agents already, which is kind of crazy
+
+268
+00:10:12.000 --> 00:10:16.240
+to say, but it's all thanks to this meta
+
+269
+00:10:14.240 --> 00:10:18.480
+agent, right? As soon as you get access
+
+270
+00:10:16.240 --> 00:10:20.399
+to a new feature, figure out how you can
+
+271
+00:10:18.480 --> 00:10:23.040
+scale it up. Oftent times, you know,
+
+272
+00:10:20.399 --> 00:10:24.720
+with Genai, you build a meta version of
+
+273
+00:10:23.040 --> 00:10:27.720
+that, right? The thing that builds the
+
+274
+00:10:24.720 --> 00:10:27.720
+thing.
+
+275
+00:10:29.519 --> 00:10:33.200
+What are we going to do here? Let's just
+
+276
+00:10:30.720 --> 00:10:35.920
+delete a bunch of stuff. Okay. If this
+
+277
+00:10:33.200 --> 00:10:38.399
+causes you pain, you know, if deleting
+
+278
+00:10:35.920 --> 00:10:40.240
+causes you pain, you probably aren't
+
+279
+00:10:38.399 --> 00:10:42.800
+deleting enough. Uh, so let's get rid of
+
+280
+00:10:40.240 --> 00:10:44.720
+this. Let's get rid of this. And, uh,
+
+281
+00:10:42.800 --> 00:10:47.600
+let's get rid of this as well. Let's
+
+282
+00:10:44.720 --> 00:10:49.760
+create new agents with our meta agent.
+
+283
+00:10:47.600 --> 00:10:51.920
+And so, to cue this up, you know, a big
+
+284
+00:10:49.760 --> 00:10:54.320
+issue I see in the engineering space, in
+
+285
+00:10:51.920 --> 00:10:57.600
+the Gen AI ecosystem, is that I'm seeing
+
+286
+00:10:54.320 --> 00:11:00.000
+a lot of engineers uh, using technology
+
+287
+00:10:57.600 --> 00:11:02.480
+to create solutions for problems that
+
+288
+00:11:00.000 --> 00:11:03.760
+don't exist. Noobs and beginners, they
+
+289
+00:11:02.480 --> 00:11:05.600
+start with the technology and work
+
+290
+00:11:03.760 --> 00:11:07.600
+backward. If you want to become a real
+
+291
+00:11:05.600 --> 00:11:09.440
+engineer, if you want to continue being
+
+292
+00:11:07.600 --> 00:11:11.600
+a valuable engineer in the generative AI
+
+293
+00:11:09.440 --> 00:11:13.600
+age, work the other way. Work the right
+
+294
+00:11:11.600 --> 00:11:15.680
+way. Work the way that product builders
+
+295
+00:11:13.600 --> 00:11:18.399
+think. You have a problem first. Next
+
+296
+00:11:15.680 --> 00:11:21.120
+comes a solution and then the tech comes
+
+297
+00:11:18.399 --> 00:11:22.720
+third. Okay? Problem, solution, tech.
+
+298
+00:11:21.120 --> 00:11:24.160
+Okay? So, what do I mean by that? Let me
+
+299
+00:11:22.720 --> 00:11:26.160
+show you a concrete example. Let's use
+
+300
+00:11:24.160 --> 00:11:27.600
+our meta agent to solve a real problem.
+
+301
+00:11:26.160 --> 00:11:29.200
+Let's start at the top, right? What's
+
+302
+00:11:27.600 --> 00:11:31.600
+the problem? When I'm a magenta coding
+
+303
+00:11:29.200 --> 00:11:33.519
+at scale, I lose track of what some
+
+304
+00:11:31.600 --> 00:11:36.240
+agents have done. Okay. Problem
+
+305
+00:11:33.519 --> 00:11:38.800
+statement. Solution. Add text to speech
+
+306
+00:11:36.240 --> 00:11:40.959
+to my agents so they notify me when
+
+307
+00:11:38.800 --> 00:11:42.800
+they're done and more importantly what
+
+308
+00:11:40.959 --> 00:11:44.240
+they've done. Okay. So now we have a
+
+309
+00:11:42.800 --> 00:11:46.399
+problem and a solution. Now let's use
+
+310
+00:11:44.240 --> 00:11:47.680
+the technology. Okay. Only after you
+
+311
+00:11:46.399 --> 00:11:49.760
+have a problem and solution should you
+
+312
+00:11:47.680 --> 00:11:51.839
+move the technology. So technology we
+
+313
+00:11:49.760 --> 00:11:54.640
+can use cloud code sub aents. I have a
+
+314
+00:11:51.839 --> 00:11:57.440
+meta agent here that I can use to build
+
+315
+00:11:54.640 --> 00:11:59.680
+up a new textto-spech agent that
+
+316
+00:11:57.440 --> 00:12:01.519
+communicates what was done. Okay,
+
+317
+00:11:59.680 --> 00:12:03.519
+fantastic. Order matters problem
+
+318
+00:12:01.519 --> 00:12:05.760
+solution technology. So inside of
+
+319
+00:12:03.519 --> 00:12:09.200
+MCP.json.sample,
+
+320
+00:12:05.760 --> 00:12:10.720
+we have a setup for the 11 labs MCP
+
+321
+00:12:09.200 --> 00:12:12.720
+server. I have this configured in
+
+322
+00:12:10.720 --> 00:12:14.160
+my.json here. This is get ignored
+
+323
+00:12:12.720 --> 00:12:16.240
+because of course we have environment
+
+324
+00:12:14.160 --> 00:12:18.160
+variable information here. First I want
+
+325
+00:12:16.240 --> 00:12:20.800
+to understand what my agent can do. So
+
+326
+00:12:18.160 --> 00:12:22.639
+I'm going to run all tools. All tools
+
+327
+00:12:20.800 --> 00:12:25.120
+looks like this. It's a simple reusable
+
+328
+00:12:22.639 --> 00:12:26.800
+prompt. List all available tools in your
+
+329
+00:12:25.120 --> 00:12:28.959
+system prompt. I want bullet points. I
+
+330
+00:12:26.800 --> 00:12:30.880
+want TypeScript function signature
+
+331
+00:12:28.959 --> 00:12:33.200
+format. This is going to allow us to
+
+332
+00:12:30.880 --> 00:12:35.760
+understand the tools available to us.
+
+333
+00:12:33.200 --> 00:12:37.600
+And specifically, I want to see the 11
+
+334
+00:12:35.760 --> 00:12:38.800
+Labs tools. Great. So, here are all the
+
+335
+00:12:37.600 --> 00:12:40.560
+available tools. I'm just going to copy
+
+336
+00:12:38.800 --> 00:12:43.040
+these out so I can quickly search. I
+
+337
+00:12:40.560 --> 00:12:44.320
+need two things. Text speech and we
+
+338
+00:12:43.040 --> 00:12:46.320
+probably need some way to play, right?
+
+339
+00:12:44.320 --> 00:12:47.920
+So, I'm going to search text
+
+340
+00:12:46.320 --> 00:12:50.959
+forwardlooking
+
+341
+00:12:47.920 --> 00:12:52.320
+speech. There it is. Text to speech. So,
+
+342
+00:12:50.959 --> 00:12:54.880
+I'm just going to paste that here. And
+
+343
+00:12:52.320 --> 00:12:57.279
+we also want to find a play. There it
+
+344
+00:12:54.880 --> 00:12:58.959
+is. Play audio. Great. Okay. So, we have
+
+345
+00:12:57.279 --> 00:13:00.639
+these two methods that we can use. And
+
+346
+00:12:58.959 --> 00:13:03.440
+we actually want the entire definition
+
+347
+00:13:00.639 --> 00:13:05.200
+so we can know the exact parameters that
+
+348
+00:13:03.440 --> 00:13:08.480
+we're playing with. Right. Let's paste
+
+349
+00:13:05.200 --> 00:13:11.600
+this all in mode back to text format
+
+350
+00:13:08.480 --> 00:13:13.519
+real quick. Great. Now, let's go ahead
+
+351
+00:13:11.600 --> 00:13:15.920
+and just run these. Right. So, this is
+
+352
+00:13:13.519 --> 00:13:18.959
+in our primary agents context window.
+
+353
+00:13:15.920 --> 00:13:22.240
+I'm just going to say 11 labs. I've
+
+354
+00:13:18.959 --> 00:13:24.959
+completed. Next, we can and I think we
+
+355
+00:13:22.240 --> 00:13:27.440
+have voice ID here. Let me quickly copy
+
+356
+00:13:24.959 --> 00:13:29.040
+one of my favorite 11 labs voice IDs.
+
+357
+00:13:27.440 --> 00:13:31.040
+Voice ID. Just going to be super clear
+
+358
+00:13:29.040 --> 00:13:32.880
+in the prompt. Output directory. Right.
+
+359
+00:13:31.040 --> 00:13:34.959
+Output. Great. Output directory. Output
+
+360
+00:13:32.880 --> 00:13:36.639
+to pwd, which is current working
+
+361
+00:13:34.959 --> 00:13:38.880
+directory/output.
+
+362
+00:13:36.639 --> 00:13:40.639
+I'm going to have cloud code opus fire
+
+363
+00:13:38.880 --> 00:13:42.320
+off this tool here. And all I'm doing
+
+364
+00:13:40.639 --> 00:13:44.000
+here is validating the workflow. I'm
+
+365
+00:13:42.320 --> 00:13:46.399
+going to encode into an agent. So, text
+
+366
+00:13:44.000 --> 00:13:47.120
+to speech. Great. Save the file. And now
+
+367
+00:13:46.399 --> 00:13:48.720
+we want to run.
+
+368
+00:13:47.120 --> 00:13:49.680
+>> All set and ready for your next step.
+
+369
+00:13:48.720 --> 00:13:51.279
+>> Great. Now we're going to run play
+
+370
+00:13:49.680 --> 00:13:53.040
+audio. And I should just be able to say
+
+371
+00:13:51.279 --> 00:13:55.279
+play audio
+
+372
+00:13:53.040 --> 00:13:57.120
+because all the context is loaded. Um,
+
+373
+00:13:55.279 --> 00:13:58.240
+our agent is prime. Okay, that was good.
+
+374
+00:13:57.120 --> 00:13:59.600
+I was talking over it. So I'm going to
+
+375
+00:13:58.240 --> 00:14:02.399
+run it again. Run again.
+
+376
+00:13:59.600 --> 00:14:04.160
+>> I've completed XYZ. Next weekend ABC.
+
+377
+00:14:02.399 --> 00:14:05.600
+>> Great. So we can see that we have text
+
+378
+00:14:04.160 --> 00:14:07.199
+to speech working. We now have full
+
+379
+00:14:05.600 --> 00:14:09.199
+capability to have our agents
+
+380
+00:14:07.199 --> 00:14:11.519
+communicate with us via a sub agent.
+
+381
+00:14:09.199 --> 00:14:14.320
+Okay. So fantastic. So now we can crank
+
+382
+00:14:11.519 --> 00:14:15.920
+open our powerful metaprompt. Okay. So
+
+383
+00:14:14.320 --> 00:14:18.160
+now that we know the workflow and the
+
+384
+00:14:15.920 --> 00:14:20.560
+work that we want done, we can build a
+
+385
+00:14:18.160 --> 00:14:23.360
+new agent that encapsulates this work.
+
+386
+00:14:20.560 --> 00:14:26.000
+So we can open this up and we can see
+
+387
+00:14:23.360 --> 00:14:28.560
+exactly what our meta agent is doing. It
+
+388
+00:14:26.000 --> 00:14:30.959
+has a system prompt that details how to
+
+389
+00:14:28.560 --> 00:14:33.680
+create a new agent, right? It's doing
+
+390
+00:14:30.959 --> 00:14:35.440
+all this work in the isolated context
+
+391
+00:14:33.680 --> 00:14:36.560
+window. And so I'll fast forward through
+
+392
+00:14:35.440 --> 00:14:37.680
+this. I'm going to type up the prompt
+
+393
+00:14:36.560 --> 00:14:39.120
+right here. So this is what it's going
+
+394
+00:14:37.680 --> 00:14:41.600
+to look like, right? Build a new sub
+
+395
+00:14:39.120 --> 00:14:43.600
+agent. So I'm asking cloud code to build
+
+396
+00:14:41.600 --> 00:14:45.120
+the agent. And you can see here uh
+
+397
+00:14:43.600 --> 00:14:47.440
+generate a new complete cloud drive sub
+
+398
+00:14:45.120 --> 00:14:50.320
+aent configuration file you from a
+
+399
+00:14:47.440 --> 00:14:53.279
+user's description. Okay. So use this to
+
+400
+00:14:50.320 --> 00:14:55.600
+create new agents proactively. So we're
+
+401
+00:14:53.279 --> 00:14:57.600
+using the information dense keyword
+
+402
+00:14:55.600 --> 00:14:58.800
+encoded by anthropic and that we should
+
+403
+00:14:57.600 --> 00:15:00.560
+probably make this uppercase just to
+
+404
+00:14:58.800 --> 00:15:03.120
+make it more dramatic. When a user asks
+
+405
+00:15:00.560 --> 00:15:04.399
+you to create a new sub aent. Okay. So
+
+406
+00:15:03.120 --> 00:15:06.560
+we want to make sure that we have that
+
+407
+00:15:04.399 --> 00:15:09.120
+language inside of our prompt. Build a
+
+408
+00:15:06.560 --> 00:15:11.519
+new sub aent. Great. We're defining when
+
+409
+00:15:09.120 --> 00:15:13.440
+it's proactively triggered based on our
+
+410
+00:15:11.519 --> 00:15:15.040
+conversation so far. Our agents will
+
+411
+00:15:13.440 --> 00:15:17.040
+have blah blah blah blah blah. I'm just
+
+412
+00:15:15.040 --> 00:15:18.399
+detailing exactly the flow that we went
+
+413
+00:15:17.040 --> 00:15:20.480
+through. Okay. Get the current working
+
+414
+00:15:18.399 --> 00:15:22.320
+directory. Text to speech. Play. Great.
+
+415
+00:15:20.480 --> 00:15:24.800
+So again, copy this. Let's fire this
+
+416
+00:15:22.320 --> 00:15:27.040
+off. And now you're going to see the
+
+417
+00:15:24.800 --> 00:15:28.800
+description of our meta agent here. Get
+
+418
+00:15:27.040 --> 00:15:31.440
+activated. This is very important. You
+
+419
+00:15:28.800 --> 00:15:34.399
+need your description to properly set up
+
+420
+00:15:31.440 --> 00:15:36.639
+when your agent should call a specific
+
+421
+00:15:34.399 --> 00:15:38.160
+sub aent. So you can see cloud code is
+
+422
+00:15:36.639 --> 00:15:39.920
+thinking about this. it knows and now
+
+423
+00:15:38.160 --> 00:15:42.079
+it's going to use the sub agent. So,
+
+424
+00:15:39.920 --> 00:15:44.079
+couple key pieces inside of this prompt.
+
+425
+00:15:42.079 --> 00:15:47.279
+I'm not just having this build on zero
+
+426
+00:15:44.079 --> 00:15:49.519
+information. I'm repooling the cloud
+
+427
+00:15:47.279 --> 00:15:51.600
+code documentation live. Okay, I want
+
+428
+00:15:49.519 --> 00:15:53.120
+the most recent updated AI
+
+429
+00:15:51.600 --> 00:15:54.800
+documentation. viewers of the channel,
+
+430
+00:15:53.120 --> 00:15:57.199
+you know that I like to place this in AI
+
+431
+00:15:54.800 --> 00:15:59.360
+docs, but there's a more powerful way to
+
+432
+00:15:57.199 --> 00:16:02.320
+do this where inside of AI docs, you
+
+433
+00:15:59.360 --> 00:16:04.399
+just place a readme and then on the fly
+
+434
+00:16:02.320 --> 00:16:07.440
+you have, you know, a prompt or now a
+
+435
+00:16:04.399 --> 00:16:09.519
+sub agent pull in live documentation
+
+436
+00:16:07.440 --> 00:16:10.959
+with some type of refresh command. And
+
+437
+00:16:09.519 --> 00:16:12.880
+so you can see we have a brand new agent
+
+438
+00:16:10.959 --> 00:16:14.399
+generated there. Let's go ahead and
+
+439
+00:16:12.880 --> 00:16:16.639
+understand what's happened. Great. So
+
+440
+00:16:14.399 --> 00:16:18.480
+through tool uses, our meta agent
+
+441
+00:16:16.639 --> 00:16:20.880
+successfully created now wants to read
+
+442
+00:16:18.480 --> 00:16:22.720
+and verify. So this is great. So, our
+
+443
+00:16:20.880 --> 00:16:25.519
+reasoning model is double-checking the
+
+444
+00:16:22.720 --> 00:16:26.079
+work. It's read the file and now it
+
+445
+00:16:25.519 --> 00:16:28.000
+exists.
+
+446
+00:16:26.079 --> 00:16:30.720
+>> All set and ready for the next step.
+
+447
+00:16:28.000 --> 00:16:33.279
+>> Let's go ahead and check it out. This is
+
+448
+00:16:30.720 --> 00:16:35.440
+a great summary. Voice proactive output
+
+449
+00:16:33.279 --> 00:16:37.199
+autoplay. Looks good. Let's go ahead and
+
+450
+00:16:35.440 --> 00:16:39.519
+look at our new agent. You can see it's
+
+451
+00:16:37.199 --> 00:16:41.199
+in the exact format as we asked.
+
+452
+00:16:39.519 --> 00:16:43.600
+Fantastic. So, we can see here, you
+
+453
+00:16:41.199 --> 00:16:45.440
+know, always review. Every word must add
+
+454
+00:16:43.600 --> 00:16:47.440
+value. That's great. I like that line.
+
+455
+00:16:45.440 --> 00:16:49.600
+No pleasant trees. Yep. Exactly. I'm
+
+456
+00:16:47.440 --> 00:16:52.880
+going to add a couple of things, right?
+
+457
+00:16:49.600 --> 00:16:54.880
+So, variables, username, and what else
+
+458
+00:16:52.880 --> 00:16:57.680
+we're going to do here? I want just one
+
+459
+00:16:54.880 --> 00:17:00.560
+sentence. Uh, these can be quite long. A
+
+460
+00:16:57.680 --> 00:17:01.680
+concise one sentence looks great. I'm
+
+461
+00:17:00.560 --> 00:17:03.920
+going to make a couple tweaks here
+
+462
+00:17:01.680 --> 00:17:06.799
+specifically to the description. This
+
+463
+00:17:03.920 --> 00:17:09.039
+determines when your primary agent is
+
+464
+00:17:06.799 --> 00:17:11.679
+going to call your sub agent. Cloud code
+
+465
+00:17:09.039 --> 00:17:14.480
+has this IDK, this information keyword
+
+466
+00:17:11.679 --> 00:17:16.400
+that they mention um proactively, right?
+
+467
+00:17:14.480 --> 00:17:18.880
+They even have a little section for it.
+
+468
+00:17:16.400 --> 00:17:20.640
+Use proactively or must be used. What we
+
+469
+00:17:18.880 --> 00:17:23.679
+can do here is something a little bit
+
+470
+00:17:20.640 --> 00:17:25.760
+extra, right? You noticed in my hello
+
+471
+00:17:23.679 --> 00:17:28.880
+agent, hello world agent, I like to have
+
+472
+00:17:25.760 --> 00:17:31.520
+these concrete tags or these concrete
+
+473
+00:17:28.880 --> 00:17:34.880
+triggers for my sub agents. So if they
+
+474
+00:17:31.520 --> 00:17:36.080
+say X, Y, or Z, use this agent. So I'm
+
+475
+00:17:34.880 --> 00:17:37.919
+basically just going to reuse this
+
+476
+00:17:36.080 --> 00:17:39.840
+pattern. Frankly, I should encode this
+
+477
+00:17:37.919 --> 00:17:43.039
+into my meta agent. I'm just going to
+
+478
+00:17:39.840 --> 00:17:46.400
+add this here, right? If they say TTS,
+
+479
+00:17:43.039 --> 00:17:51.039
+TTS summary, use this agent. um review
+
+480
+00:17:46.400 --> 00:17:52.880
+user prompt given to you a concise
+
+481
+00:17:51.039 --> 00:17:54.720
+summary of what it does. By the way, um
+
+482
+00:17:52.880 --> 00:17:57.840
+one of the big reasons I'm using cursor
+
+483
+00:17:54.720 --> 00:17:59.520
+still is for writing prompts. It's great
+
+484
+00:17:57.840 --> 00:18:01.520
+for that tab completion. I also want to
+
+485
+00:17:59.520 --> 00:18:03.600
+add one thing here. So, coming full
+
+486
+00:18:01.520 --> 00:18:05.840
+circle here, remember that if we go back
+
+487
+00:18:03.600 --> 00:18:08.559
+to our basic flow here, it's your
+
+488
+00:18:05.840 --> 00:18:11.360
+primary agent that prompts your sub
+
+489
+00:18:08.559 --> 00:18:13.919
+agent. What your primary agent can see
+
+490
+00:18:11.360 --> 00:18:16.400
+and has access to is this description,
+
+491
+00:18:13.919 --> 00:18:18.640
+right? This is how it knows when to call
+
+492
+00:18:16.400 --> 00:18:20.640
+any given sub agent you have. So you
+
+493
+00:18:18.640 --> 00:18:22.880
+really want to leverage the description
+
+494
+00:18:20.640 --> 00:18:26.400
+and tell your topable agent how to
+
+495
+00:18:22.880 --> 00:18:30.240
+prompt this agent. When you prompt this
+
+496
+00:18:26.400 --> 00:18:34.400
+agent, describe exactly what you want
+
+497
+00:18:30.240 --> 00:18:36.000
+them to communicate to the user. And I'm
+
+498
+00:18:34.400 --> 00:18:38.160
+going to add even more detail here. I'm
+
+499
+00:18:36.000 --> 00:18:39.360
+going to say, remember, and again, this
+
+500
+00:18:38.160 --> 00:18:42.000
+is something that I really just need to
+
+501
+00:18:39.360 --> 00:18:45.520
+encode in my meta agent. Um remember
+
+502
+00:18:42.000 --> 00:18:47.039
+this agent has no context any questions
+
+503
+00:18:45.520 --> 00:18:50.080
+conversations
+
+504
+00:18:47.039 --> 00:18:53.120
+between you and the user and something I
+
+505
+00:18:50.080 --> 00:18:55.280
+like to do to increase prompt adherence
+
+506
+00:18:53.120 --> 00:18:56.880
+um anthropic has another information
+
+507
+00:18:55.280 --> 00:18:59.360
+dense keyword that you can use it is
+
+508
+00:18:56.880 --> 00:19:01.120
+this so important colon I want to be
+
+509
+00:18:59.360 --> 00:19:02.640
+absolutely clear with this agent do
+
+510
+00:19:01.120 --> 00:19:05.039
+these following things right we want a
+
+511
+00:19:02.640 --> 00:19:06.880
+concise summary of what was done and
+
+512
+00:19:05.039 --> 00:19:12.240
+also I want to add one more here best
+
+513
+00:19:06.880 --> 00:19:15.200
+practices important run only bash pwd
+
+514
+00:19:12.240 --> 00:19:18.000
+and the 11 labs mcbp tools. Don't use
+
+515
+00:19:15.200 --> 00:19:20.480
+any other tools. Base your response.
+
+516
+00:19:18.000 --> 00:19:21.760
+Exactly. Okay, let's fire up another
+
+517
+00:19:20.480 --> 00:19:25.520
+claw instance. We'll go ahead and just
+
+518
+00:19:21.760 --> 00:19:30.080
+use sonic for this one. What does this
+
+519
+00:19:25.520 --> 00:19:32.240
+codebase do? Use tts summary. After we
+
+520
+00:19:30.080 --> 00:19:36.320
+add details to when this should be
+
+521
+00:19:32.240 --> 00:19:38.559
+called, after we add instructions to the
+
+522
+00:19:36.320 --> 00:19:41.039
+system prompt for our work completion
+
+523
+00:19:38.559 --> 00:19:43.120
+summary sub agent, we now have an
+
+524
+00:19:41.039 --> 00:19:45.679
+operational agent that can quickly
+
+525
+00:19:43.120 --> 00:19:47.679
+summarize in natural language for us
+
+526
+00:19:45.679 --> 00:19:49.840
+anywhere, anytime on any piece of work.
+
+527
+00:19:47.679 --> 00:19:51.919
+Right? This is the beauty of agents and
+
+528
+00:19:49.840 --> 00:19:54.320
+reusable prompts. Now we have this
+
+529
+00:19:51.919 --> 00:19:55.760
+problem solved for good and we can reuse
+
+530
+00:19:54.320 --> 00:19:57.520
+it and improve it when we need to.
+
+531
+00:19:55.760 --> 00:19:59.600
+codebase has been analyzed and now we're
+
+532
+00:19:57.520 --> 00:20:00.960
+getting text to speech structure, text
+
+533
+00:19:59.600 --> 00:20:01.840
+to speech response. There it is. There's
+
+534
+00:20:00.960 --> 00:20:03.760
+an input prompt.
+
+535
+00:20:01.840 --> 00:20:06.400
+>> This codebase demonstrates Claude code
+
+536
+00:20:03.760 --> 00:20:08.400
+hooks mastery with all six life cycle
+
+537
+00:20:06.400 --> 00:20:10.640
+events implemented for deterministic
+
+538
+00:20:08.400 --> 00:20:14.000
+control featuring security filtering,
+
+539
+00:20:10.640 --> 00:20:16.240
+intelligent TTS feedback, automatic JSON
+
+540
+00:20:14.000 --> 00:20:18.799
+logging, and UV single file
+
+541
+00:20:16.240 --> 00:20:20.799
+architecture. Next step, explore
+
+542
+00:20:18.799 --> 00:20:23.280
+specific hook implementations or test
+
+543
+00:20:20.799 --> 00:20:25.679
+the security filtering functionality.
+
+544
+00:20:23.280 --> 00:20:27.120
+>> Nice. Okay, so that looked good or that
+
+545
+00:20:25.679 --> 00:20:28.960
+sounded good rather. You can see here
+
+546
+00:20:27.120 --> 00:20:31.520
+there is work to be done here. That was
+
+547
+00:20:28.960 --> 00:20:34.000
+still longer than I wanted it to be. If
+
+548
+00:20:31.520 --> 00:20:36.080
+we open up logs, thanks to cloud code
+
+549
+00:20:34.000 --> 00:20:37.520
+hooks, we are recording all the
+
+550
+00:20:36.080 --> 00:20:38.960
+conversation that just happened. So, we
+
+551
+00:20:37.520 --> 00:20:41.600
+can do something really cool. If we want
+
+552
+00:20:38.960 --> 00:20:44.080
+to, we can dive in and actually see our
+
+553
+00:20:41.600 --> 00:20:46.720
+top level agent prompting our sub agent
+
+554
+00:20:44.080 --> 00:20:48.159
+and our sub agent prompting the response
+
+555
+00:20:46.720 --> 00:20:49.600
+back to our top level agent. I'll leave
+
+556
+00:20:48.159 --> 00:20:51.840
+that up to you after you finish watching
+
+557
+00:20:49.600 --> 00:20:53.600
+this video. Run this. fire off the hello
+
+558
+00:20:51.840 --> 00:20:55.840
+world agent and the meta agent so you
+
+559
+00:20:53.600 --> 00:20:58.400
+can really understand what the flow of
+
+560
+00:20:55.840 --> 00:21:02.520
+information is between multi- aent
+
+561
+00:20:58.400 --> 00:21:02.520
+systems inside of cloud code.
+
+562
+00:21:04.320 --> 00:21:06.720
+So the benefits are pretty
+
+563
+00:21:05.440 --> 00:21:08.880
+straightforward, right? Cloud code
+
+564
+00:21:06.720 --> 00:21:10.720
+engineers said it themselves. Context
+
+565
+00:21:08.880 --> 00:21:12.640
+preservation. This is both a benefit and
+
+566
+00:21:10.720 --> 00:21:14.559
+an issue. We'll talk about how this is
+
+567
+00:21:12.640 --> 00:21:16.960
+an issue in a moment, but each sub agent
+
+568
+00:21:14.559 --> 00:21:19.360
+operates in its own context, preventing
+
+569
+00:21:16.960 --> 00:21:21.120
+pollution of the main conversation. So
+
+570
+00:21:19.360 --> 00:21:24.080
+this is powerful. We are booting up
+
+571
+00:21:21.120 --> 00:21:26.480
+fresh agent instances for every one of
+
+572
+00:21:24.080 --> 00:21:28.320
+these tasks that we have for our natural
+
+573
+00:21:26.480 --> 00:21:30.559
+language text to speech for our meta
+
+574
+00:21:28.320 --> 00:21:32.880
+agent. They all have their own isolated
+
+575
+00:21:30.559 --> 00:21:34.240
+context window. This is very powerful.
+
+576
+00:21:32.880 --> 00:21:36.400
+On the channel, we're going to talk more
+
+577
+00:21:34.240 --> 00:21:39.280
+about how you can use this to scale
+
+578
+00:21:36.400 --> 00:21:41.600
+agents across your large complex code
+
+579
+00:21:39.280 --> 00:21:43.280
+bases. You could already do this with
+
+580
+00:21:41.600 --> 00:21:46.240
+sub aents, but now you can do it even
+
+581
+00:21:43.280 --> 00:21:48.640
+better with specialized sub aents. All
+
+582
+00:21:46.240 --> 00:21:50.080
+right, so you get to save your context
+
+583
+00:21:48.640 --> 00:21:51.840
+window. This is a big idea that's going
+
+584
+00:21:50.080 --> 00:21:55.039
+to come back up over and over again
+
+585
+00:21:51.840 --> 00:21:56.559
+until we get those two 5 million plus
+
+586
+00:21:55.039 --> 00:21:58.320
+context windows. You know, I can tell
+
+587
+00:21:56.559 --> 00:22:00.000
+you those aren't coming uh anytime soon
+
+588
+00:21:58.320 --> 00:22:01.520
+as far as I can see. I would love to be
+
+589
+00:22:00.000 --> 00:22:03.600
+wrong about that. Specialized agent
+
+590
+00:22:01.520 --> 00:22:07.200
+expertise. We can of course fine-tune
+
+591
+00:22:03.600 --> 00:22:08.799
+the instructions and the tools. So, you
+
+592
+00:22:07.200 --> 00:22:10.640
+know, you can see this here for our text
+
+593
+00:22:08.799 --> 00:22:13.760
+to speech agent. You can see we wrote a
+
+594
+00:22:10.640 --> 00:22:16.000
+nice rich description on not only when
+
+595
+00:22:13.760 --> 00:22:18.640
+to trigger this, but um we're giving our
+
+596
+00:22:16.000 --> 00:22:20.799
+top level agent instructions on how to
+
+597
+00:22:18.640 --> 00:22:22.400
+prompt this. Okay, a lot of engineers
+
+598
+00:22:20.799 --> 00:22:24.559
+are going to miss this. Don't be one of
+
+599
+00:22:22.400 --> 00:22:26.480
+them. You can instruct how exactly you
+
+600
+00:22:24.559 --> 00:22:28.240
+want the prompt to flow in here in the
+
+601
+00:22:26.480 --> 00:22:30.159
+description. Reusability. This is a
+
+602
+00:22:28.240 --> 00:22:33.280
+classic one. By storing this inside your
+
+603
+00:22:30.159 --> 00:22:35.679
+repository, you can build agents for
+
+604
+00:22:33.280 --> 00:22:37.440
+your codebase. There's a powerful way
+
+605
+00:22:35.679 --> 00:22:40.720
+we're going to discuss on the channel to
+
+606
+00:22:37.440 --> 00:22:44.480
+use a meta agent to build specialized
+
+607
+00:22:40.720 --> 00:22:46.480
+localized agents that excel at operating
+
+608
+00:22:44.480 --> 00:22:48.480
+specific parts of your large codebase.
+
+609
+00:22:46.480 --> 00:22:50.559
+Again, subscribe, comment, all that good
+
+610
+00:22:48.480 --> 00:22:52.320
+stuff so you don't miss out on future
+
+611
+00:22:50.559 --> 00:22:54.559
+valuable information like this. Flexible
+
+612
+00:22:52.320 --> 00:22:55.919
+permissions. You can lock down the tools
+
+613
+00:22:54.559 --> 00:22:57.280
+your agent can call. That's fantastic.
+
+614
+00:22:55.919 --> 00:22:59.280
+Obviously, if you're in YOLO mode, you
+
+615
+00:22:57.280 --> 00:23:01.520
+have to be more explicit about what
+
+616
+00:22:59.280 --> 00:23:03.679
+tools can run, which is why I have this
+
+617
+00:23:01.520 --> 00:23:05.200
+I added this important best practice
+
+618
+00:23:03.679 --> 00:23:07.360
+here. But that's that. So, these are the
+
+619
+00:23:05.200 --> 00:23:08.880
+kind of four key benefits that Enthropic
+
+620
+00:23:07.360 --> 00:23:10.240
+lists directly here. I think these are
+
+621
+00:23:08.880 --> 00:23:12.000
+all true. There are a couple hidden
+
+622
+00:23:10.240 --> 00:23:14.320
+benefits as well. You get focused
+
+623
+00:23:12.000 --> 00:23:16.480
+agents. All right? And you know, the
+
+624
+00:23:14.320 --> 00:23:18.159
+cloud code team does mention this, but
+
+625
+00:23:16.480 --> 00:23:20.159
+you can really take this far, right?
+
+626
+00:23:18.159 --> 00:23:22.080
+Just like booting up a fresh agent with
+
+627
+00:23:20.159 --> 00:23:24.880
+a single prompt, when you use cloud code
+
+628
+00:23:22.080 --> 00:23:27.360
+sub agents, the agent is fresh. It only
+
+629
+00:23:24.880 --> 00:23:28.799
+knows what your primary agent tells it.
+
+630
+00:23:27.360 --> 00:23:30.960
+That means it's less likely to make
+
+631
+00:23:28.799 --> 00:23:33.039
+mistakes given that you design a good
+
+632
+00:23:30.960 --> 00:23:35.360
+system prompt. Why is that? It's because
+
+633
+00:23:33.039 --> 00:23:37.039
+your agent is focused on one thing. Just
+
+634
+00:23:35.360 --> 00:23:38.880
+like a focus engineer, when you're
+
+635
+00:23:37.039 --> 00:23:40.960
+focused on one thing, you perform
+
+636
+00:23:38.880 --> 00:23:43.679
+better. Full stop. Another hidden
+
+637
+00:23:40.960 --> 00:23:45.919
+benefit of cloud code sub aents is
+
+638
+00:23:43.679 --> 00:23:47.200
+simple multi- aent orchestration. And
+
+639
+00:23:45.919 --> 00:23:49.520
+this is something that I'm most excited
+
+640
+00:23:47.200 --> 00:23:52.559
+for with custom slashcomands combined
+
+641
+00:23:49.520 --> 00:23:54.159
+with cloud code hooks combined with sub
+
+642
+00:23:52.559 --> 00:23:55.679
+aents
+
+643
+00:23:54.159 --> 00:23:57.840
+right just kind of stacking up these
+
+644
+00:23:55.679 --> 00:24:00.320
+powerful features you can build powerful
+
+645
+00:23:57.840 --> 00:24:03.039
+yet simple multi- aent systems. So you
+
+646
+00:24:00.320 --> 00:24:05.039
+know as a concrete example we have this
+
+647
+00:24:03.039 --> 00:24:07.360
+in our commands we have this classic
+
+648
+00:24:05.039 --> 00:24:09.280
+prime command and we can easily improve
+
+649
+00:24:07.360 --> 00:24:11.679
+this right. So now we can have prime
+
+650
+00:24:09.280 --> 00:24:15.679
+tts. So say I want to kick off prime. I
+
+651
+00:24:11.679 --> 00:24:19.039
+can say when you finish run the TTS
+
+652
+00:24:15.679 --> 00:24:21.440
+summary agent the user know you're ready
+
+653
+00:24:19.039 --> 00:24:23.440
+to build. I already have uh cloud code
+
+654
+00:24:21.440 --> 00:24:25.039
+hooks with text to speech. We did this
+
+655
+00:24:23.440 --> 00:24:26.320
+in a previous video. I'll link that in
+
+656
+00:24:25.039 --> 00:24:28.000
+the description if you're interested.
+
+657
+00:24:26.320 --> 00:24:29.919
+But we can of course you know run this
+
+658
+00:24:28.000 --> 00:24:32.799
+now in a fresh instance. We can run
+
+659
+00:24:29.919 --> 00:24:34.480
+prime tts. And now when this finishes
+
+660
+00:24:32.799 --> 00:24:37.200
+we're going to run right we're going to
+
+661
+00:24:34.480 --> 00:24:39.200
+chain text to speech summary agent at
+
+662
+00:24:37.200 --> 00:24:41.200
+the end. There it is. And so here's a
+
+663
+00:24:39.200 --> 00:24:42.559
+summary. It wrote the text to speech. So
+
+664
+00:24:41.200 --> 00:24:44.640
+we have the audio file
+
+665
+00:24:42.559 --> 00:24:46.559
+>> code hooks mastery project with complete
+
+666
+00:24:44.640 --> 00:24:47.120
+coverage of all six hook life cycle
+
+667
+00:24:46.559 --> 00:24:48.320
+events.
+
+668
+00:24:47.120 --> 00:24:49.600
+>> There you go. So it's ready to go. So if
+
+669
+00:24:48.320 --> 00:24:51.200
+you open up that that summary there,
+
+670
+00:24:49.600 --> 00:24:52.880
+control E. You can see cloud code
+
+671
+00:24:51.200 --> 00:24:54.000
+analyze hooks mastery blah blah blah
+
+672
+00:24:52.880 --> 00:24:55.440
+blah blah. So it's letting us know that
+
+673
+00:24:54.000 --> 00:24:58.400
+it is complete. You know, we were able
+
+674
+00:24:55.440 --> 00:25:00.720
+to guide our primary agents prompt to
+
+675
+00:24:58.400 --> 00:25:02.880
+our sub agent right here. Right? When
+
+676
+00:25:00.720 --> 00:25:05.120
+you finish, run the TTS summary agent
+
+677
+00:25:02.880 --> 00:25:06.799
+and let the user know you're ready to
+
+678
+00:25:05.120 --> 00:25:08.880
+build. So this is another hidden
+
+679
+00:25:06.799 --> 00:25:11.840
+benefit. Right? we improve our multi-
+
+680
+00:25:08.880 --> 00:25:14.559
+aent orchestration. Okay. And so another
+
+681
+00:25:11.840 --> 00:25:16.000
+pro and con is prompt delegation. So
+
+682
+00:25:14.559 --> 00:25:17.600
+again, this is kind of on the line.
+
+683
+00:25:16.000 --> 00:25:19.679
+You're delegating your prompts to the
+
+684
+00:25:17.600 --> 00:25:21.919
+primary agent oftent times just like you
+
+685
+00:25:19.679 --> 00:25:23.919
+saw here and just like you saw in the
+
+686
+00:25:21.919 --> 00:25:25.200
+work completion summary agent right in
+
+687
+00:25:23.919 --> 00:25:27.279
+the description. This means you have to
+
+688
+00:25:25.200 --> 00:25:29.840
+do a little bit more work guiding your
+
+689
+00:25:27.279 --> 00:25:31.600
+primary agent to call your sub agent
+
+690
+00:25:29.840 --> 00:25:33.679
+properly. This is powerful though. It's
+
+691
+00:25:31.600 --> 00:25:35.200
+still good. We are offloading work,
+
+692
+00:25:33.679 --> 00:25:37.039
+right? We're encoding powerful
+
+693
+00:25:35.200 --> 00:25:38.880
+engineering practices into our prompts
+
+694
+00:25:37.039 --> 00:25:40.320
+and now into our sub agents. So all in
+
+695
+00:25:38.880 --> 00:25:42.480
+all, it's good. So what are the issues
+
+696
+00:25:40.320 --> 00:25:44.640
+of this? Right? The opposite of context
+
+697
+00:25:42.480 --> 00:25:46.159
+preservation is that and and you know
+
+698
+00:25:44.640 --> 00:25:48.000
+this was a great example because you
+
+699
+00:25:46.159 --> 00:25:50.320
+kind of saw that you need to be super
+
+700
+00:25:48.000 --> 00:25:52.240
+clear to your sub agents and to your
+
+701
+00:25:50.320 --> 00:25:53.919
+primary agent what you're passing in to
+
+702
+00:25:52.240 --> 00:25:56.159
+the sub agent because it doesn't have
+
+703
+00:25:53.919 --> 00:25:58.000
+any previous context. By definition,
+
+704
+00:25:56.159 --> 00:26:00.400
+every sub aent having its own context
+
+705
+00:25:58.000 --> 00:26:02.240
+means that there is no context history.
+
+706
+00:26:00.400 --> 00:26:05.360
+It doesn't have the rich context that
+
+707
+00:26:02.240 --> 00:26:07.679
+your primary agent has. It has only what
+
+708
+00:26:05.360 --> 00:26:09.520
+your primary agent prompts it with. This
+
+709
+00:26:07.679 --> 00:26:13.039
+is the equivalent just to make it ultra
+
+710
+00:26:09.520 --> 00:26:14.559
+clear. This is like firing up claude in
+
+711
+00:26:13.039 --> 00:26:16.960
+print mode, you know, whatever. You can
+
+712
+00:26:14.559 --> 00:26:18.480
+run yolo or dangerous blah blah blah.
+
+713
+00:26:16.960 --> 00:26:19.840
+And don't run this by the way if you
+
+714
+00:26:18.480 --> 00:26:21.679
+don't know what you're doing. Uh this
+
+715
+00:26:19.840 --> 00:26:25.039
+will run any command. We're starting to
+
+716
+00:26:21.679 --> 00:26:26.880
+see in the industry uh yolo mode coders
+
+717
+00:26:25.039 --> 00:26:30.000
+are getting cooked by this command. So
+
+718
+00:26:26.880 --> 00:26:31.520
+be really careful. Um, but this runs the
+
+719
+00:26:30.000 --> 00:26:35.039
+following, right? So, it's basically
+
+720
+00:26:31.520 --> 00:26:37.360
+saying call work completion summary
+
+721
+00:26:35.039 --> 00:26:40.640
+agent and then you're passing in one
+
+722
+00:26:37.360 --> 00:26:42.480
+prompt. Okay, this is what your primary
+
+723
+00:26:40.640 --> 00:26:44.240
+agent is doing when it's calling the sub
+
+724
+00:26:42.480 --> 00:26:47.039
+agents. It's it's literally like it's
+
+725
+00:26:44.240 --> 00:26:49.039
+you calling a oneshot prompt to the sub
+
+726
+00:26:47.039 --> 00:26:51.039
+agent. Okay, there's no context. This is
+
+727
+00:26:49.039 --> 00:26:52.640
+a problem, right? It's a problem and
+
+728
+00:26:51.039 --> 00:26:54.559
+it's a benefit, right? It's the it's the
+
+729
+00:26:52.640 --> 00:26:57.120
+opposite side of the coin of context
+
+730
+00:26:54.559 --> 00:27:00.159
+preservation. Another big issue, these
+
+731
+00:26:57.120 --> 00:27:01.919
+sub aents are hard to debug. You can see
+
+732
+00:27:00.159 --> 00:27:04.400
+every time we've run one of these,
+
+733
+00:27:01.919 --> 00:27:06.640
+right? If we run high CC, even with this
+
+734
+00:27:04.400 --> 00:27:08.559
+simple prompt, we have no idea what's
+
+735
+00:27:06.640 --> 00:27:10.240
+going on here. We'll get the tool calls,
+
+736
+00:27:08.559 --> 00:27:12.559
+which is super super nice. But the
+
+737
+00:27:10.240 --> 00:27:14.400
+actual workflows, the prompts, the full
+
+738
+00:27:12.559 --> 00:27:17.440
+parameters for every tool call, we don't
+
+739
+00:27:14.400 --> 00:27:19.520
+get these. And this is by design, but it
+
+740
+00:27:17.440 --> 00:27:21.360
+also makes these harder to debug and
+
+741
+00:27:19.520 --> 00:27:23.840
+understand what's going on. Right? So,
+
+742
+00:27:21.360 --> 00:27:25.600
+another big issue here is decision
+
+743
+00:27:23.840 --> 00:27:27.120
+overload. As you start scaling up the
+
+744
+00:27:25.600 --> 00:27:29.039
+number of agents you have, it's going to
+
+745
+00:27:27.120 --> 00:27:30.159
+be harder and harder for your agent to
+
+746
+00:27:29.039 --> 00:27:31.360
+know which one to call.
+
+747
+00:27:30.159 --> 00:27:32.880
+>> Sub agent complete.
+
+748
+00:27:31.360 --> 00:27:34.480
+>> Okay, commands are a bit different.
+
+749
+00:27:32.880 --> 00:27:36.240
+Although, you know, you the engineer
+
+750
+00:27:34.480 --> 00:27:37.919
+might forget all the commands that you
+
+751
+00:27:36.240 --> 00:27:39.200
+have, right? You just might start
+
+752
+00:27:37.919 --> 00:27:41.039
+forgetting all these commands, right?
+
+753
+00:27:39.200 --> 00:27:42.400
+All the powerful commands you've built.
+
+754
+00:27:41.039 --> 00:27:44.559
+Agents are a little different because
+
+755
+00:27:42.400 --> 00:27:46.159
+based on the description and based on
+
+756
+00:27:44.559 --> 00:27:48.320
+the number of agents you have, your
+
+757
+00:27:46.159 --> 00:27:49.840
+primary agent might get confused here.
+
+758
+00:27:48.320 --> 00:27:51.600
+Okay, so this is important. You really
+
+759
+00:27:49.840 --> 00:27:53.360
+want to be keeping track of your agents.
+
+760
+00:27:51.600 --> 00:27:54.640
+Otherwise, it'll come back to bite you
+
+761
+00:27:53.360 --> 00:27:56.559
+and you're going to kick off these
+
+762
+00:27:54.640 --> 00:27:58.080
+agents when you don't want to. As a
+
+763
+00:27:56.559 --> 00:28:00.799
+solution, you really want to be clear
+
+764
+00:27:58.080 --> 00:28:02.559
+about when to call your sub agents with
+
+765
+00:28:00.799 --> 00:28:04.080
+the description variable. This is the
+
+766
+00:28:02.559 --> 00:28:05.679
+most important variable right next to
+
+767
+00:28:04.080 --> 00:28:07.360
+the name. Two remaining issues here.
+
+768
+00:28:05.679 --> 00:28:08.880
+Dependency coupling is going to be a
+
+769
+00:28:07.360 --> 00:28:11.120
+problem here. So, once you start setting
+
+770
+00:28:08.880 --> 00:28:13.200
+up prompts, primary agent, reusable
+
+771
+00:28:11.120 --> 00:28:15.120
+prompts or custom slash commands, and
+
+772
+00:28:13.200 --> 00:28:16.799
+once these are calling out your sub
+
+773
+00:28:15.120 --> 00:28:18.320
+agents, which this is how you, you know,
+
+774
+00:28:16.799 --> 00:28:20.080
+start scaling up into multi- aent
+
+775
+00:28:18.320 --> 00:28:21.360
+systems. Once you get that going, it's
+
+776
+00:28:20.080 --> 00:28:22.640
+going to be hard. Again, back to
+
+777
+00:28:21.360 --> 00:28:24.480
+debugging. It's going to be hard to
+
+778
+00:28:22.640 --> 00:28:26.799
+understand what's going on. You're going
+
+779
+00:28:24.480 --> 00:28:28.399
+to have dependency coupling. Inevitably,
+
+780
+00:28:26.799 --> 00:28:30.159
+you're going to have an agent depend on
+
+781
+00:28:28.399 --> 00:28:31.840
+output from another agent, depend on the
+
+782
+00:28:30.159 --> 00:28:33.600
+format of the specific response from
+
+783
+00:28:31.840 --> 00:28:35.200
+another agent, on and on and on. And
+
+784
+00:28:33.600 --> 00:28:36.960
+then one day, you're going to need to
+
+785
+00:28:35.200 --> 00:28:38.399
+change something to improve it or to
+
+786
+00:28:36.960 --> 00:28:40.559
+ship something new, whatever. You're
+
+787
+00:28:38.399 --> 00:28:42.880
+going to change the planner agent right
+
+788
+00:28:40.559 --> 00:28:44.880
+here, and it's going to ruin everything
+
+789
+00:28:42.880 --> 00:28:46.480
+else because one thing changed. We're
+
+790
+00:28:44.880 --> 00:28:48.399
+already operating in nondeterministic
+
+791
+00:28:46.480 --> 00:28:50.240
+systems. When that one thing changes, it
+
+792
+00:28:48.399 --> 00:28:51.760
+could blow up everything else. Okay, so
+
+793
+00:28:50.240 --> 00:28:53.279
+this is another problem with sub aents.
+
+794
+00:28:51.760 --> 00:28:55.279
+As you start scaling them up, keep your
+
+795
+00:28:53.279 --> 00:28:57.200
+eye on this. Try to keep them separate.
+
+796
+00:28:55.279 --> 00:29:00.399
+Try to keep them in isolated workflows.
+
+797
+00:28:57.200 --> 00:29:02.000
+Don't overload your sub aent chain.
+
+798
+00:29:00.399 --> 00:29:04.559
+Okay. And then last thing, and this is
+
+799
+00:29:02.000 --> 00:29:06.240
+just kind of a request on my side, even
+
+800
+00:29:04.559 --> 00:29:08.320
+though it is literally counterintuitive
+
+801
+00:29:06.240 --> 00:29:12.799
+to what I was just saying, you cannot
+
+802
+00:29:08.320 --> 00:29:14.559
+call sub aents in your sub agents. Okay?
+
+803
+00:29:12.799 --> 00:29:16.080
+Probably for all the reasons that I just
+
+804
+00:29:14.559 --> 00:29:18.159
+mentioned. You know, it would be cool if
+
+805
+00:29:16.080 --> 00:29:21.919
+we had, you know, kind of like dangerous
+
+806
+00:29:18.159 --> 00:29:23.919
+um sub agent true, right? So that inside
+
+807
+00:29:21.919 --> 00:29:26.640
+of this agent or, you know, it's
+
+808
+00:29:23.919 --> 00:29:28.559
+probably like sub sub aent true. So that
+
+809
+00:29:26.640 --> 00:29:31.200
+inside of this agent, we enable this
+
+810
+00:29:28.559 --> 00:29:33.520
+dangerous powerful setting of calling
+
+811
+00:29:31.200 --> 00:29:34.720
+sub aents inside of sub aents. So this
+
+812
+00:29:33.520 --> 00:29:36.159
+is me just being picky. That's not
+
+813
+00:29:34.720 --> 00:29:37.840
+actually a real issue, but it's
+
+814
+00:29:36.159 --> 00:29:40.480
+important to note that, you know, you
+
+815
+00:29:37.840 --> 00:29:41.760
+can't call sub aents in your sub aents,
+
+816
+00:29:40.480 --> 00:29:43.360
+at least not yet. That's me being
+
+817
+00:29:41.760 --> 00:29:45.520
+hopeful. So this is a very powerful
+
+818
+00:29:43.360 --> 00:29:47.200
+feature. We have quite a few more ideas
+
+819
+00:29:45.520 --> 00:29:49.520
+to explore here with the combination of
+
+820
+00:29:47.200 --> 00:29:51.360
+agents and custom slash commands aka
+
+821
+00:29:49.520 --> 00:29:54.080
+reusable prompts. Remember that
+
+822
+00:29:51.360 --> 00:29:56.559
+perspective matters as you start scaling
+
+823
+00:29:54.080 --> 00:29:59.039
+up your multi- aent system. Right? The
+
+824
+00:29:56.559 --> 00:30:01.919
+flow of the big three context, model,
+
+825
+00:29:59.039 --> 00:30:04.320
+and prompt matter more than ever and
+
+826
+00:30:01.919 --> 00:30:06.480
+more and more as you scale up the number
+
+827
+00:30:04.320 --> 00:30:08.480
+of agents who have shipping work on your
+
+828
+00:30:06.480 --> 00:30:10.480
+behalf. There's a reason why it's a
+
+829
+00:30:08.480 --> 00:30:11.760
+principle of AI coding. As usual, link
+
+830
+00:30:10.480 --> 00:30:13.679
+in the description if you want to learn
+
+831
+00:30:11.760 --> 00:30:15.679
+the other principles of a coding that
+
+832
+00:30:13.679 --> 00:30:17.520
+will help you differentiate what you can
+
+833
+00:30:15.679 --> 00:30:19.279
+do with agent coding. And I'll go ahead
+
+834
+00:30:17.520 --> 00:30:20.960
+and bring back the other uh prompts that
+
+835
+00:30:19.279 --> 00:30:22.960
+I had here just for fun. But the meta
+
+836
+00:30:20.960 --> 00:30:25.039
+agent is going to be here available to
+
+837
+00:30:22.960 --> 00:30:27.120
+you. Link in the description. I'm going
+
+838
+00:30:25.039 --> 00:30:28.960
+to add these to the cloud code hooks
+
+839
+00:30:27.120 --> 00:30:31.440
+mastery codebase. If you made it to the
+
+840
+00:30:28.960 --> 00:30:34.159
+end, be sure to like, subscribe, and
+
+841
+00:30:31.440 --> 00:30:39.120
+comment your thoughts. No matter what,
+
+842
+00:30:34.159 --> 00:30:39.120
+stay focused and keep building.

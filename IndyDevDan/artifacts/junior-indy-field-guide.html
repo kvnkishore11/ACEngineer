@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Junior Indy — Assimilation Field Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --paper:#f4efe4; --paper-2:#ece4d4; --paper-3:#e3d9c5;
+  --surface:#fbf8f1; --card:#fdfbf5; --card-2:#f6f0e2;
+  --ink-bg:#1c1813; --ink-bg-2:#272019;
+  --rule:#dcd3c1; --rule-soft:#e9e1d1; --rule-strong:#c8bca3;
+  --ink:#211d18; --ink-2:#4b443b; --ink-dim:#7d7568; --ink-faint:#a59c8c;
+  --on-dark:#efe7d8; --on-dark-dim:#b9ad97;
+  --clay:#c75b39; --clay-2:#d97757; --clay-soft:rgba(199,91,57,.10); --clay-line:rgba(199,91,57,.32);
+  --blue:#2f6f9f; --blue-soft:rgba(47,111,159,.10);
+  --olive:#5f7138; --olive-soft:rgba(95,113,56,.12);
+  --plum:#6e4a86; --plum-soft:rgba(110,74,134,.10);
+  --amber:#c1882a; --amber-soft:rgba(193,136,42,.12);
+  --rose:#b1556c; --rose-soft:rgba(177,85,108,.10);
+  --serif:'Fraunces','Iowan Old Style',Georgia,'Times New Roman',serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sh-sm:0 1px 2px rgba(60,45,25,.06),0 1px 2px rgba(60,45,25,.05);
+  --sh-md:0 4px 16px rgba(60,45,25,.10),0 1px 4px rgba(60,45,25,.06);
+  --sh-lg:0 18px 44px rgba(60,45,25,.16),0 6px 14px rgba(60,45,25,.09);
+  --sh-xl:0 34px 80px rgba(40,30,15,.26),0 12px 26px rgba(40,30,15,.12);
+  --rail:288px; --wrap:1080px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--sans);
+  font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(60,45,25,.028) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+::selection{background:var(--clay-soft);color:var(--clay)}
+a{color:var(--clay);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;padding:0}
+
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;
+  background:linear-gradient(90deg,var(--clay),var(--amber));transition:width .12s linear}
+
+#rail{position:fixed;top:0;left:0;width:var(--rail);height:100vh;z-index:90;
+  background:linear-gradient(180deg,var(--surface),var(--paper));
+  border-right:1.5px solid var(--rule);
+  display:flex;flex-direction:column;padding:26px 22px 20px;overflow-y:auto}
+#rail .brand{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+#rail .brand .mark{width:34px;height:34px;border-radius:9px;flex:none;
+  background:linear-gradient(140deg,var(--clay-2),var(--clay));color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:var(--serif);
+  font-weight:600;font-size:19px;box-shadow:var(--sh-sm)}
+#rail .brand .bt{font-family:var(--serif);font-weight:600;font-size:16px;line-height:1.15;letter-spacing:-.01em}
+#rail .brand .bs{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim)}
+#rail .railhint{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin:18px 6px 9px;border-top:1px solid var(--rule-soft);padding-top:14px}
+nav.toc{display:flex;flex-direction:column;gap:1px;flex:1}
+nav.toc a{display:flex;align-items:baseline;gap:11px;padding:7px 10px;border-radius:8px;
+  color:var(--ink-2);font-size:13.5px;line-height:1.3;transition:background .15s,color .15s;position:relative}
+nav.toc a .n{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);min-width:18px;flex:none;padding-top:1px}
+nav.toc a:hover{background:var(--card-2);color:var(--ink)}
+nav.toc a.active{background:var(--clay-soft);color:var(--clay)}
+nav.toc a.active .n{color:var(--clay)}
+nav.toc a.active::before{content:"";position:absolute;left:-22px;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--clay)}
+#rail .foot{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--ink-faint);
+  margin-top:14px;border-top:1px solid var(--rule-soft);padding-top:12px;line-height:1.7}
+#railToggle{display:none}
+
+main{margin-left:var(--rail)}
+/* paged: one chapter shown at a time — no infinite scroll */
+.chapter{display:none;min-height:100vh;padding:70px 56px 150px;
+  flex-direction:column;justify-content:flex-start;position:relative}
+.chapter.active{display:flex;animation:pagein .5s cubic-bezier(.2,.7,.2,1)}
+.chapter.dark{justify-content:center}
+@keyframes pagein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto}
+.wrap.wide{max-width:1280px}
+
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--clay);display:inline-flex;align-items:center;gap:9px;margin-bottom:20px}
+.kicker::before{content:"";width:26px;height:1.5px;background:var(--clay-line)}
+.kicker.plain::before{display:none}
+.display{font-family:var(--serif);font-weight:600;letter-spacing:-.022em;line-height:1.02;
+  font-size:clamp(40px,6vw,76px);margin:0 0 22px;color:var(--ink)}
+h2.title{font-family:var(--serif);font-weight:600;letter-spacing:-.02em;line-height:1.06;
+  font-size:clamp(30px,4.2vw,50px);margin:0 0 18px}
+h3{font-family:var(--serif);font-weight:600;font-size:clamp(20px,2.3vw,26px);letter-spacing:-.01em;
+  margin:34px 0 12px;line-height:1.18}
+h4{font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:.01em;margin:22px 0 8px;color:var(--ink)}
+em,.it{font-style:italic}
+.display em,h2.title em,h3 em{color:var(--clay);font-style:italic}
+.lede{font-family:var(--serif);font-size:clamp(19px,2.1vw,24px);line-height:1.5;color:var(--ink-2);
+  font-weight:400;max-width:58ch;margin:0 0 8px}
+.prose{max-width:68ch}
+.prose p{margin:0 0 18px;color:var(--ink-2)}
+.prose p strong,strong{color:var(--ink);font-weight:600}
+.prose .lead-in{font-family:var(--serif);font-size:22px;line-height:1.5;color:var(--ink);margin-bottom:20px}
+.dropcap::first-letter{font-family:var(--serif);font-weight:600;float:left;font-size:62px;line-height:.82;
+  padding:6px 12px 0 0;color:var(--clay)}
+.small{font-size:13.5px;color:var(--ink-dim)}
+.mono{font-family:var(--mono)}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:100px;
+  border:1.5px solid var(--rule-strong);color:var(--ink-2);background:var(--surface)}
+.pill.clay{border-color:var(--clay-line);color:var(--clay);background:var(--clay-soft)}
+.pill.blue{border-color:rgba(47,111,159,.3);color:var(--blue);background:var(--blue-soft)}
+.pill.olive{border-color:rgba(95,113,56,.3);color:var(--olive);background:var(--olive-soft)}
+.pill.plum{border-color:rgba(110,74,134,.3);color:var(--plum);background:var(--plum-soft)}
+.pill.amber{border-color:rgba(193,136,42,.3);color:var(--amber);background:var(--amber-soft)}
+.pillrow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px}
+
+.grid{display:grid;gap:18px;margin:26px 0}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1.5px solid var(--rule);border-radius:13px;padding:22px 22px 20px;
+  transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-3px);box-shadow:var(--sh-md);border-color:var(--rule-strong)}
+.card .cnum{font-family:var(--mono);font-size:11px;color:var(--clay);letter-spacing:.1em;margin-bottom:11px;display:block}
+.card .ctitle{font-family:var(--serif);font-weight:600;font-size:19px;letter-spacing:-.01em;margin:0 0 8px;line-height:1.2}
+.card .cbody{font-size:14px;color:var(--ink-2);line-height:1.55}
+.card.accent{border-top:3px solid var(--clay)}
+.card.blue{border-top:3px solid var(--blue)}
+.card.olive{border-top:3px solid var(--olive)}
+.card.plum{border-top:3px solid var(--plum)}
+.card.amber{border-top:3px solid var(--amber)}
+.card.glow{background:linear-gradient(160deg,var(--card),var(--card-2))}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin:26px 0}
+.stat{border-left:3px solid var(--clay);padding:4px 0 4px 16px}
+.stat .sv{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4vw,44px);line-height:1;letter-spacing:-.02em;color:var(--ink)}
+.stat .sl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-top:8px}
+.stat.blue{border-color:var(--blue)} .stat.olive{border-color:var(--olive)}
+.stat.plum{border-color:var(--plum)} .stat.amber{border-color:var(--amber)}
+
+.quote{border-left:3px solid var(--clay);padding:6px 0 6px 26px;margin:32px 0;max-width:48ch}
+.quote p{font-family:var(--serif);font-style:italic;font-size:clamp(21px,2.6vw,28px);line-height:1.4;
+  color:var(--ink);margin:0 0 12px;font-weight:400}
+.quote .cite{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+.quote.big{border:none;padding:0;max-width:44ch;margin:10px 0}
+.quote.big p{font-size:clamp(24px,3.3vw,36px);line-height:1.22}
+
+.callout{display:flex;gap:14px;background:var(--card);border:1.5px solid var(--rule);
+  border-left:3px solid var(--clay);border-radius:0 11px 11px 0;padding:18px 20px;margin:24px 0}
+.callout .ci{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--clay);flex:none;padding-top:3px;writing-mode:horizontal-tb}
+.callout .cc{font-size:14.5px;color:var(--ink-2);line-height:1.55}
+.callout .cc strong{color:var(--ink)}
+.callout.warn{border-left-color:var(--amber);background:var(--amber-soft)} .callout.warn .ci{color:var(--amber)}
+.callout.ok{border-left-color:var(--olive);background:var(--olive-soft)} .callout.ok .ci{color:var(--olive)}
+.callout.idea{border-left-color:var(--plum);background:var(--plum-soft)} .callout.idea .ci{color:var(--plum)}
+.callout.bad{border-left-color:var(--rose);background:var(--rose-soft)} .callout.bad .ci{color:var(--rose)}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:24px 0;display:grid;gap:14px}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:16px;align-items:start}
+.steps li::before{counter-increment:s;content:counter(s);grid-column:1;align-self:start;
+  width:34px;height:34px;border-radius:50%;border:1.5px solid var(--clay-line);background:var(--clay-soft);
+  color:var(--clay);font-family:var(--mono);font-size:13px;font-weight:600;
+  display:flex;align-items:center;justify-content:center}
+.steps li > *{grid-column:2}
+.steps li h4{margin:5px 0 4px}
+.steps li p{margin:0;font-size:14px;color:var(--ink-2)}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:26px 0}
+.col{border:1.5px solid var(--rule);border-radius:12px;padding:20px;background:var(--card)}
+.col .clabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:12px;display:inline-flex;align-items:center;gap:7px}
+.col.bad{border-color:rgba(177,85,108,.28);background:var(--rose-soft)}
+.col.bad .clabel{color:var(--rose)}
+.col.good{border-color:rgba(95,113,56,.32);background:var(--olive-soft)}
+.col.good .clabel{color:var(--olive)}
+.col ul{margin:0;padding-left:18px} .col li{margin:0 0 8px;font-size:14px;color:var(--ink-2)}
+
+.code{background:var(--ink-bg);border:1.5px solid var(--ink-bg-2);border-radius:11px;
+  padding:18px 20px;margin:22px 0;overflow-x:auto;box-shadow:var(--sh-sm)}
+.code pre{margin:0;font-family:var(--mono);font-size:13px;line-height:1.7;color:#e7decd;white-space:pre}
+.code .cm{color:#9c8f76} .code .k{color:#e0a578} .code .s{color:#a9c08a} .code .v{color:#8fb6d4}
+.codecap{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-faint);margin:-12px 0 14px;padding-left:4px}
+kbd{font-family:var(--mono);font-size:11px;background:var(--paper-2);border:1.5px solid var(--rule-strong);
+  border-bottom-width:2.5px;border-radius:5px;padding:2px 7px;color:var(--ink-2)}
+
+.fig{border:1.5px solid var(--rule);border-radius:14px;background:var(--surface);padding:26px 24px 16px;
+  margin:28px 0;box-shadow:var(--sh-sm)}
+.fig.bare{border:none;background:none;box-shadow:none;padding:8px 0}
+.fig svg{display:block;width:100%;height:auto;overflow:visible}
+.fig .fcap{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--ink-dim);
+  text-align:center;margin-top:16px;border-top:1px solid var(--rule-soft);padding-top:12px}
+.fig .fcap b{color:var(--ink-2);font-weight:600}
+
+.s-card{fill:var(--card);stroke:var(--rule-strong);stroke-width:1.5}
+.s-clay{fill:var(--clay)} .s-clay-f{fill:var(--clay-soft);stroke:var(--clay);stroke-width:1.5}
+.s-blue-f{fill:var(--blue-soft);stroke:var(--blue);stroke-width:1.5}
+.s-olive-f{fill:var(--olive-soft);stroke:var(--olive);stroke-width:1.5}
+.s-plum-f{fill:var(--plum-soft);stroke:var(--plum);stroke-width:1.5}
+.s-amber-f{fill:var(--amber-soft);stroke:var(--amber);stroke-width:1.5}
+.s-ink{fill:var(--ink)} .s-dim{fill:var(--ink-dim)}
+.s-line{stroke:var(--rule-strong);stroke-width:1.5;fill:none}
+.s-flow{stroke:var(--clay);stroke-width:2;fill:none}
+.s-label{font-family:var(--mono);font-size:11px;fill:var(--ink-2);letter-spacing:.04em}
+.s-label-sm{font-family:var(--mono);font-size:9.5px;fill:var(--ink-dim);letter-spacing:.06em}
+.s-title{font-family:var(--sans);font-size:14px;font-weight:600;fill:var(--ink)}
+.s-serif{font-family:var(--serif);fill:var(--ink)}
+
+.draw path,.draw line,.draw circle,.draw rect,.draw polyline,.draw polygon{
+  stroke-dasharray:var(--len,1200);stroke-dashoffset:var(--len,1200);transition:stroke-dashoffset 1.3s ease}
+.draw.drawn path,.draw.drawn line,.draw.drawn circle,.draw.drawn rect,.draw.drawn polyline,.draw.drawn polygon{stroke-dashoffset:0}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.07s} .reveal.d2{transition-delay:.14s} .reveal.d3{transition-delay:.21s}
+.reveal.d4{transition-delay:.28s} .reveal.d5{transition-delay:.35s} .reveal.d6{transition-delay:.42s}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}
+  .draw path,.draw line,.draw circle,.draw rect,.draw polyline,.draw polygon{stroke-dashoffset:0}}
+
+.chapter.dark{background:radial-gradient(120% 90% at 78% 8%,#332821 0%,var(--ink-bg) 46%,#161210 100%);
+  color:var(--on-dark);border-bottom:none}
+.chapter.dark .kicker{color:var(--clay-2)} .chapter.dark .kicker::before{background:rgba(217,119,87,.5)}
+.chapter.dark .display,.chapter.dark h2.title{color:#f6efe2}
+.chapter.dark .display em{color:var(--clay-2)}
+.chapter.dark .lede{color:var(--on-dark-dim)}
+.chapter.dark .small{color:var(--on-dark-dim)}
+.chapter.dark .prose p{color:var(--on-dark-dim)}
+.chapter.dark .prose p strong{color:#f6efe2}
+.chapter.dark .pill{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.16);color:var(--on-dark-dim)}
+.chapter.dark .pill.clay{color:var(--clay-2);border-color:rgba(217,119,87,.4);background:rgba(217,119,87,.1)}
+.chapter.dark .quote p{color:#f6efe2}
+.chapter.dark .card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.12)}
+.chapter.dark .card .cbody{color:var(--on-dark-dim)}
+.chapter.dark .card .ctitle{color:#f6efe2}
+
+.chapnum{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--ink-faint);
+  display:inline-block;margin-bottom:14px}
+.divline{height:1.5px;background:var(--rule);border:none;margin:36px 0}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.spread{display:grid;grid-template-columns:1.1fr .9fr;gap:46px;align-items:center}
+.spread.rev{grid-template-columns:.9fr 1.1fr}
+.center{text-align:center}
+.maxw{max-width:760px;margin:0 auto}
+.tag-list{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
+.tag-list .t{font-family:var(--mono);font-size:11px;color:var(--ink-dim);padding:3px 9px;
+  border:1px solid var(--rule);border-radius:6px;background:var(--surface)}
+.sig{font-family:var(--serif);font-style:italic;font-size:28px;color:var(--clay);margin-top:8px}
+.jump{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--clay);margin-top:30px;
+  padding:9px 16px;border:1.5px solid var(--clay-line);border-radius:100px;background:var(--clay-soft);
+  transition:gap .18s,background .18s}
+.jump:hover{gap:13px;background:var(--clay);color:#fff}
+
+/* ── in-chapter contents nav (sticky) ──────────────────── */
+.chapnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 6px;padding:13px 16px;
+  background:rgba(251,248,241,.92);border:1.5px solid var(--rule-strong);border-radius:13px;
+  position:sticky;top:12px;z-index:46;box-shadow:var(--sh-sm);backdrop-filter:saturate(1.3) blur(9px)}
+.chapnav .cnl{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);margin-right:4px}
+.chapnav a{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-2);
+  padding:5px 11px;border:1.5px solid var(--rule);border-radius:100px;background:var(--card);transition:all .15s}
+.chapnav a:hover{color:var(--clay);border-color:var(--clay-line);background:var(--clay-soft)}
+.chapnav a.cur{color:#fff;border-color:var(--clay);background:var(--clay)}
+.chapnav a.cur b{color:#fff}
+.chapnav a b{color:var(--clay);font-weight:600;margin-right:6px}
+
+/* ── subsection header (numbered band) ─────────────────── */
+.subsec{display:flex;align-items:center;gap:15px;margin:10px 0 2px;scroll-margin-top:30px}
+.subsec .sn{font-family:var(--mono);font-size:14px;font-weight:600;color:#fff;
+  background:linear-gradient(140deg,var(--clay-2),var(--clay));
+  width:32px;height:32px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;
+  flex:none;box-shadow:var(--sh-sm)}
+.subsec.blue .sn{background:linear-gradient(140deg,#4a8cbf,var(--blue))}
+.subsec.olive .sn{background:linear-gradient(140deg,#7b9150,var(--olive))}
+.subsec.plum .sn{background:linear-gradient(140deg,#8a66a6,var(--plum))}
+.subsec.amber .sn{background:linear-gradient(140deg,#d6a24a,var(--amber))}
+.subsec h2,.subsec h3{margin:0}
+
+/* ── file tree (dark, like the code block) ─────────────── */
+.filetree{background:var(--ink-bg);border:1.5px solid var(--ink-bg-2);border-radius:11px;
+  padding:18px 22px;margin:22px 0;font-family:var(--mono);font-size:12.5px;line-height:1.85;
+  color:#e7decd;overflow-x:auto;box-shadow:var(--sh-sm);white-space:pre}
+.filetree .d{color:#e0a578;font-weight:600}
+.filetree .f{color:#cfc4b0}
+.filetree .c{color:#9c8f76}
+.filetree .hl{color:#a9c08a}
+
+/* annotated code: caption + body pairing already via .codecap + .code */
+.note{font-size:13.5px;color:var(--ink-dim);font-style:italic;margin:-10px 0 16px;padding-left:4px}
+
+/* ── "from the lecture" video stills band ──────────────── */
+.lecband{margin:30px 0 8px;padding:22px 22px 18px;border:1.5px solid var(--rule-strong);border-radius:16px;
+  background:linear-gradient(160deg,var(--card),var(--card-2))}
+.lecband .lechead{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--clay);margin-bottom:12px}
+.lecband .lechead::before{content:"▶";font-size:10px}
+.lecband .lecintro{font-size:14.5px;color:var(--ink-2);line-height:1.6;max-width:74ch;margin:0 0 6px}
+.lecband .lecintro strong{color:var(--ink)}
+.stillgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:15px;margin:18px 0 8px}
+.still{border:1.5px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--ink-bg);
+  box-shadow:var(--sh-sm);transition:transform .2s,box-shadow .2s}
+.still:hover{transform:translateY(-3px);box-shadow:var(--sh-md)}
+.still.hero{grid-column:1 / -1}
+.still img{display:block;width:100%;height:auto}
+.still figcaption{padding:11px 14px;font-size:13px;color:var(--ink-2);background:var(--card);line-height:1.5}
+.still figcaption b{display:block;color:var(--clay);font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.lecband .watch{display:inline-flex;align-items:center;gap:8px;margin-top:6px;font-family:var(--mono);
+  font-size:11px;letter-spacing:.06em;color:var(--clay);border:1.5px solid var(--clay-line);
+  padding:7px 14px;border-radius:100px;background:var(--clay-soft)}
+.lecband .watch:hover{background:var(--clay);color:#fff}
+
+/* ── pager (prev / indicator / next) ───────────────────── */
+#pager{position:fixed;bottom:22px;left:calc(50% + var(--rail)/2);transform:translateX(-50%);z-index:80;
+  display:flex;align-items:center;gap:2px;padding:6px;border-radius:100px;
+  background:rgba(251,248,241,.94);border:1.5px solid var(--rule-strong);box-shadow:var(--sh-lg);backdrop-filter:blur(10px)}
+#pager button{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;
+  color:var(--ink-2);font-size:20px;line-height:1;transition:all .15s}
+#pager button:hover:not(:disabled){background:var(--clay-soft);color:var(--clay)}
+#pager button:disabled{opacity:.28;cursor:default}
+#pager .pind{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-dim);padding:0 14px;min-width:78px;text-align:center}
+#pager .pind b{color:var(--clay);font-weight:600}
+#topbtn{position:fixed;right:22px;bottom:22px;z-index:80;width:44px;height:44px;border-radius:50%;
+  background:var(--clay);color:#fff;display:none;align-items:center;justify-content:center;
+  box-shadow:var(--sh-lg);font-size:17px}
+#topbtn.show{display:flex}
+#pgbar{position:fixed;bottom:78px;left:var(--rail);right:0;height:0;z-index:79;pointer-events:none}
+
+/* ── syntax-highlight tokens (added by the inline highlighter) ── */
+.code .n{color:#cf9d6a}.code .b{color:#d98f7a}.code .fn{color:#e0b083}
+.code .md-h{color:#e0a578;font-weight:600}.code .md-b{color:#f1e9d8;font-weight:600}
+.code .md-c{color:#a9c08a}.code .md-li{color:#e0a578}.code .md-q{color:#9c8f76;font-style:italic}.code .md-link{color:#8fb6d4}
+
+@media (max-width:1100px){
+  .spread,.spread.rev{grid-template-columns:1fr;gap:26px}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:980px){
+  :root{--rail:0px}
+  #rail{transform:translateX(-100%);transition:transform .25s;width:280px;box-shadow:var(--sh-xl)}
+  #rail.open{transform:none}
+  main{margin-left:0}
+  #railToggle{display:flex;position:fixed;top:14px;left:14px;z-index:100;width:44px;height:44px;
+    border-radius:11px;background:var(--clay);color:#fff;align-items:center;justify-content:center;
+    box-shadow:var(--sh-md);font-size:18px}
+  .chapter{padding:80px 26px 70px}
+  .grid-2,.grid-3,.compare{grid-template-columns:1fr}
+}
+@media (max-width:560px){ .grid-4{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="railToggle" aria-label="Menu">☰</button>
+
+<aside id="rail">
+  <!-- BRAND: replace mark letter/glyph, title, subtitle -->
+  <div class="brand">
+    <div class="mark">JI</div>
+    <div>
+      <div class="bt">Junior Indy</div>
+      <div class="bs">Assimilation field guide</div>
+    </div>
+  </div>
+  <!-- TABLE OF CONTENTS: one <a href="#chNN"> per section, in order.
+       Optional <div class="railhint">GROUP NAME</div> dividers between groups.
+       ch00 = cover, last = send-off. The nav drives the paged navigation. -->
+  <nav class="toc" id="toc">
+    <a href="#ch00"><span class="n">00</span><span>The ambition</span></a>
+    <div class="railhint">Part I · Assimilate</div>
+    <a href="#ch01"><span class="n">01</span><span>The real goal</span></a>
+    <a href="#ch02"><span class="n">02</span><span>Watch with two eyes</span></a>
+    <a href="#ch03"><span class="n">03</span><span>The corpus map</span></a>
+    <div class="railhint">Part II · Become useful</div>
+    <a href="#ch04"><span class="n">04</span><span>The mental operating loop</span></a>
+    <a href="#ch05"><span class="n">05</span><span>Always accessible</span></a>
+    <a href="#ch06"><span class="n">06</span><span>How mastery is proven</span></a>
+    <a href="#ch07"><span class="n">07</span><span>The build sequence</span></a>
+    <div class="railhint">∞ · Send-off</div>
+    <a href="#ch99"><span class="n">99</span><span>Closing</span></a>
+  </nav>
+  <div class="foot">
+    Course + YouTube + code + practice<br>
+    Press <kbd>J</kbd>/<kbd>K</kbd> to turn pages<br>
+    Made with HTML, on purpose.
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ════════ CH00 · COVER (dark scene) ════════
+     The cover sets the tone: a kicker, a big serif display headline with one clay <em>,
+     a lede, a row of topic pills, and ONE bespoke animated SVG infographic.        -->
+<section class="chapter dark" id="ch00">
+  <div class="wrap">
+    <div class="kicker reveal">A persistent apprenticeship system</div>
+    <h1 class="display reveal d1" style="max-width:15ch">Build a <em>Junior Indy</em> you can work with every day.</h1>
+    <p class="lede reveal d2" style="max-width:40ch;color:var(--on-dark-dim)">
+      Not a course summary. Not a searchable transcript pile. A multimodal, practiced, evidence-backed operating mind that helps you think, code, act, teach, and create through IndyDevDan’s agentic-engineering principles.
+    </p>
+
+    <div class="row reveal d3" style="margin-top:34px;gap:10px">
+      <span class="pill clay">18 course lessons</span>
+      <span class="pill">202 YouTube videos</span>
+      <span class="pill">frames + transcripts</span>
+      <span class="pill">code + practice</span>
+    </div>
+
+    <div class="fig bare reveal d4" style="margin-top:46px;max-width:560px">
+      <svg class="draw" viewBox="0 0 560 118" role="img" aria-label="Course and YouTube evidence becoming an operating mind used in real work">
+        <rect x="4" y="15" width="104" height="34" rx="9" fill="none" stroke="var(--blue)" stroke-width="1.8"/>
+        <text x="56" y="36" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--on-dark-dim)">course spine</text>
+        <rect x="4" y="69" width="104" height="34" rx="9" fill="none" stroke="var(--amber)" stroke-width="1.8"/>
+        <text x="56" y="90" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--on-dark-dim)">YouTube frontier</text>
+        <path d="M108 32 C 152 32, 150 59, 190 59" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M108 86 C 152 86, 150 59, 190 59" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <circle cx="232" cy="59" r="40" fill="none" stroke="var(--clay-2)" stroke-width="2"/>
+        <path d="M214 58 C214 43 229 37 240 45 C252 52 250 72 235 79 C221 83 211 71 214 58" fill="none" stroke="var(--clay-2)" stroke-width="1.6"/>
+        <text x="232" y="114" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--on-dark-dim)">mental models</text>
+        <path d="M272 59 H 342" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M342 59 l-9 -6 v12 z" fill="var(--clay-2)"/>
+        <rect x="346" y="31" width="112" height="56" rx="10" fill="none" stroke="var(--olive)" stroke-width="2"/>
+        <text x="402" y="54" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--on-dark-dim)">Junior Indy</text>
+        <text x="402" y="72" text-anchor="middle" font-family="var(--mono)" font-size="9.5" fill="var(--on-dark-dim)">global skill suite</text>
+        <path d="M458 59 H 512" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M512 59 l-9 -6 v12 z" fill="var(--clay-2)"/>
+        <circle cx="536" cy="59" r="16" fill="none" stroke="var(--clay-2)" stroke-width="2"/>
+        <path d="M529 59 l5 5 10 -12" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+
+    <p class="small reveal d5" style="margin-top:40px;font-family:var(--mono);letter-spacing:.06em">
+      Scroll, or press <kbd style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#efe7d8">J</kbd>
+      to begin &nbsp;↓
+    </p>
+  </div>
+</section>
+
+<section class="chapter" id="ch01">
+  <div class="wrap wide">
+    <span class="chapnum reveal">01 — The real goal</span>
+    <div class="kicker reveal">From archive to apprenticeship</div>
+    <h2 class="title reveal d1" style="max-width:21ch">You are asking for a <em>working mind</em>, not stored information.</h2>
+    <p class="lede reveal d2">The system succeeds only when it changes how we approach real engineering and creation—not when it merely retrieves a quote.</p>
+    <div class="stats reveal d3">
+      <div class="stat"><div class="sv">Think</div><div class="sl">decision heuristics</div></div>
+      <div class="stat blue"><div class="sv">Code</div><div class="sl">harnesses and workflows</div></div>
+      <div class="stat olive"><div class="sv">Act</div><div class="sl">delegate, verify, learn</div></div>
+      <div class="stat plum"><div class="sv">Create</div><div class="sl">original systems and teaching</div></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div>
+        <div class="compare">
+          <div class="col bad"><span class="clabel">The shallow version</span><ul><li>A transcript search box</li><li>Memorized slogans and catchphrases</li><li>A giant always-loaded memory file</li><li>Answers that sound inspired but cannot perform</li></ul></div>
+          <div class="col good"><span class="clabel">The real version</span><ul><li>Bounded, source-linked mental models</li><li>Reproduced code and observable behavior</li><li>Transfer to unfamiliar problems</li><li>Verified learning from your actual work</li></ul></div>
+        </div>
+        <div class="callout idea"><span class="ci">Reality</span><span class="cc">I cannot rewrite my permanent model weights. The durable equivalent is an <strong>external operating mind</strong> installed as skills and loaded on demand across sessions.</span></div>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 500 320" role="img" aria-label="A staircase from recall to original creation">
+          <path d="M45 270 H130 V220 H215 V170 H300 V120 H385 V70 H462" class="s-flow"/>
+          <rect x="48" y="239" width="78" height="28" rx="7" class="s-card"/><text x="87" y="257" text-anchor="middle" class="s-label-sm">recall</text>
+          <rect x="133" y="189" width="78" height="28" rx="7" class="s-blue-f"/><text x="172" y="207" text-anchor="middle" class="s-label-sm">explain</text>
+          <rect x="218" y="139" width="78" height="28" rx="7" class="s-plum-f"/><text x="257" y="157" text-anchor="middle" class="s-label-sm">reproduce</text>
+          <rect x="303" y="89" width="78" height="28" rx="7" class="s-amber-f"/><text x="342" y="107" text-anchor="middle" class="s-label-sm">adapt</text>
+          <rect x="388" y="39" width="78" height="28" rx="7" class="s-olive-f"/><text x="427" y="57" text-anchor="middle" class="s-label-sm">create</text>
+          <path d="M72 289 C170 309 346 299 445 84" class="s-line" stroke-dasharray="5 5"/>
+          <text x="247" y="302" text-anchor="middle" class="s-label">assimilation is demonstrated transfer</text>
+        </svg>
+        <div class="fcap"><b>Knowledge becomes expertise through transfer.</b> The target is original creation grounded in the learned system.</div>
+      </div>
+    </div>
+    <a class="jump reveal" href="#ch02">Next · Watch with two eyes &nbsp;&rarr;</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch02">
+  <div class="wrap wide">
+    <span class="chapnum reveal">02 — Multimodal assimilation</span>
+    <div class="kicker reveal">Watch with two eyes</div>
+    <h2 class="title reveal d1" style="max-width:23ch">Speech gives the reasoning. <em>Frames reveal the demonstration.</em></h2>
+    <p class="lede reveal d2">A long video will be divided into semantic chapters and inspected through transcript evidence, scene changes, visual cues, and high-resolution code moments.</p>
+
+    <div class="fig reveal d3">
+      <svg class="draw" viewBox="0 0 1040 330" role="img" aria-label="Pipeline converting a long video into timestamped multimodal lesson records">
+        <rect x="24" y="86" width="142" height="92" rx="13" class="s-clay-f"/>
+        <polygon points="76,112 76,151 112,131" class="s-clay"/>
+        <text x="95" y="202" text-anchor="middle" class="s-title">Long video</text><text x="95" y="220" text-anchor="middle" class="s-label-sm">30–70 minutes</text>
+        <path d="M166 132 H232" class="s-flow"/><path d="M232 132 l-9 -6 v12 z" class="s-clay"/>
+        <rect x="238" y="55" width="154" height="52" rx="10" class="s-blue-f"/><text x="315" y="78" text-anchor="middle" class="s-title">Transcript</text><text x="315" y="95" text-anchor="middle" class="s-label-sm">claims + timestamps</text>
+        <rect x="238" y="121" width="154" height="52" rx="10" class="s-plum-f"/><text x="315" y="144" text-anchor="middle" class="s-title">Scene pass</text><text x="315" y="161" text-anchor="middle" class="s-label-sm">distinct visual states</text>
+        <rect x="238" y="187" width="154" height="52" rx="10" class="s-amber-f"/><text x="315" y="210" text-anchor="middle" class="s-title">Cue pass</text><text x="315" y="227" text-anchor="middle" class="s-label-sm">“look here” frames</text>
+        <path d="M392 81 C442 81 438 146 486 146" class="s-line"/><path d="M392 147 H486" class="s-line"/><path d="M392 213 C442 213 438 146 486 146" class="s-line"/>
+        <rect x="490" y="92" width="172" height="108" rx="12" class="s-card"/><text x="576" y="122" text-anchor="middle" class="s-title">Semantic chapter</text><text x="576" y="145" text-anchor="middle" class="s-label-sm">5–10 minute segment</text><line x1="515" y1="161" x2="637" y2="161" class="s-line"/><text x="576" y="184" text-anchor="middle" class="s-label-sm">dense rerun if critical</text>
+        <path d="M662 146 H728" class="s-flow"/><path d="M728 146 l-9 -6 v12 z" class="s-clay"/>
+        <rect x="734" y="54" width="276" height="196" rx="14" class="s-olive-f"/>
+        <text x="872" y="83" text-anchor="middle" class="s-title">Multimodal lesson record</text>
+        <line x1="766" y1="102" x2="978" y2="102" class="s-line"/>
+        <text x="766" y="126" class="s-label-sm">timestamp</text><text x="876" y="126" class="s-label">28:17</text>
+        <text x="766" y="151" class="s-label-sm">spoken idea</text><text x="876" y="151" class="s-label">mental model</text>
+        <text x="766" y="176" class="s-label-sm">visible proof</text><text x="876" y="176" class="s-label">self-improve prompt</text>
+        <text x="766" y="201" class="s-label-sm">source code</text><text x="876" y="201" class="s-label">expertise workflow</text>
+        <text x="766" y="226" class="s-label-sm">caveat</text><text x="876" y="226" class="s-label">false expertise</text>
+        <path d="M99 250 C270 309 709 303 870 258" class="s-line" stroke-dasharray="6 5"/>
+        <text x="510" y="302" text-anchor="middle" class="s-label">not every frame — every meaningfully distinct visual state</text>
+      </svg>
+      <div class="fcap"><b>The watch strategy is layered.</b> Broad coverage finds structure; focused reruns recover code, diagrams, and deictic moments at useful resolution.</div>
+    </div>
+
+    <div class="grid grid-4 reveal">
+      <div class="card accent"><span class="cnum">PASS 01</span><p class="ctitle">Transcript-first</p><p class="cbody">Extract concepts, chapters, names, claims, and visual attention cues.</p></div>
+      <div class="card blue"><span class="cnum">PASS 02</span><p class="ctitle">Scene-aware frames</p><p class="cbody">Preserve slides, terminal states, diagrams, UI transitions, and demonstrations.</p></div>
+      <div class="card plum"><span class="cnum">PASS 03</span><p class="ctitle">Cue frames</p><p class="cbody">Force captures exactly where the speaker directs attention to the screen.</p></div>
+      <div class="card olive"><span class="cnum">PASS 04</span><p class="ctitle">Focused replay</p><p class="cbody">Re-run important regions densely and at higher resolution for code readability.</p></div>
+    </div>
+    <div class="callout warn reveal"><span class="ci">Honesty</span><span class="cc">A sparse dozen-frame scan of a sixty-minute lesson is useful reconnaissance, but it is <strong>not mastery</strong>. Critical lessons receive segmented, focused visual passes.</span></div>
+    <a class="jump reveal" href="#ch03">Next · The corpus map &nbsp;&rarr;</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch03">
+  <div class="wrap wide">
+    <span class="chapnum reveal">03 — The learning universe</span>
+    <div class="kicker reveal">Canonical spine + evolving frontier</div>
+    <h2 class="title reveal d1" style="max-width:23ch">The course teaches the system. <em>YouTube shows it evolving.</em></h2>
+    <p class="lede reveal d2">The wider corpus is large enough to require hierarchy, deduplication, versioning, and a concept graph—not a single chronological notebook.</p>
+    <div class="stats reveal d3">
+      <div class="stat"><div class="sv">18</div><div class="sl">course lessons</div></div>
+      <div class="stat blue"><div class="sv">15h 13m</div><div class="sl">course video</div></div>
+      <div class="stat plum"><div class="sv">202</div><div class="sl">public YouTube videos</div></div>
+      <div class="stat amber"><div class="sv">84.3h</div><div class="sl">YouTube runtime</div></div>
+    </div>
+
+    <div class="spread reveal">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 540 370" role="img" aria-label="Course spine surrounded by YouTube topic clusters">
+          <rect x="204" y="38" width="132" height="292" rx="18" class="s-clay-f"/>
+          <text x="270" y="69" text-anchor="middle" class="s-title">Course spine</text>
+          <rect x="224" y="91" width="92" height="54" rx="9" class="s-card"/><text x="270" y="115" text-anchor="middle" class="s-title">TAC</text><text x="270" y="133" text-anchor="middle" class="s-label-sm">principles</text>
+          <rect x="224" y="161" width="92" height="54" rx="9" class="s-card"/><text x="270" y="185" text-anchor="middle" class="s-title">AH</text><text x="270" y="203" text-anchor="middle" class="s-label-sm">capabilities</text>
+          <rect x="224" y="231" width="92" height="54" rx="9" class="s-card"/><text x="270" y="255" text-anchor="middle" class="s-title">MA</text><text x="270" y="273" text-anchor="middle" class="s-label-sm">frontier patterns</text>
+          <rect x="22" y="38" width="138" height="52" rx="10" class="s-blue-f"/><text x="91" y="61" text-anchor="middle" class="s-title">Context + prompts</text><text x="91" y="78" text-anchor="middle" class="s-label-sm">mental leverage</text>
+          <rect x="22" y="119" width="138" height="52" rx="10" class="s-plum-f"/><text x="91" y="142" text-anchor="middle" class="s-title">Harness + Pi</text><text x="91" y="159" text-anchor="middle" class="s-label-sm">system control</text>
+          <rect x="22" y="200" width="138" height="52" rx="10" class="s-amber-f"/><text x="91" y="223" text-anchor="middle" class="s-title">Models + tools</text><text x="91" y="240" text-anchor="middle" class="s-label-sm">fast-moving layer</text>
+          <rect x="22" y="281" width="138" height="52" rx="10" class="s-olive-f"/><text x="91" y="304" text-anchor="middle" class="s-title">Strategy + CEO</text><text x="91" y="321" text-anchor="middle" class="s-label-sm">decisions</text>
+          <rect x="380" y="38" width="138" height="52" rx="10" class="s-plum-f"/><text x="449" y="61" text-anchor="middle" class="s-title">ADWs + ZTE</text><text x="449" y="78" text-anchor="middle" class="s-label-sm">out-loop systems</text>
+          <rect x="380" y="119" width="138" height="52" rx="10" class="s-blue-f"/><text x="449" y="142" text-anchor="middle" class="s-title">Agent teams</text><text x="449" y="159" text-anchor="middle" class="s-label-sm">orchestration</text>
+          <rect x="380" y="200" width="138" height="52" rx="10" class="s-olive-f"/><text x="449" y="223" text-anchor="middle" class="s-title">Verification</text><text x="449" y="240" text-anchor="middle" class="s-label-sm">trust + safety</text>
+          <rect x="380" y="281" width="138" height="52" rx="10" class="s-amber-f"/><text x="449" y="304" text-anchor="middle" class="s-title">UI + creation</text><text x="449" y="321" text-anchor="middle" class="s-label-sm">original output</text>
+          <path d="M160 64 H204 M160 145 H204 M160 226 H204 M160 307 H204 M336 64 H380 M336 145 H380 M336 226 H380 M336 307 H380" class="s-line"/>
+        </svg>
+        <div class="fcap"><b>The course controls the center.</b> YouTube expands, challenges, and updates the surrounding expert domains.</div>
+      </div>
+      <div>
+        <ol class="steps">
+          <li><h4>Deduplicate</h4><p>Remove course/YouTube overlap and mirrored demonstrations while preserving provenance.</p></li>
+          <li><h4>Cluster</h4><p>Organize by durable problem class rather than upload date or product name.</p></li>
+          <li><h4>Separate layers</h4><p>Keep timeless principles distinct from fast-changing model, price, and tool advice.</p></li>
+          <li><h4>Record evolution</h4><p>When newer content disagrees, preserve the change in reasoning instead of erasing history.</p></li>
+          <li><h4>Load selectively</h4><p>Retrieve only the experts required by the task so context stays focused.</p></li>
+        </ol>
+        <div class="callout ok"><span class="ci">Rule</span><span class="cc"><strong>Course = canonical spine.</strong> YouTube = evolving frontier. Real project outcomes = the proving ground.</span></div>
+      </div>
+    </div>
+    <a class="jump reveal" href="#ch04">Next · The mental operating loop &nbsp;&rarr;</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch04">
+  <div class="wrap wide">
+    <span class="chapnum reveal">04 — How Junior Indy thinks</span>
+    <div class="kicker reveal">The operating loop</div>
+    <h2 class="title reveal d1" style="max-width:23ch">Assimilation means asking the <em>right questions by default.</em></h2>
+    <p class="lede reveal d2">The course becomes useful when its recurring heuristics shape planning, coding, delegation, verification, and learning without requiring a transcript lookup first.</p>
+
+    <div class="spread reveal" style="align-items:center">
+      <div>
+        <ol class="steps">
+          <li><h4>Problem class</h4><p>What repeatable class are we solving, beyond this one task?</p></li>
+          <li><h4>Human constraint</h4><p>Where are you still the planner, orchestrator, reviewer, or bottleneck?</p></li>
+          <li><h4>Core Four</h4><p>Which context, model, prompt, and tools fit this purpose?</p></li>
+          <li><h4>Focused unit</h4><p>Can one agent, one prompt, and one purpose own the work?</p></li>
+          <li><h4>Feedback loop</h4><p>What observable evidence lets the system correct itself?</p></li>
+          <li><h4>Out-loop path</h4><p>Can a trigger, safe environment, and review boundary remove human babysitting?</p></li>
+          <li><h4>Reusable learning</h4><p>What should become a prompt, skill, workflow, evaluator, or bounded expertise update?</p></li>
+        </ol>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 520 520" role="img" aria-label="Circular Junior Indy decision loop">
+          <circle cx="260" cy="260" r="92" class="s-clay-f"/>
+          <text x="260" y="248" text-anchor="middle" class="s-serif" font-size="27" font-weight="600">Junior Indy</text>
+          <text x="260" y="275" text-anchor="middle" class="s-label">mental operating loop</text>
+          <rect x="201" y="27" width="118" height="48" rx="10" class="s-blue-f"/><text x="260" y="56" text-anchor="middle" class="s-label">problem class</text>
+          <rect x="372" y="104" width="122" height="48" rx="10" class="s-plum-f"/><text x="433" y="133" text-anchor="middle" class="s-label">human constraint</text>
+          <rect x="398" y="236" width="102" height="48" rx="10" class="s-amber-f"/><text x="449" y="265" text-anchor="middle" class="s-label">Core Four</text>
+          <rect x="343" y="372" width="138" height="48" rx="10" class="s-olive-f"/><text x="412" y="401" text-anchor="middle" class="s-label">feedback loop</text>
+          <rect x="185" y="445" width="150" height="48" rx="10" class="s-blue-f"/><text x="260" y="474" text-anchor="middle" class="s-label">verified learning</text>
+          <rect x="39" y="372" width="138" height="48" rx="10" class="s-plum-f"/><text x="108" y="401" text-anchor="middle" class="s-label">out-loop path</text>
+          <rect x="20" y="236" width="116" height="48" rx="10" class="s-amber-f"/><text x="78" y="265" text-anchor="middle" class="s-label">focused unit</text>
+          <rect x="31" y="104" width="136" height="48" rx="10" class="s-olive-f"/><text x="99" y="133" text-anchor="middle" class="s-label">template judgment</text>
+          <path d="M319 51 C368 62 405 81 433 104 M494 152 C511 188 514 213 500 236 M470 284 C460 326 444 350 412 372 M343 420 C318 436 300 442 286 445 M185 469 C145 458 122 441 108 420 M50 372 C30 342 24 312 31 284 M31 236 C25 204 34 171 54 151 M167 104 C185 83 210 68 235 74" class="s-flow"/>
+        </svg>
+        <div class="fcap"><b>The loop runs before the implementation.</b> It repeatedly moves attention from the task to the system that can solve the task class.</div>
+      </div>
+    </div>
+    <div class="quote reveal"><p>Improve the application—and improve the system that improves the application.</p><span class="cite">The line to operationalize</span></div>
+    <a class="jump reveal" href="#ch05">Next · Always accessible &nbsp;&rarr;</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch05">
+  <div class="wrap wide">
+    <span class="chapnum reveal">05 — Persistence</span>
+    <div class="kicker reveal">Available in every workspace</div>
+    <h2 class="title reveal d1" style="max-width:24ch">The mind lives outside one chat—and <em>loads only what matters.</em></h2>
+    <p class="lede reveal d2">A canonical Hermes skill suite makes the system reusable across Codex, Claude Code, Gemini CLI, OpenCode, Pi, and future projects.</p>
+
+    <div class="fig reveal d3">
+      <svg class="draw" viewBox="0 0 1040 380" role="img" aria-label="Persistent Junior Indy skill suite routing focused experts into projects and agent tools">
+        <rect x="32" y="110" width="190" height="150" rx="15" class="s-clay-f"/>
+        <text x="127" y="142" text-anchor="middle" class="s-title">Canonical brain</text>
+        <text x="127" y="165" text-anchor="middle" class="s-label-sm">Hermes global skills</text>
+        <line x1="58" y1="182" x2="196" y2="182" class="s-line"/>
+        <text x="67" y="207" class="s-label-sm">mental models</text>
+        <text x="67" y="230" class="s-label-sm">evidence ledger</text>
+        <text x="67" y="253" class="s-label-sm">evaluations</text>
+        <path d="M222 185 H316" class="s-flow"/><path d="M316 185 l-9 -6 v12 z" class="s-clay"/>
+        <rect x="322" y="76" width="194" height="218" rx="15" class="s-card"/>
+        <text x="419" y="108" text-anchor="middle" class="s-title">Indy router</text>
+        <text x="419" y="131" text-anchor="middle" class="s-label-sm">smallest useful expert set</text>
+        <rect x="348" y="154" width="142" height="31" rx="7" class="s-blue-f"/><text x="419" y="174" text-anchor="middle" class="s-label-sm">think + plan</text>
+        <rect x="348" y="195" width="142" height="31" rx="7" class="s-plum-f"/><text x="419" y="215" text-anchor="middle" class="s-label-sm">build + orchestrate</text>
+        <rect x="348" y="236" width="142" height="31" rx="7" class="s-olive-f"/><text x="419" y="256" text-anchor="middle" class="s-label-sm">verify + evolve</text>
+        <path d="M516 185 H610" class="s-flow"/><path d="M610 185 l-9 -6 v12 z" class="s-clay"/>
+        <rect x="616" y="46" width="180" height="56" rx="10" class="s-blue-f"/><text x="706" y="70" text-anchor="middle" class="s-title">Codex</text><text x="706" y="88" text-anchor="middle" class="s-label-sm">PiCanvas work</text>
+        <rect x="616" y="116" width="180" height="56" rx="10" class="s-plum-f"/><text x="706" y="140" text-anchor="middle" class="s-title">Claude Code</text><text x="706" y="158" text-anchor="middle" class="s-label-sm">another repository</text>
+        <rect x="616" y="186" width="180" height="56" rx="10" class="s-amber-f"/><text x="706" y="210" text-anchor="middle" class="s-title">Pi + OpenCode</text><text x="706" y="228" text-anchor="middle" class="s-label-sm">custom harnesses</text>
+        <rect x="616" y="256" width="180" height="56" rx="10" class="s-olive-f"/><text x="706" y="280" text-anchor="middle" class="s-title">Gemini CLI</text><text x="706" y="298" text-anchor="middle" class="s-label-sm">portable guidance</text>
+        <path d="M796 74 C846 74 836 146 882 146 M796 144 H882 M796 214 C846 214 836 146 882 146 M796 284 C868 284 846 176 882 164" class="s-line"/>
+        <rect x="886" y="112" width="130" height="92" rx="13" class="s-clay-f"/>
+        <text x="951" y="143" text-anchor="middle" class="s-title">Your work</text>
+        <text x="951" y="166" text-anchor="middle" class="s-label-sm">plan · code</text>
+        <text x="951" y="186" text-anchor="middle" class="s-label-sm">review · create</text>
+        <path d="M951 204 C951 344 238 351 127 260" class="s-flow" stroke-dasharray="7 6"/>
+        <text x="548" y="355" text-anchor="middle" class="s-label">Act → Learn → Verify → Reuse</text>
+      </svg>
+      <div class="fcap"><b>One canonical brain, many working surfaces.</b> Outcomes travel back through a verified learning loop instead of disappearing with the session.</div>
+    </div>
+
+    <div class="spread reveal">
+      <div class="filetree"><span class="d">~/.hermes/skills/junior-indy/</span>
+  <span class="f">SKILL.md</span>                  <span class="c">router</span>
+  <span class="d">experts/</span>
+    <span class="f">context.md</span>
+    <span class="f">prompting.md</span>
+    <span class="f">workflows.md</span>
+    <span class="f">orchestration.md</span>
+    <span class="f">verification.md</span>
+    <span class="f">creation.md</span>
+  <span class="d">evidence/</span>               <span class="c">timestamps + code paths</span>
+  <span class="d">evals/</span>                  <span class="c">mastery tests</span></div>
+      <div>
+        <div class="grid grid-2" style="margin-top:0">
+          <div class="card accent"><span class="cnum">MODE 01</span><p class="ctitle">Think</p><p class="cbody">Frame the problem class, constraint, leverage, and system boundary.</p></div>
+          <div class="card blue"><span class="cnum">MODE 02</span><p class="ctitle">Build</p><p class="cbody">Create focused prompts, skills, agents, ADWs, and harnesses.</p></div>
+          <div class="card olive"><span class="cnum">MODE 03</span><p class="ctitle">Verify</p><p class="cbody">Design feedback loops, atomic claims, review, safety, and evals.</p></div>
+          <div class="card plum"><span class="cnum">MODE 04</span><p class="ctitle">Create</p><p class="cbody">Develop original systems, demos, explanations, and teaching artifacts.</p></div>
+        </div>
+        <div class="callout"><span class="ci">Context</span><span class="cc">The router never loads the entire corpus. It selects the <strong>smallest relevant mental model</strong> and preserves the agent’s working context.</span></div>
+      </div>
+    </div>
+    <a class="jump reveal" href="#ch06">Next · How mastery is proven &nbsp;&rarr;</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch06">
+  <div class="wrap wide">
+    <span class="chapnum reveal">06 — Evaluation</span>
+    <div class="kicker reveal">No fake expertise</div>
+    <h2 class="title reveal d1" style="max-width:22ch">A lesson is mastered only when it <em>survives contact with new work.</em></h2>
+    <p class="lede reveal d2">Summaries establish recall. Mastery requires evidence, reproduction, critique, adaptation, verification, and original creation.</p>
+
+    <div class="fig reveal d3">
+      <svg class="draw" viewBox="0 0 1040 300" role="img" aria-label="Six mastery gates leading from explanation to original creation">
+        <path d="M64 151 H974" class="s-line"/>
+        <circle cx="104" cy="151" r="34" class="s-card"/><text x="104" y="147" text-anchor="middle" class="s-title">Explain</text><text x="104" y="167" text-anchor="middle" class="s-label-sm">teach it</text>
+        <circle cx="270" cy="151" r="34" class="s-blue-f"/><text x="270" y="147" text-anchor="middle" class="s-title">Ground</text><text x="270" y="167" text-anchor="middle" class="s-label-sm">cite it</text>
+        <circle cx="436" cy="151" r="34" class="s-plum-f"/><text x="436" y="147" text-anchor="middle" class="s-title">Rebuild</text><text x="436" y="167" text-anchor="middle" class="s-label-sm">run it</text>
+        <circle cx="602" cy="151" r="34" class="s-amber-f"/><text x="602" y="147" text-anchor="middle" class="s-title">Critique</text><text x="602" y="167" text-anchor="middle" class="s-label-sm">bound it</text>
+        <circle cx="768" cy="151" r="34" class="s-blue-f"/><text x="768" y="147" text-anchor="middle" class="s-title">Adapt</text><text x="768" y="167" text-anchor="middle" class="s-label-sm">transfer it</text>
+        <circle cx="934" cy="151" r="42" class="s-olive-f"/><text x="934" y="147" text-anchor="middle" class="s-title">Create</text><text x="934" y="167" text-anchor="middle" class="s-label-sm">originate</text>
+        <path d="M138 151 H236 M304 151 H402 M470 151 H568 M636 151 H734 M802 151 H892" class="s-flow"/>
+        <text x="104" y="88" text-anchor="middle" class="s-label-sm">concept</text><text x="270" y="88" text-anchor="middle" class="s-label-sm">timestamp</text><text x="436" y="88" text-anchor="middle" class="s-label-sm">code</text><text x="602" y="88" text-anchor="middle" class="s-label-sm">failure</text><text x="768" y="88" text-anchor="middle" class="s-label-sm">novel task</text><text x="934" y="82" text-anchor="middle" class="s-label-sm">new system</text>
+        <path d="M104 208 C324 274 708 274 934 208" class="s-flow" stroke-dasharray="6 5"/>
+        <text x="519" y="276" text-anchor="middle" class="s-label">verified outcomes update the mental model</text>
+      </svg>
+      <div class="fcap"><b>Six gates separate familiarity from expertise.</b> Failure at any gate produces a targeted learning task, not a confidence claim.</div>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">FIDELITY</span><p class="ctitle">Does it match the source?</p><p class="cbody">Claims link to timestamps, frames, notes, code paths, and version context.</p></div>
+      <div class="card blue"><span class="cnum">JUDGMENT</span><p class="ctitle">Does it choose well?</p><p class="cbody">Scenario tests probe when to use, avoid, specialize, delegate, or stay in-loop.</p></div>
+      <div class="card olive"><span class="cnum">TRANSFER</span><p class="ctitle">Does it work here?</p><p class="cbody">PiCanvas and other unfamiliar projects test whether the model generalizes.</p></div>
+      <div class="card plum"><span class="cnum">BUILD</span><p class="ctitle">Can it reproduce behavior?</p><p class="cbody">Golden paths execute the important course labs and smaller independent versions.</p></div>
+      <div class="card amber"><span class="cnum">SAFETY</span><p class="ctitle">Does autonomy stay bounded?</p><p class="cbody">Isolation, restricted tools, ownership, review, and verifier loops protect the work.</p></div>
+      <div class="card accent"><span class="cnum">CREATION</span><p class="ctitle">Can it make something new?</p><p class="cbody">Original repositories, workflows, explanations, and visual teaching prove synthesis.</p></div>
+    </div>
+    <div class="callout bad reveal"><span class="ci">Guardrail</span><span class="cc">The goal is <strong>Indy-inspired reasoning and creation</strong>, not deceptive impersonation or copied verbal style. The work should be recognizably original.</span></div>
+    <a class="jump reveal" href="#ch07">Next · The build sequence &nbsp;&rarr;</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch07">
+  <div class="wrap wide">
+    <span class="chapnum reveal">07 — Execution</span>
+    <div class="kicker reveal">Build in dependency order</div>
+    <h2 class="title reveal d1" style="max-width:23ch">First build the metabolism. <em>Then expand the memory.</em></h2>
+    <p class="lede reveal d2">The first usable slice should already encode judgment, act, learn, and verify. The broader corpus then deepens that functioning system.</p>
+
+    <div class="spread reveal">
+      <div>
+        <ol class="steps">
+          <li><h4>Catalog and deduplicate</h4><p>Build the source manifest for course assets and the 202-video channel corpus.</p></li>
+          <li><h4>Deep-ingest the canonical spine</h4><p>Complete full transcript, segmented frame, code, note, and caveat passes for all 18 lessons.</p></li>
+          <li><h4>Reproduce the labs</h4><p>Trace prompts to runtime behavior and capture safe, repeatable golden paths.</p></li>
+          <li><h4>Build Junior Indy version zero</h4><p>Install the router and initial expert mental models globally through Hermes.</p></li>
+          <li><h4>Prove it on PiCanvas</h4><p>Use real planning, coding, review, and creation tasks as transfer evaluations.</p></li>
+          <li><h4>Expand through YouTube</h4><p>Ingest the public corpus by conceptual importance, preserving evolution and recency.</p></li>
+          <li><h4>Compound carefully</h4><p>Act, learn, verify, reuse, version, and retire stale tool-specific guidance.</p></li>
+        </ol>
+      </div>
+      <div>
+        <div class="fig">
+          <svg class="draw" viewBox="0 0 500 390" role="img" aria-label="First vertical slice combining template engineering, feedback loops, agent experts, and verifier agents">
+            <rect x="52" y="35" width="396" height="58" rx="11" class="s-blue-f"/><text x="250" y="61" text-anchor="middle" class="s-title">TAC-3 · Template engineering</text><text x="250" y="80" text-anchor="middle" class="s-label-sm">encode judgment</text>
+            <path d="M250 93 V127" class="s-flow"/><path d="M250 127 l-6 -9 h12 z" class="s-clay"/>
+            <rect x="52" y="132" width="396" height="58" rx="11" class="s-plum-f"/><text x="250" y="158" text-anchor="middle" class="s-title">TAC-5 · Feedback loops</text><text x="250" y="177" text-anchor="middle" class="s-label-sm">observe and correct</text>
+            <path d="M250 190 V224" class="s-flow"/><path d="M250 224 l-6 -9 h12 z" class="s-clay"/>
+            <rect x="52" y="229" width="396" height="58" rx="11" class="s-amber-f"/><text x="250" y="255" text-anchor="middle" class="s-title">AH-5 · Agent Experts</text><text x="250" y="274" text-anchor="middle" class="s-label-sm">act, learn, reuse</text>
+            <path d="M250 287 V321" class="s-flow"/><path d="M250 321 l-6 -9 h12 z" class="s-clay"/>
+            <rect x="52" y="326" width="396" height="58" rx="11" class="s-olive-f"/><text x="250" y="352" text-anchor="middle" class="s-title">MA-4 · Verifier Agent</text><text x="250" y="371" text-anchor="middle" class="s-label-sm">trust through independent checking</text>
+            <path d="M448 355 C488 355 488 64 448 64" class="s-flow" stroke-dasharray="7 6"/>
+            <text x="480" y="210" text-anchor="middle" class="s-label-sm" transform="rotate(90 480 210)">verified improvement</text>
+          </svg>
+          <div class="fcap"><b>The first vertical slice has a complete metabolism.</b> Encode → act → learn → verify → improve.</div>
+        </div>
+        <div class="callout ok"><span class="ci">Ready</span><span class="cc">The corpus is mapped. The next meaningful action is the <strong>canonical deep-ingest</strong> and the first working Junior Indy skill—not more planning.</span></div>
+      </div>
+    </div>
+    <a class="jump reveal" href="#ch99">Finish · The commitment &nbsp;&rarr;</a>
+  </div>
+</section>
+
+<!-- ════════ SEND-OFF (dark scene) — id must match the last TOC entry ════════ -->
+<section class="chapter dark" id="ch99">
+  <div class="wrap">
+    <span class="chapnum reveal" style="color:var(--on-dark-dim)">— The Send-off</span>
+    <div class="kicker reveal">Where this leaves us</div>
+    <h2 class="title reveal d1" style="max-width:20ch;color:#f6efe2">The aim is not to know everything Indy said. It is to <em>build as he taught.</em></h2>
+    <p class="lede reveal d2" style="max-width:42ch;color:var(--on-dark-dim)">
+      Course evidence becomes mental models. Mental models become practiced workflows. Practiced workflows become a persistent collaborator available wherever you build.
+    </p>
+
+    <div class="grid grid-3 reveal" style="margin-top:18px">
+      <div class="card glow accent"><span class="cnum">ASSIMILATE</span><p class="ctitle">Two evidence streams</p><p class="cbody">Transcript reasoning and visual demonstrations remain linked by timestamp.</p></div>
+      <div class="card glow blue"><span class="cnum">PRACTICE</span><p class="ctitle">Six mastery gates</p><p class="cbody">Explain, ground, rebuild, critique, adapt, and create on unfamiliar work.</p></div>
+      <div class="card glow olive"><span class="cnum">PERSIST</span><p class="ctitle">One global brain</p><p class="cbody">Focused experts load on demand across agents, repositories, and sessions.</p></div>
+    </div>
+
+    <div class="quote big reveal" style="margin:36px 0 8px">
+      <p>Encode judgment. Act through systems. Learn from evidence. Verify before trust.</p>
+      <span class="cite" style="display:block;margin-top:14px;color:var(--on-dark-dim)">— the Junior Indy metabolism</span>
+    </div>
+
+    <div class="fig bare reveal" style="max-width:620px;margin-top:28px">
+      <svg class="draw" viewBox="0 0 620 90" role="img" aria-label="Encode, act, learn, verify, and reuse loop">
+        <circle cx="62" cy="44" r="26" fill="none" stroke="var(--clay-2)" stroke-width="2"/><text x="62" y="48" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--on-dark-dim)">encode</text>
+        <circle cx="187" cy="44" r="26" fill="none" stroke="var(--blue)" stroke-width="2"/><text x="187" y="48" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--on-dark-dim)">act</text>
+        <circle cx="312" cy="44" r="26" fill="none" stroke="var(--amber)" stroke-width="2"/><text x="312" y="48" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--on-dark-dim)">learn</text>
+        <circle cx="437" cy="44" r="26" fill="none" stroke="var(--olive)" stroke-width="2"/><text x="437" y="48" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--on-dark-dim)">verify</text>
+        <circle cx="562" cy="44" r="26" fill="none" stroke="var(--plum)" stroke-width="2"/><text x="562" y="48" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--on-dark-dim)">reuse</text>
+        <path d="M88 44 H161 M213 44 H286 M338 44 H411 M463 44 H536" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M562 70 C480 91 138 91 62 70" stroke="var(--clay-2)" stroke-width="1.7" stroke-dasharray="6 5" fill="none"/>
+      </svg>
+    </div>
+
+    <p class="small reveal" style="margin-top:30px;color:var(--on-dark-dim)">
+      Prepared from the local IndyDevDan course archive and the mapped public YouTube corpus.<br>
+      <span style="font-family:var(--mono);letter-spacing:.06em">Press <kbd style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#efe7d8">K</kbd> to climb back up ↑</span>
+    </p>
+    <a class="jump reveal" href="#ch00" style="margin-top:26px">Back to the top &nbsp;↑</a>
+  </div>
+</section>
+
+</main>
+
+<div id="pager">
+  <button id="pprev" aria-label="Previous section">‹</button>
+  <span class="pind" id="pind"></span>
+  <button id="pnext" aria-label="Next section">›</button>
+</div>
+<button id="topbtn" aria-label="Back to top">↑</button>
+
+<script>
+/* ═══ self-contained syntax highlighter ═══════════════════ */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+const KW={
+ python:['def','class','import','from','return','if','elif','else','for','while','in','not','and','or','is','None','True','False','with','as','try','except','finally','raise','lambda','yield','async','await','self','pass','break','continue','global'],
+ js:['const','let','var','function','return','if','else','for','while','of','in','new','class','extends','import','export','default','async','await','try','catch','finally','throw','typeof','this','true','false','null','undefined','interface','type','enum','public','private','readonly'],
+ bash:['if','then','else','elif','fi','for','do','done','while','case','esac','function','export','source','return','local','set','git','npm','npx','uv','uvx','bun','python','python3','node','claude','curl','mkdir','cd','echo','cat','cp','mv','rm','chmod'],
+ yaml:['true','false','null'],
+ json:['true','false','null'],
+ text:[]
+};
+const COMMENT={python:'#',bash:'#',yaml:'#',js:'//',json:null,text:null};
+function hlMd(e){
+  return e.split('\n').map(function(line){
+    if(/^#{1,6}\s/.test(line))return '<span class="md-h">'+line+'</span>';
+    if(/^\s*&gt;/.test(line))return '<span class="md-q">'+line+'</span>';
+    if(/^\s*([-*+]|\d+\.)\s/.test(line))line=line.replace(/^(\s*)([-*+]|\d+\.)(\s)/,'$1<span class="md-li">$2</span>$3');
+    line=line.replace(/`([^`]+)`/g,'<span class="md-c">`$1`</span>');
+    line=line.replace(/\*\*([^*]+)\*\*/g,'<span class="md-b">**$1**</span>');
+    line=line.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<span class="md-link">[$1]($2)</span>');
+    return line;
+  }).join('\n');
+}
+function detectLang(pre){
+  var cap=''; var c=pre.closest('.code'); if(c&&c.previousElementSibling&&c.previousElementSibling.classList.contains('codecap'))cap=c.previousElementSibling.textContent.toLowerCase();
+  var t=pre.textContent;
+  if(/\.md\b|markdown|\.claude\/commands|slash command|command file|prompt\.md|claude\.md/.test(cap)||/^#{1,6}\s.+/m.test(t)&&!/^\s*(def |import )/m.test(t))return'md';
+  if(/\.py\b|python/.test(cap)||/^\s*(def |class |import |from \S+ import|print\()/m.test(t))return'python';
+  if(/\.json\b|json|\.mcp|settings/.test(cap)||(/^\s*[\{\[]/.test(t.trim())&&/":\s/.test(t)))return'json';
+  if(/\.(ts|js|tsx|jsx)\b|typescript|javascript/.test(cap)||/(=>|\bconst |\bfunction |\bexport )/.test(t))return'js';
+  if(/\.ya?ml\b|yaml/.test(cap))return'yaml';
+  if(/terminal|bash|shell|\.sh\b|justfile|command line/.test(cap)||/^\s*(\$|#!\/|git |cd |npm |uv |bun |export |curl )/m.test(t))return'bash';
+  return'text';
+}
+function hl(text,lang){
+  if(lang==='md')return hlMd(esc(text));
+  var e=esc(text);
+  var alts=['"(?:[^"\\\\]|\\\\.)*"',"'(?:[^'\\\\]|\\\\.)*'",'`(?:[^`\\\\]|\\\\.)*`'];
+  var cm=COMMENT[lang];
+  if(cm==='#')alts.push('#[^\\n]*');
+  if(cm==='//')alts.push('//[^\\n]*');
+  alts.push('\\b\\d+(?:\\.\\d+)?\\b');
+  var kw=KW[lang]||[];
+  if(kw.length)alts.push('\\b(?:'+kw.join('|')+')\\b');
+  var re=new RegExp(alts.join('|'),'g');
+  return e.replace(re,function(m){
+    var q=m.charAt(0);
+    if(q==='"'||q==="'"||q==='`')return '<span class="s">'+m+'</span>';
+    if(m.indexOf('#')===0||m.indexOf('//')===0)return '<span class="cm">'+m+'</span>';
+    if(/^\d/.test(m))return '<span class="n">'+m+'</span>';
+    return '<span class="k">'+m+'</span>';
+  });
+}
+function highlightAll(){
+  document.querySelectorAll('.code pre').forEach(function(pre){
+    if(pre.dataset.hl)return;
+    try{ pre.innerHTML=hl(pre.textContent,detectLang(pre)); }catch(e){}
+    pre.dataset.hl='1';
+  });
+}
+highlightAll();
+
+/* ═══ paged navigation ════════════════════════════════════ */
+var chapters=[].slice.call(document.querySelectorAll('.chapter'));
+var tocLinks=[].slice.call(document.querySelectorAll('#toc a'));
+var prog=document.getElementById('progress');
+var rail=document.getElementById('rail');
+var idIndex={}; chapters.forEach(function(c,i){idIndex[c.id]=i;});
+var cur=0, total=chapters.length;
+
+var revObs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in','drawn');revObs.unobserve(e.target);}});},{rootMargin:'0px 0px -6% 0px',threshold:.1});
+function wirePage(ch){
+  ch.querySelectorAll('.draw').forEach(function(svg){
+    svg.querySelectorAll('path,line,polyline,polygon,circle,rect').forEach(function(p){
+      try{var len=p.getTotalLength?p.getTotalLength():1200;p.style.setProperty('--len',Math.ceil(len)||1200);}catch(e){}
+    });
+  });
+  ch.querySelectorAll('.reveal,.draw').forEach(function(el){el.classList.remove('in','drawn');revObs.observe(el);});
+}
+var subObs=null;
+function wireSubnav(ch){
+  if(subObs)subObs.disconnect();
+  var subs=[].slice.call(ch.querySelectorAll('.subsec[id]'));
+  var links=[].slice.call(ch.querySelectorAll('.chapnav a'));
+  if(!subs.length||!links.length)return;
+  subObs=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(e.isIntersecting){links.forEach(function(a){a.classList.remove('cur');});
+      var l=ch.querySelector('.chapnav a[href="#'+e.target.id+'"]'); if(l)l.classList.add('cur');}
+  });},{rootMargin:'-15% 0px -75% 0px',threshold:0});
+  subs.forEach(function(s){subObs.observe(s);});
+}
+function pageNum(i){var m=chapters[i].id.match(/ch(\d+)/);return m?m[1]:'00';}
+function updatePager(){
+  document.getElementById('pprev').disabled=cur<=0;
+  document.getElementById('pnext').disabled=cur>=total-1;
+  document.getElementById('pind').innerHTML='<b>'+pageNum(cur)+'</b> / '+String(total-1).padStart(2,'0');
+}
+function show(i,push){
+  i=Math.max(0,Math.min(total-1,i));
+  if(chapters[cur])chapters[cur].classList.remove('active');
+  cur=i; var ch=chapters[i];
+  ch.classList.add('active');
+  wirePage(ch); wireSubnav(ch);
+  window.scrollTo(0,0);
+  tocLinks.forEach(function(a){a.classList.remove('active');});
+  var rl=document.querySelector('#toc a[href="#'+ch.id+'"]'); if(rl){rl.classList.add('active');rl.scrollIntoView({block:'nearest'});}
+  updatePager();
+  if(push!==false){try{history.replaceState(null,'','#'+ch.id);}catch(e){location.hash=ch.id;}}
+}
+document.getElementById('pnext').onclick=function(){show(cur+1);};
+document.getElementById('pprev').onclick=function(){show(cur-1);};
+document.getElementById('topbtn').onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};
+tocLinks.forEach(function(a){a.addEventListener('click',function(e){
+  var id=a.getAttribute('href').slice(1);
+  if(idIndex[id]!=null){e.preventDefault();show(idIndex[id]);rail.classList.remove('open');}
+});});
+window.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key==='ArrowRight'||e.key==='j'||e.key==='J'){e.preventDefault();show(cur+1);}
+  if(e.key==='ArrowLeft'||e.key==='k'||e.key==='K'){e.preventDefault();show(cur-1);}
+});
+function onScroll(){
+  var h=document.documentElement;var max=h.scrollHeight-h.clientHeight;
+  prog.style.width=(max>0?(h.scrollTop/max*100):0)+'%';
+  document.getElementById('topbtn').classList.toggle('show',h.scrollTop>560);
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+
+document.getElementById('railToggle').addEventListener('click',function(){rail.classList.toggle('open');});
+
+/* init from hash */
+var initId=(location.hash||'').slice(1);
+show(idIndex[initId]!=null?idIndex[initId]:0,false);
+onScroll();
+</script>
+</body>
+</html>

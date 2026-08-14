@@ -1,0 +1,99 @@
+<section class="chapter" id="ch03">
+  <div class="wrap wide">
+    <span class="chapnum reveal">03 — The loop</span>
+    <div class="kicker reveal">run this identically for a chore, a bug, or a feature</div>
+    <h2 class="title reveal d1" style="max-width:22ch">Two agents. <em>Never one.</em></h2>
+    <p class="lede reveal d2">This is the whole procedure. Step zero has no agent in it, and skipping it is the most common way the rest fails.</p>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 320" role="img" aria-label="The two-prompt loop with a hard context break between planner and builder">
+        <rect x="24" y="60" width="150" height="200" rx="10" class="s-card"/>
+        <text x="99" y="88" text-anchor="middle" class="s-label">STEP 0</text>
+        <text x="99" y="120" text-anchor="middle" class="s-serif" font-size="15">paper</text>
+        <text x="99" y="146" text-anchor="middle" class="s-label-sm">purpose</text>
+        <text x="99" y="166" text-anchor="middle" class="s-label-sm">problem</text>
+        <text x="99" y="186" text-anchor="middle" class="s-label-sm">solution</text>
+        <text x="99" y="214" text-anchor="middle" class="s-label-sm">output file tree</text>
+        <text x="99" y="240" text-anchor="middle" class="s-label-sm">— no agent —</text>
+
+        <path d="M180 160 H 232" class="s-flow"/><path d="M232 160 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="240" y="60" width="200" height="200" rx="10" class="s-blue-f"/>
+        <text x="340" y="88" text-anchor="middle" class="s-label">AGENT ONE — FRESH</text>
+        <text x="340" y="120" text-anchor="middle" class="s-serif" font-size="15">the planner</text>
+        <text x="340" y="152" text-anchor="middle" class="s-label-sm">/prime</text>
+        <text x="340" y="176" text-anchor="middle" class="s-label-sm">/plan "one high-level line"</text>
+        <text x="340" y="206" text-anchor="middle" class="s-label-sm">↓</text>
+        <text x="340" y="232" text-anchor="middle" class="s-label-sm">specs/&lt;name&gt;.md</text>
+
+        <path d="M470 40 V 286" stroke="var(--clay)" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>
+        <text x="470" y="30" text-anchor="middle" class="s-label">HARD CONTEXT BREAK</text>
+        <text x="470" y="306" text-anchor="middle" class="s-label-sm">new terminal · new instance · zero memory</text>
+
+        <rect x="500" y="60" width="200" height="200" rx="10" class="s-olive-f"/>
+        <text x="600" y="88" text-anchor="middle" class="s-label">AGENT TWO — FRESH</text>
+        <text x="600" y="120" text-anchor="middle" class="s-serif" font-size="15">the builder</text>
+        <text x="600" y="152" text-anchor="middle" class="s-label-sm">/build specs/&lt;name&gt;.md</text>
+        <text x="600" y="176" text-anchor="middle" class="s-label-sm">no priming needed</text>
+        <text x="600" y="206" text-anchor="middle" class="s-label-sm">↓</text>
+        <text x="600" y="232" text-anchor="middle" class="s-label-sm">code + green validations</text>
+
+        <path d="M706 160 H 758" class="s-flow"/><path d="M758 160 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="766" y="110" width="90" height="100" rx="10" class="s-clay-f"/>
+        <text x="811" y="140" text-anchor="middle" class="s-label">YOU</text>
+        <text x="811" y="166" text-anchor="middle" class="s-label-sm">review</text>
+        <text x="811" y="186" text-anchor="middle" class="s-label-sm">the diff</text>
+      </svg>
+      <div class="fcap"><b>Two touchpoints, not a conversation.</b> You appear once to approve the plan and once to review the diff. The dashed line is the part people skip.</div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch03-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The steps</h2></div>
+
+    <ol class="steps reveal">
+      <li><h4>Push the laptop away</h4><p>Open <code>raw.md</code> by hand. Write purpose, problem, solution — then the <strong>literal output file tree</strong>. What will exist when this is done that does not exist now? <em>"We never start by just blasting out prompts."</em></p></li>
+      <li><h4>Fresh agent, /prime</h4><p>New terminal, new instance. Check <code>/context</code> — you want roughly 90% free.</p></li>
+      <li><h4>Fire /plan with a deliberately vague prompt</h4><p><em>"We're writing a high level prompt, which is a prompt that's void of detail."</em> The detail already lives in the template. Output lands in <code>specs/</code>.</p></li>
+      <li><h4>Read the plan. Delete things.</h4><p>Touchpoint one. <em>"You always go overboard. By the end of your planning phase, you should be deleting information that isn't relevant."</em> Confirm the Validation Commands section is real.</p></li>
+      <li><h4>Commit the spec</h4><p>Before any code exists to blur it.</p></li>
+      <li><h4>NEW terminal. NEW agent. /build the plan.</h4><p>Never continue the planner. This is the rule that survives every contradiction in the corpus.</p></li>
+      <li><h4>Watch it close its own loop</h4><p>The agent runs every validation command, fixes failures, and <strong>reruns all of them from the top</strong> — not just the one that failed.</p></li>
+      <li><h4>Review the diff, then commit</h4><p>Touchpoint two. <code>git diff --stat</code>, then spot-check by hand.</p></li>
+    </ol>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch03-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Why fresh, every time</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big"><p>It's easy to know what your agent has seen when it's seen nothing.</p><span class="cite" style="display:block;margin-top:10px">— the line that makes the whole rule click</span></div>
+      <div class="prose">
+        <p>He poses the objection himself and answers it flatly:</p>
+        <p><em>"Don't we want to keep rolling the important context between planning, building, and really the entire software development lifecycle?</em> <strong>No.</strong><em>"</em></p>
+      </div>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">REASON 01</span><p class="ctitle">Context is freed</p><p class="cbody">"Focus every available token on the task at hand."</p></div>
+      <div class="card blue"><span class="cnum">REASON 02</span><p class="ctitle">Assets become improvable</p><p class="cbody">Prompts and plans are forced to be isolated and reusable with zero dependencies — "a trail of success or a trail of things we can improve."</p></div>
+      <div class="card olive"><span class="cnum">REASON 03</span><p class="ctitle">It prepares for off-device</p><p class="cbody">The same prompts that work in-loop run out-of-loop unchanged.</p></div>
+    </div>
+
+    <div class="callout reveal"><span class="ci">THE DEBUGGING PAYOFF</span>
+      <span class="cc">Because every run starts from committed assets in a clean window, you know <strong>exactly</strong> what was in context when it failed. You cannot root-cause a failure in a polluted window — which is why <code>/compact</code> is treated as an anti-pattern. If the window fills mid-task, the task was too big. Chop it.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch03-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Testing is not reviewing</h2></div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ what tests answer</span><ul><li>Does it run?</li><li>Deterministic, cheap, repeatable</li><li>A known command — so it belongs in code, not in an agent</li><li>Red tests are input, not a crash</li></ul></div>
+      <div class="col good"><span class="clabel">◵ what review answers</span><ul><li>Is what we built what we asked for?</li><li>Needs judgement, so it needs an agent</li><li>Graded against the plan, not against taste</li><li>Requires evidence — a claim is never proof</li></ul></div>
+    </div>
+
+    <p class="prose reveal" style="max-width:72ch">His later factory <strong>deleted its tester agent entirely</strong> on exactly this reasoning: <em>"A known command is code, not an agent — if you can write the invocation down (<code>bun test</code>, <code>ruff check</code>), it belongs in a code phase."</em></p>
+
+    <a class="jump reveal" href="#ch04">Next · When it fails &nbsp;→</a>
+  </div>
+</section>

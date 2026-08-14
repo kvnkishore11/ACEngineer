@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first companion to TAC-5: Close the Loops. Learn request–validate–resolve prompts, stacked validators, browser-driven end-to-end tests, isolated test workflows, and observable out-loop validation.">
+  <title>TAC-5 · Close the Loops — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="05-close-the-loops.assets.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to chapter</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL I · TAC · CHAPTER 05</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume I · Chapter 5</p>
+      <h2>Close the Loops</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation</span></a></li>
+          <li><a href="#valuable-work"><span class="chapter-nav__n">01</span><span>The validation question</span></a></li>
+          <li><a href="#always-feedback"><span class="chapter-nav__n">02</span><span>Always add feedback</span></a></li>
+          <li><a href="#three-loops"><span class="chapter-nav__n">03</span><span>Three loop positions</span></a></li>
+          <li><a href="#closed-prompt"><span class="chapter-nav__n">04</span><span>Request · validate · resolve</span></a></li>
+          <li><a href="#stack-confidence"><span class="chapter-nav__n">05</span><span>Stack confidence</span></a></li>
+          <li><a href="#browser-validator"><span class="chapter-nav__n">06</span><span>Browser as validator</span></a></li>
+          <li><a href="#template-loops"><span class="chapter-nav__n">07</span><span>Template the loops</span></a></li>
+          <li><a href="#adw-test"><span class="chapter-nav__n">08</span><span>The isolated test node</span></a></li>
+          <li><a href="#observe"><span class="chapter-nav__n">09</span><span>Observe the failure</span></a></li>
+          <li><a href="#adoption"><span class="chapter-nav__n">10</span><span>Move outward safely</span></a></li>
+          <li><a href="#current-practice"><span class="chapter-nav__n">11</span><span>Current practice</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">12</span><span>Graded lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">13</span><span>Cumulative mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">14</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--loops">
+        <span class="hero__chapter">Tactic #5 · Always Add Feedback Loops</span>
+        <h1>Close the Loops</h1>
+        <p class="hero__dek">Make every request carry its own proof. Encode how your codebase checks work, feed that evidence back to the agent, and resolve failures until the whole validation stack is green.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 53:52</li>
+          <li>Lab · 90–150 min</li>
+          <li>Course repo · tac/tac-5</li>
+          <li>Level · operator → workflow designer</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to write a closed-loop prompt from memory, choose validators across six failure classes, explain why tests carry standards across fresh context windows, trace the bounded <code>adw_test</code> node, and grade an out-loop result from saved evidence rather than intuition.</p>
+        <div class="hero-loop" aria-label="Closed-loop prompt anatomy">
+          <article class="hero-loop__step"><strong>Request</strong><p>State the valuable change and its boundary.</p></article>
+          <article class="hero-loop__step"><strong>Validate</strong><p>Run commands and tools that expose reality.</p></article>
+          <article class="hero-loop__step"><strong>Resolve</strong><p>Repair every failure, then repeat the sweep.</p></article>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation</a></li><li><a href="#valuable-work">The validation question</a></li><li><a href="#always-feedback">Always add feedback</a></li><li><a href="#three-loops">Three loop positions</a></li><li><a href="#closed-prompt">Request · validate · resolve</a></li><li><a href="#stack-confidence">Stack confidence</a></li><li><a href="#browser-validator">Browser as validator</a></li><li><a href="#template-loops">Template the loops</a></li><li><a href="#adw-test">The isolated test node</a></li><li><a href="#observe">Observe the failure</a></li><li><a href="#adoption">Move outward safely</a></li><li><a href="#current-practice">Current practice</a></li><li><a href="#lab">Graded lab</a></li><li><a href="#mastery">Cumulative mastery</a></li><li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">A result without evidence is unfinished work</h2>
+        <p class="section-lead">An agent removes an endpoint, rewrites an import, adds a button, and reports success. The diff looks plausible. The real question is still unanswered: did the change do what you designed it to do, and did it break anything else?</p>
+
+        <p>TAC-5 begins by changing what counts as valuable. Code, architecture, systems, plans, and features are means. The value arrives as an experience in a user’s hands. Validation is therefore not cleanup after engineering; it is the act that establishes whether engineering produced value. If your proof method is opening the browser and clicking the same path again, you possess useful knowledge—but that knowledge is trapped in your attention.</p>
+        <p>The lesson’s move is to make that knowledge executable. Write down how you would validate each class of work. Turn each answer into a command or tool call. Put those validators inside the prompt. Let their observations return to the agent. Require resolution and a fresh validation sweep. Then preserve the pattern in reusable templates and wrap it in an isolated workflow with bounded retries, structured results, traceable artifacts, and an honest failure state.</p>
+        <p>The course repository makes the whole ladder concrete. Its application is a natural-language-to-SQL system: FastAPI and SQLite on the backend, Vite and TypeScript on the frontend. Around it sits an agentic layer with 21 command templates, three permanent end-to-end specs, two resolver prompts, Playwright MCP, five ADW scripts, five lifecycle hook events, and the 1,106-line <code>adws/adw_test.py</code> node. This is not a generic testing survey. It is one codebase teaching how validation becomes part of an agentic system.</p>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The chapter’s one-sentence thesis</p>
+          <p>For every valuable request, encode the checks that would prove it works, let the agent use their feedback to repair the work, and keep the loop observable and bounded until every required check is green or the system reports an honest failure.</p>
+        </aside>
+
+        <h3>What you are training</h3>
+        <ul class="learning-objectives">
+          <li><strong>Specification</strong>Turn a human validation ritual into explicit commands, tool calls, expectations, and evidence.</li>
+          <li><strong>Coverage</strong>Stack validators that catch different failure classes rather than repeating the same weak signal.</li>
+          <li><strong>Control</strong>Separate deterministic sequencing and retry bounds from agentic diagnosis and repair.</li>
+          <li><strong>Trust</strong>Trace success or failure through issue comments, prompts, raw output, screenshots, commits, and pull requests.</li>
+        </ul>
+
+        <h3>How the learning loop works</h3>
+        <p>Each major idea follows the same ten moves: encounter a concrete failure, see a picture, follow one timestamped story, name the idea, walk the real codebase, perform a small task, repair a common failure, place the lesson in current practice, retrieve it without looking, and teach it back. Do not skip the retrieval disclosures. Recognition feels fluent; closed-book reconstruction reveals whether you can operate the idea.</p>
+
+        <div class="callout callout--warning">
+          <p class="callout__label">Lab boundaries</p>
+          <p>Every exercise stays inside the TAC-5 course codebase. Type zero application code by hand; route mutations through prompts. Every prompt you fire carries a validation block. Review command templates and permissions before executing them, and use a repository copy you control for issue, branch, push, and pull-request drills.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="valuable-work">
+        <span class="section-number">01</span>
+        <h2 class="section-title">Ask the core validation question</h2>
+        <p class="section-lead">The entire lesson is an answer to one question. If you treat it as philosophy, nothing changes. If you answer it with commands, your codebase gains an executable definition of “ready.”</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The feature that exists only in the diff</h3>
+          <p>A change can be elegant and still fail the person it was built for. The server imports. The types look tidy. The pull request explains the intention. Yet the query button may do nothing, the API may return 500, the generated SQL may be unsafe, or an unrelated upload path may have regressed. When the team calls the code itself “the valuable work,” those failures become someone else’s problem—usually the user’s.</p>
+          <p>Dan’s opening reframes the asset: the most valuable contribution is the experience created for users. That makes the engineer’s highest-value move proving the work behaves as intended. The uncomfortable follow-up is that many engineers still supply this proof by manually opening the browser and repeating familiar clicks. The knowledge is good. The delivery mechanism wastes scarce attention.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — validation as a menu</p>
+          <h3>Different work demands different evidence</h3>
+          <div class="validation-menu" aria-label="Examples of validation mechanisms named in the lesson">
+            <article><h4>Code signals</h4><p>Linter, unit tests, syntax compilation, type checks, and production builds turn repository rules into fast feedback.</p></article>
+            <article><h4>System signals</h4><p>Integration and CI/CD checks, log inspection, and absence of monitored errors test the running system around the diff.</p></article>
+            <article><h4>Experience signals</h4><p>UI tests, browser-driving end-to-end checks, custom evals, and model judging can inspect behavior closer to the user.</p></article>
+          </div>
+          <p>These are examples from the narration, not a claim that TAC-5 implements every service named. The course codebase encodes the first and third columns directly; the broader menu shows that any repeatable check can become a candidate tool call.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the load-bearing slide</p>
+          <h3>One question becomes the chapter’s contract</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-5-close-the-loops/t0105-core-validation-question.jpg" alt="Course slide asking how an engineer would test and validate a production-ready unit of valuable work" loading="lazy">
+            <figcaption><span class="frame-card__t">1:45</span>The load-bearing question. The next move is not to agree with it; it is to answer it for each work class and encode each answer.</figcaption>
+          </figure>
+          <p>At 1:37 the question appears: given production-ready valuable work, how would the engineer test and validate it? At 1:50 Dan supplies the operational clause: answer it for every class of work the codebase handles, then encode those answers as commands or tool calls. The question converts tacit judgment into an interface an agent can use.</p>
+          <p>This is also where architecture becomes leverage. A codebase with clear seams, deterministic setup, fast commands, and observable outputs is easier for an agent to validate. A net-new codebase can install those properties early. An existing codebase can still move toward them, but the missing commands are architectural work—not a prompting failure.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s term</p>
+          <h3>The core validation question</h3>
+          <aside class="callout callout--term"><p class="callout__label">Canonical form</p><p><strong>The core validation question:</strong> “Given a unit of valuable work that’s production ready, how would you, the engineer, test and validate this work?”</p></aside>
+          <p>In plain language: what observable facts would make you willing to say this result works? “I would review it carefully” is not yet executable. “Run <code>uv run pytest</code>, build the client, reset the database, drive one precise query, and keep the screenshots” gives the system actions and evidence.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — the TAC-5 validation menu</p>
+          <h3>Translate one repository into proof-producing commands</h3>
+          <div class="evidence-table-wrap"><table><thead><tr><th>Work surface</th><th>Validator in TAC-5</th><th>Failure class exposed</th><th>Evidence</th></tr></thead><tbody>
+            <tr><td>Python source</td><td><code>cd app/server &amp;&amp; uv run ruff check .</code></td><td>Unused imports, ordering, static-quality errors</td><td>Exit status and diagnostics</td></tr>
+            <tr><td>Backend behavior</td><td><code>cd app/server &amp;&amp; uv run pytest</code></td><td>Business rules, security, file and API regressions</td><td>Collected test results</td></tr>
+            <tr><td>Python syntax</td><td><code>uv run python -m py_compile server.py</code></td><td>Malformed Python that other checks may not reach</td><td>Clean compilation</td></tr>
+            <tr><td>TypeScript source</td><td><code>cd app/client &amp;&amp; bun tsc --noEmit</code></td><td>Type and module-contract errors</td><td>Compiler result</td></tr>
+            <tr><td>Production client</td><td><code>cd app/client &amp;&amp; bun run build</code></td><td>Bundling and production-compilation failures</td><td>Successful build</td></tr>
+            <tr><td>User path</td><td>Playwright MCP + one deterministic query</td><td>UI, browser, network, rendering, and result mismatch</td><td>Before/after screenshots and seven rows</td></tr>
+          </tbody></table></div>
+          <p>No single row proves the whole experience. Together they answer the question at increasing distances from the source code.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — five-minute artifact</p>
+          <h3>Build the course repository’s class-of-work matrix</h3>
+          <ol><li>Write four rows: backend logic, frontend behavior, cross-stack user path, and agentic-workflow result.</li><li>For each row, copy one exact validator from the TAC-5 repository or its command templates.</li><li>Name the expected evidence, not merely the command.</li><li>Mark any row whose starting state must be reset before the check becomes meaningful.</li><li>Circle the row that still depends on your manual attention. That is the next loop to encode.</li></ol>
+          <p>Pass when another learner could run the matrix without asking what “check it” means.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: answering with intentions</h3>
+          <p><strong>Symptom:</strong> “We should test the backend and click through the UI.” The statement is correct and useless to an unattended workflow. It has no directory, command, starting state, exact expectation, or evidence destination.</p>
+          <p><strong>Fix:</strong> force every answer into five fields: work class, setup state, executable action, precise expectation, retained evidence. If a check cannot be expressed yet, label it architecture work. Do not hide the gap behind a stronger prompt.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The menu widened; the question did not age</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Validation may now be packaged in reusable skills, enforced by hooks, executed in hosted sandboxes, or connected to browser and computer-use tools. Those are delivery choices. Begin with the same invariant: define what would prove each class of work, and make that proof executable.</p><p class="current-practice__source">Course-first rule: learn the explicit commands before hiding them behind packaging.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Close the section before revealing</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Recite the core validation question.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Given a unit of valuable work that is production ready, how would you, the engineer, test and validate this work?</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What deliverable follows the answer?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A per-work-class list of exact commands or tool calls, including starting state, expectation, and evidence.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why is “open the browser and test it” incomplete?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It traps the procedure in human attention and omits a deterministic state, exact actions, assertion, and retained evidence.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Turn philosophy into an interface</h3>
+          <div class="teach-back"><p>Teach the core validation question in ninety seconds. Use the TAC-5 backend as your example and show the difference between “test the server” and a proof-producing command contract.</p><p class="fine">Pass if your listener can name the command, expected signal, and why architecture affects encodability.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="always-feedback">
+        <span class="section-number">02</span>
+        <h2 class="section-title">Make feedback a rule of every prompt</h2>
+        <p class="section-lead">The economics of tests change when agents execute them repeatedly. A validator is no longer a tax on one human run; it becomes reusable judgment inside every agent run.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The prompt that quietly assigns you the last mile</h3>
+          <p>You ask an agent to remove an endpoint. It edits three files and stops. Nothing in the prompt says how to check the import graph, whether the backend suite still passes, or whether the server compiles. The agent may have done exactly what was requested. You still volunteered to become the validator because the request ended before reality could answer.</p>
+          <p>This failure is deceptive because the output can look complete. Open-loop work rarely announces that validation was omitted; it simply transfers the obligation to a later human. The queue grows faster while confidence shrinks.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the tactic card</p>
+          <h3>“Always” means the prompt you are firing now</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/tac-5-close-the-loops/t0230-tactic-always-add-feedback-loops.jpg" alt="Tactic five slide titled Always Add Feedback Loops with daily actions for validation commands, closed-loop prompts, end-to-end tests, chained feedback, and confidence" loading="lazy">
+            <figcaption><span class="frame-card__t">3:50</span>The official tactic card. The course page says “More Compute, More Confidence”; the slide footer uses “Higher Confidence.” The operating idea is the same.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the testing arithmetic changes</p>
+          <h3>One test now pays out across agent executions</h3>
+          <p>Dan treats the familiar debate over how much testing is worth as settled by multiplication. In a human-only workflow, the value of a test is amortized over the times a person remembers to run it. In an agentic workflow, the same test can execute inside every prompt, template, and workflow node. As agent runs increase, the test keeps spending compute to protect standards without spending the engineer’s presence.</p>
+          <p>The claim is not that human review disappears. Dan explicitly says to hand off testing responsibility and teach agents to test, not to stop testing or reviewing. Users remain the ultimate test. The shift is that the next layer of checking can be performed by agents at a scale a person would never sustain manually.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Tactic #5</p>
+          <h3>Always Add Feedback Loops</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s tactic</p><p><strong>Always Add Feedback Loops:</strong> attach validation commands or tool calls to every agentic request so the agent can observe the result, repair failures, and confirm the repair.</p></aside>
+          <p>This is a prompt-structure rule before it is a testing strategy. “Always” can be inspected immediately: does the request in your buffer contain validators and resolution instructions? If not, the loop is open.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — measure the leverage</p>
+          <h3>Feedback moves all four agentic KPIs</h3>
+          <div class="kpi-grid" aria-label="Agentic coding KPI effects of self-validation"><article><b>Attempts <span>↓</span></b><p>Failures are repaired before a human must re-prompt.</p></article><article><b>Size <span>↑</span></b><p>Larger units can be delegated when proof travels with them.</p></article><article><b>Streak <span>↑</span></b><p>More runs finish correctly on the first human request.</p></article><article><b>Presence <span>↓</span></b><p>The system checks routine evidence without continuous supervision.</p></article></div>
+          <p>Consider the endpoint-removal prompt. Adding ruff, pytest, and py_compile raises compute usage. It also gives the agent three opportunities to discover and resolve errors before the engineer returns. The useful unit is not tokens saved; it is confidence gained per unit of scarce human attention.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — two-minute prompt audit</p>
+          <h3>Find the missing loop before firing</h3>
+          <ol><li>Open any TAC-5 task prompt you are about to use.</li><li>Underline the request.</li><li>Box every command or tool call that can falsify success.</li><li>Circle the instruction that tells the agent what to do with a red result.</li><li>If either box or circle is missing, add it before execution.</li></ol>
+          <p>Pass when the prompt could produce evidence and react to it without another human message.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating feedback as a future initiative</h3>
+          <p><strong>Someday testing:</strong> the team agrees tests are important, then fires unvalidated prompts all week. <strong>Human-era ROI:</strong> the team says the suite is too expensive because it imagines one engineer running it once, ignoring the many agent executions it could protect. <strong>Review withdrawal:</strong> the team misreads delegation as permission to accept a green report blindly.</p>
+          <p><strong>Fix:</strong> make validation a firing condition. No request leaves the buffer without its relevant checks. Keep the human review gate, but move routine evidence collection earlier and into the agent’s loop.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Prompts teach judgment; hooks can enforce rails</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>The course keeps validators in prompt text so learners can see observations enter the agent’s work. Current tooling can also run non-negotiable checks after edits or before completion. Use prompt-level loops where judgment and task-specific evidence matter; use hook-level rails where a rule must not be skipped.</p><p class="current-practice__source">Do not move a check into hidden enforcement until you can explain what it proves and how failure returns to the workflow.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the tactic, not the slogan</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Why does agent execution change the ROI of tests?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The same encoded test can run across many agent executions, multiplying its protective value while reducing repeated human presence.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What two ideas does the tactic not imply?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It does not mean humans stop testing or reviewing, and it does not mean validation can be postponed to a future testing initiative.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What is the immediate inspection test?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The prompt about to be fired contains relevant validators and an instruction to resolve failures.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Explain why more compute can mean less presence</h3>
+          <div class="teach-back"><p>Teach Tactic #5 with one KPI. Explain how adding three validators to a prompt can increase compute while reducing attempts or presence.</p><p class="fine">Pass if you preserve human review and distinguish today’s prompt rule from a someday test plan.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="three-loops">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Separate three loop positions</h2>
+        <p class="section-lead">In-loop, out-loop, and closing the loop differ by more than one preposition. One locates the human, one locates the workflow, and one describes the feedback cycle inside the work.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The unattended agent with no way to know it is wrong</h3>
+          <p>A team celebrates that a feature agent now runs on another machine. Nobody watches it. The prompt requests a change, the agent edits, commits, and opens a pull request. There are no validation commands inside the work. The team has moved the human out of the loop without closing any feedback loop. It has not created trusted autonomy; it has created unsupervised risk.</p>
+          <p>The inverse failure is subtler. A team perfects in-loop validators while a person still launches every command, moves every artifact, and waits for every run. The feedback is good, but the presence KPI never moves. The terms need separate names so each architecture gap stays visible.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — three different boundaries</p>
+          <h3>Locate the human, the workflow, and the micro-cycle</h3>
+          <div class="loop-types" aria-label="Comparison of in-loop, out-loop, and closed-loop work">
+            <article><h4>In-loop</h4><p>You sit at the device and trade prompts with the agent. Useful for learning, presenting, exploring, and correcting new loops.</p><code>human ↔ agent ↔ tools</code></article>
+            <article><h4>Out-loop</h4><p>A high-level prompt runs through PITER on an isolated environment. You return to issue evidence and a pull request.</p><code>issue → trigger → environment → review</code></article>
+            <article><h4>Closing the loop</h4><p>Inside either location, the agent calls a validator, observes the result, repairs failure, and repeats until positive or bounded failure.</p><code>action → feedback → resolution ↻</code></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the lesson performs all three</p>
+          <h3>A GitHub issue starts working while Dan teaches</h3>
+          <div class="frame-grid">
+            <figure class="frame-card"><img src="../media/frames/tac-5-close-the-loops/t0700-github-issue-is-the-prompt.png" alt="GitHub new issue form containing adw_plan_build_test, a feature command, and the random natural-language query request" loading="lazy"><figcaption><span class="frame-card__t">11:40</span>Issue #28 is the prompt input: <code>adw_plan_build_test</code>, <code>/feature</code>, and a bounded request for a Generate Random Query button.</figcaption></figure>
+            <figure class="frame-card"><img src="../media/frames/tac-5-close-the-loops/t0725-agent-machine-webhook-trigger.png" alt="Dedicated agent Mac mini terminal running the GitHub webhook listener while the issue is created" loading="lazy"><figcaption><span class="frame-card__t">12:05</span>The trigger and environment become visible: a webhook listener on the dedicated agent machine receives the issue event.</figcaption></figure>
+          </div>
+          <p>At 10:13 Dan starts the out-loop plan→build→test run. He then spends roughly thirty minutes in-loop demonstrating the smaller closed-loop primitives from which that pipeline is built. At 46:32 he returns to a pull request. One lesson can therefore contain all three positions: the teacher is in-loop, the pipeline is out-loop, and each validator inside either workflow closes a micro-loop.</p>
+          <p>The distinction is causal. The out-loop pipeline is trustworthy only to the degree that its internal loops have already been observed and corrected in-loop. Moving execution off-device does not create feedback; it merely changes where the absence of feedback can hurt you.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — canonical definitions</p>
+          <h3>In-loop · out-loop · closing the loop</h3>
+          <aside class="callout callout--term"><p class="callout__label">Keep the terms disjoint</p><p><strong>In-loop:</strong> human and agent exchange prompts at the device. <strong>Out-loop:</strong> a high-level prompt runs through PITER on an isolated environment. <strong>Closing the loop:</strong> an agent uses feedback from a command or tool to resolve its own work.</p></aside>
+          <p>PITER comes from TAC-4: Prompt input, Trigger, Environment, Review. It describes the perimeter around out-loop work. A closed loop describes the action-feedback-resolution mechanism inside a step. You can install either without the other; TAC-5 teaches why you eventually need both.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace issue #28</p>
+          <h3>Classify each event by loop position</h3>
+          <ol><li><strong>Prompt input:</strong> the issue requests a random-query button and names the plan/build/test workflow.</li><li><strong>Trigger:</strong> the GitHub webhook reaches <code>trigger_webhook.py</code> on the agent machine.</li><li><strong>Out-loop execution:</strong> separate plan, build, and test nodes operate while Dan returns to an interactive lesson.</li><li><strong>Closed loops:</strong> the test node runs unit and e2e checks, passes failures to resolver agents, and reruns within fixed bounds.</li><li><strong>Review:</strong> the issue summary and PR return the result to the human—the final test on top of the tests.</li></ol>
+          <p>The middle three steps are often collapsed into “the agent ran.” Keeping them separate tells you where to debug: bad request, absent trigger, unsafe environment, weak validator, unbounded resolver, or poor review evidence.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — classification drill</p>
+          <h3>Label eight events without using “autonomous”</h3>
+          <p>For each event, write <em>in-loop</em>, <em>out-loop</em>, or <em>closed-loop mechanism</em>: chatting after ruff fails; a webhook starting a script; a fresh resolver receiving a failing command; you inspecting a PR; Playwright reading an after screenshot; a cron process polling issues; you manually copying test output into a second prompt; an agent rerunning all checks after a repair.</p>
+          <p>Answers: in-loop; out-loop trigger; closed-loop; out-loop review; closed-loop; out-loop trigger; in-loop but open at the agent level; closed-loop. Explain every answer by who moves information and who performs the feedback cycle.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: scaling location before scaling feedback</h3>
+          <p><strong>Out-loop first:</strong> a webhook and dedicated machine amplify unverified changes. <strong>In-loop forever:</strong> every validator works, but the person remains scheduler and courier. <strong>Terminology blur:</strong> “closed loop” is used as a synonym for “runs without me,” hiding the absence of self-correction.</p>
+          <p><strong>Fix:</strong> prove the micro-loop in-loop, preserve the exact validator and resolution contract in a reusable asset, then move the asset into the out-loop perimeter. Review the first runs heavily and improve the loop before expanding scope.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The environment may be rented; the distinction remains yours</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>The course uses a Mac mini and a webhook tunnel as PITER’s environment and trigger. Hosted actions, managed sandboxes, and background coding surfaces can occupy the same roles. They make out-loop execution easier to rent; they do not close a validation loop on your behalf.</p><p class="current-practice__source">Map the role before choosing the product: prompt input, trigger, environment, review, then the internal feedback cycles.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Separate the terms under pressure</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Can a workflow be out-loop and still open-loop?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Yes. It can run off-device without any validator-feedback-resolution cycle, which is unattended but not self-correcting.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What does PITER describe that a closed loop does not?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The out-loop perimeter: prompt input, trigger, environment, and review.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why learn loops in-loop first?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>You can observe feedback, correct validators and resolution behavior, and earn evidence before unattended execution amplifies the design.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Draw three loops on one page</h3>
+          <div class="teach-back"><p>Teach the three terms using issue #28. Point to the human, the webhook pipeline, and one validator-resolver cycle. End by explaining why “out-loop” is not a synonym for “safe.”</p><p class="fine">Pass if your listener can imagine one out-loop/open-loop counterexample.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="closed-prompt">
+        <span class="section-number">04</span>
+        <h2 class="section-title">Write Request → Validate → Resolve</h2>
+        <p class="section-lead">A closed-loop prompt does not need to be grand. The first one is three lines long, deliberately introduces a defect, and contains the mechanism that catches it.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The “simple change” exemption</h3>
+          <p>Small edits are where feedback disappears first. Comment one line, rename one import, move one call—surely review can wait. But a one-line change can leave a dangling import, violate ordering rules, disable a security check, or break a test far from the edited file. “Simple” describes typing effort, not the size of the reachable behavior.</p>
+          <p>TAC-5 kills the exemption with a prompt so small that validation cannot plausibly be called overhead. The prompt asks for sabotage, runs one linter, and requires resolution. The loop is almost embarrassingly ordinary. That is its strength.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the minimum viable cycle</p>
+          <h3>Three parts, one repeating contract</h3>
+          <div class="rvr-cycle" aria-label="Request validate resolve cycle"><article><b>Request</b><p>Change <code>sql_processor.py</code>: comment out validation.</p></article><article><b>Validate</b><p>Run <code>uv run ruff check .</code> from the server.</p></article><article><b>Resolve</b><p>If any errors appear, fix them and validate again.</p></article></div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — stdout becomes work context</p>
+          <h3>Watch the smallest loop close</h3>
+          <div class="frame-grid">
+            <figure class="frame-card"><img src="../media/frames/tac-5-close-the-loops/t0860-first-closed-loop-prompt.png" alt="VS Code buffer showing the three-line request to comment out SQL validation, run Ruff, and resolve errors" loading="lazy"><figcaption><span class="frame-card__t">14:20</span>The exact minimum artifact: request, validator command, and resolution instruction.</figcaption></figure>
+            <figure class="frame-card"><img src="../media/frames/tac-5-close-the-loops/t0985-ruff-closes-the-loop.png" alt="Claude Code terminal showing Ruff E402 output and the agent reasoning that load_dotenv must move below imports" loading="lazy"><figcaption><span class="frame-card__t">16:25</span>A later stacked run makes the mechanism visible: Ruff reports E402, the diagnostic enters the agent’s working context, and the agent moves the call before rerunning.</figcaption></figure>
+          </div>
+          <p>In the first demo, commenting out <code>validate_sql_query(sql_query)</code> leaves its import unused. Ruff reports the error. The agent receives that observation, removes the dangling problem, and runs the check again. The intelligence is useful, but the loop depends on plumbing: without a validator call, no diagnostic enters the work and no correction is demanded.</p>
+          <p>The second frame is course-era UI, including the “Bypassing Permissions” banner. Treat that surface as period detail. The durable story is command → diagnostic → agent decision → changed file → rerun.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — anatomy</p>
+          <h3>Closed-loop prompt</h3>
+          <aside class="callout callout--term"><p class="callout__label">Request · Validate · Resolve</p><p><strong>Request</strong> states the work. <strong>Validate</strong> specifies the commands and tools that can expose failure. <strong>Resolve</strong> tells the agent to repair every failure and repeat validation.</p></aside>
+          <p>The request may be a one-line mutation or a large feature specification. The anatomy stays stable. “Resolve” is not “make the command green by any means”; later sections add the rule of law and evidence constraints that prevent cheating.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — scale from one to three</p>
+          <h3>Endpoint removal with an ordered validation stack</h3>
+          <pre><code>REQUEST
+Remove the /api/insights endpoint from @app/server/server.py.
+Move load_dotenv() directly below its import.
+
+VALIDATE — run in this order
+1. cd app/server &amp;&amp; uv run ruff check .
+2. cd app/server &amp;&amp; uv run pytest
+3. cd app/server &amp;&amp; uv run python -m py_compile server.py
+
+RESOLVE
+On any error, stop and resolve it. Then rerun every validation
+step from the top; a repair may have broken an earlier check.</code></pre>
+          <p>Ruff catches import ordering. Pytest detects behavior. Pycompile seals syntax. Ordering matters because later repairs can invalidate earlier success. A loop closes only after a complete green sweep, not when the first visible error disappears.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — write before you run</p>
+          <h3>Produce a 30-token closed-loop prompt</h3>
+          <ol><li>Choose one reversible TAC-5 mutation.</li><li>Write one sentence for the request.</li><li>Add the narrowest real repository command that can falsify it.</li><li>Add: resolve every error, rerun the validator, and report the evidence.</li><li>Label the three parts, then remove the labels and confirm the structure is still obvious.</li></ol>
+          <p>Do not execute until a partner can identify all three parts without explanation.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: one repair, one partial rerun</h3>
+          <p><strong>Symptom:</strong> Ruff fails, the agent fixes an import, then resumes at pytest. The repair accidentally introduces another lint error. The prompt reports the later checks green while the full stack is red. <strong>Another symptom:</strong> the validate block says “run tests” without directory or command, so different agents choose different evidence.</p>
+          <p><strong>Fix:</strong> order the checks, stop on a failure where appropriate, resolve immediately, and restart the sweep from the top. Pin the directory and command. Require the final report to name what ran and what passed.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Keep judgment visible; mechanize non-negotiables</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Request–validate–resolve remains the right mental model even when hooks or workflow engines run some checks automatically. Put task-specific expectations in the prompt. Put universal invariants in enforcement rails. In both cases, failure must return as actionable context rather than disappear into a separate dashboard.</p><p class="current-practice__source">The modern surface may hide the command; the feedback contract must remain inspectable.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Reconstruct the smallest loop</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Name the three parts in order.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Request, Validate, Resolve.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What catches the first demo’s sabotage?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Ruff reports the unused import left after <code>validate_sql_query(sql_query)</code> is commented out.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why rerun every validator after a repair?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The repair can break a check that already passed; only a fresh full sweep establishes the combined state.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Teach the loop without mentioning model quality</h3>
+          <div class="teach-back"><p>Explain why the first prompt self-corrects. Your explanation must include the file mutation, Ruff’s observation, how that observation reaches the work, and the rerun.</p><p class="fine">Pass if the mechanism still makes sense with a different capable agent.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="stack-confidence">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Stack confidence across failure classes</h2>
+        <p class="section-lead">A linter can be perfectly green while the business rule is broken. Confidence rises when each validator sees a class of failure the others structurally cannot.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The forgotten sabotage that a fresh agent repairs</h3>
+          <p>Demo one comments out SQL validation. Then the context is cleared. A new agent receives a different endpoint-and-import request. It has no conversational memory of the sabotage. If correctness depended on memory, the defect would survive. Pytest catches it instead. The validator, not the chat history, carries the standard across agents.</p>
+          <p>This is the proof moment for fresh contexts. Clearing memory makes the result stronger, not weaker: it removes the possibility that the agent repaired the defect because it remembered creating it.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — six layers, six kinds of evidence</p>
+          <h3>Build a confidence stack, not a pile of duplicates</h3>
+          <div class="confidence-stack" aria-label="Six validation layers"><article style="--level:0"><h4>Ruff</h4><p>Static quality and import rules.</p><code>ruff check .</code></article><article style="--level:1"><h4>Pytest</h4><p>Backend behavior and regression rules.</p><code>pytest</code></article><article style="--level:2"><h4>Pycompile</h4><p>Python syntax compilation.</p><code>python -m py_compile</code></article><article style="--level:3"><h4>TypeScript</h4><p>Frontend types and contracts.</p><code>bun tsc --noEmit</code></article><article style="--level:4"><h4>Build</h4><p>Production bundling.</p><code>bun run build</code></article><article style="--level:5"><h4>Playwright</h4><p>End-user path and precise result.</p><code>browser evidence</code></article></div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — standards survive the context window</p>
+          <h3>Pytest restores the security call</h3>
+          <figure class="frame-card"><img src="../media/frames/tac-5-close-the-loops/t1030-pytest-catches-sabotage.png" alt="Claude Code diff restoring validate_sql_query and its SQLSecurityError import before rerunning pytest" loading="lazy"><figcaption><span class="frame-card__t">17:10</span>A fresh agent restores <code>validate_sql_query(sql_query)</code> and the associated import, then runs pytest again. The test suite—not memory—preserves the rule.</figcaption></figure>
+          <p>Ruff first catches the load-dotenv ordering mistake. During repair the agent briefly creates duplicate imports; it reruns and corrects them. Pytest then reaches the older sabotage, restores the validation call, and reruns. Pycompile checks that the final server module compiles. The imperfections are instructive: a loop need not avoid every wrong move; it must expose and correct wrong moves before claiming completion.</p>
+          <p>By 25:20 the lesson counts six buckets. “Pytest” represents many tests but one feedback class in the stack. The browser check sits furthest from source and closest to the user. Confidence is the combined coverage, not the prestige of one tool.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — rule and metaphor</p>
+          <h3>Stacking the confidence · tests as the rule of law</h3>
+          <aside class="callout callout--term"><p class="callout__label">Architecture decree</p><p><strong>Stacking the confidence</strong> adds checks across disjoint failure classes. <strong>Tests as the rule of law</strong> means red evidence stops the work; if a test is genuinely wrong, correct the test visibly rather than routing around it.</p></aside>
+          <p>Tests are not infallible. “Rule of law” describes how disagreement is handled. A red test is evidence requiring diagnosis. Deleting it, weakening it, or skipping it merely to produce green destroys the meaning of every future run.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — one defect, several blind spots</p>
+          <h3>Ask what each layer cannot see</h3>
+          <div class="evidence-table-wrap"><table><thead><tr><th>State</th><th>Could pass</th><th>Check that exposes it</th></tr></thead><tbody><tr><td>Security validation call commented out; import cleaned up</td><td>Ruff and pycompile</td><td>Behavioral pytest</td></tr><tr><td>Python backend green; TypeScript call shape wrong</td><td>All backend checks</td><td><code>bun tsc --noEmit</code></td></tr><tr><td>Types green; Vite production bundle broken</td><td>Type check</td><td><code>bun run build</code></td></tr><tr><td>Both projects compile; Query button fails at runtime</td><td>Lint, unit, type, build</td><td>Playwright e2e</td></tr><tr><td>Seven-row assertion run against polluted state</td><td>Commands may all execute</td><td>Database reset plus precise e2e expectation</td></tr></tbody></table></div>
+          <p>The stack is ordered partly by cost and partly by dependency. Fast failures should surface early. Expensive browser evidence should run only when cheaper foundations are green.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — coverage map</p>
+          <h3>Defend every validator’s place</h3>
+          <ol><li>Write the six validators in order from memory.</li><li>Beside each, name one defect it can expose that the previous layer cannot.</li><li>Cross out any explanation that merely says “more confidence.” Replace it with a failure class.</li><li>Mark the checks that require a particular starting state.</li><li>Explain why e2e belongs after green unit checks in <code>adw_test.py</code>.</li></ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: green by negotiation</h3>
+          <p><strong>Single-validator confidence:</strong> Ruff is green, so the feature is declared safe. <strong>Red-test bargaining:</strong> the agent deletes the assertion or adds a skip. <strong>Expensive-first ordering:</strong> the browser run burns time before syntax or unit failure is known. <strong>Memory dependence:</strong> validation instructions assume the current chat remembers prior defects.</p>
+          <p><strong>Fix:</strong> map disjoint failure classes, protect test intent, order cheap prerequisites before expensive paths, and use <code>/clear</code> to prove that standards live in repository evidence rather than conversation.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Enforcement is stronger; the law still needs a legislature</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Hooks can gate completion on green checks, and structured workflows can prevent e2e from running before unit success. Those rails enforce the current law. Humans still decide what the tests mean, review changes to tests, and update wrong tests explicitly.</p><p class="current-practice__source">A hard gate around a weak assertion only enforces the wrong rule more reliably.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the proof moment</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Name the six validation buckets in order.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Ruff, pytest, Python py_compile, TypeScript no-emit check, frontend production build, Playwright end-to-end.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why did <code>/clear</code> strengthen the sabotage demonstration?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The fresh agent had no memory of the sabotage; the test suite alone carried the standard and exposed the defect.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What happens when a test is genuinely wrong?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Diagnose and correct the test visibly, preserving review of the rule change; never silently route around red.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Defend the stack to a skeptic</h3>
+          <div class="teach-back"><p>A colleague says, “If pytest passes, the browser test is redundant.” Use one TAC-5 failure class to rebut them, then state the rule of law and its wrong-test corollary.</p><p class="fine">Pass if your argument is about distinct observability, not “more tests are always better.”</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="browser-validator">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Turn the browser into a validator</h2>
+        <p class="section-lead">The manual ritual dismissed at minute three returns at minute twenty as a tool call: open the app, take a before image, perform the user action, take an after image, and judge a precise result.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>Everything compiles; the button still does nothing</h3>
+          <p>Static checks can prove imports, types, syntax, tests, and builds while missing the path a user actually takes. The client may render a button whose event handler never reaches the server. The server may return data the interface fails to display. The right rows may exist while the loading state makes the input unusable. A stack that stops before the browser can certify code and miss experience.</p>
+          <p>The old answer was human click-through. It is valuable because it crosses layers. It is expensive because a person must repeat it. Browser control converts that tacit multi-step check into an executable specification with retained evidence.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — an evidence-producing user path</p>
+          <h3>State → action → result → judgment</h3>
+          <div class="browser-loop" aria-label="Five-step browser validation loop"><article><h4>Reset</h4><p>Restore the known SQLite database.</p></article><article><h4>Before</h4><p>Open localhost and save a screenshot.</p></article><article><h4>Act</h4><p>Enter the exact natural-language query and click Query.</p></article><article><h4>After</h4><p>Save a second screenshot with the results.</p></article><article><h4>Judge</h4><p>Read both images and confirm exactly seven rows.</p></article></div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the full validation prompt</p>
+          <h3>The toy loop scales into a reusable codebase asset</h3>
+          <figure class="frame-card"><img src="../media/frames/tac-5-close-the-loops/t1200-full-validation-prompt-e2e.png" alt="Reusable Validation prompt showing backend, frontend, and six Playwright end-to-end steps ending with confirmation of seven results" loading="lazy"><figcaption><span class="frame-card__t">20:00</span>The complete reusable prompt: backend checks, frontend checks, then six browser steps with before/after screenshots and a precise seven-result assertion.</figcaption></figure>
+          <p>Playwright MCP opens <code>localhost:5173</code>, writes <code>e2e_before.png</code>, enters “select newest 7 products sort by price desc,” clicks Query, writes <code>e2e_after.png</code>, and lets the agent read both images. The agent confirms seven returned rows. Dan then performs the ultimate spot-check: he copies the generated SQL from the evidence into the live app and sees the identical result.</p>
+          <p>The before image reveals a second issue: junk tables such as <code>test</code> and <code>data___DROP_TABLE_users___</code>. The test system is polluting the live SQLite database. That discovery becomes input to the later <code>/bug</code> planning demonstration. One well-instrumented e2e loop can validate the intended path and expose a side effect outside the original request.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — end-to-end</p>
+          <h3>Precise behavior from a known state</h3>
+          <aside class="callout callout--term"><p class="callout__label">End-to-end test</p><p>A browser-driven specification that starts from known application state, performs user-visible actions, captures evidence, and verifies a precise result across the running stack.</p></aside>
+          <p>“The page looked right” is not a precise result. “After a database reset, this exact query produces exactly seven displayed rows, with before and after screenshots retained” is. The assertion is only as trustworthy as its starting state.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — make seven meaningful</p>
+          <h3>Determinism is part of the assertion</h3>
+          <ol><li>From the repository root, run <code>sh scripts/reset_db.sh</code>. This is setup, not a seventh validator.</li><li>Run the backend and frontend checks so the browser does not inherit a cheaper known failure.</li><li>Ask Playwright to open the app with the course’s isolated, headless 1920×1080 configuration.</li><li>Capture the blank/ready state before acting.</li><li>Use the exact natural-language query from the reusable prompt.</li><li>Capture the result state, read both images, and count seven rows.</li><li>Keep the filenames in the report so another reviewer can inspect the same evidence.</li></ol>
+          <p>If the reset is skipped, seven might be accidental. If the screenshots are not retained, the agent’s judgment cannot be audited. If the expectation is vague, a tool can complete every action without proving the experience.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — evidence critique</p>
+          <h3>Find the missing contract field</h3>
+          <p>Critique each e2e instruction: “make sure search works”; “open the page and screenshot it”; “run the seven-product query”; “confirm seven results against whatever database is running”; “reset, act, screenshot after, report pass.” For each, name the missing state, action, expectation, or evidence.</p>
+          <p>Then rewrite one into the course shape: known database, exact URL, exact input, exact interaction, before/after artifacts, exact row count, and resolution instruction.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: nondeterministic confidence theater</h3>
+          <p><strong>Unknown state:</strong> the database still contains pollution from a previous pytest run. <strong>Action without assertion:</strong> screenshots exist, but nobody reads them. <strong>Tiny-app dismissal:</strong> because the demo offers few actions, the team assumes the pattern will not scale. <strong>Artifact loss:</strong> the report says passed while evidence is overwritten or stored nowhere.</p>
+          <p><strong>Fix:</strong> reset first, specify one precise behavior, retain artifacts under the run identity, and scale by composing more focused specs—not by making one enormous ambiguous browser script.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Playwright remains one strong route, not the only route</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>The course’s Playwright MCP configuration remains a clear worked example. Browser validation can also use computer-use tools, developer-tools integrations, or hosted browser sandboxes. Preserve the invariant across surfaces: deterministic state, explicit actions, precise expectation, retained evidence.</p><p class="current-practice__source">Tool choice is replaceable; an auditable user-path contract is not.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Reconstruct the six browser steps</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What exact query does the reusable prompt use?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>select newest 7 products sort by price desc</code>.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What artifacts make the judgment reviewable?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>e2e_before.png</code> and <code>e2e_after.png</code>, read by the agent and retained for a reviewer.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What makes “seven” trustworthy?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>scripts/reset_db.sh</code> restores a known database state immediately before the validation sweep.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Teach why a screenshot is not yet a test</h3>
+          <div class="teach-back"><p>Explain the browser loop to someone who already uses Playwright. Emphasize the database reset, exact query, before/after evidence, and precise row assertion.</p><p class="fine">Pass if your listener can identify why an unreset database invalidates the result.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="template-loops">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Template validation by default</h2>
+        <p class="section-lead">“Always” is fragile when it depends on memory. Put validation into the prompts that generate plans so every future bug, feature, and chore inherits the codebase’s evidence rules.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The disciplined engineer on an undisciplined Tuesday</h3>
+          <p>On Monday you remember to add pytest, TypeScript, build, reproduction commands, and a UI test. On Tuesday the issue queue is loud, so the prompt says only “fix the bug.” The result is not a different engineering philosophy; it is a different level of care produced by available attention. A practice that disappears under load is not yet a system.</p>
+          <p>The course removes “remember validation” from the human checklist. It encodes validation in <code>/bug</code>, <code>/feature</code>, and related planning templates. Those templates create plans whose last step is proof.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — three altitudes of the same loop</p>
+          <h3>Prompt, generated plan, workflow node</h3>
+          <div class="altitude-map" aria-label="Three altitudes for validation"><article><h4>Single request</h4><p>A scratch prompt carries request, commands, and resolution. Best for learning the primitive.</p></article><article><h4>Meta prompt</h4><p><code>/bug</code> or <code>/feature</code> creates a plan with validation commands and conditional e2e work.</p></article><article><h4>ADW node</h4><p>Deterministic code executes tests, dispatches resolvers, records evidence, and reports bounded success or failure.</p></article></div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the plan format carries the law</p>
+          <h3>Validation survives prompt generation</h3>
+          <figure class="frame-card"><img src="../media/frames/tac-5-close-the-loops/t1760-bug-plan-validation-commands.png" alt="bug.md plan format showing validation commands, reproduce-before and after placeholders, default pytest, TypeScript, build commands, and conditional end-to-end test instructions" loading="lazy"><figcaption><span class="frame-card__t">29:20</span>The <code>/bug</code> meta prompt bakes <code>## Validation Commands</code> into every generated plan and conditionally requires a new e2e spec for UI-affecting work.</figcaption></figure>
+          <p>Dan runs <code>/bug</code> for the junk-table problem. The issue is backend-only: one integration test writes to the production SQLite connection instead of the isolated pattern used by other tests. The generated plan includes reproduction, root-cause analysis, targeted checks, and the standard backend/frontend validations. It correctly omits an e2e task because the bug does not affect the UI.</p>
+          <p>A second UI task—disable the query input while a query runs and add a debounce—does cross the user-interaction boundary. The template should therefore add a task to create a new <code>.claude/commands/e2e/test_&lt;name&gt;.md</code> specification. The conditional is as important as the defaults: always running e2e is wasteful; failing to require it for user-visible work leaves the strongest gap open.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — meta prompt</p>
+          <h3>Templating our engineering</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s terms</p><p><strong>Meta prompt:</strong> a prompt that creates another prompt or plan. <strong>Templating our engineering:</strong> encoding how the codebase should plan, build, and validate so agents repeat the desired process by default.</p></aside>
+          <p>The generated plan is a durable boundary. A fresh implementer can read it without inheriting the planner’s conversation. The validation section carries standards across that context boundary just as pytest carried the SQL security rule across <code>/clear</code>.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — use the real signature</p>
+          <h3>Plan bug 111 without dropping the issue payload</h3>
+          <pre><code>/bug 111 adw111 '{"title":"Tests pollute production SQLite","body":"The malicious-filename integration test writes a junk table to app/server/db/database.db. Isolate that test using existing in-memory or temporary database patterns."}'</code></pre>
+          <p>The third argument matters: <code>.claude/commands/bug.md</code> declares <code>issue_number</code>, <code>adw_id</code>, and <code>issue_json</code>. A two-argument reproduction is incomplete. After generation, audit the plan before implementation:</p>
+          <ol><li><code>## Validation Commands</code> exists.</li><li>Reproduce-before and reproduce-after commands list SQLite tables, not <code>git status</code>; <code>database.db</code> is ignored.</li><li>The targeted test is <code>tests/test_sql_injection.py::test_integration_upload_malicious_filename</code>.</li><li>The expected post-fix table invariant is exactly <code>products,users</code>.</li><li>No e2e task appears because the defect is test isolation, not user interaction.</li></ol>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — audit the conditional</p>
+          <h3>Grade two plans before any agent implements them</h3>
+          <p>Generate one backend-only plan and one UI-affecting plan in the TAC-5 copy. For each, underline the validation block, the reproduction commands, and the final full sweep. Then inspect the UI plan for the required new e2e-file task and the backend plan for its correct omission.</p>
+          <p>Pass when you can say not only “the template included tests,” but “the conditional matched the work surface and the evidence would falsify this exact bug.”</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: a template that is trusted but not audited</h3>
+          <p><strong>Manual repetition:</strong> validators are copied by hand into every task and slowly drift. <strong>Rubber stamp:</strong> a UI plan omits e2e, but the engineer assumes the template must know best. <strong>Wrong oracle:</strong> a plan uses <code>git status</code> to check an ignored database. <strong>Context pollution:</strong> plan and implementation share a long session, masking what the plan actually carries.</p>
+          <p><strong>Fix:</strong> centralize defaults, keep conditionals explicit, audit every generated plan against the work surface, use repository-real oracles, and start implementers fresh with the plan artifact as their input.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Reusable prompts now have first-class packaging</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>The course’s command templates expose every instruction plainly. Agent Skills package the same idea with discoverable instructions, reusable resources, and composition. The concept maps directly: encode the validation workflow once, load it for the right task, and keep evidence rules near the codebase.</p><p class="current-practice__source">Packaging improves discovery; it does not rescue a vague validator or wrong oracle.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the guarantee and the condition</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What does <code>/bug</code> guarantee in every generated plan?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A <code>## Validation Commands</code> section with reproduction-specific checks and the default pytest, TypeScript, and build validations.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. When is a new e2e specification required?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>When the bug affects the UI or user interactions.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What arguments does the real <code>/bug</code> template require?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Issue number, ADW ID, and an issue JSON payload containing the title and body.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Explain how “always” survives Tuesday</h3>
+          <div class="teach-back"><p>Teach the chain from <code>/bug</code> to generated plan to fresh <code>/implement</code> agent. Include the backend/UI conditional and the junk-table oracle correction.</p><p class="fine">Pass if your listener can explain why <code>git status</code> is the wrong evidence for an ignored database.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="adw-test">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Isolate testing as an ADW node</h2>
+        <p class="section-lead">The test step becomes a reusable machine: deterministic code owns sequencing, gates, retries, and exit status; fresh agents own diagnosis and repair inside those boundaries.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The build agent that tests until the context turns to soup</h3>
+          <p>One agent plans, implements, runs every test, diagnoses every failure, repairs the code, reruns the browser, writes the summary, commits, and opens the pull request. The design feels simple because it has one entry point. Internally it mixes incompatible responsibilities, accumulates context, and gives deterministic control to a stochastic conversation. When the fifth test fails, nobody knows which prior assumption polluted the repair.</p>
+          <p>TAC-5 takes the opposite approach. Testing is its own SDLC node, independently invokable and independently improvable. Each failure can receive a fresh resolver context. Ordinary Python code decides how many times the loop may run and when it must stop honestly.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — code decides, agents judge</p>
+          <h3>A deterministic shell around agentic resolution</h3>
+          <div class="adw-control" aria-label="Control split in adw_test"><article><h4>Inputs</h4><p>Issue, branch state, ADW ID, command templates, and repository paths.</p><code>issue → state → prompts</code></article><article class="adw-control__code"><h4>Deterministic controller</h4><ol><li>Run test contract</li><li>Parse results</li><li>Dispatch fresh resolvers</li><li>Count rounds</li><li>Gate e2e</li><li>Summarize and exit</li></ol></article><article><h4>Agent judgment</h4><p>Interpret one failure, reproduce with its command, make the smallest repair, and return evidence.</p><code>failure → diagnosis → fix</code></article></div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the loop becomes code</p>
+          <h3>The 1,106-line test node exposes its control boundary</h3>
+          <figure class="frame-card"><img src="../media/frames/tac-5-close-the-loops/t2460-adw-test-resolution-loop.png" alt="adw_test.py run_tests_with_resolution function showing a while loop bounded by MAX_TEST_RETRY_ATTEMPTS and a call to run_tests" loading="lazy"><figcaption><span class="frame-card__t">41:00</span><code>run_tests_with_resolution</code> makes the split visible: Python counts attempts and calls the test runner; fresh agents handle individual failing results.</figcaption></figure>
+          <p>The controller asks <code>/test</code> to execute the five command checks and return only a JSON array. Each record carries <code>test_name</code>, <code>passed</code>, <code>execution_command</code>, <code>test_purpose</code>, and optional <code>error</code>. Failures sort first. Each failure is handed to a fresh <code>/resolve_failed_test</code> agent, which must reproduce the problem using the supplied command before making a minimal fix.</p>
+          <p>The unit loop runs at most four rounds and stops early if a round resolves nothing. End-to-end begins only when unit checks are green and <code>--skip-e2e</code> is absent. E2e specs run one file at a time; the controller stops at the first failure, gives it to <code>/resolve_failed_e2e_test</code>, and permits at most two rounds. Finally the node posts a test summary, attempts the repository’s commit/PR path when there are tracked changes, and exits nonzero if failures remain.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — isolated node</p>
+          <h3>AI Developer Workflow</h3>
+          <aside class="callout callout--term"><p class="callout__label">ADW</p><p>An <strong>AI Developer Workflow</strong> is deterministic code that composes agents, prompts, tools, state, and return contracts into a reusable SDLC node. Here, test is isolated from plan and build.</p></aside>
+          <p>Isolation is not duplication. <code>adw_plan_build_test.py</code> composes the plan, build, and test scripts while sharing one ADW ID and state file. Each node can still be called or improved separately.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — walk the exact state machine</p>
+          <h3>Unit gate before browser cost</h3>
+          <ol><li>Fetch the issue and prepare the state branch.</li><li>Run <code>/test</code>; parse its machine-readable array.</li><li>For each failed record, create a resolver agent named by attempt and index.</li><li>Give that agent the exact <code>execution_command</code> and purpose.</li><li>Rerun the test contract; repeat up to four rounds, but stop if nothing was resolved.</li><li>If unit checks remain red, do not start e2e.</li><li>If green and not skipped, glob <code>.claude/commands/e2e/*.md</code> from the repository root.</li><li>Run specs until the first failure, resolve it, and retry up to two rounds.</li><li>Post the 📊 summary and retain per-agent prompts and raw output.</li><li>Return an honest exit code.</li></ol>
+          <p>Run the script from the TAC-5 repository root as <code>uv run adws/adw_test.py &lt;issue-number&gt;</code>. Running from <code>adws/</code> breaks root-relative commands and makes the e2e glob find zero specs. The repository README shape is not a substitute for reading path-sensitive code.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — paper execution</p>
+          <h3>Trace a mixed failure without spending tokens</h3>
+          <p>Suppose <code>/test</code> returns one lint failure and one frontend-build failure. Round one fixes lint but not build. Round two resolves nothing. Draw every controller decision. Does e2e run? How many resolver agents were created? What does the final exit status communicate?</p>
+          <p>Answer: the controller runs unit resolution, stops after the second round because nothing was resolved, never starts e2e because unit checks are not green, posts the remaining failure, and exits nonzero. Resolver count depends on returned failures per round, but each dispatch is fresh and separately named.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: unbounded “self-healing”</h3>
+          <p><strong>One giant agent:</strong> context and duties blur. <strong>Unlimited retries:</strong> an infrastructure error burns tokens forever. <strong>E2e before unit green:</strong> expensive evidence runs on a known-broken foundation. <strong>Current-directory drift:</strong> the script silently finds no specs. <strong>PR promise on a clean node:</strong> testing creates only ignored artifacts, so there may be no tracked commit to open a PR from.</p>
+          <p><strong>Fix:</strong> isolate the node, bound it at four and two, stop when no progress occurs, gate expensive checks, run from the repository root, and grade a standalone clean test run on evidence—not on a guaranteed commit or pull request.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The JSON-you-hope-parses has a typed successor</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>The course asks for “ONLY JSON” and parses text. Current agent SDKs can enforce schema-shaped structured outputs, session management, hooks, and subagent boundaries more directly. The durable contract is unchanged: deterministic code owns control flow; agents return narrow judgments.</p><p class="current-practice__source">A stronger transport hardens the boundary; it does not decide the retry policy for you.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Rebuild the controller from memory</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What are the unit and e2e retry bounds?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>At most four unit-resolution rounds and two e2e-resolution rounds.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What gates e2e?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>All unit checks must be green, and <code>--skip-e2e</code> must not be set.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why does each JSON result carry <code>execution_command</code>?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A resolver can reproduce the exact failing check, and a human can rerun the same evidence without reconstructing it.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. From which directory must the script run?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The TAC-5 repository root, so root-relative test commands and the e2e glob resolve.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Explain the control split with one failure</h3>
+          <div class="teach-back"><p>Teach how a failed frontend build moves through <code>/test</code>, JSON, one fresh resolver, a rerun, the unit gate, and eventual summary. Name every decision made by Python and every judgment made by the agent.</p><p class="fine">Pass if you include the 4/2 bounds and honest nonzero exit.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="observe">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Adopt the agent’s perspective</h2>
+        <p class="section-lead">An out-loop system earns trust when every verdict can be traced to the prompt, observation, agent, command, and artifact that produced it. “FAILED” is a starting point, not a diagnosis.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The red status that triggers a blind rerun</h3>
+          <p>The out-loop run returns “Overall Status: FAILED.” The feature appears in a pull request. Unit checks are green. Two of three end-to-end specs pass. A third reports a Claude Code error. An impatient operator clicks rerun and hopes the second attempt goes green. If it does, the system learns nothing. If it fails again, the team still knows nothing.</p>
+          <p>A trustworthy loop must fail loudly and leave enough state to explain itself. Otherwise green is equally untrustworthy: there is no way to know what actually ran, what an agent saw, or why it claimed success.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — a trace, not a transcript</p>
+          <h3>Follow one identity through four evidence layers</h3>
+          <div class="trace-map" aria-label="ADW observability layers"><article><h4>Issue feed</h4><p>Prefixed progress and summary comments.</p><code>{adw_id}_{agent}</code></article><article><h4>Agent prompt</h4><p>The exact request and failure payload.</p><code>prompts/*.txt</code></article><article><h4>Raw output</h4><p>Tool events, model output, and infrastructure errors.</p><code>raw_output.jsonl</code></article><article><h4>Review artifact</h4><p>Branch, commit, screenshots, and pull request.</p><code>PR + img/</code></article></div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — diagnose the demo failure</p>
+          <h3>Ninety seconds from red summary to infrastructure verdict</h3>
+          <figure class="frame-card"><img src="../media/frames/tac-5-close-the-loops/t2925-agent-log-trace-500.png" alt="Agent machine showing the agents ce364af1 directory tree and the saved e2e test resolver prompt for the failed complex query test" loading="lazy"><figcaption><span class="frame-card__t">48:45</span>The frame shows the resolver’s saved payload and agent tree. The associated raw output—not the visible screenshot alone—establishes the API 500.</figcaption></figure>
+          <p>The issue summary says unit checks passed and e2e finished two of three. The failed spec is <code>test_complex_query</code>. Dan copies ADW ID <code>ce364af1</code> from the run and opens <code>agents/ce364af1/e2e_test_resolver_iter1_0/</code>. The saved prompt shows exactly what the resolver was asked to fix. Its raw output shows an Anthropic API error 500: an infrastructure overload, not a product assertion failure.</p>
+          <p>The resolver cannot repair a provider outage. The bounded loop reports failure honestly. Dan then reviews the application on the agent machine; the new feature works, including a complex query and correct rows. The human notices a loading-state nit that can become a future test. Human judgment returns at the end, informed by system evidence.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — observability and tracing</p>
+          <h3>Know what was inside every agent</h3>
+          <aside class="callout callout--term"><p class="callout__label">Adopt your agent’s perspective</p><p><strong>Observability</strong> makes internal work inspectable. <strong>Tracing</strong> connects a run identity across issue comments, agent prompts, raw events, screenshots, commits, and review artifacts.</p></aside>
+          <p>The goal is not to save everything forever. It is to preserve enough causal evidence that a reviewer can distinguish product failure, test failure, environment failure, provider failure, and controller failure without interrogating a vanished context window.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — the diagnosis worksheet</p>
+          <h3>Move from surface verdict to owning layer</h3>
+          <div class="evidence-table-wrap"><table><thead><tr><th>Question</th><th>Artifact</th><th>Demo answer</th></tr></thead><tbody><tr><td>Which run and agent failed?</td><td>Issue comment prefix and summary</td><td><code>ce364af1</code>, e2e complex-query path</td></tr><tr><td>What did the resolver receive?</td><td><code>prompts/resolve_failed_e2e_test.txt</code></td><td>Failed <code>test_complex_query</code> payload</td></tr><tr><td>What happened during execution?</td><td><code>raw_output.jsonl</code></td><td>Anthropic API error 500</td></tr><tr><td>Was the product behavior actually absent?</td><td>Running app and PR review</td><td>Feature produced a complex query and rows</td></tr><tr><td>What should change?</td><td>Judgment from evidence</td><td>Do not patch product code for provider overload; retain honest failure</td></tr></tbody></table></div>
+          <p>A rerun may be reasonable after the diagnosis. It is not a substitute for diagnosis. The evidence changes the action from “fix whatever is red” to “classify an external transient and preserve the verdict.”</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — local trace walk</p>
+          <h3>Diagnose without asking the agent</h3>
+          <ol><li>Choose one course-run ADW ID.</li><li>Find every issue comment with that prefix.</li><li>Open the matching agent directory and saved prompt.</li><li>Read <code>raw_output.jsonl</code> for the decisive observation.</li><li>Classify the failure: product, test, environment, provider, or controller.</li><li>Name the next action and the evidence that justifies it.</li></ol>
+          <p>Pass when a second learner can reproduce your diagnosis from the same artifacts.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: punishing honest red</h3>
+          <p><strong>Blind rerun:</strong> intermittent green hides the cause. <strong>Product blame:</strong> every failed agent run becomes a code patch. <strong>Log hoarding:</strong> raw files exist but have no run identity or agent names. <strong>Status worship:</strong> a green summary is accepted without checking evidence. <strong>Silent catch:</strong> controller code swallows the error to protect the success rate.</p>
+          <p><strong>Fix:</strong> prefix artifacts with run and agent identities, save input and output, classify before acting, reward accurate failure, and make the human review the test on top of the tests.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>More agents make trace boundaries more valuable</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Subagents, hosted runs, and structured event streams increase the number of simultaneous contexts. The TAC-5 pattern becomes more—not less—important: stable run IDs, per-agent inputs, raw outputs, retained screenshots, and a review surface that connects them.</p><p class="current-practice__source">A richer dashboard can visualize the trail; it cannot recover evidence the workflow never saved.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Reconstruct the API-500 path</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What was the demo ADW ID?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>ce364af1</code>.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Which evidence established infrastructure failure?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The resolver’s persisted raw output showed an Anthropic API error 500; the frame itself only shows the payload and agent tree.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why is honest FAILED a successful system behavior?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It accurately surfaces an unresolved condition, preserves the cause, and prevents false confidence when the loop cannot safely repair the failure.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Defend a failed run</h3>
+          <div class="teach-back"><p>Teach a reviewer why the API-500 run should not be scored as a broken product fix. Walk issue → ADW ID → resolver prompt → raw output → live review.</p><p class="fine">Pass if you distinguish the screenshot’s visible evidence from the raw output’s 500 evidence.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="adoption">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Start with one loop, then move outward</h2>
+        <p class="section-lead">The lesson’s end state is impressive: an issue becomes a planned, built, tested pull request on another machine. The prescribed starting point remains a three-line prompt you can understand completely.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The webhook cathedral built before one validator works</h3>
+          <p>An engineer sees the final pipeline and begins with tunnels, webhook signatures, branch orchestration, multiple agents, retry controllers, issue comments, and pull-request automation. The first real feature fails because the repository has no deterministic reset, the tests pollute production state, and the e2e assertion says only “check the page.” The architecture amplified loops that had never earned trust.</p>
+          <p>The opposite engineer writes one request–validate–resolve prompt, watches it fail, fixes the validator, reruns with a fresh context, turns the prompt into a template, and only then adds a dedicated environment. That path looks smaller because each step is legible. It reaches reliable out-loop work faster.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the adoption gradient</p>
+          <h3>Move complexity only after evidence</h3>
+          <div class="adoption-gradient" aria-label="Closed-loop adoption gradient"><article style="--level:0"><h4>One prompt</h4><p>Request, one validator, resolve.</p></article><article style="--level:1"><h4>Stack</h4><p>Cover disjoint failure classes.</p></article><article style="--level:2"><h4>Template</h4><p>Make validation the default.</p></article><article style="--level:3"><h4>ADW</h4><p>Isolate, bound, trace, compose.</p></article><article style="--level:4"><h4>Human review</h4><p>Judge evidence and improve the system.</p></article></div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — request to review</p>
+          <h3>The out-loop feature reaches a pull request</h3>
+          <figure class="frame-card"><img src="../media/frames/tac-5-close-the-loops/t2990-feature-shipped-pr.png" alt="Pull request 29 behind the agent machine browser showing the Generate Random Query feature, a complex SQL query, and returned rows" loading="lazy"><figcaption><span class="frame-card__t">49:50</span>The payoff: PR #29 and the working Generate Random Query feature. The human returns to review the output and notice what the automated tests still missed.</figcaption></figure>
+          <p>Issue #28 begins with a compact high-level request. The agentic layer classifies and plans it, builds the feature, authors or runs validation, records one honest e2e infrastructure failure, and presents PR #29. On the agent machine, Generate Random Query produces a complex CTE query and a results table. The feature exists as reviewable experience, not merely code.</p>
+          <p>Dan’s role in the middle was not to relay outputs. He designed and demonstrated the loops. His role returns at the end: review the evidence, inspect the running behavior, catch a loading-state nit, and turn that observation into the next validator. The human is the test on top of the tests and the designer of the next system improvement.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — the agentic layer</p>
+          <h3>The system around the application</h3>
+          <aside class="callout callout--term"><p class="callout__label">Agentic layer</p><p>The repository-facing system of command templates, ADW scripts, triggers, hooks, evidence directories, and review surfaces that lets agents operate the application codebase according to encoded engineering practices.</p></aside>
+          <p>In TAC-5, the layer includes <code>.claude/commands/</code>, <code>adws/</code>, <code>scripts/</code>, and lifecycle hooks. It does not replace the application. It makes the codebase legible and operable to agents.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — a four-week sequence inside TAC-5</p>
+          <h3>Build trust without skipping the primitive</h3>
+          <ol><li><strong>First run:</strong> reproduce the three-line Ruff loop and inspect how feedback changes the agent’s next action.</li><li><strong>Next run:</strong> clear context and stack pytest and pycompile; prove standards survive chat memory.</li><li><strong>Next asset:</strong> preserve the full backend/frontend/e2e validation prompt.</li><li><strong>Next system:</strong> generate plans through <code>/bug</code> and audit their validation conditionals.</li><li><strong>Next node:</strong> inspect or run <code>adw_test.py</code> with bounded resolution from the repository root.</li><li><strong>Next perimeter:</strong> connect the already-trusted node to a controlled issue/trigger/environment/review path.</li><li><strong>Every return:</strong> use review findings to improve the template, test, trace, or boundary that owns the failure class.</li></ol>
+          <p>The time units are illustrative sequencing, not a schedule promise. The evidence gate matters: do not promote a loop because the calendar moved.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — place the course system</p>
+          <h3>Score each TAC-5 artifact on the gradient</h3>
+          <p>Place these artifacts: the three-line scratch prompt, the reusable <code># Validation</code> block, <code>.claude/commands/bug.md</code>, <code>adws/adw_test.py</code>, issue #28, <code>agents/ce364af1/</code>, and PR #29. For each, state what new trust property it adds and what human judgment remains.</p>
+          <p>Pass when “more autonomous” is replaced by concrete properties: reuse, context isolation, bounded retries, known environment, retained evidence, or review.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: copying the end state</h3>
+          <p><strong>Infrastructure first:</strong> the team automates launch before proof. <strong>Template first:</strong> a vague process is made reusable. <strong>Scale first:</strong> multiple agents repeat a bad validator faster. <strong>Human exit:</strong> review is removed because the automated stack is green. <strong>Artifact patch:</strong> the reviewer fixes one PR instead of improving the owning loop.</p>
+          <p><strong>Fix:</strong> move one verified primitive outward at a time. Keep the reviewer on top. When review finds a repeatable gap, encode the correction where future runs inherit it.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Modern surfaces shorten setup, not learning</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · mid-2026</p><p>Skills, hooks, structured SDK outputs, managed sandboxes, and hosted background runs can compress several implementation steps. Keep the adoption order: understand one loop, stack it, package it, bound it, trace it, then move it out-loop.</p><p class="current-practice__source">Faster scaffolding makes it easier to skip understanding; it does not change what earns trust.</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the path and the human role</h3>
+          <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What is the prescribed adoption sequence?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Single in-loop closed prompt → stacked validators → reusable/templated prompts → isolated ADW on a dedicated environment → human review on top.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What does the human do after routine validation moves into the system?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Define constraints, review evidence and running behavior, classify failures, and improve the owning loop or template.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What remains for TAC-6?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The review and document SDLC steps, extending the agentic layer toward operating more of the codebase.</p></details></div></section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <h3>Tell the whole chapter as one gradient</h3>
+          <div class="teach-back"><p>In five minutes, move from the three-line Ruff prompt to PR #29. At every stage, name the new feedback, reuse, isolation, or trace property—and the human judgment that remains.</p><p class="fine">Expert pass: your listener can identify why a webhook is late in the sequence rather than the first implementation task.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="current-practice">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Current practice · preserve the model, update the packaging</h2>
+        <p class="section-lead">TAC-5’s mental model has aged well. The notable changes are how loops are packaged, enforced, contracted, and hosted—not why they exist.</p>
+
+        <div class="contract-grid" aria-label="Course-era and current-practice mappings">
+          <article><h4>Course-era explicit form</h4><ul><li>Validation written inside prompt text</li><li>Reusable slash-command templates</li><li>“ONLY JSON” text contract</li><li>Playwright MCP browser loop</li><li>Mac mini + webhook environment</li><li>Saved prompt and JSONL trails</li></ul></article>
+          <article><h4>Current packaging options</h4><ul><li>Hooks for non-negotiable rails</li><li>Agent Skills for discoverable reuse</li><li>Schema-shaped structured outputs</li><li>Broader browser/computer-use menu</li><li>Managed actions and sandboxes</li><li>Structured multi-agent event streams</li></ul></article>
+        </div>
+
+        <aside class="callout callout--why" style="margin-top:var(--space-5)"><p class="callout__label">The split to remember</p><p>Use prompt-level loops for task-specific judgment and evidence. Use hook-level loops for repository invariants that must not be skipped. Package either as a reusable skill only after the validator and its failure meaning are explicit.</p></aside>
+
+        <h3>Two bounded follow-ups</h3>
+        <p>The extract approves exactly two current-practice videos. Both IDs and titles were rechecked against indexed video metadata during chapter build; no third overlay is added.</p>
+        <div class="video-cards">
+          <a class="video-card" href="https://www.youtube.com/watch?v=X2ciJedw2vU"><span class="video-card__type">Current-practice overlay · Agent Skills</span><strong>RAW Agentic Coding: ZERO to Agent SKILL</strong><p>Use after the template section to see reusable prompt-and-code guidance packaged as a first-class skill.</p><span class="video-card__watch">Watch on YouTube →</span></a>
+          <a class="video-card" href="https://www.youtube.com/watch?v=6fCqj4xFCZI"><span class="video-card__type">Current-practice overlay · engineering surface</span><strong>How Claude Code CHANGED Engineering Forever (and what’s next)</strong><p>Use after the enforcement discussion for the broader programmable, hook-enabled agentic-engineering surface.</p><span class="video-card__watch">Watch on YouTube →</span></a>
+        </div>
+
+        <h3>What has not changed</h3>
+        <ul><li>The core validation question and the requirement to encode its answers.</li><li>Request → Validate → Resolve as the anatomy of self-correcting work.</li><li>Tests as the rule of law, including visible correction of wrong tests.</li><li>Stacking disjoint failure classes from source checks to user paths.</li><li>Deterministic setup before precise browser assertions.</li><li>Deterministic code owning bounds while agents own judgment.</li><li>Fresh contexts, isolated nodes, stable return contracts, and traceable evidence.</li><li>The adoption gradient: one in-loop prompt before an out-loop pipeline.</li><li>The human as the final test and the designer of the next loop.</li></ul>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="lab">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Graded lab · close the course codebase’s loops</h2>
+        <p class="section-lead">Operate only inside a fresh TAC-5 repository copy. The grade comes from commands, retained evidence, repository-real invariants, and explanation—not from a confident agent report.</p>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Prime directives</p>
+          <p>Type zero application code by hand. Every mutation flows through a prompt. Every prompt carries Request → Validate → Resolve. Run one repository-mutating in-loop agent at a time; this lesson does not use worktrees. Never point the course’s issue/PR automation at the upstream course repository.</p>
+        </aside>
+
+        <section class="lab-box" id="lab-setup">
+          <h3 class="lab-box__title">Lab 5.0 · Establish a known, owned environment</h3>
+          <ul class="lab-box__meta"><li>15–25 min</li><li>10 points</li><li>Safety gate</li></ul>
+          <ol class="lab-box__steps">
+            <li>Clone <code>https://github.com/disler/tac-5.git</code> into a fresh directory and enter it. All remaining steps stay in this copy.</li>
+            <li>Verify <code>claude --version</code>, <code>uv --version</code>, <code>bun --version</code>, and—only for the issue/PR extension—<code>gh auth status</code>.</li>
+            <li>Read <code>.claude/commands/install.md</code> before running <code>/install</code>. The command removes the existing <code>origin</code> and initializes Git, so do <em>not</em> add your own remote first.</li>
+            <li>Run <code>/install</code>. If you install manually instead, use the repository’s scripts and package files; do not improvise application changes.</li>
+            <li>After installation, create an empty GitHub repository you control, add it as <code>origin</code>, and push <code>main</code> if you plan to run the issue/PR extension. Verify <code>git remote -v</code> does not point at the course upstream.</li>
+            <li>Copy the root and server environment samples to their real environment files and add only the credentials required for the path you will run. The programmatic ADW path needs its provider key; the NL→SQL feature needs its configured model provider.</li>
+            <li>Audit <code>.claude/settings.json</code>. Record the three deny patterns—two force-push forms and <code>rm -rf</code>—and the five lifecycle events: PreToolUse, PostToolUse, Notification, Stop, and SubagentStop.</li>
+            <li>Read <code>.claude/commands/install.md</code>, <code>bug.md</code>, <code>implement.md</code>, <code>test.md</code>, and <code>test_e2e.md</code>. Mark which ones can mutate files, Git state, or external issue/PR state.</li>
+            <li>Start from a deterministic database: <code>sh scripts/reset_db.sh</code>. Start the app with <code>sh scripts/start.sh</code>; stop stale processes first with the repository script if ports are occupied.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 0:</strong> without looking, state why <code>/install</code> must precede adding your own origin, name the deny rules and five hook events, and explain which later drills need external credentials.</div>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>Written permission/command audit.</li><li>Remote points only to a repository you control, if configured.</li><li>Database reset completed and the sample app renders.</li><li>No application file edited by hand.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-min-loop">
+          <h3 class="lab-box__title">Lab 5.1 · Reproduce the minimum closed loop</h3>
+          <ul class="lab-box__meta"><li>10 min</li><li>15 points</li><li>Required</li></ul>
+          <p>In a scratch prompt buffer, fire the course artifact:</p>
+          <pre><code>Update @app/server/core/sql_processor.py: comment out validation.
+Validate with `cd app/server &amp;&amp; uv run ruff check .`.
+If there are errors at all, resolve them, rerun Ruff, and report the result.</code></pre>
+          <ol class="lab-box__steps"><li>Before firing, annotate Request, Validate, and Resolve on paper.</li><li>Watch Ruff report the unused <code>validate_sql_query</code> import after the call is commented out.</li><li>Do not edit. Let the agent resolve the diagnostic and rerun to green.</li><li>Independently execute <code>cd app/server &amp;&amp; uv run ruff check .</code>.</li><li>Save the prompt, first red output, agent repair summary, and independent green output.</li></ol>
+          <div class="checkpoint"><strong>Checkpoint 1:</strong> explain the feedback channel in one sentence: a real command produces a diagnostic that becomes part of the agent’s working context and changes its next action.</div>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>Three-part prompt.</li><li>Ruff F401 evidence for the dangling import.</li><li>Agent—not human—repair.</li><li>Independent final green Ruff run.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-fresh-agent">
+          <h3 class="lab-box__title">Lab 5.2 · Prove standards survive context</h3>
+          <ul class="lab-box__meta"><li>15 min</li><li>15 points</li><li><code>/clear</code> gate</li></ul>
+          <ol class="lab-box__steps">
+            <li>Ensure the Drill 5.1 sabotage exists long enough for this test, then run <code>/clear</code>. If the previous loop already fully restored the call, ask the agent to recreate only the course sabotage through a closed-loop setup prompt and clear immediately afterward.</li>
+            <li>With a fresh agent, request removal of <code>/api/insights</code> from <code>@app/server/server.py</code> and move <code>load_dotenv()</code> directly below its import.</li>
+            <li>Validate in order: <code>cd app/server &amp;&amp; uv run ruff check .</code>, <code>uv run pytest</code>, and <code>uv run python -m py_compile server.py</code>.</li>
+            <li>Require the agent to stop on every error, resolve it, and restart the full sequence.</li>
+            <li>Observe Ruff’s import-order diagnostics and pytest’s detection of the older SQL-validation sabotage.</li>
+            <li>Independently rerun the full three-command stack. Preserve the diff that restores <code>validate_sql_query(sql_query)</code>.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 2:</strong> write two sentences: why <code>/clear</code> makes the result stronger, and why a validator—not a context window—should carry a repository standard.</div>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>Proof that <code>/clear</code> occurred before the second task.</li><li>Ordered three-check prompt.</li><li>Fresh-agent repair of the prior sabotage.</li><li>Full green sweep after the final repair.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-browser">
+          <h3 class="lab-box__title">Lab 5.3 · Stack all six loops</h3>
+          <ul class="lab-box__meta"><li>20–30 min</li><li>15 points</li><li>Deterministic state</li></ul>
+          <ol class="lab-box__steps">
+            <li>From the repository root, run <code>sh scripts/reset_db.sh</code> immediately before this drill. Earlier pytest runs can pollute the live database, so setup from Lab 5.0 is no longer sufficient.</li>
+            <li>Run the backend stack: Ruff, pytest, and <code>python -m py_compile server.py</code>.</li>
+            <li>Run the frontend stack: <code>cd app/client &amp;&amp; bun tsc --noEmit</code>, then <code>bun run build</code>.</li>
+            <li>Through Playwright MCP, open <code>http://localhost:5173</code>, save <code>e2e_before.png</code>, enter <code>select newest 7 products sort by price desc</code>, click Query, and save <code>e2e_after.png</code>.</li>
+            <li>Require the agent to read both images and confirm exactly seven displayed results. If any validator fails, resolve and restart the sweep.</li>
+            <li>Perform Dan’s human spot-check: inspect the after image and reproduce the generated query in the running app. Record whether the rows match.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 3:</strong> name six loops—not seven. The database reset establishes state; it is setup. Then explain why the exact count is meaningless without that setup.</div>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>Timestamped reset immediately before the sweep.</li><li>Five command results plus browser result.</li><li>Readable before/after screenshots.</li><li>Seven-row assertion and independent human comparison.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-core-grade">
+          <h3 class="lab-box__title">Lab 5.4 · Core grade — fix a green test with a red side effect</h3>
+          <ul class="lab-box__meta"><li>35–55 min</li><li>35 points</li><li>Deterministic capstone</li></ul>
+          <p>The real course defect is narrow: <code>tests/test_sql_injection.py::test_integration_upload_malicious_filename</code> receives a <code>test_db</code> fixture but calls <code>convert_csv_to_sqlite</code> through the production connection. The test passes while adding a sanitized junk table to <code>app/server/db/database.db</code>. Because that database is ignored, <code>git status</code> cannot detect the side effect.</p>
+          <h4>Phase A · Prove the pre-fix contradiction</h4>
+          <pre><code>sh scripts/reset_db.sh
+sqlite3 app/server/db/database.db "SELECT group_concat(name, ',') FROM (SELECT name FROM sqlite_master WHERE type='table' ORDER BY name);"
+cd app/server &amp;&amp; uv run pytest tests/test_sql_injection.py::test_integration_upload_malicious_filename -q
+sqlite3 db/database.db "SELECT group_concat(name, ',') FROM (SELECT name FROM sqlite_master WHERE type='table' ORDER BY name);"</code></pre>
+          <p>The first query must return <code>products,users</code>. The targeted pytest is expected to pass. The second query exposes the hidden failure by including <code>data___DROP_TABLE_users____</code> alongside <code>products,users</code>. Save all three outputs. A green test and a red environment invariant can coexist.</p>
+          <h4>Phase B · Generate and audit the plan</h4>
+          <pre><code>/bug 111 adw111 '{"title":"Tests pollute production SQLite","body":"The malicious-filename integration test passes but writes data___DROP_TABLE_users____ into app/server/db/database.db. Isolate this test using existing in-memory or temporary database patterns, with no application behavior change."}'</code></pre>
+          <ol class="lab-box__steps">
+            <li>Open the generated <code>specs/issue-111-adw-adw111-sdlc_planner-*.md</code>.</li>
+            <li>Reject the plan if it uses <code>git status</code> as the database oracle.</li>
+            <li>Require the exact table-list check before and after the targeted test.</li>
+            <li>Require the diff to stay test-only and use an existing isolation pattern, such as the in-memory fixture behavior already present in <code>tests/core/test_file_processor.py</code>.</li>
+            <li>Confirm the plan contains no e2e task: the defect is test isolation, not UI behavior.</li>
+            <li>Run <code>/clear</code>, then <code>/implement &lt;generated-plan-path&gt;</code>. Type no fix by hand.</li>
+          </ol>
+          <h4>Phase C · Close every relevant loop</h4>
+          <pre><code>sh scripts/reset_db.sh
+cd app/server &amp;&amp; uv run pytest tests/test_sql_injection.py::test_integration_upload_malicious_filename -q
+sqlite3 db/database.db "SELECT group_concat(name, ',') FROM (SELECT name FROM sqlite_master WHERE type='table' ORDER BY name);"
+uv run ruff check .
+uv run pytest</code></pre>
+          <p>The targeted test must remain green. The SQLite query must now return exactly <code>products,users</code>. Ruff and the full backend suite must pass. Grade the behavior invariant, not a magic diff shape; the implementation must remain minimal and test-scoped.</p>
+          <div class="checkpoint"><strong>Checkpoint 4:</strong> explain why the original passing test was unsafe, why <code>git status</code> lied by omission, and why the correct fix belongs in test isolation rather than production query logic.</div>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>Pre-fix: targeted test green and table invariant red.</li><li>Complete three-argument <code>/bug</code> invocation.</li><li>Audited plan with correct oracle and no e2e task.</li><li>Fresh implementer agent; no human code edit.</li><li>Post-fix: targeted test green and exact <code>products,users</code> invariant.</li><li>Final Ruff and full pytest green.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-controller">
+          <h3 class="lab-box__title">Lab 5.5 · Audit the bounded controller</h3>
+          <ul class="lab-box__meta"><li>15–25 min</li><li>10 points</li><li>No external run required</li></ul>
+          <ol class="lab-box__steps">
+            <li>Read <code>.claude/commands/test.md</code>. Copy its result fields and explain why <code>execution_command</code> and <code>test_purpose</code> both matter.</li>
+            <li>Read <code>adws/adw_test.py</code>. Locate <code>MAX_TEST_RETRY_ATTEMPTS = 4</code> and <code>MAX_E2E_TEST_RETRY_ATTEMPTS = 2</code>.</li>
+            <li>Trace the early stop when a resolution round fixes nothing, the e2e-on-green-unit gate, and the stop at the first e2e failure in a round.</li>
+            <li>Find the issue summary path and per-agent artifact path. Confirm prompts and <code>raw_output.jsonl</code> are retained beneath <code>agents/{adw_id}/{agent}/</code>.</li>
+            <li>Write the correct root invocation: <code>uv run adws/adw_test.py &lt;issue-number&gt;</code>. Explain why <code>cd adws &amp;&amp; uv run adw_test.py …</code> is wrong for this source: root-relative commands and the e2e glob no longer resolve.</li>
+            <li>Explain why a clean standalone test run cannot guarantee a commit or PR: test artifacts may be ignored, leaving no tracked change to commit.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 5:</strong> draw the controller with no notes: JSON unit contract → fresh resolvers ≤4 → unit gate → first failing e2e + resolver ≤2 → summary → honest exit.</div>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>Annotated source/control-flow map.</li><li>Correct root invocation.</li><li>Accurate 4/2 bounds and gate.</li><li>Explanation of honest failure and non-guaranteed PR.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-stretch">
+          <h3 class="lab-box__title">Lab 5.6 · Course-only stretches</h3>
+          <ul class="lab-box__meta"><li>Choose 2</li><li>20–40 min</li><li>Bonus, still TAC-5 only</li></ul>
+          <ol class="lab-box__steps">
+            <li><strong>New e2e spec:</strong> through the agent, create <code>.claude/commands/e2e/test_hide_button.md</code> modeled on the existing specs. Include User Story, Test Steps with <code>**Verify**</code> markers, Success Criteria, and retained screenshot expectations. Run it through the real <code>/test_e2e</code> contract.</li>
+            <li><strong>Break a loop safely:</strong> through the agent, flip one assertion in <code>tests/core/test_sql_processor.py</code> on a scratch branch, then use the resolver prompt to reproduce, minimally repair, and rerun. Grade whether test intent remained intact.</li>
+            <li><strong>Bounded-cost reading:</strong> compare the controller path with and without <code>--skip-e2e</code>. State exactly what confidence is surrendered and why bounded honest failure is better than endless retries.</li>
+            <li><strong>Template audit:</strong> compare <code>bug.md</code>, <code>feature.md</code>, and <code>test.md</code>. Build a table showing where the same validator appears at prompt, plan, and ADW altitudes.</li>
+            <li><strong>Core question, course scope:</strong> answer the validation question for four TAC-5 work classes—backend bug, UI feature, e2e spec change, and ADW-controller change. Use only commands and files from this repository.</li>
+          </ol>
+        </section>
+
+        <h3>Grading rubric</h3>
+        <div class="rubric" role="table" aria-label="TAC-5 lab grading rubric">
+          <div class="rubric__head" role="columnheader">Dimension</div><div class="rubric__head" role="columnheader">Full credit</div><div class="rubric__head" role="columnheader">Partial</div><div class="rubric__head" role="columnheader">No credit</div>
+          <div role="cell">Safety and setup · 10</div><div role="cell">Install order, owned remote, permission audit, deterministic start.</div><div role="cell">Minor missing evidence; boundary intact.</div><div role="cell">Upstream target, unreviewed commands, or manual app edit.</div>
+          <div role="cell">Minimum loop · 15</div><div role="cell">Red diagnostic, autonomous repair, independent green proof.</div><div role="cell">Loop works but evidence incomplete.</div><div role="cell">Human repairs code or no validator.</div>
+          <div role="cell">Fresh-context proof · 15</div><div role="cell"><code>/clear</code>, cross-context catch, full rerun.</div><div role="cell">Correct result without proof of fresh context.</div><div role="cell">Agent remembers sabotage.</div>
+          <div role="cell">Six-loop evidence · 15</div><div role="cell">Immediate reset, six checks, screenshots, exact seven, spot-check.</div><div role="cell">One evidence artifact absent.</div><div role="cell">Unknown DB state or vague browser assertion.</div>
+          <div role="cell">SQLite capstone · 35</div><div role="cell">Green/red contradiction proven, plan audited, agent fix, exact post-invariant, full green sweep.</div><div role="cell">Correct fix but one proof or plan audit missing.</div><div role="cell"><code>git status</code> used as oracle, hand fix, or junk table remains.</div>
+          <div role="cell">Controller mastery · 10</div><div role="cell">Correct JSON fields, 4/2 bounds, gates, root cwd, trace, honest failure.</div><div role="cell">One control edge missed.</div><div role="cell">Unbounded/incorrect state machine.</div>
+        </div>
+
+        <h3>Troubleshooting from evidence</h3>
+        <div class="evidence-table-wrap"><table><thead><tr><th>Symptom</th><th>Likely cause</th><th>Evidence-first correction</th></tr></thead><tbody>
+          <tr><td>Your new <code>origin</code> disappears</td><td>You added it before <code>/install</code></td><td>Review <code>install.md</code>; add the owned remote after installation.</td></tr>
+          <tr><td>Browser says seven, later run says otherwise</td><td>Database not reset immediately before e2e</td><td>Run <code>scripts/reset_db.sh</code>, repeat the whole sweep, keep both images.</td></tr>
+          <tr><td><code>/bug 111 adw111</code> makes a vague plan</td><td>Missing <code>issue_json</code> third argument</td><td>Pass quoted JSON with title and body.</td></tr>
+          <tr><td><code>git status</code> is clean but junk table exists</td><td><code>database.db</code> is ignored</td><td>Query <code>sqlite_master</code>; grade exact table names.</td></tr>
+          <tr><td><code>adw_test</code> runs no e2e specs</td><td>Started from <code>adws/</code></td><td>Run <code>uv run adws/adw_test.py …</code> from repository root.</td></tr>
+          <tr><td>Standalone test node cannot open PR</td><td>No tracked change exists</td><td>Grade evidence/exit; use a prior plan/build branch for a real PR path.</td></tr>
+          <tr><td>Overall FAILED after provider 500</td><td>Infrastructure, not necessarily product</td><td>Trace ADW ID → resolver prompt → raw output before deciding.</td></tr>
+          <tr><td>Ports already occupied</td><td>Stale app processes</td><td>Use repository stop/start scripts and restate known starting state.</td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">13</span>
+        <h2 class="section-title">Cumulative mastery · retrieve, diagnose, design</h2>
+        <p class="section-lead">Close the chapter and answer on paper. Reveal only after committing to an answer. Operationally correct reasoning earns more than remembered phrasing.</p>
+
+        <h3>Round 1 · Foundations</h3>
+        <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Recite the core validation question and its required deliverable.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Ask how the engineer would test and validate a production-ready unit of valuable work; then encode the answers per work class as commands or tool calls with state, expectations, and evidence.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Define Request → Validate → Resolve.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Request states the change, Validate provides falsifiable commands/tools, Resolve requires repair and a fresh validation sweep.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Distinguish in-loop, out-loop, and closing the loop.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>In-loop locates the human in interactive work; out-loop locates a PITER-run workflow away from continuous human presence; closing the loop describes agent action → feedback → resolution inside either.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Why is validation part of producing value?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The valuable outcome is the user experience, not the code artifact; validation establishes that the experience works and no required behavior regressed.</p></details></div></section>
+
+        <h3>Round 2 · Stack and browser</h3>
+        <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">5. Name the six TAC-5 validation buckets in order.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Ruff, pytest, Python py_compile, TypeScript no-emit check, frontend build, Playwright e2e.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">6. A linter and unit suite pass, but Query does nothing. Which gap remains?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The end-to-end user path; browser control must act through the running stack and verify a precise rendered result.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">7. Why is <code>/clear</code> a proof tool?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It removes conversational memory, showing that repository validators carry standards across fresh agents.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">8. What is the rule of law when a test is wrong?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Stop and diagnose; update the wrong test visibly and review the rule change. Never bypass or weaken red merely to produce green.</p></details></div></section>
+
+        <h3>Round 3 · Templates and controller</h3>
+        <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">9. What does <code>/bug</code> add by default, and when does it require e2e?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It adds a Validation Commands section with default and reproduction checks; a UI or user-interaction bug requires a new e2e specification task.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">10. Walk the unit-to-e2e gate in <code>adw_test.py</code>.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Run JSON unit contract, resolve failures with fresh agents for at most four rounds and stop if no progress; only after all unit checks are green and e2e is not skipped, run e2e one spec at a time, stop at first failure, resolve for at most two rounds.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">11. Why include <code>execution_command</code> in the result contract?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It gives resolvers and humans an exact reproduction path, preserving the evidence boundary between controller and judgment.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">12. Why run the ADW command from repository root?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The test commands and e2e glob are root-relative; running inside <code>adws/</code> breaks them and may silently find no specs.</p></details></div></section>
+
+        <h3>Round 4 · Diagnosis and transfer</h3>
+        <section class="retrieval-quiz"><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">13. A test passes but creates a junk table in the live DB. Green or red?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Red overall. The assertion passed, but the environment invariant failed; test isolation is part of correctness.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">14. Why can <code>git status</code> not grade the junk-table bug?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The database file is ignored. Query <code>sqlite_master</code> and require the exact table set instead.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">15. Trace the demo’s API-500 diagnosis.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Issue summary → ADW ID <code>ce364af1</code> → e2e resolver directory → saved prompt → <code>raw_output.jsonl</code> → Anthropic API 500, classified as infrastructure.</p></details></div><div class="retrieval-quiz__item"><p class="retrieval-quiz__q">16. State the adoption gradient and final human role.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>One in-loop closed prompt → stacked validators → reusable templates → isolated bounded ADW → out-loop environment; the human reviews evidence as the test on top of the tests and improves the owning system.</p></details></div></section>
+
+        <aside class="callout callout--why"><p class="callout__label">Scoring</p><p><strong>14–16:</strong> ready to teach and proceed. <strong>10–13:</strong> rerun the lab checkpoint associated with each miss. <strong>0–9:</strong> redraw the three loop positions and Request–Validate–Resolve cycle, then reproduce Labs 5.1 and 5.4. A recognized phrase without an operational explanation earns half credit.</p></aside>
+
+        <h3>Capstone teach-back</h3>
+        <div class="teach-back"><p>Without notes, teach the complete lesson in eight minutes:</p><ol><li>Ask the core validation question.</li><li>Write one minimum closed-loop prompt.</li><li>Separate in-loop, out-loop, and closing the loop.</li><li>Name the six confidence layers and the rule of law.</li><li>Explain deterministic browser state and seven-row evidence.</li><li>Show how <code>/bug</code> templates validation.</li><li>Walk the 4/2 bounded ADW controller.</li><li>Diagnose the API 500 from the trace.</li><li>End with the adoption gradient and human review.</li></ol><p class="fine">Expert pass: your listener can explain why a green test may still be red, why a failed pipeline may still be working correctly, and which evidence decides each case.</p></div>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">14</span>
+        <h2 class="section-title">TAC-5 glossary</h2>
+        <p class="section-lead">Use the terms narrowly enough that they predict system behavior.</p>
+        <dl class="glossary">
+          <div><dt>Core validation question</dt><dd>The question asking how an engineer would test and validate a production-ready unit of valuable work, followed by encoding each answer.</dd></div>
+          <div><dt>Feedback loop</dt><dd>An action produces an observable result that influences the next action rather than ending at artifact generation.</dd></div>
+          <div><dt>Closed-loop prompt</dt><dd>A request with explicit validators and resolution instructions that lets an agent test and repair its own work.</dd></div>
+          <div><dt>Request</dt><dd>The desired change, boundary, starting state, and constraints.</dd></div>
+          <div><dt>Validate</dt><dd>The commands or tool calls that can falsify success and produce evidence.</dd></div>
+          <div><dt>Resolve</dt><dd>The instruction to repair failures and rerun the validation stack until green or bounded failure.</dd></div>
+          <div><dt>In-loop</dt><dd>Interactive human-agent work at the device, useful for exploration, learning, and correcting new loops.</dd></div>
+          <div><dt>Out-loop</dt><dd>A high-level prompt running through PITER on an isolated environment while the human leaves continuous execution.</dd></div>
+          <div><dt>PITER</dt><dd>Prompt input, Trigger, Environment, Review—the perimeter for out-loop work introduced in TAC-4.</dd></div>
+          <div><dt>Stacking the confidence</dt><dd>Combining validators that observe disjoint failure classes, from source rules to user-visible behavior.</dd></div>
+          <div><dt>Rule of law</dt><dd>Tests outrank convenience: red stops work; a genuinely wrong test is corrected visibly rather than bypassed.</dd></div>
+          <div><dt>End-to-end test</dt><dd>A deterministic browser-driven path with explicit actions, expectations, and retained evidence across the running stack.</dd></div>
+          <div><dt>Meta prompt</dt><dd>A prompt such as <code>/bug</code> that creates another prompt or plan.</dd></div>
+          <div><dt>Higher-order prompt (HOP)</dt><dd>A prompt that accepts another prompt or file as input, such as implementation or e2e execution against a plan/spec.</dd></div>
+          <div><dt>Information-dense keyword (IDK)</dt><dd>A compact phrase intended to activate a larger behavior; <code>think hard</code> is a course-era example and product detail.</dd></div>
+          <div><dt>Fresh agent</dt><dd>A new context for one bounded responsibility, protected from assumptions and pollution in previous conversations.</dd></div>
+          <div><dt>AI Developer Workflow (ADW)</dt><dd>Deterministic code composing agents, prompts, tools, state, and contracts into a reusable SDLC node.</dd></div>
+          <div><dt>ADW ID</dt><dd>An eight-character run identity connecting comments, branches, state, agent directories, and review artifacts.</dd></div>
+          <div><dt>Return contract</dt><dd>A narrow machine-consumable result; <code>/test</code> uses named records with pass status, command, purpose, and optional error.</dd></div>
+          <div><dt>Bounded loop</dt><dd>A self-correction cycle with explicit retry limits, progress checks, gates, and an honest terminal failure state.</dd></div>
+          <div><dt>Agentic layer</dt><dd>The codebase-facing prompts, workflows, scripts, hooks, evidence stores, and review surfaces surrounding the application.</dd></div>
+          <div><dt>Observability</dt><dd>The ability to inspect what a workflow and each agent received, did, observed, and returned.</dd></div>
+          <div><dt>Tracing</dt><dd>Following a stable run identity through issue comments, prompts, raw output, screenshots, commits, and pull request.</dd></div>
+          <div><dt>Test on top of the tests</dt><dd>The human reviewer who evaluates automated evidence, inspects the experience, classifies failures, and improves the system.</dd></div>
+          <div><dt>Agentic coding KPIs</dt><dd>The scoreboard: attempts down, size up, streak up, presence down.</dd></div>
+        </dl>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">Volume I · Tactical Agentic Coding</p>
+        <div class="chapter-footer__nav"><a href="04-afk-agents.html">← TAC-4 · AFK Agents</a><a href="../index.html">Book hub</a><a href="06-let-your-agents-focus.html">TAC-6 · Let Your Agents Focus →</a></div>
+      </footer>
+    
+      <p class="code-deep-link"><a href="../code/tac-5-close-the-loops.html">Code deep-dive · how Dan built this repo →</a></p>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => { updateProgress(); progressFramePending = false; });
+      };
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+          const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+          links.forEach(link => {
+            const active = link.getAttribute('href') === `#${visible.target.id}`;
+            if (active) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          });
+        }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+        sections.forEach(section => observer.observe(section));
+      }
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+</body>
+</html>

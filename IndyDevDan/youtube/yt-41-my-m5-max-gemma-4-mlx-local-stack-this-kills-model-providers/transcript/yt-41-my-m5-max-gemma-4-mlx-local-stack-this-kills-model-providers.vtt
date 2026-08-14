@@ -1,0 +1,4397 @@
+WEBVTT
+
+1
+00:00:10.480 --> 00:00:12.500
+[music]
+
+2
+00:00:19.650 --> 00:00:21.670
+[music]
+
+3
+00:00:24.235 --> 00:00:26.255
+[music]
+
+4
+00:00:33.080 --> 00:00:36.800
+>> What's up engineers? Today we're going
+
+5
+00:00:34.520 --> 00:00:40.560
+to have some fun. On the left I have my
+
+6
+00:00:36.800 --> 00:00:42.760
+new fully specked out M5 MacBook Pro. On
+
+7
+00:00:40.560 --> 00:00:46.600
+the right I have the previous generation
+
+8
+00:00:42.760 --> 00:00:47.960
+fully specked out M4 Max MacBook Pro.
+
+9
+00:00:46.600 --> 00:00:50.040
+Today we're going to push the limits of
+
+10
+00:00:47.960 --> 00:00:52.920
+these devices by using some of the best
+
+11
+00:00:50.040 --> 00:00:55.360
+models and tooling from Apple, Google,
+
+12
+00:00:52.920 --> 00:00:58.000
+Alibaba, and Nvidia. I'm filming at the
+
+13
+00:00:55.360 --> 00:01:00.920
+perfect time here because once again the
+
+14
+00:00:58.000 --> 00:01:03.240
+Claude APIs are down. You know what I
+
+15
+00:01:00.920 --> 00:01:06.840
+wish I could do? I wish I could use
+
+16
+00:01:03.240 --> 00:01:09.440
+private, cheap, fast, performant, local
+
+17
+00:01:06.840 --> 00:01:11.200
+models right on my device. Here's
+
+18
+00:01:09.440 --> 00:01:12.880
+everything we're going to cover in this
+
+19
+00:01:11.200 --> 00:01:14.400
+video. If you want to see the insane
+
+20
+00:01:12.880 --> 00:01:17.800
+gains you can get from using the
+
+21
+00:01:14.400 --> 00:01:19.560
+dedicated MLX models specialized for
+
+22
+00:01:17.800 --> 00:01:22.000
+Apple hardware, definitely stick around.
+
+23
+00:01:19.560 --> 00:01:24.320
+Many engineers are wasting time not
+
+24
+00:01:22.000 --> 00:01:26.600
+using the dedicated MLX models. We're
+
+25
+00:01:24.320 --> 00:01:29.240
+going to look at the M5 versus the M4.
+
+26
+00:01:26.600 --> 00:01:31.320
+We're going to look at GGUF versus MLX
+
+27
+00:01:29.240 --> 00:01:34.040
+models. And if you want to see how much
+
+28
+00:01:31.320 --> 00:01:35.400
+Google cooked on the Gemma 4 model,
+
+29
+00:01:34.040 --> 00:01:38.960
+stick around as well. We're going to
+
+30
+00:01:35.400 --> 00:01:40.880
+compare Gemma 4 versus the Qwen 3.5
+
+31
+00:01:38.960 --> 00:01:42.400
+series. All of these innovations are
+
+32
+00:01:40.880 --> 00:01:45.120
+coming together to create
+
+33
+00:01:42.400 --> 00:01:47.720
+state-of-the-art model performance from
+
+34
+00:01:45.120 --> 00:01:50.160
+Apple, Google's Gemma 4, Nvidia
+
+35
+00:01:47.720 --> 00:01:51.960
+optimized models, of course the cracked
+
+36
+00:01:50.160 --> 00:01:55.520
+Qwen 3.5, and then we're going to
+
+37
+00:01:51.960 --> 00:01:57.520
+supercharge it with Apple's MLX machine
+
+38
+00:01:55.520 --> 00:02:00.200
+learning framework designed for Apple
+
+39
+00:01:57.520 --> 00:02:02.840
+silicon. This helps us push away from
+
+40
+00:02:00.200 --> 00:02:05.200
+our dependency on Anthropic's APIs, on
+
+41
+00:02:02.840 --> 00:02:07.520
+OpenAI's APIs, on any cloud provider's
+
+42
+00:02:05.200 --> 00:02:10.039
+APIs. It's almost a guaranteed future we
+
+43
+00:02:07.520 --> 00:02:12.920
+will be running powerful models on our
+
+44
+00:02:10.039 --> 00:02:15.160
+devices in a private, cheap, fast, and
+
+45
+00:02:12.920 --> 00:02:17.360
+performant way. It's only a matter of
+
+46
+00:02:15.160 --> 00:02:19.600
+time. But the only way to know when the
+
+47
+00:02:17.360 --> 00:02:21.240
+time has arrived is to prepare ahead of
+
+48
+00:02:19.600 --> 00:02:22.440
+time. That's what we're doing here. So
+
+49
+00:02:21.240 --> 00:02:24.120
+the first thing we're going to do here,
+
+50
+00:02:22.440 --> 00:02:26.320
+when you're running local models, is you
+
+51
+00:02:24.120 --> 00:02:27.680
+have to warm them up. We have our M5 on
+
+52
+00:02:26.320 --> 00:02:28.760
+the right, we have the M4. I want to
+
+53
+00:02:27.680 --> 00:02:30.640
+show you the models we're going to be
+
+54
+00:02:28.760 --> 00:02:33.680
+using here. So on both sides we're going
+
+55
+00:02:30.640 --> 00:02:35.880
+to run Jade Bench Ping, and we're going
+
+56
+00:02:33.680 --> 00:02:37.280
+to kick off our models on both sides. So
+
+57
+00:02:35.880 --> 00:02:38.680
+at the same time, we're going to run
+
+58
+00:02:37.280 --> 00:02:41.600
+these and we're going to compare them in
+
+59
+00:02:38.680 --> 00:02:43.160
+this simple first prompt test. 1 2 3.
+
+60
+00:02:41.600 --> 00:02:45.560
+This is what's called a cold start. The
+
+61
+00:02:43.160 --> 00:02:47.640
+models are not in memory yet, so both
+
+62
+00:02:45.560 --> 00:02:49.320
+devices are loading the models into
+
+63
+00:02:47.640 --> 00:02:50.760
+memory. And here we're going to show
+
+64
+00:02:49.320 --> 00:02:52.200
+exactly the models we're going to be
+
+65
+00:02:50.760 --> 00:02:53.160
+using throughout our benchmarks. But
+
+66
+00:02:52.200 --> 00:02:55.240
+we're going to start small, we're going
+
+67
+00:02:53.160 --> 00:02:56.840
+to start simple. So the first run always
+
+68
+00:02:55.240 --> 00:02:59.320
+takes a bit of time. You can see here my
+
+69
+00:02:56.840 --> 00:03:02.280
+M4 actually was able to warm up the Qwen
+
+70
+00:02:59.320 --> 00:03:05.480
+3.5 before the M5. There we go, there's
+
+71
+00:03:02.280 --> 00:03:07.280
+the M5 device. M4 just got Qwen 3.5 with
+
+72
+00:03:05.480 --> 00:03:09.960
+the NVFP4
+
+73
+00:03:07.280 --> 00:03:12.160
+format from Nvidia. M5 just completed.
+
+74
+00:03:09.960 --> 00:03:15.200
+Gemma 4s are complete, and then we have
+
+75
+00:03:12.160 --> 00:03:16.480
+the Gemma 4 MLX variant also complete.
+
+76
+00:03:15.200 --> 00:03:18.400
+I'm going to run this again and get
+
+77
+00:03:16.480 --> 00:03:20.200
+another cleaner benchmark now that these
+
+78
+00:03:18.400 --> 00:03:22.360
+models have warmed up. So we have that
+
+79
+00:03:20.200 --> 00:03:24.040
+first result on the M5. There's the
+
+80
+00:03:22.360 --> 00:03:25.320
+second result on the M5. There's the
+
+81
+00:03:24.040 --> 00:03:27.160
+third result, and we should get the
+
+82
+00:03:25.320 --> 00:03:28.840
+fourth result here in a second. Stats
+
+83
+00:03:27.160 --> 00:03:31.560
+look great, and on the right you can see
+
+84
+00:03:28.840 --> 00:03:33.400
+the M4 with the Qwen GGUF model 35
+
+85
+00:03:31.560 --> 00:03:35.120
+billion parameter is coming in as well.
+
+86
+00:03:33.400 --> 00:03:37.440
+So here are the key metrics we're going
+
+87
+00:03:35.120 --> 00:03:39.520
+to cover here. Prefill speeds. This is
+
+88
+00:03:37.440 --> 00:03:41.120
+the processing of the incoming prompt.
+
+89
+00:03:39.520 --> 00:03:43.120
+Decode. This is what people refer to as
+
+90
+00:03:41.120 --> 00:03:44.320
+the true tokens per second. And then the
+
+91
+00:03:43.120 --> 00:03:46.920
+wall. This is the thing that really
+
+92
+00:03:44.320 --> 00:03:49.080
+matters. Wall is the end-to-end time to
+
+93
+00:03:46.920 --> 00:03:50.600
+actually execute with all costs,
+
+94
+00:03:49.080 --> 00:03:52.560
+including the cold start, including
+
+95
+00:03:50.600 --> 00:03:54.560
+prefill, decode, and a couple other kind
+
+96
+00:03:52.560 --> 00:03:56.000
+of hidden costs of running models
+
+97
+00:03:54.560 --> 00:03:57.440
+locally. So this is the true time. This
+
+98
+00:03:56.000 --> 00:03:59.960
+is what we really, really care about.
+
+99
+00:03:57.440 --> 00:04:02.760
+Already you can see here on the M5
+
+100
+00:03:59.960 --> 00:04:04.520
+prefill and decode speeds across the
+
+101
+00:04:02.760 --> 00:04:06.520
+board for every single model are
+
+102
+00:04:04.520 --> 00:04:07.960
+generally higher. We're prefilling
+
+103
+00:04:06.520 --> 00:04:10.520
+faster and we're decoding faster,
+
+104
+00:04:07.960 --> 00:04:12.320
+resulting in faster times. We of course
+
+105
+00:04:10.520 --> 00:04:14.880
+can't benchmark anything meaningful
+
+106
+00:04:12.320 --> 00:04:16.840
+going one prompt at a time. Instead
+
+107
+00:04:14.880 --> 00:04:19.680
+we're going to use a live benchmarking
+
+108
+00:04:16.840 --> 00:04:21.799
+tool to track what's going on with each
+
+109
+00:04:19.680 --> 00:04:23.720
+one of these models. So over on the M4
+
+110
+00:04:21.799 --> 00:04:26.640
+here, you can see we're going to live
+
+111
+00:04:23.720 --> 00:04:29.200
+track prefill, decode, total wall clock
+
+112
+00:04:26.640 --> 00:04:31.440
+time, and then random access memory at
+
+113
+00:04:29.200 --> 00:04:32.920
+peak usage. So this is really important
+
+114
+00:04:31.440 --> 00:04:35.120
+because if you can't fit the model into
+
+115
+00:04:32.920 --> 00:04:36.840
+RAM, it just can't run. There are new
+
+116
+00:04:35.120 --> 00:04:39.400
+LLM innovations coming out all the time
+
+117
+00:04:36.840 --> 00:04:41.440
+to help with the KV cache to get some of
+
+118
+00:04:39.400 --> 00:04:42.800
+that hard work out of the RAM. But right
+
+119
+00:04:41.440 --> 00:04:45.120
+now this is how it works. So now we're
+
+120
+00:04:42.800 --> 00:04:47.040
+going to run five prompts increasing in
+
+121
+00:04:45.120 --> 00:04:48.880
+complexity. We have all of our models
+
+122
+00:04:47.040 --> 00:04:50.840
+aligned at the top. So let's go ahead
+
+123
+00:04:48.880 --> 00:04:53.200
+and kick off our first benchmark to
+
+124
+00:04:50.840 --> 00:04:54.098
+really compare these models side by side
+
+125
+00:04:53.200 --> 00:04:56.118
+by side.
+
+126
+00:04:54.098 --> 00:04:56.118
+>> [music]
+
+127
+00:04:57.280 --> 00:05:02.200
+>> We'll run these on both devices. J Bench
+
+128
+00:04:59.880 --> 00:05:03.880
+QG. It's Qwen versus Gemma. And this is
+
+129
+00:05:02.200 --> 00:05:05.680
+going to be the M4. We're going to copy
+
+130
+00:05:03.880 --> 00:05:08.320
+this over, and with the screen
+
+131
+00:05:05.680 --> 00:05:10.520
+connection feature here, jump right over
+
+132
+00:05:08.320 --> 00:05:13.600
+to the M5. And then we're going to kick
+
+133
+00:05:10.520 --> 00:05:15.480
+these both off. 1 2 3. So you can see
+
+134
+00:05:13.600 --> 00:05:16.320
+the available baseline memory. And now
+
+135
+00:05:15.480 --> 00:05:18.600
+we're going to start booting up these
+
+136
+00:05:16.320 --> 00:05:19.920
+models and actually executing on each
+
+137
+00:05:18.600 --> 00:05:21.520
+prompt. I'll share more about the
+
+138
+00:05:19.920 --> 00:05:23.520
+architecture of this application. The
+
+139
+00:05:21.520 --> 00:05:25.760
+big idea here is that you can run
+
+140
+00:05:23.520 --> 00:05:27.520
+benchmarks from multiple devices, and
+
+141
+00:05:25.760 --> 00:05:29.840
+the results are going to be streamed
+
+142
+00:05:27.520 --> 00:05:31.520
+right to this live interface. Open up
+
+143
+00:05:29.840 --> 00:05:33.880
+your new terminal on the M5, and if we
+
+144
+00:05:31.520 --> 00:05:36.240
+type J Ping, you'll notice on the live
+
+145
+00:05:33.880 --> 00:05:38.480
+bench UI ping received. Our first
+
+146
+00:05:36.240 --> 00:05:41.040
+benchmark just came in. On the right
+
+147
+00:05:38.480 --> 00:05:42.400
+we're going to have our M5 Max device,
+
+148
+00:05:41.040 --> 00:05:45.400
+and on the left we're going to have our
+
+149
+00:05:42.400 --> 00:05:47.600
+M4 device benchmarks as well. And so how
+
+150
+00:05:45.400 --> 00:05:49.600
+this is going to work is across these
+
+151
+00:05:47.600 --> 00:05:53.200
+five prompts we're going to kick off
+
+152
+00:05:49.600 --> 00:05:55.560
+Qwen 3.5 GGUF Nvidia optimized version
+
+153
+00:05:53.200 --> 00:05:58.000
+with the MLX variant, and this is the
+
+154
+00:05:55.560 --> 00:06:00.240
+model that Ollama announced. Ollama now
+
+155
+00:05:58.000 --> 00:06:02.240
+supports models that can run directly on
+
+156
+00:06:00.240 --> 00:06:04.600
+MLX and Apple silicon, and this is that
+
+157
+00:06:02.240 --> 00:06:06.960
+exact model. Gemma 4 GGUF format. But
+
+158
+00:06:04.600 --> 00:06:08.960
+then we also have a MLX community built
+
+159
+00:06:06.960 --> 00:06:10.520
+version of the Gemma 4 model that's
+
+160
+00:06:08.960 --> 00:06:12.240
+going to be optimized to run on Apple
+
+161
+00:06:10.520 --> 00:06:13.920
+silicon, and you'll see that as the
+
+162
+00:06:12.240 --> 00:06:15.840
+numbers come in. So right now things
+
+163
+00:06:13.920 --> 00:06:17.640
+look pretty close. There isn't a huge
+
+164
+00:06:15.840 --> 00:06:20.040
+difference between the M4 and the M5. If
+
+165
+00:06:17.640 --> 00:06:22.320
+we scroll down to the wall time, our M4
+
+166
+00:06:20.040 --> 00:06:24.760
+is actually moving a bit faster with
+
+167
+00:06:22.320 --> 00:06:26.160
+this Qwen 3.5 GGUF model. And so we're
+
+168
+00:06:24.760 --> 00:06:28.200
+kind of going back and forth a little
+
+169
+00:06:26.160 --> 00:06:32.160
+bit, but as these models execute the
+
+170
+00:06:28.200 --> 00:06:34.720
+clear advantage of the M5 Max chip is
+
+171
+00:06:32.160 --> 00:06:37.240
+going to emerge. Our M5 device has just
+
+172
+00:06:34.720 --> 00:06:39.240
+finished running all of the Qwen 3.5
+
+173
+00:06:37.240 --> 00:06:41.200
+GGUF formats, and now it's going to kick
+
+174
+00:06:39.240 --> 00:06:43.240
+off the MLX. Now this is where things
+
+175
+00:06:41.200 --> 00:06:45.640
+get really interesting. So the MLX
+
+176
+00:06:43.240 --> 00:06:48.280
+variants are going to run very, very
+
+177
+00:06:45.640 --> 00:06:49.379
+fast. They're going to smoke the GGUF
+
+178
+00:06:48.280 --> 00:06:49.840
+format.
+
+179
+00:06:49.379 --> 00:06:51.280
+>> [laughter]
+
+180
+00:06:49.840 --> 00:06:52.600
+>> And it's not really even going to be
+
+181
+00:06:51.280 --> 00:06:55.360
+close. You can see we already got the
+
+182
+00:06:52.600 --> 00:06:57.960
+second response from the M5 Max using
+
+183
+00:06:55.360 --> 00:07:00.480
+the Qwen 3.5 MLX variant. There's a
+
+184
+00:06:57.960 --> 00:07:02.880
+couple big optimizations in this thing.
+
+185
+00:07:00.480 --> 00:07:05.640
+First off, MLX, it's the mixture of
+
+186
+00:07:02.880 --> 00:07:07.360
+experts just as the GGUF format is. So
+
+187
+00:07:05.640 --> 00:07:09.920
+that's great, but it's also the Nvidia
+
+188
+00:07:07.360 --> 00:07:11.760
+optimized NVFP4.
+
+189
+00:07:09.920 --> 00:07:13.040
+This thing is souped up. It's quite
+
+190
+00:07:11.760 --> 00:07:14.880
+powerful and it's quite fast. You're
+
+191
+00:07:13.040 --> 00:07:17.080
+going to see this on both devices, but
+
+192
+00:07:14.880 --> 00:07:18.000
+you can see it especially on the M5
+
+193
+00:07:17.080 --> 00:07:20.760
+here. So if you look at some of the
+
+194
+00:07:18.000 --> 00:07:22.480
+stats, prefill speed is almost double
+
+195
+00:07:20.760 --> 00:07:24.720
+using the MLX variant. You can see the
+
+196
+00:07:22.480 --> 00:07:26.840
+M4 is also completing very, very
+
+197
+00:07:24.720 --> 00:07:29.680
+quickly. The difference isn't as big on
+
+198
+00:07:26.840 --> 00:07:32.120
+the M4 device, but it's still there. If
+
+199
+00:07:29.680 --> 00:07:34.480
+we check out the decode speeds, the GGUF
+
+200
+00:07:32.120 --> 00:07:36.360
+format on the M5 got 60 tokens per
+
+201
+00:07:34.480 --> 00:07:39.080
+second. Pretty good, right? Very fast.
+
+202
+00:07:36.360 --> 00:07:41.240
+But it's not close. The MLX Qwen 3.5
+
+203
+00:07:39.080 --> 00:07:43.080
+version got 118 tokens per second. You
+
+204
+00:07:41.240 --> 00:07:45.240
+can see that this is pretty consistent
+
+205
+00:07:43.080 --> 00:07:47.040
+across each one of these prompts. After
+
+206
+00:07:45.240 --> 00:07:49.400
+you run prefill, which is the more
+
+207
+00:07:47.040 --> 00:07:52.040
+variable speed, this is that initial
+
+208
+00:07:49.400 --> 00:07:54.120
+loading of the prompt, the decode is
+
+209
+00:07:52.040 --> 00:07:56.120
+very, very consistent. 118 tokens per
+
+210
+00:07:54.120 --> 00:07:57.920
+second for every single one of these
+
+211
+00:07:56.120 --> 00:07:59.040
+prompts. And so speaking of the prompts,
+
+212
+00:07:57.920 --> 00:08:00.880
+what are we actually running here? These
+
+213
+00:07:59.040 --> 00:08:01.880
+are very, very simple tasks. And so if I
+
+214
+00:08:00.880 --> 00:08:03.480
+just click into this, you know, the
+
+215
+00:08:01.880 --> 00:08:05.360
+first prompt here is explain what a hash
+
+216
+00:08:03.480 --> 00:08:07.320
+table is in two sentences. So just very,
+
+217
+00:08:05.360 --> 00:08:09.000
+very simple surface level questions.
+
+218
+00:08:07.320 --> 00:08:10.600
+We're not pushing the performance quite
+
+219
+00:08:09.000 --> 00:08:12.080
+yet. We'll do that in our future
+
+220
+00:08:10.600 --> 00:08:13.760
+benchmark coming up. But what we really
+
+221
+00:08:12.080 --> 00:08:16.640
+want to see here is what are the model
+
+222
+00:08:13.760 --> 00:08:19.120
+statistics on these different models on
+
+223
+00:08:16.640 --> 00:08:21.760
+both devices. The Gemma 4 model is
+
+224
+00:08:19.120 --> 00:08:23.680
+starting to run on the M5 device. This
+
+225
+00:08:21.760 --> 00:08:26.000
+model is really, really incredible. The
+
+226
+00:08:23.680 --> 00:08:28.040
+Gemma 4 GGUF model that we're running
+
+227
+00:08:26.000 --> 00:08:30.480
+right now. It's got about 100 tokens per
+
+228
+00:08:28.040 --> 00:08:33.000
+second, so it's not as fast as the MLX
+
+229
+00:08:30.480 --> 00:08:34.800
+variant, but the prefill speed is
+
+230
+00:08:33.000 --> 00:08:36.640
+faster. So in the prefill step we're
+
+231
+00:08:34.800 --> 00:08:39.080
+getting about 550 tokens per second, and
+
+232
+00:08:36.640 --> 00:08:40.520
+it's beating out in every prompt. And
+
+233
+00:08:39.080 --> 00:08:42.159
+now if we look side by side, right? If
+
+234
+00:08:40.520 --> 00:08:44.440
+we just scroll down to wall time, this
+
+235
+00:08:42.159 --> 00:08:47.280
+is the total time it takes to run.
+
+236
+00:08:44.440 --> 00:08:50.120
+Overall we're getting faster speeds out
+
+237
+00:08:47.280 --> 00:08:51.880
+of the M5 with some variants, right?
+
+238
+00:08:50.120 --> 00:08:53.720
+These are non-deterministic systems, so
+
+239
+00:08:51.880 --> 00:08:56.920
+you can see here the first three Qwen
+
+240
+00:08:53.720 --> 00:08:59.320
+3.5 GGUF runs on the M5 were quite slow,
+
+241
+00:08:56.920 --> 00:09:00.880
+but the MLX and the Gemma model are
+
+242
+00:08:59.320 --> 00:09:01.960
+much, much faster. They're getting a lot
+
+243
+00:09:00.880 --> 00:09:03.320
+more performance. There are a lot of
+
+244
+00:09:01.960 --> 00:09:04.960
+ways to measure local model performance.
+
+245
+00:09:03.320 --> 00:09:06.480
+The thing that matters the most is the
+
+246
+00:09:04.960 --> 00:09:08.200
+wall clock time. How much time did you
+
+247
+00:09:06.480 --> 00:09:09.400
+actually sit and wait end-to-end? You
+
+248
+00:09:08.200 --> 00:09:12.120
+can see something really special
+
+249
+00:09:09.400 --> 00:09:14.520
+happening now. The Gemma 4 MLX variant,
+
+250
+00:09:12.120 --> 00:09:15.760
+our last model, is blitzing through this
+
+251
+00:09:14.520 --> 00:09:17.880
+stuff. And that's going to lead us to
+
+252
+00:09:15.760 --> 00:09:19.800
+our first big takeaway here. You know,
+
+253
+00:09:17.880 --> 00:09:21.640
+there's a clear trend. I set these
+
+254
+00:09:19.800 --> 00:09:23.080
+models up in this order on purpose. If
+
+255
+00:09:21.640 --> 00:09:25.120
+we focus back over in the M5, the
+
+256
+00:09:23.080 --> 00:09:27.560
+benchmark is complete. It's run all the
+
+257
+00:09:25.120 --> 00:09:31.720
+models back-to-back. You'll notice here
+
+258
+00:09:27.560 --> 00:09:33.400
+my M4 Max MacBook Pro, the fan is on and
+
+259
+00:09:31.720 --> 00:09:35.480
+it's pretty heavy right now. But
+
+260
+00:09:33.400 --> 00:09:37.200
+throughout that whole time, the M5 Max
+
+261
+00:09:35.480 --> 00:09:39.320
+was relatively quiet. We're getting
+
+262
+00:09:37.200 --> 00:09:42.160
+really, really great prefill speeds out
+
+263
+00:09:39.320 --> 00:09:44.280
+of both of our Gemma models on both
+
+264
+00:09:42.160 --> 00:09:45.960
+devices. The blue here is our Gemma
+
+265
+00:09:44.280 --> 00:09:47.960
+models. If we scroll to the bottom here,
+
+266
+00:09:45.960 --> 00:09:49.840
+we can look at our max random access
+
+267
+00:09:47.960 --> 00:09:52.680
+memory, and you can see the smallest
+
+268
+00:09:49.840 --> 00:09:55.000
+model here we have is that Gemma 4 MLX
+
+269
+00:09:52.680 --> 00:09:58.480
+variant. And so this thing is compact.
+
+270
+00:09:55.000 --> 00:10:00.080
+It's fitting in just 16 GB of RAM. And
+
+271
+00:09:58.480 --> 00:10:01.560
+we can actually visualize this as well,
+
+272
+00:10:00.080 --> 00:10:04.440
+right? If I open up a new terminal and I
+
+273
+00:10:01.560 --> 00:10:05.840
+type MacMon, we're going to see a live
+
+274
+00:10:04.440 --> 00:10:08.280
+visual here. This is what really
+
+275
+00:10:05.840 --> 00:10:09.880
+matters. We have 128 GB of RAM, and
+
+276
+00:10:08.280 --> 00:10:11.160
+we're using about 42 right now. Looks
+
+277
+00:10:09.880 --> 00:10:12.880
+like things are completing, memory is
+
+278
+00:10:11.160 --> 00:10:14.560
+getting swapped in and out here. So, it
+
+279
+00:10:12.880 --> 00:10:16.280
+just completed. It just kind of dropped
+
+280
+00:10:14.560 --> 00:10:17.840
+down that memory back to some base
+
+281
+00:10:16.280 --> 00:10:20.160
+level. That looks good. Let's just
+
+282
+00:10:17.840 --> 00:10:22.240
+understand and internalize this first
+
+283
+00:10:20.160 --> 00:10:25.000
+benchmark run. Prefill speeds. What do
+
+284
+00:10:22.240 --> 00:10:27.880
+we see here? We see that the Qwen 3.5 GG
+
+285
+00:10:25.000 --> 00:10:29.440
+of model is the slowest at prefill. From
+
+286
+00:10:27.880 --> 00:10:33.040
+there, pretty much every model just
+
+287
+00:10:29.440 --> 00:10:35.880
+increases up till the GG and MLX. So,
+
+288
+00:10:33.040 --> 00:10:38.200
+the MLX is not prefilling as quickly as
+
+289
+00:10:35.880 --> 00:10:39.560
+a GG file. Now, if we take a look at the
+
+290
+00:10:38.200 --> 00:10:41.920
+actual prompt we're running here,
+
+291
+00:10:39.560 --> 00:10:43.120
+prefill speed doesn't matter a ton. Why
+
+292
+00:10:41.920 --> 00:10:44.720
+is that? It's because our prompts are
+
+293
+00:10:43.120 --> 00:10:47.040
+relatively small. But for our next
+
+294
+00:10:44.720 --> 00:10:48.800
+context benchmark, prefill speed becomes
+
+295
+00:10:47.040 --> 00:10:50.280
+very, very important because this is the
+
+296
+00:10:48.800 --> 00:10:53.120
+time you're waiting for the model to
+
+297
+00:10:50.280 --> 00:10:54.960
+actually load the prompt into its memory
+
+298
+00:10:53.120 --> 00:10:56.400
+and to start processing it. All of these
+
+299
+00:10:54.960 --> 00:10:58.280
+prompts that we just ran, very, very
+
+300
+00:10:56.400 --> 00:10:59.160
+simple, two, three, four sentences, and
+
+301
+00:10:58.280 --> 00:11:01.800
+that's it. And then we can see the
+
+302
+00:10:59.160 --> 00:11:03.960
+responses for each model here on the P5
+
+303
+00:11:01.800 --> 00:11:06.320
+deep, the final prompt, design a rate
+
+304
+00:11:03.960 --> 00:11:08.040
+limiter. And you can see how every model
+
+305
+00:11:06.320 --> 00:11:10.080
+went through that example and kind of,
+
+306
+00:11:08.040 --> 00:11:11.560
+you know, came up with its response. So,
+
+307
+00:11:10.080 --> 00:11:13.320
+fantastic. So, that's prefill speeds,
+
+308
+00:11:11.560 --> 00:11:15.320
+but let's look at tokens per second.
+
+309
+00:11:13.320 --> 00:11:17.760
+What is the pattern here? The pattern is
+
+310
+00:11:15.320 --> 00:11:21.280
+very, very clear. The MLX model variants
+
+311
+00:11:17.760 --> 00:11:23.240
+of Qwen 3.5 and Gemma 4 are extremely
+
+312
+00:11:21.280 --> 00:11:25.400
+fast. We're talking about 100 tokens per
+
+313
+00:11:23.240 --> 00:11:27.280
+second. The slowest here is the Qwen 3.5
+
+314
+00:11:25.400 --> 00:11:29.080
+GG of coming in at just 50 tokens per
+
+315
+00:11:27.280 --> 00:11:31.760
+second, which is fully usable, by the
+
+316
+00:11:29.080 --> 00:11:33.760
+way. Anything over 30 tokens per second,
+
+317
+00:11:31.760 --> 00:11:36.200
+I consider fully usable. Once you drop
+
+318
+00:11:33.760 --> 00:11:38.360
+below 20, I consider that the dead zone.
+
+319
+00:11:36.200 --> 00:11:39.680
+I just can't wait for that token speed.
+
+320
+00:11:38.360 --> 00:11:42.480
+Comment down below, let me know your
+
+321
+00:11:39.680 --> 00:11:44.120
+minimum viable speed for these models.
+
+322
+00:11:42.480 --> 00:11:46.000
+All right? And so, again, in our next
+
+323
+00:11:44.120 --> 00:11:48.960
+context benchmark, we're going to see
+
+324
+00:11:46.000 --> 00:11:50.560
+how the total wait time is affected by
+
+325
+00:11:48.960 --> 00:11:53.280
+the prompt length. This is something
+
+326
+00:11:50.560 --> 00:11:55.680
+that's often left out of small local
+
+327
+00:11:53.280 --> 00:11:58.040
+model benchmarks. The bigger that prompt
+
+328
+00:11:55.680 --> 00:11:59.520
+gets, the bigger the total context
+
+329
+00:11:58.040 --> 00:12:01.480
+that's going to run in your agent, which
+
+330
+00:11:59.520 --> 00:12:03.000
+will be our final benchmark, the slower
+
+331
+00:12:01.480 --> 00:12:04.839
+the total time is going to be because
+
+332
+00:12:03.000 --> 00:12:06.200
+they have to process all that context.
+
+333
+00:12:04.839 --> 00:12:08.120
+But you can see here, the theme is
+
+334
+00:12:06.200 --> 00:12:09.960
+pretty consistent. The Gemma models are
+
+335
+00:12:08.120 --> 00:12:12.320
+faster in general, both formats. But
+
+336
+00:12:09.960 --> 00:12:14.720
+when we start using the Apple silicon,
+
+337
+00:12:12.320 --> 00:12:17.160
+the performance goes up by quite a lot.
+
+338
+00:12:14.720 --> 00:12:19.120
+I mean, almost double from the Qwen 3.5
+
+339
+00:12:17.160 --> 00:12:21.400
+GG format. And I do think we need to
+
+340
+00:12:19.120 --> 00:12:24.240
+give credit to Nvidia's floating point
+
+341
+00:12:21.400 --> 00:12:26.200
+format here, NVFP4, but it's also due to
+
+342
+00:12:24.240 --> 00:12:28.400
+the MLX. Right, it's very clear that MLX
+
+343
+00:12:26.200 --> 00:12:31.920
+is a huge, huge, huge speed gain on the
+
+344
+00:12:28.400 --> 00:12:33.920
+Mac devices. So, 5 is clearly faster on
+
+345
+00:12:31.920 --> 00:12:36.200
+average. The slowest speed here we got
+
+346
+00:12:33.920 --> 00:12:38.280
+was 60 tokens per second over that 45
+
+347
+00:12:36.200 --> 00:12:40.160
+tokens per second wall clock time, which
+
+348
+00:12:38.280 --> 00:12:42.400
+is the thing that really matters. The
+
+349
+00:12:40.160 --> 00:12:47.200
+big takeaway here between the M4 and the
+
+350
+00:12:42.400 --> 00:12:49.800
+M5 is that the M5 is about 15 to 50%
+
+351
+00:12:47.200 --> 00:12:51.440
+faster than the M4, which is a pretty
+
+352
+00:12:49.800 --> 00:12:53.360
+massive jump. And we're going to see the
+
+353
+00:12:51.440 --> 00:12:55.880
+trend continue as we increase the
+
+354
+00:12:53.360 --> 00:12:57.400
+context size of the prompts that we're
+
+355
+00:12:55.880 --> 00:13:00.360
+executing. And then memory, pretty
+
+356
+00:12:57.400 --> 00:13:02.320
+simple. Gemma 4 is an incredibly packed
+
+357
+00:13:00.360 --> 00:13:03.839
+model, like they say it here themselves,
+
+358
+00:13:02.320 --> 00:13:05.640
+right? They're maximizing intelligence
+
+359
+00:13:03.839 --> 00:13:07.080
+per parameter, and they've definitely
+
+360
+00:13:05.640 --> 00:13:09.600
+accomplished that. It's great to have a
+
+361
+00:13:07.080 --> 00:13:12.000
+model coming out of the US that's truly
+
+362
+00:13:09.600 --> 00:13:13.560
+open and actually competitive with the
+
+363
+00:13:12.000 --> 00:13:15.160
+Qwen series and the other Chinese labs.
+
+364
+00:13:13.560 --> 00:13:16.640
+So, that's great to see. I don't really
+
+365
+00:13:15.160 --> 00:13:17.920
+discriminate at all when it comes to
+
+366
+00:13:16.640 --> 00:13:19.320
+where the model's coming from, but it's
+
+367
+00:13:17.920 --> 00:13:20.800
+great to have something from the US.
+
+368
+00:13:19.320 --> 00:13:22.960
+Fantastic. Let's move on to our next
+
+369
+00:13:20.800 --> 00:13:25.040
+benchmark. These are simple prompts.
+
+370
+00:13:22.960 --> 00:13:27.040
+These are a fraction of the prompts that
+
+371
+00:13:25.040 --> 00:13:29.280
+people are actually running now. We've
+
+372
+00:13:27.040 --> 00:13:30.920
+run some pretty heavy, serious prompts
+
+373
+00:13:29.280 --> 00:13:32.600
+with the state-of-the-art models. Let's
+
+374
+00:13:30.920 --> 00:13:34.360
+start to scale this up. Let's throw
+
+375
+00:13:32.600 --> 00:13:35.400
+harder problems at this. So, I'm going
+
+376
+00:13:34.360 --> 00:13:37.960
+to hit back here, and we're going to
+
+377
+00:13:35.400 --> 00:13:39.520
+move into our context scaling benchmark.
+
+378
+00:13:37.960 --> 00:13:41.839
+So, here we're just going to look at
+
+379
+00:13:39.520 --> 00:13:44.200
+these MLX models. The big takeaway, by
+
+380
+00:13:41.839 --> 00:13:46.200
+the way, from these four models is if
+
+381
+00:13:44.200 --> 00:13:48.640
+you're running on Apple silicon, always
+
+382
+00:13:46.200 --> 00:13:50.640
+find an MLX model. There's just really
+
+383
+00:13:48.640 --> 00:13:53.960
+no debate about this, and they're up to
+
+384
+00:13:50.640 --> 00:13:55.680
+twice as good as their GG counterparts.
+
+385
+00:13:53.960 --> 00:13:57.040
+So, this is big. This is a really
+
+386
+00:13:55.680 --> 00:13:59.440
+important thing to understand. If you're
+
+387
+00:13:57.040 --> 00:14:02.960
+on Apple silicon, use MLX. Now, whether
+
+388
+00:13:59.440 --> 00:14:05.160
+to use the MLX Qwen model or the Gemma
+
+389
+00:14:02.960 --> 00:14:07.120
+model, that's not so clear. Let's see if
+
+390
+00:14:05.160 --> 00:14:08.839
+we can get some more clarity out of Qwen
+
+391
+00:14:07.120 --> 00:14:10.400
+versus Gemma in this next benchmark. So,
+
+392
+00:14:08.839 --> 00:14:11.520
+let's go to our context scaling, and
+
+393
+00:14:10.400 --> 00:14:14.079
+let's go ahead and kick this off. So,
+
+394
+00:14:11.520 --> 00:14:15.760
+we're going to run just bench context,
+
+395
+00:14:14.079 --> 00:14:17.920
+and this is the M4. And then I'll copy
+
+396
+00:14:15.760 --> 00:14:19.920
+that same thing over, cross over to the
+
+397
+00:14:17.920 --> 00:14:23.299
+M5. So, let's go ahead and kick this off
+
+398
+00:14:19.920 --> 00:14:25.319
+at the same time. Here we go. 1 2 3.
+
+399
+00:14:23.299 --> 00:14:25.319
+>> [music]
+
+400
+00:14:25.760 --> 00:14:30.640
+>> And now we're going to start streaming
+
+401
+00:14:28.079 --> 00:14:33.400
+updates to our live bench tool from both
+
+402
+00:14:30.640 --> 00:14:35.040
+our M4 and our M5. Let's see how they
+
+403
+00:14:33.400 --> 00:14:36.800
+run. So, side by side, they're both
+
+404
+00:14:35.040 --> 00:14:39.640
+kicking off right now, and this is
+
+405
+00:14:36.800 --> 00:14:40.959
+running the graph walks benchmark. So,
+
+406
+00:14:39.640 --> 00:14:42.600
+this is something we looked at in last
+
+407
+00:14:40.959 --> 00:14:45.079
+week's video when we were talking about
+
+408
+00:14:42.600 --> 00:14:47.120
+Claude Mythos. Graph walk is really
+
+409
+00:14:45.079 --> 00:14:49.760
+interesting. The models have to perform
+
+410
+00:14:47.120 --> 00:14:52.680
+breadth-first search across increasing
+
+411
+00:14:49.760 --> 00:14:55.040
+contexts. 200 tokens here, 500 tokens
+
+412
+00:14:52.680 --> 00:14:56.640
+here, 1,000 tokens here. And so, we're
+
+413
+00:14:55.040 --> 00:14:58.120
+scaling up the prompt size. Let me be
+
+414
+00:14:56.640 --> 00:14:59.720
+super clear, this is the size of the
+
+415
+00:14:58.120 --> 00:15:02.120
+prompt. And so, here we're keeping track
+
+416
+00:14:59.720 --> 00:15:04.200
+of prefill, decode. You can see results
+
+417
+00:15:02.120 --> 00:15:06.640
+coming in already. The M5 is running
+
+418
+00:15:04.200 --> 00:15:08.280
+pretty steadily here, 117 tokens per
+
+419
+00:15:06.640 --> 00:15:09.680
+second. And then we have our total wall
+
+420
+00:15:08.280 --> 00:15:11.640
+clock size. So, this is the most
+
+421
+00:15:09.680 --> 00:15:12.760
+important thing, just how fast did that
+
+422
+00:15:11.640 --> 00:15:14.680
+thing run? And then we have the
+
+423
+00:15:12.760 --> 00:15:17.760
+accuracy. So, we're all keeping track of
+
+424
+00:15:14.680 --> 00:15:19.560
+the actual graph walks F1 score, higher
+
+425
+00:15:17.760 --> 00:15:20.880
+is better. And if we click into this, we
+
+426
+00:15:19.560 --> 00:15:23.079
+have an expected answer. They're
+
+427
+00:15:20.880 --> 00:15:24.200
+performing breadth-first search along a
+
+428
+00:15:23.079 --> 00:15:25.560
+graph. I'm not going to go into the
+
+429
+00:15:24.200 --> 00:15:27.480
+details of that too much. If you're
+
+430
+00:15:25.560 --> 00:15:30.280
+interested, you can check out the graph
+
+431
+00:15:27.480 --> 00:15:31.760
+walks code base. This is the benchmark
+
+432
+00:15:30.280 --> 00:15:35.280
+we looked at last week. Mythos was
+
+433
+00:15:31.760 --> 00:15:37.120
+performing a staggering 80% success rate
+
+434
+00:15:35.280 --> 00:15:39.160
+on this benchmark all the way up to a
+
+435
+00:15:37.120 --> 00:15:41.839
+million tokens. And so, you know, just
+
+436
+00:15:39.160 --> 00:15:43.760
+for comparison here, you can see our
+
+437
+00:15:41.839 --> 00:15:46.640
+model already made a mistake here at
+
+438
+00:15:43.760 --> 00:15:48.600
+just 8K tokens of context length. If you
+
+439
+00:15:46.640 --> 00:15:51.520
+want to get the behind-the-scenes scoop
+
+440
+00:15:48.600 --> 00:15:53.000
+on my take on the Mythos model, check
+
+441
+00:15:51.520 --> 00:15:54.360
+out last week's video where we dug into
+
+442
+00:15:53.000 --> 00:15:56.079
+the Mythos model and really looked
+
+443
+00:15:54.360 --> 00:15:57.959
+behind the curtain at what Project
+
+444
+00:15:56.079 --> 00:15:59.720
+Glasswing really means. Anyway, back to
+
+445
+00:15:57.959 --> 00:16:02.480
+local models here. So, once again, we
+
+446
+00:15:59.720 --> 00:16:03.839
+are seeing as these models perform
+
+447
+00:16:02.480 --> 00:16:05.959
+breadth-first search through
+
+448
+00:16:03.839 --> 00:16:08.040
+increasingly complex and longer and
+
+449
+00:16:05.959 --> 00:16:09.600
+longer graphs, the machines are starting
+
+450
+00:16:08.040 --> 00:16:13.520
+to work. I'll be quiet for a second
+
+451
+00:16:09.600 --> 00:16:13.520
+here, and you can just hear the M4.
+
+452
+00:16:13.920 --> 00:16:18.560
+Okay. So, the M4 is making some noise,
+
+453
+00:16:16.160 --> 00:16:20.520
+and we're even going to get my M5 fan to
+
+454
+00:16:18.560 --> 00:16:22.240
+really kick on here in a second. You
+
+455
+00:16:20.520 --> 00:16:23.720
+know, for instance, let's look at some
+
+456
+00:16:22.240 --> 00:16:24.839
+of the work that these have to do. You
+
+457
+00:16:23.720 --> 00:16:27.000
+can see some of the chain of thought
+
+458
+00:16:24.839 --> 00:16:28.959
+here. This is the Qwen 3.5 35 billion
+
+459
+00:16:27.000 --> 00:16:31.360
+parameter MLX variant, and you can see
+
+460
+00:16:28.959 --> 00:16:32.680
+it's thinking through, working through
+
+461
+00:16:31.360 --> 00:16:35.160
+the
+
+462
+00:16:32.680 --> 00:16:36.400
+uh traversing the nodes inside of a
+
+463
+00:16:35.160 --> 00:16:38.200
+graph. And you can see, you know, the
+
+464
+00:16:36.400 --> 00:16:39.959
+expected answer is becoming more and
+
+465
+00:16:38.200 --> 00:16:41.920
+more complicated. And this is just at 4K
+
+466
+00:16:39.959 --> 00:16:43.280
+context. It got close to the answer,
+
+467
+00:16:41.920 --> 00:16:44.440
+actually. Looks like it made a mistake.
+
+468
+00:16:43.280 --> 00:16:46.160
+So, we docked some points from that.
+
+469
+00:16:44.440 --> 00:16:48.360
+These devices are fully on. So, we're
+
+470
+00:16:46.160 --> 00:16:50.320
+making these Mac devices work all
+
+471
+00:16:48.360 --> 00:16:51.920
+through ultra hard to perform this work,
+
+472
+00:16:50.320 --> 00:16:53.600
+right? The fans are on, GPUs are
+
+473
+00:16:51.920 --> 00:16:55.959
+cooking, and we can go ahead and just
+
+474
+00:16:53.600 --> 00:16:59.200
+see that as well, MacMon here. And let's
+
+475
+00:16:55.959 --> 00:17:02.079
+go to the M5 MacMon as well. GPU
+
+476
+00:16:59.200 --> 00:17:04.720
+utilization here is quite high, almost
+
+477
+00:17:02.079 --> 00:17:06.520
+100% here, 55 RAM. So, we're only
+
+478
+00:17:04.720 --> 00:17:07.959
+running two models here, so and they're
+
+479
+00:17:06.520 --> 00:17:11.360
+running one at a time. Both of these
+
+480
+00:17:07.959 --> 00:17:14.079
+devices absolutely cooking right now.
+
+481
+00:17:11.360 --> 00:17:16.240
+Uh working through breadth-first search
+
+482
+00:17:14.079 --> 00:17:18.360
+as a language model, which is pretty
+
+483
+00:17:16.240 --> 00:17:20.480
+crazy. That's very precise token
+
+484
+00:17:18.360 --> 00:17:22.400
+reading, token traversing, and
+
+485
+00:17:20.480 --> 00:17:23.880
+reasoning. This only works because these
+
+486
+00:17:22.400 --> 00:17:26.920
+models can now think. And so, you can
+
+487
+00:17:23.880 --> 00:17:29.560
+see here, on 32K, both systems are now
+
+488
+00:17:26.920 --> 00:17:33.120
+processing that. The 32K is what I'm
+
+489
+00:17:29.560 --> 00:17:35.400
+seeing as the proper context limit for
+
+490
+00:17:33.120 --> 00:17:38.040
+these small language models. I'm talking
+
+491
+00:17:35.400 --> 00:17:40.240
+35 billion parameters and below. Even
+
+492
+00:17:38.040 --> 00:17:42.880
+with the mixture of experts running,
+
+493
+00:17:40.240 --> 00:17:44.679
+right? We have A4B here and A3B. These
+
+494
+00:17:42.880 --> 00:17:47.120
+are both the MLX variants. We are
+
+495
+00:17:44.679 --> 00:17:48.440
+getting that top-tier performance thanks
+
+496
+00:17:47.120 --> 00:17:50.280
+to the Apple silicon we're running on
+
+497
+00:17:48.440 --> 00:17:53.360
+here, but yeah, it's very clear that
+
+498
+00:17:50.280 --> 00:17:55.720
+this is a hard problem for our models,
+
+499
+00:17:53.360 --> 00:17:57.400
+both Qwen and, as you'll see here, Gemma
+
+500
+00:17:55.720 --> 00:18:00.480
+as well. But the differences are pretty
+
+501
+00:17:57.400 --> 00:18:01.960
+apparent here. The M5 is really chewing
+
+502
+00:18:00.480 --> 00:18:03.840
+through these problems relatively
+
+503
+00:18:01.960 --> 00:18:05.720
+quickly. And here we go. So, now we're
+
+504
+00:18:03.840 --> 00:18:08.120
+getting the Gemma
+
+505
+00:18:05.720 --> 00:18:09.400
+Gemma 4 MLX variants running here. It's
+
+506
+00:18:08.120 --> 00:18:11.160
+actually getting fewer tokens per
+
+507
+00:18:09.400 --> 00:18:13.080
+second, right? Tokens per second is not
+
+508
+00:18:11.160 --> 00:18:14.760
+the full story. The full story for us is
+
+509
+00:18:13.080 --> 00:18:16.880
+wall clock time. The Gemma model's
+
+510
+00:18:14.760 --> 00:18:18.760
+starting to come through here on the M5
+
+511
+00:18:16.880 --> 00:18:20.440
+device side. We're just focusing on the
+
+512
+00:18:18.760 --> 00:18:22.440
+M5 Max. You know, you can see that
+
+513
+00:18:20.440 --> 00:18:25.640
+accuracy is coming in nicely here as
+
+514
+00:18:22.440 --> 00:18:27.560
+well. The correct graph nodes are being
+
+515
+00:18:25.640 --> 00:18:28.880
+mentioned by both models. So, it looks
+
+516
+00:18:27.560 --> 00:18:31.000
+like the performance is going to be
+
+517
+00:18:28.880 --> 00:18:33.919
+pretty neck and neck here between Gemma
+
+518
+00:18:31.000 --> 00:18:35.600
+and Qwen 3.5. So, that's great to see.
+
+519
+00:18:33.919 --> 00:18:38.679
+You know, the devices are fully, fully
+
+520
+00:18:35.600 --> 00:18:41.240
+working now. Maxed GPU, the efficiency
+
+521
+00:18:38.679 --> 00:18:43.400
+cores, performance cores, and this new
+
+522
+00:18:41.240 --> 00:18:46.200
+super core is quite activated, doing a
+
+523
+00:18:43.400 --> 00:18:47.919
+lot of work. It's clear that the M5
+
+524
+00:18:46.200 --> 00:18:49.800
+doesn't need the performance core for
+
+525
+00:18:47.919 --> 00:18:51.960
+this work, and it's only using the super
+
+526
+00:18:49.800 --> 00:18:54.880
+core for this work. But what is for sure
+
+527
+00:18:51.960 --> 00:18:57.080
+being used is our RAM, our GPU, our
+
+528
+00:18:54.880 --> 00:19:01.200
+power utilization is quite high as well.
+
+529
+00:18:57.080 --> 00:19:03.679
+On the M5, we got 35 W, and on the M4,
+
+530
+00:19:01.200 --> 00:19:05.960
+we're up to 40 W. So, the M4 is doing a
+
+531
+00:19:03.679 --> 00:19:08.280
+lot more work here, and this is pretty
+
+532
+00:19:05.960 --> 00:19:11.520
+consistent. So, prefill looking good.
+
+533
+00:19:08.280 --> 00:19:14.120
+Prefill is the prompt processing. The M5
+
+534
+00:19:11.520 --> 00:19:16.360
+is nearly double the M4. Just to say it
+
+535
+00:19:14.120 --> 00:19:17.880
+super clearly, you know, out loud, if
+
+536
+00:19:16.360 --> 00:19:20.360
+you want local model performance,
+
+537
+00:19:17.880 --> 00:19:21.840
+upgrade from your M4, from your M3, from
+
+538
+00:19:20.360 --> 00:19:24.560
+your M2, from your M1, whatever you're
+
+539
+00:19:21.840 --> 00:19:27.520
+currently using. I have a fully maxed
+
+540
+00:19:24.560 --> 00:19:29.560
+out M4, and the M5 is outperforming it
+
+541
+00:19:27.520 --> 00:19:31.679
+by a wide margin. It especially
+
+542
+00:19:29.560 --> 00:19:33.960
+outperforms in prefill speed. And this
+
+543
+00:19:31.679 --> 00:19:36.200
+becomes very, very important as the
+
+544
+00:19:33.960 --> 00:19:39.200
+prompt size increases. Look at the M4,
+
+545
+00:19:36.200 --> 00:19:42.000
+it's still processing the 32K context
+
+546
+00:19:39.200 --> 00:19:44.120
+prompt. So, this is a huge graph that is
+
+547
+00:19:42.000 --> 00:19:45.560
+a set of nodes that our language model
+
+548
+00:19:44.120 --> 00:19:48.480
+has to work through, and it has to give
+
+549
+00:19:45.560 --> 00:19:51.679
+the correct answer to. But the Gemma 4
+
+550
+00:19:48.480 --> 00:19:53.760
+MLX on the M5 is just burning through
+
+551
+00:19:51.679 --> 00:19:56.080
+this. It just completed the 8K and and
+
+552
+00:19:53.760 --> 00:19:57.200
+how quickly they do that? In 13 seconds.
+
+553
+00:19:56.080 --> 00:19:58.560
+All right, so it's very very fast, but
+
+554
+00:19:57.200 --> 00:20:00.280
+you can see here something interesting.
+
+555
+00:19:58.560 --> 00:20:01.440
+The wall clock time, so the total time
+
+556
+00:20:00.280 --> 00:20:03.560
+of the Quinn models are actually
+
+557
+00:20:01.440 --> 00:20:05.880
+performing a bit faster here. You know,
+
+558
+00:20:03.560 --> 00:20:07.640
+Quinn's got a nice leg up here even
+
+559
+00:20:05.880 --> 00:20:09.080
+though it's a 35 billion parameter
+
+560
+00:20:07.640 --> 00:20:11.040
+model. Of course, this is mixture of
+
+561
+00:20:09.080 --> 00:20:12.760
+experts, so they're both only using
+
+562
+00:20:11.040 --> 00:20:14.800
+three or four billion parameters to
+
+563
+00:20:12.760 --> 00:20:16.240
+answer each question. Gemma models are
+
+564
+00:20:14.800 --> 00:20:17.800
+going to be a little bit slower here and
+
+565
+00:20:16.240 --> 00:20:19.560
+actually quite a bit slower if you look
+
+566
+00:20:17.800 --> 00:20:21.589
+at this on an average basis. We'll see
+
+567
+00:20:19.560 --> 00:20:22.040
+how this last 32K
+
+568
+00:20:21.589 --> 00:20:24.720
+>> [laughter]
+
+569
+00:20:22.040 --> 00:20:26.520
+>> context window prompt looks. Overall
+
+570
+00:20:24.720 --> 00:20:27.960
+though, performance looking really good.
+
+571
+00:20:26.520 --> 00:20:29.600
+They're both answering the question,
+
+572
+00:20:27.960 --> 00:20:31.120
+which is really important. These models
+
+573
+00:20:29.600 --> 00:20:33.120
+are incredible now. These local models
+
+574
+00:20:31.120 --> 00:20:35.200
+are doing significant challenging work.
+
+575
+00:20:33.120 --> 00:20:37.760
+Let's look at the 16K. So they have to
+
+576
+00:20:35.200 --> 00:20:39.960
+work through a very very complex set of
+
+577
+00:20:37.760 --> 00:20:42.760
+nodes. Looks like it's looking at 14
+
+578
+00:20:39.960 --> 00:20:44.200
+depths of trees in a graph. And then
+
+579
+00:20:42.760 --> 00:20:47.640
+here it's a little tricky, it has to
+
+580
+00:20:44.200 --> 00:20:49.640
+find just one answer. Just one node. MLX
+
+581
+00:20:47.640 --> 00:20:51.160
+got the correct answer. Gemma did not
+
+582
+00:20:49.640 --> 00:20:52.200
+find the correct answer. It's really
+
+583
+00:20:51.160 --> 00:20:54.720
+really important for these models to
+
+584
+00:20:52.200 --> 00:20:58.280
+think and to process properly. Looks
+
+585
+00:20:54.720 --> 00:20:59.840
+like our M4 just completed that huge
+
+586
+00:20:58.280 --> 00:21:01.920
+run. Look at this wall clock time. So
+
+587
+00:20:59.840 --> 00:21:05.720
+this is end-to-end time. So about 400
+
+588
+00:21:01.920 --> 00:21:08.120
+seconds on the M4. And my M5 took 280
+
+589
+00:21:05.720 --> 00:21:11.080
+seconds. Okay, so that's, you know, 40%
+
+590
+00:21:08.120 --> 00:21:13.360
+improvement in speed for a large prompt.
+
+591
+00:21:11.080 --> 00:21:16.400
+And right now the M5 is working through
+
+592
+00:21:13.360 --> 00:21:17.960
+that final prompt on the Gemma 4 MLX
+
+593
+00:21:16.400 --> 00:21:19.680
+variant. This is taking quite a bit of
+
+594
+00:21:17.960 --> 00:21:22.040
+time as well. I'm expecting it to come
+
+595
+00:21:19.680 --> 00:21:25.120
+at you know, 308 seconds or something
+
+596
+00:21:22.040 --> 00:21:27.000
+for the Gemma 4 26 billion parameter MLX
+
+597
+00:21:25.120 --> 00:21:30.840
+model. But once again, in terms of like
+
+598
+00:21:27.000 --> 00:21:32.920
+raw usage, the M4 is working its ass off
+
+599
+00:21:30.840 --> 00:21:34.200
+to compete with the M5.
+
+600
+00:21:32.920 --> 00:21:36.160
+And you can hear it. Pretty incredible
+
+601
+00:21:34.200 --> 00:21:38.760
+stuff. Again, stats, if we look at the
+
+602
+00:21:36.160 --> 00:21:42.240
+tokens per second, M4 versus the M5 is
+
+603
+00:21:38.760 --> 00:21:43.640
+getting about what is this? Maybe 15%?
+
+604
+00:21:42.240 --> 00:21:46.120
+No, a little bit more than 15. It looks
+
+605
+00:21:43.640 --> 00:21:48.000
+like 20% tokens per second, but we do
+
+606
+00:21:46.120 --> 00:21:49.920
+lose tokens per second here as the
+
+607
+00:21:48.000 --> 00:21:51.480
+prompt size goes up. So this is an
+
+608
+00:21:49.920 --> 00:21:53.880
+interesting observation. And it kind of
+
+609
+00:21:51.480 --> 00:21:55.400
+leads us to another big takeaway from
+
+610
+00:21:53.880 --> 00:21:57.320
+running these models side by side and
+
+611
+00:21:55.400 --> 00:21:59.480
+really seeing what they can do. As
+
+612
+00:21:57.320 --> 00:22:02.200
+prompt size increases, local model
+
+613
+00:21:59.480 --> 00:22:03.640
+performance goes down very very quickly.
+
+614
+00:22:02.200 --> 00:22:05.760
+This might sound obvious, but it's
+
+615
+00:22:03.640 --> 00:22:07.480
+important to realize the impacts of this
+
+616
+00:22:05.760 --> 00:22:09.480
+when you're expecting your local model
+
+617
+00:22:07.480 --> 00:22:11.520
+to do agentic work. These one-off
+
+618
+00:22:09.480 --> 00:22:13.320
+prompts aren't really that important
+
+619
+00:22:11.520 --> 00:22:15.520
+anymore. Everyone is putting language
+
+620
+00:22:13.320 --> 00:22:17.720
+models inside of an agent. And that
+
+621
+00:22:15.520 --> 00:22:19.280
+context window stacks up very very
+
+622
+00:22:17.720 --> 00:22:21.240
+quickly. I can almost guarantee you
+
+623
+00:22:19.280 --> 00:22:22.840
+every time you put up Claude Code and
+
+624
+00:22:21.240 --> 00:22:25.920
+you run two or three prompts, you're
+
+625
+00:22:22.840 --> 00:22:28.560
+already at 32K tokens. What's limiting
+
+626
+00:22:25.920 --> 00:22:31.400
+our models now, our local models, isn't
+
+627
+00:22:28.560 --> 00:22:34.040
+so much the performance because we're
+
+628
+00:22:31.400 --> 00:22:36.679
+doing breadth-first search on up to
+
+629
+00:22:34.040 --> 00:22:38.320
+32,000 tokens and getting correct
+
+630
+00:22:36.679 --> 00:22:39.400
+answers out of these local models. Looks
+
+631
+00:22:38.320 --> 00:22:41.400
+like we're breaking down here a little
+
+632
+00:22:39.400 --> 00:22:42.760
+bit at the 8K and 16K mark. You know,
+
+633
+00:22:41.400 --> 00:22:44.280
+the point here is uh performance
+
+634
+00:22:42.760 --> 00:22:45.560
+matters. And in our last benchmark,
+
+635
+00:22:44.280 --> 00:22:47.640
+we're going to look at how these models
+
+636
+00:22:45.560 --> 00:22:50.520
+perform inside of the Pi coding agent to
+
+637
+00:22:47.640 --> 00:22:52.880
+get a real like agentic view at these
+
+638
+00:22:50.520 --> 00:22:56.000
+models. But the bottleneck here for
+
+639
+00:22:52.880 --> 00:22:58.400
+local models is context window size. At
+
+640
+00:22:56.000 --> 00:23:01.160
+that 16K mark, we have to wait 30
+
+641
+00:22:58.400 --> 00:23:02.600
+seconds for a response. That's tough,
+
+642
+00:23:01.160 --> 00:23:04.720
+right? [laughter] In fact, it's
+
+643
+00:23:02.600 --> 00:23:06.880
+unusable, I would say, right? Waiting 30
+
+644
+00:23:04.720 --> 00:23:09.200
+seconds for a response is frankly just
+
+645
+00:23:06.880 --> 00:23:11.600
+unusable. Again, as a general rule,
+
+646
+00:23:09.200 --> 00:23:15.080
+these local models say they can handle,
+
+647
+00:23:11.600 --> 00:23:16.880
+you know, 250 context windows, 160K
+
+648
+00:23:15.080 --> 00:23:19.360
+context windows. That's all great if
+
+649
+00:23:16.880 --> 00:23:21.520
+you're running it on Nvidia cracked
+
+650
+00:23:19.360 --> 00:23:23.640
+GPUs. We are not, right? We are running
+
+651
+00:23:21.520 --> 00:23:26.840
+it on local hardware. And even with the
+
+652
+00:23:23.640 --> 00:23:29.520
+best state-of-the-art M5 Max MacBook Pro
+
+653
+00:23:26.840 --> 00:23:31.480
+device here, we are consuming a lot of
+
+654
+00:23:29.520 --> 00:23:33.880
+time when the tokens hit about, you
+
+655
+00:23:31.480 --> 00:23:35.640
+know, 16,000 token context window
+
+656
+00:23:33.880 --> 00:23:37.480
+length. Accuracy is still there. What we
+
+657
+00:23:35.640 --> 00:23:39.400
+do lose is these models completing in a
+
+658
+00:23:37.480 --> 00:23:41.480
+reasonable amount of time. Just like
+
+659
+00:23:39.400 --> 00:23:43.880
+large language models who say they have
+
+660
+00:23:41.480 --> 00:23:46.560
+a 1 million token context window, it's
+
+661
+00:23:43.880 --> 00:23:49.840
+really like the true context is 500K,
+
+662
+00:23:46.560 --> 00:23:51.720
+maybe 700K, maybe 800K. The Claude 4.6
+
+663
+00:23:49.840 --> 00:23:54.160
+series has been the best so far with
+
+664
+00:23:51.720 --> 00:23:56.600
+their true 1 million context window. For
+
+665
+00:23:54.160 --> 00:23:58.360
+local models, it's much much more
+
+666
+00:23:56.600 --> 00:24:00.200
+limited than that. We're running a lot
+
+667
+00:23:58.360 --> 00:24:01.440
+of like state-of-the-art game-changing
+
+668
+00:24:00.200 --> 00:24:03.360
+hardware and now we're getting the wrong
+
+669
+00:24:01.440 --> 00:24:05.280
+answer at 32K, right? This is just too
+
+670
+00:24:03.360 --> 00:24:07.520
+complex. Check this out. Expected answer
+
+671
+00:24:05.280 --> 00:24:09.760
+is all these nodes and Quinn didn't
+
+672
+00:24:07.520 --> 00:24:12.080
+respond. It just crapped itself. And
+
+673
+00:24:09.760 --> 00:24:13.720
+Gemma 4 gave an answer, but it's not
+
+674
+00:24:12.080 --> 00:24:15.200
+correct. So we spent all that time to
+
+675
+00:24:13.720 --> 00:24:19.040
+get a incorrect answer out of these
+
+676
+00:24:15.200 --> 00:24:21.640
+models. 32K is pushing it. 16K is it's
+
+677
+00:24:19.040 --> 00:24:23.520
+still viable. But again, at 16K context
+
+678
+00:24:21.640 --> 00:24:25.000
+window, we waited 30 seconds for an
+
+679
+00:24:23.520 --> 00:24:27.720
+answer. So, you know, this is going to
+
+680
+00:24:25.000 --> 00:24:29.480
+kind of tell a story as to what you can
+
+681
+00:24:27.720 --> 00:24:31.440
+actually do with these models locally.
+
+682
+00:24:29.480 --> 00:24:33.800
+And so now we're just waiting for my M4
+
+683
+00:24:31.440 --> 00:24:36.280
+to finish the final 32K long prompt
+
+684
+00:24:33.800 --> 00:24:38.360
+running the Gemma 4 26 billion parameter
+
+685
+00:24:36.280 --> 00:24:40.280
+MLX variant. And, you know, final notes
+
+686
+00:24:38.360 --> 00:24:42.360
+here, you can see tokens per second
+
+687
+00:24:40.280 --> 00:24:44.960
+looking pretty good, then going downhill
+
+688
+00:24:42.360 --> 00:24:46.760
+at that 8, 16, 32K mark. That is a
+
+689
+00:24:44.960 --> 00:24:48.560
+signal that the model is just not
+
+690
+00:24:46.760 --> 00:24:50.760
+processing. It's having a hard time. And
+
+691
+00:24:48.560 --> 00:24:53.120
+then prefill speeds kind of that same
+
+692
+00:24:50.760 --> 00:24:55.760
+deal on the M5 where prefill speeds are
+
+693
+00:24:53.120 --> 00:24:58.480
+improving as we increase the size of the
+
+694
+00:24:55.760 --> 00:25:00.480
+prompt. And then around 8K, 16K, we
+
+695
+00:24:58.480 --> 00:25:01.840
+start to hit a wall. At 32K, we really
+
+696
+00:25:00.480 --> 00:25:03.880
+fall off the cliff. Before I filmed this
+
+697
+00:25:01.840 --> 00:25:06.480
+video, I actually had an agent cut out
+
+698
+00:25:03.880 --> 00:25:07.920
+the 64K just because it took too much
+
+699
+00:25:06.480 --> 00:25:10.280
+time. If you scroll down here, you know,
+
+700
+00:25:07.920 --> 00:25:12.080
+280 seconds and we have 400 seconds here
+
+701
+00:25:10.280 --> 00:25:14.560
+and we're probably going to get like
+
+702
+00:25:12.080 --> 00:25:17.120
+maybe a 500 second run here out of the
+
+703
+00:25:14.560 --> 00:25:20.320
+Gemma model on the M4. We'll see. The M4
+
+704
+00:25:17.120 --> 00:25:23.240
+Max worked its butt off here and finally
+
+705
+00:25:20.320 --> 00:25:25.520
+completed the final graph walk at 32K
+
+706
+00:25:23.240 --> 00:25:28.160
+and it got the answer wrong. So again,
+
+707
+00:25:25.520 --> 00:25:30.800
+just reaffirming this idea that larger
+
+708
+00:25:28.160 --> 00:25:33.960
+context windows are really really hard
+
+709
+00:25:30.800 --> 00:25:36.640
+for local models to process. And really
+
+710
+00:25:33.960 --> 00:25:38.400
+the falloff starts at that 8K context
+
+711
+00:25:36.640 --> 00:25:39.960
+window length level. So if you're doing
+
+712
+00:25:38.400 --> 00:25:41.960
+work underneath that level, you're
+
+713
+00:25:39.960 --> 00:25:44.560
+probably in good shape to use a powerful
+
+714
+00:25:41.960 --> 00:25:46.520
+local model. Gemma 4, Quinn 3.5, they're
+
+715
+00:25:44.560 --> 00:25:48.480
+both equally viable if you look at the
+
+716
+00:25:46.520 --> 00:25:50.440
+benchmarks here in accuracy for long
+
+717
+00:25:48.480 --> 00:25:52.320
+context. They're both about the same.
+
+718
+00:25:50.440 --> 00:25:54.720
+They're going to answer right or not at
+
+719
+00:25:52.320 --> 00:25:56.440
+all with a slight edge to Quinn 3.5. But
+
+720
+00:25:54.720 --> 00:25:58.720
+you can see here wall clock time, this
+
+721
+00:25:56.440 --> 00:26:00.720
+benchmark took a lot longer to run. Just
+
+722
+00:25:58.720 --> 00:26:03.240
+really that key takeaway, context window
+
+723
+00:26:00.720 --> 00:26:05.679
+length is the true limitation for local
+
+724
+00:26:03.240 --> 00:26:07.040
+models now. It's not really performance,
+
+725
+00:26:05.679 --> 00:26:09.400
+right? The intelligence of these models
+
+726
+00:26:07.040 --> 00:26:11.160
+is great, but you can only use them up
+
+727
+00:26:09.400 --> 00:26:13.320
+to a certain context window length.
+
+728
+00:26:11.160 --> 00:26:15.040
+Otherwise, the speed just takes too
+
+729
+00:26:13.320 --> 00:26:18.160
+long. The wall clock time, the
+
+730
+00:26:15.040 --> 00:26:20.440
+end-to-end latency is just too high. The
+
+731
+00:26:18.160 --> 00:26:23.400
+numbers are even worse on the M4, right?
+
+732
+00:26:20.440 --> 00:26:25.960
+At 2K, we're already up at 30 seconds.
+
+733
+00:26:23.400 --> 00:26:29.120
+At 1K, we're already at that 20 second
+
+734
+00:26:25.960 --> 00:26:33.040
+mark and the 36 second mark. M5 running
+
+735
+00:26:29.120 --> 00:26:34.280
+the Quinn 3.5 MLX model, very very fast.
+
+736
+00:26:33.040 --> 00:26:36.360
+So we're using the best local models
+
+737
+00:26:34.280 --> 00:26:38.760
+with the best tooling at a decent
+
+738
+00:26:36.360 --> 00:26:40.880
+parameter size. So the speed is here.
+
+739
+00:26:38.760 --> 00:26:42.120
+This is at that 35 and the 26 billion
+
+740
+00:26:40.880 --> 00:26:44.520
+parameter mark. If you push the
+
+741
+00:26:42.120 --> 00:26:46.800
+parameter size lower, you can expect to
+
+742
+00:26:44.520 --> 00:26:48.440
+see your accuracy go down while you
+
+743
+00:26:46.800 --> 00:26:50.520
+increase your speed a little bit. For
+
+744
+00:26:48.440 --> 00:26:53.280
+simple problems, this is fine. But I'm
+
+745
+00:26:50.520 --> 00:26:56.200
+really looking at this 26, 35 billion
+
+746
+00:26:53.280 --> 00:26:58.760
+parameter level model to get top-tier
+
+747
+00:26:56.200 --> 00:27:00.360
+performance in a decent amount of time.
+
+748
+00:26:58.760 --> 00:27:03.040
+Let's move on to our final benchmark
+
+749
+00:27:00.360 --> 00:27:05.280
+here. Let's look at the Pi coding agent.
+
+750
+00:27:03.040 --> 00:27:06.960
+What happens when we put these models
+
+751
+00:27:05.280 --> 00:27:09.520
+inside of the Pi coding agent and make
+
+752
+00:27:06.960 --> 00:27:10.840
+them do agentic work for us. Let's find
+
+753
+00:27:09.520 --> 00:27:13.960
+out. All right, we're going to run
+
+754
+00:27:10.840 --> 00:27:16.200
+Jbench Pi M4 and we're going to take
+
+755
+00:27:13.960 --> 00:27:18.080
+that exact same prompt, go over to our
+
+756
+00:27:16.200 --> 00:27:20.120
+M5. Let's go ahead and kick this off and
+
+757
+00:27:18.080 --> 00:27:22.520
+let's see how our models perform inside
+
+758
+00:27:20.120 --> 00:27:24.720
+of an agent. This is where most agentic
+
+759
+00:27:22.520 --> 00:27:26.480
+work is happening. One-off prompt calls
+
+760
+00:27:24.720 --> 00:27:29.440
+aren't really that useful, right? We
+
+761
+00:27:26.480 --> 00:27:31.880
+want agents operating our software and
+
+762
+00:27:29.440 --> 00:27:33.238
+our products. Here we go. One, two,
+
+763
+00:27:31.880 --> 00:27:35.258
+three.
+
+764
+00:27:33.238 --> 00:27:35.258
+>> [music]
+
+765
+00:27:35.800 --> 00:27:39.480
+>> Unloading the models, restarting them,
+
+766
+00:27:38.000 --> 00:27:41.720
+and then they're going to do a quick
+
+767
+00:27:39.480 --> 00:27:44.440
+warm-up. And after that, we're going to
+
+768
+00:27:41.720 --> 00:27:46.160
+start doing agentic work. So here's what
+
+769
+00:27:44.440 --> 00:27:48.400
+we're looking at here with our Pi coding
+
+770
+00:27:46.160 --> 00:27:50.880
+agent. M5 just came in really really
+
+771
+00:27:48.400 --> 00:27:52.640
+fast followed by the M4. You can see our
+
+772
+00:27:50.880 --> 00:27:54.840
+model lineup here. We are leaving off
+
+773
+00:27:52.640 --> 00:27:56.880
+the Gemma 4 MLX variant due to some
+
+774
+00:27:54.840 --> 00:28:01.720
+configuration issues. As I mentioned,
+
+775
+00:27:56.880 --> 00:28:03.040
+the Claude API just went down
+
+776
+00:28:01.720 --> 00:28:06.080
+and I didn't want to finish the work
+
+777
+00:28:03.040 --> 00:28:07.880
+with GPT 5.4. We didn't get the full MLX
+
+778
+00:28:06.080 --> 00:28:10.440
+server up. That's some local model work
+
+779
+00:28:07.880 --> 00:28:12.720
+that I have to continue doing in agentic
+
+780
+00:28:10.440 --> 00:28:14.679
+coding tasks. What's going on here? So
+
+781
+00:28:12.720 --> 00:28:16.840
+we do have a correctness check here. And
+
+782
+00:28:14.679 --> 00:28:18.679
+we're also tracking total tokens and
+
+783
+00:28:16.840 --> 00:28:20.320
+total tool calls. All right, so you can
+
+784
+00:28:18.679 --> 00:28:22.360
+see two, two, three. Looking good so
+
+785
+00:28:20.320 --> 00:28:24.840
+far. We want to see these numbers be the
+
+786
+00:28:22.360 --> 00:28:26.480
+same on both sides. Of course, we know
+
+787
+00:28:24.840 --> 00:28:28.760
+that our M5 device is going to do a
+
+788
+00:28:26.480 --> 00:28:30.480
+little bit better here when it comes to
+
+789
+00:28:28.760 --> 00:28:32.080
+the raw speed and performance of this.
+
+790
+00:28:30.480 --> 00:28:33.320
+But you can see the correctness looking
+
+791
+00:28:32.080 --> 00:28:34.919
+the same on both sides, which is
+
+792
+00:28:33.320 --> 00:28:36.880
+fantastic. And you can see the total
+
+793
+00:28:34.919 --> 00:28:38.880
+tokens that our models are using to
+
+794
+00:28:36.880 --> 00:28:40.720
+complete the task. So input and output
+
+795
+00:28:38.880 --> 00:28:43.080
+tokens. So this is going to matter here
+
+796
+00:28:40.720 --> 00:28:45.720
+as you saw in the previous benchmark, as
+
+797
+00:28:43.080 --> 00:28:47.320
+tokens increase, performance goes down.
+
+798
+00:28:45.720 --> 00:28:49.720
+Already we're starting to see a break in
+
+799
+00:28:47.320 --> 00:28:51.800
+performance. M5 completing all these
+
+800
+00:28:49.720 --> 00:28:52.880
+tasks, 7 seconds, 10 seconds, 14
+
+801
+00:28:51.800 --> 00:28:53.840
+seconds. And let's go ahead and look at
+
+802
+00:28:52.880 --> 00:28:54.919
+some of the tasks, right? What are we
+
+803
+00:28:53.840 --> 00:28:57.120
+actually running? So we're starting
+
+804
+00:28:54.919 --> 00:28:58.919
+simple, create file hello, print hello
+
+805
+00:28:57.120 --> 00:29:01.240
+world, nothing else. Super super simple.
+
+806
+00:28:58.919 --> 00:29:02.560
+Testing file writing, testing execution.
+
+807
+00:29:01.240 --> 00:29:04.400
+And then our correctness test is
+
+808
+00:29:02.560 --> 00:29:05.400
+actually going to execute the code and
+
+809
+00:29:04.400 --> 00:29:08.400
+make sure that it's right. We're moving
+
+810
+00:29:05.400 --> 00:29:10.040
+to Fibonacci. And so just slowly scaling
+
+811
+00:29:08.400 --> 00:29:11.800
+up the difficulty for these models
+
+812
+00:29:10.040 --> 00:29:14.120
+inside of the Pi coding agent. Create a
+
+813
+00:29:11.800 --> 00:29:15.400
+file called fib. Here we're memoizing
+
+814
+00:29:14.120 --> 00:29:17.280
+with a dictionary. And then we're
+
+815
+00:29:15.400 --> 00:29:20.159
+printing out Fibonacci 10, which should
+
+816
+00:29:17.280 --> 00:29:22.440
+be 55. Easy to validate, very very easy
+
+817
+00:29:20.159 --> 00:29:24.240
+to scale and add complexity. So right
+
+818
+00:29:22.440 --> 00:29:26.000
+now we're running the Quinn 3.5. We're
+
+819
+00:29:24.240 --> 00:29:28.919
+going to run Quinn 3.5 MLX and then
+
+820
+00:29:26.000 --> 00:29:31.120
+finally Gemma 4 GGUF. So this is what
+
+821
+00:29:28.919 --> 00:29:33.000
+really matters now. It's can your model
+
+822
+00:29:31.120 --> 00:29:34.880
+run inside of an agent. Both these
+
+823
+00:29:33.000 --> 00:29:37.880
+models are really really great at
+
+824
+00:29:34.880 --> 00:29:39.720
+running inside of the agent up to a
+
+825
+00:29:37.880 --> 00:29:41.919
+certain context window length, okay?
+
+826
+00:29:39.720 --> 00:29:43.880
+Because of course, as mentioned, as that
+
+827
+00:29:41.919 --> 00:29:46.520
+context window increases, performance
+
+828
+00:29:43.880 --> 00:29:47.800
+goes down in these local models. You
+
+829
+00:29:46.520 --> 00:29:50.640
+know, something I'm really happy about
+
+830
+00:29:47.800 --> 00:29:52.520
+here with both is serious real work you
+
+831
+00:29:50.640 --> 00:29:53.560
+can do on your local device. These
+
+832
+00:29:52.520 --> 00:29:55.960
+models are great at coding, they're
+
+833
+00:29:53.560 --> 00:29:58.760
+great at parsing, summarizing, doing
+
+834
+00:29:55.960 --> 00:30:00.080
+what I like to call micro agent tasks.
+
+835
+00:29:58.760 --> 00:30:02.160
+I'm starting to incorporate these local
+
+836
+00:30:00.080 --> 00:30:04.680
+models into my pie coding agent
+
+837
+00:30:02.160 --> 00:30:06.640
+specifically and into skills and into
+
+838
+00:30:04.680 --> 00:30:08.720
+kind of sub agent processes where I can
+
+839
+00:30:06.640 --> 00:30:10.760
+run micro agents to do a little bit of
+
+840
+00:30:08.720 --> 00:30:12.880
+work in a very consolidated simple way.
+
+841
+00:30:10.760 --> 00:30:14.520
+Why am I doing that? I'm preparing for a
+
+842
+00:30:12.880 --> 00:30:16.840
+future where these local models become
+
+843
+00:30:14.520 --> 00:30:18.200
+more viable. If you don't understand
+
+844
+00:30:16.840 --> 00:30:20.840
+what these models can do now, you won't
+
+845
+00:30:18.200 --> 00:30:23.280
+understand the next step. And I, maybe
+
+846
+00:30:20.840 --> 00:30:25.680
+like you, want to have the advantages of
+
+847
+00:30:23.280 --> 00:30:28.240
+these local models, private, fast, zero
+
+848
+00:30:25.680 --> 00:30:30.240
+dependency on an outside API. We want
+
+849
+00:30:28.240 --> 00:30:31.480
+these properties inside of local
+
+850
+00:30:30.240 --> 00:30:33.440
+intelligence that we can run on our
+
+851
+00:30:31.480 --> 00:30:35.360
+device. I'm really, really excited for
+
+852
+00:30:33.440 --> 00:30:38.440
+what Apple could do next here. They've
+
+853
+00:30:35.360 --> 00:30:39.840
+really fallen into or fallen into a
+
+854
+00:30:38.440 --> 00:30:41.280
+position is
+
+855
+00:30:39.840 --> 00:30:43.320
+not giving them enough credit here, but
+
+856
+00:30:41.280 --> 00:30:45.640
+they're taking advantage of their
+
+857
+00:30:43.320 --> 00:30:48.400
+silicon, their chips, right? The M5
+
+858
+00:30:45.640 --> 00:30:50.920
+Ultra or the M6 chip running in a Mac
+
+859
+00:30:48.400 --> 00:30:52.400
+Mini is the next device that I'm really
+
+860
+00:30:50.920 --> 00:30:53.880
+waiting on, that I'm really keeping my
+
+861
+00:30:52.400 --> 00:30:56.240
+eye on because that is going to be the
+
+862
+00:30:53.880 --> 00:30:57.880
+moment. If they give you 500 GB of RAM
+
+863
+00:30:56.240 --> 00:31:00.080
+in one of those, we are going to have
+
+864
+00:30:57.880 --> 00:31:01.680
+very, very powerful local models right
+
+865
+00:31:00.080 --> 00:31:03.040
+on device. Truly, it's going to change
+
+866
+00:31:01.680 --> 00:31:05.840
+the industry. So, I'm looking forward to
+
+867
+00:31:03.040 --> 00:31:07.880
+that and all that to say, when that time
+
+868
+00:31:05.840 --> 00:31:09.600
+comes, you want to know what you can do
+
+869
+00:31:07.880 --> 00:31:12.360
+with these local models. You want to be
+
+870
+00:31:09.600 --> 00:31:14.120
+able to spin them up in micro agents and
+
+871
+00:31:12.360 --> 00:31:16.000
+sub agent processes. That's really the
+
+872
+00:31:14.120 --> 00:31:18.920
+frontier I'm looking at for local
+
+873
+00:31:16.000 --> 00:31:21.040
+models. What simple work can I hand off
+
+874
+00:31:18.920 --> 00:31:23.400
+to my local model to run very quickly,
+
+875
+00:31:21.040 --> 00:31:25.160
+very cheaply on my device? There's
+
+876
+00:31:23.400 --> 00:31:27.000
+engineering work, there's your, you
+
+877
+00:31:25.160 --> 00:31:28.920
+know, personal life work, and then
+
+878
+00:31:27.000 --> 00:31:30.840
+there's product work, right? These are
+
+879
+00:31:28.920 --> 00:31:33.040
+kind of three key buckets that you can
+
+880
+00:31:30.840 --> 00:31:35.720
+think through when you are assigning
+
+881
+00:31:33.040 --> 00:31:38.000
+tasks to these small models, cheap, fast
+
+882
+00:31:35.720 --> 00:31:40.160
+models, to workhorse models, and then to
+
+883
+00:31:38.000 --> 00:31:42.440
+state-of-the-art models. So, as you
+
+884
+00:31:40.160 --> 00:31:43.640
+would expect, our large packaging
+
+885
+00:31:42.440 --> 00:31:46.000
+prompt, so we're actually having the
+
+886
+00:31:43.640 --> 00:31:48.200
+agent build a full package or some
+
+887
+00:31:46.000 --> 00:31:49.760
+files, multiple writes. That's been the
+
+888
+00:31:48.200 --> 00:31:51.480
+right format, it has to execute
+
+889
+00:31:49.760 --> 00:31:53.160
+properly. For you have a bunch of pure
+
+890
+00:31:51.480 --> 00:31:55.120
+functions that we want them to implement
+
+891
+00:31:53.160 --> 00:31:56.400
+and we're using clean function syntax
+
+892
+00:31:55.120 --> 00:31:57.600
+here. This is going to take quite a bit
+
+893
+00:31:56.400 --> 00:31:59.840
+of time. What we effectively have is a
+
+894
+00:31:57.600 --> 00:32:01.640
+spec for our agent to work through and
+
+895
+00:31:59.840 --> 00:32:03.240
+build out a simple calculator app. And
+
+896
+00:32:01.640 --> 00:32:04.600
+this could be anything. The trick is
+
+897
+00:32:03.240 --> 00:32:06.320
+that we're having our agent do more
+
+898
+00:32:04.600 --> 00:32:08.760
+work. Look at the tool calls down here
+
+899
+00:32:06.320 --> 00:32:10.880
+on the M5 and on the M4. Test T1 through
+
+900
+00:32:08.760 --> 00:32:13.400
+T4, relatively simple, three tool calls.
+
+901
+00:32:10.880 --> 00:32:16.960
+But, test five and test six is requiring
+
+902
+00:32:13.400 --> 00:32:19.480
+our models to do 14 and 26 plus tool
+
+903
+00:32:16.960 --> 00:32:21.920
+calls. Okay, nice. We got 26 out of both
+
+904
+00:32:19.480 --> 00:32:23.280
+the Quinn 3.5 and the MLX. That's good.
+
+905
+00:32:21.920 --> 00:32:25.560
+You want to see these be relatively
+
+906
+00:32:23.280 --> 00:32:26.682
+similar. Total tokens, you can see that
+
+907
+00:32:25.560 --> 00:32:27.200
+used quite
+
+908
+00:32:26.682 --> 00:32:29.640
+>> [laughter]
+
+909
+00:32:27.200 --> 00:32:31.679
+>> a bit of tokens to complete. So, our
+
+910
+00:32:29.640 --> 00:32:33.600
+models are really, really being pushed
+
+911
+00:32:31.679 --> 00:32:35.880
+here. To be super clear here, these are
+
+912
+00:32:33.600 --> 00:32:38.679
+running one-shot prompts. We don't
+
+913
+00:32:35.880 --> 00:32:40.480
+actually have the full 200K inside of
+
+914
+00:32:38.679 --> 00:32:41.880
+the context window of the agent as it
+
+915
+00:32:40.480 --> 00:32:43.600
+continues to stack up its work.
+
+916
+00:32:41.880 --> 00:32:45.280
+Correctness is looking really good. So,
+
+917
+00:32:43.600 --> 00:32:47.679
+these models are actually able to
+
+918
+00:32:45.280 --> 00:32:48.920
+perform and to get the job done. Once
+
+919
+00:32:47.679 --> 00:32:52.120
+again, of course, you can see that the
+
+920
+00:32:48.920 --> 00:32:54.880
+M5 is quite a bit ahead uh thanks to its
+
+921
+00:32:52.120 --> 00:32:57.800
+lower total end-to-end agent execution
+
+922
+00:32:54.880 --> 00:33:00.840
+times. You can see here the M4 across
+
+923
+00:32:57.800 --> 00:33:03.400
+Quinn 3.5 GGUF and MLX and Gemma, you
+
+924
+00:33:00.840 --> 00:33:06.200
+know, 9 seconds, 10 seconds, 20 seconds,
+
+925
+00:33:03.400 --> 00:33:08.640
+40 seconds, 60 seconds, 160 seconds.
+
+926
+00:33:06.200 --> 00:33:11.960
+While the M5, 7 seconds, 10 seconds, 14
+
+927
+00:33:08.640 --> 00:33:14.880
+seconds, 25, 50, 180, 100, so on and so
+
+928
+00:33:11.960 --> 00:33:16.560
+forth. So, the M5 is the device you want
+
+929
+00:33:14.880 --> 00:33:19.000
+if you're doing any local model work. I
+
+930
+00:33:16.560 --> 00:33:20.600
+recommend you max this thing out if you
+
+931
+00:33:19.000 --> 00:33:21.960
+have extra cash in the bank and you
+
+932
+00:33:20.600 --> 00:33:23.400
+really want to understand what you can
+
+933
+00:33:21.960 --> 00:33:24.360
+do with local models. I would just go
+
+934
+00:33:23.400 --> 00:33:25.720
+all the way. I don't really think
+
+935
+00:33:24.360 --> 00:33:27.240
+there's a purpose in buying the lower
+
+936
+00:33:25.720 --> 00:33:29.200
+tier of these models unless you're
+
+937
+00:33:27.240 --> 00:33:31.880
+getting the base model. Just go all the
+
+938
+00:33:29.200 --> 00:33:34.800
+way, get all the RAM, get all the cores.
+
+939
+00:33:31.880 --> 00:33:36.920
+If you boot up even a 35 or a 20 billion
+
+940
+00:33:34.800 --> 00:33:39.320
+parameter model, you will be using a
+
+941
+00:33:36.920 --> 00:33:41.200
+decent chunk of your RAM and all of your
+
+942
+00:33:39.320 --> 00:33:42.840
+GPU when that thing executes. You know,
+
+943
+00:33:41.200 --> 00:33:45.240
+side note, whenever you run these
+
+944
+00:33:42.840 --> 00:33:47.080
+models, plug your device in. Running
+
+945
+00:33:45.240 --> 00:33:49.160
+this, running the fans, running the GPU,
+
+946
+00:33:47.080 --> 00:33:51.040
+running your cores like this saps your
+
+947
+00:33:49.160 --> 00:33:53.200
+power very, very quickly. So, we're
+
+948
+00:33:51.040 --> 00:33:54.679
+coming up to the last test here for M5.
+
+949
+00:33:53.200 --> 00:33:55.880
+I don't think we need to let the M4
+
+950
+00:33:54.679 --> 00:33:58.400
+complete. It's going to take some time
+
+951
+00:33:55.880 --> 00:34:01.080
+for the M4 to work through all this.
+
+952
+00:33:58.400 --> 00:34:03.440
+Local models can absolutely run inside
+
+953
+00:34:01.080 --> 00:34:05.560
+of agents now. They can do agentic work
+
+954
+00:34:03.440 --> 00:34:07.160
+for you. The complexity of that work is,
+
+955
+00:34:05.560 --> 00:34:10.520
+of course, going to be on the simpler
+
+956
+00:34:07.160 --> 00:34:14.200
+end for now, but you can absolutely do
+
+957
+00:34:10.520 --> 00:34:17.040
+useful local model work up to that 8 to
+
+958
+00:34:14.200 --> 00:34:18.800
+16K token level. So, really, really
+
+959
+00:34:17.040 --> 00:34:20.159
+impressive here. Okay, yeah, Gemma's
+
+960
+00:34:18.800 --> 00:34:22.200
+doing a lot of work here. It didn't
+
+961
+00:34:20.159 --> 00:34:24.800
+quite get the answer right. Looks like
+
+962
+00:34:22.200 --> 00:34:27.280
+it got 0.7 on the package generation,
+
+963
+00:34:24.800 --> 00:34:29.840
+but um it ran this with just five tool
+
+964
+00:34:27.280 --> 00:34:32.000
+calls. Moreover, I'm really impressed
+
+965
+00:34:29.840 --> 00:34:34.280
+with both of these models, both the
+
+966
+00:34:32.000 --> 00:34:37.000
+Quinn 3.5 and the Gemma model. But, a
+
+967
+00:34:34.280 --> 00:34:39.800
+big takeaway here is if you're on Mac
+
+968
+00:34:37.000 --> 00:34:42.720
+devices, find the MLX model variants.
+
+969
+00:34:39.800 --> 00:34:44.888
+Absolutely use the MLX model variants.
+
+970
+00:34:42.720 --> 00:34:46.908
+Okay, so it got the answer wrong.
+
+971
+00:34:44.888 --> 00:34:46.908
+>> [laughter]
+
+972
+00:34:47.200 --> 00:34:51.399
+>> The M4 just kind of gave up here, one
+
+973
+00:34:49.640 --> 00:34:53.800
+tool call, and then it just like could
+
+974
+00:34:51.399 --> 00:34:55.120
+not finish. But, um all benchmarks are
+
+975
+00:34:53.800 --> 00:34:57.160
+now complete. Yeah, you can see that
+
+976
+00:34:55.120 --> 00:34:59.800
+this is clearly not a legitimate result.
+
+977
+00:34:57.160 --> 00:35:01.200
+It tried, uh that's fine. This entire
+
+978
+00:34:59.800 --> 00:35:02.520
+code base is going to be available to
+
+979
+00:35:01.200 --> 00:35:04.280
+you. I can go ahead and just pull this
+
+980
+00:35:02.520 --> 00:35:05.760
+up quickly here. The structure is
+
+981
+00:35:04.280 --> 00:35:08.000
+relatively simple. You have four
+
+982
+00:35:05.760 --> 00:35:09.440
+benchmarks, including a simple mock test
+
+983
+00:35:08.000 --> 00:35:11.520
+YAML file benchmark. This is what
+
+984
+00:35:09.440 --> 00:35:13.520
+defines every single benchmark. You can
+
+985
+00:35:11.520 --> 00:35:15.640
+see kind of the general structure there.
+
+986
+00:35:13.520 --> 00:35:17.240
+Um and then inside of apps, we have the
+
+987
+00:35:15.640 --> 00:35:20.520
+kind of core back end, front end, the
+
+988
+00:35:17.240 --> 00:35:22.520
+CLI that the M4 and the M5 use to ping
+
+989
+00:35:20.520 --> 00:35:25.359
+messages to the server. And then we have
+
+990
+00:35:22.520 --> 00:35:26.920
+the actual benchmarks that execute all
+
+991
+00:35:25.359 --> 00:35:29.400
+of the tests. All of this is going to be
+
+992
+00:35:26.920 --> 00:35:30.800
+here for you uh from me as a thank you
+
+993
+00:35:29.400 --> 00:35:32.760
+for making it to the end of the video.
+
+994
+00:35:30.800 --> 00:35:34.480
+Link will be in the description for you.
+
+995
+00:35:32.760 --> 00:35:35.880
+This benchmark isn't perfect. There's
+
+996
+00:35:34.480 --> 00:35:37.359
+always something to miss when you're
+
+997
+00:35:35.880 --> 00:35:38.760
+creating these benchmarks, these local
+
+998
+00:35:37.359 --> 00:35:40.480
+benchmarks, and cloud benchmarks,
+
+999
+00:35:38.760 --> 00:35:41.960
+frankly. But, I think it's useful to sit
+
+1000
+00:35:40.480 --> 00:35:43.600
+down every once in a while when there's
+
+1001
+00:35:41.960 --> 00:35:45.400
+a stack of innovations coming out of the
+
+1002
+00:35:43.600 --> 00:35:47.320
+local model space and just understand
+
+1003
+00:35:45.400 --> 00:35:48.920
+what you can really do. So, feel free to
+
+1004
+00:35:47.320 --> 00:35:50.520
+play with this, customize this, create
+
+1005
+00:35:48.920 --> 00:35:51.960
+your own benchmarks, and, you know,
+
+1006
+00:35:50.520 --> 00:35:53.200
+throw an agent at this, throw a
+
+1007
+00:35:51.960 --> 00:35:54.760
+state-of-the-art agent at these
+
+1008
+00:35:53.200 --> 00:35:55.960
+benchmarks, have them tweak it, tune it,
+
+1009
+00:35:54.760 --> 00:35:57.400
+make it your own. Couple additional
+
+1010
+00:35:55.960 --> 00:35:59.040
+directions I want to go here. We saw
+
+1011
+00:35:57.400 --> 00:36:00.880
+here that, you know, the decode speeds
+
+1012
+00:35:59.040 --> 00:36:02.840
+are really, really good on these models
+
+1013
+00:36:00.880 --> 00:36:04.600
+up to really, really large context
+
+1014
+00:36:02.840 --> 00:36:06.920
+windows. This means that we can push to
+
+1015
+00:36:04.600 --> 00:36:09.600
+even larger parameter models. I'd love
+
+1016
+00:36:06.920 --> 00:36:12.240
+to find a good 50, 60, 70 billion
+
+1017
+00:36:09.600 --> 00:36:13.440
+parameter model to run on my M5. So,
+
+1018
+00:36:12.240 --> 00:36:15.160
+we're going to be looking out for that.
+
+1019
+00:36:13.440 --> 00:36:17.440
+Um I'm also going to be running a ton
+
+1020
+00:36:15.160 --> 00:36:19.240
+more pie coding agent related
+
+1021
+00:36:17.440 --> 00:36:21.320
+benchmarks. Uh the pie agent is just the
+
+1022
+00:36:19.240 --> 00:36:22.920
+simplest way to customize and understand
+
+1023
+00:36:21.320 --> 00:36:25.720
+what your agent can do. You can imagine
+
+1024
+00:36:22.920 --> 00:36:27.640
+a fully customized uh pie agent harness
+
+1025
+00:36:25.720 --> 00:36:30.080
+that can spec out a lot of the model
+
+1026
+00:36:27.640 --> 00:36:31.640
+performance right inside the UI since if
+
+1027
+00:36:30.080 --> 00:36:33.160
+you're using the pie coding agent, as
+
+1028
+00:36:31.640 --> 00:36:34.880
+we've talked about in previous videos,
+
+1029
+00:36:33.160 --> 00:36:37.480
+you can customize the entire agent
+
+1030
+00:36:34.880 --> 00:36:39.320
+harness. This is a big idea in 2026,
+
+1031
+00:36:37.480 --> 00:36:40.520
+control your agent harness to control
+
+1032
+00:36:39.320 --> 00:36:42.680
+your results. So, I'm going to be
+
+1033
+00:36:40.520 --> 00:36:44.720
+digging into specialized pie agent
+
+1034
+00:36:42.680 --> 00:36:46.320
+harness variants specifically built for
+
+1035
+00:36:44.720 --> 00:36:48.720
+SLMs. And then, you know, there's a ton
+
+1036
+00:36:46.320 --> 00:36:51.960
+of other directions here. The Gemma 4
+
+1037
+00:36:48.720 --> 00:36:53.640
+models can also take in images and
+
+1038
+00:36:51.960 --> 00:36:55.880
+audio. So, that's another benchmark.
+
+1039
+00:36:53.640 --> 00:36:57.359
+Quinn model can also take in text and
+
+1040
+00:36:55.880 --> 00:36:58.920
+images. So, there's a lot more work to
+
+1041
+00:36:57.359 --> 00:37:00.600
+be done here to understand what you can
+
+1042
+00:36:58.920 --> 00:37:02.280
+really do with local models. But, when
+
+1043
+00:37:00.600 --> 00:37:05.520
+it comes down to it, local models are
+
+1044
+00:37:02.280 --> 00:37:08.160
+still a work in progress. For 90% of
+
+1045
+00:37:05.520 --> 00:37:09.920
+tasks, using a model provider is the way
+
+1046
+00:37:08.160 --> 00:37:12.440
+to go. But, this is a space I'm keeping
+
+1047
+00:37:09.920 --> 00:37:15.120
+a sharp eye on because as soon as you
+
+1048
+00:37:12.440 --> 00:37:17.560
+can save all the costs, all the time by
+
+1049
+00:37:15.120 --> 00:37:19.320
+just running your model locally on your
+
+1050
+00:37:17.560 --> 00:37:21.080
+hardware, it's going to be a massive
+
+1051
+00:37:19.320 --> 00:37:22.640
+advantage that's going to compound very,
+
+1052
+00:37:21.080 --> 00:37:24.120
+very quickly. Those who prepare for
+
+1053
+00:37:22.640 --> 00:37:25.880
+local models and understand what's
+
+1054
+00:37:24.120 --> 00:37:27.320
+possible will be the ones saving
+
+1055
+00:37:25.880 --> 00:37:29.480
+resources. If you don't need a large
+
+1056
+00:37:27.320 --> 00:37:31.520
+model, don't use one. This especially
+
+1057
+00:37:29.480 --> 00:37:33.440
+matters for product engineering when you
+
+1058
+00:37:31.520 --> 00:37:35.520
+have hundreds, thousands, and hopefully
+
+1059
+00:37:33.440 --> 00:37:37.480
+hundreds of thousands of users hitting
+
+1060
+00:37:35.520 --> 00:37:39.440
+your service and your models over and
+
+1061
+00:37:37.480 --> 00:37:41.320
+over and over. The future is agentic, so
+
+1062
+00:37:39.440 --> 00:37:43.359
+make sure that you can control the
+
+1063
+00:37:41.320 --> 00:37:45.680
+performance, the cost, and the speed of
+
+1064
+00:37:43.359 --> 00:37:47.440
+your models over time. And of course, as
+
+1065
+00:37:45.680 --> 00:37:49.480
+you know, local models are going to play
+
+1066
+00:37:47.440 --> 00:37:51.160
+a huge role in that. Comment down below,
+
+1067
+00:37:49.480 --> 00:37:52.640
+let me know what other types of
+
+1068
+00:37:51.160 --> 00:37:54.560
+benchmarks, what other models, what
+
+1069
+00:37:52.640 --> 00:37:57.080
+other input types, output types you want
+
+1070
+00:37:54.560 --> 00:37:59.760
+to see in a local model benchmark. I can
+
+1071
+00:37:57.080 --> 00:38:02.280
+spin up my M5 and showcase what you can
+
+1072
+00:37:59.760 --> 00:38:03.800
+do with the best Mac hardware right now.
+
+1073
+00:38:02.280 --> 00:38:05.920
+So, feel free to comment down below.
+
+1074
+00:38:03.800 --> 00:38:07.880
+It's clear the AI improvements are not
+
+1075
+00:38:05.920 --> 00:38:09.760
+going to stop. In fact, they're speeding
+
+1076
+00:38:07.880 --> 00:38:11.600
+up. That means costs go down and
+
+1077
+00:38:09.760 --> 00:38:13.720
+performance goes up. It's only a matter
+
+1078
+00:38:11.600 --> 00:38:15.920
+of time, you know, and I'm predicting by
+
+1079
+00:38:13.720 --> 00:38:21.040
+the end of the year we should be able to
+
+1080
+00:38:15.920 --> 00:38:23.840
+run a Sonnet or Opus 4.0 level model on
+
+1081
+00:38:21.040 --> 00:38:26.040
+your device. Now, how useful it'll be
+
+1082
+00:38:23.840 --> 00:38:27.960
+and for what use cases will depend
+
+1083
+00:38:26.040 --> 00:38:30.160
+directly on the hardware you have
+
+1084
+00:38:27.960 --> 00:38:31.720
+available to you and the software
+
+1085
+00:38:30.160 --> 00:38:32.480
+improvements that come out over the
+
+1086
+00:38:31.720 --> 00:38:33.920
+years. So, make sure you're
+
+1087
+00:38:32.480 --> 00:38:36.640
+benchmarking, make sure you're vibe
+
+1088
+00:38:33.920 --> 00:38:38.600
+checking these local models. So, when
+
+1089
+00:38:36.640 --> 00:38:40.280
+they're ready, you know, and you can
+
+1090
+00:38:38.600 --> 00:38:43.240
+start getting the privacy, speed, and
+
+1091
+00:38:40.280 --> 00:38:44.760
+cost benefits the model providers don't
+
+1092
+00:38:43.240 --> 00:38:47.120
+want you to have. Let me super clear,
+
+1093
+00:38:44.760 --> 00:38:50.160
+model providers want you and I super,
+
+1094
+00:38:47.120 --> 00:38:52.480
+super hooked on their Kool-Aid, on their
+
+1095
+00:38:50.160 --> 00:38:54.200
+models, on everything they're building
+
+1096
+00:38:52.480 --> 00:38:56.240
+in their agent stack. You know where to
+
+1097
+00:38:54.200 --> 00:38:58.840
+find me every single Monday where we
+
+1098
+00:38:56.240 --> 00:39:03.400
+focus on hands-on agentic engineering.
+
+1099
+00:38:58.840 --> 00:39:03.400
+Stay focused and keep building.

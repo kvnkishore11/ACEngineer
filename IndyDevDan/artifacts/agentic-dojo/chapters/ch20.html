@@ -1,0 +1,677 @@
+<section class="chapter" id="ch20">
+<div class="wrap wide">
+<span class="chapnum reveal">20 — The Vault · Videos 01–09</span>
+<div class="kicker reveal">foundations · hooks, observability, sub-agents, context engineering</div>
+<h2 class="title reveal d1" style="max-width:26ch">Nine videos, one spine: <em>the Big Three</em> — context, model, prompt.</h2>
+<p class="lede reveal d2">From July 14 to September 8, 2025, IndyDevDan laid the foundation course in public: observe your agents, understand the primitive, delegate, pick your model tiers, eval fairly, raise the information rate, choose the right pattern, leave the chat UI, and finally engineer the context window itself.</p>
+<div class="pillrow reveal d2"><span class="pill clay">videos 01–09</span><span class="pill blue">Jul 14 – Sep 8, 2025</span><span class="pill olive">principles over tools</span><span class="pill plum">one agent → many focused agents</span><span class="pill amber">5 repos to clone</span></div>
+
+<div class="chapnav reveal">
+<span class="cnl">In this chapter</span>
+<a href="#ch20-s1"><b>1</b>Hooks Observability</a>
+<a href="#ch20-s2"><b>2</b>The New Primitive</a>
+<a href="#ch20-s3"><b>3</b>Sub-Agents</a>
+<a href="#ch20-s4"><b>4</b>Model Stack</a>
+<a href="#ch20-s5"><b>5</b>Nano Agent Evals</a>
+<a href="#ch20-s6"><b>6</b>Output Styles</a>
+<a href="#ch20-s7"><b>7</b>Five Patterns</a>
+<a href="#ch20-s8"><b>8</b>Drop Zones</a>
+<a href="#ch20-s9"><b>9</b>Context R&amp;D</a>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal" id="ch20-s1"><span class="sn">1</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">See everything your agents do</h2></div>
+<div class="kicker reveal">yt-01 · I Can SEE EVERYTHING — Claude Code Hooks for Multi-Agent Observability</div>
+<p class="lede reveal d1">Once you scale past one Claude Code instance, observability is everything — hooks streaming every lifecycle event into a one-way client/server pipeline let you "see everything" your agents do.</p>
+
+<div class="spread reveal d2" style="align-items:center">
+<div class="prose">
+<p class="lead-in">"When it comes to multi-agent systems, observability is everything." Running a single agent "is just the beginning."</p>
+<p>The architecture is deliberately minimal: hooks fire an HTTP POST to a Bun server, which persists to SQLite and streams over WebSocket to a Vue client. <strong>"This one-way data stream keeps things really simple."</strong> Every hook event is tracked — PreToolUse, PostToolUse, Notification, Stop, SubagentStop, PreCompact — with a session ID and source app on every row.</p>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 920 250" role="img" aria-label="Observability pipeline: agents with hooks post events to a Bun server which persists to SQLite and streams over WebSocket to a Vue client">
+<rect x="24" y="58" width="150" height="64" rx="10" class="s-card"/>
+<rect x="32" y="66" width="150" height="64" rx="10" class="s-card"/>
+<rect x="40" y="74" width="150" height="64" rx="10" class="s-clay-f"/>
+<text x="115" y="100" text-anchor="middle" class="s-title" font-size="13">Claude Code ×N</text>
+<text x="115" y="118" text-anchor="middle" class="s-label-sm">hooks: Pre/PostToolUse, Stop…</text>
+<path d="M192 106 H 292" class="s-flow"/>
+<path d="M296 106 l-9 -6 0 12 z" class="s-clay"/>
+<text x="244" y="94" text-anchor="middle" class="s-label-sm">HTTP POST</text>
+<rect x="196" y="132" width="98" height="36" rx="8" class="s-amber-f"/>
+<text x="245" y="148" text-anchor="middle" class="s-label-sm">Haiku summary</text>
+<text x="245" y="161" text-anchor="middle" class="s-label-sm">&lt; 20¢ / thousands</text>
+<rect x="300" y="76" width="140" height="60" rx="10" class="s-blue-f"/>
+<text x="370" y="101" text-anchor="middle" class="s-title" font-size="13">Bun server</text>
+<text x="370" y="118" text-anchor="middle" class="s-label-sm">one-way stream</text>
+<path d="M440 96 C 490 80, 510 62, 550 56" class="s-flow"/>
+<path d="M556 54 l-11 -2 3 11 z" class="s-clay"/>
+<path d="M440 116 C 490 132, 510 150, 550 156" class="s-flow"/>
+<path d="M556 158 l-11 2 3 -11 z" class="s-clay"/>
+<rect x="560" y="30" width="146" height="52" rx="10" class="s-olive-f"/>
+<text x="633" y="52" text-anchor="middle" class="s-title" font-size="12.5">SQLite</text>
+<text x="633" y="68" text-anchor="middle" class="s-label-sm">persist every event</text>
+<rect x="560" y="130" width="146" height="52" rx="10" class="s-plum-f"/>
+<text x="633" y="152" text-anchor="middle" class="s-title" font-size="12.5">WebSocket</text>
+<text x="633" y="168" text-anchor="middle" class="s-label-sm">live stream</text>
+<path d="M706 56 C 740 60, 754 76, 768 90" class="s-flow"/>
+<path d="M772 94 l-11 -3 6 -9 z" class="s-clay"/>
+<path d="M706 156 C 740 152, 754 136, 768 122" class="s-flow"/>
+<path d="M772 118 l-11 3 6 9 z" class="s-clay"/>
+<rect x="776" y="76" width="130" height="60" rx="10" class="s-clay-f"/>
+<text x="841" y="101" text-anchor="middle" class="s-title" font-size="13">Vue client</text>
+<text x="841" y="118" text-anchor="middle" class="s-label-sm">color per session</text>
+<text x="460" y="232" text-anchor="middle" class="s-label">agents → server → persist + stream → dashboard · one-way, deliberately simple</text>
+</svg>
+<div class="fcap"><b>The whole stack, drawn.</b> Hooks → HTTP POST → Bun → SQLite + WebSocket → Vue. No framework magic, no return path.</div>
+</div>
+</div>
+
+<div class="grid grid-3">
+<div class="card accent reveal"><span class="cnum">01</span>
+<p class="ctitle">Color by hash</p>
+<p class="cbody">Hash the app name + session ID into a color so you can visually tell agents apart at a glance — cheap UX that matters at 5–10 agents.</p></div>
+<div class="card amber reveal d1"><span class="cnum">02</span>
+<p class="ctitle">Haiku summarizes first</p>
+<p class="cbody">Each event runs a summarization prompt via a small fast model <em>before</em> sending — "thousands of events... less than 20 cents." "This is where small fast models really shine."</p></div>
+<div class="card blue reveal d2"><span class="cnum">03</span>
+<p class="ctitle">Stop = the full transcript</p>
+<p class="cbody">The Stop event carries the full chat transcript path — the perfect time to copy the entire log and filter it: all reads, all globs, all assistant responses.</p></div>
+</div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<ul>
+<li>Hooks give <strong>"deterministic control over Claude Code's behavior"</strong> — steer, monitor, control.</li>
+<li>"Frameworks are irrelevant when it comes to raw productivity. Your agent knows all of them" — the Vue client is disposable; convert it to any framework with a prompt.</li>
+<li>The codebase-wrapping <strong>agentic layer</strong> (<span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">.claude/</span>, hooks, apps) is a new layer around your code that "will change the way you engineer forever."</li>
+<li>Endgame: "prompting back and forth, one prompt at a time is not the way to engineer. It's a great place to start. It's a terrible place to finish." Push toward off-device, fully programmable agentic coding.</li>
+</ul>
+</div>
+<div class="quote"><p>"If you don't measure it, you can't improve it. If you don't monitor it, how will you know what's actually happening?"</p><span class="cite">— yt-01, the case for observability</span></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">Claude Code hooks (6+ lifecycle events)</span><span class="t">Bun server</span><span class="t">SQLite</span><span class="t">WebSockets</span><span class="t">Vue.js</span><span class="t">Astral UV single-file Python</span><span class="t">Haiku event summaries</span><span class="t">TTS notifications</span></div>
+
+<h3 class="reveal">The drill — build it</h3>
+<div class="spread reveal" style="align-items:start">
+<ol class="steps">
+<li><h4>Wire the hooks</h4><p>Clone the repo; wire the <span class="mono">.claude/hooks</span> send_event script into one codebase's settings.json.</p></li>
+<li><h4>Confirm the pipe</h4><p>Start the Bun server + client; fire a Claude Code session and confirm events land in SQLite and stream to the UI.</p></li>
+<li><h4>Add a second instance</h4><p>Add another codebase/instance and confirm both stream in with distinct session colors.</p></li>
+<li><h4>Turn on summaries</h4><p>Enable the <span class="mono">--summarize</span> flag path so PreToolUse/PostToolUse rows get Haiku one-liners.</p></li>
+<li><h4>Walk a transcript</h4><p>Open a Stop event and walk the full transcript from the payload.</p></li>
+</ol>
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>disler/claude-code-hooks-multi-agent-observability</strong> — the full hooks→server→client observability stack for multiple concurrent Claude Code instances.</span></div>
+<div class="callout ok" style="margin-top:14px"><span class="ci">DONE WHEN</span><span class="cc">Two simultaneous Claude Code sessions stream live color-coded events with model-generated summaries, and you can filter by event type and session.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal blue" id="ch20-s2"><span class="sn">2</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">A new engineering primitive</h2></div>
+<div class="kicker reveal">yt-02 · How Claude Code CHANGED Engineering Forever (and what's next)</div>
+<p class="lede reveal d1">Claude Code isn't a tool or an assistant — it's a new engineering primitive, programmable from any terminal, and betting on that architecture is how you position for what's next.</p>
+
+<div class="spread reveal d2" style="align-items:center">
+<div class="prose">
+<p class="lead-in">"Just like deep learning worked, the agent architecture worked."</p>
+<p>This is phase 2 of the generative AI age: we're not chatting with LLMs, we're <strong>"commanding compute."</strong> And the primitive has exactly three essential elements — powerful LLMs, the right tools, and the agent loop. "You can't have one of these. You can't have two of these. You need all three."</p>
+</div>
+<div class="quote big"><p>The architecture is everything.</p><span class="cite" style="display:block;margin-top:10px">— the three-element thesis, yt-02</span></div>
+</div>
+
+<div class="grid grid-3">
+<div class="card blue reveal"><span class="cnum">01</span>
+<p class="ctitle">Powerful LLMs</p>
+<p class="cbody">"Benchmark ghosting models": since Sonnet 3.5, Anthropic models show emergent behavior that "doesn't show up in benchmarks... They didn't just pass benchmarks. They made benchmarks irrelevant." The only way to find it: time with the model.</p></div>
+<div class="card accent reveal d1"><span class="cnum">02</span>
+<p class="ctitle">The right tools</p>
+<p class="cbody">"You want just the context window" — skip unnecessary RAG; give the model the tool <em>you</em> would use. The terminal is "the highest leverage point for engineers": maximum control over the flow of information, minimal friction.</p></div>
+<div class="card olive reveal d2"><span class="cnum">03</span>
+<p class="ctitle">The agent loop, programmable</p>
+<p class="cbody"><span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">claude -p</span> from any terminal is a fundamental building block for your own agentic systems. Composability and interoperability are "a key feature of true engineering."</p></div>
+</div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<ul>
+<li><strong>Simplicity as a feature:</strong> "There's no complexity. It's just the context window... No setup... No friction. It's just the prompt." (Contrast: Cursor as an app that outgrew simplicity.)</li>
+<li>"Writing code is a fraction of what engineering is" — why vibe coding falls apart, and why agentic coding (not AI coding) was needed.</li>
+<li><strong>Predictions:</strong> multi-agent swarms in ADWs (AI developer workflows); dedicated agent environments — his Mac Mini agent box, and "one of these companies is going to become the new Vercel for AI agents"; codebases refactored while you sleep.</li>
+<li>The engineering gap <em>widens</em> before it shrinks — a "dark age" between 10x engineers who understand what's underneath and vibe coders who "are just building. They're not learning."</li>
+<li><strong>Action items:</strong> master Claude Code; "more prompts, better prompts, then more agents"; keep agents running longer and longer; "your codebase is too big" = you haven't written the right prompts; close the loop — "write a prompt and then say validate your work with X."</li>
+</ul>
+</div>
+<div class="quote"><p>"Focus on principles, not tools, not models. Both of these will change. Principles never change."</p><span class="cite">— the closing law of yt-02</span></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">Claude Code plan mode</span><span class="t">hooks</span><span class="t">sub-agents</span><span class="t">claude -p programmable mode</span><span class="t">Sonnet 3.5 → Claude 4 series</span><span class="t">Aider (historical credit)</span><span class="t">artificial analysis benchmarks</span><span class="t">Mac Mini as agent device</span></div>
+
+<div class="callout idea reveal"><span class="ci">WATCH &amp; ABSORB</span><span class="cc">No repo — internalize instead: <strong>(1)</strong> agent = model + tools + loop, and the primitive is programmable via <strong>claude -p</strong>; <strong>(2)</strong> benchmark-ghosting — judge models by time spent on real tasks, not leaderboards; <strong>(3)</strong> sequence your scaling: better prompts → longer-running agents → more agents.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal olive" id="ch20-s3"><span class="sn">3</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Agents building agents</h2></div>
+<div class="kicker reveal">yt-03 · My Claude Code Sub-Agents BUILD THEMSELVES</div>
+<p class="lede reveal d1">Sub-agents are tools of delegation for your primary agent — you write their system prompts, they respond to the primary agent (not to you) — and a meta-agent can generate new sub-agents on demand.</p>
+
+<div class="compare reveal d2">
+<div class="col bad"><span class="clabel">◴ the two big mistakes</span>
+<ul><li>Treating the agent .md file as a user prompt you're sending.</li>
+<li>Assuming sub-agents report back to <em>you</em>.</li></ul></div>
+<div class="col good"><span class="clabel">◵ what's actually true</span>
+<ul><li>The .md file is the sub-agent's <strong>system prompt</strong>.</li>
+<li>Sub-agents respond to the <strong>primary agent</strong> — "the flow of information here is absolutely critical."</li></ul></div>
+</div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<p class="lead-in">The <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">description</span> field is the routing contract.</p>
+<p>It's what the primary agent reads to decide when to invoke a sub-agent. Encode trigger phrases ("If they say TTS, TTS summary, use this agent") and even <em>how to prompt it</em> ("When you prompt this agent, describe exactly what you want them to communicate"). Raise adherence with Anthropic's information-dense keywords (IDKs): <strong>"use PROACTIVELY"</strong>, <strong>"MUST BE USED"</strong>, <strong>"IMPORTANT:"</strong>. And write the report section explicitly: "Claude, respond to the user with this message."</p>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 460 220" role="img" aria-label="Information flow: you prompt the primary agent, the primary prompts the sub-agent, the sub-agent reports to the primary, the primary reports to you">
+<rect x="20" y="82" width="90" height="54" rx="10" class="s-card"/>
+<text x="65" y="113" text-anchor="middle" class="s-title" font-size="13">You</text>
+<rect x="172" y="82" width="120" height="54" rx="10" class="s-clay-f"/>
+<text x="232" y="106" text-anchor="middle" class="s-title" font-size="12.5">Primary agent</text>
+<text x="232" y="122" text-anchor="middle" class="s-label-sm">routes on description</text>
+<rect x="352" y="82" width="90" height="54" rx="10" class="s-blue-f"/>
+<text x="397" y="106" text-anchor="middle" class="s-title" font-size="12.5">Sub-agent</text>
+<text x="397" y="122" text-anchor="middle" class="s-label-sm">own context</text>
+<text x="397" y="66" text-anchor="middle" class="s-label-sm">.md = its system prompt</text>
+<path d="M110 94 H 164" class="s-flow"/>
+<path d="M168 94 l-9 -6 0 12 z" class="s-clay"/>
+<text x="139" y="84" text-anchor="middle" class="s-label-sm">prompt</text>
+<path d="M292 94 H 344" class="s-flow"/>
+<path d="M348 94 l-9 -6 0 12 z" class="s-clay"/>
+<text x="320" y="84" text-anchor="middle" class="s-label-sm">delegates</text>
+<path d="M348 124 H 296" class="s-flow"/>
+<path d="M292 124 l9 -6 0 12 z" class="s-clay"/>
+<text x="320" y="146" text-anchor="middle" class="s-label-sm">reports back</text>
+<path d="M168 124 H 116" class="s-flow"/>
+<path d="M112 124 l9 -6 0 12 z" class="s-clay"/>
+<text x="139" y="146" text-anchor="middle" class="s-label-sm">reports to you</text>
+<text x="230" y="196" text-anchor="middle" class="s-label">the sub-agent answers the primary — never you</text>
+</svg>
+<div class="fcap"><b>Flow of information.</b> You → primary → sub-agent → primary → you. Engineer both hops explicitly.</div>
+</div>
+</div>
+
+<div class="grid grid-3">
+<div class="card olive reveal"><span class="cnum">01</span>
+<p class="ctitle">The meta-agent</p>
+<p class="cbody">A sub-agent whose system prompt knows how to generate complete new sub-agent files from a description — "my agents are building my agents." Dan has built 50–100+ agents with it. It re-pulls live Claude Code docs rather than trusting stale context.</p></div>
+<div class="card accent reveal d1"><span class="cnum">02</span>
+<p class="ctitle">Problem → solution → tech</p>
+<p class="cbody">Workflow discipline, in that order. "Noobs and beginners start with the technology and work backward." Validate the workflow manually in the primary agent first (run the ElevenLabs tools by hand), <em>then</em> encode it into an agent.</p></div>
+<div class="card plum reveal d2"><span class="cnum">03</span>
+<p class="ctitle">Context preservation — and the trap</p>
+<p class="cbody">A sub-agent has its own isolated context window, saving your primary's — but "it has only what your primary agent prompts it with": equivalent to a one-shot <span class="mono">claude -p</span> call with zero history.</p></div>
+</div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<ul>
+<li><strong>Cons to watch:</strong> hard to debug (you don't see internal prompts/params); decision overload as agent count grows; dependency coupling in chained agents — "you're going to change the planner agent and it's going to ruin everything else"; and sub-agents can't call sub-agents.</li>
+<li>Use <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/all_tools</span>-style listing prompts to discover MCP tool signatures before wiring agents to them.</li>
+<li>The only rule that scales: keep sub-agent workflows isolated and focused — <strong>"a focused agent is a performant agent"</strong> (foreshadows yt-09).</li>
+<li>"If deleting causes you pain, you probably aren't deleting enough."</li>
+</ul>
+</div>
+<div class="quote"><p>"Code is a commodity. Your fine-tuned prompts can be valuable."</p><span class="cite">— yt-03, on what to actually keep</span></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">.claude/agents/</span><span class="t">meta-agent</span><span class="t">custom slash commands</span><span class="t">ElevenLabs MCP (TTS + play audio)</span><span class="t">hooks-driven TTS on Stop</span><span class="t">Cursor for prompt editing</span><span class="t">Claude docs</span></div>
+
+<h3 class="reveal">The drill — build it</h3>
+<div class="spread reveal" style="align-items:start">
+<ol class="steps">
+<li><h4>Read the source</h4><p>Clone claude-code-hooks-mastery; read <span class="mono">.claude/agents/meta-agent.md</span> and one simple agent (hello-world).</p></li>
+<li><h4>Validate by hand</h4><p>Pick a real problem (e.g., work-completion TTS summary). Validate the tool workflow manually in a primary agent session.</p></li>
+<li><h4>Generate the agent</h4><p>Prompt the meta-agent to generate the new sub-agent; review the generated file.</p></li>
+<li><h4>Tighten the contract</h4><p>Sharpen the description with trigger words + prompting instructions for the primary agent; add tool restrictions.</p></li>
+<li><h4>Trigger naturally</h4><p>In a fresh instance, trigger it via natural phrasing and confirm the primary delegates correctly.</p></li>
+<li><h4>Trace the flow</h4><p>Read the hook logs to trace the primary→sub prompt and the sub→primary response.</p></li>
+</ol>
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>disler/claude-code-hooks-mastery</strong> — hooks (all lifecycle events) + sub-agents + meta-agent playground.</span></div>
+<div class="callout ok" style="margin-top:14px"><span class="ci">DONE WHEN</span><span class="cc">A meta-agent-generated sub-agent fires from its description alone, and you can point to the exact primary→sub→primary information flow in the logs.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal plum" id="ch20-s4"><span class="sn">4</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Weak, base, strong</h2></div>
+<div class="kicker reveal">yt-04 · I'm ADDICTED to Claude Code — Rate Limits, Agent Models, and CC Alternatives</div>
+<p class="lede reveal d1">With sub-agent model selection you should run a weak/base/strong model stack — the right model for the job — while diversifying away from over-dependence on any one tool as rate limits arrive.</p>
+
+<div class="spread reveal d2" style="align-items:center">
+<div class="prose">
+<p class="lead-in">"Weak, base, strong. Three levels of model control."</p>
+<p>Model selection solves two problems at once: <strong>model overkill</strong> (wasted tokens and money) and <strong>model underperformance</strong> (wasted time). Behind it sits the eternal trade-off triangle — performance, speed, cost — plus a "hidden fourth dimension": <strong>rate limits</strong>. And when it matters, "performance over everything": "When I want to use the best, I don't hesitate... You pay to play."</p>
+</div>
+<div>
+<div class="stats">
+<div class="stat"><div class="sv">Haiku</div><div class="sl">weak — file naming, moves, quick summaries (CC's one-word status popup is a Haiku call)</div></div>
+<div class="stat blue"><div class="sv">Sonnet</div><div class="sl">base — the workhorse: "what model is responsible for the most code in the world... very clearly Sonnet 4"</div></div>
+<div class="stat plum"><div class="sv">Opus</div><div class="sl">strong — pedal to the metal, + thinking mode for serious/production work</div></div>
+</div>
+<p class="note">Thinking mode is a second axis on top of model choice: "Sonnet 4 thinking beats Opus 4 base." IDKs: think hard / ultrathink.</p>
+</div>
+</div>
+
+<div class="grid grid-2">
+<div class="card plum reveal"><span class="cnum">01</span>
+<p class="ctitle">A/B/C-test with thin wrappers</p>
+<p class="cbody">One shared prompt across models: cryptocoin-analyzer-haiku/-sonnet/-opus all reference the same <span class="mono">_agent_prompt.md</span>. Only the model, name, and color change. Test sub-agent prompts at the top level first — run the isolated prompt in a primary agent end-to-end before burying it in a sub-agent.</p></div>
+<div class="card accent reveal d1"><span class="cnum">02</span>
+<p class="ctitle">Grade strength by format obedience</p>
+<p class="cbody">Haiku goes off the rails, Sonnet gets close, Opus matches the header exactly. "You can always check for model strength by looking to see if it can obey your output formats." His prompt anatomy everywhere: <strong>Purpose / Variables / Workflow / Output format</strong> — "Output format... forces your agents to report their output."</p></div>
+</div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<ul>
+<li>We're <strong>"clawholics"</strong> — overexposed, too many eggs in one basket. "If you're an industry leader, you will always be copied and cloned." Diversify (Qwen3 Coder, Gemini CLI, open source) — "but let's be super real, no one is close to Claude Code."</li>
+<li>Reusable prompts (custom slash commands) + sub-agents = <em>the</em> way to scale compute: prompt-chaining and fusion-chaining with bigger compositional units.</li>
+</ul>
+</div>
+<div class="quote"><p>"There's nothing more important in the generative AI age as an engineer than your ability to scale up compute and use it to solve real engineering problems."</p><span class="cite">— yt-04</span></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">sub-agent model: selection</span><span class="t">@-mentions for agents &amp; hidden files</span><span class="t">thinking mode / ultrathink</span><span class="t">Haiku 3.5 / Sonnet 4 / Opus 4</span><span class="t">Gemini Flash/Pro tiers</span><span class="t">Qwen3 Coder</span><span class="t">rate limits (Aug 28)</span><span class="t">/crypto-research 12-agent parallel workflow</span></div>
+
+<h3 class="reveal">The drill — build it</h3>
+<div class="spread reveal" style="align-items:start">
+<ol class="steps">
+<li><h4>Extract the prompt</h4><p>Take one analysis-style prompt you use; extract it to <span class="mono">_agent_prompt.md</span> (Purpose/Variables/Workflow/Output-format).</p></li>
+<li><h4>Make three wrappers</h4><p>Create haiku/sonnet/opus sub-agents that differ only in <span class="mono">model:</span> and name, all referencing that prompt.</p></li>
+<li><h4>Fan out</h4><p>Write a top-level slash command that runs all three in parallel and writes outputs to <span class="mono">outputs/</span> with model-tagged filenames.</p></li>
+<li><h4>Diff obedience</h4><p>Diff the three outputs against your specified output-format headers.</p></li>
+<li><h4>Pin the tier</h4><p>Decide the cheapest model that passes, and pin it.</p></li>
+</ol>
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>disler/claude-code-hooks-mastery</strong> — includes the crypto research agent teams (haiku/sonnet/opus variants sharing one agent prompt).</span></div>
+<div class="callout ok" style="margin-top:14px"><span class="ci">DONE WHEN</span><span class="cc">You have a written verdict of which tier the task actually needs, backed by side-by-side format-obedience diffs.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal amber" id="ch20-s5"><span class="sn">5</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Flatten the field, then judge</h2></div>
+<div class="kicker reveal">yt-05 · GPT-5 Agentic Coding with Claude Code</div>
+<p class="lede reveal d1">To judge agentic models fairly you must flatten the playing field — a minimal "nano agent" MCP server gives every model the same context, tools, and prompt, then Claude Code (Opus 4.1) plays LLM-as-judge on performance, speed, and cost.</p>
+
+<div class="spread reveal d2" style="align-items:center">
+<div class="prose">
+<p class="lead-in">"It's not about a single prompt call anymore. It's about how well your agent chains together multiple tools to accomplish real engineering results."</p>
+<p>"A single prompt eval is not enough anymore." The rig is <strong>HOP/LOP</strong>: a higher-order prompt (grading rubric, S–F grades, orchestration) that takes lower-order prompts (individual benchmark tasks) as input — a reusable eval harness in pure prompts. The nano agent itself is a micro Claude Code: one MCP tool (<span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">prompt_nano_agent</span>) wrapping an OpenAI Agents SDK loop with ~7 primitive tools (read, write, list, edit...). Same scaffolding for every model = a fair fight.</p>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 460 280" role="img" aria-label="HOP LOP eval rig: a higher-order prompt fans out one task to four models on identical scaffolding, then an LLM judge grades S to F">
+<rect x="155" y="18" width="150" height="48" rx="10" class="s-clay-f"/>
+<text x="230" y="38" text-anchor="middle" class="s-title" font-size="12.5">HOP · rubric</text>
+<text x="230" y="54" text-anchor="middle" class="s-label-sm">LOP task in, grades out</text>
+<path d="M196 66 C 140 84, 90 98, 62 114" class="s-flow"/>
+<path d="M58 116 l11 -8 -5 11 z" class="s-clay"/>
+<path d="M218 66 C 200 84, 186 98, 176 114" class="s-flow"/>
+<path d="M174 118 l9 -8 -1 11 z" class="s-clay"/>
+<path d="M242 66 C 260 84, 274 98, 284 114" class="s-flow"/>
+<path d="M286 118 l1 -11 9 8 z" class="s-clay"/>
+<path d="M264 66 C 320 84, 370 98, 398 114" class="s-flow"/>
+<path d="M402 116 l-6 -11 11 8 z" class="s-clay"/>
+<rect x="8" y="120" width="100" height="46" rx="9" class="s-blue-f"/>
+<text x="58" y="139" text-anchor="middle" class="s-label-sm">GPT-5 nano</text>
+<text x="58" y="153" text-anchor="middle" class="s-label-sm">cheap + fast</text>
+<rect x="120" y="120" width="100" height="46" rx="9" class="s-olive-f"/>
+<text x="170" y="139" text-anchor="middle" class="s-label-sm">Sonnet 4</text>
+<text x="170" y="153" text-anchor="middle" class="s-label-sm">lost pts: preamble</text>
+<rect x="232" y="120" width="100" height="46" rx="9" class="s-plum-f"/>
+<text x="282" y="139" text-anchor="middle" class="s-label-sm">Opus 4.1</text>
+<text x="282" y="153" text-anchor="middle" class="s-label-sm">raw perf S-tier</text>
+<rect x="344" y="120" width="108" height="46" rx="9" class="s-amber-f"/>
+<text x="398" y="139" text-anchor="middle" class="s-label-sm">GPT-OSS 20B</text>
+<text x="398" y="153" text-anchor="middle" class="s-label-sm">local · $0</text>
+<path d="M58 166 C 90 190, 140 202, 172 210" class="s-flow"/>
+<path d="M176 212 l-11 2 4 -10 z" class="s-clay"/>
+<path d="M170 166 C 184 182, 196 194, 206 206" class="s-flow"/>
+<path d="M208 210 l-10 -3 7 -8 z" class="s-clay"/>
+<path d="M282 166 C 272 182, 264 194, 256 206" class="s-flow"/>
+<path d="M254 210 l3 -11 7 8 z" class="s-clay"/>
+<path d="M398 166 C 370 190, 322 202, 290 210" class="s-flow"/>
+<path d="M286 212 l7 -8 4 10 z" class="s-clay"/>
+<rect x="140" y="214" width="180" height="48" rx="10" class="s-card"/>
+<text x="230" y="234" text-anchor="middle" class="s-title" font-size="12">LLM-as-judge · Opus 4.1</text>
+<text x="230" y="250" text-anchor="middle" class="s-label-sm">grades S–F · perf, speed, cost</text>
+</svg>
+<div class="fcap"><b>The fair fight.</b> One rubric, one task, identical nano-agent scaffolding per model, one judge.</div>
+</div>
+</div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<ul>
+<li>Judged as a <em>package</em> (perf + speed + cost), GPT-5 nano/mini beat the giants on simple agentic tasks; judged on raw performance, Opus 4.1 / Opus 4 / Sonnet 4 stay S-tier. <strong>Both things are true</strong> — grade against the trade-off you care about.</li>
+<li>GPT-OSS 20B/120B on an M4 Max (128GB, via Ollama/LM Studio): "viable agentic coding happening on device right now... total cost: $0."</li>
+<li><strong>Instruction-following is the eval:</strong> exact response formats, exact file outputs ("MODEL_NAME was here") — Sonnet lost points for preamble; nano nailed the format.</li>
+<li>"Don't trust any individual benchmark. It's their job to tell you that they're doing a great job... crack open the hood of all these models." Most engineers can't feel what "+2% on a benchmark" means in agentic work — "it's actually massive." Run models on real problems to know.</li>
+<li>It isn't just the model: "there's a lot of work that goes into something like Claude Code to make it the best... most consistent agent." Keep the SOTA top-level agent; delegate selected tasks downward. The OpenAI Agents SDK is a great way to learn the year's most important architecture — the agent loop — by building one. "The true value proposition of models is being exposed. It's real work end to end."</li>
+</ul>
+</div>
+<div class="quote big"><p>Atomize your units of compute so you can test them and scale them up.</p><span class="cite" style="display:block;margin-top:10px">— every sub-agent independently runnable from the terminal</span></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">nano-agent MCP server</span><span class="t">OpenAI Agents SDK</span><span class="t">GPT-5 / mini / nano</span><span class="t">GPT-OSS 20B &amp; 120B on-device (M4 Max)</span><span class="t">Opus 4.1 / Opus 4 / Sonnet 4 / Haiku</span><span class="t">LLM-as-judge</span><span class="t">HOP/LOP orchestration</span><span class="t">sub-agents as model launchers</span></div>
+
+<h3 class="reveal">The drill — build it</h3>
+<div class="spread reveal" style="align-items:start">
+<ol class="steps">
+<li><h4>Configure providers</h4><p>Clone nano-agent; configure Anthropic, OpenAI, and Ollama for a local model.</p></li>
+<li><h4>Run the dummy eval</h4><p>Run the dummy test HOP/LOP through Claude Code; watch parallel sub-agents fan out.</p></li>
+<li><h4>Verify by hand</h4><p>Run the file-operations LOP; manually verify each model's output files.</p></li>
+<li><h4>Write your own LOP</h4><p>Pick a task from your real work: read X, transform, write Y in an exact format.</p></li>
+<li><h4>Audit the judge</h4><p>Read the grade table; sanity-check one S and one F grade by hand.</p></li>
+</ol>
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>disler/nano-agent</strong> — MCP server + eval harness (HOP/LOP under <span class="mono">.claude/commands/perf/</span>, per-model sub-agents, eval_results files).</span></div>
+<div class="callout ok" style="margin-top:14px"><span class="ci">DONE WHEN</span><span class="cc">Your custom LOP produces a defensible S–F ranking across ≥4 models including one local model, and you disagree with the judge zero times after manual spot-checks.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal blue" id="ch20-s6"><span class="sn">6</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Raise the information rate</h2></div>
+<div class="kicker reveal">yt-06 · Engineers… Claude Code Output Styles Are Here — Don't Miss This TREND</div>
+<p class="lede reveal d1">Output styles — system-prompt-level control of how the agent responds — plus stateful status lines increase the information rate between you and your agents. And the HTML style is the first useful generative UI.</p>
+
+<div class="spread reveal d2" style="align-items:center">
+<div class="prose">
+<p class="lead-in">"Never bet on your first initial reaction without doing the work."</p>
+<p>Dan thought output styles were useless — until a dev session proved otherwise. They literally swap the system prompt: "I'm really happy that they're being clear about the fundamental unit this is updating." Big Three thinking makes new features instantly legible. Six styles demoed: default, table, YAML, ultra-concise, TTS summary, HTML. <strong>YAML "typically outperforms the rest"</strong> — highly structured output formats can improve agent performance — and ultra-concise cuts token consumption. Remember: "New features are only valuable in relation to existing features" — output styles × hooks × status lines compound.</p>
+</div>
+<div class="quote big"><p>"This is the first useful application of generative UI. This is not a gimmick."</p><span class="cite" style="display:block;margin-top:10px">— the GenUI style: the agent writes an HTML file per response and opens it, building UI on the fly</span></div>
+</div>
+
+<div class="grid grid-2">
+<div class="card blue reveal"><span class="cnum">01</span>
+<p class="ctitle">Better agents → output formats</p>
+<p class="cbody">"Two directions to grow: better agents or more agents. Output formats help us with better agents." Extension idea: conditional branches inside the output-style system prompt to pick the output type per prompt.</p></div>
+<div class="card accent reveal d1"><span class="cnum">02</span>
+<p class="ctitle">More agents → status lines</p>
+<p class="cbody">A status line is just a script that prints anything; combine it with a UserPromptSubmit hook writing per-session JSON state to show the last prompt (and trailing 3) per instance. Killer when juggling 3–10 instances: glance and know what each was doing. A local Ollama model generates one-word agent names (5-second timeout, fallback) — small local models for tiny jobs.</p></div>
+</div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<ul>
+<li>The <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/quest</span> question prompt primes your agent while extracting decision-grade info — "ultra valuable for speeding up the information flow between you and your agent," and great for team onboarding.</li>
+<li><strong>Hot take / warning:</strong> Opus-plan-mode and background bash feel like "the beginning of loss of directional focus" — opinionated overreach. The guiding question for any feature: "Do I know exactly what the context, model, and prompt are at every step of the process?" Anything that obscures the Big Three is a red flag.</li>
+</ul>
+</div>
+<div class="quote big"><p>Increase the information rate between you and your agent.</p><span class="cite" style="display:block;margin-top:10px">— the core metric he keeps repeating</span></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">output styles</span><span class="t">statusLine in settings</span><span class="t">UserPromptSubmit hook + JSON session state</span><span class="t">GenUI / HTML generation</span><span class="t">ElevenLabs TTS</span><span class="t">Ollama on-device naming</span><span class="t">Firecrawl (HN research demo)</span><span class="t">Opus plan mode (critiqued)</span></div>
+
+<h3 class="reveal">The drill — build it</h3>
+<div class="spread reveal" style="align-items:start">
+<ol class="steps">
+<li><h4>Install GenUI</h4><p>Copy the GenUI output style into <span class="mono">.claude/output-styles/</span>; set it, run a /quest-style question, and confirm an HTML answer file is generated and opened.</p></li>
+<li><h4>Wire status line v3</h4><p>UserPromptSubmit hook → session JSON → status line script in settings.json.</p></li>
+<li><h4>Go parallel</h4><p>Open 3 instances, prompt each differently, verify each status line shows its own last prompt(s).</p></li>
+<li><h4>Name the agents</h4><p>Add agent-name generation (local model, or hardcode a fallback).</p></li>
+<li><h4>Roll your own style</h4><p>Write one custom output style (e.g., YAML) and compare response quality on the same prompt.</p></li>
+</ol>
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>disler/claude-code-hooks-mastery</strong> — <span class="mono">output-styles/</span>, <span class="mono">status_lines/</span> v1–v4, session data under <span class="mono">.claude/data/sessions/</span>.</span></div>
+<div class="callout ok" style="margin-top:14px"><span class="ci">DONE WHEN</span><span class="cc">Three parallel instances are distinguishable at a glance via stateful status lines, and one prompt produces a rendered HTML (GenUI) response.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal olive" id="ch20-s7"><span class="sn">7</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The five-pattern ladder</h2></div>
+<div class="kicker reveal">yt-07 · 5 Agent PATTERNS to Simplify Your Agentic Coding</div>
+<p class="lede reveal d1">There are five agent interaction patterns — ad-hoc human-in-the-loop, reusable prompts, sub-agents, wrapper MCP server, full application — and you climb that ladder left-to-right only as the problem earns it. The bet behind everything: "a majority of the economic value of AI will come from AI agents."</p>
+
+<div class="fig reveal d2">
+<svg class="draw" viewBox="0 0 920 320" role="img" aria-label="Five rising steps: ad-hoc chat, reusable prompts, sub-agents, wrapper MCP server, full application — climb only as the problem earns it">
+<rect x="30" y="210" width="150" height="70" rx="10" class="s-card"/>
+<text x="105" y="238" text-anchor="middle" class="s-title" font-size="12.5">1 · Ad-hoc chat</text>
+<text x="105" y="256" text-anchor="middle" class="s-label-sm">you are the bottleneck</text>
+<rect x="205" y="165" width="150" height="115" rx="10" class="s-blue-f"/>
+<text x="280" y="193" text-anchor="middle" class="s-title" font-size="12.5">2 · Reusable prompts</text>
+<text x="280" y="211" text-anchor="middle" class="s-label-sm">the 80/20 · 3× = pattern</text>
+<rect x="380" y="120" width="150" height="160" rx="10" class="s-olive-f"/>
+<text x="455" y="148" text-anchor="middle" class="s-title" font-size="12.5">3 · Sub-agents</text>
+<text x="455" y="166" text-anchor="middle" class="s-label-sm">specialize + parallelize</text>
+<rect x="555" y="75" width="150" height="205" rx="10" class="s-plum-f"/>
+<text x="630" y="103" text-anchor="middle" class="s-title" font-size="12.5">4 · Wrapper MCP</text>
+<text x="630" y="121" text-anchor="middle" class="s-label-sm">interface layer · prompts</text>
+<rect x="730" y="30" width="160" height="250" rx="10" class="s-clay-f"/>
+<text x="810" y="58" text-anchor="middle" class="s-title" font-size="12.5">5 · Full app</text>
+<text x="810" y="76" text-anchor="middle" class="s-label-sm">CLI + MCP + UI + API</text>
+<path d="M105 192 C 300 148, 560 78, 786 20" class="s-flow"/>
+<path d="M792 18 l-12 -1 5 11 z" class="s-clay"/>
+<text x="420" y="96" text-anchor="middle" class="s-label">climb only as the problem earns it</text>
+<text x="460" y="308" text-anchor="middle" class="s-label">left → right, never right → left · each level up = more compute, more complexity, more build time</text>
+</svg>
+<div class="fcap"><b>The ladder.</b> "Keep it simple, scale when needed... always go from left to right, never right to left."</div>
+</div>
+
+<ol class="steps reveal">
+<li><h4>Iterative human-in-the-loop</h4><p>High control, but "you are quite literally stuck in the loop... you are in fact the bottleneck." Great start, terrible end.</p></li>
+<li><h4>Reusable prompts (slash commands)</h4><p>"The 80/20 of agent interaction patterns... write it once, reuse all the time." "Three times marks a pattern" — automate on the third repetition.</p></li>
+<li><h4>Sub-agents</h4><p>The decision rule is crisp: "only use sub-agents when you need <strong>specialization and parallelization</strong>. If you don't need to parallelize and you don't need to specialize, just create a reusable prompt." Every sub-agent is another context/model/prompt to manage — plus Claude Code lock-in, the "gray box" debugging problem, and the primary↔sub prompt flow you must engineer.</p></li>
+<li><h4>Wrapper MCP server</h4><p>Build when you must integrate multiple services or expose repeat functionality behind your own interface. "The MCP server is an interface layer." Sleeper feature: <strong>MCP prompts</strong> — "the real value of the MCP server is in the prompts that represent the reusable workflows of specific tool calls... insanely underrated, insanely underused."</p></li>
+<li><h4>Full application</h4><p>CLI + MCP + UI + API — only with a long-term vision or non-engineering consumers. "What's the difference between a customer-facing application and a developer tool? It's the interface layer."</p></li>
+</ol>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<ul>
+<li>"Larger working systems are almost always built from simple working systems." / "Don't overengineer. Let the patterns emerge naturally from usage."</li>
+<li>Skipping levels 1–2 means "there are things you don't know about the problem... because you didn't do it by hand" — where "by hand" now means <em>with your agent in the loop</em>.</li>
+<li>For the images-for-a-presentation example he'd stop at level 2, go to 3 only for 100+ images, and 4 only when other services join.</li>
+</ul>
+</div>
+<div class="quote big"><p>Complexity should be earned, not assumed.</p><span class="cite" style="display:block;margin-top:10px">— the master framework of yt-07</span></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">Claude Code</span><span class="t">Gemini CLI (TOML reusable prompts)</span><span class="t">Codex CLI (dinged for lacking reusable prompts)</span><span class="t">Replicate MCP server</span><span class="t">Qwen image edit</span><span class="t">MCP tools / prompts / resources</span></div>
+
+<div class="callout idea reveal"><span class="ci">WATCH &amp; ABSORB</span><span class="cc">No repo — internalize instead: <strong>(1)</strong> the five-level ladder and its costs — start ad-hoc, codify on the third repetition; <strong>(2)</strong> the sub-agent gate: specialization + parallelization, or don't; <strong>(3)</strong> MCP servers are interface layers whose <em>prompts</em> (not just tools) carry the workflow value. <strong>Bonus:</strong> classify every automation you currently own into levels 1–5 and check nothing skipped a level.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal plum" id="ch20-s8"><span class="sn">8</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Beyond the chat UI</h2></div>
+<div class="kicker reveal">yt-08 · Agentic Workflows — BEYOND the Chat UI (Claude Code SDK + Nano Banana)</div>
+<p class="lede reveal d1">Chat is the lowest-hanging AI interface. File-drop-triggered agentic workflows — Agentic Drop Zones built on the programmable Claude Code SDK — automate repeat, file-based work end-to-end.</p>
+
+<div class="spread reveal d2" style="align-items:start">
+<div class="prose">
+<p class="lead-in">"Chat is just the first, simplest, and most overused AI interface."</p>
+<p>"They're called agents for a reason. They're capable of agency. Let's lean into the autonomy." The architecture: a file dropped into a watched directory matches a drop-zone config, loads a prompt template, runs an agent via the Claude Code SDK, and streams output — all configured in one <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">drops.yaml</span>. "A lot of engineering work is file-based" — so reuse "the oldest interface known to engineers": folders and files, the file system as UI.</p>
+</div>
+<div>
+<div class="filetree"><span class="d">agentic-drop-zones/</span>
+  <span class="f hl">sfs_agentic_drop_zone.py</span>  <span class="c"># ~700-line single-file app (UV inline deps)</span>
+  <span class="f hl">drops.yaml</span>                <span class="c"># every zone: dir → prompt → agent</span>
+  <span class="d">zones/</span>
+    <span class="f">echo.md</span>                 <span class="c"># hello-world zone</span>
+    <span class="f">image_gen.md</span>            <span class="c"># nano banana via Replicate</span>
+    <span class="f">morning_debrief.md</span>      <span class="c"># audio → Whisper → prioritized notes</span></div>
+<p class="note">"I love when I can pack a ton of value into a single script."</p>
+</div>
+</div>
+
+<div class="grid grid-3">
+<div class="card plum reveal"><span class="cnum">01</span>
+<p class="ctitle">Prompt gospel, again</p>
+<p class="cbody"><strong>Purpose / Variables / Workflow / Report.</strong> "LLMs are good enough to reference your variables throughout the rest of the prompt" — <span class="mono">{{drop_file_path}}</span> templating keeps prompts agent-agnostic (avoid <span class="mono">$ARGUMENTS</span> lock-in).</p></div>
+<div class="card accent reveal d1"><span class="cnum">02</span>
+<p class="ctitle">The demo zones</p>
+<p class="cbody">Image generation (Gemini 2.5 Flash "nano banana" via Replicate), image edit, finance categorizer (CSV → charts + report), morning debrief (audio → Whisper transcript → prioritized notes + extensions + questions), training-data expansion (CSV/JSONL row generation), and echo (hello-world).</p></div>
+<div class="card amber reveal d2"><span class="cnum">03</span>
+<p class="ctitle">The killer personal workflow</p>
+<p class="cbody">Morning voice memo → drop → transcribed, formatted, prioritized, extended with ideas and leading questions. Repeat daily, zero chat.</p></div>
+</div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<ul>
+<li><strong>"You need programmatic agents"</strong> — the Claude Code SDK (Python/TypeScript) is the leader; Gemini/Codex lack SDKs so you're stuck with subprocess. "It's too early to pick a winner... prevent lock-in," but CC has the best support for real work.</li>
+<li>Use LLMs to generate the <em>input files</em> at scale, then drop them — agents on both sides of the pipe.</li>
+<li>"Think about the repeat workflows you can now automate with agents" — every drop zone is an encoded, reusable solution.</li>
+</ul>
+</div>
+<div class="quote big"><p>"The models, the agents, are no longer the bottleneck. It's now a complete skill issue."</p><span class="cite" style="display:block;margin-top:10px">— yt-08</span></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">Claude Code Python SDK</span><span class="t">drops.yaml</span><span class="t">Watchdog file watcher</span><span class="t">Astral UV single-file scripts</span><span class="t">Rich logging</span><span class="t">Replicate MCP/API</span><span class="t">Gemini 2.5 Flash image (nano banana)</span><span class="t">Qwen image edit</span><span class="t">OpenAI Whisper (tiny)</span><span class="t">Gemini CLI / Codex (partial support)</span></div>
+
+<h3 class="reveal">The drill — build it</h3>
+<div class="spread reveal" style="align-items:start">
+<ol class="steps">
+<li><h4>Run echo</h4><p>Clone agentic-drop-zones; run the echo zone end-to-end (drop <span class="mono">echo.txt</span>, watch the streamed response).</p></li>
+<li><h4>Map the wiring</h4><p>Read <span class="mono">drops.yaml</span> + <span class="mono">echo.md</span> to map config → prompt → agent invocation.</p></li>
+<li><h4>Design a real zone</h4><p>Pick a genuine repeat workflow (meeting-notes formatter, CSV categorizer): add a drops.yaml entry + a Purpose/Variables/Workflow/Report prompt.</p></li>
+<li><h4>Prove autonomy</h4><p>Drop a file; verify output artifacts + the archive step run unattended.</p></li>
+<li><h4>Stress it</h4><p>Have an LLM generate 5 varied input files and drop them all.</p></li>
+</ol>
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>disler/agentic-drop-zones</strong> — the single-file drop-zone runner (<span class="mono">sfs_agentic_drop_zone.py</span>), drops.yaml, example zones and prompts.</span></div>
+<div class="callout ok" style="margin-top:14px"><span class="ci">DONE WHEN</span><span class="cc">Your custom zone processes a dropped file to finished artifacts with zero chat interaction, repeatably.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal amber" id="ch20-s9"><span class="sn">9</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Reduce &amp; Delegate</h2></div>
+<div class="kicker reveal">yt-09 · Elite Context Engineering with Claude Code</div>
+<p class="lede reveal d1">"A focused agent is a performant agent" — context engineering is managing the context window with only two moves, R&amp;D: Reduce and Delegate, applied across beginner → intermediate → advanced → agentic levels.</p>
+
+<div class="spread reveal d2" style="align-items:center">
+<div class="prose">
+<p class="lead-in">"There are only two ways to manage your context window: R and D — reduce and delegate."</p>
+<p><strong>Reduce #1 — don't preload MCP servers.</strong> A default mcp.json ate 24.1k tokens (12% of the window) before work began. Delete it; load per-task with <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">claude --mcp-config &lt;file&gt;</span> (+ <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">--strict-mcp-config</span> to override globals). <strong>Reduce #2 — context priming over CLAUDE.md.</strong> "A CLAUDE.md file is incredible for one reason: it's a reusable memory file that's always loaded. Simultaneously it's terrible for the exact same reason." Memory files only ever grow (his bloated demo: 23k tokens ≈ 10% of the window). The rule: "only the absolute universal essentials that you're 100% sure you want loaded 100% of the time" — his trimmed file is 43 lines / ~350 tokens. Context priming = per-task-type /prime slash commands (prime_bug, prime_feature, prime_cc...) — "your hot-loading memory file," fully controllable per run.</p>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 460 260" role="img" aria-label="Context engineering: the context window in the middle, Reduce pulling weight out on the left, Delegate pushing work out on the right">
+<text x="230" y="34" text-anchor="middle" class="s-label">only two moves</text>
+<rect x="150" y="60" width="160" height="120" rx="12" class="s-card"/>
+<text x="230" y="92" text-anchor="middle" class="s-title" font-size="13">context window</text>
+<rect x="168" y="106" width="124" height="13" rx="4" class="s-clay"/>
+<rect x="168" y="126" width="88" height="13" rx="4" class="s-dim"/>
+<rect x="168" y="146" width="56" height="13" rx="4" class="s-dim"/>
+<text x="230" y="172" text-anchor="middle" class="s-label-sm">the one thing to protect</text>
+<path d="M146 120 H 130" class="s-flow"/>
+<path d="M126 120 l9 -6 0 12 z" class="s-clay"/>
+<rect x="12" y="86" width="110" height="70" rx="10" class="s-olive-f"/>
+<text x="67" y="108" text-anchor="middle" class="s-title" font-size="12">R · Reduce</text>
+<text x="67" y="126" text-anchor="middle" class="s-label-sm">no preloaded MCP</text>
+<text x="67" y="140" text-anchor="middle" class="s-label-sm">/prime, not CLAUDE.md</text>
+<path d="M314 120 H 330" class="s-flow"/>
+<path d="M334 120 l-9 -6 0 12 z" class="s-clay"/>
+<rect x="338" y="86" width="110" height="70" rx="10" class="s-plum-f"/>
+<text x="393" y="108" text-anchor="middle" class="s-title" font-size="12">D · Delegate</text>
+<text x="393" y="126" text-anchor="middle" class="s-label-sm">sub-agents</text>
+<text x="393" y="140" text-anchor="middle" class="s-label-sm">background agents</text>
+<text x="230" y="226" text-anchor="middle" class="s-label">prompt → chain → agent → many focused agents</text>
+</svg>
+<div class="fcap"><b>R&amp;D.</b> Everything in context engineering is one of these two moves.</div>
+</div>
+</div>
+
+<div class="grid grid-4">
+<div class="card olive reveal"><span class="cnum">L1</span>
+<p class="ctitle">Beginner · Reduce</p>
+<p class="cbody">Kill the default mcp.json; trim CLAUDE.md to universal essentials; prime per task with /prime commands.</p></div>
+<div class="card blue reveal d1"><span class="cnum">L2</span>
+<p class="ctitle">Intermediate · Delegate</p>
+<p class="cbody">Sub-agents are "a partially forked context window" — definitions are <em>system prompts</em>, costing the primary ~122 tokens for three agents. <span class="mono">/load_ai_docs</span> fanned out ~10 scraper sub-agents, keeping ~40k scrape tokens out of the primary.</p></div>
+<div class="card plum reveal d2"><span class="cnum">L3</span>
+<p class="ctitle">Advanced · Bundles</p>
+<p class="cbody">Hooks append a trimmed log (prompt + reads/searches, not writes) per session; after a context blowout, <span class="mono">/load_bundle &lt;path&gt;</span> re-mounts a fresh agent to ~60–70% of the prior agent's state.</p></div>
+<div class="card accent reveal d3"><span class="cnum">L4</span>
+<p class="ctitle">Agentic · Background</p>
+<p class="cbody"><span class="mono">/background</span> boots a whole background Claude Code instance (via CLI/SDK) with a report file it must write to and rename on completion — "compute orchestrating compute, agents orchestrating agents." Get out of the loop.</p></div>
+</div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<ul>
+<li>If you're losing track of a single agent's context, "you probably aren't yet ready for sub-agents" — master one window first. Track every agent's core four: context, model, prompt, tools.</li>
+<li>The scaling-law justification: model performance degrades as context grows — "it's a safe bet to bet on context engineering."</li>
+<li>Ladder mantra: "What's better than a prompt? A prompt chain. What's better than a prompt chain? An agent. What's better than an agent? Many focused, specialized agents."</li>
+<li><strong>Teaser:</strong> agent experts (<span class="mono">.claude/commands/experts/</span> with expertise.yaml + self-improve) as potentially the most powerful technique.</li>
+</ul>
+</div>
+<div class="quote"><p>"It's not necessarily about saving tokens. It's about spending them properly. We manage our context window so that we don't waste time and tokens correcting our agents' mistakes."</p><span class="cite">— yt-09</span></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">/context</span><span class="t">claude --mcp-config / --strict-mcp-config</span><span class="t">CLAUDE.md vs /prime commands</span><span class="t">doc-scraper sub-agents</span><span class="t">Firecrawl MCP</span><span class="t">hooks-driven context bundles</span><span class="t">/load_bundle</span><span class="t">/background (CLI + Python SDK)</span><span class="t">experts directory</span><span class="t">TAC: in-loop → out-loop → ZTE</span></div>
+
+<h3 class="reveal">The drill — build it</h3>
+<div class="spread reveal" style="align-items:start">
+<ol class="steps">
+<li><h4>Measure the baseline</h4><p>In one of your real repos, run <span class="mono">/context</span> and record MCP tokens + memory-file tokens.</p></li>
+<li><h4>Delete and trim</h4><p>Remove the default mcp.json; cut CLAUDE.md to universal essentials only; re-measure.</p></li>
+<li><h4>Prime instead</h4><p>Write two prime commands (/prime general, /prime_&lt;tasktype&gt; focused) and use them instead of memory.</p></li>
+<li><h4>Bundle sessions</h4><p>Wire the context-bundle hook (append prompt + reads to <span class="mono">agents/context_bundles/…</span>) and test /load_bundle in a fresh instance.</p></li>
+<li><h4>Go background</h4><p>Add a /background command that launches a background CC instance with a report file; kick off a plan while your primary stays free.</p></li>
+</ol>
+<div>
+<div class="callout"><span class="ci">REPO</span><span class="cc"><strong>agentic-horizon/elite-context-engineering</strong> — CLAUDE.md variants (concise/large), prime commands, bundles, background delegation, experts scaffolding.</span></div>
+<div class="callout ok" style="margin-top:14px"><span class="ci">DONE WHEN</span><span class="cc">Startup context is ≥90% free, a fresh agent can resume a dead session from a bundle, and one background agent completes a delegated task with a written report — no babysitting.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal" id="ch20-s10"><span class="sn">✦</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The through-line</h2></div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">Nine videos, one chronological arc.</p>
+<p>Observe your agents (01) → understand the primitive (02) → delegate via sub-agents (03) → pick model tiers (04) → eval models fairly (05) → raise the human↔agent information rate (06) → choose the right interaction pattern (07) → leave the chat UI entirely (08) → engineer the context window itself (09). Each video assumes you've absorbed the last; the batch is a curriculum disguised as a channel.</p>
+</div>
+<div class="quote big"><p>A focused agent is a performant agent.</p><span class="cite" style="display:block;margin-top:10px">— the law the whole batch keeps landing on</span></div>
+</div>
+
+<h3 class="reveal">Recurring laws — the batch in eight cards</h3>
+<div class="grid grid-4">
+<div class="card accent reveal"><span class="cnum">01</span>
+<p class="ctitle">The Big Three</p>
+<p class="cbody">Context, model, prompt — every feature and tool is legible through them.</p></div>
+<div class="card blue reveal d1"><span class="cnum">02</span>
+<p class="ctitle">Prompt anatomy</p>
+<p class="cbody">Purpose / Variables / Workflow / Report — used in every repo.</p></div>
+<div class="card olive reveal d2"><span class="cnum">03</span>
+<p class="ctitle">Focused &gt; sprawling</p>
+<p class="cbody">A focused agent is a performant agent. Master one window before many.</p></div>
+<div class="card plum reveal d3"><span class="cnum">04</span>
+<p class="ctitle">Better, then more</p>
+<p class="cbody">Better agents first, then more agents — in that order.</p></div>
+<div class="card amber reveal d2"><span class="cnum">05</span>
+<p class="ctitle">Three times = pattern</p>
+<p class="cbody">On the third repetition, codify it as a reusable prompt.</p></div>
+<div class="card glow reveal d3"><span class="cnum">06</span>
+<p class="ctitle">Earn complexity</p>
+<p class="cbody">Complexity should be earned, not assumed. Keep it simple, scale when needed.</p></div>
+<div class="card accent reveal d4"><span class="cnum">07</span>
+<p class="ctitle">Get out of the loop</p>
+<p class="cbody">In-loop → out-loop → background, off-device agents.</p></div>
+<div class="card blue reveal d5"><span class="cnum">08</span>
+<p class="ctitle">Close the loop</p>
+<p class="cbody">Every prompt should include its own validation step.</p></div>
+</div>
+
+<a class="jump reveal" href="#ch21">Next · Videos 10–18 &nbsp;&rarr;</a>
+</div>
+</section>

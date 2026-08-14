@@ -1,0 +1,210 @@
+<section class="chapter" id="ch04">
+  <div class="wrap wide">
+    <span class="chapnum reveal">04 — Vol I · Tactic 3</span>
+    <div class="kicker reveal">tac-3 · template your engineering</div>
+    <h2 class="title reveal d1" style="max-width:26ch">The plan is the prompt. Success is <em>planned</em>.</h2>
+    <p class="lede reveal d2">"What was once a complete joke is now the most valuable skill any engineer can have. The prompt is everything" — and a plan is just a prompt scaled up for high impact.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">Tactic 3 · Template Your Engineering</span><span class="pill blue">Meta Prompts</span><span class="pill olive">Higher Order Prompts</span><span class="pill plum">specs/</span></div>
+
+    <div class="chapnav reveal"><span class="cnl">In this chapter</span>
+      <a href="#ch04-s1"><b>1</b>The Idea</a>
+      <a href="#ch04-s2"><b>2</b>The Nuggets</a>
+      <a href="#ch04-s3"><b>3</b>What Dan Did</a>
+      <a href="#ch04-s4"><b>4</b>The Workout</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch04-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Idea — Encode How You Solve Problems</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">"Plans are prompts scaled up for high impact… great planning is great prompting."</p>
+        <p>A scaled prompt is "a plan, a specification, a PRD." Tactic #3 — <strong>Template Your Engineering</strong> — means "you encode your problem solving into reusable units that you, your team, and your agents can see, use, and importantly, improve."</p>
+        <p>Two prompt species make it work. A <strong>meta prompt</strong> is "a prompt that builds a prompt" — <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/chore</span> generates a plan from a template. A <strong>Higher Order Prompt (HOP)</strong> takes another prompt as an argument — <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/implement &lt;path-to-plan&gt;</span>, "plans getting passed into plans," like passing functions into functions. A <strong>high-level prompt</strong> is "a prompt void of detail" that templates expand into detailed plans, landing in <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">specs/</span> — "staging environments for code that will be generated."</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 920 240" role="img" aria-label="Pipeline from high-level prompt through a template meta prompt to a plan in specs, implemented by a fresh agent">
+          <text x="460" y="30" text-anchor="middle" class="s-title">TWO PROMPTS SHIP THE CHORE</text>
+          <rect x="30" y="90" width="170" height="70" rx="10" class="s-card"/>
+          <text x="115" y="120" text-anchor="middle" class="s-label">/chore "task"</text>
+          <text x="115" y="140" text-anchor="middle" class="s-label-sm">high-level prompt</text>
+          <path d="M204 125 H 240" class="s-flow"/><path d="M248 125 l-9 -6 0 12 z" class="s-clay"/>
+          <rect x="248" y="78" width="190" height="94" rx="10" class="s-clay-f"/>
+          <text x="343" y="106" text-anchor="middle" class="s-label">chore.md</text>
+          <text x="343" y="126" text-anchor="middle" class="s-label-sm">template meta prompt</text>
+          <text x="343" y="144" text-anchor="middle" class="s-label-sm">"a prompt that builds a prompt"</text>
+          <path d="M442 125 H 478" class="s-flow"/><path d="M486 125 l-9 -6 0 12 z" class="s-clay"/>
+          <rect x="486" y="78" width="180" height="94" rx="10" class="s-olive-f"/>
+          <text x="576" y="106" text-anchor="middle" class="s-label">specs/plan.md</text>
+          <path d="M510 122 H 642" class="s-line"/>
+          <path d="M510 136 H 642" class="s-line"/>
+          <path d="M510 150 H 600" class="s-line"/>
+          <path d="M670 125 H 706" class="s-flow"/><path d="M714 125 l-9 -6 0 12 z" class="s-clay"/>
+          <rect x="714" y="78" width="180" height="94" rx="10" class="s-plum-f"/>
+          <text x="804" y="106" text-anchor="middle" class="s-label">/implement plan</text>
+          <text x="804" y="126" text-anchor="middle" class="s-label-sm">fresh agent · HOP</text>
+          <text x="804" y="144" text-anchor="middle" class="s-label-sm">"a prompt that takes a prompt"</text>
+          <text x="343" y="196" text-anchor="middle" class="s-label-sm">prompt 1 · planning phase</text>
+          <text x="804" y="196" text-anchor="middle" class="s-label-sm">prompt 2 · coding phase</text>
+        </svg>
+        <div class="fcap"><b>The pipeline.</b> This chore "has been completed agentically with two prompts — one for the planning phase and one for the coding/building phase."</div>
+      </div>
+    </div>
+
+    <div class="spread rev reveal d1" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 340" role="img" aria-label="Anatomy of a template: purpose, instructions, relevant files, plan format, and the arguments slot">
+          <rect x="90" y="24" width="280" height="292" rx="12" class="s-card"/>
+          <text x="230" y="12" text-anchor="middle" class="s-label-sm">.claude/commands/chore.md</text>
+          <rect x="112" y="44" width="236" height="40" rx="8" class="s-clay-f"/>
+          <text x="230" y="69" text-anchor="middle" class="s-label">Purpose</text>
+          <rect x="112" y="96" width="236" height="40" rx="8" class="s-blue-f"/>
+          <text x="230" y="121" text-anchor="middle" class="s-label">Instructions</text>
+          <rect x="112" y="148" width="236" height="40" rx="8" class="s-olive-f"/>
+          <text x="230" y="173" text-anchor="middle" class="s-label">Relevant Files</text>
+          <rect x="112" y="200" width="236" height="40" rx="8" class="s-plum-f"/>
+          <text x="230" y="225" text-anchor="middle" class="s-label">Plan Format</text>
+          <rect x="112" y="252" width="236" height="40" rx="8" class="s-amber-f"/>
+          <text x="230" y="277" text-anchor="middle" class="s-label">Chore: $ARGUMENTS</text>
+          <text x="230" y="308" text-anchor="middle" class="s-label-sm">your one-liner slots in at the bottom</text>
+        </svg>
+        <div class="fcap"><b>Anatomy of a template.</b> Purpose, Instructions, Relevant Files, Plan Format, and an $ARGUMENTS slot.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Always run fresh agents. Three reasons.</p>
+        <p><strong>One</strong> — free the context window: "one agent, one task, one mission." <strong>Two</strong> — it forces prompts, plans, and templates to be "isolated, reusable, improvable assets with zero dependencies." <strong>Three</strong> — "prepare for true off-device agentic coding": "we need to decouple our performance from the conversational context window."</p>
+        <p>Inside the templates, Anthropic's encoded IDK <strong>"think hard"</strong> activates the reasoning model — "throw more compute at the problem." And together, the first three tactics — Stop Coding, Adopt Your Agent's Perspective, Template Your Engineering — form <strong>the Pareto 80/20 of agentic engineering</strong>.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch04-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Nuggets</h2></div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal"><span class="cnum">01</span>
+        <p class="ctitle">The prompt is everything</p><p class="cbody">"What was once a complete joke is now the most valuable skill any engineer can have. The prompt is everything."</p></div>
+      <div class="card blue reveal d1"><span class="cnum">02</span>
+        <p class="ctitle">Vibe Coders, not Vibe Engineers</p><p class="cbody">"There's a reason they're called Vibe Coders, not Vibe Engineers. They're just coding. We're doing it all."</p></div>
+      <div class="card olive reveal d2"><span class="cnum">03</span>
+        <p class="ctitle">Plan the future</p><p class="cbody">"Those who plan the future tend to create it. Success is planned."</p></div>
+      <div class="card plum reveal d3"><span class="cnum">04</span>
+        <p class="ctitle">Template everything</p><p class="cbody">"Chores, bugs, features, front end, back end, research notebooks, data analytics, code optimization, net new codebases — all of it can be templated. Don't limit yourself."</p></div>
+      <div class="card amber reveal d4"><span class="cnum">05</span>
+        <p class="ctitle">Custom is the moat</p><p class="cbody">"The more custom your templates are, the more unique your engineering gets."</p></div>
+      <div class="card accent reveal d5"><span class="cnum">06</span>
+        <p class="ctitle">The system that builds the system</p><p class="cbody">"You want to be building the system that builds the system."</p></div>
+    </div>
+
+    <div class="spread reveal d1" style="align-items:start">
+      <div class="prose">
+        <h4>On planning</h4>
+        <ul>
+          <li>"Planning alone is expensive… there's always something to miss."</li>
+          <li>Templates are "one of many solutions to the 'my codebase is too big' problem."</li>
+          <li>Out-of-the-box tools (Codex, Copilot, Devin, Jules, Gemini CLI) "don't understand your codebase like you do… they're limited by nature."</li>
+          <li>"It doesn't take a lot to do a lot, but you need the right information."</li>
+          <li>"Not only should we stop coding, we should also lean into and leverage our agent to write plans with us and for us."</li>
+        </ul>
+      </div>
+      <div class="prose">
+        <h4>On conviction</h4>
+        <ul>
+          <li>"Don't make the mistake in thinking that Gen AI can't solve your problem… tools will change, models will improve. We know this for a fact."</li>
+          <li>"We need to decouple our performance from the conversational context window."</li>
+          <li>"When I boot up this agent, I know 100% what the agent's perspective is."</li>
+          <li>"The more code, the more complexity in your codebase, the more you'll want to dial in your reusable templates to solve specific problems really well."</li>
+          <li>This chore "has been completed agentically with two prompts — one for the planning phase and one for the coding/building phase."</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="spread reveal d2">
+      <div class="callout bad"><span class="ci">PLAN FOR FAILURE</span>
+        <span class="cc">"Having agents run loose on your codebase <strong>without structure</strong>, without knowing how you do things, is a plan for failure."</span></div>
+      <div class="callout idea"><span class="ci">RUN ONE NOW</span>
+        <span class="cc">"You want to get to that first aha moment as fast as possible… <strong>run one of these</strong>. Don't wait to complete this course."</span></div>
+    </div>
+    <div class="callout warn reveal d3"><span class="ci">LIMITING BELIEF</span>
+      <span class="cc">"Be very careful thinking that these tactics can't work for your codebase. <strong>That is a limiting belief.</strong>"</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch04-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What Dan Did</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <ol class="steps">
+        <li><h4>Cloned tac-3 and installed agentically</h4><p><span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/install</span> now also runs <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">scripts/copy.env</span> to copy the .env from tac-2 — agentic resource reuse — then <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">scripts/start</span> boots the NL→SQL app.</p></li>
+        <li><h4>Ran the chore flow</h4><p>Fresh Claude → <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/chore</span> "replace all server print statements proper python logging log levels make sure all output is written to standard out". The meta prompt researched the codebase in thinking mode and generated a plan in specs/.</p></li>
+        <li><h4>Dissected chore.md</h4><p>Purpose → Instructions → Relevant Files → Plan Format → <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">Chore: $ARGUMENTS</span>.</p></li>
+        <li><h4>Implemented in a fresh instance</h4><p>New terminal, fresh Claude → <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/implement specs/&lt;plan&gt;.md</span>. The 12-line HOP: read the plan, think hard, implement, report. Watched it execute, run pytest for regressions, and report.</p></li>
+        <li><h4>Validated by hand</h4><p>Restarted the server, ran queries, confirmed the new logging format, regex-searched to confirm zero <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">print(</span> remained.</p></li>
+        <li><h4>Ran the bug flow</h4><p><span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/bug</span> "resolve major issue our SQL statements not being escaped, user input into SQL" → plan with Problem Statement, Solution Statement, Steps to Reproduce, Root Cause Analysis, Relevant Files, New Files (sql_security), Step-by-Step Tasks, Validation, Notes. Then <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/implement</span> in a fresh instance — self-validation caught and fixed 2 issues, generating 18 new SQL-injection tests (52 total).</p></li>
+        <li><h4>Explained the fresh-agents rationale</h4><p>The three reasons above — context, reusable assets, off-device readiness.</p></li>
+        <li><h4>Previewed out-of-loop with /feature</h4><p>Wrote <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/feature</span> "create a new query history side panel…" but ran it via programmable mode — watching the JSONL stream append live while the agent produced a comprehensive feature plan: user story, problem/solution statement, implementation phases, testing, acceptance criteria.</p></li>
+      </ol>
+      <div>
+        <div class="codecap">.claude/commands/chore.md · the skeleton</div>
+        <div class="code reveal"><pre># Purpose
+Create a plan in specs/ to resolve the chore.
+
+# Instructions
+Research the codebase. Think hard.
+
+# Relevant Files
+# Plan Format
+Chore / Description / Relevant Files /
+Step-by-Step Tasks / Validation Commands / Notes
+
+Chore: $ARGUMENTS</pre></div>
+        <div class="codecap" style="margin-top:14px">.claude/commands/implement.md · 12 lines</div>
+        <div class="code reveal d1"><pre>Read the plan at $ARGUMENTS. Think hard.
+Implement every step in order.
+Then report: summarize work + files changed.</pre></div>
+        <div class="codecap" style="margin-top:14px">the out-of-loop preview</div>
+        <div class="code reveal d2"><pre>claude -p "/feature '…'" \
+  --output-format stream-json \
+  --dangerously-skip-permissions \
+  --model &lt;best&gt; --verbose &gt; output.jsonl</pre></div>
+        <div class="filetree reveal d3"><span class="d">specs/</span>
+  <span class="hl">chore-python-logging.md</span>  <span class="c"># prompt 1 wrote this</span>
+  <span class="f">bug-sql-escaping.md</span>      <span class="c"># 18 new injection tests</span>
+  <span class="f">feature-query-history.md</span> <span class="c"># streamed in headlessly</span></div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch04-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Workout</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div>
+        <div class="callout"><span class="ci">GOAL</span>
+          <span class="cc">Build a <strong>chore → plan → implement</strong> pipeline from templates and ship one chore with exactly two prompts.</span></div>
+        <div class="callout blue" style="margin-top:14px"><span class="ci">PREREQUISITES</span>
+          <span class="cc">Claude Code · a repo with at least one test command (or <strong>disler/tac-3</strong>).</span></div>
+      </div>
+      <div class="quote big"><p>The plan is the prompt — and that means great planning is great prompting.</p>
+        <span class="cite" style="display:block;margin-top:10px">— quote of the lesson</span></div>
+    </div>
+
+    <ol class="steps reveal d1">
+      <li><h4>Write the meta prompt</h4><p>Create <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">.claude/commands/chore.md</span>: Purpose ("create a plan in specs/ to resolve the chore"), Instructions, Relevant Files, a Plan Format (Chore / Description / Relevant Files / Step-by-Step Tasks / Validation Commands / Notes), ending with <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">Chore: $ARGUMENTS</span>.</p></li>
+      <li><h4>Write the HOP</h4><p>Create <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">.claude/commands/implement.md</span>: "Read the plan at $ARGUMENTS. Think hard. Implement every step in order. Run the validation commands. Report: summary + files changed."</p></li>
+      <li><h4>Generate a real plan</h4><p>Run <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/chore "&lt;one real small task in your repo&gt;"</span> and read the generated plan in specs/.</p></li>
+      <li><h4>Implement fresh</h4><p>Open a NEW terminal + fresh Claude instance; run <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/implement specs/&lt;plan&gt;.md</span>.</p></li>
+      <li><h4>Verify and commit</h4><p>Run the plan's validation commands yourself; commit specs + code.</p></li>
+      <li><h4>Repeat headlessly</h4><p><span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">claude -p "/chore '&lt;another chore&gt;'" --output-format stream-json --verbose &gt; run.jsonl</span> — and watch the stream.</p></li>
+    </ol>
+
+    <div class="spread reveal d2">
+      <div class="callout ok"><span class="ci">DONE WHEN</span>
+        <span class="cc">One chore ships end-to-end with <strong>two prompts</strong>, the plan file exists in specs/, and validation commands pass on rerun.</span></div>
+      <div class="callout idea"><span class="ci">LEVEL UP</span>
+        <span class="cc">Add <strong>/bug</strong> (Steps to Reproduce + Root Cause Analysis) and <strong>/feature</strong> (user story + phased implementation) templates; specialize one template to a specific subsystem of your codebase.</span></div>
+    </div>
+
+    <a class="jump reveal" href="#ch05">Next · AFK Agents &nbsp;&rarr;</a>
+  </div>
+</section>

@@ -1,0 +1,522 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1920 1080" width="1920" height="1080"
+     role="img" aria-label="Domain-locked expert memory — three specialized agents each accumulating knowledge within their own domain boundary">
+  <title>Domain-Locked Expert Memory</title>
+  <desc>
+    Three specialized agents (Backend Dev, QA Engineer, Security Reviewer) each
+    bounded within their own dashed domain zone. Each agent has a growing stack
+    of domain-specific memory items. Animation: 15s cycle — left-to-right column
+    reveal with items stacking up, pulse highlights, breathe and reset.
+  </desc>
+
+  <!-- ================================================================
+       LAYOUT:
+         Column centers: x=480 (blue/Backend), x=960 (green/QA), x=1440 (rose/Security)
+         Agent circles: cy=220, r=34
+         Domain label pill: cy=300, 220x28, rx=6
+         Memory items 160x30, rx=6, stacked at y=370,410,450,490
+         Domain zone border: x=[col-110,col+110], y=[156,550]
+         Lock icon: at (col_x, 156+18) = top of zone
+         Title: y=90, subtitle y=125
+         Tagline: y=1010
+
+       Timing (t/15*100):
+         Title/sub: 0%-6.67%
+         Col1 reveal: 3.33%-15.33% (agent 3.33-6.67, items cascade 6.67-15.33)
+         Col2 reveal: 13.33%-25.33% (agent 13.33-16.67, items 16.67-25.33)
+         Col3 reveal: 20%-35.33% (agent 20-23.33, items 26.67-35.33)
+         Tagline: 30%-33.33%
+         Phase2 pulse: 33.33%-60%
+         Phase3 breathe: 60%-98%
+       ================================================================ -->
+  <defs>
+    <filter id="f-glow-blue" x="-40%" y="-40%" width="180%" height="180%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-glow-green" x="-40%" y="-40%" width="180%" height="180%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-glow-rose" x="-40%" y="-40%" width="180%" height="180%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="f-hit" x="-50%" y="-50%" width="200%" height="200%"
+            color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Play:wght@400;700&amp;display=swap');
+
+    /* Typography */
+    .t {
+      font-family: 'Play', sans-serif;
+      font-weight: 700;
+      fill: #ffffff;
+      paint-order: stroke fill;
+      stroke: rgba(0,0,0,0.9);
+      stroke-width: 2.5px;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+    .t-title  { font-size: 22px; letter-spacing: 3px; }
+    .t-sub    { font-size: 13px; fill: rgba(255,255,255,0.55); stroke: rgba(0,0,0,0.8);
+                stroke-width: 2px; }
+    .t-agent  { font-size: 12px; letter-spacing: 0.5px; }
+    .t-domain { font-size: 12px; letter-spacing: 0.5px; }
+    .t-mem    { font-size: 12px; letter-spacing: 0.2px; }
+    .t-tag    { font-size: 12px; letter-spacing: 2px;
+                fill: rgba(255,255,255,0.45); stroke: rgba(0,0,0,0.8);
+                stroke-width: 2.5px; }
+
+    /* ================================================================
+       PHASE 1 REVEAL
+       ================================================================ */
+
+    /* Title + subtitle */
+    #g-title { animation: rev-title 15s infinite; }
+    @keyframes rev-title {
+      0%      { opacity: 0; }
+      6.67%   { opacity: 1; }
+      98%     { opacity: 1; }
+      100%    { opacity: 0; }
+    }
+
+    /* COLUMN 1 (Backend Dev, blue) */
+    /* Agent circle + zone border: 3.33%-6.67% */
+    #g-col1-agent { animation: rev-c1-agent 15s infinite; }
+    @keyframes rev-c1-agent {
+      0%,3.33%  { opacity: 0; }
+      6.67%     { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+    /* Domain label: 6.67%-9.33% */
+    #g-col1-domain { animation: rev-c1-domain 15s infinite; }
+    @keyframes rev-c1-domain {
+      0%,6.67%  { opacity: 0; }
+      9.33%     { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+    /* Memory items cascade: staggered 6.67%-15.33% */
+    #g-c1i1 { animation: rev-c1i1 15s infinite; }
+    @keyframes rev-c1i1 {
+      0%,6.67%  { opacity: 0; } 9.33%  { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+    #g-c1i2 { animation: rev-c1i2 15s infinite; }
+    @keyframes rev-c1i2 {
+      0%,8.67%  { opacity: 0; } 11.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+    #g-c1i3 { animation: rev-c1i3 15s infinite; }
+    @keyframes rev-c1i3 {
+      0%,10.67% { opacity: 0; } 13.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+    #g-c1i4 { animation: rev-c1i4 15s infinite; }
+    @keyframes rev-c1i4 {
+      0%,12.67% { opacity: 0; } 15.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+
+    /* COLUMN 2 (QA Engineer, green) */
+    #g-col2-agent { animation: rev-c2-agent 15s infinite; }
+    @keyframes rev-c2-agent {
+      0%,13.33% { opacity: 0; }
+      16.67%    { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+    #g-col2-domain { animation: rev-c2-domain 15s infinite; }
+    @keyframes rev-c2-domain {
+      0%,16.67% { opacity: 0; }
+      19.33%    { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+    #g-c2i1 { animation: rev-c2i1 15s infinite; }
+    @keyframes rev-c2i1 {
+      0%,16.67% { opacity: 0; } 19.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+    #g-c2i2 { animation: rev-c2i2 15s infinite; }
+    @keyframes rev-c2i2 {
+      0%,18.67% { opacity: 0; } 21.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+    #g-c2i3 { animation: rev-c2i3 15s infinite; }
+    @keyframes rev-c2i3 {
+      0%,20.67% { opacity: 0; } 23.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+    #g-c2i4 { animation: rev-c2i4 15s infinite; }
+    @keyframes rev-c2i4 {
+      0%,22.67% { opacity: 0; } 25.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+
+    /* COLUMN 3 (Security Reviewer, rose) */
+    #g-col3-agent { animation: rev-c3-agent 15s infinite; }
+    @keyframes rev-c3-agent {
+      0%,20%    { opacity: 0; }
+      23.33%    { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+    #g-col3-domain { animation: rev-c3-domain 15s infinite; }
+    @keyframes rev-c3-domain {
+      0%,23.33% { opacity: 0; }
+      26%       { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+    #g-c3i1 { animation: rev-c3i1 15s infinite; }
+    @keyframes rev-c3i1 {
+      0%,26.67% { opacity: 0; } 29.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+    #g-c3i2 { animation: rev-c3i2 15s infinite; }
+    @keyframes rev-c3i2 {
+      0%,28.67% { opacity: 0; } 31.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+    #g-c3i3 { animation: rev-c3i3 15s infinite; }
+    @keyframes rev-c3i3 {
+      0%,30.67% { opacity: 0; } 33.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+    #g-c3i4 { animation: rev-c3i4 15s infinite; }
+    @keyframes rev-c3i4 {
+      0%,32.67% { opacity: 0; } 35.33% { opacity: 1; }
+      98% { opacity: 1; } 100% { opacity: 0; }
+    }
+
+    /* Tagline */
+    #g-tagline { animation: rev-tag 15s infinite; }
+    @keyframes rev-tag {
+      0%,30%    { opacity: 0; }
+      33.33%    { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+
+    /* ================================================================
+       PHASE 2 — MEMORY ITEM PULSES (33.33%-60%)
+       Each item in each column pulses sequentially top-to-bottom
+       Blue items (Col 1): 33.33%-44%
+       Green items (Col 2): 40%-51%
+       Rose items (Col 3): 47%-58%
+       ================================================================ */
+
+    /* Col1 pulse wave */
+    .p-c1 { animation: pulse-c1 15s infinite; }
+    @keyframes pulse-c1 {
+      0%,33.33% { opacity: 1; }
+      35.33%    { opacity: 0.4; }
+      37.33%    { opacity: 1; }
+      39.33%    { opacity: 0.4; }
+      41.33%    { opacity: 1; }
+      44%       { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+    /* Col2 pulse wave */
+    .p-c2 { animation: pulse-c2 15s infinite; }
+    @keyframes pulse-c2 {
+      0%,40%    { opacity: 1; }
+      42%       { opacity: 0.4; }
+      44%       { opacity: 1; }
+      46%       { opacity: 0.4; }
+      48%       { opacity: 1; }
+      51%       { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+    /* Col3 pulse wave */
+    .p-c3 { animation: pulse-c3 15s infinite; }
+    @keyframes pulse-c3 {
+      0%,47%    { opacity: 1; }
+      49%       { opacity: 0.4; }
+      51%       { opacity: 1; }
+      53%       { opacity: 0.4; }
+      55%       { opacity: 1; }
+      58%       { opacity: 1; }
+      98%       { opacity: 1; }
+      100%      { opacity: 0; }
+    }
+
+    /* Zone border glow on pulse */
+    #zone1-glow { animation: zone1-pulse 15s infinite; }
+    @keyframes zone1-pulse {
+      0%,33.33% { opacity: 0; }
+      35.33%    { opacity: 1; }
+      37.33%    { opacity: 0; }
+      39.33%    { opacity: 1; }
+      42%       { opacity: 0; }
+      98%       { opacity: 0; }
+      100%      { opacity: 0; }
+    }
+    #zone2-glow { animation: zone2-pulse 15s infinite; }
+    @keyframes zone2-pulse {
+      0%,40%    { opacity: 0; }
+      42%       { opacity: 1; }
+      44%       { opacity: 0; }
+      46%       { opacity: 1; }
+      49%       { opacity: 0; }
+      98%       { opacity: 0; }
+      100%      { opacity: 0; }
+    }
+    #zone3-glow { animation: zone3-pulse 15s infinite; }
+    @keyframes zone3-pulse {
+      0%,47%    { opacity: 0; }
+      49%       { opacity: 1; }
+      51%       { opacity: 0; }
+      53%       { opacity: 1; }
+      56%       { opacity: 0; }
+      98%       { opacity: 0; }
+      100%      { opacity: 0; }
+    }
+
+    /* ================================================================
+       PHASE 3 — BREATHE (60%-98%)
+       ================================================================ */
+    #col1-breathe {
+      animation: breathe-c1 15s infinite;
+      transform-origin: 480px 537px;
+    }
+    @keyframes breathe-c1 {
+      0%,60%   { transform: scale(1);    opacity: 0; }
+      68%      { transform: scale(1.03); opacity: 0.7; }
+      76%      { transform: scale(1);    opacity: 0.3; }
+      84%      { transform: scale(1.03); opacity: 0.7; }
+      92%      { transform: scale(1);    opacity: 0.3; }
+      98%      { opacity: 0; }
+      100%     { opacity: 0; }
+    }
+    #col2-breathe {
+      animation: breathe-c2 15s infinite;
+      transform-origin: 960px 537px;
+    }
+    @keyframes breathe-c2 {
+      0%,60%   { transform: scale(1);    opacity: 0; }
+      70%      { transform: scale(1.03); opacity: 0.7; }
+      78%      { transform: scale(1);    opacity: 0.3; }
+      86%      { transform: scale(1.03); opacity: 0.7; }
+      94%      { transform: scale(1);    opacity: 0.3; }
+      98%      { opacity: 0; }
+      100%     { opacity: 0; }
+    }
+    #col3-breathe {
+      animation: breathe-c3 15s infinite;
+      transform-origin: 1440px 537px;
+    }
+    @keyframes breathe-c3 {
+      0%,60%   { transform: scale(1);    opacity: 0; }
+      72%      { transform: scale(1.03); opacity: 0.7; }
+      80%      { transform: scale(1);    opacity: 0.3; }
+      88%      { transform: scale(1.03); opacity: 0.7; }
+      96%      { transform: scale(1);    opacity: 0.3; }
+      98%      { opacity: 0; }
+      100%     { opacity: 0; }
+    }
+  </style>
+
+  <!-- ================================================================
+       TITLE
+       ================================================================ -->
+  <g id="g-title">
+    <text x="960" y="90"  class="t t-title">DOMAIN-LOCKED EXPERT MEMORY</text>
+    <text x="960" y="125" class="t t-sub">Each agent builds knowledge only in its domain</text>
+  </g>
+
+  <!-- ================================================================
+       COLUMN 1 — BACKEND DEV (blue, cx=480)
+       ================================================================ -->
+  <!-- Zone glow overlay (phase 2 pulse) -->
+  <rect id="zone1-glow" x="370" y="343" width="220" height="394" rx="10"
+        fill="none" stroke="#3b82f6" stroke-width="2" opacity="0"
+        filter="url(#f-hit)"/>
+
+  <!-- Zone border (dashed) -->
+  <g id="g-col1-agent">
+    <rect x="370" y="343" width="220" height="394" rx="10"
+          fill="rgba(59,130,246,0.03)" stroke="#3b82f6" stroke-width="1.2"
+          stroke-dasharray="6 5" stroke-opacity="0.35"/>
+    <!-- Lock icon at top of zone -->
+    <rect x="472" y="355" width="16" height="12" rx="2"
+          fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-opacity="0.7"/>
+    <path d="M476,355 C476,349 484,349 484,355"
+          fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-opacity="0.7"/>
+    <!-- Agent circle -->
+    <circle cx="480" cy="407" r="34"
+            fill="#161b2e" stroke="#3b82f6" stroke-width="2"
+            filter="url(#f-glow-blue)"/>
+    <text x="480" y="401" class="t t-agent">Backend</text>
+    <text x="480" y="415" class="t t-agent">Dev</text>
+    <!-- Breathe ring (phase 3) -->
+    <circle id="col1-breathe" cx="480" cy="407" r="44"
+            fill="none" stroke="#3b82f6" stroke-width="1"
+            stroke-dasharray="5 7" opacity="0"/>
+  </g>
+
+  <!-- Domain label -->
+  <g id="g-col1-domain">
+    <rect x="370" y="473" width="220" height="28" rx="6"
+          fill="#161b2e" stroke="#3b82f6" stroke-width="1" stroke-opacity="0.6"/>
+    <text x="480" y="487" class="t t-domain"
+          style="fill:rgba(59,130,246,0.9);">backend/ · api/ · db/</text>
+  </g>
+
+  <!-- Memory items Col 1 -->
+  <g id="g-c1i1" class="p-c1">
+    <rect x="400" y="557" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#3b82f6" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="480" y="572" class="t t-mem">Express Routes</text>
+  </g>
+  <g id="g-c1i2" class="p-c1">
+    <rect x="400" y="597" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#3b82f6" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="480" y="612" class="t t-mem">Postgres Patterns</text>
+  </g>
+  <g id="g-c1i3" class="p-c1">
+    <rect x="400" y="637" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#3b82f6" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="480" y="652" class="t t-mem">Auth Middleware</text>
+  </g>
+  <g id="g-c1i4" class="p-c1">
+    <rect x="400" y="677" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#3b82f6" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="480" y="692" class="t t-mem">Rate Limiting</text>
+  </g>
+
+  <!-- ================================================================
+       COLUMN 2 — QA ENGINEER (green, cx=960)
+       ================================================================ -->
+  <rect id="zone2-glow" x="850" y="343" width="220" height="394" rx="10"
+        fill="none" stroke="#22c55e" stroke-width="2" opacity="0"
+        filter="url(#f-hit)"/>
+
+  <g id="g-col2-agent">
+    <rect x="850" y="343" width="220" height="394" rx="10"
+          fill="rgba(34,197,94,0.03)" stroke="#22c55e" stroke-width="1.2"
+          stroke-dasharray="6 5" stroke-opacity="0.35"/>
+    <!-- Lock icon -->
+    <rect x="952" y="355" width="16" height="12" rx="2"
+          fill="none" stroke="#22c55e" stroke-width="1.5" stroke-opacity="0.7"/>
+    <path d="M956,355 C956,349 964,349 964,355"
+          fill="none" stroke="#22c55e" stroke-width="1.5" stroke-opacity="0.7"/>
+    <!-- Agent circle -->
+    <circle cx="960" cy="407" r="34"
+            fill="#161b2e" stroke="#22c55e" stroke-width="2"
+            filter="url(#f-glow-green)"/>
+    <text x="960" y="401" class="t t-agent">QA</text>
+    <text x="960" y="415" class="t t-agent">Engineer</text>
+    <!-- Breathe ring -->
+    <circle id="col2-breathe" cx="960" cy="407" r="44"
+            fill="none" stroke="#22c55e" stroke-width="1"
+            stroke-dasharray="5 7" opacity="0"/>
+  </g>
+
+  <g id="g-col2-domain">
+    <rect x="850" y="473" width="220" height="28" rx="6"
+          fill="#161b2e" stroke="#22c55e" stroke-width="1" stroke-opacity="0.6"/>
+    <text x="960" y="487" class="t t-domain"
+          style="fill:rgba(34,197,94,0.9);">tests/ · specs/</text>
+  </g>
+
+  <g id="g-c2i1" class="p-c2">
+    <rect x="880" y="557" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#22c55e" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="960" y="572" class="t t-mem">Test Strategies</text>
+  </g>
+  <g id="g-c2i2" class="p-c2">
+    <rect x="880" y="597" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#22c55e" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="960" y="612" class="t t-mem">Regression Patterns</text>
+  </g>
+  <g id="g-c2i3" class="p-c2">
+    <rect x="880" y="637" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#22c55e" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="960" y="652" class="t t-mem">CI Pipeline</text>
+  </g>
+  <g id="g-c2i4" class="p-c2">
+    <rect x="880" y="677" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#22c55e" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="960" y="692" class="t t-mem">Coverage Gaps</text>
+  </g>
+
+  <!-- ================================================================
+       COLUMN 3 — SECURITY REVIEWER (rose, cx=1440)
+       ================================================================ -->
+  <rect id="zone3-glow" x="1330" y="343" width="220" height="394" rx="10"
+        fill="none" stroke="#f43f5e" stroke-width="2" opacity="0"
+        filter="url(#f-hit)"/>
+
+  <g id="g-col3-agent">
+    <rect x="1330" y="343" width="220" height="394" rx="10"
+          fill="rgba(244,63,94,0.03)" stroke="#f43f5e" stroke-width="1.2"
+          stroke-dasharray="6 5" stroke-opacity="0.35"/>
+    <!-- Lock icon -->
+    <rect x="1432" y="355" width="16" height="12" rx="2"
+          fill="none" stroke="#f43f5e" stroke-width="1.5" stroke-opacity="0.7"/>
+    <path d="M1436,355 C1436,349 1444,349 1444,355"
+          fill="none" stroke="#f43f5e" stroke-width="1.5" stroke-opacity="0.7"/>
+    <!-- Agent circle -->
+    <circle cx="1440" cy="407" r="34"
+            fill="#161b2e" stroke="#f43f5e" stroke-width="2"
+            filter="url(#f-glow-rose)"/>
+    <text x="1440" y="401" class="t t-agent">Security</text>
+    <text x="1440" y="415" class="t t-agent">Reviewer</text>
+    <!-- Breathe ring -->
+    <circle id="col3-breathe" cx="1440" cy="407" r="44"
+            fill="none" stroke="#f43f5e" stroke-width="1"
+            stroke-dasharray="5 7" opacity="0"/>
+  </g>
+
+  <g id="g-col3-domain">
+    <rect x="1330" y="473" width="220" height="28" rx="6"
+          fill="#161b2e" stroke="#f43f5e" stroke-width="1" stroke-opacity="0.6"/>
+    <text x="1440" y="487" class="t t-domain"
+          style="fill:rgba(244,63,94,0.9);">security/ · auth/</text>
+  </g>
+
+  <g id="g-c3i1" class="p-c3">
+    <rect x="1360" y="557" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#f43f5e" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="1440" y="572" class="t t-mem">Threat Models</text>
+  </g>
+  <g id="g-c3i2" class="p-c3">
+    <rect x="1360" y="597" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#f43f5e" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="1440" y="612" class="t t-mem">OWASP Checks</text>
+  </g>
+  <g id="g-c3i3" class="p-c3">
+    <rect x="1360" y="637" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#f43f5e" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="1440" y="652" class="t t-mem">Token Flows</text>
+  </g>
+  <g id="g-c3i4" class="p-c3">
+    <rect x="1360" y="677" width="160" height="30" rx="6"
+          fill="#161b2e" stroke="#f43f5e" stroke-width="1.2" stroke-opacity="0.7"/>
+    <text x="1440" y="692" class="t t-mem">Vuln Patterns</text>
+  </g>
+
+  <!-- ================================================================
+       TAGLINE
+       ================================================================ -->
+  <g id="g-tagline">
+    <text x="960" y="1010" class="t t-tag">
+      AGENTS STAY IN THEIR LANE · KNOWLEDGE STAYS FOCUSED
+    </text>
+  </g>
+
+</svg>

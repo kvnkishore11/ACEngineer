@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first companion to MA-2: Multi-Team Agentic Coding and Lead Agents. Learn depth-2 delegation, domain locking, compounding agent memory, config-driven teams, and the Pi multi-team runtime.">
+  <title>MA-2 · Multi-Team Agentic Coding / Lead Agents — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="16-lead-agents.assets.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to chapter</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL III · MA · LESSON 16</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume III · Multi-Agent Systems</p>
+      <h2>Lead Agents</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation</span></a></li>
+          <li><a href="#one-interface"><span class="chapter-nav__n">01</span><span>One interface</span></a></li>
+          <li><a href="#hierarchy"><span class="chapter-nav__n">02</span><span>Leads &amp; workers</span></a></li>
+          <li><a href="#domain"><span class="chapter-nav__n">03</span><span>Domain locking</span></a></li>
+          <li><a href="#memory"><span class="chapter-nav__n">04</span><span>Expert memory</span></a></li>
+          <li><a href="#skills"><span class="chapter-nav__n">05</span><span>Skills &amp; anatomy</span></a></li>
+          <li><a href="#configuration"><span class="chapter-nav__n">06</span><span>Configuration</span></a></li>
+          <li><a href="#spend"><span class="chapter-nav__n">07</span><span>Models &amp; spend</span></a></li>
+          <li><a href="#trust"><span class="chapter-nav__n">08</span><span>Trust &amp; evidence</span></a></li>
+          <li><a href="#runtime"><span class="chapter-nav__n">09</span><span>Under the hood</span></a></li>
+          <li><a href="#current-practice"><span class="chapter-nav__n">10</span><span>Current practice</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">11</span><span>Graded lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">12</span><span>Mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">13</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--teams">
+        <span class="hero__chapter">MA-2 · One Agent Is Not Enough</span>
+        <h1>Multi-Team Agentic Coding / Lead Agents</h1>
+        <p class="hero__dek">Stop acting as the router for one endlessly re-prompted agent. Command a config-driven hierarchy of specialized, domain-locked, memory-compounding agent teams through one chat room.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 34:56</li>
+          <li>Lab · 75–120 min</li>
+          <li>Course repo · agentic-horizon-extras/lead-agents</li>
+          <li>Level · operator → team-system designer</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to draw the three-tier architecture from memory, explain why a blocked lead is a successful route, distinguish soft instructions from hard domain enforcement, inspect the source of an agent’s model/tools/skills/domain, operate and reconfigure the real ten-agent team, audit its conversation log, and teach why trust must precede scale.</p>
+
+        <div class="hero-system" role="img" aria-label="The user talks to one orchestrator, which coordinates three team leads and six specialized workers">
+          <div class="hero-system__node"><b>You</b><span>One request. One interface. No worker micromanagement.</span></div>
+          <span class="hero-system__arrow" aria-hidden="true">→</span>
+          <div class="hero-system__node hero-system__node--orchestrator"><b>Orchestrator</b><span>Classify · route · track · synthesize</span></div>
+          <span class="hero-system__arrow" aria-hidden="true">→</span>
+          <div class="hero-system__node hero-system__node--teams"><b>3 leads · 6 workers</b><span>Planning · Engineering · Validation; specialist execution inside bounded domains</span></div>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation</a></li>
+            <li><a href="#one-interface">One interface, many experts</a></li>
+            <li><a href="#hierarchy">Leads think; workers do</a></li>
+            <li><a href="#domain">Domain ownership and locking</a></li>
+            <li><a href="#memory">Agent experts that remember</a></li>
+            <li><a href="#skills">Skills and agent anatomy</a></li>
+            <li><a href="#configuration">Configuration-driven teams</a></li>
+            <li><a href="#spend">Model tiering and spend</a></li>
+            <li><a href="#trust">Conversation awareness, trust, scale</a></li>
+            <li><a href="#runtime">Under the hood</a></li>
+            <li><a href="#current-practice">Current practice companions</a></li>
+            <li><a href="#lab">Graded lab</a></li>
+            <li><a href="#mastery">Cumulative mastery</a></li>
+            <li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">Begin with the human bottleneck</h2>
+        <p class="section-lead">You ask one agent to inspect the repository. Then you ask it to plan. Then to implement. Then to test. Then you notice a security concern and reprompt it again. The agent appears busy, but you are still classifying every request, changing its role, deciding what context matters, sequencing the phases, and merging the answers. You are the orchestrator.</p>
+
+        <p>That is the failure this lesson targets. The problem is not merely that one agent can make mistakes. It is that a single general-purpose context must repeatedly impersonate product manager, researcher, engineering lead, frontend developer, backend developer, QA engineer, and security reviewer. Each role starts from a diluted purpose. Each handoff travels through you. Your cognitive load grows with every specialist perspective you add.</p>
+
+        <p>The course codebase replaces that manual relay with a multi-team chat system built on the Pi coding-agent harness. The user talks only to one Orchestrator. The Orchestrator classifies the request and delegates to a Planning, Engineering, or Validation lead. Each lead may consult two specialist workers. The workers execute inside explicit file domains. Results move back through the lead, then through the Orchestrator, and arrive as one synthesized answer. The shipped default is <strong>three teams and ten agents</strong>: one Orchestrator, three leads, and six workers.</p>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The sentence to carry</p>
+          <p><strong>One agent is a ceiling.</strong> Break it with specialized teams behind one interface, then make autonomy safe with explicit roles, persistent expertise, composable skills, and hard domain boundaries.</p>
+        </aside>
+
+        <h3>Dan’s six pillars</h3>
+        <p>These are not six unrelated features. They form a dependency chain. A chat room without specialized teams is only a prettier single-agent shell. Specialization without memory relearns the domain. Memory without ownership can compound the wrong knowledge. Ownership without enforcement is a suggestion. A hierarchy without configuration becomes hand-wired and hard to scale. Read the chapter with all six in view.</p>
+
+        <div class="pillar-grid" aria-label="Six pillars of the multi-team architecture">
+          <article class="pillar-card"><span class="pillar-card__n">1</span><h3>Team leads &amp; workers</h3><p>Depth-2 delegation removes you from the classify, route, and synthesize loop.</p></article>
+          <article class="pillar-card"><span class="pillar-card__n">2</span><h3>Expertise &amp; specialization</h3><p>Each role optimizes a narrower purpose than a generic coding agent.</p></article>
+          <article class="pillar-card"><span class="pillar-card__n">3</span><h3>Agent memory</h3><p>Per-agent mental models preserve domain knowledge and compound across sessions.</p></article>
+          <article class="pillar-card"><span class="pillar-card__n">4</span><h3>Domain ownership</h3><p>Per-path read, upsert, and delete rules bound every agent’s blast radius.</p></article>
+          <article class="pillar-card"><span class="pillar-card__n">5</span><h3>Chat room interface</h3><p>You communicate with one Orchestrator while the team coordinates behind it.</p></article>
+          <article class="pillar-card"><span class="pillar-card__n">6</span><h3>Config-driven harness</h3><p>The roster lives in YAML; each agent’s deeper anatomy lives in its own Markdown front matter.</p></article>
+        </div>
+
+        <h3>What you are training</h3>
+        <ul class="learning-objectives">
+          <li><strong>Architecture</strong>Recover the user → Orchestrator → lead → worker route and state what each tier may do.</li>
+          <li><strong>Safety judgment</strong>Separate prompt-level behavior from structurally enforced file and tool boundaries.</li>
+          <li><strong>Fleet design</strong>Place specialization, memory, skills, model tier, and domain rules at the correct configuration layer.</li>
+          <li><strong>Operation</strong>Launch, observe, inspect, prune, and domain-test the real course system without inventing a substitute app.</li>
+          <li><strong>Evidence</strong>Use the footer, session directory, logs, source files, and blocked tool calls to verify claims about behavior.</li>
+        </ul>
+
+        <div class="callout callout--warning">
+          <p class="callout__label">Source and cost discipline</p>
+          <p>The prompt-routing classifier shown in the video is a separate codebase and is not shipped here. The lab runs the multi-team tool against its own source repository, exactly as its README’s local test instructs. Live team runs consume paid model tokens; keep prompts small, record costs, and do not launch the scaled preset casually.</p>
+        </div>
+
+        <h3>How to study this chapter</h3>
+        <p>Every major idea repeats the same ten moves: hook, picture, frame-backed story, name, worked source example, small practice, fail/fix, current-practice note, retrieval, and teach-back. Do the small practice before revealing the answers. In the lab, collect evidence rather than impressions. “It seemed like a team” is weak. “The lead’s tool call was blocked, a worker ran the read, and the session log records both” is inspectable.</p>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="one-interface">
+        <span class="section-number">01</span>
+        <h2 class="section-title">One interface, many agent experts</h2>
+        <p class="section-lead">Adding specialists should increase the system’s capability without increasing the number of conversations you must personally manage.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The operator with nine tabs</h3>
+          <p>You open one session for product planning, one for frontend architecture, one for backend work, another for QA, and another for security. Each session needs a different slice of context. A decision from Planning must be copied into Engineering. A test failure must be copied back into implementation. You may have specialists, but you have also created a human message bus.</p>
+          <p>This flat arrangement scales the number of interfaces with the number of experts. Every new role adds routing, context transfer, sequencing, and synthesis work to the operator. The system’s intelligence rises while the human’s coordination burden rises with it. The architecture has distributed work but not orchestration.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — one narrow waist</p>
+          <h3>Keep your cognitive input flat</h3>
+          <div class="team-map" role="img" aria-label="A three-tier team with one orchestrator, three leads, and six workers">
+            <div class="team-map__tier">
+              <span class="team-map__label">Tier 1 · interface</span>
+              <div class="team-map__node team-map__node--orch"><b>Orchestrator</b><span>You talk here. It classifies, delegates, tracks, and synthesizes.</span></div>
+            </div>
+            <div class="team-map__tier">
+              <span class="team-map__label">Tier 2 · leads</span>
+              <div class="team-map__node team-map__node--planning"><b>Planning Lead</b><span>Product direction and scope</span></div>
+              <div class="team-map__node team-map__node--engineering"><b>Engineering Lead</b><span>Architecture and implementation route</span></div>
+              <div class="team-map__node team-map__node--validation"><b>Validation Lead</b><span>QA and security route</span></div>
+            </div>
+            <div class="team-map__tier">
+              <span class="team-map__label">Tier 3 · workers</span>
+              <div class="team-map__workers">
+                <div class="team-map__node"><b>Product Manager</b><span>Requirements · acceptance</span></div>
+                <div class="team-map__node"><b>UX Researcher</b><span>Behavior · journeys</span></div>
+                <div class="team-map__node"><b>Frontend Dev</b><span>UI · client state</span></div>
+                <div class="team-map__node"><b>Backend Dev</b><span>APIs · data · infra</span></div>
+                <div class="team-map__node"><b>QA Engineer</b><span>Tests · regression</span></div>
+                <div class="team-map__node"><b>Security Reviewer</b><span>Threats · auth · data</span></div>
+              </div>
+            </div>
+          </div>
+          <p>The narrow waist is the Orchestrator. The workers can multiply without creating new interfaces for you. The team config describes who exists and when each specialist should be consulted; the Orchestrator absorbs that routing complexity.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — ping the system</p>
+          <h3>One message reveals the control plane</h3>
+          <p>Dan begins with the smallest possible interaction: <code>ping</code>. Only the Orchestrator responds with a pong-style confirmation that Planning, Engineering, and Validation are online. The user does not greet ten agents. Then <code>ping each team lead</code> exercises the next layer: the Orchestrator contacts the three leads and composes the result. The footer records the agents, context, cost, and total.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t0118-ping-orchestrator-leads-cost.jpg" alt="Multi-team chat showing a user ping, an Orchestrator response, lead responses, and cost tracking in the footer" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">1:58</span>The first proof of the chat-room pillar: the user enters through the Orchestrator, then the Orchestrator fans a request to the leads while the footer makes coordination cost visible.</figcaption>
+          </figure>
+          <p>The simplicity is pedagogical. If the first demo were “build an application,” you could attribute the result to a capable model. A ping isolates the route. It asks: who received the user message, who spoke back, and what happened when the system was told to contact the next tier?</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s term + plain English</p>
+          <h3>Multi-team agentic coding</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s architecture</p>
+            <p><strong>Multi-team agentic coding:</strong> specialized teams of agents coordinated through one Orchestrator interface, with results bubbling from workers to leads to the user-facing synthesis.</p>
+          </aside>
+          <p>The unit is not “many chatbots.” It is a team with an internal leader, specialist members, a routing contract, and a shared conversation. The Orchestrator does not merely broadcast. It decides whether the request is simple enough to answer, belongs to one team, or needs a dependent sequence such as plan → engineer → validate.</p>
+          <p>The single interface is not cosmetic. It is what turns horizontal specialization into human leverage. Without it, every expert relationship remains a manual operating obligation. With it, adding a specialist is primarily a configuration change and a routing problem for the system.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — read the shipped roster</p>
+          <h3>Follow one request through <code>multi-team-config.yaml</code></h3>
+          <p>The default config declares the Orchestrator path, the agent and session directories, two shared context files, and three teams. Every team has a <code>team-name</code>, display color, <code>consult-when</code> description, one lead, and two members. The Engineering team’s routing description owns architecture, implementation, code changes, API design, database schema, and infrastructure. Its members split UI concerns from APIs, databases, jobs, and integrations.</p>
+          <p>Suppose the user asks, “What should this feature do?” The Orchestrator’s own prompt says to classify and default to one team. The Planning <code>consult-when</code> owns requirements and scoping, so the request routes to Planning Lead. If the user instead asks to implement the accepted feature, Engineering owns it. If the implementation then needs validation, the Orchestrator chains a later call to Validation. The route changes while the user interface does not.</p>
+          <p>The config also includes <code>shared_context: README.md, CLAUDE.md</code>. That supplies common project orientation without merging all specialists into one generic role. Shared context answers “what system are we in?” Agent files answer “what is my purpose and action boundary?”</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — route without running</p>
+          <h3>Classify five requests in four minutes</h3>
+          <ol>
+            <li>Write five requests: a scope question, a usability question, an API question, a regression question, and a threat-model question.</li>
+            <li>For each, name the first team and the likely specialist the lead would consult.</li>
+            <li>Mark whether the Orchestrator should answer directly, delegate once, or chain teams sequentially.</li>
+            <li>For one request, write the single synthesis you would expect back—not nine separate replies.</li>
+          </ol>
+          <p>Pass if your route follows the shipped <code>consult-when</code> descriptions and you can explain why a second team is dependent rather than merely interesting.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: “subagents with new labels”</h3>
+          <p><strong>Symptom:</strong> the Orchestrator sends everything to everyone, the leads add no synthesis, and the user receives a wall of parallel opinions. The agent count increased, but routing and cognitive load did not improve.</p>
+          <p><strong>Fix:</strong> preserve the hierarchy. The Orchestrator defaults to one relevant team, team leads consult members only when their expertise is useful, and every layer synthesizes rather than relays. Judge the system by whether the user’s interface stays simple while specialization behind it becomes richer.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>The interface transfers; the harness may change</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · mid-2026</p>
+            <p>The lesson demonstrates Pi because its harness can be customized down to the UI, hooks, tools, and subprocess runtime. Other agentic tools have expanded their customization surfaces since recording. Keep the portable requirement: one interface that can classify, route, preserve context, expose costs, and synthesize across specialist teams. Do not equate the idea with one product.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Close the tree and answer</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for the one-interface architecture">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What makes the human the orchestrator in a single-agent workflow?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The human repeatedly classifies work, changes roles, transfers context, sequences phases, and synthesizes answers. The model generates, but the human remains the routing layer.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. How many agents and teams ship in the default roster?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Ten agents across three teams: one Orchestrator, three team leads, and six specialist workers.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What keeps the user’s cognitive load flat as specialists are added?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The single Orchestrator interface. The user talks only to it; the team config and lead hierarchy absorb routing and synthesis.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Explain the narrow waist</h3>
+            <p>In two minutes, teach why nine independent specialist chats are not yet a multi-team system. Draw the ten-agent default, point to the narrow waist, and explain what must happen at both synthesis boundaries.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="hierarchy">
+        <span class="section-number">02</span>
+        <h2 class="section-title">Leads think; workers do</h2>
+        <p class="section-lead">The hierarchy becomes real only when coordination and execution are separated. A lead that can quietly do the worker’s job will eventually bypass the specialist.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The lead that “helps” until the team disappears</h3>
+          <p>An Engineering Lead receives a repository question. It can read every file, run the shell, edit code, and return an answer, so it does. The response may be fast. Yet the Backend Dev never applies its domain memory, the Frontend Dev never checks interface concerns, and no worker gains experience. The lead has become an expensive generalist with unused specialists beneath it.</p>
+          <p>Permission abundance creates a behavioral trap: when a coordinator can execute, delegation feels like overhead. The system drifts toward a single smart agent again. Dan’s design makes that shortcut unavailable. A lead is supposed to route, consult, and synthesize. When it steps outside that job, the boundary should be visible.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — three jobs, three action surfaces</p>
+          <h3>Separate interface, coordination, and execution</h3>
+          <div class="table-scroll" role="region" aria-label="Agent tier responsibilities table" tabindex="0">
+          <table class="tier-table">
+            <thead><tr><th>Tier</th><th>Course-era model</th><th>Primary job</th><th>Application-code action</th></tr></thead>
+            <tbody>
+              <tr><td>Orchestrator</td><td>Opus 4.6</td><td>Classify, create a TillDone list for substantial work, delegate to teams, synthesize</td><td>Reads broadly; may update its own expertise, but does not execute application work</td></tr>
+              <tr><td>Team lead</td><td>Opus 4.6</td><td>Understand the team question, delegate to members, combine specialist evidence</td><td>May update its own mental model; no bash; application work belongs to workers</td></tr>
+              <tr><td>Worker</td><td>Sonnet 4.6</td><td>Execute the assigned specialist task precisely inside its domain</td><td>Has read/write/edit/bash subject to domain enforcement</td></tr>
+            </tbody>
+          </table>
+          </div>
+          <p>“Leads never execute” means they do not perform the application task. The shipped files still give Orchestrator and leads <code>write</code>/<code>edit</code> so they can maintain their own permitted expertise files; the domain gate denies broader writes. Workers have the shell and application-write surface.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the block that teaches the architecture</p>
+          <h3>The Engineering Lead reaches, fails, and routes</h3>
+          <p>Dan asks Engineering to present the important repository files. The Engineering Lead attempts file operations and receives visible red failures. It then states that its tool access is restricted as a lead and delegates to team members with the right tools. Backend Dev reads the codebase and returns the tree. The lead synthesizes. The Orchestrator reports.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t0185-lead-domain-block-delegate.jpg" alt="Engineering Lead file calls blocked with red X marks before the lead delegates the repository tree task to Backend Dev" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">3:05</span>The architecture in one frame: a lead crosses its boundary, the domain gate rejects the calls, and a worker with execution access takes over. The block is the route becoming visible.</figcaption>
+          </figure>
+          <p>Dan then reveals the full tree with <code>/toggle-workers</code>. All ten agents appear with per-agent cost and model. The tree matters because it proves that the worker was not an invisible mode inside the lead. It was a distinct specialist session with its own model, context, cost, prompt, tools, domain, and memory.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t0232-toggle-workers-team-tree.jpg" alt="Multi-team chat footer expanded to show the Orchestrator, three leads, and six workers with models and per-agent costs" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">3:52</span><code>/toggle-workers</code> exposes the full ten-agent roster. Coordination sits on the stronger model tier; execution sits with specialist workers.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — depth-2 delegation + zero micro-management</p>
+          <h3>User → Orchestrator → leads → workers</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Two linked terms</p>
+            <p><strong>Depth-2 delegation</strong> means the Orchestrator delegates to a lead and the lead can delegate once more to a worker. <strong>Zero micro-management</strong> means coordinators route, decide, and synthesize instead of executing the specialist task themselves.</p>
+          </aside>
+          <p>Depth counts delegation edges beneath the user-facing Orchestrator: Orchestrator → lead, then lead → worker. The design deliberately stops there. Workers do not receive another delegate tool. More depth is not automatically more intelligence; it adds latency, context transfer, cost, and places for intent to deform.</p>
+          <p>The course’s <code>zero-micro-management.md</code> skill states the pattern plainly: leaders read for context, delegate, synthesize, and decide; they do not write application files, edit code, run bash, create directories, or install packages. If they are about to use <code>write</code>, <code>edit</code>, or <code>bash</code> for the task, they stop and delegate.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace the hard depth cap</p>
+          <h3>A worker cannot create an accidental fourth tier</h3>
+          <p>The runtime uses the same Pi binary for leads and members, so the recursion limit cannot depend on different executables. The <code>lead-delegate.ts</code> extension activates only when the subprocess receives <code>LEAD_MEMBERS_JSON</code>. Before a lead spawns a member, it removes that environment variable. The member process still loads the extension file, but the trigger is absent, so the delegate tool self-disables.</p>
+          <p>This is a compact structural guard. The lead’s prompt says how to delegate. The environment handshake decides whether the tool exists. A worker cannot decide to become another lead merely because its model believes a subtask would be useful. It must report the need upward, and its lead owns the routing decision.</p>
+          <p>The Orchestrator and leads also use <code>tilldone</code> differently. The Orchestrator owns the canonical task list and can create, add, and complete work. Leads receive a reduced surface to start and finish assigned items. Workers do not receive TillDone. Tracking authority follows coordination authority.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — narrate one cascade</p>
+          <h3>Turn a request into four accountable sentences</h3>
+          <ol>
+            <li>Choose a request that needs both a plan and an implementation.</li>
+            <li>Write the Orchestrator’s classification and first team delegation.</li>
+            <li>Write the lead’s specialist delegation, including the worker’s bounded deliverable.</li>
+            <li>Write what the worker returns, what the lead synthesizes, and when the Orchestrator should contact the next team.</li>
+          </ol>
+          <p>Pass if every tier contributes a distinct job. If the Orchestrator dictates worker steps or the lead performs the task, revise the route.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: reading rejection as wasted tokens</h3>
+          <p><strong>Symptom:</strong> the lead’s red X marks look inefficient, so you widen the lead’s domain until it can complete everything directly.</p>
+          <p><strong>Fix:</strong> distinguish a noisy demonstration from the intended steady state. The attempted call exposes a configuration or behavior mismatch; the correct route is delegation. Improve the prompt and skill so the lead delegates earlier, but keep the execution boundary. The specialist’s tools and compounding memory are the reason the team exists.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Parallel-safe is not dependency-safe</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · shipped system and roadmap</p>
+            <p>The demonstrated cross-team workflow chains dependent phases sequentially: plan, then engineer, then validate. The code can fan a <code>delegate</code> call to a list with <code>Promise.allSettled</code>, but the course notes parallel delegation as a direction whose hard part is deciding when work is independent. “Review this from Engineering and Validation” may be parallel-safe; “build what Planning defines” is not.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Recover the tier boundaries</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for leads and workers">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Which tier runs bash and mutates application code?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Workers. Leads and the Orchestrator coordinate and may update their own permitted expertise, but application execution belongs to workers.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why is the lead’s domain block useful?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It prevents the coordinator from bypassing specialists and forces execution toward the worker with the correct tools, domain, and compounding memory.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. How does the runtime prevent a worker from delegating deeper?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The lead removes <code>LEAD_MEMBERS_JSON</code> before spawning a member. Without that trigger variable, the member’s delegate extension does not register the tool.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Defend the blocked lead</h3>
+            <p>Teach a cost-conscious teammate why a lead that cannot directly run the repository task is not “crippled.” Include the specialist-memory argument, the hard depth cap, and the difference between reducing accidental failed calls and deleting the boundary.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="domain">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Domain ownership makes autonomy safe</h2>
+        <p class="section-lead">A specialist is trustworthy only when its authority is as specialized as its prompt. “You are the frontend expert” is a role; “you may write here and nowhere else” is a boundary.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The frontend fix that edits the backend</h3>
+          <p>A Frontend Dev discovers that the API response does not fit the screen. The fastest apparent repair is to change the backend payload. A Backend Dev simultaneously edits the same contract for performance. Both agents are capable. Both are acting toward the shared goal. The repository now contains a collision created by overlapping authority.</p>
+          <p>Role prompts alone do not prevent this. A model can interpret “frontend specialist” as “do whatever is necessary to ship the frontend.” The more autonomous the agent, the more likely it is to cross an implicit line when that line blocks the goal. Safe autonomy therefore needs the line to exist outside the model’s argument.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — two locks on one door</p>
+          <h3>Behavioral guidance plus structural enforcement</h3>
+          <div class="lock-stack" aria-label="Soft prompt-level lock and hard runtime domain lock work together">
+            <article class="lock-card">
+              <p class="eyebrow">Soft lock · prompt</p>
+              <h3>Zero micro-management</h3>
+              <p>The skill tells leaders what good behavior is: read for context, delegate execution, synthesize results, and stop before writing application code.</p>
+            </article>
+            <span class="lock-stack__plus" aria-hidden="true">+</span>
+            <article class="lock-card lock-card--hard">
+              <p class="eyebrow">Hard lock · runtime</p>
+              <h3>Domain enforcer</h3>
+              <p>The Pi extension checks allowed tools and per-path read/upsert/delete rules. No matching rule means deny. Prompt persuasion does not widen it.</p>
+            </article>
+          </div>
+          <p>The two layers solve different problems. The skill helps the model choose the right route before wasting a call. The enforcer preserves the invariant when the model chooses badly. A good system wants both low-friction compliance and a final boundary that does not depend on compliance.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — “read the backend, never touch it”</p>
+          <h3>Dan narrows the Frontend Dev live</h3>
+          <p>In the video, Dan edits <code>frontend-dev.md</code> so the agent may read the broader <code>apps/</code> tree but may upsert and delete only under <code>apps/frontend/</code>. The frontend specialist can understand the backend contract, yet the runtime should reject an attempt to modify it. The mirror rule belongs to Backend Dev.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t1290-frontend-domain-lock.png" alt="Frontend Dev agent front matter showing domain rules that allow writes in the frontend directory while keeping the wider application tree read-only" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">21:30</span>The pattern is the lesson: read across a boundary when collaboration requires context, but grant mutation only inside the owned path. This is a live demonstration edit; the shipped default remains broader.</figcaption>
+          </figure>
+          <p>That last sentence matters. In the checked-in repository, <code>frontend-dev.md</code> and <code>backend-dev.md</code> both grant read/upsert/delete on <code>apps/</code>; the frontend file denies root upsert while the backend file permits root upsert. The neat <code>apps/frontend/</code> versus <code>apps/backend/</code> split shown on screen is a pattern Dan demonstrates, not the shipped default. The lab applies the pattern deliberately and restores it.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — domain ownership / domain locking</p>
+          <h3>Permissions are part of the agent definition</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s term</p>
+            <p><strong>Domain locking:</strong> explicit per-agent, per-path permissions that control reading, creating/updating, and deleting, enforced by the runtime rather than trusted to the prompt alone.</p>
+          </aside>
+          <div class="permission-map" aria-label="The three domain permissions">
+            <div><b>read</b><span>May inspect the path and use it as context.</span></div>
+            <div><b>upsert</b><span>May create or update content at the path.</span></div>
+            <div><b>delete</b><span>May remove content at the path.</span></div>
+          </div>
+          <p>A rule can grant any combination. That lets Planning read application code but write only plans or its mental model; QA and Security can inspect code without modifying it; a specialist can read a neighboring domain to understand a contract while remaining unable to edit it. The shape is more expressive than “read-only” versus “full access.”</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — follow <code>isAllowed</code></p>
+          <h3>What happens when a tool call reaches the gate</h3>
+          <p>The runtime passes domain rules through <code>AGENT_DOMAIN_RULES</code>. The <code>domain-enforcer.ts</code> extension intercepts tool calls. First, it applies the allowed-tool surface from <code>AGENT_ALLOWED_TOOLS</code>. Then path-bearing operations are checked as reads or upserts. Expertise paths are handled with their declared <code>updatable</code> setting; directory rules are considered; the repository root <code>.</code> receives special handling; and if no rule matches, the answer is deny.</p>
+          <p>Bash is harder because a shell string can hide writes. The enforcer uses heuristics to detect write and delete patterns rather than assuming that <code>bash</code> is harmless. Per-path guarantees apply to the ordinary file tools. The Bash checks are a coarse secondary guard: they notice common mutation patterns and then ask whether the agent has any upsert or delete permission at all; they do not authorize the target path and are not a sandbox. A critical boundary test must therefore use <code>write</code> or <code>edit</code>, not shell redirection.</p>
+          <p>After a tool result, the extension re-reads expertise files and checks <code>max-lines</code>. This connects ownership to memory hygiene: an agent may own its mental model, but that ownership remains bounded by whether the file is updatable and how large it may grow.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — write a boundary table</p>
+          <h3>Design one agent that can collaborate without trespassing</h3>
+          <ol>
+            <li>Choose a hypothetical DevOps, billing, or migrations specialist.</li>
+            <li>List the path it owns, one neighboring path it must read, and the repository root.</li>
+            <li>Assign read, upsert, and delete separately for all three.</li>
+            <li>Write one allowed action and one denied action that prove the distinction.</li>
+          </ol>
+          <p>Pass if the agent can gather the context it needs while the denied action stays outside its mutation domain. “Can read everything and write everything” is not a domain design.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating YAML as documentation</h3>
+          <p><strong>Symptom:</strong> the domain block is carefully written in front matter, but no runtime extension consumes it. The team assumes the model will honor the prose.</p>
+          <p><strong>Fix:</strong> trace the entire enforcement path: agent front matter → parsed config → environment rules → extension hook → blocked tool call. Then test one allowed and one denied action. A rule is a boundary only if a violating action cannot cross it.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Teach from shipped truth, label the live edit</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Recording vs shipped repository</p>
+            <p>The video’s frontend/backend split is the architecture you would apply to a real divided application. The checked-in sample leaves both workers broad access to <code>apps/</code>. Present the frame as a demonstrated hardening pattern, not as evidence that the current file already contains the split.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the enforcement contract</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for domain ownership">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What three permissions can a domain rule grant?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>read</code>, <code>upsert</code>, and <code>delete</code>.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Name the soft and hard locks.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Soft: prompt-level skills such as <code>zero-micro-management</code>. Hard: per-path/tool checks in the <code>domain-enforcer</code> extension.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What happens when no domain rule matches?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The request is denied. The runtime is closed by default.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Explain safe autonomy without saying “be careful”</h3>
+            <p>Teach how a Frontend Dev can understand a backend contract without owning backend mutation. Include the three permissions, no-match-deny behavior, bash heuristics, and why prompt guidance remains useful even with a hard gate.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="memory">
+        <span class="section-number">04</span>
+        <h2 class="section-title">Agent experts that remember</h2>
+        <p class="section-lead">Specialization gets expensive if every specialist forgets the system at the end of the session. The compounding advantage comes from a narrow role carrying forward a narrow, maintained model of its domain.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The senior specialist with first-day amnesia</h3>
+          <p>Your Backend Dev studies the API layout, identifies a queueing pattern, learns why a database decision was made, and discovers a scaling risk. The task ends. On the next run, the same role rereads everything and repeats the discovery. The prompt is specialized, but the experience is not cumulative.</p>
+          <p>Global “remember everything” is not the repair. A single memory stream containing planning debates, frontend conventions, security concerns, and casual chat would make retrieval noisy and ownership unclear. Dan’s pattern is narrower: each agent maintains a personal expertise file focused on what that role should learn.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — a compounding session loop</p>
+          <h3>Boot stronger than last time</h3>
+          <div class="memory-loop" role="img" aria-label="Agent session loop: boot, load mental model, read context, do bounded work, update mental model">
+            <div class="memory-loop__step"><b>Boot</b><span>The specialist starts from its declared role and model.</span></div>
+            <div class="memory-loop__step"><b>Load</b><span>Read the personal expertise file for remembered patterns.</span></div>
+            <div class="memory-loop__step"><b>Orient</b><span>Read shared context and recent conversation.</span></div>
+            <div class="memory-loop__step"><b>Work</b><span>Execute the lead’s assignment inside the owned domain.</span></div>
+            <div class="memory-loop__step"><b>Update</b><span>Record durable learnings; trim and validate YAML.</span></div>
+          </div>
+          <p>The file is not an archive of every output. It is a maintained mental model: architecture patterns, decisions, gotchas, open questions, and role-relevant observations. The <code>mental-model</code> skill tells the agent to reference files rather than copy them, omit transient build output, update stale beliefs instead of only appending, keep within the line limit, and validate YAML after writes.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — open the shared session</p>
+          <h3>Memory and conversation solve different time scales</h3>
+          <p>Dan opens a session directory containing <code>conversation.jsonl</code>, per-agent session state, and artifacts such as a benchmark plan and head-to-head results. The conversation log gives everyone recent shared awareness. The personal mental model carries durable role knowledge across sessions. The session workspace holds detailed artifacts that do not belong in chat or expertise.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t1420-conversation-jsonl-log.png" alt="Visual Studio Code showing the shared conversation JSONL and a multi-team session directory with team folders and generated work artifacts" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">23:40</span>Three storage layers are visible: the append-only team conversation, persistent per-agent sessions, and session-level work products. Expertise is the curated long-lived layer, not a transcript dump.</figcaption>
+          </figure>
+          <p>The frame also corrects a common mental model: agents are not private black boxes exchanging only final answers. Every tier can inspect the shared conversation. That prevents needless restatement and lets a specialist notice decisions or disagreements that occurred before it was consulted.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — mental models / agent experts</p>
+          <h3>Purpose-bound memory that compounds</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s pattern</p>
+            <p><strong>Agent expert:</strong> a specialized agent whose prompt, tools, domain, skills, and persistent expertise align around one purpose. Its <strong>mental model</strong> is the structured, self-maintained expertise file it reads and updates.</p>
+          </aside>
+          <p>The course makes memory inspectable. In <code>backend-dev.md</code>, the expertise entry declares a path, a <code>use-when</code> sentence, <code>updatable: true</code>, and <code>max-lines: 10000</code>. That is a memory contract: what file belongs to the agent, when it should matter, whether the agent may change it, and how large it may become.</p>
+          <p>Read-only expertise is a second pattern. Set <code>updatable: false</code> for a billing workflow, migration procedure, or deployment checklist that the agent should use but never “improve.” Specialized memory can therefore include both evolving experience and fixed doctrine.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — empty is the correct starting state</p>
+          <h3>Why the shipped mental models contain zero lines</h3>
+          <p>All ten expertise files in the checked-in course repo are empty. The video shows a Backend Dev mental model with thousands of tokens, but Dan identifies it as knowledge from a previous codebase that should be removed and retuned. Installation into a new codebase creates empty expertise so the specialists grow knowledge in the correct environment.</p>
+          <p>This is a critical data-hygiene decision. Preloading a polished mental model from the wrong project would make the agent look experienced while quietly injecting stale architecture, risks, and conventions. Empty expertise is not missing content. It is an honest prior.</p>
+          <p>After meaningful work, Backend Dev might record the application’s API layer, a key schema decision, a queueing pattern, a scaling observation, and one unresolved question. It should not paste the entire source file, store the full conversation log, or preserve raw test output. Those belong in source, <code>conversation.jsonl</code>, or a session artifact.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — curate one durable note</p>
+          <h3>Separate conclusion from evidence trail</h3>
+          <ol>
+            <li>Choose one verified observation from the shipped <code>lead-agents</code> repo.</li>
+            <li>Write a five-line YAML mental-model entry with the source path and a concise conclusion.</li>
+            <li>Write the raw evidence you intentionally omitted.</li>
+            <li>Decide whether the item should be updatable expertise or a read-only playbook.</li>
+          </ol>
+          <p>Pass if the note would help the next task without becoming a duplicate repository or conversation archive.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: hand-curating every memory</h3>
+          <p><strong>Symptom:</strong> the human edits the mental models after every run, turning persistent expertise into another manual knowledge base to maintain.</p>
+          <p><strong>Fix:</strong> improve the <code>mental-model</code> skill and inspect the results, but let each agent own its file. Use <code>max-lines</code>, YAML validation, domain enforcement, and read-only expertise for the parts that require fixed control. The lesson’s trust move is to teach the maintenance behavior, then let go.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Do not confuse chat memory with domain expertise</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Timeless distinction</p>
+            <p>Tooling may offer larger context windows or broader automatic memory, but the chapter’s durable practice is purpose-bound curation. The shared log answers “what happened in this conversation?” The expertise file answers “what durable model should this role carry into future work?”</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the storage layers</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for agent memory">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What is the shipped state of the ten expertise files?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>All are empty. Agents are meant to build codebase-specific mental models over time.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What does <code>updatable: false</code> enable?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Read-only expertise: a critical playbook or procedure the agent can consult but cannot modify.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What belongs in <code>conversation.jsonl</code> rather than the mental model?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The append-only exchange among the user, Orchestrator, leads, and workers. Expertise keeps curated durable conclusions, not the whole conversation.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Explain why empty memory is honest</h3>
+            <p>Teach a teammate who opens the zero-line expertise files and calls the feature broken. Explain the previous-codebase risk, the session loop, the curation rules, and the difference among conversation log, session artifacts, and mental model.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="skills">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Compose behavior; define anatomy</h2>
+        <p class="section-lead">A useful agent is not a name and a paragraph. Its model, expertise, skills, tools, and domain form one inspectable operating contract.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>Ten copied prompts, ten drifting fixes</h3>
+          <p>You discover that agents respond without reading the latest team decisions. You paste an “always read history” paragraph into all ten prompts. A week later, you refine the behavior in seven files but miss three. The fleet now has three subtly different notions of conversation awareness.</p>
+          <p>Copying behavior into identities couples every fleet-wide change to every agent file. It also makes the agent definition hard to audit: is concision an identity trait, a reusable response policy, or a user preference? The course extracts repeated behavior into shared Markdown skills with explicit <code>use-when</code> descriptions.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — five dimensions per agent</p>
+          <h3>Read front matter as an operating contract</h3>
+          <div class="anatomy-grid" aria-label="Five dimensions in an agent definition">
+            <div><b>Model</b><span>The reasoning/execution tier selected for this role.</span></div>
+            <div><b>Expertise</b><span>Personal files, use conditions, update permission, line limits.</span></div>
+            <div><b>Skills</b><span>Composable behavior modules and when to use them.</span></div>
+            <div><b>Tools</b><span>The callable action surface: read, edit, bash, delegate, TillDone.</span></div>
+            <div><b>Domain</b><span>Where each action may read, upsert, or delete.</span></div>
+          </div>
+          <p>The Markdown body adds purpose, variables, instructions, team membership, and tool semantics. Front matter answers “what capacity and authority does this agent have?” The prompt body answers “how should this role use them?”</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — inspect one agent, then one shared skill</p>
+          <h3>The Orchestrator is configuration you can audit</h3>
+          <p>Dan opens <code>orchestrator.md</code> and walks through its name, model, expertise, skills, tools, and domain. The recording captures an earlier build whose tool list lacks the later TillDone integration. The shipped file is authoritative: it includes <code>write</code>, <code>edit</code>, <code>read</code>, <code>grep</code>, <code>find</code>, <code>ls</code>, <code>delegate</code>, and <code>tilldone</code>, with writes restricted to the expertise area.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t0768-orchestrator-agent-config.png" alt="Visual Studio Code showing the Orchestrator agent front matter with model, expertise, skills, tools, and domain fields" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">12:48</span>Anatomy of an agent in one file. Recording note: this frame predates the shipped TillDone integration; teach the schema from the frame and the current tool list from the repository.</figcaption>
+          </figure>
+          <p>Later, a search for <code>active-listener.md</code> returns ten references in ten agent files. That one skill tells every agent to read the last ten conversation entries, avoid repeating work, and flag conflicts. One behavior module reaches the whole fleet.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t1180-active-listener-10-files.png" alt="Visual Studio Code search results showing active-listener referenced in ten agent files" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">19:40</span>Skills composition made visible: ten agents share the same active-listening behavior without ten copied instruction blocks.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — skills composition</p>
+          <h3>Small behaviors, deliberately distributed</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Control surface</p>
+            <p><strong>Skills composition:</strong> attach reusable Markdown behaviors to agents by path and use condition, so fleet-wide policy can be shared without flattening role differences.</p>
+          </aside>
+          <div class="table-scroll" role="region" aria-label="Shared skill assignment matrix" tabindex="0">
+          <table class="skill-matrix">
+            <thead><tr><th>Skill</th><th>Orchestrator</th><th>Leads</th><th>Workers</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>active-listener</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td>Read recent shared conversation before responding</td></tr>
+              <tr><td>mental-model</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td>Read and maintain role expertise</td></tr>
+              <tr><td>zero-micro-management</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td>Leaders delegate instead of executing</td></tr>
+              <tr><td>conversational-response</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td>Keep coordinating chat concise; workers stay detailed</td></tr>
+              <tr><td>high-autonomy</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td>Let the user-facing coordinator act without routine questions</td></tr>
+              <tr><td>precise-worker</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td>Execute the assigned scope exactly; do not improvise or delegate</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — why workers stay verbose</p>
+          <h3>Shared does not mean universal</h3>
+          <p><code>conversational-response.md</code> optimizes chat bubbles: direct sentences, concise summaries, detailed work written to session files, and references instead of repeated analysis. That behavior fits the Orchestrator and leads because their product is a synthesis the next layer can absorb.</p>
+          <p>Workers deliberately do not receive it. Their product may be a detailed implementation analysis, exact vulnerability list, or comprehensive execution result for a lead to synthesize. If workers compress too aggressively, the lead loses evidence. The fleet therefore shares active listening and mental-model maintenance while varying response shape by role.</p>
+          <p>This is the subtle power of composition: you can change one line in an agent file to remove a skill from a role that should work independently, or update one skill file to retune all attached roles. The distribution is explicit and inspectable rather than implied by inheritance.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — audit one of each tier</p>
+          <h3>Diff the contracts, not the prose</h3>
+          <ol>
+            <li>Open <code>orchestrator.md</code>, <code>planning-lead.md</code>, and <code>backend-dev.md</code>.</li>
+            <li>Create five rows: model, expertise, skills, tools, domain.</li>
+            <li>Write one meaningful difference per row and explain which tier responsibility it supports.</li>
+            <li>Find one capability that exists as a tool but is still narrowed by domain.</li>
+          </ol>
+          <p>Pass if you can explain why the differences form an architecture rather than three arbitrary prompt styles.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating skills as inert text snippets</h3>
+          <p><strong>Symptom:</strong> every agent receives every “good” skill. Workers become concise leaders, leads become precise executors, and no one can explain which behavior belongs to which tier.</p>
+          <p><strong>Fix:</strong> distribute behavior by job. Ask what failure a skill prevents and at which tier that failure exists. Then verify the agent’s tools and domain support the behavior. A no-micromanagement skill on a worker without <code>delegate</code> would be incoherent.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>The on-screen tool list is period detail</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Recording vs shipped repository</p>
+            <p>The recorded <code>orchestrator.md</code> lacks the shipped <code>tilldone</code> addition and its updated expertise-write surface. Use the frame to teach agent anatomy, then inspect the checked-in front matter for the current course behavior. The tactic is stable; the tool list changed during development.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the composition choices</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for skills and agent anatomy">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Which skill appears on all ten agents?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>active-listener</code>; all agents read the recent conversation before responding.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why is <code>conversational-response</code> withheld from workers?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Workers should return detailed specialist evidence to leads; concise chat synthesis belongs to the coordinating tiers.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Name the five front-matter dimensions taught here.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Model, expertise, skills, tools, and domain.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Explain why one good skill should not go everywhere</h3>
+            <p>Teach the skill matrix without looking. Use <code>conversational-response</code> and <code>zero-micro-management</code> to prove that composition preserves tier differences rather than merely reducing duplication.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="configuration">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Configuration-driven teams</h2>
+        <p class="section-lead">A team architecture becomes scalable when adding, removing, or duplicating a team is configuration—not a rewrite of the chat system.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The hard-coded organization chart</h3>
+          <p>You want to remove Validation for a cheap planning run. The chat UI assumes three columns. The Orchestrator prompt names all three teams. Routing logic contains a switch statement. Footer colors are embedded in rendering code. Removing one team means editing five modules, and adding DevOps requires another application release.</p>
+          <p>The agents may be configurable, but the organization is not. That makes every experiment expensive and encourages one permanent “do everything” roster. Dan’s system loads the organization from a YAML file at launch so the runtime can render and route whichever team tree is declared.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — roster here, anatomy there</p>
+          <h3>Do not put every concern in one file</h3>
+          <div class="config-split" aria-label="Team YAML compared with agent Markdown front matter">
+            <article class="config-split__card config-split__card--yaml">
+              <h3><code>multi-team-config.yaml</code></h3>
+              <ul>
+                <li>Orchestrator display name and agent path</li>
+                <li>Agent/session directories and shared context</li>
+                <li>Team names, colors, and routing descriptions</li>
+                <li>Lead/member names, prompt paths, colors, <code>consult-when</code></li>
+                <li>Optional per-agent model override in alternate configs</li>
+              </ul>
+            </article>
+            <article class="config-split__card config-split__card--agent">
+              <h3><code>agents/*.md</code></h3>
+              <ul>
+                <li>Default model</li>
+                <li>Expertise paths and update policy</li>
+                <li>Skills and use conditions</li>
+                <li>Tools</li>
+                <li>Per-path domain rules</li>
+                <li>Purpose, instructions, variables, and tier behavior</li>
+              </ul>
+            </article>
+          </div>
+          <p>The distinction prevents a frequent error: the YAML is the organization chart, not the whole agent. The roster says which prompt file fills a seat. The prompt file defines the seat’s operating contract.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — kill, edit, relaunch</p>
+          <h3>Drop a team without rebuilding the tool</h3>
+          <p>Dan shows that the visible organization changes when the configuration changes. Remove the Validation block, restart, and the chat room now contains Planning and Engineering. Add a DevOps team by following the same lead/member pattern, and the Orchestrator receives its routing description at startup. The next launch picks up the new organization.</p>
+          <p>The shipped repository makes the idea testable with five presets. The default provides three balanced teams. Engineering-only strips the system to one execution team. Planning + Engineering removes Validation. Plan-and-scale keeps Planning and creates three Engineering teams. The open-source configuration demonstrates model overrides across providers.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t0232-toggle-workers-team-tree.jpg" alt="Expanded multi-team roster showing that the configured Orchestrator, three leads, and six workers materialized as separate runtime seats" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">3:52</span>The rendered tree is the runtime evidence for the roster. This frame is reused deliberately: in the hierarchy section it proves distinct tiers; here it proves that configuration materialized into ten visible seats.</figcaption>
+          </figure>
+          <div class="preset-grid" aria-label="Five shipped team presets">
+            <div><code>just team</code><span>Planning + Engineering + Validation</span></div>
+            <div><code>just team-eng</code><span>Engineering only</span></div>
+            <div><code>just team-pe</code><span>Planning + Engineering</span></div>
+            <div><code>just team-scale</code><span>Planning + 3× Engineering</span></div>
+            <div><code>just team-oss</code><span>Multi-provider roster</span></div>
+          </div>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — configuration-driven harness</p>
+          <h3>Change the organization without changing the runtime</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Sixth pillar</p>
+            <p><strong>Configuration-driven teams:</strong> the runtime reads an external roster at launch, resolves each seat to an agent definition, and constructs the team tree, routing context, sessions, colors, and model choices from that data.</p>
+          </aside>
+          <p>This is horizontal leverage. You can duplicate Engineering teams for scale without duplicating the agent definitions. You can point two seats at the same prompt for a drill, then later replace them with purpose-built agents. You can reduce cost by selecting only the teams a workflow needs.</p>
+          <p>Configuration does not make every organization good. A copied DevOps label pointing at Backend Dev is enough to prove the mechanism, not enough to create a DevOps expert. Real specialization still requires a distinct purpose, tools, skills, domain, and expertise.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — add a bounded DevOps drill</p>
+          <h3>Prove the roster mechanism before authoring a new agent</h3>
+          <p>Copy <code>multi-team-config.yaml</code> to a temporary course-repo config. Add a team named DevOps, give it a distinct color and a <code>consult-when</code> sentence about deployment or infrastructure, and point the lead/member seats at existing <code>engineering-lead.md</code> and <code>backend-dev.md</code>. Launch with <code>just teamc &lt;your-config&gt;</code>.</p>
+          <p>When you ask a small deployment-oriented question, the visible pass condition is structural: DevOps appears in the tree and the Orchestrator can select it. The exercise does not prove that Backend Dev has become a high-quality DevOps expert. It proves that team count, names, routing hints, and seat paths are data.</p>
+          <p>A production next step would create new agent files, narrow their tools and domains, assign deployment expertise, and sharpen <code>consult-when</code>. Keep mechanism verification and specialization quality as separate grades.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — predict five trees</p>
+          <h3>Use the presets before launching them</h3>
+          <ol>
+            <li>Read the five YAML preset filenames and the matching <code>justfile</code> recipes.</li>
+            <li>For each, predict the team names and approximate roster shape.</li>
+            <li>Circle which preset proves team pruning, horizontal scaling, and model diversity.</li>
+            <li>State which file you would edit to change Backend Dev’s domain and why it is not the team YAML.</li>
+          </ol>
+          <p>Pass if your predicted tree matches the config before you pay to launch it.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: confusing a roster change with a specialist change</h3>
+          <p><strong>Symptom:</strong> you copy the Engineering team three times and claim the system now has three different engineering perspectives, even though all seats point to the same definitions and memories.</p>
+          <p><strong>Fix:</strong> say precisely what changed. A replicated team increases capacity and creates separate sessions; it does not automatically create diversity. Distinct expertise, prompts, models, tools, or domains are needed when the goal is distinct judgment rather than throughput.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Model strings drift; precedence stays testable</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · publish-time caution</p>
+            <p>The checked-in model IDs are course-era values. When operating the code, replace them only with available equivalents in your environment. Preserve and test the principle: the agent file supplies a default, while a config-level <code>model:</code> override wins for that seat.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve where each decision lives</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for configuration-driven teams">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Where does an agent’s domain live?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>In the agent Markdown file’s front matter, not in <code>multi-team-config.yaml</code>.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Which preset proves horizontal team scaling?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>just team-scale</code>, backed by <code>plan-and-scale-engineering-config.yaml</code>, launches Planning plus three Engineering teams.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What does the team YAML primarily own?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The roster and routing/display structure: Orchestrator path, teams, leads, members, colors, shared context, sessions path, and <code>consult-when</code> descriptions, plus optional model overrides.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Separate organization from anatomy</h3>
+            <p>Teach where to change a team name, a routing hint, a default model, a model override, a skill, and a domain. Your listener should be able to point each change to YAML or agent front matter without guessing.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="spend">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Tier models and spend with evidence</h2>
+        <p class="section-lead">The system deliberately spends more calls than a single-agent chat. The engineering question is not “Can I minimize tokens?” It is “Which intelligence belongs at each decision point, what value did it deliver, and did I measure the real spend?”</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The cheapest run that keeps the human expensive</h3>
+          <p>You avoid lead calls, specialist reviews, and persistent context to keep the API footer small. Then you spend an hour rebuilding the plan, catching a regression, and asking the same agent to reconsider security. The model bill is low because the human absorbed the missing coordination.</p>
+          <p>The opposite failure is uncontrolled fan-out: every prompt goes to every team on the strongest model whether or not the perspectives are needed. Dan’s “spend to win” stance is not a license to ignore routing or accounting. The codebase tiers models, defaults to one team, and exposes per-agent cost so spending remains an engineering decision.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — coordination gets the strongest tier</p>
+          <h3>Put intelligence where compression and routing happen</h3>
+          <div class="cost-balance" aria-label="Course-era model tiering balances coordination cost with specialist execution value">
+            <article class="cost-balance__side">
+              <h3>Coordination tier</h3>
+              <p><strong>Orchestrator + leads · Opus 4.6 in the course.</strong> They interpret ambiguous goals, choose routes, preserve dependencies, reconcile specialist evidence, and compress it into the next decision.</p>
+            </article>
+            <span class="cost-balance__mark" aria-hidden="true">↔</span>
+            <article class="cost-balance__side cost-balance__side--value">
+              <h3>Execution tier</h3>
+              <p><strong>Workers · Sonnet 4.6 in the course.</strong> They receive a narrower assignment, use tools, and execute precisely inside a bounded specialist domain.</p>
+            </article>
+          </div>
+          <p>The model names are recording-era detail. The placement rule is the transferable idea: use your strongest available reasoning where mistakes in classification, dependency order, and synthesis would corrupt all downstream work; use a capable execution tier where scope is already narrow.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — value first, footer second</p>
+          <h3>The classifier demo gives the team a real decision</h3>
+          <p>The video’s target project is a separate scikit-learn prompt-complexity classifier. Its purpose is to label a prompt LOW, MID, or HIGH so a request can route to an appropriate model rather than paying for intelligence it does not need. Running <code>just predict "summarize this codebase"</code> returns MID with confidences high 0.35, low 0.19, mid 0.45 and routes to the course-era Sonnet model.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t0337-classifier-predict-route.png" alt="Terminal showing the prompt classifier predict command returning a MID label, confidence values, and a route to a Sonnet model" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">5:37</span>The separate demo project makes the value question concrete: classify required intelligence so you do not pay for more than the task needs. This classifier codebase is not part of the course lab.</figcaption>
+          </figure>
+          <p>The teams propose classifiers, plan a benchmark, engineer the comparison, and validate the result. In the recorded head-to-head, Logistic Regression performs better on LOW, ComplementNB performs better on MID, and both are perfect on HIGH; the synthesis keeps Logistic Regression as the default and names ComplementNB a credible challenger. The footer shows roughly <strong>$8.28</strong> for the full run.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t1610-head-to-head-cost-tiering.jpg" alt="Multi-team chat showing classifier head-to-head results and a footer with an 8.28 dollar total and model tiers" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">26:50</span>The cost is shown beside the delivered evidence. Dan’s argument is not that eight dollars is always cheap; it is that model cost must be compared with the coordinated result and the human time displaced.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — model tiering + spend to win</p>
+          <h3>Optimize the system, not one call</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s stance</p>
+            <p><strong>Model tiering</strong> assigns intelligence by role. <strong>Spend to win</strong> means willingly purchasing the specialist context and coordination that replace scarce human work, while tracking what was spent and what evidence was produced.</p>
+          </aside>
+          <p>Dan’s future-facing argument is that models improve, token cost falls, and intelligence per token rises. The engineer who practices using specialized compute before it is obvious builds the orchestration skill early. The mindset shift is from treating every token as waste to asking whether compute is buying trustworthy leverage.</p>
+          <p>That claim does not remove local constraints. A student may not have budget for a scaled run. The architecture still teaches how to route only relevant teams, choose a cheaper worker tier, use presets, keep prompts small, and inspect costs. “Spend more” is a strategic posture, not a requirement to run every expensive variant.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — account for hidden worker cost</p>
+          <h3>Spend to win, then verify the meter</h3>
+          <p>The repository includes <code>specs/fix-worker-cost-tracking.md</code>, a real defect report. In the documented case, the TUI showed $8.79 while the API dashboard showed $34.28—about a quarter of the real spend. Worker costs were being dropped across layers. The fix had to propagate costs from member subprocesses through leads into the parent footer.</p>
+          <p>This is a valuable tension. The lesson advocates using more tokens, and the codebase preserves evidence that the cost display once under-reported them. A trustworthy system must do both: allocate compute aggressively where it creates leverage and maintain accounting accurate enough to judge that allocation.</p>
+          <p>For a live run, record the visible tree, the per-agent model, the total before and after the task, the artifact or decision produced, and any external billing cross-check available to you. Cost without value is incomplete; value without cost is unauditable.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — design a tiered route</p>
+          <h3>Spend one expensive call on the highest-leverage decision</h3>
+          <ol>
+            <li>Choose a small repo-relevant task with a planning decision and an execution step.</li>
+            <li>Mark the point where a routing or synthesis mistake would contaminate everything downstream.</li>
+            <li>Assign the stronger tier there and a capable worker tier to the bounded execution.</li>
+            <li>Name the evidence you will compare with cost at the end.</li>
+          </ol>
+          <p>Pass if your model placement follows responsibility rather than prestige and if you can say which call you would remove when budget is tight.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: cost-minimizing the wrong denominator</h3>
+          <p><strong>Symptom:</strong> you compare a multi-team footer only with one single-agent call and ignore the human routing, re-prompting, validation, and correction the cheaper run requires.</p>
+          <p><strong>Fix:</strong> compare complete workflows. Record compute cost, elapsed time, human interventions, evidence quality, and rework. Then route surgically. A multi-team system should earn its cost by reducing coordination burden or improving trust—not by displaying more agents.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Keep the tiering principle; refresh the IDs</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · mid-2026</p>
+            <p><code>claude-opus-4-6</code> and <code>claude-sonnet-4-6</code> are course-era strings. Do not copy them blindly into a new environment. Select current available equivalents, then test routing, output quality, and cost. The chapter intentionally avoids declaring replacement IDs because they are not part of the extract.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the economic argument</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for model tiering and spend">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Where does the course put Opus and Sonnet?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Opus on the Orchestrator and leads; Sonnet on workers. The strings are period detail, but stronger coordination and capable bounded execution is the principle.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What is Dan’s answer to “this is expensive”?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Do not optimize only for today’s token price. Intelligence per token rises and costs fall; learn to spend compute on leverage instead of preserving the old human-heavy workflow.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What does the worker-cost bug teach?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Spend-to-win still requires accurate accounting. Member cost must propagate through leads to the parent total and should be cross-checked when the meter looks implausible.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Defend an eight-dollar run without hand-waving</h3>
+            <p>Teach the complete economic case using the classifier result, the tiering rule, and the cost-tracking defect. Your argument must include both value and measurement.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="trust">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Shared awareness turns fan-out into trust</h2>
+        <p class="section-lead">More perspectives help only when the team receives a consistent question, can see the shared history, returns inspectable evidence, and preserves disagreement for synthesis.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>Three answers to three accidentally different questions</h3>
+          <p>You ask Planning about product value, Engineering about implementation, and Validation about risk—but paraphrase the task differently each time. The teams disagree. You cannot tell whether the disagreement is expertise or prompt drift. Later, QA repeats a concern Security already resolved because neither can see the prior exchange.</p>
+          <p>Multi-perspective work needs a shared referent. Dan’s chat room logs the full conversation and can send one user intent through the Orchestrator to all teams with domain-tailored framing. Specialists bring different objectives while remaining anchored to the same thread.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — one question, three lenses, one synthesis</p>
+          <h3>Preserve the spine; vary the angle</h3>
+          <div class="team-map" role="img" aria-label="One Orchestrator sends a shared question to Planning, Engineering, and Validation and synthesizes their responses">
+            <div class="team-map__tier"><span class="team-map__label">Shared intent</span><div class="team-map__node team-map__node--orch"><b>Orchestrator</b><span>Same core question; context from the shared log</span></div></div>
+            <div class="team-map__tier"><span class="team-map__label">Domain lenses</span><div class="team-map__node team-map__node--planning"><b>Planning</b><span>Goals · adoption · latency trade-offs</span></div><div class="team-map__node team-map__node--engineering"><b>Engineering</b><span>Training · inference · implementation</span></div><div class="team-map__node team-map__node--validation"><b>Validation</b><span>Testability · security · regressions</span></div></div>
+            <div class="team-map__tier"><span class="team-map__label">User-visible result</span><div class="team-map__node team-map__node--orch"><b>Synthesis</b><span>Consensus, meaningful differences, risks, and next route</span></div></div>
+          </div>
+          <p>The Orchestrator’s job is not to erase differences. It must keep the shared question stable enough that differences can be attributed to domain perspective, then compress them into an actionable answer.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — ask all teams, then validate</p>
+          <h3>Different contexts produce different findings</h3>
+          <p>Dan asks all teams to propose two additional scikit-learn classifiers. The Orchestrator sends the request to Planning, Engineering, and Validation with domain-specific concerns. Planning considers goals and latency, Engineering considers training and inference behavior, and Validation considers testability and regressions. The recommendations overlap but are not identical.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t0408-ask-all-teams-fanout.jpg" alt="Multi-team chat showing the Orchestrator sending a classifier question to Planning, Engineering, and Validation with domain-specific wording" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">6:48</span>Consistent fan-out: one user intent reaches all three teams, while each team receives a lens aligned with its domain.</figcaption>
+          </figure>
+          <p>Later, the Validation Lead consults QA and Security. Security returns a structured review and “Ship it. No blocking issues,” while QA contributes additional findings. Dan emphasizes that different agents with different contexts find different things. The value is not a ceremonial approval stage; it is independent specialist attention before the system declares completion.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t0955-validation-security-review.jpg" alt="Validation team chat showing the Security Reviewer returning a structured review and ship-it assessment" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">15:55</span>Autonomous validation becomes evidence: a named specialist, a distinct review, an inspectable response, and a lead synthesis.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — conversation awareness + trust then scale</p>
+          <h3>Shared history first; higher autonomy second</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s 2026 game</p>
+            <p><strong>Conversation awareness</strong> means every tier can read the shared append-only exchange before acting. <strong>Trust and scale</strong> means first make the system reliable enough that you expect it to ship on enter, then increase how large and surgical its work can become.</p>
+          </aside>
+          <p>Trust here is not optimism. It comes from role specialization, domain boundaries, visible routing, persistent expertise, cost tracking, task tracking, validation, and logs. Each mechanism converts a reason to hover over the agents into evidence you can inspect afterward.</p>
+          <p>Scale comes second because a larger untrusted team amplifies uncertainty. Three Engineering teams with vague ownership are not a stronger system. Three teams with clear domains, task boundaries, and evidence may increase capacity while preserving control.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — audit one answer end to end</p>
+          <h3>Move from chat bubble to session evidence</h3>
+          <p>Start with the Orchestrator’s final claim. Open <code>.pi/multi-team/sessions/&lt;session-id&gt;/conversation.jsonl</code>. Find the user message, Orchestrator delegation, lead message, member response, lead synthesis, and final answer. The rows carry fields such as <code>from</code>, <code>message</code>, <code>to</code>, <code>type</code>, and timestamps. The <code>active-listener</code> skill instructs every agent to read the latest entries before responding.</p>
+          <p>Then inspect any session artifact named in chat. If a benchmark plan or result was written, the artifact should support the synthesis. If the final answer claims Security reviewed the change, locate the Security Reviewer’s response. If a team was not consulted, the absence should match the Orchestrator’s routing rationale rather than disappear into an opaque system.</p>
+          <p>This audit creates a learning loop. You can diagnose whether a weak outcome began with routing, lead synthesis, worker evidence, shared context, or final compression. Trust grows because failures become attributable and repairable.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — design an evidence chain</p>
+          <h3>Write the proof before you launch the team</h3>
+          <ol>
+            <li>Choose a small question that genuinely benefits from all three teams.</li>
+            <li>Write the invariant core prompt and one domain lens for each team.</li>
+            <li>List the six log events or messages you expect to find afterward.</li>
+            <li>Write what disagreement would be meaningful rather than a prompt inconsistency.</li>
+          </ol>
+          <p>Pass if a reviewer could distinguish a routing failure from a specialist disagreement using only your expected evidence.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: trust as “I stopped watching”</h3>
+          <p><strong>Symptom:</strong> you enable high autonomy, stop inspecting runs, and call the absence of supervision trust.</p>
+          <p><strong>Fix:</strong> replace continuous babysitting with inspectable contracts and sampled audits. Verify domains, team routes, task state, logs, artifacts, validation evidence, and cost. Trust is the earned ability to review at the right level, not the decision to discard evidence.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Scale the boundary and the meter together</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · course roadmap</p>
+            <p>The shipped scale preset proves team count is a knob, while the cost bug proves observability must keep pace. Before adding teams, define ownership, routing, completion evidence, and cost propagation. The next frontier is not merely more simultaneous agents; it is parallel work whose independence is explicit.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the trust ladder</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for conversation awareness and trust">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What file makes the whole team exchange observable?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>conversation.jsonl</code> inside the session directory.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Which skill consumes recent shared history?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>active-listener</code>, shared by all ten agents.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What are Dan’s two moves for 2026, in order?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Trust first, then scale.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Turn “ship it” into evidence</h3>
+            <p>Teach why a Security Reviewer’s “ship it” is useful only when you can identify the prompt, specialist session, review content, lead synthesis, and final claim. End by explaining why scale belongs after that evidence path works.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="runtime">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Under the hood: one binary, bounded recursion</h2>
+        <p class="section-lead">The team tree is not a metaphor layered over one conversation. The runtime spawns persistent Pi subprocesses, injects role-specific prompts and boundaries, streams JSON, and reconstructs the result inside a replaced chat interface.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The architecture diagram that never meets the source</h3>
+          <p>A UI draws ten avatars and animated arrows. The product claims hierarchical delegation. Underneath, one model call changes a “role” string and produces all responses serially. The visual may still be useful, but claims about independent sessions, model tiers, memory, tool boundaries, and cost cannot be inferred from the animation.</p>
+          <p>Dan’s lesson invites source-level inspection. The course repo contains the chat extension, delegation extension, domain enforcer, task extension, configuration loader, prompt renderer, subprocess runner, logs, themes, specs, and agent definitions. The runtime claim can be traced.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — one request at runtime resolution</p>
+          <h3>UI → tool → subprocess → extensions → persistent session</h3>
+          <div class="runtime-flow" role="img" aria-label="Runtime flow from custom chat UI through delegation tools to Pi subprocesses, runtime extensions, and persistent sessions">
+            <div class="runtime-flow__node"><b>Custom chat</b><code>multi-team-chat.ts</code><span>Owns input, bubbles, tree, footer, costs, and task display.</span></div>
+            <div class="runtime-flow__node"><b>Delegate</b><code>delegate()</code><span>Selects one team, a list, or all and streams lead output.</span></div>
+            <div class="runtime-flow__node"><b>Pi subprocess</b><code>pi --mode json -p</code><span>Same binary, role-specific model/prompt/session.</span></div>
+            <div class="runtime-flow__node"><b>Guards</b><code>domain · lead · tilldone</code><span>Extensions activate only when trigger environment exists.</span></div>
+            <div class="runtime-flow__node"><b>State</b><code>*.jsonl</code><span>Persistent agent session, shared conversation, artifacts, and costs.</span></div>
+          </div>
+          <p>The uniform binary is elegant: a lead and a worker do not need separate agent engines. Their injected prompt, enabled tools, environment variables, domains, models, and sessions make them different operational roles.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — replace the display, keep the brain</p>
+          <h3>The nuclear UI pattern</h3>
+          <p><code>multi-team-chat.ts</code> does not merely apply a theme. During session start, it replaces Pi’s display child with a custom chat view and blanks adjacent display regions. The underlying agent runtime remains, while the user experiences a purpose-built multi-team room with colored speakers, live delegation, worker toggles, task progress, context, and cost.</p>
+          <p>When a delegation begins, <code>callAgent()</code> launches Pi in JSON mode with prompts, themes, and ordinary extensions disabled, then explicitly loads the domain, lead-delegate, and TillDone extensions. The first run supplies the system prompt and model; later runs resume the persisted session file. JSON streaming lets the parent update the visible chat bubble while work is happening.</p>
+          <p>The Orchestrator’s <code>delegate</code> tool accepts a team name, a list, or <code>all</code>. A list can be settled with <code>Promise.allSettled</code>, so one target failing does not erase all results. The user sees one control plane over several real subprocess conversations.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-2-lead-agents/t1420-conversation-jsonl-log.png" alt="Visual Studio Code showing the shared conversation JSONL beside the multi-team session directories and generated work artifacts" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">23:40</span>Persistent files make the subprocess story inspectable. Reused from the memory section, this frame now supplies runtime evidence: shared conversation, per-agent session state, and work artifacts survive beyond a painted chat bubble.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — customizable agentic harness</p>
+          <h3>Control below the prompt layer</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Harness-level customization</p>
+            <p>A <strong>customizable agentic harness</strong> lets the builder own not only prompts, but tool registration, hooks, environment, subprocesses, persistent sessions, model selection, logging, task state, and the interaction surface.</p>
+          </aside>
+          <p>The lesson’s “beyond Claude Code” language refers to this degree of customization in the demonstrated system. It does not mean the architecture’s ideas belong only to Pi. It means the implementation requires surfaces below an ordinary chat prompt: a place to enforce domains, cap delegation, inject runtime variables, and replace the interface.</p>
+          <p>The system prompt is templated with <code>{{SESSION_DIR}}</code>, <code>{{CONVERSATION_LOG}}</code>, team/member blocks, expertise blocks, and skill blocks. The agent definition remains readable source; the loader resolves the current runtime facts into it.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — do not conflate two orchestration layers</p>
+          <h3>Claude Code builds it; Pi runs it</h3>
+          <div class="two-runtimes" aria-label="Pi runtime compared with the Claude Code build harness">
+            <article><h3>Pi runtime · lesson subject</h3><p><code>delegate</code> and <code>tilldone</code> custom tools; Pi subprocesses; domain, lead, and task extensions; custom chat UI; persistent JSONL sessions.</p></article>
+            <article><h3>Claude Code build harness</h3><p><code>.claude/commands/</code>, the meta Pi agent, and Task-style orchestration in planning/spec materials install, extend, and deploy the system.</p></article>
+          </div>
+          <p>The README calls Claude Code the bootloader. <code>/install</code> checks prerequisites, verifies the environment, installs dependencies, validates agents/config, and adds a launch alias. <code>/install-into-codebase</code> deploys fresh teams and empty expertise into another project. Once launched, the chat-room hierarchy is the Pi runtime—not a hidden Claude Code Task tree.</p>
+          <p>This distinction matters in debugging. If a worker cannot write a path, inspect the Pi domain rules and runtime environment. If installation fails to copy agent definitions, inspect the build command. Mixing the two layers sends diagnosis to the wrong mechanism.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — trace three environment gates</p>
+          <h3>Explain why each extension may self-disable</h3>
+          <ol>
+            <li>Map <code>AGENT_DOMAIN_RULES</code> to domain enforcement.</li>
+            <li>Map <code>LEAD_MEMBERS_JSON</code> to the lead delegate tool and explain why workers lose it.</li>
+            <li>Map <code>TILLDONE_TASKS</code> to shared task state.</li>
+            <li>State what uniform subprocess command becomes safer because these extensions activate conditionally.</li>
+          </ol>
+          <p>Pass if you can explain the recursion cap without saying “the worker model knows not to delegate.”</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: trusting the UI as runtime proof</h3>
+          <p><strong>Symptom:</strong> a colored bubble is treated as proof of a distinct model, memory, or permission boundary.</p>
+          <p><strong>Fix:</strong> triangulate. Read the agent file and team config, inspect the subprocess/session code, and verify a runtime artifact such as the JSONL log, per-agent session file, model in the tree, or a blocked tool call. Promise, implementation, and evidence should agree.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Portable ideas outlast the custom UI trick</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · ecosystem drift</p>
+            <p>Other tools now expose richer skills, hooks, subagents, plugins, output styles, and background-task surfaces. Re-evaluate which harness can implement the contract today. Preserve the invariants: one interface, real specialist sessions, bounded tools/domains, explicit delegation depth, shared evidence, and configuration-driven teams.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the runtime</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for runtime internals">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What runs each lead and worker?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The same Pi binary as a JSON-mode subprocess, with role-specific prompt, model, tools, environment, and persistent session.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What makes the custom UI a “nuclear” pattern?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The extension replaces Pi’s display layer with its own chat view while retaining the underlying agent runtime.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. State the two orchestration layers without conflating them.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Pi runs the multi-team chat with <code>delegate</code>/<code>tilldone</code> and subprocesses. Claude Code commands and Task-style tooling install, build, and extend that runtime.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Narrate one message like an implementer</h3>
+            <p>Begin at the custom chat input and end at the resumed worker session. Include tool registration, subprocess flags at a high level, the three conditional extensions, prompt variable injection, JSON streaming, and the return synthesis.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="current-practice">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Current practice companions</h2>
+        <p class="section-lead">The chapter is offline-first and complete without video. These two optional companions are the only YouTube overlays used: both come from the lesson’s own resource list and address named gaps rather than repeating the lesson.</p>
+        <div class="current-links">
+          <article class="current-link">
+            <p class="eyebrow">Harness comparison · optional</p>
+            <h3><a href="https://www.youtube.com/watch?v=f8cfH5XX-XU" target="_blank" rel="noopener noreferrer">Pi vs Claude Code</a></h3>
+            <p>Use this beside the runtime section to deepen the “customizable harness” claim: prompts are only one layer; hooks, tools, UI, and runtime control determine which architecture can be implemented.</p>
+          </article>
+          <article class="current-link">
+            <p class="eyebrow">Prerequisite · optional</p>
+            <h3><a href="https://www.youtube.com/watch?v=TqjmTZRL31E" target="_blank" rel="noopener noreferrer">CEO Agents</a></h3>
+            <p>Use this beside memory and model spend. It is the immediately preceding lesson’s foundation for large context, specialized agent teams, and moving human attention up the stack.</p>
+          </article>
+        </div>
+        <aside class="callout callout--why">
+          <p class="callout__label">What remains timeless</p>
+          <p>One agent is a ceiling; a single Orchestrator interface keeps cognitive load flat; leads delegate and workers execute; soft behavior and hard domains work together; role memory compounds; skills retune the fleet; configuration scales the organization; model IDs drift while tiering, accounting, trust, and evidence remain engineering responsibilities.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Graded lab · operate the real lead-agent system</h2>
+        <p class="section-lead">The course repository is the tool. You will run it against its own source, observe the three tiers, inspect the agent contracts, reconfigure the roster, trigger a hard domain block, and prove conversation awareness from the session log. The separate classifier shown in the video is not part of this lab.</p>
+
+        <section class="lab-box" id="lab-contract">
+          <h3 class="lab-box__title">Scope, safety, and evidence contract</h3>
+          <ul class="lab-box__meta"><li>Course codebase only</li><li>Paid model calls</li><li>Restore every edit</li><li>No PiCanvas</li></ul>
+          <ol class="lab-box__steps">
+            <li>Work only in <code>agentic-horizon-extras/lead-agents</code>. Do not recreate the prompt-routing classifier or substitute another repository.</li>
+            <li>Do not improvise destructive Git or <code>rm</code> commands. Use copied config files for roster experiments. For the one required agent-file edit, save the original diff and restore it before finishing.</li>
+            <li>Keep live prompts small. A light session still consumes paid tokens; the scaled and multi-provider presets are optional.</li>
+            <li>Save a lab note with command, observed route, visible cost, evidence path, and pass/fail for each checkpoint. Screenshots are optional; exact file/log evidence is stronger.</li>
+            <li>Kill and recreate the Pi/tmux session between configuration tests. Reusing a live session can create ghost or duplicate messages.</li>
+          </ol>
+          <div class="lab-box__pass">
+            <h4>Critical-pass rule</h4>
+            <p>A score of 80/100 is necessary but not sufficient. You must pass the three-tier block/delegate checkpoint, one roster reconfiguration, the out-of-domain write block, and the conversation-log audit. Missing any one leaves the lab incomplete.</p>
+          </div>
+        </section>
+
+        <section class="lab-box" id="lab-setup">
+          <h3 class="lab-box__title">Setup · prove the environment before spending tokens</h3>
+          <ul class="lab-box__meta"><li>Static first</li><li>5 points</li></ul>
+          <ol class="lab-box__steps">
+            <li>From <code>agentic-horizon-extras/lead-agents</code>, verify Claude Code, Pi, Bun, Node.js, and Just. The shipped <code>team*</code> recipes call <code>pi</code> directly; make sure that command resolves.</li>
+            <li>Create <code>.env</code> from <code>.env.sample</code> and set <code>ANTHROPIC_API_KEY</code>. The configuration loader throws if <code>.env</code> is absent. Add other provider keys only if you choose the optional multi-provider drill.</li>
+            <li>Run <code>/install</code> inside Claude Code or <code>just install</code>. The install flow checks prerequisites and the environment, installs dependencies, validates config/agent paths, and offers the <code>teams</code> alias.</li>
+            <li>Before launch, open <code>.pi/multi-team/agents/orchestrator.md</code>. Say its domain aloud: read all; write within the expertise area; no application-code execution.</li>
+            <li>Run <code>just team-list</code> to inspect available configurations without starting the full workflow.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass evidence</h4><ul><li>All required commands resolve.</li><li>The environment exists without exposing the key in notes.</li><li>You recorded the Orchestrator’s read/write boundary correctly.</li><li>The five shipped team configs are discoverable.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-cp0">
+          <h3 class="lab-box__title">Checkpoint 0 · one interface</h3>
+          <ul class="lab-box__meta"><li>Launch + ping</li><li>10 points</li></ul>
+          <ol class="lab-box__steps">
+            <li>Run <code>just team</code> and wait until the chat room is ready.</li>
+            <li>Type <code>ping</code>.</li>
+            <li>Record which agent answers, which teams it says are online, and the visible footer cost/context state.</li>
+            <li>Do not address a lead or worker directly.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>Only the Orchestrator returns the pong-style response.</li><li>Planning, Engineering, and Validation are named as available.</li><li>The footer shows an Orchestrator line with cost and context.</li><li>Your note explains why this proves the single-interface pillar, not the full hierarchy yet.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-cp1">
+          <h3 class="lab-box__title">Checkpoint 1 · witness depth-2 delegation</h3>
+          <ul class="lab-box__meta"><li>Critical</li><li>15 points</li></ul>
+          <ol class="lab-box__steps">
+            <li>Type <code>ping each team lead</code>. Record the Orchestrator → three-lead fan-out and the changed footer total.</li>
+            <li>Then type: <code>have engineering present a tree structure of the most important files in this repo</code>.</li>
+            <li>Watch for the Engineering Lead’s rejected file attempts and its message that a worker has the correct tools.</li>
+            <li>Record which worker actually reads the repository, how the lead synthesizes, and how the answer returns through the Orchestrator.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>You observed all three runtime tiers in one exchange.</li><li>The lead was domain-blocked rather than silently executing.</li><li>A worker performed the repository read.</li><li>Your one-sentence explanation says the lead delegates because execution belongs to the specialist’s tool/domain/memory contract.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-cp2">
+          <h3 class="lab-box__title">Checkpoint 2 · reveal cost and model tiering</h3>
+          <ul class="lab-box__meta"><li>Full tree</li><li>10 points</li></ul>
+          <ol class="lab-box__steps">
+            <li>Type <code>/toggle-workers</code>.</li>
+            <li>Count the visible Orchestrator, leads, and workers.</li>
+            <li>Record each tier’s course-era model family and the current total cost.</li>
+            <li>State what would remain true if every model string changed tomorrow.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>The tree shows ten agents: 1 + 3 + 6.</li><li>The Orchestrator/leads are on Opus 4.6 in this repo and workers on Sonnet 4.6.</li><li>Per-agent costs are visible.</li><li>Your durable statement is “stronger coordination tier, capable bounded execution tier,” not a memorized model ID.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-cp3">
+          <h3 class="lab-box__title">Checkpoint 3 · consistent multi-perspective fan-out</h3>
+          <ul class="lab-box__meta"><li>One intent, three lenses</li><li>10 points</li></ul>
+          <ol class="lab-box__steps">
+            <li>Ask: <code>ask all teams: what is the single biggest risk in this codebase's architecture, and why?</code></li>
+            <li>Record the core intent sent to all teams and the domain-specific framing each receives.</li>
+            <li>Identify one consensus point and one meaningful difference, if present.</li>
+            <li>Evaluate whether the final Orchestrator response synthesizes or merely concatenates.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>All three teams receive the same core question.</li><li>Planning, Engineering, and Validation apply different lenses.</li><li>The user receives one synthesis.</li><li>Your note distinguishes perspective difference from prompt drift.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-cp4">
+          <h3 class="lab-box__title">Checkpoint 4 · audit the anatomy from source</h3>
+          <ul class="lab-box__meta"><li>No model calls required</li><li>15 points</li></ul>
+          <ol class="lab-box__steps">
+            <li>Compare <code>orchestrator.md</code>, <code>planning-lead.md</code>, and <code>backend-dev.md</code> front matter.</li>
+            <li>Inspect <code>multi-team-config.yaml</code>, <code>skills/zero-micro-management.md</code>, and <code>skills/active-listener.md</code>.</li>
+            <li>Write a table with model, tools, skills, expertise, and domain for all three tiers.</li>
+            <li>Explain why <code>write</code>/<code>edit</code> on a lead does not mean broad application-write authority.</li>
+            <li>Count all ten references to <code>active-listener.md</code> and verify that <code>conversational-response.md</code> is absent from workers.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>You locate model/tools/skills/domain in agent files and roster/routing in YAML.</li><li>You identify bash as worker-only.</li><li>You state the expertise-write exception for coordinators.</li><li>You explain why leads are concise while workers remain detailed.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-cp5">
+          <h3 class="lab-box__title">Checkpoint 5 · audit conversation awareness</h3>
+          <ul class="lab-box__meta"><li>Critical</li><li>10 points</li></ul>
+          <ol class="lab-box__steps">
+            <li>Find the current directory under <code>.pi/multi-team/sessions/&lt;session-id&gt;/</code>.</li>
+            <li>Open <code>conversation.jsonl</code>.</li>
+            <li>Find records for the user, Orchestrator, at least one lead, and at least one worker.</li>
+            <li>Record the fields present and connect the file to <code>active-listener.md</code>.</li>
+            <li>List any detailed session artifacts produced by the run without copying them into expertise.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass criteria</h4><ul><li>Every tier is evidenced in the shared log.</li><li>You identify <code>from</code>, <code>message</code>, and message-type/routing fields actually present.</li><li>You explain the difference among conversation log, agent session, session artifact, and mental model.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-practicum">
+          <h3 class="lab-box__title">Required practicum · reconfigure, then hit the hard gate</h3>
+          <ul class="lab-box__meta"><li>Two critical drills</li><li>25 points</li></ul>
+
+          <h4>P1 · Prune or add a team · 10 points</h4>
+          <ol class="lab-box__steps">
+            <li>Fully stop the current app/session.</li>
+            <li>Choose one: run <code>just team-pe</code> to prune Validation, or copy the default config and add a DevOps team that reuses existing agent files for this mechanism drill.</li>
+            <li>Relaunch with the preset or <code>just teamc &lt;copied-config&gt;</code>.</li>
+            <li>Record the new visible tree and one routing behavior that changed.</li>
+          </ol>
+          <p><strong>Pass:</strong> the launched roster matches the edited/preset YAML. If you added DevOps with reused prompts, you explicitly label it a roster proof rather than a completed specialist design.</p>
+
+          <h4>P2 · Domain-lock experiment · 15 points</h4>
+          <ol class="lab-box__steps">
+            <li>Save the current diff of <code>.pi/multi-team/agents/frontend-dev.md</code>.</li>
+            <li>Edit its domain so <code>apps/frontend/</code> permits read/upsert/delete while the rest of <code>apps/</code> is read-only, matching the lesson pattern.</li>
+            <li>Fully relaunch. Through the Orchestrator, ask Engineering to have Frontend Dev use its <code>write</code> or <code>edit</code> file tool—not Bash or shell redirection—to create a harmless test file outside <code>apps/frontend/</code>.</li>
+            <li>Capture the blocked tool call or refusal. Then ask for an allowed write inside the owned path only if it is safe and easy to remove through the same bounded workflow.</li>
+            <li>Restore <code>frontend-dev.md</code> exactly and verify no test artifact remains.</li>
+          </ol>
+          <p><strong>Pass:</strong> the out-of-domain <code>write</code>/<code>edit</code> call is structurally blocked, the edit is restored, and your explanation names both the soft skill and hard enforcer. A prompt-only refusal or Bash-only attempt earns no critical pass because the shell heuristic does not prove target-path authorization.</p>
+        </section>
+
+        <section class="lab-box" id="lab-stretch">
+          <h3 class="lab-box__title">Stretch drills · choose by learning need, not spectacle</h3>
+          <ul class="lab-box__meta"><li>Optional</li><li>Cost-aware</li></ul>
+          <h4>S1 · Model override precedence</h4>
+          <p>Use a copied config to override one agent model, or run <code>just team-oss</code> only if the necessary provider keys are configured. Pass when the visible tree shows the override rather than the agent file’s default.</p>
+
+          <h4>S2 · Read-only expertise</h4>
+          <p>Add a small second expertise file to one worker with <code>updatable: false</code>. Confirm the agent can read it but cannot modify it. Restore the agent file and remove the drill file afterward.</p>
+
+          <h4>S3 · Horizontal scale</h4>
+          <p>Run <code>just team-scale</code> with a trivial prompt and watch cost carefully. Pass when Planning plus Engineering1/2/3 appear as distinct teams. Do not claim distinct expertise unless their definitions or learned state differ.</p>
+
+          <h4>S4 · Meta build</h4>
+          <p>Use <code>just metacc</code> or <code>just metapi</code> to scaffold a purpose-built agent and wire it into a copied config. This exercises the build harness, which is distinct from the Pi multi-team runtime.</p>
+        </section>
+
+        <section class="lab-box" id="lab-troubleshooting">
+          <h3 class="lab-box__title">Troubleshooting by mechanism</h3>
+          <ul class="lab-box__meta"><li>Diagnose before widening permissions</li></ul>
+          <div class="table-scroll" role="region" aria-label="Lead-agent troubleshooting table" tabindex="0">
+          <table>
+            <thead><tr><th>Observation</th><th>Likely mechanism</th><th>Repair</th></tr></thead>
+            <tbody>
+              <tr><td>Ghost or duplicate messages during retest</td><td>A live Pi/tmux session was reused</td><td>Fully kill and recreate the session; wait for idle before the next prompt.</td></tr>
+              <tr><td>Launch dies before chat appears</td><td>Missing <code>.env</code> or <code>ANTHROPIC_API_KEY</code></td><td>Create the environment from <code>.env.sample</code>; never paste the key into lab evidence.</td></tr>
+              <tr><td>Fatal error names an agent path</td><td>Config points to a missing or renamed Markdown file</td><td>Correct the copied config path or restore the shipped file.</td></tr>
+              <tr><td>Worker write does not happen</td><td><code>domain-enforcer</code> rejected path/tool access</td><td>Inspect that agent’s domain. Do not widen it until you can state the intended ownership.</td></tr>
+              <tr><td>Lead tries to write application code</td><td>Coordinator behavior drift</td><td>Keep the hard boundary; inspect <code>zero-micro-management</code> and route to a worker.</td></tr>
+              <tr><td>Footer cost looks implausibly low</td><td>Worker-cost propagation defect in an older build</td><td>Read <code>specs/fix-worker-cost-tracking.md</code> and cross-check external billing if available.</td></tr>
+              <tr><td><code>team-oss</code> provider fails</td><td>Missing provider credential</td><td>Configure the matching key or use the default Anthropic roster.</td></tr>
+              <tr><td>Expertise warning after a write</td><td>File exceeds <code>max-lines</code> or invalid YAML</td><td>Condense durable entries and validate YAML as the mental-model skill requires.</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </section>
+
+        <section class="lab-box" id="lab-rubric">
+          <h3 class="lab-box__title">100-point rubric and final pass sheet</h3>
+          <ul class="lab-box__meta"><li>80 points + all criticals</li><li>Grade evidence, not confidence</li></ul>
+          <div class="table-scroll" role="region" aria-label="One hundred point lab rubric" tabindex="0">
+          <table class="rubric-table">
+            <thead><tr><th>Evidence</th><th>Full</th><th>Partial</th><th>Missing</th></tr></thead>
+            <tbody>
+              <tr><td>Setup and permissions audit</td><td>5</td><td>2</td><td>0</td></tr>
+              <tr><td>Orchestrator-only ping</td><td>10</td><td>5</td><td>0</td></tr>
+              <tr><td>Lead block → worker execution</td><td>15</td><td>7</td><td>0</td></tr>
+              <tr><td>Ten-agent model/cost tree</td><td>10</td><td>5</td><td>0</td></tr>
+              <tr><td>Three-team perspective synthesis</td><td>10</td><td>5</td><td>0</td></tr>
+              <tr><td>Source anatomy audit</td><td>15</td><td>8</td><td>0</td></tr>
+              <tr><td>Conversation-log audit</td><td>10</td><td>5</td><td>0</td></tr>
+              <tr><td>Roster reconfiguration</td><td>10</td><td>5</td><td>0</td></tr>
+              <tr><td>Hard domain-block experiment + restore</td><td>15</td><td>7</td><td>0</td></tr>
+            </tbody>
+          </table>
+          </div>
+          <div class="lab-box__pass">
+            <h4>Final declarations · all required</h4>
+            <ul>
+              <li>□ I launched the default system and used only the Orchestrator interface.</li>
+              <li>□ I witnessed a lead get blocked and route execution to a worker.</li>
+              <li>□ I revealed all ten agents and recorded model tiers and cost.</li>
+              <li>□ I traced model/tools/skills/domain to agent front matter and roster/routing to YAML.</li>
+              <li>□ I found every tier in <code>conversation.jsonl</code>.</li>
+              <li>□ I changed the roster through configuration and relaunched.</li>
+              <li>□ I triggered an out-of-domain Frontend Dev write block and restored the file.</li>
+              <li>□ I left no test artifacts, secrets, or un-restored course-file changes.</li>
+              <li>□ Without notes, I can teach the three tiers, soft/hard locks, mental-model loop, and trust → scale order.</li>
+            </ul>
+          </div>
+        </section>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Cumulative mastery · route, bound, inspect, teach</h2>
+        <p class="section-lead">Close the chapter. Draw the architecture and answer on paper. Reveal only after committing to an answer. A correct phrase without a runtime implication earns half credit.</p>
+
+        <h3>Round 1 · Architecture</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative architecture quiz">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Draw the three tiers and state each job.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>User → Orchestrator → team leads → workers. The Orchestrator is the only user interface and classifies/routes/synthesizes. Leads coordinate and delegate within a team. Workers execute bounded specialist tasks.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why is the architecture called depth-2 delegation?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>There are two delegation edges beneath the user-facing Orchestrator: Orchestrator to lead, then lead to worker. Workers cannot delegate further.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What keeps cognitive load flat as workers are added?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The single Orchestrator interface plus synthesis at both hierarchy boundaries.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Reconstruct the shipped default roster.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>One Orchestrator; Planning Lead with Product Manager and UX Researcher; Engineering Lead with Frontend Dev and Backend Dev; Validation Lead with QA Engineer and Security Reviewer.</p></details></div>
+        </section>
+
+        <h3>Round 2 · Authority and memory</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative authority and memory quiz">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">5. A lead has <code>write</code> in its tool list. Why should it still not edit application code?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The tool is narrowed by domain to its permitted expertise file or area. The zero-micro-management skill routes application execution to workers, and the hard domain gate blocks broader writes.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">6. State the soft lock, hard lock, and default rule.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Soft lock: behavioral skills such as zero micro-management. Hard lock: the domain-enforcer tool and path checks. If no domain rule matches, deny.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">7. Why are the shipped expertise files empty?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They are intended to grow from the installed codebase. Carrying a rich model from a previous project would inject stale knowledge.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">8. Distinguish shared conversation, session artifact, and mental model.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>conversation.jsonl</code> records the team exchange; session artifacts hold detailed work products; a mental model is a curated, durable, role-specific expertise file maintained across sessions.</p></details></div>
+        </section>
+
+        <h3>Round 3 · Configuration and runtime</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative configuration and runtime quiz">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">9. Where do roster/consult-when and model/tools/skills/domain live?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Roster and routing hints live in the team YAML. Default model, tools, skills, expertise, and domain live in each agent Markdown front matter; a team config may override a seat’s model.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">10. Which skill is universal, and which response skill is withheld from workers?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>active-listener</code> is universal. <code>conversational-response</code> is withheld so workers can return detailed evidence to concise leads.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">11. What actually runs a worker, and what prevents deeper delegation?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A Pi JSON-mode subprocess with a persistent session. The lead removes <code>LEAD_MEMBERS_JSON</code> before spawning it, so the delegate extension does not enable another delegation layer.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">12. Separate the Pi runtime from the Claude Code build harness.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Pi runs the custom chat, tools, extensions, and agent subprocesses. Claude Code commands and meta tooling install, deploy, and help build the system.</p></details></div>
+        </section>
+
+        <h3>Round 4 · Judgment and transfer</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative judgment quiz">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">13. Why is sending every request to every team a design failure?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It discards routing, increases cost and latency, and returns unnecessary perspectives. The Orchestrator should default to one relevant team and fan out only when domains genuinely contribute.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">14. What survives model-name drift?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Tier intelligence by responsibility: strongest available reasoning at coordination and synthesis points and a capable execution tier for bounded worker tasks, with config overrides and measured outcomes.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">15. Why must trust precede scale?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Scale amplifies whatever the system already does. Specialization, domains, logs, costs, task state, and validation must make outcomes inspectable before more teams increase capacity.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">16. Resolve “spend to win” in one careful sentence.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Purchase the specialist context and coordination that displace scarce human work when the evidence justifies it, while routing surgically and measuring complete cost rather than treating tokens as inherently wasteful or free.</p></details></div>
+        </section>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Scoring</p>
+          <p><strong>14–16:</strong> ready to teach and design a new team. <strong>10–13:</strong> revisit the matching source files and rerun one lab checkpoint. <strong>0–9:</strong> redraw the tier/domain/memory diagrams and complete the core lab again. Any answer you cannot connect to a file, tool call, or observable behavior counts as half credit.</p>
+        </aside>
+
+        <h3>Capstone teach-back</h3>
+        <div class="teach-back">
+          <p>Without notes, teach a colleague for seven minutes:</p>
+          <ol>
+            <li>Why one generalist plus a human router is a ceiling.</li>
+            <li>How the single interface and depth-2 hierarchy remove that bottleneck.</li>
+            <li>Why leads delegate, workers execute, and a blocked lead is a feature.</li>
+            <li>How domain rules and mental models make autonomy safer and stronger over time.</li>
+            <li>Where YAML ends and agent front matter begins.</li>
+            <li>How Pi subprocesses, environment gates, and JSONL evidence make the architecture real.</li>
+            <li>Why the economic close is trust → scale with measured spend.</li>
+          </ol>
+          <p class="fine">Expert pass: your listener can predict the effect of removing <code>active-listener</code>, widening Frontend Dev to all of <code>apps/</code>, overriding one model in config, or leaking <code>LEAD_MEMBERS_JSON</code> into a worker.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">13</span>
+        <h2 class="section-title">MA-2 glossary</h2>
+        <p class="section-lead">Use these terms narrowly. Each definition points to a behavior or source surface in the course repository.</p>
+        <dl class="glossary">
+          <div><dt>Multi-team agentic coding</dt><dd>Specialized teams coordinated through one Orchestrator interface, with leads routing to workers and syntheses bubbling back to the user.</dd></div>
+          <div><dt>Orchestrator</dt><dd>The only user-facing agent. It classifies requests, chooses teams, manages substantial work with TillDone, and synthesizes team output.</dd></div>
+          <div><dt>Team lead</dt><dd>A coordination agent that understands a team request, delegates specialist work, tracks its task, and returns a synthesis without executing application work.</dd></div>
+          <div><dt>Worker</dt><dd>A specialist member with read/write/edit/bash tools, no delegate/TillDone tools, and a domain that bounds execution.</dd></div>
+          <div><dt>Depth-2 delegation</dt><dd>Orchestrator → lead → worker, with no further worker delegation.</dd></div>
+          <div><dt>Zero micro-management</dt><dd>The leader behavior that routes, coordinates, and synthesizes rather than performing the specialist task.</dd></div>
+          <div><dt>Domain ownership</dt><dd>An explicit statement of which repository paths an agent may read, upsert, and delete.</dd></div>
+          <div><dt>Domain locking</dt><dd>Per-path runtime enforcement for ordinary file tools, plus coarse shell-mutation heuristics that are not target-path authorization.</dd></div>
+          <div><dt>Agent expert</dt><dd>A role whose purpose, model, expertise, skills, tools, and domain align around a narrow problem area.</dd></div>
+          <div><dt>Mental model</dt><dd>A structured YAML expertise file an agent reads and self-maintains with durable, domain-relevant knowledge.</dd></div>
+          <div><dt>Read-only expertise</dt><dd>An expertise entry with <code>updatable: false</code>, used for doctrine or procedures the agent may consult but not change.</dd></div>
+          <div><dt>Skills composition</dt><dd>Attaching reusable Markdown behavior modules to selected agents with explicit use conditions.</dd></div>
+          <div><dt>Active listener</dt><dd>The shared skill that reads recent <code>conversation.jsonl</code> entries before every response to avoid repetition and surface conflicts.</dd></div>
+          <div><dt>Conversation awareness</dt><dd>The property that every tier can inspect the shared append-only conversation and respond with knowledge of prior decisions.</dd></div>
+          <div><dt>Configuration-driven team</dt><dd>A roster loaded from YAML so teams, seats, colors, routing hints, and model overrides can change without rewriting the runtime.</dd></div>
+          <div><dt>Consult-when</dt><dd>A routing description in team configuration that tells the Orchestrator or lead when a team or member’s specialization is relevant.</dd></div>
+          <div><dt>Model tiering</dt><dd>Assigning model intelligence according to role responsibility, demonstrated with stronger coordination models and cheaper worker models.</dd></div>
+          <div><dt>Spend to win</dt><dd>Using paid compute for specialist context and coordination when it produces justified leverage, while measuring real costs and outcomes.</dd></div>
+          <div><dt>Trust and scale</dt><dd>Dan’s order of operations: build an inspectable system you expect to ship, then increase its size and surgical reach.</dd></div>
+          <div><dt>Customizable agentic harness</dt><dd>A runtime surface that exposes prompts, tools, hooks, subprocesses, sessions, models, logs, task state, and UI to the builder.</dd></div>
+          <div><dt>Pi runtime</dt><dd>The lesson’s multi-team execution layer: custom chat UI, delegate and TillDone tools, Pi subprocesses, extensions, and persistent JSONL sessions.</dd></div>
+          <div><dt>Claude Code bootloader</dt><dd>The course’s install, deploy, and build layer under <code>.claude/</code>; distinct from the Pi runtime it sets up.</dd></div>
+          <div><dt>TillDone</dt><dd>The shared task-tracking tool: full canonical list management at the Orchestrator and reduced start, done, and list operations for leads.</dd></div>
+          <div><dt>Session directory</dt><dd>The per-run workspace holding conversation logs, persistent agent sessions, team folders, and detailed artifacts.</dd></div>
+          <div><dt>No-match deny</dt><dd>The domain-enforcer default: a path without an applicable permission rule is blocked.</dd></div>
+          <div><dt>Nuclear UI pattern</dt><dd>The extension technique of replacing Pi’s display layer with the custom multi-team chat while retaining the agent engine.</dd></div>
+        </dl>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">Volume III · Multi-Agent Systems</p>
+        <div class="chapter-footer__nav">
+          <a href="15-ceo-agents.html">← Previous: MA-1 · CEO Agents</a>
+          <a href="../index.html">Book hub →</a>
+        </div>
+      </footer>
+    
+      <p class="code-deep-link"><a href="../../../agentic-horizon-extras/lead-agents/README.md">Course code deep-dive · inspect the shipped lead-agent repository →</a></p>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          progressFramePending = false;
+        });
+      };
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => {
+          const active = link.getAttribute('href') === `#${visible.target.id}`;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+
+      sections.forEach(section => observer.observe(section));
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+</body>
+</html>

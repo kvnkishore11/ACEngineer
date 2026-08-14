@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first companion to MA-4: The Pi Verifier Agent. Learn the two-agent observer loop, atomic verification, read-only architecture, the verifier Report flywheel, and a graded course-repository lab.">
+  <title>MA-4 · The Pi Verifier Agent — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="../vol-1-tac/01-hello-agentic-coding.assets.css">
+  <link rel="stylesheet" href="18-verifier-agent.assets.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to chapter</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL III · MA · LESSON 18</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume III · Multi-Agent Systems</p>
+      <h2>The Pi Verifier Agent</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation</span></a></li>
+          <li><a href="#observer"><span class="chapter-nav__n">01</span><span>The observer loop</span></a></li>
+          <li><a href="#review"><span class="chapter-nav__n">02</span><span>The review constraint</span></a></li>
+          <li><a href="#atoms"><span class="chapter-nav__n">03</span><span>Atomic claims</span></a></li>
+          <li><a href="#tokens"><span class="chapter-nav__n">04</span><span>Tokens for time</span></a></li>
+          <li><a href="#trust-scale"><span class="chapter-nav__n">05</span><span>Trust AND scale</span></a></li>
+          <li><a href="#template"><span class="chapter-nav__n">06</span><span>Template by force</span></a></li>
+          <li><a href="#read-only"><span class="chapter-nav__n">07</span><span>Read-only architecture</span></a></li>
+          <li><a href="#flywheel"><span class="chapter-nav__n">08</span><span>The Report flywheel</span></a></li>
+          <li><a href="#stack"><span class="chapter-nav__n">09</span><span>Stack intelligence</span></a></li>
+          <li><a href="#current-practice"><span class="chapter-nav__n">10</span><span>Current practice</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">11</span><span>Graded lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">12</span><span>Cumulative mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">13</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--verifier">
+        <span class="hero__chapter">MA-4 · Spend tokens to save time</span>
+        <h1>The Pi Verifier Agent</h1>
+        <p class="hero__dek">Stop hand-checking every “done.” Put a second, input-locked, authority-narrowed agent behind the builder. It wakes on every stop event, turns the builder’s claims into atomic propositions, checks each against domain-appropriate evidence, and sends one concrete correction back when a check fails.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 32:51</li>
+          <li>Lab · 60–90 min</li>
+          <li>Course repo · the-verifier-agent-system</li>
+          <li>Level · advanced shipping engineer</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to trace the builder/verifier lifecycle without calling it model delegation, decompose a bundled claim into domain-appropriate checks, explain the token-for-time trade, audit the scoped SQLite authority layers, read the Report as a control surface, improve a verifier through its files instead of a one-off prompt, and reproduce the SQLite fail→feedback→repair→PERFECT loop in the real course codebase.</p>
+
+        <div class="hero-loop" role="img" aria-label="An engineer prompts a builder. A private socket carries lifecycle events to an input-locked verifier, which reads the builder session and can send corrective feedback back to the builder.">
+          <div class="hero-loop__node">
+            <b>Builder</b>
+            <span>Interactive. Writes, edits, generates, and reports what it did.</span>
+          </div>
+          <div class="hero-loop__channel">start · stop · error<br>private unix socket</div>
+          <div class="hero-loop__node hero-loop__node--verifier">
+            <b>Verifier</b>
+            <span>Observes. Reads the turn slice, checks claims, and prompts back only on actionable failure.</span>
+          </div>
+          <div class="hero-loop__lock">Input locked · rules live in persona + script + template</div>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation</a></li>
+            <li><a href="#observer">The two-agent observer loop</a></li>
+            <li><a href="#review">The review constraint</a></li>
+            <li><a href="#atoms">Atomic claims</a></li>
+            <li><a href="#tokens">Spend tokens to save time</a></li>
+            <li><a href="#trust-scale">Trust AND scale</a></li>
+            <li><a href="#template">Template engineering by force</a></li>
+            <li><a href="#read-only">Read-only by architecture</a></li>
+            <li><a href="#flywheel">The Report flywheel</a></li>
+            <li><a href="#stack">Stack intelligence and own the harness</a></li>
+            <li><a href="#current-practice">Current practice companions</a></li>
+            <li><a href="#lab">Graded lab</a></li>
+            <li><a href="#mastery">Cumulative mastery</a></li>
+            <li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">Move review out of your head</h2>
+        <p class="section-lead">The builder says it created the table, added the foreign key, applied the migration, and checked the result. That sentence is not evidence. It is a bundle of claims that has quietly transferred a new job to you: prove that every part is true.</p>
+
+        <p>The course system moves that job to a second Pi process. The builder remains the normal interactive agent. The verifier appears beside it in a sibling window, but its input is disabled. When the builder finishes a turn, the builder-side extension emits a <code>stop</code> lifecycle event over a private unix socket. The verifier-side extension renders the same <code>verify_on_stop.md</code> template every cycle, reads only that turn’s slice from the builder’s session JSONL, decomposes the request and result into atomic claims, and checks them through the tools allowed by its domain persona.</p>
+
+        <p>If the claims hold, the verifier ends with a structured Report and stays out of the builder’s way. If a claim fails and the fix is concrete, its sole outbound tool—<code>verifier_prompt</code>—sends a correction to the builder. The builder receives that message as a follow-up turn, repairs the work, and triggers verification again. The course default allows three correction loops; after that, the system escalates to the human instead of pretending progress.</p>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The tactic</p>
+          <p><strong>Spend tokens to save time.</strong> Use a second, focused, authority-narrowed agent to check the builder’s atomic claims. Trade the lesson’s demonstrated 2–5× compute range for review hours you do not have to spend yourself.</p>
+        </aside>
+
+        <h3>What this is—and what it is not</h3>
+        <div class="comparison">
+          <article class="comparison__card">
+            <div class="comparison__head"><h3>Not model delegation</h3><p>The builder model does not decide to call a verifier or coordinate its proof work.</p></div>
+            <div class="comparison__body"><p>The builder harness does know: it owns the socket, spawns the child, shows connection state, and injects corrections. The separation is outside the builder model’s task flow.</p></div>
+          </article>
+          <article class="comparison__card comparison__card--agentic">
+            <div class="comparison__head"><h3>A top-down observer</h3><p>The verifier is attached to the builder’s lifecycle and proof surface.</p></div>
+            <div class="comparison__body"><p>It wakes automatically, reads the bounded session slice, checks actual state, and returns only a correction or a Report.</p></div>
+          </article>
+        </div>
+
+        <h3>Five outcomes to train</h3>
+        <ul class="learning-objectives">
+          <li><strong>Trace the system</strong>Explain what triggers verification, what crosses the socket, what is read from disk, and how a correction becomes a builder follow-up.</li>
+          <li><strong>Decompose proof</strong>Turn one confident summary into independently testable atoms with domain-appropriate evidence for each.</li>
+          <li><strong>Engineer authority</strong>Distinguish a prompt-level request for safety from the persona, tool-call, and domain-checker layers, including what the current source does not enforce.</li>
+          <li><strong>Improve the class</strong>Convert an unverifiable gap into a durable persona, script, or template improvement without typing at the verifier.</li>
+          <li><strong>Operate the real loop</strong>Use <code>just vsql</code> and the shipped files to catch a planted schema defect and collect proof of automatic repair.</li>
+        </ul>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Accuracy boundary</p>
+          <p>The recording and the checked-in files differ in a few places. The video’s SQLite verifier uses GLM 5.1; the current persona file declares <code>openai/gpt-5.5</code>. The README’s old “v1 limitations” paragraph says only SQLite ships, while the local tree contains full generic, SQLite, image, and Python personas. This chapter labels those differences and treats the files as the operational source of truth.</p>
+        </aside>
+
+        <h3>How to study the chapter</h3>
+        <p>Each of the nine ideas follows the same active sequence: feel the failure, see the system, replay a frame-backed moment, name the concept, inspect the course source, attempt a small task, diagnose a tempting error, update the idea for current practice, retrieve it from memory, and teach it back. Do the “You try” prompt before opening the retrieval answers. In the lab, save exact commands and outputs. “The verifier looked green” is a weak claim; “<code>atomic_claims_failed: 0</code> followed a failed FK atom proven by <code>PRAGMA foreign_key_list</code>” is inspectable evidence.</p>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="observer">
+        <span class="section-number">01</span>
+        <h2 class="section-title">The verifier is an observer, not a helper</h2>
+        <p class="section-lead">The core mechanic is deliberately small: one interactive builder, one input-locked verifier, one lifecycle channel, one bounded transcript slice, and one corrective path back.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The “second agent” that still needs you</h3>
+          <p>You ask a builder to implement a change. When it finishes, you open another chat, paste the request and summary, ask that agent to review, copy its findings back, and prompt the builder again. Two models were involved, but your hands performed every trigger, context transfer, and correction. The review loop did not close; it grew another manual step.</p>
+          <p>That setup also lets the builder choose the story the reviewer sees. If you paste only the summary, the reviewer receives the claims but not the tool calls, results, and actual repository state behind them. The second agent may sound independent while inheriting the builder’s framing. More chat is not automatically more proof.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — separate lifecycle from substance</p>
+          <h3>The assistant transcript is not streamed over the socket</h3>
+          <div class="observer-flow" role="img" aria-label="Builder emits lifecycle events over a unix socket. The verifier reads the bounded turn slice from session JSONL and can send one corrective prompt back.">
+            <div class="observer-flow__node observer-flow__node--builder"><b>Builder</b><span>Normal interactive Pi. Captures original prompt and turn line offsets.</span></div>
+            <span class="observer-flow__arrow" aria-hidden="true">→</span>
+            <div class="observer-flow__node"><b>Lifecycle event</b><span><code>start</code> · <code>stop</code> · <code>error</code> plus session id, turn index, line bounds.</span></div>
+            <span class="observer-flow__arrow" aria-hidden="true">→</span>
+            <div class="observer-flow__node observer-flow__node--verifier"><b>Verifier</b><span>Reads <code>session.jsonl</code> slice, checks actual state, returns a Report or correction.</span></div>
+          </div>
+          <div class="event-ledger">
+            <div><b>On the wire</b><code>lifecycle metadata + control, correction, report, ack, and liveness envelopes</code><p class="fine">Events include the original prompt and turn line offsets, but not the builder assistant transcript.</p></div>
+            <div><b>On disk</b><code>~/.pi/agent/sessions/&lt;sid&gt;.jsonl</code><p class="fine">The verifier reads the bounded slice named by the stop event.</p></div>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — Dan’s two-window reveal</p>
+          <h3>One input box is alive; the other is intentionally dead</h3>
+          <p>The opening view places two Pi agents side by side. The builder is ready for a human prompt and shows that a verifier is connected. The verifier’s editor has been replaced by a status surface. Dan draws attention to the strange part: this harness takes no input. That asymmetry matters more than the number of windows. One process builds because a person asked; the other verifies because the system observed completion.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t0080-two-agent-split-intro.jpg" alt="Two Pi agents side by side: an input-locked verifier on the left and an interactive builder on the right" width="3840" height="2160" fetchpriority="high">
+            <figcaption><span class="frame-card__t">1:20</span>The whole primitive in one view. The builder accepts the request. The verifier is connected but cannot be prompted by the operator.</figcaption>
+          </figure>
+          <p>After the builder finishes, the verifier wakes without a human keystroke, reads the artifact and turn record, and later sends a correction through <code>verifier_prompt</code>. The builder immediately begins another turn. The agent-to-agent message is not an improvised conversation; it is a single typed channel with an acknowledgement.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t0246-verifier-prompts-builder.png" alt="Verifier window acknowledging a corrective prompt while the builder receives the correction and starts another image generation turn" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">4:06</span><code>verifier_prompt ✓ ack: prompt delivered to builder</code> closes the loop. The left side proves and corrects; the right side rebuilds.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s term + plain English</p>
+          <h3>The verifier agent</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Canonical term</p>
+            <p><strong>Verifier agent:</strong> a top-down observer that starts after a builder turn, independently checks the work against domain-appropriate evidence, and prompts the builder back only when a concrete failure has a concrete fix.</p>
+          </aside>
+          <p>The definition excludes three nearby ideas. It is not self-review, because a separate process and persona check the builder. It is not ordinary delegation, because the builder model never decides to recruit it. It is not a conversational peer, because ordinary operator instructions are locked out and its output is constrained to evidence, Report, and correction.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace the real lifecycle</p>
+          <h3>Read the two extension hooks as a protocol</h3>
+          <p>Builder-side <code>apps/verifier/verifiable.ts</code> captures the line count before the user turn, then captures it again at <code>agent_end</code>. The resulting stop envelope names the exact slice the verifier should inspect:</p>
+          <pre><code>pi.on("agent_end", async (_event, _ctx) =&gt; {
+  const endLine = await currentSessionFileLineCount(state.sessionFilePath);
+  sendEnvelope({
+    type: "event",
+    name: "stop",
+    sessionId: state.sessionId,
+    turnIndex: state.turnIndex,
+    userPrompt: state.lastUserPrompt,
+    sessionFileStartLine: state.turnStartLine,
+    sessionFileEndLine: endLine,
+  });
+});</code></pre>
+          <p class="code-source"><span>Course source</span><span>apps/verifier/verifiable.ts · lines 304–323</span></p>
+          <p>Verifier-side <code>apps/verifier/verifier.ts</code> handles that stop event by rendering <code>.pi/verifier/prompts/verify_on_stop.md</code> with the turn index, timestamp, original prompt, and line bounds. It injects the rendered content as an extension-sourced follow-up, the one input source allowed through the verifier lock.</p>
+          <p>The architecture is therefore event-driven and bounded. The verifier does not continually scan a growing transcript. It receives enough metadata to locate one turn, then reads that turn from disk. The socket coordinates; the session file supplies substance.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — narrate the wire</p>
+          <h3>Write the six-arrow trace</h3>
+          <ol>
+            <li>Start with “The user prompts the builder.”</li>
+            <li>Add the builder event that begins the bounded turn and the event that ends it.</li>
+            <li>State exactly what the verifier reads and from where.</li>
+            <li>Add the two possible outcomes: Report only, or <code>verifier_prompt</code> plus Report.</li>
+            <li>End with the builder repair turn and the next verification cycle.</li>
+          </ol>
+          <p>Pass if no arrow says “the builder model delegates to the verifier” and no arrow says “the builder assistant transcript crosses the socket.”</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: calling every second agent a sub-agent</h3>
+          <p><strong>Why it fails:</strong> the label hides who owns initiation and context. In delegation, the primary agent asks another agent to do work and usually shapes the task it receives. Here, the harness observes the primary agent from above. That independence is what allows the verifier to judge the builder’s claims rather than inherit them as instructions.</p>
+          <p><strong>Fix:</strong> ask three diagnostic questions. Who triggers the second agent? Who chooses its persona and tools? Where does it obtain the evidence? If the answers are “the lifecycle hook,” “the harness configuration,” and “the bounded session slice plus actual state,” you are looking at an observer.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>The shape matters more than Pi</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · mid-2026 extract</p>
+            <p>The extract identifies four portable requirements: a stop-style lifecycle hook, access to the builder transcript, a tool allowlist, and a tool-call gate. Pi supplies all four in the course implementation. Other harnesses can host the pattern only to the degree that they expose the same control surfaces.</p>
+            <p class="current-practice__source">Keep the invariant: independent observer, bounded evidence, narrowed tools, typed correction channel.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the trigger and evidence path</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for the observer loop">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What starts verification?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The builder’s <code>agent_end</code> causes the builder-side extension to emit a <code>stop</code> lifecycle event; the verifier handles that event and injects its verification prompt.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What carries the substantive turn content?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The builder’s session JSONL file on disk. The stop event supplies line bounds so the verifier reads only the relevant turn slice.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What is the verifier’s only agent-to-agent corrective channel?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The <code>verifier_prompt</code> tool, which sends a prompt envelope to the builder and awaits a <code>prompt_ack</code>.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Correct the “two bots chatting” explanation</h3>
+            <p>A teammate says, “The builder chats with a reviewer after it finishes.” Replace that sentence with a precise one-minute explanation that includes the stop event, unix socket, bounded session slice, input lock, Report, and correction channel.</p>
+            <p class="fine">Pass if the listener could draw the data flow and would not mistake the verifier for builder-controlled delegation.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="review">
+        <span class="section-number">02</span>
+        <h2 class="section-title">Attack the review constraint</h2>
+        <p class="section-lead">Agentic engineering shifts scarce human effort away from typing. In Dan’s framework, the remaining constraints are planning and reviewing. The verifier is built to collapse the second.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The summary that creates another task</h3>
+          <p>A builder returns: “Created the users table, added the foreign key, applied the migration, and verified integrity.” The work may be correct. But if you are accountable for the result, four verbs become four review obligations. You open the schema, inspect columns, trace the FK target, check the migrated database, and run integrity checks. Faster generation has pushed the bottleneck downstream into your review queue.</p>
+          <p>Skimming the answer does not remove that obligation. It only replaces verification with confidence in fluent prose. The more work the agent performs per turn, the more claims can hide behind a compact summary. Throughput rises while the human’s proof capacity stays fixed.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the two constraints</p>
+          <h3>Plan what should happen; review what did happen</h3>
+          <div class="constraint-map" aria-label="Planning and reviewing are the two constraints of agentic coding, with the verifier targeting reviewing">
+            <article><h3>Planning</h3><p>Define intent, scope, constraints, sequence, and success evidence before compute runs.</p><p><strong>Question:</strong> Did we specify the right outcome and proof?</p></article>
+            <article><h3>Reviewing</h3><p>Compare claims with actual state, find gaps, and decide whether the outcome is trustworthy.</p><p><strong>Verifier target:</strong> execute the evidence checklist after every relevant turn.</p></article>
+          </div>
+          <p>The verifier does not remove planning. It makes reviewing parallel and repeatable, then improves planning indirectly: every claim it cannot verify becomes a request for a better fixture, oracle, script command, or specification next time.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — review becomes a Report</p>
+          <h3>The failure is named, counted, and made actionable</h3>
+          <p>In the image demonstration, the builder produces an architecture diagram that looks detailed and useful. The verifier checks the requested visual claims and discovers that the diagram violates a persona rule: more than ten distinct text blocks. It does not return a vague dislike. It names the failed rule, records six atoms with five verified and one failed, and tells the builder how to reduce the text burden.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t0360-failed-report-readability.png" alt="Verifier Report showing one failed readability claim, five verified claims, and a concrete correction sent to the builder" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">6:00</span>Review labor externalized: the failed readability atom, the exact threshold, the claim counts, and the corrective action appear in one structured Report.</figcaption>
+          </figure>
+          <p>The distinction is subtle but important. The verifier is not merely commenting on the builder’s summary. The persona turned a reusable review judgment—limit distinct text blocks—into a rule. A vision-capable model applied that rule to the bytes that were produced. The Report tells the operator what was checked, what was not, and what happened next.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s term + plain English</p>
+          <h3>Planning and reviewing</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">The two constraints</p>
+            <p><strong>Planning</strong> determines what the system should do. <strong>Reviewing</strong> determines whether the actual result deserves trust. The verifier improves the review constraint by executing a domain-specific evidence routine on every relevant completed turn.</p>
+          </aside>
+          <p>Review in this system is a verb, not a feeling. It consists of decomposing claims, selecting checks, running them against actual state, recording evidence, and admitting what remains unknown. SQLite checks can be deterministic tool outputs; image checks are model-mediated judgments grounded in the actual pixels. A green status is the output of that process; it is not a substitute for the process.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — encode a review checklist</p>
+          <h3>The SQLite persona is an executable reviewer</h3>
+          <p><code>.pi/verifier/agents/verify_sqlite.md</code> turns familiar database review moves into heuristics. If the builder claims a file was created, read it. If it claims a row count, run <code>SELECT count(*)</code>. If it declares a foreign key, run <code>PRAGMA foreign_key_list</code> and verify that the referenced table and column exist. If it modified a database, run <code>PRAGMA integrity_check</code> and require <code>ok</code>. If it claims an index, combine <code>PRAGMA index_list</code> with <code>EXPLAIN QUERY PLAN</code>.</p>
+          <p>That list is valuable because it is both domain-specific and stable. The builder may phrase its summary differently on every turn, but the SQLite verifier maps claims to the same deterministic checks. The review routine does not depend on the operator remembering which command to run after a long generation session.</p>
+          <aside class="callout callout--why"><p class="callout__label">Evidence hierarchy</p><p>The builder’s final message is a claim. A tool output tied to the exact atom is evidence. A Report that preserves the command, observed output, and verdict is review.</p></aside>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — convert prose to review work</p>
+          <h3>Build a proof checklist from one sentence</h3>
+          <p>Take the sentence “I created the orders table with the right columns, primary key, foreign key, and index.” Without adding requirements, write the smallest checks that the shipped SQLite verifier can perform. For each check, name one exact command family: <code>.schema</code>, <code>PRAGMA table_info</code>, <code>PRAGMA foreign_key_list</code>, <code>PRAGMA index_list</code>, or <code>PRAGMA integrity_check</code>.</p>
+          <p>Pass if each claim can independently be true or false and every verdict would cite actual output rather than the builder’s wording.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: reviewing the explanation instead of the state</h3>
+          <p><strong>Symptom:</strong> the review agent says the summary is clear, the approach is reasonable, or the implementation “appears correct.” None of those statements establishes that the requested artifact exists with the requested properties.</p>
+          <p><strong>Fix:</strong> force every verified finding to include an oracle. In the course persona, a missing deterministic output must become <code>unsure</code>, not verified. That rule protects you from a reviewer that merely agrees with the builder’s story.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Trust the operational files when prose lags</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · repository reality</p>
+            <p>The checked-in README still contains an older limitations paragraph that understates the shipped personas. The local tree has full generic, SQLite, image, and Python verifier personas. For an operational review system, inspect the active persona, launcher, and script—not only the overview prose.</p>
+            <p class="current-practice__source">This discrepancy is documented in the lesson extract; it is itself a reminder that documentation is a claim until checked against disk.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the bottleneck</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for planning and review">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What are the two constraints Dan names?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Planning and reviewing.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Which constraint does the verifier directly attack?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Reviewing. It executes repeatable evidence checks after each relevant builder turn.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why is the builder’s final answer not proof?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It is the builder’s own assertion about its work. Proof requires an independent check against actual state and the output of that check.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Explain where the bottleneck moved</h3>
+            <p>Teach a senior engineer who says, “Generation is fast now, so throughput is solved.” Explain how longer agent turns create more review obligations, why prose review does not satisfy them, and how a domain persona converts the obligations into executable checks.</p>
+            <p class="fine">Pass if your explanation includes planning, reviewing, actual state, and a domain-appropriate oracle.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="atoms">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Verification begins with decomposition</h2>
+        <p class="section-lead">A verifier is only as trustworthy as the granularity of its claims. “Done” is too large to prove. Each atom needs one unambiguous truth value and one evidence path.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The green check that hides four unknowns</h3>
+          <p>A reviewer runs <code>.tables</code>, sees <code>users</code>, and marks “created users table with constraints” as PASS. The table exists, but that single observation says nothing about the column types, primary key, foreign keys, defaults, or uniqueness constraints. The verdict is technically attached to evidence and still misleading because the claim was too broad.</p>
+          <p>Coarse claims create counterfeit certainty. One observed property lends its truth to neighboring properties that were never checked. The cure is not a smarter summary; it is smaller propositions.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — one bundle becomes five atoms</p>
+          <h3>“I created the users table” is not atomic</h3>
+          <div class="atom-board" aria-label="A bundled users table claim decomposed into five atomic claims">
+            <article data-atom="1"><h3>Exists</h3><p>The table named <code>users</code> exists.</p></article>
+            <article data-atom="2"><h3>Columns</h3><p>The requested columns and types exist.</p></article>
+            <article data-atom="3"><h3>Primary key</h3><p>The requested column is the primary key.</p></article>
+            <article data-atom="4"><h3>Foreign keys</h3><p>Each declared reference targets a real table and column.</p></article>
+            <article data-atom="5"><h3>Defaults</h3><p>The requested defaults and flags are present.</p></article>
+          </div>
+          <p>Each card can fail while the others pass. That independence is the point. The resulting Report may look longer than the builder’s summary, but the extra length is where trust lives.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — sixteen SQLite claims</p>
+          <h3>Different domain, same proof discipline</h3>
+          <p>Dan boots <code>just vsql</code> and asks the builder to find the SQLite databases and break down their tables, columns, and relationships. That request sounds like one inspection task. The verifier turns it into sixteen claims and proves them individually with <code>PRAGMA</code> queries, row counts, index checks, foreign-key checks, and an integrity result.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t1180-sqlite-verify-16-claims.png" alt="Builder and SQLite verifier windows showing 16 of 16 atomic claims verified with PRAGMA, SELECT, and integrity evidence" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">19:40</span>Sixteen independently proven atoms, not one “database inspection passed.” The same frame also reveals the deliberate compute disparity between builder and verifier.</figcaption>
+          </figure>
+          <p>The image example reaches the same endpoint through a non-deterministic oracle: the vision-capable verifier checks the actual pixels against seven visual claims. The mechanism is stable across domains even when the check changes—decompose, choose an oracle, observe, record, decide.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t0420-verified-report-7of7.png" alt="Image verifier with a green PERFECT status and seven of seven atomic visual claims verified" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">7:00</span>The repaired image closes at 7/7 with no feedback required. The verifier reports PERFECT: every atom checked with zero gaps in that cycle.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s term + plain English</p>
+          <h3>Atomic claims, or small axioms</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Verification unit</p>
+            <p><strong>Atomic claim:</strong> the smallest proposition in the request or builder result that can be independently proven true, proven false, or declared unverifiable with the available oracle.</p>
+          </aside>
+          <p>An atom is not “small text.” It is small in responsibility. “The migration succeeded” may require several atoms because success bundles schema state, constraints, and integrity. “<code>PRAGMA integrity_check</code> returned <code>ok</code>” is atomic because one command has one observable answer.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — build an evidence matrix</p>
+          <h3>Route each claim to one check</h3>
+          <table class="claim-table">
+            <thead><tr><th>Atomic claim</th><th>Course verifier check</th><th>Possible verdict</th></tr></thead>
+            <tbody>
+              <tr><td><code>orders</code> exists</td><td><code>.schema orders</code></td><td class="pass">PASS / FAIL</td></tr>
+              <tr><td><code>orders.id</code> is a primary key</td><td><code>PRAGMA table_info(orders)</code></td><td class="pass">PASS / FAIL</td></tr>
+              <tr><td><code>orders.user_id</code> references <code>users.id</code></td><td><code>PRAGMA foreign_key_list(orders)</code> plus target inspection</td><td class="fail">PASS / FAIL</td></tr>
+              <tr><td>The database is internally consistent</td><td><code>PRAGMA integrity_check</code></td><td class="pass"><code>ok</code> / failure</td></tr>
+              <tr><td>A claimed query uses its index</td><td><code>PRAGMA index_list</code> + <code>EXPLAIN QUERY PLAN</code></td><td class="pass">used / not used</td></tr>
+            </tbody>
+          </table>
+          <p>This matrix does not predict the output. It defines what output would settle each claim. That distinction keeps the verifier honest. When no available command can settle an atom, the correct result is an explicit gap—not a guessed PASS.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — atomize before checking</p>
+          <h3>Decompose the lab prompt</h3>
+          <p>The lab asks the builder to “inspect <code>tmp/mock_shop.db</code> and confirm every table has a primary key and every foreign key references a real table and column.” Before running anything, write the atom list you expect. Include discovery atoms, one primary-key atom per table, one reference atom per FK, and an integrity atom. Do not invent a table or relationship that is not present; allow discovery to determine the final count.</p>
+          <p>Pass if a single failed FK does not force unrelated primary-key atoms to fail, and if every atom has a named check.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: one PASS for a bundle</h3>
+          <p><strong>Why it fails:</strong> a coarse PASS collapses checked and unchecked properties into the same status. It prevents the operator from seeing exactly what failed, exactly what remains unknown, and exactly what the builder should repair.</p>
+          <p><strong>Fix:</strong> split until each line can carry one command, one observed output, and one verdict. The SQLite persona says it plainly: one PASS hiding three unverified sub-claims is worse than three explicit FAILs.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Specific models drift; the atom stays stable</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · model-agnostic proof</p>
+            <p>The video uses GLM 5.1 for SQLite and GPT-5.5 for images; the checked-in personas now declare <code>openai/gpt-5.5</code>. The model line moved. The proof discipline did not: atomic claims, domain oracle, exact evidence, honest gaps.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the unit of verification</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for atomic claims">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Why is “I created the users table” not atomic?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It bundles existence, columns and types, primary key, foreign keys, defaults, and other constraints that can vary independently.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What three outcomes can an atom receive?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Proven true, proven false, or explicitly unverifiable with the available oracle.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What makes a claim-to-check mapping good?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The check’s observable output settles that one claim without borrowing certainty from neighboring claims.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Defend the longer Report</h3>
+            <p>A teammate complains that sixteen findings are noisier than one green check. Explain why the extra rows are not verbosity but preserved proof boundaries. Use one table claim and one image readability claim to show that the oracle can differ while the atomic method stays the same.</p>
+            <p class="fine">Pass if you distinguish claim granularity from writing length and include the role of explicit unverifiable gaps.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="tokens">
+        <span class="section-number">04</span>
+        <h2 class="section-title">Spend tokens to save time</h2>
+        <p class="section-lead">The verifier writes no application code and often consumes more context than the builder. That is not an accidental inefficiency. It is the economic thesis of the lesson.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The token optimizer who buys back manual review</h3>
+          <p>You disable the verifier because a second model doubles or multiplies the token bill. The next builder run is cheaper. Then you spend forty minutes checking the schema, reading generated files, reproducing commands, and asking for repairs. You saved the resource the system can produce and spent the resource you cannot restore.</p>
+          <p>The mistake is not caring about cost. It is optimizing the wrong denominator. The verifier should be judged against human review time reclaimed and failure risk reduced, not against the fantasy baseline of unreviewed agent output.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — price the exchanged resources</p>
+          <h3>More compute, less operator attention</h3>
+          <div class="token-balance" role="img" aria-label="The builder uses a smaller amount of compute while the verifier uses more compute to return human review time">
+            <div class="token-balance__bar"><b>Builder</b><span>Generate the artifact and claims</span></div>
+            <div class="token-balance__bar"><b>Verifier · often 2–5×</b><span>Re-read, decompose, run proof checks, report, and correct</span></div>
+          </div>
+          <p>The bar is intentionally asymmetric. The verifier repeats work the builder may already have done and inspects it from a second perspective. Redundancy is the product when the objective is trust.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — watch compute get spent</p>
+          <h3>One agent prompts another model before verification even begins</h3>
+          <p>In the image demonstration, the Opus builder reads the <code>gpt-image-2</code> skill, constructs a highly detailed image prompt, and runs the generation script. The frame shows roughly seventy-five seconds of work. Then the verifier spends another model’s context inspecting the result, finds the readability failure, and causes the generation to run again.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t0178-builder-gpt-image-skill.png" alt="Builder agent creating a detailed GPT Image 2 prompt and running the image generation skill" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">2:58</span>Compute is already layered: the builder model authors a prompt for GPT Image 2. The verifier then adds another proof pass. The system spends deliberately.</figcaption>
+          </figure>
+          <p>The extract records the image example at roughly 4% builder context versus 23% verifier context, about five times, and the SQLite example at roughly twice the builder’s tokens. The exact meter changes by turn and model. The invariant is the direction of the trade: spend extra compute now so the engineer does not become the serial reviewer later.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s term + plain English</p>
+          <h3>Tokens for time</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Economic rule</p>
+            <p><strong>Spend tokens to save time:</strong> deliberately pay for redundant generation and verification when that compute buys back scarce human review hours and increases confidence in the result.</p>
+          </aside>
+          <blockquote><p>“Whenever you can, you should be spending tokens to save time.”</p><cite>Dan, approximately 9:52 in the lesson transcript</cite></blockquote>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — evaluate the trade</p>
+          <h3>Compare against the real alternative</h3>
+          <p>The course README states the trade directly: the verifier often burns 2–5× the builder’s tokens and gives a second perspective plus domain checks. Suppose a SQLite turn reports tables, columns, foreign keys, indexes, counts, and integrity. Without the verifier, the alternative is not zero cost. It is the operator reconstructing the same checklist, running the same queries, comparing the same outputs, and deciding which discrepancy should become a correction.</p>
+          <p>The correct evaluation therefore has two columns. In the compute column: builder tokens, verifier tokens, any repeated builder turn, and domain-tool execution. In the human column: time to inspect, reproduce, diagnose, reprompt, and re-check. The lesson does not supply a universal dollar threshold. It supplies the decision rule: if compute can reclaim meaningful review time, take the trade.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — build a time ledger</p>
+          <h3>Estimate the manual path before judging the meter</h3>
+          <ol>
+            <li>Choose the SQLite lab or image readability loop.</li>
+            <li>List every manual review action you would perform without the verifier.</li>
+            <li>Estimate attention minutes, including the second check after repair.</li>
+            <li>List what the verifier performs automatically.</li>
+            <li>Write the maximum token spend you would accept to remove those manual actions; explain your reasoning without inventing a universal price.</li>
+          </ol>
+          <p>Pass if you compare against reviewed work, not against unreviewed output.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating token minimization as the objective</h3>
+          <p><strong>Why it fails:</strong> it assumes human review is free and unreviewed output is acceptable. Both assumptions contradict the system’s purpose.</p>
+          <p><strong>Fix:</strong> optimize total delivery cost under a trust requirement. Make review time visible, make verifier spend visible, and compare them. The frame’s context percentages are not a scoreboard to minimize; they are proof that compute was allocated to checking.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>The model roster is period detail</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · stable trade, moving prices</p>
+            <p>The lesson opens amid rapid model releases, and the shipped verifier model has already changed from the recorded SQLite configuration. Do not preserve the economics as a claim about one provider. Preserve the structure: redundant compute is justified when it buys back constrained operator review.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the exchange</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for token economics">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What two resources are exchanged?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Additional model compute/tokens are exchanged for reduced human review time and increased proof.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Why is “builder-only cost” the wrong baseline?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Because accountable delivery still requires review. Without the verifier, the operator performs that work manually or accepts unverified output.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What range does the course source use for verifier spend?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Often 2–5× the builder’s tokens per turn, with concrete examples varying by domain and cycle.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Answer the CFO and the engineer</h3>
+            <p>Explain why an agent that writes no application code can still make delivery faster. Your answer must name the manual review alternative, the repeated correction check, the 2–5× range, and the fact that the decision depends on time reclaimed rather than a universal model price.</p>
+            <p class="fine">Pass if you can justify the trade without saying tokens are literally free.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="trust-scale">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Raise trust and scale together</h2>
+        <p class="section-lead">Dan’s claim is not merely that a verifier improves quality. It is that this pattern occupies a rare middle ground: the system does more work while also attaching more evidence to the result.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The false choice between throughput and scrutiny</h3>
+          <p>You can ask the builder to do more per turn, but every added action increases the number of claims you must trust. Or you can review every action deeply, but serial human review limits how much work the system can absorb. More autonomous output feels like less trust; more scrutiny feels like less scale.</p>
+          <p>That trade is real when review remains a human step after generation. The verifier changes the placement of review. It spends parallel compute at the moment the builder stops, before the operator accepts the summary. The system performs more total work, but the extra work is aimed at evidence rather than artifact production.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — move both axes</p>
+          <h3>More work + more proof</h3>
+          <div class="trust-scale" aria-label="The verifier increases scale by doing more work and trust by checking atomic claims">
+            <article><h3>Scale ↑</h3><p>A second model reads the turn, evaluates atoms, invokes tools, emits a Report, and may trigger a repair turn without the operator routing messages.</p></article>
+            <article><h3>Trust ↑</h3><p>Each atom is attached to domain evidence, gaps remain visible, correction loops are bounded, and inability to verify becomes an explicit status.</p></article>
+            <div class="trust-scale__both">Verifier pattern = more compute applied to more evidence</div>
+          </div>
+          <p>The claim is architectural, not magical. A second unbounded agent repeating the builder’s prose would add scale without useful trust. The gain comes from separation of purpose, narrower tools, domain checks, explicit Reports, and bounded correction.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the unprompted moment</p>
+          <h3>Scale is visible when the human’s hands leave the keyboard</h3>
+          <p>At 3:16 the image builder has stopped, but the system has not. The verifier begins reading the generated image and reconstructing the request without a human prompt. This is the scale half: another meaningful thread of work started from a lifecycle event. Minutes later, the verifier rejects the overloaded diagram and grounds the rejection in the persona’s readability rule. That is the trust half.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t0196-verifier-kicks-off-unprompted.jpg" alt="Large UNPROMPTED overlay while the verifier automatically begins inspecting the builder’s generated image" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">3:16</span>The signature handoff: no operator routing, yet review begins. Automation supplies scale; the subsequent claim checks supply trust.</figcaption>
+          </figure>
+          <p>Do not read “unprompted” as “without instructions.” The verifier is highly instructed—by its persona, on-stop template, tool surface, original user prompt, and turn slice. It is unprompted by the human in that moment. The system supplies the trigger and repeatable context.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s term + plain English</p>
+          <h3>Trust AND scale</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Dan’s framing</p>
+            <p><strong>Trust AND scale:</strong> the verifier adds a separate stream of work and uses that stream to check the builder’s result, so increased compute is paired with increased evidence rather than merely increased output.</p>
+          </aside>
+          <p>This is a design claim from the lesson, not a guarantee that every extra agent lowers error. The course system earns the phrase through a focused role, evidence contract, read-only intent, and escalation boundary. Remove those structures and “more agents” can become “more unchecked claims.”</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — inspect the control boundaries</p>
+          <h3>Why the correction loop does not run forever</h3>
+          <p>When <code>verifier_prompt</code> reaches the builder, <code>verifiable.ts</code> increments <code>loopCount</code>. The persona default is <code>max_loops: 3</code>. If the next correction would exceed that limit, the builder rejects the prompt acknowledgement and surfaces the latest Report to the human as an escalation. The system scales automatic repair up to an explicit judgment boundary.</p>
+          <pre><code>state.loopCount += 1;
+
+if (state.loopCount &gt; state.maxLoops) {
+  conn.write(encodeEnvelope({
+    type: "prompt_ack",
+    ok: false,
+    error: "max loops exceeded",
+    // correlation and session fields omitted here
+  }));
+  // Latest report is surfaced to the human.
+  return;
+}</code></pre>
+          <p class="code-source"><span>Condensed from course source</span><span>apps/verifier/verifiable.ts · lines 631–659</span></p>
+          <p>The bounded loop is part of trust. An agent repeatedly correcting itself is not automatically progress. After three failed correction attempts, the system stops spending compute and asks for human judgment with the available evidence.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — audit both axes</p>
+          <h3>Make two columns for one verifier feature</h3>
+          <p>Choose one feature—automatic stop trigger, session slicing, atomic Report, <code>verifier_prompt</code>, tool narrowing, or <code>max_loops</code>. In one column, explain how it affects scale. In the other, explain how it affects trust. If a feature helps only one axis, say so.</p>
+          <p>Pass if you do not treat “automatic” as synonymous with “trustworthy” and do not treat “review” as synonymous with “human.”</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: assuming another model is enough</h3>
+          <p><strong>Symptom:</strong> a second agent receives the builder’s summary, says it looks correct, and the architecture is labeled “verified.” Compute increased; evidence did not.</p>
+          <p><strong>Fix:</strong> require an independent trigger, the original intent, actual artifact or state, an atomic claim list, domain-appropriate checks, an honest gap state, and a bounded correction channel. Trust emerges from those contracts, not from agent count.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>The verifier is the entry pattern, not the entire multi-agent ceiling</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · scope boundary</p>
+            <p>The lesson gestures toward stacked verifiers and larger teams, but the checked-in server accepts one verifier connection per builder. Treat stacking as a future design direction, not a supported lab result. Master the two-agent primitive before extrapolating it into a fleet.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the two axes</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for trust and scale">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What supplies scale in the verifier loop?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A second process performs review work automatically after the builder stops, and can trigger bounded repair without human message routing.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What supplies trust?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Independent purpose, access to actual state, atomic checks, preserved evidence and gaps, narrowed authority, structured Reports, and bounded escalation.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What happens on the fourth attempted correction with the default loop limit?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The prompt is rejected as exceeding <code>max_loops</code>, and the system escalates to the human with the latest Report.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Defend the word “AND”</h3>
+            <p>Explain to a skeptical reviewer why the verifier does more than increase throughput and more than increase scrutiny. Name the exact mechanism on each axis and the correction boundary that prevents autonomous looping from becoming an article of faith.</p>
+            <p class="fine">Pass if you say “the architecture intends to raise both” rather than claiming that any second agent automatically does.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="template">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Template your engineering—by force</h2>
+        <p class="section-lead">The verifier’s locked input removes the easiest escape hatch: a one-off instruction that fixes today’s miss and teaches the system nothing reusable.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The reviewer forgets the same rule tomorrow</h3>
+          <p>The verifier misses an important check. You type, “Also verify that diagrams have fewer labels,” it catches the issue, and the current task passes. On the next session, the instruction is absent. You remember the lesson; the system does not. The interaction solved an instance while leaving the problem class unchanged.</p>
+          <p>One-off prompts are seductive because they are fast and local. They also keep the operator responsible for recalling every prior correction at exactly the right time. The course harness makes that path unavailable in the verifier window.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — where a verifier change can live</p>
+          <h3>From ephemeral chat to durable control surface</h3>
+          <div class="harness-map" aria-label="Four durable control surfaces for the verifier: context, model, prompt, and tools">
+            <div><b>Context</b><span>Original request, bounded session slice, repository files, produced artifact.</span></div>
+            <div><b>Model</b><span>Persona front matter selects the verifier model for the role.</span></div>
+            <div><b>Prompt</b><span>Persona and <code>verify_on_stop.md</code> encode method and Report contract.</span></div>
+            <div><b>Tools</b><span>Persona allowlist, <code>verifier_prompt</code>, and domain checker define action.</span></div>
+          </div>
+          <p>When verification misses, diagnose one or more of these four surfaces. The locked input forces the fix into the system: provide missing context, change the model line, sharpen the persona/template, or add a safer domain check.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — one readability rule survives the session</p>
+          <h3>The first diagram fails because the rule is already templated</h3>
+          <p>The generated architecture image is detailed, legible, and visually ambitious. It also contains too many distinct blocks of text. The verifier does not need Dan to notice or remember that concern during the run; <code>verify_image.md</code> already contains the literal <code>MAX_TEXT_ELEMENTS: 10</code> rule and instructs the vision model to treat overload as a readability failure.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t0298-first-arch-diagram-overloaded.jpg" alt="The first generated architecture diagram with dense bullet lists and more than ten distinct text blocks" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">4:58</span>The rejected “before” artifact. The exact text-block count is model-mediated, but the reusable review rule is explicit in the persona.</figcaption>
+          </figure>
+          <p>Later Dan opens the persona itself. That file contains the verification heuristics, tool policy, relevance gate, and Report requirements. Behavior changes happen here, not in the locked editor.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t0835-customized-system-prompt.png" alt="Visual Studio Code showing the image verifier persona with its verification heuristics and tool policy" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">13:55</span>The verifier’s durable behavior is inspectable as a file. Accuracy note: the image persona explicitly has no script-only <code>bash_policy</code>; do not project the SQLite gate onto every domain.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s term + plain English</p>
+          <h3>Templated engineering</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Compounding habit</p>
+            <p><strong>Template your engineering:</strong> encode a discovered check or correction in the persona, domain script, or cycle template so the next run inherits the improvement without relying on human memory.</p>
+          </aside>
+          <p>The “by force” modifier matters. The harness does not merely recommend durable changes; it swallows ordinary typing in the verifier editor and handles non-extension input. The operator can still use preserved application shortcuts, but cannot turn the verifier into a free-form chat partner.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — inspect both input locks</p>
+          <h3>UI friction plus event-layer enforcement</h3>
+          <p><code>VerifierStatusBar.handleInput()</code> preserves selected application shortcuts, then swallows normal text and Enter. A second hook handles any non-extension input that reaches the Pi event layer:</p>
+          <pre><code>pi.on("input", async (event, ctx) =&gt; {
+  if (event.source === "extension") return { action: "continue" };
+  ctx.ui.notify(
+    "Verifier input is disabled — driven by builder events only.",
+    "warning",
+  );
+  return { action: "handled" };
+});</code></pre>
+          <p class="code-source"><span>Course source</span><span>apps/verifier/verifier.ts · lines 532–543</span></p>
+          <p>The on-stop prompt is extension-sourced, so it passes. That is the only normal verification input path. The design converts “remember to use the template” into “the template is how the verifier runs.”</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — place the improvement</p>
+          <h3>Classify four misses</h3>
+          <ol>
+            <li>The verifier did not see the original requirement. Which context or template field is wrong?</li>
+            <li>The verifier saw the claim but lacks a safe command to check it. Which script surface must change?</li>
+            <li>The verifier accepts a visually overloaded image. Which persona rule should be sharpened?</li>
+            <li>The verifier reasons poorly even with the right evidence and tools. Which front-matter dimension can be tested?</li>
+          </ol>
+          <p>Pass if every fix lands in a durable file and none of your answers says “type a reminder into the verifier.”</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: routing around the lock</h3>
+          <p><strong>Why it fails:</strong> it restores the operator as a hidden dependency and prevents the verifier from accumulating reusable behavior. You may finish the current task while preserving the same miss for every future task.</p>
+          <p><strong>Fix:</strong> treat the desire to type as diagnostic data. Name what the one-off message would contain, then decide whether it belongs in context, model selection, prompt, or tools. Encode it there and rerun from the same observable condition.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>File-backed behavior survives model churn</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · core four</p>
+            <p>The recorded and shipped model names differ, yet the readability rule, cycle template, Report schema, and input lock remain inspectable. That is the durability benefit of owning the control surfaces: a model swap is one line; the engineering method remains in files.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the forced path</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for templated engineering">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Why is the input lock a feature?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It removes one-off operator prompting and forces improvements into durable context, persona, script, or template surfaces.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What two code layers block ordinary verifier instructions?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The custom editor swallows normal typing, and the <code>input</code> hook handles any non-extension input.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Is image text-block verification deterministic?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. The rule is explicit, but a vision-capable model judges the actual pixels and counts blocks. Treat it as model-mediated evidence.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Turn annoyance into architecture</h3>
+            <p>Explain to a teammate why “I can’t type into my own verifier” is the mechanism, not a usability defect. Include both input locks, the extension-sourced cycle prompt, the Core Four diagnosis, and the difference between solving an instance and solving a class.</p>
+            <p class="fine">Pass if your teammate knows exactly which files to inspect after the next miss.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="read-only">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Read-only is an architectural claim—scope it honestly</h2>
+        <p class="section-lead">The SQLite verifier is designed to separate writing from checking through three layers. The checked-in implementation meaningfully narrows authority, but it is not an absolute sandbox. Knowing what each layer really enforces is part of verification.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The reviewer that repairs its own evidence</h3>
+          <p>A database verifier discovers a broken foreign key and “helpfully” runs an <code>ALTER</code> or rebuild. The next check passes. The Report looks green, but the reviewer changed the subject under review. It can no longer tell you whether the builder’s work was correct because it silently completed the builder’s job.</p>
+          <p>A prompt saying “please be read-only” is not enough. The same model that decides an edit is helpful can ignore or reinterpret that sentence. Authority must be removed or narrowed outside the model’s reasoning wherever the harness allows it.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the SQLite defense stack</p>
+          <h3>Three layers with three different jobs</h3>
+          <div class="lock-stack" aria-label="Three SQLite verifier layers: persona tool list, bash prefix gate, and read-only SQLite checker">
+            <div class="lock-stack__layer"><b>1 · Persona tools</b><span>Launcher registers <code>read, grep, find, ls, bash, verifier_prompt</code>. No <code>write</code> or <code>edit</code> tool.</span></div>
+            <div class="lock-stack__layer"><b>2 · Bash gate</b><span>Tool-call hook allows commands whose string starts with the configured runner + script prefix; blocks other bash calls with guidance.</span></div>
+            <div class="lock-stack__layer"><b>3 · SQLite checker</b><span>SQL router permits selected read shapes; Python connections use <code>mode=ro&amp;immutable=1</code>; PRAGMAs use an allowlist.</span></div>
+          </div>
+          <aside class="callout callout--warning"><p class="callout__label">Threat-model boundary</p><p>This stack describes the SQLite verifier’s design intent. Generic and image personas have no script-only <code>bash_policy</code>. The Python checker can run tests and tools that may write caches or execute arbitrary test code. The verifier also runs as your user. This is narrowing, not a universal sandbox.</p></aside>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the one-script policy on screen</p>
+          <h3>Dan turns the bash concern into front matter</h3>
+          <p>The SQLite persona declares its tools, model, domain, loop limit, and <code>bash_policy</code>. The allowed runner is <code>uv run --script</code>; the allowed script is <code>.pi/verifier/scripts/verify_sqlite.py</code>. This is the lesson’s concrete security move: do not hand the verifier an unrestricted shell and rely only on prose.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t1200-bash-policy-lockdown.png" alt="SQLite verifier front matter showing tool list and script-only bash policy" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">20:00</span>The policy surface in the recording. Model note: this frame shows <code>z-ai/glm-5.1</code>; the current checked-in persona uses <code>openai/gpt-5.5</code>. The model is a front-matter swap; the policy shape is the lesson.</figcaption>
+          </figure>
+          <p>Dan describes bash as the most dangerous tool and the one-script restriction as the highest control available in this design. The current source deserves an engineer’s follow-up question: does the implementation enforce an exact executable boundary or only recognize a string prefix?</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — read-only by architecture</p>
+          <h3>Move safety outside model intent</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Scoped definition</p>
+            <p><strong>Read-only by architecture:</strong> remove mutation tools, narrow the remaining execution path, and make the domain checker reject mutation independently of the model’s instructions. Then audit what the implementation actually enforces.</p>
+          </aside>
+          <p>The last sentence prevents a security slogan from becoming another unchecked claim. A good architecture can still have a weak predicate, an overly broad subcommand, or a same-user trust assumption. Verification applies to the verifier too.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — read the code, not the promise</p>
+          <h3>Two strong checks and two hardening gaps</h3>
+          <p>The tool-call hook constructs the expected prefix, then uses <code>startsWith</code>:</p>
+          <pre><code>const cmd = ((event.input as { command?: string })?.command ?? "").trim();
+const expected = `${state.bashPolicy.runner} ${state.bashPolicy.allowed_script}`;
+
+if (cmd.startsWith(expected)) return;
+
+return { block: true, reason: "Bash is restricted to the verifier script..." };</code></pre>
+          <p class="code-source"><span>Condensed from course source</span><span>apps/verifier/verifier.ts · lines 499–529</span></p>
+          <p>This is a meaningful narrowing layer, but a string-prefix test is not parsed argv enforcement. A hardened design would execute a fixed program without a shell or parse and validate arguments structurally.</p>
+          <p>The Python SQLite checker adds real domain restrictions. <code>SELECT</code>, <code>WITH</code>, <code>EXPLAIN</code>, and allowlisted PRAGMAs route through a connection opened as:</p>
+          <pre><code>def open_ro(path: str) -&gt; sqlite3.Connection:
+    return sqlite3.connect(
+        f"file:{path}?mode=ro&amp;immutable=1",
+        uri=True,
+    )</code></pre>
+          <p class="code-source"><span>Course source</span><span>.pi/verifier/scripts/verify_sqlite.py · lines 67–70</span></p>
+          <p>Mutation keywords are rejected with structured JSON. PRAGMA names must be in an explicit introspection allowlist. One caveat remains: any command beginning with <code>.</code> is passed to <code>sqlite3 -readonly</code>; the script does not define a dot-command allowlist. The CLI’s <code>-readonly</code> flag protects database opening, but the source does not prove that every possible dot-command is filesystem-side-effect free.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — security claim audit</p>
+          <h3>Write what each layer proves and does not prove</h3>
+          <ol>
+            <li>Read <code>verify_sqlite.md</code> front matter and list registered tools.</li>
+            <li>Read <code>verifier.ts</code> lines 499–529 and state the exact acceptance predicate.</li>
+            <li>Read <code>verify_sqlite.py</code> routing and separate SQL/PRAGMA handling from dot-command handling.</li>
+            <li>Read <code>socket-path.ts</code> and describe <code>0700</code> as same-user filesystem authorization, not cryptographic peer authentication.</li>
+            <li>Propose one hardening change without implementing it.</li>
+          </ol>
+          <p>Pass if your write-up contains both protections and limitations. “Safe because prompt says read-only” and “perfect sandbox” both fail.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: teaching the three layers as universal and absolute</h3>
+          <p><strong>Why it fails:</strong> the layer stack varies by persona, the current bash gate is prefix-based, and the SQLite script forwards dot-commands without its own dot-command allowlist. The Python domain also runs test code, which is not equivalent to immutable database inspection.</p>
+          <p><strong>Fix:</strong> scope every guarantee to a domain, name the mechanism, inspect the enforcement code, and preserve residual risk. A security property without a threat model is another coarse claim.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Make the error message documentation—but harden the boundary too</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · code audit</p>
+            <p>The structured rejection object—<code>error</code>, <code>received</code>, <code>reason</code>, <code>allowed</code>, <code>hint</code>—helps the model self-correct. Keep that teaching surface. For stronger enforcement, replace shell-prefix recognition with fixed executable dispatch and parsed arguments, then explicitly allowlist every subcommand family.</p>
+            <p class="current-practice__source">The lesson teases a later agentic-security deep dive, but no source-approved video ID exists yet.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the real guarantees</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for read-only architecture">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What does the persona tool list enforce?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The launcher does not register <code>write</code> or <code>edit</code> for the verifier; only the declared tools are exposed.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What is the current bash-gate caveat?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It accepts command strings with <code>startsWith(expected)</code>; it does not parse argv or establish an exact shell-free executable boundary.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. What does the SQLite script do well?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It rejects mutation SQL, allowlists introspective PRAGMAs, opens Python SQLite connections with <code>mode=ro&amp;immutable=1</code>, uses <code>sqlite3 -readonly</code> for dot-commands, and returns structured errors.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Why is this not a universal verifier sandbox?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Policies vary by persona, the process runs as the user, generic/image lack the script-only gate, Python tests can have side effects, and current gates have documented implementation limits.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Teach security without marketing language</h3>
+            <p>Explain the three SQLite layers to a security engineer. For each layer, state the mechanism, what it blocks, and one thing it does not establish. Finish with the production hardening change you would prioritize first.</p>
+            <p class="fine">Pass if your explanation is still useful after removing the words “impossible,” “absolute,” and “sandbox.”</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="flywheel">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Turn every unverifiable gap into the next improvement</h2>
+        <p class="section-lead">The Report does more than declare a verdict. Its two most valuable questions expose what the current verifier cannot prove and what evidence surface must be added next.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The verifier that hides uncertainty</h3>
+          <p>A check cannot run because there is no fixture or no script command. The verifier wants to be helpful, so it marks the claim likely correct and moves on. The operator sees green, the missing oracle disappears, and the verifier remains equally weak on the next turn.</p>
+          <p>Honest uncertainty feels less satisfying than a verdict, but it is better engineering data. A verifier that can say exactly why it could not check something has identified the next system improvement for you.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the Report contract</p>
+          <h3>Five sections preserve evidence and next action</h3>
+          <div class="report-map" aria-label="Five sections of the verifier Report">
+            <article><h3>What did you verify?</h3><p>Atom + check + observed output + verdict.</p></article>
+            <article><h3>What could you not verify?</h3><p>Claim + missing oracle, fixture, command, or clarity.</p></article>
+            <article><h3>What feedback did you give?</h3><p>Concrete builder correction, or none.</p></article>
+            <article><h3>What do you need next time?</h3><p>The exact new system capability required.</p></article>
+            <article><h3>Metadata</h3><p>Turn, atom totals, verified/failed/unverified counts, duration.</p></article>
+          </div>
+          <div class="confidence-ladder" aria-label="Verifier confidence ladder">
+            <div><b>PERFECT</b><span>Every atom checked; zero gaps; no correction.</span><i aria-label="green"></i></div>
+            <div><b>VERIFIED</b><span>Checks pass; only minor non-blocking gaps.</span><i aria-label="green"></i></div>
+            <div><b>PARTIAL</b><span>No failed atom, but meaningful gaps remain.</span><i aria-label="orange"></i></div>
+            <div><b>FEEDBACK</b><span>An atom failed and a correction was sent.</span><i aria-label="orange"></i></div>
+            <div><b>FAILED</b><span>The verifier could not perform the needed check.</span><i aria-label="red"></i></div>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the architecture contains its own improvement loop</p>
+          <h3>Read, check, correct, record, template</h3>
+          <p>After the image repair reaches 7/7, Dan opens the clean architecture picture. It shows the builder, unix socket, session JSONL, input-locked verifier, and narrowed SQLite checker. The diagram is more than a topology. It reveals where an unverifiable gap can be repaired: add missing context to the session/template, add a rule to the persona, add a check to the domain script, or clarify the Report.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t0478-clean-arch-diagram.jpg" alt="Clean architecture diagram showing builder, unix socket, session JSONL, input-locked verifier, and SQLite verification script" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">7:58</span>The repaired image also becomes the system mental model: lifecycle coordination, evidence from disk, a narrow correction path, and domain checks.</figcaption>
+          </figure>
+          <p>The Report’s “What do you need from me?” line connects that topology to work. A missing fixture points to context/setup. A missing oracle points to the script. An ambiguous success condition points back to planning or persona instructions. The failure is classified into a durable next action.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — positive feedback loop</p>
+          <h3>The verifier flywheel</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Compounding loop</p>
+            <p><strong>Verifier flywheel:</strong> expose an unverifiable claim, name the missing evidence surface, template that capability into the verifier system, and rerun until the same class of gap is covered automatically.</p>
+          </aside>
+          <div class="flywheel" aria-label="Verifier improvement flywheel">
+            <div><b>Expose</b><p>Report the gap honestly.</p></div>
+            <div><b>Classify</b><p>Missing context, oracle, tool, or requirement?</p></div>
+            <div><b>Template</b><p>Change persona, script, or cycle prompt.</p></div>
+            <div><b>Re-run</b><p>Show the same atom now has evidence.</p></div>
+          </div>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — read the exact schema</p>
+          <h3>The Report is parseable, not decorative</h3>
+          <p>The SQLite persona requires one literal <code>## Report</code> block with <code>STATUS</code>, <code>CONFIDENCE</code>, five sections, and metadata counters. <code>verifier.ts</code> parses that block after the verifier’s own <code>agent_end</code> and sends a report envelope to the builder. The builder keeps the raw Report for escalation rather than duplicating it in both panes.</p>
+          <pre><code>## Report
+
+STATUS: verified | failed | unsure
+CONFIDENCE: PERFECT | VERIFIED | PARTIAL | FEEDBACK | FAILED
+
+### What did you verify?
+### What could you not verify?
+### What feedback did you give?
+### What do you need from me to verify this next time?
+### Verification metadata</code></pre>
+          <p class="code-source"><span>Course contract</span><span>.pi/verifier/agents/verify_sqlite.md · lines 120–150</span></p>
+          <p>Notice that FEEDBACK is not the worst state. It means the verifier found a failed atom and successfully used <code>verifier_prompt</code>. FAILED means the verifier could not perform the needed verification at all. The ladder distinguishes “the work is wrong and the loop is functioning” from “the proof system lacks an oracle.”</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — close one real gap</p>
+          <h3>Do not invent the improvement before the Report</h3>
+          <ol>
+            <li>Run a relevant course-repo verification cycle.</li>
+            <li>Copy one real entry from “What could you not verify?”</li>
+            <li>Classify the missing surface: context, requirement, persona heuristic, or script command.</li>
+            <li>Change the smallest durable file.</li>
+            <li>Rerun and attach the new evidence for that same atom.</li>
+          </ol>
+          <p>Pass if the before/after pair proves a class improvement. A one-off operator instruction does not count.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: treating “unsure” as useless output</h3>
+          <p><strong>Why it fails:</strong> it pressures the verifier to guess and discards the exact information needed to improve the system. The next run encounters the same blind spot.</p>
+          <p><strong>Fix:</strong> grade uncertainty by specificity. “Couldn’t verify” is weak. “No fixture exposes a database with the declared FK, and the script lacks a command to inspect the target schema” identifies two concrete surfaces. Template one, rerun, and show the gap shrink.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Keep reports honest across domains</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · evidence varies</p>
+            <p>A SQLite atom may close with a deterministic PRAGMA row. An image atom closes with model-mediated inspection of actual pixels. Do not flatten both into the word “proof” without naming the evidence type. The Report contract can stay stable while confidence reflects the domain’s oracle.</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the flywheel</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for the verifier Report">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. Which two Report questions drive improvement?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>“What could you not verify?” and “What do you need from me to verify this next time?”</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What is the difference between FEEDBACK and FAILED?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>FEEDBACK means an atom failed and a correction was sent; FAILED means the verifier could not perform the necessary verification and must escalate.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why keep exact atom counts?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They preserve completeness and make it visible whether a green outcome covers every claim or hides unverified work.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Explain why a gap can be the best result</h3>
+            <p>Teach the Report to someone who only wants PASS or FAIL. Explain the confidence ladder, the five sections, the difference between failed work and failed verification, and how one “need next time” item becomes a new permanent check.</p>
+            <p class="fine">Pass if the listener would stop punishing honest uncertainty and start using it as a backlog for the verifier system.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="stack">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Stack intelligence; own the harness</h2>
+        <p class="section-lead">Single-model comparisons ask which model wins. The verifier lesson asks a different engineering question: what becomes possible when models hold different roles inside a harness whose lifecycle and tools you control?</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — concrete failure</p>
+          <h3>The benchmark winner that reviews itself</h3>
+          <p>You choose the model with the strongest isolated score and use it for planning, building, checking, and final judgment in one context. The system may be capable, but every role shares one framing, one set of omissions, and one moment of compute. The engineering problem was reduced to model selection when the larger design space was role composition.</p>
+          <p>Dan’s provocation is “AND, not OR.” The video pairs an Opus builder with a GPT-5.5 image verifier and a GLM 5.1 SQLite verifier. The current files can swap the verifier model in one front-matter line. The pattern is orchestration above any single roster.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — two roles, two model slots</p>
+          <h3>Separate generation from judgment</h3>
+          <div class="model-pair" role="img" aria-label="A builder model and a different verifier model combined with AND">
+            <div class="model-pair__model"><b>Builder model</b><span>Create, edit, run, and explain.</span></div>
+            <div class="model-pair__and">AND</div>
+            <div class="model-pair__model"><b>Verifier model</b><span>Observe, decompose, check, report, correct.</span></div>
+          </div>
+          <div class="two-camps" aria-label="Camp A single-agent prompting versus Camp B coordinated systems">
+            <article><h3>Camp A</h3><p>Prompt → babysit → inspect → reprompt. The human remains router and reviewer.</p></article>
+            <article><h3>Camp B</h3><p>Builder → verifier → feedback → repeat. The harness carries lifecycle, evidence, and correction.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — choose the verifier at launch</p>
+          <h3>Specialization is an operator command, not a new application</h3>
+          <p>Dan runs <code>just</code> and reveals the operator surface: generic, SQLite, image, and Python recipes. Each launches the same builder-side and verifier-side extensions but selects a different persona. The SQLite run then uses a different verifier model in the recording and a domain-specific checker. The harness shape stays fixed while the verification purpose changes.</p>
+          <figure class="frame-card">
+            <img src="../media/frames/ma-4-verifier-agent/t1052-just-recipes-vsql-boot.png" alt="Terminal showing just recipes for generic, SQLite, image, and Python verifier launches" width="3840" height="2160" loading="lazy">
+            <figcaption><span class="frame-card__t">17:32</span>The course operator surface. <code>just v</code>, <code>vsql</code>, <code>vimg</code>, and <code>vpy</code> all use the same harness and select a focused verifier persona.</figcaption>
+          </figure>
+          <p>The lesson’s phrase “one agent, one prompt, one purpose” prevents a common mistake: one giant verifier that checks databases, images, Python, security, and everything else with a broad tool surface. Focus narrows the oracle and makes the Report easier to interpret. Although Dan teases stacking specialized verifiers, the current server supports one verifier connection per builder; specialization is demonstrated, fan-out is not.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it — Dan’s terms</p>
+          <h3>AND, not OR · stack intelligence · own your harness</h3>
+          <aside class="callout callout--term">
+            <p class="callout__label">Three connected terms</p>
+            <p><strong>Stack intelligence:</strong> combine models in specialized roles instead of selecting one model for every job. <strong>Own your harness:</strong> control lifecycle, context, model, prompt, and tools deeply enough to enforce those roles.</p>
+          </aside>
+          <p>“Different model” is a design for independent perspective, not proof that two named models will always catch one another’s errors. The engineering value is role and context separation plus domain evidence. Evaluate the actual pair; do not turn model diversity into superstition.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — read the recipes</p>
+          <h3>One harness, four focused entry points</h3>
+          <pre><code># generic
+pi -e ./apps/verifier/verifiable.ts \
+   -e ./apps/verifier/cross-agent.ts --verifiable
+
+# SQLite specialization
+pi -e ./apps/verifier/verifiable.ts \
+   -e ./apps/verifier/cross-agent.ts \
+   --verifiable --verifier-agent verify_sqlite
+
+# image / Python use verify_image or verify_python</code></pre>
+          <p class="code-source"><span>Course source</span><span>justfile · lines 15–29</span></p>
+          <p>The code default is the generic <code>verifier</code>, despite stale README and flag-description text that names <code>verify_sqlite</code>. The <code>--verifier-agent</code> flag is implemented and used by the justfile. This is another reason to own and inspect the harness: the running source, not a remembered paragraph, defines the role.</p>
+          <p>Each persona’s <code>model:</code> field selects the verifier model. Changing that line does not rewrite the lifecycle protocol. It changes one Core Four dimension while the others remain stable enough to compare.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — design a model-pair experiment</p>
+          <h3>Change one dimension at a time</h3>
+          <ol>
+            <li>Choose the SQLite persona and one stable fixture.</li>
+            <li>Keep the original prompt, script, and Report contract fixed.</li>
+            <li>Run with the checked-in verifier model.</li>
+            <li>Change only the persona’s <code>model:</code> to another provider model you can actually access.</li>
+            <li>Compare atom coverage, gaps, corrections, duration, and token use. Do not claim superiority from one anecdote.</li>
+          </ol>
+          <p>Pass if the experiment isolates model choice and records the same evidence fields for both runs.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: chasing one best model or building one giant verifier</h3>
+          <p><strong>Why it fails:</strong> the first collapses architecture into a leaderboard; the second expands purpose and tools until the reviewer becomes another general builder.</p>
+          <p><strong>Fix:</strong> choose a focused domain, define its evidence surface, give the verifier only the role it needs, and place model choice inside that system. Add a new specialized persona when the proof problem changes; do not silently broaden the old one.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice overlay</p>
+          <h3>Harness control is the transferable requirement</h3>
+          <aside class="current-practice">
+            <p class="current-practice__label">Current practice · pattern over product</p>
+            <p>Pi enables this course implementation because it exposes editor replacement, lifecycle hooks, tool registration and interception, system-prompt replacement, model selection, and child-process launch. The lesson’s portable question is not “must I use Pi?” It is “does my harness expose enough control to preserve the observer, authority, and evidence boundaries?”</p>
+          </aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval check</p>
+          <h3>Retrieve the composition</h3>
+          <section class="retrieval-quiz" aria-label="Retrieval questions for stack intelligence">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What does “AND, not OR” mean here?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Use models together in specialized builder and verifier roles rather than treating isolated model selection as the whole engineering problem.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. What are the four justfile verifier entries?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>v</code> generic, <code>vsql</code> SQLite, <code>vimg</code> image, and <code>vpy</code> Python.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Is multi-verifier fan-out demonstrated by the current code?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. It is teased as a direction, while the current builder server accepts one verifier connection.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. What does owning the harness buy?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Control over lifecycle, context, model, prompt, tool registration/gating, input behavior, child spawning, and the correction/report protocol.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back">
+            <h3>Move the debate above the leaderboard</h3>
+            <p>A colleague asks whether the builder should use Model A or Model B. Explain how the verifier chapter reframes the question. Include specialization, model line, fixed harness, domain evidence, current one-verifier limit, and why different models are a hypothesis to evaluate rather than an automatic guarantee.</p>
+            <p class="fine">Pass if the answer ends with an architecture and experiment, not a favorite model.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="current-practice">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Current practice companions</h2>
+        <p class="section-lead">The extract approves two companion videos because Dan names the larger systems in the lesson. They extend the map; they do not replace the two-agent primitive or the course codebase lab.</p>
+
+        <div class="video-cards">
+          <a class="video-card" href="https://www.youtube.com/watch?v=RairMJflUSA">
+            <span class="video-card__type">Named hole · larger orchestration</span>
+            <strong>Multi-Agent Teams</strong>
+            <span>Where a focused verifier sits relative to orchestrators, leads, and workers.</span>
+            <span class="video-card__watch">Open video ↗</span>
+          </a>
+          <a class="video-card" href="https://www.youtube.com/watch?v=V5A1IU8VVp4">
+            <span class="video-card__type">Operationalizes the tactic</span>
+            <strong>Stripe Blueprint Agents</strong>
+            <span>A companion for the “code + agents” Camp B system direction Dan references.</span>
+            <span class="video-card__watch">Open video ↗</span>
+          </a>
+        </div>
+        <aside class="current-practice">
+          <p class="current-practice__label">Publication note</p>
+          <p>Both IDs and titles come from the locked lesson extract. Direct metadata resolution was unavailable in this build environment, so re-check the links at publication. The teased agentic-security video has no approved ID and is intentionally omitted.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="lab">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Graded lab · Prove the verifier, then audit it</h2>
+        <p class="section-lead">Run only inside <code>agentic-horizon-extras/the-verifier-agent-system</code>. The required runtime drill plants a SQLite defect, watches the verifier drive a repair, and collects atomic evidence. The required static audit then checks whether the security prose matches the actual gate.</p>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Prime directive</p>
+          <p>Never type an ordinary instruction into the verifier window. All operator prompts go to the builder. Every verifier behavior change belongs in <code>.pi/verifier/agents/</code>, <code>.pi/verifier/scripts/</code>, or <code>.pi/verifier/prompts/verify_on_stop.md</code>.</p>
+        </aside>
+
+        <div class="lab-phase">
+          <span class="lab-phase__time">PHASE 0 · 15 MIN · STATIC + SETUP</span>
+          <h3>Establish the real authority and prerequisites</h3>
+          <ol>
+            <li>Open the course repository. Run <code>/install</code> from the supplied Claude command or follow the README’s manual installation. The course checks Node 20+, Pi, tmux, uv, Python 3.11+, sqlite3, just, package installation, persona/script validity, provider-key presence, and <code>npx tsc --noEmit</code>.</li>
+            <li>Ensure <code>.pi/verifier/scripts/verify_sqlite.py</code> and <code>verify_python.py</code> are executable.</li>
+            <li>Add the provider key required by your current persona to a project-local <code>.env</code>. Confirm presence without printing the value.</li>
+            <li>Read <code>justfile</code>, <code>verify_sqlite.md</code>, <code>verifier.ts</code> lines 499–543, and <code>verify_sqlite.py</code> lines 18–93 and 256–293.</li>
+            <li>Write a four-row preflight: persona tools, bash predicate, SQL/PRAGMA routing, and remaining caveat. Do not copy the README’s stronger wording without reconciling it to code.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 0:</strong> state the intended three SQLite layers and the current <code>startsWith</code> / dot-command limitations without notes.</div>
+        </div>
+
+        <div class="lab-phase">
+          <span class="lab-phase__time">PHASE 1 · 25–35 MIN · REQUIRED RUNTIME</span>
+          <h3>Catch a planted SQLite defect and watch the repair loop close</h3>
+          <ol>
+            <li>The course tree does not ship the video’s runtime databases. Ask the <strong>builder</strong> to create <code>tmp/mock_shop.db</code> with <code>users</code>, <code>products</code>, and <code>orders</code>. Deliberately choose one defect from the extract: omit the <code>orders</code> primary key, or point <code>orders.user_id</code> at a mistyped table name such as <code>user</code> instead of <code>users</code>.</li>
+            <li>Run <code>just vsql</code>. If already inside tmux, look for a sibling window; otherwise the launcher attempts a new terminal window attached to a detached verifier tmux session.</li>
+            <li>Confirm the verifier’s ordinary input is locked and the builder shows a connected verifier.</li>
+            <li>Prompt the builder: <em>“Inspect the schema of tmp/mock_shop.db and confirm every table has a primary key and every foreign key references a real table and column.”</em></li>
+            <li>Do not touch the verifier. Observe the stop event, bounded turn-slice read, atom list, and checker calls.</li>
+            <li>Require separate evidence for <code>.schema orders</code>, <code>PRAGMA table_info(orders)</code>, <code>PRAGMA foreign_key_list(orders)</code>, existence of each referenced table/column, and <code>PRAGMA integrity_check</code>. Do not let <code>integrity_check</code> stand in for PK/FK correctness.</li>
+            <li>Capture the first <code>STATUS: failed</code> / <code>CONFIDENCE: FEEDBACK</code> Report, the exact failed atom, the observed output, the concrete <code>verifier_prompt</code>, and the builder repair.</li>
+            <li>Capture the next cycle with <code>atomic_claims_failed: 0</code>. PERFECT requires every atom checked with no gaps and no further correction.</li>
+          </ol>
+          <div class="evidence-pack">
+            <div><strong>Artifact A</strong><p>Failing Report with one circled atom and exact evidence.</p></div>
+            <div><strong>Artifact B</strong><p><code>verifier_prompt</code> acknowledgement and builder repair turn.</p></div>
+            <div><strong>Artifact C</strong><p>Passing Report showing zero failed atoms and all gaps disclosed.</p></div>
+          </div>
+          <div class="checkpoint"><strong>Checkpoint 1:</strong> explain why a mistyped FK target may require both <code>foreign_key_list</code> and a separate target-existence check, especially when the table contains no data.</div>
+        </div>
+
+        <div class="lab-phase">
+          <span class="lab-phase__time">PHASE 2 · 15–20 MIN · REQUIRED STATIC AUDIT</span>
+          <h3>Verify the verifier’s security claim</h3>
+          <ol>
+            <li>Copy the exact <code>tools:</code> list from <code>verify_sqlite.md</code> and identify absent mutation tools.</li>
+            <li>Copy the exact bash acceptance predicate from <code>verifier.ts</code>. Explain why string-prefix recognition is weaker than fixed executable dispatch.</li>
+            <li>Trace a raw <code>INSERT</code> through <code>verify_sqlite.py</code>. Record that the router rejects it before the SQLite connection; do not claim this run demonstrated connection-level refusal.</li>
+            <li>Trace an allowlisted PRAGMA and record the read-only URI connection.</li>
+            <li>Trace a dot-command and record that it passes to <code>sqlite3 -readonly</code> without a script-side dot-command allowlist.</li>
+            <li>Write one hardening proposal: fixed executable/argv dispatch, explicit dot-command allowlist, or both.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint 2:</strong> submit a table with columns “mechanism,” “blocks,” “does not prove,” and “hardening.” Accuracy is worth more than a perfect-sounding guarantee.</div>
+        </div>
+
+        <div class="lab-phase">
+          <span class="lab-phase__time">PHASE 3 · 20 MIN · CHOOSE ONE</span>
+          <h3>Extend the system without leaving the course repository</h3>
+          <ul>
+            <li><strong>Flywheel option:</strong> use a real “could not verify” entry, add the smallest persona/script/template capability, and prove the same gap closes next run.</li>
+            <li><strong>Image option:</strong> run <code>just vimg</code>, generate an image clearly above ten text blocks, observe model-mediated readability feedback, change <code>MAX_TEXT_ELEMENTS</code> to six, and generate a case clearly above six. Do not grade an exact boundary count as deterministic.</li>
+            <li><strong>Model option:</strong> change only the SQLite persona’s <code>model:</code>, rerun the same fixture and prompt, and compare atom coverage, gaps, corrections, duration, and spend.</li>
+            <li><strong>Domain-authoring option:</strong> clone the two-file SQLite pattern into <code>verify_&lt;domain&gt;.md</code> and <code>verify_&lt;domain&gt;.py</code>, preserve the structured rejection and Report contracts, and boot with <code>--verifier-agent verify_&lt;domain&gt;</code>. Keep the work inside the course repo.</li>
+          </ul>
+        </div>
+
+        <h3>Rubric · 20 points</h3>
+        <table class="scorecard">
+          <thead><tr><th>Criterion</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr></thead>
+          <tbody>
+            <tr><td>Prime directive and lifecycle trace</td><td>Typed at verifier / no trace</td><td>Partial</td><td>Trigger known</td><td>Accurate path</td><td>Accurate path + protocol nuance</td></tr>
+            <tr><td>Atomic evidence</td><td>Summary only</td><td>Coarse pass</td><td>Some atoms</td><td>All required atoms</td><td>All atoms + gaps + exact outputs</td></tr>
+            <tr><td>Automatic correction loop</td><td>Not shown</td><td>Manual repair</td><td>Failure only</td><td>Feedback + repair</td><td>Fail→feedback→repair→zero failures</td></tr>
+            <tr><td>Security accuracy</td><td>Prompt-only claim</td><td>Three-layer slogan</td><td>Mechanisms named</td><td>Limits named</td><td>Limits + precise hardening proposal</td></tr>
+            <tr><td>Compounding improvement / teach-back</td><td>Missing</td><td>One-off prompt</td><td>Change made</td><td>Rerun evidence</td><td>Class improvement + complete teach-back</td></tr>
+          </tbody>
+        </table>
+        <aside class="callout callout--why"><p class="callout__label">Pass standard</p><p><strong>16/20 minimum</strong>, with no zero in lifecycle, atomic evidence, or security accuracy. A learner cannot compensate for an unsafe or unverified loop with polished prose.</p></aside>
+
+        <h3>Troubleshooting grounded in the course</h3>
+        <div class="comparison">
+          <article class="comparison__card"><div class="comparison__head"><h3>No second window</h3></div><div class="comparison__body"><p>Inside tmux, check sibling windows. Outside tmux, inspect the builder’s surfaced spawn error. Common causes in the extract are missing dependencies or an invalid persona model id. Use <code>just clean</code> for stale verifier tmux sessions, sockets, and breadcrumbs.</p></div></article>
+          <article class="comparison__card"><div class="comparison__head"><h3>Zero claims</h3></div><div class="comparison__body"><p>Domain personas use relevance gates. An image verifier can correctly no-op on non-image work; a Python verifier can no-op on non-Python work. Match the recipe to the task.</p></div></article>
+          <article class="comparison__card"><div class="comparison__head"><h3>FAILED / no oracle</h3></div><div class="comparison__body"><p>Do not fight the result. Preserve the gap, identify the missing fixture or checker capability, and use the flywheel option.</p></div></article>
+          <article class="comparison__card"><div class="comparison__head"><h3>Model unavailable</h3></div><div class="comparison__body"><p>The shipped personas currently name <code>openai/gpt-5.5</code>, but runtime availability was not verified in this chapter build. Use a provider/model you can access and record the front-matter change.</p></div></article>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Cumulative mastery</h2>
+        <p class="section-lead">Close the chapter and retrieve the system from first principles. Score evidence and boundaries, not vocabulary alone.</p>
+
+        <h3>Round 1 · Architecture from memory</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative architecture retrieval">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Draw the path from genuine user prompt to the next verified builder state.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>User prompts builder → builder captures original prompt and start line → builder completes → <code>agent_end</code> emits stop metadata with end line → verifier renders <code>verify_on_stop.md</code> → reads bounded JSONL slice → decomposes and checks atoms → sends Report; on actionable failure it also uses <code>verifier_prompt</code> → builder injects correction as follow-up → another stop triggers another verification cycle.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does and does not cross the socket?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The socket carries lifecycle events with original prompt and line offsets, connection/control messages, acknowledgements, corrections, Reports, and liveness/bye messages. It does not stream the builder assistant transcript; the verifier reads that turn from session JSONL on disk.</p></details></div>
+        </section>
+
+        <h3>Round 2 · Diagnose the evidence</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative evidence retrieval">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">A Report says “database valid” because <code>PRAGMA integrity_check</code> returned <code>ok</code>. What is missing?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Integrity alone does not prove requested primary keys, foreign-key targets, columns, defaults, or indexes. Those claims need separate atoms and checks.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">An image verifier says a diagram has seven text blocks. What kind of evidence is that?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A model-mediated visual judgment grounded in the actual image, not a deterministic parser result.</p></details></div>
+        </section>
+
+        <h3>Round 3 · Diagnose the authority</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative security retrieval">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name the intended SQLite layers and one caveat for each architecture claim.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Persona tool list omits write/edit, but bash remains. The tool-call hook narrows bash, but currently uses a string-prefix predicate. The SQLite script rejects mutation SQL, allowlists PRAGMAs, and opens read-only, but forwards dot-commands through <code>sqlite3 -readonly</code> without its own dot-command allowlist. The process still runs as the user.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why can’t the same “three layers” claim be applied to every persona?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Generic and image personas do not declare the script-only bash policy; Python runs checkers/tests that may have side effects. Authority is domain-specific.</p></details></div>
+        </section>
+
+        <h3>Round 4 · Explain the economics</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative economics retrieval">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Resolve the paradox: how can 2–5× the tokens make delivery faster?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The second stream of compute performs claim decomposition, review checks, correction, and re-checking that the human would otherwise do serially. The comparison is against accountable reviewed work, not unreviewed builder output.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why “AND, not OR”?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The system composes a builder role and verifier role, potentially with different models and evidence surfaces. The pattern shifts attention from selecting one isolated winner to orchestrating specialized roles. Different models are a hypothesis to evaluate, not an automatic guarantee.</p></details></div>
+        </section>
+
+        <div class="teach-back">
+          <h3>Capstone teach-back · four minutes, no notes</h3>
+          <p>Explain: the planning/reviewing framework; the observer lifecycle and socket nuance; atomic claims and domain-appropriate evidence; the token-for-time exchange; why trust and scale can rise together; the two input locks; the scoped SQLite authority layers and current gaps; the Report flywheel; and why stack intelligence requires harness control.</p>
+          <p class="fine"><strong>Mastery standard:</strong> a listener could reproduce the course lab, avoid overclaiming security, and diagnose the next verifier miss into context, model, prompt, or tools.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">13</span>
+        <h2 class="section-title">Glossary</h2>
+        <dl class="glossary">
+          <div><dt>Atomic claim</dt><dd>The smallest independently checkable proposition extracted from the request or builder result.</dd></div>
+          <div><dt>Builder</dt><dd>The interactive Pi process that performs the user’s work. Its harness owns the verifier connection; its model does not delegate verification.</dd></div>
+          <div><dt>Verifier</dt><dd>The sibling observer process that starts a verification cycle after builder completion and checks work against domain evidence.</dd></div>
+          <div><dt>Top-down observer</dt><dd>A verifier initiated by lifecycle hooks outside the builder model’s task flow rather than by model delegation.</dd></div>
+          <div><dt>Session JSONL slice</dt><dd>The bounded range of builder session events for one turn, identified by start/end line offsets in lifecycle metadata.</dd></div>
+          <div><dt><code>verifier_prompt</code></dt><dd>The verifier’s typed outbound correction tool; it sends a prompt envelope and awaits acknowledgement from the builder.</dd></div>
+          <div><dt>Planning constraint</dt><dd>Dan’s term for the human capacity to define intent, sequence, boundaries, and success evidence.</dd></div>
+          <div><dt>Review constraint</dt><dd>Dan’s term for the human capacity to check generated work against actual state. The verifier directly targets this constraint.</dd></div>
+          <div><dt>Domain-appropriate evidence</dt><dd>The observation that settles an atom in its domain: deterministic query/test output where available, or model-mediated inspection grounded in the artifact for visual claims.</dd></div>
+          <div><dt>PERFECT</dt><dd>Every atomic claim checked, no gaps, and no corrective prompt needed in the cycle.</dd></div>
+          <div><dt>FEEDBACK</dt><dd>At least one atom failed and the verifier sent a concrete correction; the loop is functioning.</dd></div>
+          <div><dt>FAILED</dt><dd>The verifier could not perform the required verification because an oracle, fixture, command, or clarity was missing.</dd></div>
+          <div><dt>Templated engineering</dt><dd>Encoding a recurring verification improvement into the persona, checker script, or cycle template rather than a one-off chat instruction.</dd></div>
+          <div><dt>Verifier flywheel</dt><dd>The loop from explicit unverifiable gap to a new durable evidence capability and a rerun that closes the gap.</dd></div>
+          <div><dt>Read-only by architecture</dt><dd>The design practice of removing mutation tools and narrowing execution outside the model. In this course, guarantees must be scoped and audited per persona.</dd></div>
+          <div><dt>Script-prefix gate</dt><dd>The current SQLite bash policy implementation: allow command strings beginning with the configured runner and script. It narrows bash but is weaker than parsed argv or fixed executable dispatch.</dd></div>
+          <div><dt>Stack intelligence</dt><dd>Combine specialized model roles inside a controlled system—builder AND verifier—rather than treating one-model selection as the entire problem.</dd></div>
+          <div><dt>Core Four</dt><dd>Context, model, prompt, and tools: the durable surfaces to improve when the verifier misses.</dd></div>
+          <div><dt><code>max_loops</code></dt><dd>The per-persona automatic correction limit. The course default is three; the next attempted correction escalates to the human.</dd></div>
+          <div><dt>Same-user filesystem authorization</dt><dd>The socket directory’s <code>0700</code> permission prevents other UIDs from traversing it; it is not cryptographic peer authentication.</dd></div>
+        </dl>
+
+        <p class="source-note">Primary sources: MA-4 transcript and lesson extract; <code>agentic-horizon-extras/the-verifier-agent-system</code> course files; twelve extracted 3840×2160 lesson frames. Runtime model availability, paid-provider authentication, external video metadata, and live end-to-end execution were not asserted by this static chapter build.</p>
+      </section>
+
+      <footer class="chapter-footer">
+        <a href="../index.html">← Book hub</a>
+        <p>MA-4 · The Pi Verifier Agent</p>
+        <span>End of lesson 18</span>
+      </footer>
+
+      <script>
+        (() => {
+          const topBar = document.getElementById('top-progress');
+          const railBar = document.getElementById('rail-progress');
+          const label = document.getElementById('progress-label');
+          let scheduled = false;
+
+          const updateProgress = () => {
+            const root = document.documentElement;
+            const range = Math.max(1, root.scrollHeight - window.innerHeight);
+            const value = Math.min(1, Math.max(0, window.scrollY / range));
+            const percent = Math.round(value * 100);
+            topBar.style.width = `${percent}%`;
+            railBar.style.width = `${percent}%`;
+            label.textContent = `${percent}%`;
+            scheduled = false;
+          };
+
+          const schedule = () => {
+            if (!scheduled) {
+              scheduled = true;
+              window.requestAnimationFrame(updateProgress);
+            }
+          };
+
+          window.addEventListener('scroll', schedule, { passive: true });
+          window.addEventListener('resize', schedule);
+          updateProgress();
+
+          const navLinks = [...document.querySelectorAll('.chapter-nav a')];
+          const sectionIds = new Set(navLinks.map((link) => link.getAttribute('href').slice(1)));
+          const sections = [...document.querySelectorAll('main section[id]')]
+            .filter((section) => sectionIds.has(section.id));
+
+          const observer = new IntersectionObserver((entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+            if (!visible) return;
+            navLinks.forEach((link) => {
+              if (link.getAttribute('href') === `#${visible.target.id}`) {
+                link.setAttribute('aria-current', 'location');
+              } else {
+                link.removeAttribute('aria-current');
+              }
+            });
+          }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, 0.1, 0.5] });
+
+          sections.forEach((section) => observer.observe(section));
+        })();
+      </script>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,113 @@
+# benchmarks/qwen36-vs-qwen35-vs-gemma4.yaml
+# 6-way raw inference: Qwen 3.6 35B-A3B vs Qwen 3.5 35B-A3B vs Gemma 4 26B-A4B × GGUF vs MLX.
+# 8 charts: prefill/decode/wall/memory × M4 Max/M5 Max.
+# Speed charts: X = prompts (P1–P5), bars = model variants.
+# Memory charts: X = models, bar = peak RAM (GB).
+version: 1
+benchmark:
+  session_id: qwen36-vs-qwen35-vs-gemma4
+  title: "Qwen 3.6 vs Qwen 3.5 vs Gemma 4 — Raw Inference"
+  subtitle: "Qwen 3.6 35B-A3B vs Qwen 3.5 35B-A3B vs Gemma 4 26B-A4B · GGUF vs MLX · M4 Max vs M5 Max"
+  tags:
+    - { name: "qwen3.5:35b · GGUF", icons: ["/icons/alibaba.svg", "/icons/nvidia.svg"] }
+    - { name: "qwen3.5:35b-a3b-nvfp4 · MLX", icons: ["/icons/alibaba.svg", "/icons/apple.svg"] }
+    - { name: "qwen3.6:35b-a3b · GGUF", icons: ["/icons/alibaba.svg", "/icons/nvidia.svg"] }
+    - { name: "qwen3.6:35b-a3b-nvfp4 · MLX", icons: ["/icons/alibaba.svg", "/icons/apple.svg"] }
+    - { name: "gemma4:26b · GGUF", icons: ["/icons/google.svg", "/icons/nvidia.svg"] }
+    - { name: "mlx-community/gemma-4-26b-a4b-it-4bit · MLX", icons: ["/icons/google.svg", "/icons/apple.svg"] }
+  charts:
+    # ── Prefill ──
+    - chart_id: prefill_m4
+      title: "Prefill Speed (M4 Max)"
+      subtitle: "prompt processing · tok/s · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Prompt" }
+      y: { label: "Prefill", unit: "tok/s", min: 0 }
+      groups: &prompt_groups
+        - { key: p1, label: "P1 factual" }
+        - { key: p2, label: "P2 code" }
+        - { key: p3, label: "P3 tech" }
+        - { key: p4, label: "P4 complex" }
+        - { key: p5, label: "P5 deep" }
+      metrics: &model_metrics
+        - { key: qwen35_gguf, label: "Qwen 3.5 GGUF", color: "#f59e0b", icon: "/icons/alibaba.svg" }
+        - { key: qwen35_mlx,  label: "Qwen 3.5 MLX",  color: "#fbbf24", icon: "/icons/alibaba.svg" }
+        - { key: qwen36_gguf, label: "Qwen 3.6 GGUF", color: "#ef4444", icon: "/icons/alibaba.svg" }
+        - { key: qwen36_mlx,  label: "Qwen 3.6 MLX",  color: "#f87171", icon: "/icons/alibaba.svg" }
+        - { key: gemma4_gguf, label: "Gemma 4 GGUF",  color: "#3b82f6", icon: "/icons/google.svg" }
+        - { key: gemma4_mlx,  label: "Gemma 4 MLX",   color: "#60a5fa", icon: "/icons/google.svg" }
+    - chart_id: prefill_m5
+      title: "Prefill Speed (M5 Max)"
+      subtitle: "prompt processing · tok/s · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Prompt" }
+      y: { label: "Prefill", unit: "tok/s", min: 0 }
+      groups: *prompt_groups
+      metrics: *model_metrics
+    # ── Decode ──
+    - chart_id: decode_m4
+      title: "Decode Speed (M4 Max)"
+      subtitle: "token generation · tok/s · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Prompt" }
+      y: { label: "Decode", unit: "tok/s", min: 0 }
+      groups: *prompt_groups
+      metrics: *model_metrics
+    - chart_id: decode_m5
+      title: "Decode Speed (M5 Max)"
+      subtitle: "token generation · tok/s · higher is better"
+      better: higher
+      direction: BT
+      x: { label: "Prompt" }
+      y: { label: "Decode", unit: "tok/s", min: 0 }
+      groups: *prompt_groups
+      metrics: *model_metrics
+    # ── Wall-Clock ──
+    - chart_id: wall_m4
+      title: "Wall-Clock Time (M4 Max)"
+      subtitle: "avg end-to-end latency · seconds · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Prompt" }
+      y: { label: "Wall time", unit: "s", min: 0 }
+      groups: *prompt_groups
+      metrics: *model_metrics
+    - chart_id: wall_m5
+      title: "Wall-Clock Time (M5 Max)"
+      subtitle: "avg end-to-end latency · seconds · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Prompt" }
+      y: { label: "Wall time", unit: "s", min: 0 }
+      groups: *prompt_groups
+      metrics: *model_metrics
+    # ── Memory ──
+    - chart_id: memory_m4
+      title: "Memory (M4 Max)"
+      subtitle: "system RAM consumed during inference · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Model" }
+      y: { label: "Memory", unit: "GB", min: 0 }
+      groups: &model_groups
+        - { key: qwen35_gguf, label: "Qwen 3.5 GGUF", icon: "/icons/alibaba.svg" }
+        - { key: qwen35_mlx,  label: "Qwen 3.5 MLX",  icon: "/icons/alibaba.svg" }
+        - { key: qwen36_gguf, label: "Qwen 3.6 GGUF", icon: "/icons/alibaba.svg" }
+        - { key: qwen36_mlx,  label: "Qwen 3.6 MLX",  icon: "/icons/alibaba.svg" }
+        - { key: gemma4_gguf, label: "Gemma 4 GGUF",  icon: "/icons/google.svg"  }
+        - { key: gemma4_mlx,  label: "Gemma 4 MLX",   icon: "/icons/google.svg"  }
+      metrics:
+        - { key: memory_gb, label: "Peak RAM", color: ["#a855f7", "#c084fc"] }
+    - chart_id: memory_m5
+      title: "Memory (M5 Max)"
+      subtitle: "system RAM consumed during inference · lower is better"
+      better: lower
+      direction: BT
+      x: { label: "Model" }
+      y: { label: "Memory", unit: "GB", min: 0 }
+      groups: *model_groups
+      metrics:
+        - { key: memory_gb, label: "Peak RAM", color: ["#a855f7", "#c084fc"] }

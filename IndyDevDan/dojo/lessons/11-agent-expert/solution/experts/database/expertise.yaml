@@ -1,0 +1,20 @@
+# expertise.yaml — the database expert's MENTAL MODEL of sample_app.
+# This is not a source of truth. The true source of truth is always the code.
+# It is a working memory file — a data structure the agent constantly updates
+# via self-improve.md. max_lines: 100 (the agent enforces this cap on itself).
+
+purpose: answer, plan, and ship work on the sample_app data layer from a maintained mental model — act, learn, reuse
+
+key_files:
+  - path: sample_app/db.py
+    role: the data layer — connect, insert_task, list_tasks
+  - path: sample_app/schema.sql
+    role: the schema — table definitions applied by connect()
+
+conventions:
+  - every query flows through the _execute() gateway in sample_app/db.py — never call conn.execute() directly
+  - SQL is always parameterized with ? placeholders — values are never interpolated into the SQL string
+
+never:
+  - guess when the code can answer — validate this mental model against the code
+  - hand-edit this file — the agent maintains it

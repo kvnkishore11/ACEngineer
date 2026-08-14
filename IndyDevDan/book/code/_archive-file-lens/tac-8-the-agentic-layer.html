@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first code deep dive into TAC-8: The Agentic Layer.">
+  <title>The Agentic Layer — Code Deep Dive</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
+  <style>
+    :root{--code-ink:#26312c;--code-bg:#f5efe5;--clay-wash:#f6e8dc;--mint-wash:#e8f1e9;--sky-wash:#e9f0f3;--line-accent:color-mix(in srgb,var(--accent) 24%,var(--border))}
+    html{scroll-behavior:smooth}body{background:var(--bg);color:var(--text)}a{text-underline-offset:.18em}section{scroll-margin-top:4rem}section+section{margin-top:2.6rem}code{font-family:var(--font-mono)}:not(pre)>code{background:color-mix(in srgb,var(--accent) 8%,var(--surface));border-radius:.24rem;font-size:.86em;padding:.08em .27em}
+    .skip-link{position:fixed;top:.5rem;left:.5rem;z-index:100;transform:translateY(-180%);padding:.5rem .75rem;border-radius:.42rem;background:var(--text);color:var(--bg)}.skip-link:focus{transform:none}.site-bar{min-height:2.65rem}.site-bar__inner{gap:.75rem}.site-bar__title{font-size:.86rem}.site-bar__crumb{color:var(--text-muted);font-size:.78rem}
+    .chapter-layout{align-items:start}.chapter-sidebar{font-size:.81rem}.chapter-sidebar .nav-kicker{color:var(--text-muted);font-size:.66rem;font-weight:850;letter-spacing:.12em;margin:1rem 0 .34rem;text-transform:uppercase}.chapter-sidebar ul{list-style:none;margin:0;padding:0}.chapter-sidebar li{margin:.16rem 0}.chapter-sidebar a{display:block;padding:.22rem .45rem;border-radius:.35rem;text-decoration:none}.chapter-sidebar a:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+    .lesson{min-width:0;padding-bottom:5rem}.measure{max-width:48rem}.wide{width:min(100%,64rem);max-width:64rem}.lesson-head{border-bottom:1px solid var(--border);margin-bottom:1.2rem;padding:1.15rem 0 1rem}.lesson-head h1{font-size:clamp(1.9rem,4vw,3rem);line-height:.98;margin:.25rem 0 .5rem}.eyebrow,.section-label{color:var(--accent);font:850 .69rem/1.2 var(--font-sans);letter-spacing:.13em;text-transform:uppercase}.section-label{display:block;margin-bottom:.35rem}.dek{color:var(--text-muted);font-size:1.02rem;line-height:1.55;margin:0;max-width:43rem}.meta-row{display:flex;flex-wrap:wrap;gap:.42rem;margin-top:.8rem}.meta-chip{background:var(--surface);border:1px solid var(--border);border-radius:999px;font:700 .68rem/1.2 var(--font-sans);padding:.29rem .54rem}section>h2{font-size:1.55rem;line-height:1.12;margin-bottom:.65rem}h3{font-size:1.06rem}.lede{font-size:1.04rem;line-height:1.66}.muted{color:var(--text-muted)}.small{font-size:.8rem}
+    .hook-card{background:linear-gradient(135deg,var(--clay-wash),var(--surface));border:1px solid var(--line-accent);border-radius:.82rem;box-shadow:var(--shadow-sm);padding:1rem 1.08rem}.hook-card p{margin:0}.hook-card .big{font-family:var(--font-serif);font-size:1.26rem;line-height:1.44}.hook-card .answer{border-top:1px solid var(--line-accent);margin-top:.8rem;padding-top:.75rem}
+    .repo-map{background:var(--surface);border:1px solid var(--border);border-radius:.86rem;box-shadow:var(--shadow-sm);overflow:hidden;padding:.95rem}.evolution{display:grid;gap:.62rem;grid-template-columns:repeat(5,minmax(9.6rem,1fr));overflow-x:auto;padding:.2rem .1rem .65rem}.stage{background:var(--bg);border:1px solid var(--border);border-radius:.68rem;min-width:9.6rem;padding:.72rem;position:relative}.stage:not(:last-child)::after{color:var(--accent);content:"→";font:900 1.2rem/1 var(--font-sans);position:absolute;right:-.52rem;top:50%;transform:translate(50%,-50%);z-index:2}.stage .step{color:var(--accent);font:850 .63rem/1 var(--font-sans);letter-spacing:.08em}.stage strong{display:block;font-size:.83rem;line-height:1.25;margin-top:.38rem}.stage span{color:var(--text-muted);display:block;font-size:.71rem;line-height:1.4;margin-top:.28rem}.stage:nth-child(3){background:var(--sky-wash)}.stage:nth-child(5){background:var(--clay-wash)}.map-caption{color:var(--text-muted);font-size:.77rem;margin:.15rem}.planes{display:grid;gap:.55rem;grid-template-columns:repeat(3,1fr);margin-top:.7rem}.plane{border-top:2px solid var(--accent);color:var(--text-muted);font-size:.73rem;line-height:1.42;padding:.48rem .2rem .1rem}.plane b{color:var(--text);display:block}
+    .tree{background:var(--code-bg);border:1px solid var(--border);border-radius:.75rem;font:.77rem/1.58 var(--font-mono);overflow-x:auto;padding:.85rem 1rem;white-space:pre}.tree a{color:var(--code-ink)}.tree .folder{color:var(--accent);font-weight:850}.tree .dim{color:var(--text-muted)}
+    .idea-grid{display:grid;gap:.7rem;grid-template-columns:repeat(2,minmax(0,1fr))}.idea-card{background:var(--surface);border:1px solid var(--border);border-radius:.7rem;padding:.82rem}.idea-card .number{color:var(--accent);font:850 .7rem/1 var(--font-sans)}.idea-card h3{font-size:.98rem;margin:.34rem 0 .25rem}.idea-card p{color:var(--text-muted);font-size:.81rem;line-height:1.5;margin:0}
+    details.file-card{background:var(--surface);border:1px solid var(--border);border-radius:.76rem;box-shadow:var(--shadow-sm);margin:.72rem 0;overflow:clip}details.file-card>summary{align-items:center;cursor:pointer;display:grid;gap:.6rem;grid-template-columns:auto minmax(0,1fr) auto;list-style:none;padding:.78rem .9rem}details.file-card>summary::-webkit-details-marker{display:none}details.file-card>summary::before{color:var(--accent);content:"+";font:850 1rem/1 var(--font-mono);transition:transform .18s ease}details.file-card[open]>summary::before{content:"−";transform:rotate(180deg)}details.file-card[open]>summary{border-bottom:1px solid var(--border)}.file-title{min-width:0}.file-title code{color:var(--code-ink);font-size:.78rem;overflow-wrap:anywhere}.file-title small{color:var(--text-muted);display:block;font-size:.72rem;margin-top:.18rem}.file-role{background:color-mix(in srgb,var(--accent) 9%,var(--surface));border-radius:999px;color:var(--accent);font:850 .61rem/1 var(--font-sans);padding:.3rem .46rem;text-transform:uppercase}.file-body{animation:reveal .2s ease both;padding:.25rem .9rem 1rem}.file-body p,.file-body li{font-size:.88rem;line-height:1.62}@keyframes reveal{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+    .code-wrap{margin:.75rem 0;min-width:0}.code-label{background:#39352f;border-radius:.46rem .46rem 0 0;color:#f8f2e8;display:flex;font:.66rem/1.2 var(--font-mono);justify-content:space-between;padding:.4rem .62rem}pre{background:#fbf8f2!important;border:1px solid #ded5c8;border-radius:0 0 .5rem .5rem;color:var(--code-ink);font-size:.75rem;line-height:1.56;margin:0;max-width:100%;overflow-x:auto;padding:.8rem!important;tab-size:2}.annotation-list{counter-reset:annotation;list-style:none;margin:.65rem 0 0;padding:0}.annotation-list li{counter-increment:annotation;display:grid;gap:.5rem;grid-template-columns:1.4rem 1fr;margin:.45rem 0}.annotation-list li::before{align-items:center;background:var(--accent);border-radius:50%;color:white;content:counter(annotation);display:inline-flex;font:850 .66rem/1 var(--font-sans);height:1.35rem;justify-content:center;width:1.35rem}
+    .callout{background:var(--sky-wash);border-left:.22rem solid var(--accent);border-radius:0 .56rem .56rem 0;margin:.8rem 0;padding:.68rem .82rem}.callout strong{display:block;font-size:.8rem;margin-bottom:.18rem}.callout p{font-size:.82rem;margin:0}.callout.warning{background:var(--clay-wash);border-left-color:#a64823}.callout.success{background:var(--mint-wash);border-left-color:#47735a}.table-scroll{overflow-x:auto}.contract-table{border-collapse:collapse;font-size:.78rem;width:100%}.contract-table th,.contract-table td{border-bottom:1px solid var(--border);padding:.55rem .45rem;text-align:left;vertical-align:top}.contract-table th{color:var(--text-muted);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase}.contract-table td:first-child{font-family:var(--font-mono);font-size:.72rem}
+    .flow-list{counter-reset:run;list-style:none;margin:1rem 0;padding:0}.flow-list li{counter-increment:run;display:grid;gap:.75rem;grid-template-columns:2rem 1fr;margin:0;padding:0 0 1rem}.flow-list li:not(:last-child) .flow-copy{border-bottom:1px dashed var(--border);padding-bottom:1rem}.flow-list li::before{align-items:center;background:var(--accent);border-radius:.5rem;color:white;content:counter(run);display:flex;font:850 .76rem/1 var(--font-sans);height:2rem;justify-content:center}.flow-copy strong{display:block;font-size:.9rem}.flow-copy p{color:var(--text-muted);font-size:.82rem;margin:.18rem 0 0}
+    .failure-grid{display:grid;gap:.65rem;grid-template-columns:repeat(2,minmax(0,1fr))}.failure-card{background:var(--surface);border:1px solid var(--border);border-radius:.65rem;padding:.76rem}.failure-card b{color:#8a3820;display:block;font-size:.82rem}.failure-card p{color:var(--text-muted);font-size:.79rem;line-height:1.5;margin:.3rem 0 0}.lab-card{background:linear-gradient(145deg,#fffaf2,#f1e6d7);border:1px solid var(--line-accent);border-radius:.85rem;box-shadow:var(--shadow-sm);padding:1rem}.lab-card li{margin:.5rem 0}.checkpoint{background:var(--surface);border:1px dashed var(--accent);border-radius:.55rem;font-size:.83rem;margin-top:.8rem;padding:.65rem .75rem}.quiz details{background:var(--surface);border:1px solid var(--border);border-radius:.6rem;margin:.5rem 0;padding:.65rem .75rem}.quiz summary{cursor:pointer;font-weight:750}.quiz details p{color:var(--text-muted);font-size:.85rem;margin:.55rem 0 .1rem}
+    .inventory-list{columns:2;column-gap:1.3rem;list-style:none;margin:.5rem 0 0;padding:0}.inventory-list li{break-inside:avoid;border-bottom:1px dotted var(--border);color:var(--text-muted);font-size:.72rem;line-height:1.42;padding:.34rem 0}.inventory-list code{color:var(--code-ink);display:block;font-size:.68rem;overflow-wrap:anywhere}.source-data{display:none}.mobile-jump{display:none}
+    @media(max-width:860px){.chapter-sidebar{display:none}.mobile-jump{display:block}.idea-grid,.failure-grid{grid-template-columns:1fr}.inventory-list{columns:1}}@media(max-width:620px){.planes{grid-template-columns:1fr}details.file-card>summary{grid-template-columns:auto minmax(0,1fr)}.file-role{display:none}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to lesson</a>
+  <header class="site-bar"><div class="site-bar__inner"><a class="site-bar__brand" href="../index.html">Agentic Engineer</a><span class="site-bar__crumb">Code companion · TAC-8</span><a class="site-bar__title" href="../vol-1-tac/08-the-agentic-layer.html">← Chapter</a></div></header>
+  <div class="chapter-layout">
+    <aside class="chapter-sidebar" aria-label="Lesson sections">
+      <div class="nav-kicker">Start here</div><ul><li><a href="#hook">The hook</a></li><li><a href="#map">Map of the repo</a></li><li><a href="#tree">File tree</a></li><li><a href="#thesis">Six design moves</a></li></ul>
+      <div class="nav-kicker">Walk the code</div><ul><li><a href="#app1">1 · Primitives</a></li><li><a href="#app2">2 · Multi-agent queue</a></li><li><a href="#app3">3 · Observability</a></li><li><a href="#app4">4 · Prototyping</a></li><li><a href="#app5">5 · Production + AEA</a></li><li><a href="#ledger">Every file</a></li></ul>
+      <div class="nav-kicker">Put it together</div><ul><li><a href="#run">End-to-end run</a></li><li><a href="#fails">Common failures</a></li><li><a href="#lab">You try</a></li><li><a href="#teach-back">Teach-back</a></li></ul>
+    </aside>
+    <main id="main" class="lesson">
+      <div class="measure">
+        <header class="lesson-head">
+          <span class="eyebrow">TAC-8 · Code deep dive</span><h1>The Agentic Layer</h1>
+          <p class="dek">Dan does not hide autonomy inside a clever prompt. He builds a control layer around ordinary applications: prompt contracts, typed decisions, durable state, isolated worktrees, event receipts, and human-visible queues.</p>
+          <div class="meta-row"><span class="meta-chip">5 evolutionary apps</span><span class="meta-chip">410 files inspected</span><span class="meta-chip">89,030 text lines</span><span class="meta-chip">Python · TypeScript · Vue · shell</span><span class="meta-chip">Beginner path: ~45 min</span></div>
+        </header>
+        <details class="mobile-jump"><summary>Jump around</summary><a href="#map">Map</a> · <a href="#app1">Primitives</a> · <a href="#app3">Observability</a> · <a href="#app5">Production</a> · <a href="#ledger">Every file</a> · <a href="#lab">Lab</a></details>
+        <section id="hook">
+          <span class="section-label">Hook</span><h2>If the model is the engine, where is the car?</h2>
+          <div class="hook-card"><p class="big">A model can write code. It cannot, by itself, decide which task is eligible, prevent two workers taking the same job, create a safe workspace, remember what phase finished, publish evidence, or tell a human what happened.</p><p class="answer"><strong>Dan’s answer:</strong> those responsibilities belong to an <em>agentic layer</em> around the application. The model is one replaceable worker inside that layer—not the layer itself.</p></div>
+          <p class="lede">TAC-8 is best read as five versions of the same idea. Each app keeps the earlier mechanism and adds one missing system property: execution, concurrency, visibility, human task routing, then production delivery and an embedded agent experience.</p>
+        </section>
+      </div>
+      <section id="map" class="wide">
+        <span class="section-label">Diagram first</span><h2>Map of the repo: one idea grows five times</h2>
+        <div class="repo-map" role="img" aria-label="Five apps evolve from primitives to production and embedded agents.">
+          <div class="evolution">
+            <div class="stage"><span class="step">APP 1 · EXECUTE</span><strong>Agent primitives</strong><span>Prompt contracts, CLI/SDK runners, receipts.</span></div>
+            <div class="stage"><span class="step">APP 2 · SCHEDULE</span><strong>Multi-agent ToDone</strong><span>Text queue, typed eligibility, worktrees, parallel workers.</span></div>
+            <div class="stage"><span class="step">APP 3 · OBSERVE</span><strong>Out-of-loop board</strong><span>Hooks, SQLite, WebSocket, Vue timeline.</span></div>
+            <div class="stage"><span class="step">APP 4 · ROUTE</span><strong>Agentic prototyping</strong><span>Notion control surface and specialized planners.</span></div>
+            <div class="stage"><span class="step">APP 5 · OPERATE</span><strong>Production + AEA</strong><span>Isolated SDLC plus resumable agent windows.</span></div>
+          </div>
+          <div class="planes"><div class="plane"><b>Control plane</b>Triggers, eligibility, state, retries, worktrees, ports, git.</div><div class="plane"><b>Worker plane</b>Claude Code processes receive narrow contracts and return artifacts.</div><div class="plane"><b>Evidence plane</b>Specs, JSONL, logs, SQLite, screenshots, commits, PR comments, docs.</div></div>
+          <p class="map-caption">The application remains ordinary code. The agentic layer decides <em>when, where, and under what contract</em> an agent may change it—and what evidence survives.</p>
+        </div>
+      </section>
+      <div class="measure">
+        <section id="tree">
+          <span class="section-label">Orient yourself</span><h2>File tree with jump links</h2>
+          <div class="tree"><span class="folder">tac/tac-8/</span>
+├── <a href="#app1"><span class="folder">tac8_app1__agent_layer_primitives/</span></a> <span class="dim"># prompts + one-agent runners</span>
+│   ├── .claude/commands/  <span class="dim"># behavioral contracts</span>
+│   ├── adws/              <span class="dim"># CLI/SDK orchestration</span>
+│   └── specs/             <span class="dim"># planning receipts</span>
+├── <a href="#app2"><span class="folder">tac8_app2__multi_agent_todone/</span></a> <span class="dim"># queue + concurrency</span>
+│   ├── tasks.md           <span class="dim"># human-readable state machine</span>
+│   └── apps/sentiment_classification/
+├── <a href="#app3"><span class="folder">tac8_app3__out_loop_multi_agent_task_board/</span></a>
+│   ├── .claude/hooks/     <span class="dim"># lifecycle producers</span>
+│   ├── apps/server/       <span class="dim"># Bun + SQLite + WebSocket</span>
+│   ├── apps/client/       <span class="dim"># Vue observer</span>
+│   └── logs/              <span class="dim"># real receipts</span>
+├── <a href="#app4"><span class="folder">tac8_app4__agentic_prototyping/</span></a>
+│   ├── .claude/commands/  <span class="dim"># Notion + prototype contracts</span>
+│   ├── adws/              <span class="dim"># claim, route, run, update</span>
+│   └── ai_docs/           <span class="dim"># prototype context</span>
+└── <a href="#app5"><span class="folder">tac8_app5__nlq_to_sql_aea/</span></a>
+    ├── adws/              <span class="dim"># isolated SDLC + AEA</span>
+    ├── app/client/        <span class="dim"># NLQ UI + agent windows</span>
+    ├── app/server/        <span class="dim"># FastAPI + SQL safety</span>
+    ├── app_docs/          <span class="dim"># generated evidence</span>
+    └── specs/             <span class="dim"># issue plans</span></div>
+          <p class="small muted">Read the apps in order. Repeated files are intentional runnable snapshots, not accidental duplicates.</p>
+        </section>
+        <section id="thesis">
+          <span class="section-label">The design in plain English</span><h2>Six moves Dan repeats</h2>
+          <div class="idea-grid">
+            <article class="idea-card"><span class="number">01</span><h3>Prompts are interfaces</h3><p>Inputs, constraints, output shape, and evidence live in slash-command files.</p></article>
+            <article class="idea-card"><span class="number">02</span><h3>State leaves the chat</h3><p>Task marks, specs, JSON, SQLite, branches, and state files carry truth.</p></article>
+            <article class="idea-card"><span class="number">03</span><h3>Isolation enables parallelism</h3><p>Unique worktrees and ports stop concurrent workers sharing a world.</p></article>
+            <article class="idea-card"><span class="number">04</span><h3>Claim before work</h3><p>Status changes make ownership visible before a long phase begins.</p></article>
+            <article class="idea-card"><span class="number">05</span><h3>Events are product data</h3><p>Hooks are validated, stored, streamed, filtered, and visualized.</p></article>
+            <article class="idea-card"><span class="number">06</span><h3>Autonomy has levels</h3><p>Human review, SDLC, and zero-touch merge are separate workflows.</p></article>
+          </div>
+        </section>
+        <section id="app1">
+          <span class="section-label">Walk the code · app 1</span><h2>Start with the smallest useful layer</h2>
+          <p>App 1 needs only an application, slash-command contracts, a programmatic runner, and durable outputs. That turns “ask Claude” into a repeatable workflow.</p>
+          <details class="file-card" open><summary><span class="file-title"><code>.claude/commands/*.md</code><small>The stable interface the model must obey.</small></span><span class="file-role">contract</span></summary><div class="file-body">
+            <p><code>chore.md</code> and <code>feature.md</code> require a plan file and exact returned path. <code>implement.md</code> consumes it. <code>prime.md</code> inspects tracked files; <code>start.md</code> starts both toy apps. The prompts are more structured than the one-line applications because the wrapper is the lesson.</p>
+            <div class="callout warning"><strong>A spec is not the checkout</strong><p>The specs propose <code>apps/server.py</code>, but it does not exist. The real application files are only <code>apps/main.py</code> and <code>apps/main.ts</code>.</p></div>
+          </div></details>
+          <details class="file-card" open><summary><span class="file-title"><code>adws/adw_modules/agent.py</code><small>Crosses from deterministic Python to probabilistic work.</small></span><span class="file-role">core seam</span></summary><div class="file-body">
+            <div class="code-wrap"><div class="code-label"><span>agent.py</span><span>lines 590–628</span></div><pre><code class="language-python">def execute_template(request: AgentTemplateRequest) -&gt; AgentPromptResponse:
+    prompt_parts = [request.slash_command]
+    prompt_parts.extend(request.args)
+    prompt = " ".join(prompt_parts)
+
+    output_dir = os.path.join(
+        "agents", request.adw_id, request.agent_name
+    )
+    output_file = os.path.join(output_dir, "cc_raw_output.jsonl")
+
+    prompt_request = AgentPromptRequest(
+        prompt=prompt,
+        adw_id=request.adw_id,
+        agent_name=request.agent_name,
+        model=request.model,
+        dangerously_skip_permissions=True,
+        output_file=output_file,
+        working_dir=request.working_dir,
+    )
+    return prompt_claude_code_with_retry(prompt_request)</code></pre></div>
+            <ol class="annotation-list"><li><span>One slash command plus arguments is the agent-facing API.</span></li><li><span>Every role gets a receipt directory under runtime-created <code>agents/{adw_id}/{agent_name}/</code>.</span></li><li><span>Stream JSON is saved raw and normalized for debugging.</span></li><li><span>Typed retry codes separate transient failure from bad input.</span></li></ol>
+            <div class="callout warning"><strong>High-trust execution</strong><p>The runner adds <code>--dangerously-skip-permissions</code>. Narrow prompts, working directories, environment allowlists, and receipts help, but the authority remains substantial.</p></div>
+          </div></details>
+          <details class="file-card"><summary><span class="file-title"><code>adw_chore_implement.py</code> + CLI/SDK runners<small>Compose plan → implement and show alternate transports.</small></span><span class="file-role">orchestration</span></summary><div class="file-body"><p>The composed script extracts the planner’s spec path, then starts a builder. <code>adw_prompt.py</code> and <code>adw_slash_command.py</code> are CLI gateways. <code>agent_sdk.py</code> and <code>adw_sdk_prompt.py</code> show tool-enabled, async, interactive, and resumable SDK calls. Transport can change while the prompt contract stays recognizable.</p></div></details>
+        </section>
+        <section id="app2">
+          <span class="section-label">Walk the code · app 2</span><h2>Add a queue, then earn concurrency</h2>
+          <p>App 2 promotes Markdown into a task state machine. A cron loop groups eligible tasks, claims them, creates sparse worktrees, and launches independent workflows in parallel.</p>
+          <details class="file-card" open><summary><span class="file-title"><code>tasks.md</code> + <code>data_models.py</code><small>Human-readable outside; typed invariants inside.</small></span><span class="file-role">state model</span></summary><div class="file-body">
+            <div class="table-scroll"><table class="contract-table"><thead><tr><th>Mark</th><th>Meaning</th><th>Consequence</th></tr></thead><tbody><tr><td>[]</td><td>Pending</td><td>Eligible when the group is unblocked.</td></tr><tr><td>[⏰]</td><td>Waiting</td><td>Requires successful tasks above.</td></tr><tr><td>[🟡, id]</td><td>In progress</td><td>Claimed; skip duplicate pickup.</td></tr><tr><td>[✅ hash, id]</td><td>Done</td><td>Records commit and run.</td></tr><tr><td>[❌, id]</td><td>Failed</td><td>Preserves run and failure note.</td></tr></tbody></table></div>
+            <p><code>Task.is_eligible_for_pickup()</code> and <code>WorktreeTaskGroup.get_eligible_tasks()</code> move rules from prose into Pydantic-backed methods. <code>/process_tasks</code> interprets Markdown; Python validates its JSON before scheduling.</p>
+          </div></details>
+          <details class="file-card" open><summary><span class="file-title"><code>adw_trigger_cron_todone.py</code><small>Poll → decide → claim → isolate → launch.</small></span><span class="file-role">scheduler</span></summary><div class="file-body">
+            <ol class="flow-list"><li><div class="flow-copy"><strong>Precheck.</strong><p>A regex avoids an agent call when no pending marks exist.</p></div></li><li><div class="flow-copy"><strong>Structure.</strong><p><code>/process_tasks</code> returns strict JSON grouped by worktree and tag.</p></div></li><li><div class="flow-copy"><strong>Claim.</strong><p><code>/mark_in_progress</code> writes the ADW ID before launch.</p></div></li><li><div class="flow-copy"><strong>Isolate.</strong><p><code>/init_worktree</code> creates a sparse <code>trees/&lt;name&gt;</code>.</p></div></li><li><div class="flow-copy"><strong>Route.</strong><p>The tag chooses direct build or plan→implement; <code>Popen</code> runs groups concurrently.</p></div></li></ol>
+            <p>The sentiment directory is the workload agents can change. Its notebook, 499-row dataset, metadata, and lockfile are product context—not scheduler logic.</p>
+          </div></details>
+        </section>
+        <section id="app3">
+          <span class="section-label">Walk the code · app 3</span><h2>Move the human out of the loop—but not out of sight</h2>
+          <p>Concurrency makes the terminal a poor control surface. App 3 adds an evidence pipeline beside execution.</p>
+          <details class="file-card" open><summary><span class="file-title"><code>.claude/settings.json</code> + <code>.claude/hooks/</code><small>Lifecycle becomes structured events.</small></span><span class="file-role">event source</span></summary><div class="file-body">
+            <p>Settings bind PreToolUse, PostToolUse, Notification, Stop, SubagentStop, and UserPromptSubmit to Python. They read stdin JSON, append session logs, optionally summarize/speak, and block obvious recursive deletion and <code>.env</code> access before tools run.</p>
+            <div class="callout warning"><strong>Source truth beats the picture</strong><p><code>send_event.py</code> can POST to the dashboard and the README describes it. But checked-in settings invoke local log hooks directly; they do not invoke <code>send_event.py</code>. Live forwarding is provided, not wired in this snapshot.</p></div>
+          </div></details>
+          <details class="file-card" open><summary><span class="file-title"><code>apps/server/src/index.ts</code> + <code>db.ts</code><small>Validate once, store once, broadcast once.</small></span><span class="file-role">event hub</span></summary><div class="file-body">
+            <div class="code-wrap"><div class="code-label"><span>apps/server/src/index.ts</span><span>lines 39–62</span></div><pre><code class="language-typescript">if (url.pathname === '/events' &amp;&amp; req.method === 'POST') {
+  const event = await req.json() as HookEvent;
+  if (!event.source_app || !event.session_id ||
+      !event.hook_event_type || !event.payload) {
+    return new Response('Missing required fields', { status: 400 });
+  }
+  const savedEvent = insertEvent(event);
+  const message = JSON.stringify({ type: 'event', data: savedEvent });
+  wsClients.forEach(client =&gt; client.send(message));
+  return Response.json(savedEvent);
+}</code></pre></div>
+            <p><code>db.ts</code> uses SQLite WAL, event/theme tables, indexes, filter queries, and chronological recent events. <code>index.ts</code> owns HTTP, theme APIs, WebSocket upgrades, initial history, and live broadcasts.</p>
+          </div></details>
+          <details class="file-card"><summary><span class="file-title"><code>apps/client/src/</code> + <code>logs/</code><small>A scannable observer backed by concrete receipts.</small></span><span class="file-role">observer UI</span></summary><div class="file-body"><p><code>App.vue</code> composes connection, filters, chart, timeline, transcript modal, and themes. <code>useWebSocket.ts</code> reconnects and caps events; <code>useChartData.ts</code> buckets volume; <code>chartRenderer.ts</code> paints the canvas. Session logs are real prompt/tool/notification/stop/transcript receipts. The GIF, MP4, and PNG teach the same flow visually.</p></div></details>
+        </section>
+        <section id="app4">
+          <span class="section-label">Walk the code · app 4</span><h2>Make the board a human–agent protocol</h2>
+          <p>App 4 swaps <code>tasks.md</code> for Notion and adds prototype tags. Humans create/review/continue familiar database rows; the layer translates each into a specialized workflow.</p>
+          <details class="file-card" open><summary><span class="file-title"><code>NotionTask</code> in <code>data_models.py</code><small>Eligibility is a domain rule, not a prompt hunch.</small></span><span class="file-role">typed contract</span></summary><div class="file-body">
+            <p>A task is eligible only when status is Not started or HIL Review and the execution trigger is <code>execute</code> or begins with <code>continue</code>. It also carries model preference, workflow tags, page ID, and optional prototype type.</p>
+            <div class="table-scroll"><table class="contract-table"><thead><tr><th>Tag</th><th>Command</th><th>Shape</th></tr></thead><tbody><tr><td>uv_script</td><td>/plan_uv_script</td><td>Single Python script with inline dependencies.</td></tr><tr><td>vite_vue</td><td>/plan_vite_vue</td><td>Vite + Vue browser prototype.</td></tr><tr><td>bun_scripts</td><td>/plan_bun_scripts</td><td>Bun script or service.</td></tr><tr><td>uv_mcp</td><td>/plan_uv_mcp</td><td>Python MCP server.</td></tr></tbody></table></div>
+          </div></details>
+          <details class="file-card" open><summary><span class="file-title"><code>adw_trigger_cron_notion_tasks.py</code><small>Poll, claim visibly, then detach.</small></span><span class="file-role">human routing</span></summary><div class="file-body">
+            <p><code>/get_notion_tasks</code> uses Notion MCP and returns strict JSON. The trigger creates a safe worktree name, updates the page to In progress with ADW ID, chooses build or plan→implement, adds <code>--prototype</code>, and uses <code>Popen(..., start_new_session=True)</code>.</p>
+            <p>Prototype planners use the large <code>ai_docs/</code> references for uv, Vite, Bun, and MCP. <code>deep_specs/</code> is a historical design artifact.</p>
+            <div class="callout warning"><strong>Sample config is not runtime config</strong><p>The checkout has <code>.mcp.sample.json</code>, not <code>.mcp.json</code>. Copy/configure it before Notion can work.</p></div>
+          </div></details>
+        </section>
+        <section id="app5">
+          <span class="section-label">Walk the code · app 5</span><h2>Production delivery outside; resumable agents inside</h2>
+          <p>App 5 combines a natural-language SQL product, an isolated GitHub-to-PR layer, and an Agent Embedded Application. Separate those boundaries before reading details.</p>
+          <details class="file-card" open><summary><span class="file-title"><code>state.py</code> + <code>worktree_ops.py</code><small>Stop, restart, and find the same isolated world.</small></span><span class="file-role">durable state</span></summary><div class="file-body">
+            <div class="code-wrap"><div class="code-label"><span>state.py</span><span>lines 34–40</span></div><pre><code class="language-python">def update(self, **kwargs):
+    core_fields = {
+        "adw_id", "issue_number", "branch_name", "plan_file",
+        "issue_class", "worktree_path", "backend_port",
+        "frontend_port", "model_set", "all_adws"
+    }
+    for key, value in kwargs.items():
+        if key in core_fields:
+            self.data[key] = value</code></pre></div>
+            <p>State validates and writes runtime <code>agents/{adw_id}/adw_state.json</code>. Planning creates <code>trees/{adw_id}/</code>, maps IDs into backend ports 9100–9114 and frontend ports 9200–9214, finds fallbacks, and writes the isolated environment. Later phases load the same pointers.</p>
+          </div></details>
+          <details class="file-card" open><summary><span class="file-title"><code>adw_sdlc_iso.py</code> + <code>adw_sdlc_zte_iso.py</code><small>Autonomy level is explicit composition.</small></span><span class="file-role">workflow</span></summary><div class="file-body">
+            <p>Standard SDLC runs plan → build → test → review → document. It warns and continues after test failure but fails fast on plan/build/review/docs. ZTE stops on test/review failure, tolerates docs failure, then invokes <code>adw_ship_iso.py</code> to approve and merge. The risk lives in a separate executable.</p>
+            <p><code>workflow_ops.py</code> owns classify/plan/build/branch/commit/PR/patch logic. <code>git_ops.py</code>, <code>github.py</code>, <code>r2_uploader.py</code>, and <code>worktree_ops.py</code> isolate side effects. Cron and webhook translate GitHub activity into named workflows.</p>
+          </div></details>
+          <details class="file-card" open><summary><span class="file-title"><code>adw_trigger_aea_server.py</code> + <code>adw_aea_patch.py</code><small>A conversational agent inside the app.</small></span><span class="file-role">AEA boundary</span></summary><div class="file-body">
+            <ol class="flow-list"><li><div class="flow-copy"><strong>Create.</strong><p>POST <code>/aea/new_agent</code> stores a SQLite row and generates a name.</p></div></li><li><div class="flow-copy"><strong>Prompt.</strong><p>The server changes idle → working, appends the user message, and starts the patch worker.</p></div></li><li><div class="flow-copy"><strong>Resume.</strong><p>The worker adds <code>--resume</code> when <code>cc_session_id</code> exists and saves first-turn IDs.</p></div></li><li><div class="flow-copy"><strong>Poll.</strong><p>Each window fingerprints meaningful fields and adapts its interval by state.</p></div></li><li><div class="flow-copy"><strong>Restore/archive.</strong><p>Refresh restores non-archived IDs; close terminates work and archives the row.</p></div></li></ol>
+            <div class="callout success"><strong>Two context strategies</strong><p>Delivery phases hand off artifacts and benefit from fresh judgment. Interactive AEA chat needs dialogue continuity. App 5 starts a fresh OS process per prompt while intentionally resuming the Claude session inside it.</p></div>
+          </div></details>
+          <details class="file-card"><summary><span class="file-title"><code>app/server/</code> + <code>app/client/</code><small>The ordinary product the layer operates around.</small></span><span class="file-role">application</span></summary><div class="file-body">
+            <p>FastAPI accepts CSV/JSON/JSONL, flattens into SQLite, exposes schema, asks OpenAI or Anthropic for SQL, validates and executes it, generates insights/random queries/data, and exports CSV/JSON. <code>sql_security.py</code> centralizes safeguards; tests cover ingestion, providers, queries, exports, generation, and injection.</p>
+            <p>The TypeScript client renders product flows. <code>AEADevConsole</code> opens with Cmd/Ctrl+P; window, chat, and polling classes layer draggable agents over the app. The backup database has 20 users and 32 products.</p>
+          </div></details>
+        </section>
+      </div>
+      <section id="ledger" class="wide">
+        <span class="section-label">Audit trail</span><h2>Every real file and its job</h2>
+        <p class="measure">All 410 non-cache files appear below. Repeated snapshots remain separate. Expand only the app you are studying.</p>
+        <details class="file-card"><summary><span class="file-title"><code>tac8_app1__agent_layer_primitives/</code><small>Prompt and runner primitives.</small></span><span class="file-role">19 files</span></summary><div class="file-body"><ul class="inventory-list" id="list-app1">
+<li><code>.claude/commands/chore.md</code>Slash-command contract for chore.</li>
+<li><code>.claude/commands/feature.md</code>Slash-command contract for feature.</li>
+<li><code>.claude/commands/implement.md</code>Slash-command contract for implement.</li>
+<li><code>.claude/commands/prime.md</code>Slash-command contract for prime.</li>
+<li><code>.claude/commands/start.md</code>Slash-command contract for start.</li>
+<li><code>.env.sample</code>Copyable environment template; no runtime secret.</li>
+<li><code>.gitignore</code>Excludes secrets, dependencies, logs, databases, and generated output.</li>
+<li><code>README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>adws/README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>adws/adw_chore_implement.py</code>Executable ADW phase or workflow composition: chore implement.</li>
+<li><code>adws/adw_modules/agent.py</code>Runs Claude Code, parses stream JSON, retries, and saves receipts.</li>
+<li><code>adws/adw_modules/agent_sdk.py</code>Demonstrates programmatic Claude SDK execution styles.</li>
+<li><code>adws/adw_prompt.py</code>Executable ADW phase or workflow composition: prompt.</li>
+<li><code>adws/adw_sdk_prompt.py</code>Executable ADW phase or workflow composition: sdk prompt.</li>
+<li><code>adws/adw_slash_command.py</code>Executable ADW phase or workflow composition: slash command.</li>
+<li><code>apps/main.py</code>Small application entry or support source: main.</li>
+<li><code>apps/main.ts</code>Small application entry or support source: main.</li>
+<li><code>specs/chore-580d3737-add-health-check-endpoint.md</code>Historical implementation plan: chore 580d3737 add health check endpoint.</li>
+<li><code>specs/chore-8faf73eb-minimal-fastapi-server.md</code>Historical implementation plan: chore 8faf73eb minimal fastapi server.</li>
+</ul></div></details>
+        <details class="file-card"><summary><span class="file-title"><code>tac8_app2__multi_agent_todone/</code><small>Queue, worktrees, and sentiment workload.</small></span><span class="file-role">33 files</span></summary><div class="file-body"><ul class="inventory-list" id="list-app2">
+<li><code>.claude/commands/build.md</code>Slash-command contract for build.</li>
+<li><code>.claude/commands/chore.md</code>Slash-command contract for chore.</li>
+<li><code>.claude/commands/clean_worktree.md</code>Slash-command contract for clean worktree.</li>
+<li><code>.claude/commands/feature.md</code>Slash-command contract for feature.</li>
+<li><code>.claude/commands/implement.md</code>Slash-command contract for implement.</li>
+<li><code>.claude/commands/init_worktree.md</code>Slash-command contract for init worktree.</li>
+<li><code>.claude/commands/mark_in_progress.md</code>Slash-command contract for mark in progress.</li>
+<li><code>.claude/commands/plan.md</code>Slash-command contract for plan.</li>
+<li><code>.claude/commands/prime.md</code>Slash-command contract for prime.</li>
+<li><code>.claude/commands/process_tasks.md</code>Slash-command contract for process tasks.</li>
+<li><code>.claude/commands/update_task.md</code>Slash-command contract for update task.</li>
+<li><code>.env.sample</code>Copyable environment template; no runtime secret.</li>
+<li><code>.gitignore</code>Excludes secrets, dependencies, logs, databases, and generated output.</li>
+<li><code>README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>adws/README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>adws/adw_build_update_task.py</code>Executable ADW phase or workflow composition: build update task.</li>
+<li><code>adws/adw_chore_implement.py</code>Executable ADW phase or workflow composition: chore implement.</li>
+<li><code>adws/adw_modules/agent.py</code>Runs Claude Code, parses stream JSON, retries, and saves receipts.</li>
+<li><code>adws/adw_modules/data_models.py</code>Typed task, worktree, trigger, and Notion domain models.</li>
+<li><code>adws/adw_modules/utils.py</code>IDs, logs, JSON cleanup, status formatting, and safe child environments.</li>
+<li><code>adws/adw_plan_implement_update_task.py</code>Executable ADW phase or workflow composition: plan implement update task.</li>
+<li><code>adws/adw_prompt.py</code>Executable ADW phase or workflow composition: prompt.</li>
+<li><code>adws/adw_slash_command.py</code>Executable ADW phase or workflow composition: slash command.</li>
+<li><code>adws/adw_triggers/adw_trigger_cron_todone.py</code>External trigger service for trigger cron todone.</li>
+<li><code>apps/sentiment_classification/.python-version</code>Sentiment workload source, docs, or project metadata.</li>
+<li><code>apps/sentiment_classification/README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>apps/sentiment_classification/data/tweets_v1.csv</code>Sentiment-classification workload dataset.</li>
+<li><code>apps/sentiment_classification/main.py</code>Sentiment workload source, docs, or project metadata.</li>
+<li><code>apps/sentiment_classification/notebooks/01_sentiment_classification_example.ipynb</code>Exploratory sentiment-classification notebook.</li>
+<li><code>apps/sentiment_classification/pyproject.toml</code>Sentiment workload source, docs, or project metadata.</li>
+<li><code>apps/sentiment_classification/uv.lock</code>Pinned workload dependency graph.</li>
+<li><code>specs/plan-adw01-multi-agent-task-list.md</code>Historical implementation plan: plan adw01 multi agent task list.</li>
+<li><code>tasks.md</code>Human-readable multi-agent queue and status state machine.</li>
+</ul></div></details>
+        <details class="file-card"><summary><span class="file-title"><code>tac8_app3__out_loop_multi_agent_task_board/</code><small>Hooks, server, observer UI, media, receipts.</small></span><span class="file-role">126 files</span></summary><div class="file-body"><ul class="inventory-list" id="list-app3">
+<li><code>.claude/commands/build.md</code>Slash-command contract for build.</li>
+<li><code>.claude/commands/chore.md</code>Slash-command contract for chore.</li>
+<li><code>.claude/commands/clean_worktree.md</code>Slash-command contract for clean worktree.</li>
+<li><code>.claude/commands/convert_paths_absolute.md</code>Slash-command contract for convert paths absolute.</li>
+<li><code>.claude/commands/implement.md</code>Slash-command contract for implement.</li>
+<li><code>.claude/commands/init_worktree.md</code>Slash-command contract for init worktree.</li>
+<li><code>.claude/commands/plan.md</code>Slash-command contract for plan.</li>
+<li><code>.claude/commands/prime.md</code>Slash-command contract for prime.</li>
+<li><code>.claude/commands/start.md</code>Slash-command contract for start.</li>
+<li><code>.claude/hooks/notification.py</code>Claude lifecycle hook for notification events.</li>
+<li><code>.claude/hooks/post_tool_use.py</code>Claude lifecycle hook for post tool use events.</li>
+<li><code>.claude/hooks/pre_tool_use.py</code>Claude lifecycle hook for pre tool use events.</li>
+<li><code>.claude/hooks/send_event.py</code>Claude lifecycle hook for send event events.</li>
+<li><code>.claude/hooks/stop.py</code>Claude lifecycle hook for stop events.</li>
+<li><code>.claude/hooks/subagent_stop.py</code>Claude lifecycle hook for subagent stop events.</li>
+<li><code>.claude/hooks/user_prompt_submit.py</code>Claude lifecycle hook for user prompt submit events.</li>
+<li><code>.claude/hooks/utils/constants.py</code>Shared hook constant or summarization helper.</li>
+<li><code>.claude/hooks/utils/llm/anth.py</code>LLM provider adapter for hook-time summaries.</li>
+<li><code>.claude/hooks/utils/llm/oai.py</code>LLM provider adapter for hook-time summaries.</li>
+<li><code>.claude/hooks/utils/summarizer.py</code>Shared hook constant or summarization helper.</li>
+<li><code>.claude/hooks/utils/tts/elevenlabs_tts.py</code>Text-to-speech adapter for hook notifications.</li>
+<li><code>.claude/hooks/utils/tts/openai_tts.py</code>Text-to-speech adapter for hook notifications.</li>
+<li><code>.claude/hooks/utils/tts/pyttsx3_tts.py</code>Text-to-speech adapter for hook notifications.</li>
+<li><code>.claude/settings.json</code>Wires Claude lifecycle hooks to local commands.</li>
+<li><code>.env.sample</code>Copyable environment template; no runtime secret.</li>
+<li><code>.gitignore</code>Excludes secrets, dependencies, logs, databases, and generated output.</li>
+<li><code>README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>adws/README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>adws/adw_build_update_task.py</code>Executable ADW phase or workflow composition: build update task.</li>
+<li><code>adws/adw_chore_implement.py</code>Executable ADW phase or workflow composition: chore implement.</li>
+<li><code>adws/adw_modules/agent.py</code>Runs Claude Code, parses stream JSON, retries, and saves receipts.</li>
+<li><code>adws/adw_modules/data_models.py</code>Typed task, worktree, trigger, and Notion domain models.</li>
+<li><code>adws/adw_modules/utils.py</code>IDs, logs, JSON cleanup, status formatting, and safe child environments.</li>
+<li><code>adws/adw_plan_implement_update_task.py</code>Executable ADW phase or workflow composition: plan implement update task.</li>
+<li><code>adws/adw_prompt.py</code>Executable ADW phase or workflow composition: prompt.</li>
+<li><code>adws/adw_slash_command.py</code>Executable ADW phase or workflow composition: slash command.</li>
+<li><code>adws/adw_triggers/adw_trigger_cron_todone.py</code>External trigger service for trigger cron todone.</li>
+<li><code>ai_docs/README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>ai_docs/claude-code-hooks.md</code>Bundled agent reference context about claude code hooks.</li>
+<li><code>apps/client/.env.sample</code>Copyable environment template; no runtime secret.</li>
+<li><code>apps/client/.gitignore</code>Excludes secrets, dependencies, logs, databases, and generated output.</li>
+<li><code>apps/client/README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>apps/client/bun.lock</code>Pinned observer-UI dependency graph.</li>
+<li><code>apps/client/index.html</code>Observer UI config, package metadata, asset, or captured client event.</li>
+<li><code>apps/client/logs/8c8dfcc8-b41d-4b0d-a1dd-12d54be38ade/post_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>apps/client/logs/8c8dfcc8-b41d-4b0d-a1dd-12d54be38ade/pre_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>apps/client/package.json</code>Observer UI config, package metadata, asset, or captured client event.</li>
+<li><code>apps/client/postcss.config.js</code>Observer UI config, package metadata, asset, or captured client event.</li>
+<li><code>apps/client/public/vite.svg</code>Observer UI config, package metadata, asset, or captured client event.</li>
+<li><code>apps/client/src/App.vue</code>Vue observer entry, types, styling, asset, or chart utility.</li>
+<li><code>apps/client/src/assets/vue.svg</code>Vue observer entry, types, styling, asset, or chart utility.</li>
+<li><code>apps/client/src/components/ChatTranscript.vue</code>Vue observer component: ChatTranscript.</li>
+<li><code>apps/client/src/components/ChatTranscriptModal.vue</code>Vue observer component: ChatTranscriptModal.</li>
+<li><code>apps/client/src/components/EventRow.vue</code>Vue observer component: EventRow.</li>
+<li><code>apps/client/src/components/EventTimeline.vue</code>Vue observer component: EventTimeline.</li>
+<li><code>apps/client/src/components/FilterPanel.vue</code>Vue observer component: FilterPanel.</li>
+<li><code>apps/client/src/components/HelloWorld.vue</code>Vue observer component: HelloWorld.</li>
+<li><code>apps/client/src/components/LivePulseChart.vue</code>Vue observer component: LivePulseChart.</li>
+<li><code>apps/client/src/components/StickScrollButton.vue</code>Vue observer component: StickScrollButton.</li>
+<li><code>apps/client/src/components/ThemeManager.vue</code>Vue observer component: ThemeManager.</li>
+<li><code>apps/client/src/components/ThemePreview.vue</code>Vue observer component: ThemePreview.</li>
+<li><code>apps/client/src/composables/useChartData.ts</code>Reusable Vue state or behavior for useChartData.</li>
+<li><code>apps/client/src/composables/useEventColors.ts</code>Reusable Vue state or behavior for useEventColors.</li>
+<li><code>apps/client/src/composables/useEventEmojis.ts</code>Reusable Vue state or behavior for useEventEmojis.</li>
+<li><code>apps/client/src/composables/useMediaQuery.ts</code>Reusable Vue state or behavior for useMediaQuery.</li>
+<li><code>apps/client/src/composables/useThemes.ts</code>Reusable Vue state or behavior for useThemes.</li>
+<li><code>apps/client/src/composables/useWebSocket.ts</code>Reusable Vue state or behavior for useWebSocket.</li>
+<li><code>apps/client/src/main.ts</code>Vue observer entry, types, styling, asset, or chart utility.</li>
+<li><code>apps/client/src/style.css</code>Vue observer entry, types, styling, asset, or chart utility.</li>
+<li><code>apps/client/src/styles/main.css</code>Vue observer entry, types, styling, asset, or chart utility.</li>
+<li><code>apps/client/src/styles/themes.css</code>Vue observer entry, types, styling, asset, or chart utility.</li>
+<li><code>apps/client/src/types.ts</code>Vue observer entry, types, styling, asset, or chart utility.</li>
+<li><code>apps/client/src/types/theme.ts</code>Vue observer entry, types, styling, asset, or chart utility.</li>
+<li><code>apps/client/src/utils/chartRenderer.ts</code>Vue observer entry, types, styling, asset, or chart utility.</li>
+<li><code>apps/client/src/vite-env.d.ts</code>Vue observer entry, types, styling, asset, or chart utility.</li>
+<li><code>apps/client/tailwind.config.js</code>Observer UI config, package metadata, asset, or captured client event.</li>
+<li><code>apps/client/tsconfig.app.json</code>Observer UI config, package metadata, asset, or captured client event.</li>
+<li><code>apps/client/tsconfig.json</code>Observer UI config, package metadata, asset, or captured client event.</li>
+<li><code>apps/client/tsconfig.node.json</code>Observer UI config, package metadata, asset, or captured client event.</li>
+<li><code>apps/client/vite.config.ts</code>Observer UI config, package metadata, asset, or captured client event.</li>
+<li><code>apps/server/.gitignore</code>Excludes secrets, dependencies, logs, databases, and generated output.</li>
+<li><code>apps/server/CLAUDE.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>apps/server/README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>apps/server/bun.lock</code>Pinned observability-server dependency graph.</li>
+<li><code>apps/server/index.ts</code>Bun server package metadata, docs, entry, or config.</li>
+<li><code>apps/server/package.json</code>Bun server package metadata, docs, entry, or config.</li>
+<li><code>apps/server/src/db.ts</code>SQLite event and theme persistence and queries.</li>
+<li><code>apps/server/src/index.ts</code>Bun HTTP and WebSocket event hub.</li>
+<li><code>apps/server/src/theme.ts</code>Theme validation, CRUD, search, import, and export.</li>
+<li><code>apps/server/src/types.ts</code>Event and theme TypeScript contracts.</li>
+<li><code>apps/server/tsconfig.json</code>Bun server package metadata, docs, entry, or config.</li>
+<li><code>images/AgentDataFlowV2.gif</code>Course visual demonstrating the observability pipeline.</li>
+<li><code>images/AgentDataFlowV2_compressed.mp4</code>Course visual demonstrating the observability pipeline.</li>
+<li><code>images/app.png</code>Course visual demonstrating the observability pipeline.</li>
+<li><code>logs/636b34a3-f6ff-419c-bb73-3f1080e8cc0a/chat.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/636b34a3-f6ff-419c-bb73-3f1080e8cc0a/post_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/636b34a3-f6ff-419c-bb73-3f1080e8cc0a/pre_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/636b34a3-f6ff-419c-bb73-3f1080e8cc0a/stop.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/636b34a3-f6ff-419c-bb73-3f1080e8cc0a/user_prompt_submit.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/6e8ce35e-464f-42f9-91ba-ba3f94d4e1ec/chat.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/6e8ce35e-464f-42f9-91ba-ba3f94d4e1ec/post_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/6e8ce35e-464f-42f9-91ba-ba3f94d4e1ec/pre_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/6e8ce35e-464f-42f9-91ba-ba3f94d4e1ec/stop.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/6e8ce35e-464f-42f9-91ba-ba3f94d4e1ec/user_prompt_submit.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/8c8dfcc8-b41d-4b0d-a1dd-12d54be38ade/chat.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/8c8dfcc8-b41d-4b0d-a1dd-12d54be38ade/notification.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/8c8dfcc8-b41d-4b0d-a1dd-12d54be38ade/post_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/8c8dfcc8-b41d-4b0d-a1dd-12d54be38ade/pre_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/8c8dfcc8-b41d-4b0d-a1dd-12d54be38ade/stop.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/8c8dfcc8-b41d-4b0d-a1dd-12d54be38ade/user_prompt_submit.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/a5f3377e-9cff-4c4d-8921-422b9a31f4b3/chat.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/a5f3377e-9cff-4c4d-8921-422b9a31f4b3/post_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/a5f3377e-9cff-4c4d-8921-422b9a31f4b3/pre_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/a5f3377e-9cff-4c4d-8921-422b9a31f4b3/stop.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/a5f3377e-9cff-4c4d-8921-422b9a31f4b3/user_prompt_submit.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/afaeecd1-3d3a-45ea-add4-3cf3a8bf195c/post_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/afaeecd1-3d3a-45ea-add4-3cf3a8bf195c/pre_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/afaeecd1-3d3a-45ea-add4-3cf3a8bf195c/user_prompt_submit.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/ed471d99-5645-4f0d-98c9-6f6fcc9427be/post_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/ed471d99-5645-4f0d-98c9-6f6fcc9427be/pre_tool_use.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/ed471d99-5645-4f0d-98c9-6f6fcc9427be/subagent_stop.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>logs/ed471d99-5645-4f0d-98c9-6f6fcc9427be/user_prompt_submit.json</code>Recorded hook event or transcript receipt from a real session.</li>
+<li><code>scripts/reset-system.sh</code>Local operations script for reset system.</li>
+<li><code>scripts/start-system.sh</code>Local operations script for start system.</li>
+<li><code>scripts/test-system.sh</code>Local operations script for test system.</li>
+<li><code>specs/chore-9b3dbf97-replace-bun-with-npm.md</code>Historical implementation plan: chore 9b3dbf97 replace bun with npm.</li>
+</ul></div></details>
+        <details class="file-card"><summary><span class="file-title"><code>tac8_app4__agentic_prototyping/</code><small>Notion routing, prototype contracts, references.</small></span><span class="file-role">52 files</span></summary><div class="file-body"><ul class="inventory-list" id="list-app4">
+<li><code>.claude/commands/build.md</code>Slash-command contract for build.</li>
+<li><code>.claude/commands/clean_worktree.md</code>Slash-command contract for clean worktree.</li>
+<li><code>.claude/commands/get_notion_tasks.md</code>Slash-command contract for get notion tasks.</li>
+<li><code>.claude/commands/hi.md</code>Slash-command contract for hi.</li>
+<li><code>.claude/commands/init_worktree.md</code>Slash-command contract for init worktree.</li>
+<li><code>.claude/commands/make_worktree_name.md</code>Slash-command contract for make worktree name.</li>
+<li><code>.claude/commands/plan.md</code>Slash-command contract for plan.</li>
+<li><code>.claude/commands/plan_bun_scripts.md</code>Slash-command contract for plan bun scripts.</li>
+<li><code>.claude/commands/plan_uv_mcp.md</code>Slash-command contract for plan uv mcp.</li>
+<li><code>.claude/commands/plan_uv_script.md</code>Slash-command contract for plan uv script.</li>
+<li><code>.claude/commands/plan_vite_vue.md</code>Slash-command contract for plan vite vue.</li>
+<li><code>.claude/commands/prime.md</code>Slash-command contract for prime.</li>
+<li><code>.claude/commands/update_notion_task.md</code>Slash-command contract for update notion task.</li>
+<li><code>.claude/commands/update_notion_task_with_file.md</code>Slash-command contract for update notion task with file.</li>
+<li><code>.claude/hooks/notification.py</code>Claude lifecycle hook for notification events.</li>
+<li><code>.claude/hooks/post_tool_use.py</code>Claude lifecycle hook for post tool use events.</li>
+<li><code>.claude/hooks/pre_compact.py</code>Claude lifecycle hook for pre compact events.</li>
+<li><code>.claude/hooks/pre_tool_use.py</code>Claude lifecycle hook for pre tool use events.</li>
+<li><code>.claude/hooks/send_event.py</code>Claude lifecycle hook for send event events.</li>
+<li><code>.claude/hooks/session_start.py</code>Claude lifecycle hook for session start events.</li>
+<li><code>.claude/hooks/stop.py</code>Claude lifecycle hook for stop events.</li>
+<li><code>.claude/hooks/subagent_stop.py</code>Claude lifecycle hook for subagent stop events.</li>
+<li><code>.claude/hooks/user_prompt_submit.py</code>Claude lifecycle hook for user prompt submit events.</li>
+<li><code>.claude/hooks/utils/constants.py</code>Shared hook constant or summarization helper.</li>
+<li><code>.claude/hooks/utils/llm/anth.py</code>LLM provider adapter for hook-time summaries.</li>
+<li><code>.claude/hooks/utils/llm/oai.py</code>LLM provider adapter for hook-time summaries.</li>
+<li><code>.claude/hooks/utils/summarizer.py</code>Shared hook constant or summarization helper.</li>
+<li><code>.claude/hooks/utils/tts/elevenlabs_tts.py</code>Text-to-speech adapter for hook notifications.</li>
+<li><code>.claude/hooks/utils/tts/openai_tts.py</code>Text-to-speech adapter for hook notifications.</li>
+<li><code>.claude/hooks/utils/tts/pyttsx3_tts.py</code>Text-to-speech adapter for hook notifications.</li>
+<li><code>.claude/settings.json</code>Wires Claude lifecycle hooks to local commands.</li>
+<li><code>.env.sample</code>Copyable environment template; no runtime secret.</li>
+<li><code>.gitignore</code>Excludes secrets, dependencies, logs, databases, and generated output.</li>
+<li><code>.mcp.sample.json</code>MCP or browser-tool configuration used by agent workflows.</li>
+<li><code>README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>adws/adw_build_update_notion_task.py</code>Executable ADW phase or workflow composition: build update notion task.</li>
+<li><code>adws/adw_modules/agent.py</code>Runs Claude Code, parses stream JSON, retries, and saves receipts.</li>
+<li><code>adws/adw_modules/data_models.py</code>Typed task, worktree, trigger, and Notion domain models.</li>
+<li><code>adws/adw_modules/utils.py</code>IDs, logs, JSON cleanup, status formatting, and safe child environments.</li>
+<li><code>adws/adw_plan_implement_update_notion_task.py</code>Executable ADW phase or workflow composition: plan implement update notion task.</li>
+<li><code>adws/adw_prompt.py</code>Executable ADW phase or workflow composition: prompt.</li>
+<li><code>adws/adw_slash_command.py</code>Executable ADW phase or workflow composition: slash command.</li>
+<li><code>adws/adw_triggers/adw_trigger_cron_notion_tasks.py</code>External trigger service for trigger cron notion tasks.</li>
+<li><code>ai_docs/app2_repomix.xml</code>Bundled agent reference context about app2 repomix.</li>
+<li><code>ai_docs/bun.md</code>Bundled agent reference context about bun.</li>
+<li><code>ai_docs/just-prompt_uv_app_repomix.xml</code>Bundled agent reference context about just prompt uv app repomix.</li>
+<li><code>ai_docs/mcp-python-sdk.md</code>Bundled agent reference context about mcp python sdk.</li>
+<li><code>ai_docs/uv-scripts.md</code>Bundled agent reference context about uv scripts.</li>
+<li><code>ai_docs/vite-guide.md</code>Bundled agent reference context about vite guide.</li>
+<li><code>deep_specs/init-notion-multi-agent.md</code>Historical implementation plan: init notion multi agent.</li>
+<li><code>scripts/kill_notion_cron.sh</code>Local operations script for kill notion cron.</li>
+<li><code>scripts/prune_worktrees.sh</code>Local operations script for prune worktrees.</li>
+</ul></div></details>
+        <details class="file-card"><summary><span class="file-title"><code>tac8_app5__nlq_to_sql_aea/</code><small>Delivery, AEA, NLQ product, tests, docs, fixtures.</small></span><span class="file-role">180 files</span></summary><div class="file-body"><ul class="inventory-list" id="list-app5">
+<li><code>.claude/commands/bug.md</code>Slash-command contract for bug.</li>
+<li><code>.claude/commands/chore.md</code>Slash-command contract for chore.</li>
+<li><code>.claude/commands/classify_adw.md</code>Slash-command contract for classify adw.</li>
+<li><code>.claude/commands/classify_issue.md</code>Slash-command contract for classify issue.</li>
+<li><code>.claude/commands/cleanup_worktrees.md</code>Slash-command contract for cleanup worktrees.</li>
+<li><code>.claude/commands/commit.md</code>Slash-command contract for commit.</li>
+<li><code>.claude/commands/conditional_docs.md</code>Slash-command contract for conditional docs.</li>
+<li><code>.claude/commands/document.md</code>Slash-command contract for document.</li>
+<li><code>.claude/commands/e2e/test_basic_query.md</code>Browser acceptance recipe for test basic query.</li>
+<li><code>.claude/commands/e2e/test_complex_query.md</code>Browser acceptance recipe for test complex query.</li>
+<li><code>.claude/commands/e2e/test_data_generation.md</code>Browser acceptance recipe for test data generation.</li>
+<li><code>.claude/commands/e2e/test_disable_input_debounce.md</code>Browser acceptance recipe for test disable input debounce.</li>
+<li><code>.claude/commands/e2e/test_enhanced_drop_zone.md</code>Browser acceptance recipe for test enhanced drop zone.</li>
+<li><code>.claude/commands/e2e/test_export_functionality.md</code>Browser acceptance recipe for test export functionality.</li>
+<li><code>.claude/commands/e2e/test_json_export_functionality.md</code>Browser acceptance recipe for test json export functionality.</li>
+<li><code>.claude/commands/e2e/test_random_query_generator.md</code>Browser acceptance recipe for test random query generator.</li>
+<li><code>.claude/commands/e2e/test_sql_injection.md</code>Browser acceptance recipe for test sql injection.</li>
+<li><code>.claude/commands/feature.md</code>Slash-command contract for feature.</li>
+<li><code>.claude/commands/generate_branch_name.md</code>Slash-command contract for generate branch name.</li>
+<li><code>.claude/commands/health_check.md</code>Slash-command contract for health check.</li>
+<li><code>.claude/commands/implement.md</code>Slash-command contract for implement.</li>
+<li><code>.claude/commands/in_loop_review.md</code>Slash-command contract for in loop review.</li>
+<li><code>.claude/commands/install.md</code>Slash-command contract for install.</li>
+<li><code>.claude/commands/install_worktree.md</code>Slash-command contract for install worktree.</li>
+<li><code>.claude/commands/patch.md</code>Slash-command contract for patch.</li>
+<li><code>.claude/commands/prepare_app.md</code>Slash-command contract for prepare app.</li>
+<li><code>.claude/commands/prime.md</code>Slash-command contract for prime.</li>
+<li><code>.claude/commands/pull_request.md</code>Slash-command contract for pull request.</li>
+<li><code>.claude/commands/resolve_failed_e2e_test.md</code>Slash-command contract for resolve failed e2e test.</li>
+<li><code>.claude/commands/resolve_failed_test.md</code>Slash-command contract for resolve failed test.</li>
+<li><code>.claude/commands/review.md</code>Slash-command contract for review.</li>
+<li><code>.claude/commands/start.md</code>Slash-command contract for start.</li>
+<li><code>.claude/commands/test.md</code>Slash-command contract for test.</li>
+<li><code>.claude/commands/test_e2e.md</code>Slash-command contract for test e2e.</li>
+<li><code>.claude/commands/tools.md</code>Slash-command contract for tools.</li>
+<li><code>.claude/commands/track_agentic_kpis.md</code>Slash-command contract for track agentic kpis.</li>
+<li><code>.claude/hooks/notification.py</code>Claude lifecycle hook for notification events.</li>
+<li><code>.claude/hooks/post_tool_use.py</code>Claude lifecycle hook for post tool use events.</li>
+<li><code>.claude/hooks/pre_compact.py</code>Claude lifecycle hook for pre compact events.</li>
+<li><code>.claude/hooks/pre_tool_use.py</code>Claude lifecycle hook for pre tool use events.</li>
+<li><code>.claude/hooks/stop.py</code>Claude lifecycle hook for stop events.</li>
+<li><code>.claude/hooks/subagent_stop.py</code>Claude lifecycle hook for subagent stop events.</li>
+<li><code>.claude/hooks/user_prompt_submit.py</code>Claude lifecycle hook for user prompt submit events.</li>
+<li><code>.claude/hooks/utils/constants.py</code>Shared hook constant or summarization helper.</li>
+<li><code>.claude/hooks/utils/llm/anth.py</code>LLM provider adapter for hook-time summaries.</li>
+<li><code>.claude/hooks/utils/llm/oai.py</code>LLM provider adapter for hook-time summaries.</li>
+<li><code>.claude/settings.json</code>Wires Claude lifecycle hooks to local commands.</li>
+<li><code>.env.sample</code>Copyable environment template; no runtime secret.</li>
+<li><code>.gitignore</code>Excludes secrets, dependencies, logs, databases, and generated output.</li>
+<li><code>.mcp.json</code>MCP or browser-tool configuration used by agent workflows.</li>
+<li><code>README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>adws/README.md</code>Setup, architecture, or agent-facing instructions for this directory.</li>
+<li><code>adws/adw_aea_patch.py</code>Executable ADW phase or workflow composition: aea patch.</li>
+<li><code>adws/adw_build_iso.py</code>Executable ADW phase or workflow composition: build iso.</li>
+<li><code>adws/adw_document_iso.py</code>Executable ADW phase or workflow composition: document iso.</li>
+<li><code>adws/adw_modules/__init__.py</code>Marks the ADW modules directory as a Python package.</li>
+<li><code>adws/adw_modules/aea_data_types.py</code>Pydantic contracts for embedded-agent HTTP and persistence.</li>
+<li><code>adws/adw_modules/agent.py</code>Runs Claude Code, parses stream JSON, retries, and saves receipts.</li>
+<li><code>adws/adw_modules/data_types.py</code>Typed GitHub, agent, test, review, docs, and state payloads.</li>
+<li><code>adws/adw_modules/git_ops.py</code>Branch, commit, push, approval, merge, and finalization effects.</li>
+<li><code>adws/adw_modules/github.py</code>Fetches issues/comments and posts progress through GitHub CLI.</li>
+<li><code>adws/adw_modules/r2_uploader.py</code>Uploads review screenshots to Cloudflare R2.</li>
+<li><code>adws/adw_modules/state.py</code>Persists the small cross-phase ADW state contract.</li>
+<li><code>adws/adw_modules/utils.py</code>IDs, logs, JSON cleanup, status formatting, and safe child environments.</li>
+<li><code>adws/adw_modules/workflow_ops.py</code>Shared classify, plan, build, branch, commit, PR, and patch operations.</li>
+<li><code>adws/adw_modules/worktree_ops.py</code>Creates and validates worktrees and assigns isolated ports.</li>
+<li><code>adws/adw_patch_iso.py</code>Executable ADW phase or workflow composition: patch iso.</li>
+<li><code>adws/adw_plan_build_document_iso.py</code>Executable ADW phase or workflow composition: plan build document iso.</li>
+<li><code>adws/adw_plan_build_iso.py</code>Executable ADW phase or workflow composition: plan build iso.</li>
+<li><code>adws/adw_plan_build_review_iso.py</code>Executable ADW phase or workflow composition: plan build review iso.</li>
+<li><code>adws/adw_plan_build_test_iso.py</code>Executable ADW phase or workflow composition: plan build test iso.</li>
+<li><code>adws/adw_plan_build_test_review_iso.py</code>Executable ADW phase or workflow composition: plan build test review iso.</li>
+<li><code>adws/adw_plan_iso.py</code>Executable ADW phase or workflow composition: plan iso.</li>
+<li><code>adws/adw_review_iso.py</code>Executable ADW phase or workflow composition: review iso.</li>
+<li><code>adws/adw_sdlc_iso.py</code>Executable ADW phase or workflow composition: sdlc iso.</li>
+<li><code>adws/adw_sdlc_zte_iso.py</code>Executable ADW phase or workflow composition: sdlc zte iso.</li>
+<li><code>adws/adw_ship_iso.py</code>Executable ADW phase or workflow composition: ship iso.</li>
+<li><code>adws/adw_test_iso.py</code>Executable ADW phase or workflow composition: test iso.</li>
+<li><code>adws/adw_tests/__init__.py</code>Marks ADW tests as a package.</li>
+<li><code>adws/adw_tests/health_check.py</code>ADW check or proof-of-concept for health check.</li>
+<li><code>adws/adw_tests/sandbox_poc.py</code>ADW check or proof-of-concept for sandbox poc.</li>
+<li><code>adws/adw_tests/test_agents.py</code>ADW check or proof-of-concept for test agents.</li>
+<li><code>adws/adw_tests/test_model_selection.py</code>ADW check or proof-of-concept for test model selection.</li>
+<li><code>adws/adw_tests/test_r2_uploader.py</code>ADW check or proof-of-concept for test r2 uploader.</li>
+<li><code>adws/adw_tests/test_webhook_simplified.py</code>ADW check or proof-of-concept for test webhook simplified.</li>
+<li><code>adws/adw_triggers/__init__.py</code>Marks trigger code as a package.</li>
+<li><code>adws/adw_triggers/adw_trigger_aea_server.py</code>External trigger service for trigger aea server.</li>
+<li><code>adws/adw_triggers/trigger_cron.py</code>External trigger service for trigger cron.</li>
+<li><code>adws/adw_triggers/trigger_webhook.py</code>External trigger service for trigger webhook.</li>
+<li><code>ai_docs/anthropic_quick_start.md</code>Bundled agent reference context about anthropic quick start.</li>
+<li><code>ai_docs/claude_code_cli_reference.md</code>Bundled agent reference context about claude code cli reference.</li>
+<li><code>ai_docs/claude_code_sdk.md</code>Bundled agent reference context about claude code sdk.</li>
+<li><code>ai_docs/e2b.md</code>Bundled agent reference context about e2b.</li>
+<li><code>ai_docs/openai_quick_start.md</code>Bundled agent reference context about openai quick start.</li>
+<li><code>app/client/.gitignore</code>Excludes secrets, dependencies, logs, databases, and generated output.</li>
+<li><code>app/client/index.html</code>Frontend entry document, package metadata, asset, or build configuration.</li>
+<li><code>app/client/package-lock.json</code>Pinned frontend dependency graph.</li>
+<li><code>app/client/package.json</code>Frontend entry document, package metadata, asset, or build configuration.</li>
+<li><code>app/client/public/bg.png</code>Product background image.</li>
+<li><code>app/client/public/sample-data/events.jsonl</code>Upload-ready sample dataset for the NLQ product.</li>
+<li><code>app/client/public/sample-data/orders_(32).csv</code>Upload-ready sample dataset for the NLQ product.</li>
+<li><code>app/client/public/sample-data/products.csv</code>Upload-ready sample dataset for the NLQ product.</li>
+<li><code>app/client/public/sample-data/users.json</code>Upload-ready sample dataset for the NLQ product.</li>
+<li><code>app/client/public/vite.svg</code>Frontend entry document, package metadata, asset, or build configuration.</li>
+<li><code>app/client/src/aea.css</code>Layout and state styles for embedded-agent windows.</li>
+<li><code>app/client/src/aeaChatWindow.ts</code>Renders one agent conversation and sends prompts.</li>
+<li><code>app/client/src/aeaDevConsole.ts</code>Cmd/Ctrl+P command palette for AEA actions.</li>
+<li><code>app/client/src/aeaPolling.ts</code>Polls one agent adaptively and emits meaningful changes.</li>
+<li><code>app/client/src/aeaWindowManager.ts</code>Creates, positions, restores, hides, and closes agent windows.</li>
+<li><code>app/client/src/api/client.ts</code>Typed HTTP client for the natural-language SQL API.</li>
+<li><code>app/client/src/main.ts</code>Bootstraps the NLQ UI and restores embedded-agent windows.</li>
+<li><code>app/client/src/style.css</code>Main natural-language SQL product presentation.</li>
+<li><code>app/client/src/types.d.ts</code>TypeScript mirror of product and AEA backend models.</li>
+<li><code>app/client/src/vite-env.d.ts</code>Frontend source, styling, or build-time declaration.</li>
+<li><code>app/client/tsconfig.json</code>Frontend entry document, package metadata, asset, or build configuration.</li>
+<li><code>app/client/vite.config.ts</code>Frontend entry document, package metadata, asset, or build configuration.</li>
+<li><code>app/server/.env.sample</code>Copyable environment template; no runtime secret.</li>
+<li><code>app/server/after_tables.txt</code>Backend project metadata, environment sample, or local database note.</li>
+<li><code>app/server/before_tables.txt</code>Backend project metadata, environment sample, or local database note.</li>
+<li><code>app/server/core/__init__.py</code>Marks product core code as a Python package.</li>
+<li><code>app/server/core/constants.py</code>Defines delimiters shared by nested-data ingestion.</li>
+<li><code>app/server/core/data_generator.py</code>Samples rows and generates schema-shaped synthetic data with an LLM.</li>
+<li><code>app/server/core/data_models.py</code>Pydantic request and response contracts for the product API.</li>
+<li><code>app/server/core/export_utils.py</code>Serializes tables and query results as CSV or JSON.</li>
+<li><code>app/server/core/file_processor.py</code>Sanitizes and converts CSV, JSON, and JSONL into SQLite.</li>
+<li><code>app/server/core/insights.py</code>Computes column-level database insights.</li>
+<li><code>app/server/core/llm_processor.py</code>Builds schema prompts and routes generation across providers.</li>
+<li><code>app/server/core/sql_processor.py</code>Reads schema and executes generated SQL through the safe boundary.</li>
+<li><code>app/server/core/sql_security.py</code>Validates identifiers and queries and centralizes safe SQLite execution.</li>
+<li><code>app/server/core/utils.py</code>Parses model JSON into Python or Pydantic values.</li>
+<li><code>app/server/db/backup.db</code>SQLite demo backup with users and products.</li>
+<li><code>app/server/main.py</code>Console entry point for the packaged backend.</li>
+<li><code>app/server/pyproject.toml</code>Backend project metadata, environment sample, or local database note.</li>
+<li><code>app/server/server.py</code>FastAPI upload, query, schema, insight, export, and generation API.</li>
+<li><code>app/server/tests/__init__.py</code>Marks backend tests as a package.</li>
+<li><code>app/server/tests/assets/column_names.csv</code>Backend ingestion or security test fixture.</li>
+<li><code>app/server/tests/assets/complex_data.jsonl</code>Backend ingestion or security test fixture.</li>
+<li><code>app/server/tests/assets/invalid.csv</code>Backend ingestion or security test fixture.</li>
+<li><code>app/server/tests/assets/sample_data.jsonl</code>Backend ingestion or security test fixture.</li>
+<li><code>app/server/tests/assets/test_products.json</code>Backend ingestion or security test fixture.</li>
+<li><code>app/server/tests/assets/test_users.csv</code>Backend ingestion or security test fixture.</li>
+<li><code>app/server/tests/core/__init__.py</code>Marks backend tests as a package.</li>
+<li><code>app/server/tests/core/test_data_generator.py</code>Backend regression tests for test data generator.</li>
+<li><code>app/server/tests/core/test_file_processor.py</code>Backend regression tests for test file processor.</li>
+<li><code>app/server/tests/core/test_llm_processor.py</code>Backend regression tests for test llm processor.</li>
+<li><code>app/server/tests/core/test_sql_processor.py</code>Backend regression tests for test sql processor.</li>
+<li><code>app/server/tests/test_export_utils.py</code>Backend regression tests for test export utils.</li>
+<li><code>app/server/tests/test_json_export_utils.py</code>Backend regression tests for test json export utils.</li>
+<li><code>app/server/tests/test_sql_injection.py</code>Backend regression tests for test sql injection.</li>
+<li><code>app/server/uv.lock</code>Pinned Python dependency graph.</li>
+<li><code>app_docs/agentic_kpis.md</code>Generated product documentation or agentic KPI record.</li>
+<li><code>app_docs/assets/01-tables-with-export-buttons.png</code>Screenshot evidence or text placeholder attached to generated docs.</li>
+<li><code>app_docs/assets/01_main_application_background.png</code>Screenshot evidence or text placeholder attached to generated docs.</li>
+<li><code>app_docs/assets/02-query-results-with-export-button.png</code>Screenshot evidence or text placeholder attached to generated docs.</li>
+<li><code>app_docs/assets/02_application_sections_background.png</code>Screenshot evidence or text placeholder attached to generated docs.</li>
+<li><code>app_docs/assets/03-empty-results-with-export-button.png</code>Screenshot evidence or text placeholder attached to generated docs.</li>
+<li><code>app_docs/feature-490eb6b5-one-click-table-exports.md</code>Generated product documentation or agentic KPI record.</li>
+<li><code>app_docs/feature-4c768184-model-upgrades.md</code>Generated product documentation or agentic KPI record.</li>
+<li><code>app_docs/feature-6445fc8f-light-sky-blue-background.md</code>Generated product documentation or agentic KPI record.</li>
+<li><code>app_docs/feature-cc73faf1-upload-button-text.md</code>Generated product documentation or agentic KPI record.</li>
+<li><code>app_docs/feature-f055c4f8-off-white-background.md</code>Generated product documentation or agentic KPI record.</li>
+<li><code>factorial.py</code>Small application entry or support source: factorial.</li>
+<li><code>playwright-mcp-config.json</code>MCP or browser-tool configuration used by agent workflows.</li>
+<li><code>scripts/aea_server_reset.sh</code>Local operations script for aea server reset.</li>
+<li><code>scripts/aea_server_start.sh</code>Local operations script for aea server start.</li>
+<li><code>scripts/check_ports.sh</code>Local operations script for check ports.</li>
+<li><code>scripts/clear_issue_comments.sh</code>Local operations script for clear issue comments.</li>
+<li><code>scripts/copy_dot_env.sh</code>Local operations script for copy dot env.</li>
+<li><code>scripts/delete_pr.sh</code>Local operations script for delete pr.</li>
+<li><code>scripts/expose_webhook.sh</code>Local operations script for expose webhook.</li>
+<li><code>scripts/kill_trigger_webhook.sh</code>Local operations script for kill trigger webhook.</li>
+<li><code>scripts/purge_tree.sh</code>Local operations script for purge tree.</li>
+<li><code>scripts/reset_db.sh</code>Local operations script for reset db.</li>
+<li><code>scripts/start.sh</code>Local operations script for start.</li>
+<li><code>scripts/stop_apps.sh</code>Local operations script for stop apps.</li>
+<li><code>specs/issue-47-adw-cc73faf1-sdlc_planner-update-upload-button.md</code>Historical implementation plan: issue 47 adw cc73faf1 sdlc planner update upload button.</li>
+<li><code>specs/issue-51-adw-2cd85529-sdlc_planner-increase-drop-zone-area.md</code>Historical implementation plan: issue 51 adw 2cd85529 sdlc planner increase drop zone area.</li>
+<li><code>specs/issue-52-adw-edb4d3a7-sdlc_planner-json-export.md</code>Historical implementation plan: issue 52 adw edb4d3a7 sdlc planner json export.</li>
+<li><code>specs/issue-53-adw-e4c4ee94-sdlc_planner-table-random-data-generation.md</code>Historical implementation plan: issue 53 adw e4c4ee94 sdlc planner table random data generation.</li>
+<li><code>specs/issue-54-adw-0720754f-sdlc_planner-update-openai-model.md</code>Historical implementation plan: issue 54 adw 0720754f sdlc planner update openai model.</li>
+</ul></div></details>
+        <noscript><p>Enable JavaScript to expand the exhaustive path ledger. The teaching content remains readable.</p></noscript>
+      </section>
+      <div class="measure">
+        <section id="run">
+          <span class="section-label">End-to-end flow</span><h2>How one production-shaped run works</h2>
+          <ol class="flow-list"><li><div class="flow-copy"><strong>Intent enters GitHub.</strong><p>An issue or comment names an <code>adw_*</code> workflow, optional existing ID, and model set.</p></div></li><li><div class="flow-copy"><strong>The trigger returns quickly.</strong><p>It validates workflow shape, saves initial state, comments, and launches a background process.</p></div></li><li><div class="flow-copy"><strong>Planning creates an isolated world.</strong><p>Class, branch, worktree, ports, dependencies, and real spec path become durable.</p></div></li><li><div class="flow-copy"><strong>Build consumes the artifact.</strong><p>A separate phase loads state, validates the tree, implements, commits, pushes, and updates the PR.</p></div></li><li><div class="flow-copy"><strong>Tests create repairable evidence.</strong><p>Typed results feed bounded, failure-specific resolver prompts.</p></div></li><li><div class="flow-copy"><strong>Review compares result with promise.</strong><p>It uses the spec and isolated ports, classifies severity, patches blockers, and uploads screenshots.</p></div></li><li><div class="flow-copy"><strong>Docs close the loop.</strong><p>Product docs and KPIs are committed; only ZTE invokes the explicit ship phase.</p></div></li><li><div class="flow-copy"><strong>The ADW ID joins evidence.</strong><p>Comments, branch, spec, state, JSONL, logs, tests, screenshots, docs, and tree can reconstruct the run.</p></div></li></ol>
+        </section>
+        <section id="fails">
+          <span class="section-label">Common fail</span><h2>Six mistakes this design is trying to prevent</h2>
+          <div class="failure-grid"><article class="failure-card"><b>Calling the prompt “the system”</b><p>Python owns eligibility, process lifetime, paths, state, and branching.</p></article><article class="failure-card"><b>Reading plans as current code</b><p>App 1 and app 4 plans name absent files. Check the tree.</p></article><article class="failure-card"><b>Two pollers, one Markdown queue</b><p>Early claiming narrows races; it does not make <code>tasks.md</code> transactional.</p></article><article class="failure-card"><b>Assuming observability is wired</b><p>The sender exists, but current app 3 settings only wire local log hooks.</p></article><article class="failure-card"><b>Losing the working directory</b><p>Commands, env, relative SQLite paths, worktrees, and ports depend on deliberate <code>cwd</code>.</p></article><article class="failure-card"><b>Treating ZTE like a demo flag</b><p>Its ship phase can merge to main. The separate entry point is a safety signal.</p></article></div>
+          <div class="callout warning"><strong>Current-checkout rough edge</strong><p>App 5 <code>main.ts</code> accesses <code>aeaDevConsole.windowManager</code>, while <code>AEADevConsole</code> declares it private. Require successful setup/build evidence instead of trusting the README.</p></div>
+        </section>
+        <section id="lab">
+          <span class="section-label">You try · 12 minutes</span><h2>Teach the observer one new event</h2>
+          <div class="lab-card"><p><strong>Goal:</strong> add a visible <code>SessionStart</code> event to app 3, prove the frontend builds, then send one synthetic event through the server.</p>
+            <ol><li>Open <code>apps/client/src/composables/useEventEmojis.ts</code> under app 3.</li><li>Add <code>'SessionStart': '🚪'</code> to <code>eventTypeToEmoji</code>.</li><li>From <code>apps/client/</code>, run <code>bun run build</code>.</li><li>From app 3, run <code>./scripts/start-system.sh</code>.</li><li>Send a real event:
+              <div class="code-wrap"><div class="code-label"><span>terminal</span><span>POST → SQLite → WebSocket → Vue</span></div><pre><code class="language-bash">curl -X POST http://localhost:4000/events \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "source_app": "tac8-lab",
+    "session_id": "teach-back",
+    "hook_event_type": "SessionStart",
+    "payload": {"reason": "learning the event path"}
+  }'</code></pre></div></li><li>Filter to <code>tac8-lab</code> and verify the door. Explain why changing the emoji map could never create an event.</li><li>Restore the authored map.</li></ol>
+            <div class="checkpoint"><strong>Expected:</strong> the map is presentation only. POST creates the event; Bun validates/inserts; WebSocket distributes; Vue maps type to symbol.</div>
+          </div>
+        </section>
+        <section id="teach-back" class="quiz">
+          <span class="section-label">Teach-back</span><h2>Close the page, then explain these aloud</h2>
+          <details><summary>1. What is the agentic layer?</summary><p>The control/evidence system around a model worker: eligibility, narrow contract, isolation, durable state, and human-visible results.</p></details>
+          <details><summary>2. Why claim before launch?</summary><p>It makes ownership visible, reduces duplicate pickup, and gives recovery an ADW ID.</p></details>
+          <details><summary>3. Trace one app 3 event.</summary><p>Hook → optional sender → Bun validation/SQLite → WebSocket → Vue filter/chart/row.</p></details>
+          <details><summary>4. Why fresh delivery agents but resumed AEA agents?</summary><p>Delivery phases need independent judgment over artifacts; interactive chat needs conversational continuity.</p></details>
+          <details><summary>5. Which layer owns SQL safety?</summary><p>The ordinary runtime app, especially <code>sql_security.py</code> and its callers/tests.</p></details>
+          <details><summary>6. What grows with autonomy?</summary><p>Trigger surface, durable state, isolation, evidence, repair loops, review gates, and shipping authority.</p></details>
+        </section>
+        <footer class="lesson-head"><p class="eyebrow">Continue</p><p><a href="../vol-1-tac/08-the-agentic-layer.html">← Return to the chapter: The Agentic Layer</a></p><p class="small muted">Source audit: <code>tac/tac-8/</code>. <a href="tac-8-the-agentic-layer-STATUS.md">Coverage record</a>.</p></footer>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+  <script>if(window.hljs)window.hljs.highlightAll();</script>
+</body>
+</html>

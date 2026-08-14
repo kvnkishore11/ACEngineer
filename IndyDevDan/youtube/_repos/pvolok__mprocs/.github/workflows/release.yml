@@ -1,0 +1,130 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - id: version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          cargo_version=$(cargo metadata --format-version 1 --no-deps | jq -r '.packages[] | select(.name == "dekit") | .version')
+          if [ "$version" != "$cargo_version" ]; then
+            echo "tag version $version does not match dekit Cargo version $cargo_version" >&2
+            exit 1
+          fi
+          prerelease=false
+          case "$version" in
+            *-*) prerelease=true ;;
+          esac
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: meta
+    uses: ./.github/workflows/build.yml
+    with:
+      cache-prefix: release
+      artifact-prefix: release
+      retention-days: 7
+
+  github-release:
+    needs: [meta, build]
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist/release
+          merge-multiple: true
+
+      - name: Add installers and checksums
+        run: packaging/bundle.sh dist/release
+
+      # Idempotent so a re-run after a partial failure is clean: create the
+      # release if it is missing, then (re)upload assets with --clobber.
+      - name: Create GitHub release
+        shell: bash
+        run: |
+          set -euo pipefail
+          flags=(--generate-notes --title "dekit ${GITHUB_REF_NAME}")
+          if [ "${{ needs.meta.outputs.prerelease }}" = "true" ]; then
+            flags+=(--prerelease)
+          fi
+          gh release create "${GITHUB_REF_NAME}" "${flags[@]}" || true
+          gh release upload "${GITHUB_REF_NAME}" dist/release/* --clobber
+
+  publish-crate:
+    needs: [meta, github-release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: publish-crate
+      - name: Publish to crates.io
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          cp LICENSE src/LICENSE
+          cp packaging/crate/README.md src/README.md
+          cargo publish -p dekit --locked --allow-dirty
+
+  publish-npm:
+    needs: [meta, github-release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          registry-url: "https://registry.npmjs.org"
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist/release
+          merge-multiple: true
+
+      - name: Pack and publish npm packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          dist_tag=latest
+          case "${{ needs.meta.outputs.version }}" in
+            *-*) dist_tag=next ;;
+          esac
+          node packaging/npm/build.mjs pack \
+            --archives dist/release \
+            --out dist/npm \
+            --version "${{ needs.meta.outputs.version }}"
+          node packaging/npm/build.mjs publish \
+            --dir dist/npm \
+            --dist-tag "$dist_tag" \
+            --version "${{ needs.meta.outputs.version }}"

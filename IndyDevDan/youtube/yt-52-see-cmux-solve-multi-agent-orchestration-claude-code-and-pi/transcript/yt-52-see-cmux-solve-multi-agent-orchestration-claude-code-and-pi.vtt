@@ -1,0 +1,3501 @@
+WEBVTT
+
+1
+00:00:00.080 --> 00:00:07.120
+As engineers, there's just one idea you
+
+2
+00:00:03.439 --> 00:00:10.160
+and I need to win in the age of agents.
+
+3
+00:00:07.120 --> 00:00:12.960
+Scale your compute to scale your impact.
+
+4
+00:00:10.160 --> 00:00:15.200
+The goal is clear, but the path is less
+
+5
+00:00:12.960 --> 00:00:18.000
+clear. The big open question the best
+
+6
+00:00:15.200 --> 00:00:20.560
+engineers are asking is how exactly
+
+7
+00:00:18.000 --> 00:00:23.439
+should you orchestrate your agents for
+
+8
+00:00:20.560 --> 00:00:26.000
+maximum impact? And there's no shortage
+
+9
+00:00:23.439 --> 00:00:28.000
+of options. Boris and Peter are saying
+
+10
+00:00:26.000 --> 00:00:30.080
+loop engineering is the future and
+
+11
+00:00:28.000 --> 00:00:31.439
+prompt engineering is already dead. I
+
+12
+00:00:30.080 --> 00:00:34.559
+completely disagree with this. There's
+
+13
+00:00:31.439 --> 00:00:37.920
+the Ralph style to-do list to keep your
+
+14
+00:00:34.559 --> 00:00:39.760
+agents focus on a massive list of work.
+
+15
+00:00:37.920 --> 00:00:41.840
+Fable is going to love Ralph. Then
+
+16
+00:00:39.760 --> 00:00:44.079
+there's classical sub aent delegation
+
+17
+00:00:41.840 --> 00:00:46.239
+and many many more patterns. I've been
+
+18
+00:00:44.079 --> 00:00:48.640
+engineering for over 15 years and
+
+19
+00:00:46.239 --> 00:00:50.719
+building with agents since it was first
+
+20
+00:00:48.640 --> 00:00:53.280
+possible. And we have to call out the
+
+21
+00:00:50.719 --> 00:00:56.559
+fact that these AI labs have massive
+
+22
+00:00:53.280 --> 00:00:58.800
+incentives to keep you and I spending
+
+23
+00:00:56.559 --> 00:01:00.559
+tokens, token maxing, when the truth is
+
+24
+00:00:58.800 --> 00:01:02.879
+there's a dozen different agentic
+
+25
+00:01:00.559 --> 00:01:05.600
+patterns you can use to ship with
+
+26
+00:01:02.879 --> 00:01:08.159
+agents. One of my favorite patterns is
+
+27
+00:01:05.600 --> 00:01:10.640
+three tier agent orchestration.
+
+28
+00:01:08.159 --> 00:01:13.840
+Orchestrators prompt the leads. Leads
+
+29
+00:01:10.640 --> 00:01:16.240
+prompt the specialized agent experts.
+
+30
+00:01:13.840 --> 00:01:19.040
+But every multi- aent approach has
+
+31
+00:01:16.240 --> 00:01:22.000
+similar problems. The big three being
+
+32
+00:01:19.040 --> 00:01:24.400
+how do you start, interact, and improve
+
+33
+00:01:22.000 --> 00:01:26.560
+your growing fleet of agents. If you're
+
+34
+00:01:24.400 --> 00:01:28.320
+vibe coding or token maxing, this
+
+35
+00:01:26.560 --> 00:01:30.640
+doesn't matter at all. You can spin up
+
+36
+00:01:28.320 --> 00:01:32.240
+20 agents in a loop and look the other
+
+37
+00:01:30.640 --> 00:01:34.560
+way. On this channel, we don't vibe
+
+38
+00:01:32.240 --> 00:01:37.759
+code. We agentic engineer because an
+
+39
+00:01:34.560 --> 00:01:41.280
+agent you can't monitor is an agent you
+
+40
+00:01:37.759 --> 00:01:43.200
+can't improve. I have three multi- aent
+
+41
+00:01:41.280 --> 00:01:45.759
+orchestration problems I'm going to
+
+42
+00:01:43.200 --> 00:01:48.399
+solve and I'm looking at CMUX as a
+
+43
+00:01:45.759 --> 00:01:50.479
+potential solution to this problem. As
+
+44
+00:01:48.399 --> 00:01:52.320
+we work through the feature set of CMUX,
+
+45
+00:01:50.479 --> 00:01:54.720
+I want to share with you how I'm
+
+46
+00:01:52.320 --> 00:01:57.600
+continuing to learn new tools and
+
+47
+00:01:54.720 --> 00:01:59.439
+technology with agents. If these ideas
+
+48
+00:01:57.600 --> 00:02:02.320
+interest you, smash the like button,
+
+49
+00:01:59.439 --> 00:02:05.320
+lock in, and let's improve our agent
+
+50
+00:02:02.320 --> 00:02:05.320
+orchestration.
+
+51
+00:02:08.560 --> 00:02:13.040
+Whenever I sit down to learn a new tool
+
+52
+00:02:10.560 --> 00:02:16.720
+or technology, I have a state-of-the-art
+
+53
+00:02:13.040 --> 00:02:19.360
+agent build out a comprehensive HTML
+
+54
+00:02:16.720 --> 00:02:22.640
+file that I can use to visually
+
+55
+00:02:19.360 --> 00:02:24.640
+understand, study, and master new tools.
+
+56
+00:02:22.640 --> 00:02:27.120
+So, that's how we're going to learn CMOX
+
+57
+00:02:24.640 --> 00:02:29.520
+right now. Let's start with the problem.
+
+58
+00:02:27.120 --> 00:02:31.280
+What problems are we going to solve? I
+
+59
+00:02:29.520 --> 00:02:33.200
+don't start with tools. Problems come
+
+60
+00:02:31.280 --> 00:02:35.200
+first, tools come second. I know I'm
+
+61
+00:02:33.200 --> 00:02:37.200
+late to the Semox game, but I don't
+
+62
+00:02:35.200 --> 00:02:39.120
+really care outside of experimentation.
+
+63
+00:02:37.200 --> 00:02:41.920
+If I don't need a tool, I don't pick it
+
+64
+00:02:39.120 --> 00:02:43.920
+up until I have a problem. First, I have
+
+65
+00:02:41.920 --> 00:02:46.080
+three problems surrounding multi-agent
+
+66
+00:02:43.920 --> 00:02:49.200
+orchestration that you likely have, too.
+
+67
+00:02:46.080 --> 00:02:51.200
+Let's see if can solve three popular
+
+68
+00:02:49.200 --> 00:02:53.680
+multi- aent orchestration problems. So,
+
+69
+00:02:51.200 --> 00:02:55.519
+first off, no programmatic access to
+
+70
+00:02:53.680 --> 00:02:57.840
+your agents. This is a massive problem
+
+71
+00:02:55.519 --> 00:03:00.160
+because it means you're the bottleneck
+
+72
+00:02:57.840 --> 00:03:02.480
+and it keeps you in the loop all the
+
+73
+00:03:00.160 --> 00:03:04.640
+time, meaning your agents can never move
+
+74
+00:03:02.480 --> 00:03:07.200
+at the agentic speed. The big question
+
+75
+00:03:04.640 --> 00:03:09.200
+is, can Semuk solve this? The answer is
+
+76
+00:03:07.200 --> 00:03:11.680
+of course yes. The core value
+
+77
+00:03:09.200 --> 00:03:14.560
+proposition of tools like CMUX and the
+
+78
+00:03:11.680 --> 00:03:17.680
+triedand-true T-M is this exactly. They
+
+79
+00:03:14.560 --> 00:03:19.760
+give you agentic access to every single
+
+80
+00:03:17.680 --> 00:03:21.280
+terminal. An agent you can't see is an
+
+81
+00:03:19.760 --> 00:03:23.280
+agent you can't improve. This is going
+
+82
+00:03:21.280 --> 00:03:24.800
+to be increasingly controversial. A lot
+
+83
+00:03:23.280 --> 00:03:26.400
+of engineers are turning off their
+
+84
+00:03:24.800 --> 00:03:27.760
+brain. They're not studying what their
+
+85
+00:03:26.400 --> 00:03:29.920
+agents are doing. They're spinning up
+
+86
+00:03:27.760 --> 00:03:32.000
+fleets and they're ignoring the journey,
+
+87
+00:03:29.920 --> 00:03:33.360
+all the mistakes, all the successes, all
+
+88
+00:03:32.000 --> 00:03:35.840
+the things that they would want to
+
+89
+00:03:33.360 --> 00:03:37.680
+emphasize, reproduce, and cut out of
+
+90
+00:03:35.840 --> 00:03:39.040
+their workflow is completely ignored.
+
+91
+00:03:37.680 --> 00:03:41.599
+This is one of the key differences
+
+92
+00:03:39.040 --> 00:03:44.000
+between vibe coding and agentic
+
+93
+00:03:41.599 --> 00:03:46.720
+engineering. An agent you can't see is
+
+94
+00:03:44.000 --> 00:03:49.440
+an agent you can't improve. I need to be
+
+95
+00:03:46.720 --> 00:03:51.040
+able to see everyone of my agents. Okay?
+
+96
+00:03:49.440 --> 00:03:53.120
+It doesn't matter if it's cloud code,
+
+97
+00:03:51.040 --> 00:03:54.799
+pi, open code, codeex. I need to be able
+
+98
+00:03:53.120 --> 00:03:56.159
+to see it, monitor it and understand
+
+99
+00:03:54.799 --> 00:03:58.480
+when things are going right so I can
+
+100
+00:03:56.159 --> 00:04:00.640
+re-emphasize that behavior in the agent
+
+101
+00:03:58.480 --> 00:04:02.159
+via the core 4 or I need to know when
+
+102
+00:04:00.640 --> 00:04:04.560
+things are going wrong so I can present
+
+103
+00:04:02.159 --> 00:04:07.200
+negative rewards. Okay, so can Semox
+
+104
+00:04:04.560 --> 00:04:10.480
+solve that problem for us? Yes, it can.
+
+105
+00:04:07.200 --> 00:04:12.720
+We have per workspace color roll icons,
+
+106
+00:04:10.480 --> 00:04:14.720
+identity, we have tabs, we have banners.
+
+107
+00:04:12.720 --> 00:04:16.639
+We have everything we need to quickly
+
+108
+00:04:14.720 --> 00:04:19.280
+jump into an agent and see it. Quick
+
+109
+00:04:16.639 --> 00:04:21.120
+teaser here. I have semox ready to go
+
+110
+00:04:19.280 --> 00:04:23.360
+and you can see here we have a great
+
+111
+00:04:21.120 --> 00:04:25.759
+breakdown the kind of fundamental pieces
+
+112
+00:04:23.360 --> 00:04:28.160
+of a tool where we can quickly see
+
+113
+00:04:25.759 --> 00:04:29.360
+observe and therefore improve everything
+
+114
+00:04:28.160 --> 00:04:31.199
+right we have a cloud code agent we have
+
+115
+00:04:29.360 --> 00:04:33.520
+a codeex agent we have two pi agents
+
+116
+00:04:31.199 --> 00:04:35.440
+running the minimax m3 and the jm 5.2
+
+117
+00:04:33.520 --> 00:04:37.040
+too. We'll get back to this in a second.
+
+118
+00:04:35.440 --> 00:04:38.560
+Let's fully understand every single
+
+119
+00:04:37.040 --> 00:04:40.320
+problem. And this is a big one. It's
+
+120
+00:04:38.560 --> 00:04:42.400
+increasingly becoming a problem as I
+
+121
+00:04:40.320 --> 00:04:44.800
+deploy more and more agents and set up
+
+122
+00:04:42.400 --> 00:04:46.479
+new teams to do specific sets of work
+
+123
+00:04:44.800 --> 00:04:48.240
+extraordinarily well. If you're building
+
+124
+00:04:46.479 --> 00:04:50.240
+custom agents, you're running into this
+
+125
+00:04:48.240 --> 00:04:52.320
+problem, too. If you're deploying 5, 10,
+
+126
+00:04:50.240 --> 00:04:54.880
+20 plus agents, you have also seen this
+
+127
+00:04:52.320 --> 00:04:57.120
+problem. Booting an agent team by hand
+
+128
+00:04:54.880 --> 00:04:58.800
+kills the agentic speed. It just takes
+
+129
+00:04:57.120 --> 00:05:00.720
+too much time. So, can T-book solve
+
+130
+00:04:58.800 --> 00:05:02.560
+this? Of course, yes, it can. and it has
+
+131
+00:05:00.720 --> 00:05:05.199
+reusable session files. But more
+
+132
+00:05:02.560 --> 00:05:08.080
+importantly, this tool has agentic
+
+133
+00:05:05.199 --> 00:05:10.240
+access. If a tool has agentic access,
+
+134
+00:05:08.080 --> 00:05:12.880
+that means you can move at the agentic
+
+135
+00:05:10.240 --> 00:05:15.280
+speed and solve problems in natural
+
+136
+00:05:12.880 --> 00:05:16.960
+language with well- constructed prompts.
+
+137
+00:05:15.280 --> 00:05:19.199
+Okay, so these are the problems we're
+
+138
+00:05:16.960 --> 00:05:21.520
+going to solve. CMOX has solutions to
+
+139
+00:05:19.199 --> 00:05:23.680
+all of them. I think the question is, do
+
+140
+00:05:21.520 --> 00:05:26.320
+you have to use CMX or is something like
+
+141
+00:05:23.680 --> 00:05:28.240
+T-Max going to get you all the way there
+
+142
+00:05:26.320 --> 00:05:29.919
+as well? So, let's dial back into CMOX
+
+143
+00:05:28.240 --> 00:05:31.520
+and understand what this tool can do and
+
+144
+00:05:29.919 --> 00:05:34.080
+see if it can help us solve these three
+
+145
+00:05:31.520 --> 00:05:36.880
+key problems. Agentic access, monitor to
+
+146
+00:05:34.080 --> 00:05:39.199
+improve, and quick agentic launch for
+
+147
+00:05:36.880 --> 00:05:43.320
+your thousandth agent run. Not your
+
+148
+00:05:39.199 --> 00:05:43.320
+first, not your 10th, not your hundth.
+
+149
+00:05:44.800 --> 00:05:49.199
+So, what is our agent teaching us about
+
+150
+00:05:46.800 --> 00:05:51.199
+CMX? Let's understand the mental model
+
+151
+00:05:49.199 --> 00:05:53.039
+that really builds the foundation of
+
+152
+00:05:51.199 --> 00:05:54.720
+understanding CMOX and other terminal
+
+153
+00:05:53.039 --> 00:05:56.880
+multiplexes as well. You have the window
+
+154
+00:05:54.720 --> 00:05:58.560
+which is going to be this entire window
+
+155
+00:05:56.880 --> 00:06:00.400
+here with control shift N. We can boot
+
+156
+00:05:58.560 --> 00:06:02.400
+up a brand new window. And then we have
+
+157
+00:06:00.400 --> 00:06:04.319
+our workspace. Workspaces, you know, we
+
+158
+00:06:02.400 --> 00:06:06.400
+can boot up with command N. And this is
+
+159
+00:06:04.319 --> 00:06:08.639
+going to give us a new workspace to set
+
+160
+00:06:06.400 --> 00:06:10.560
+up teams of agents to set up groups of
+
+161
+00:06:08.639 --> 00:06:12.479
+terminals to do whatever you need to do.
+
+162
+00:06:10.560 --> 00:06:14.400
+Then we have PES. The pane is going to
+
+163
+00:06:12.479 --> 00:06:16.639
+be the actual window. We have a pane
+
+164
+00:06:14.400 --> 00:06:18.960
+here. We have a pane here. We have one
+
+165
+00:06:16.639 --> 00:06:21.600
+here, here, and here. It's important to
+
+166
+00:06:18.960 --> 00:06:24.720
+mention if we do commandt, this opens a
+
+167
+00:06:21.600 --> 00:06:27.440
+new surface inside of this existing
+
+168
+00:06:24.720 --> 00:06:29.840
+pane. So we have individual windows. You
+
+169
+00:06:27.440 --> 00:06:31.759
+can separate and group your agent teams,
+
+170
+00:06:29.840 --> 00:06:33.680
+your terminals, you can have production,
+
+171
+00:06:31.759 --> 00:06:35.919
+you can have staging, you can have dev,
+
+172
+00:06:33.680 --> 00:06:37.440
+we can have workspaces. So for me, I'm
+
+173
+00:06:35.919 --> 00:06:39.520
+going to put my agent teams on the
+
+174
+00:06:37.440 --> 00:06:41.440
+workspace level. And then inside of the
+
+175
+00:06:39.520 --> 00:06:43.199
+workspace, you have your individual
+
+176
+00:06:41.440 --> 00:06:44.880
+panes. So we have a pane here in my
+
+177
+00:06:43.199 --> 00:06:46.639
+multi- aent orchestration workflow. I'm
+
+178
+00:06:44.880 --> 00:06:48.880
+going to put my lead here. And then the
+
+179
+00:06:46.639 --> 00:06:50.720
+workers go over on the right. So I can
+
+180
+00:06:48.880 --> 00:06:53.680
+look at the level that I need to to get
+
+181
+00:06:50.720 --> 00:06:56.240
+the job done while not losing the depth
+
+182
+00:06:53.680 --> 00:06:58.000
+of visibility into the low-level worker
+
+183
+00:06:56.240 --> 00:07:00.400
+agents. This is super key, right?
+
+184
+00:06:58.000 --> 00:07:02.160
+Prompting in a black box in sub agents
+
+185
+00:07:00.400 --> 00:07:03.759
+is a great place to start. Terrible
+
+186
+00:07:02.160 --> 00:07:06.000
+place to finish, right? We can do a lot
+
+187
+00:07:03.759 --> 00:07:08.400
+better than that with the right agentic
+
+188
+00:07:06.000 --> 00:07:10.560
+tools. That's why we're trying to see if
+
+189
+00:07:08.400 --> 00:07:12.000
+we can really improve our multi- aent
+
+190
+00:07:10.560 --> 00:07:14.160
+orchestration abilities. Okay, so that's
+
+191
+00:07:12.000 --> 00:07:17.280
+the mental model of cmox. And so how do
+
+192
+00:07:14.160 --> 00:07:17.280
+we control it?
+
+193
+00:07:19.120 --> 00:07:23.039
+Uh it's pretty simple. Thanks to the
+
+194
+00:07:20.560 --> 00:07:25.120
+programmatic access, we do four things.
+
+195
+00:07:23.039 --> 00:07:27.039
+We can send information like send key.
+
+196
+00:07:25.120 --> 00:07:28.720
+We can then read the screen after the
+
+197
+00:07:27.039 --> 00:07:31.280
+action has been completed. And then we
+
+198
+00:07:28.720 --> 00:07:33.039
+can open and close surfaces and the loop
+
+199
+00:07:31.280 --> 00:07:34.639
+repeats. Okay, so this is how you
+
+200
+00:07:33.039 --> 00:07:36.319
+control it. We're going to walk through
+
+201
+00:07:34.639 --> 00:07:37.759
+concrete examples of how you can use
+
+202
+00:07:36.319 --> 00:07:39.759
+semucks in just a moment here, but
+
+203
+00:07:37.759 --> 00:07:42.960
+here's an example of the API, right?
+
+204
+00:07:39.759 --> 00:07:45.280
+Send, read, close surface. You specify
+
+205
+00:07:42.960 --> 00:07:46.960
+the surface and the exact text you want
+
+206
+00:07:45.280 --> 00:07:49.680
+to send in. Another powerful part about
+
+207
+00:07:46.960 --> 00:07:52.479
+CMX, we can build an orchestration agent
+
+208
+00:07:49.680 --> 00:07:55.440
+around pushing and pulling specific
+
+209
+00:07:52.479 --> 00:07:57.440
+events from the CMX life cycle and
+
+210
+00:07:55.440 --> 00:07:58.720
+therefore our agents life cycle. Okay,
+
+211
+00:07:57.440 --> 00:08:00.639
+so there's a lot of customizability
+
+212
+00:07:58.720 --> 00:08:03.280
+here. When I sit down to learn a tool, I
+
+213
+00:08:00.639 --> 00:08:05.759
+use agents the entire time. Learning is
+
+214
+00:08:03.280 --> 00:08:08.879
+the killer use case for agents. Coding
+
+215
+00:08:05.759 --> 00:08:11.120
+comes next. in these HTML rich guides. I
+
+216
+00:08:08.879 --> 00:08:12.879
+want an incremental tier-based
+
+217
+00:08:11.120 --> 00:08:15.360
+explanation of how I can best use these
+
+218
+00:08:12.879 --> 00:08:16.800
+tools to solve my specific use case. And
+
+219
+00:08:15.360 --> 00:08:18.479
+that's exactly what my agent has done
+
+220
+00:08:16.800 --> 00:08:20.160
+here. A lot of really smart engineers
+
+221
+00:08:18.479 --> 00:08:22.000
+are turning their brains off. I want to
+
+222
+00:08:20.160 --> 00:08:24.240
+push back against that. We want to rise
+
+223
+00:08:22.000 --> 00:08:27.280
+with the ceiling of agentic engineering,
+
+224
+00:08:24.240 --> 00:08:28.639
+not the floor of vibe coding. Okay. So,
+
+225
+00:08:27.280 --> 00:08:30.319
+um let's run this, right? Let's
+
+226
+00:08:28.639 --> 00:08:31.919
+understand CMOX at a deeper level. You
+
+227
+00:08:30.319 --> 00:08:33.680
+see here, this tool can get very, very
+
+228
+00:08:31.919 --> 00:08:35.360
+complex. It can help you orchestrate and
+
+229
+00:08:33.680 --> 00:08:36.880
+do a lot of work. They even have like a
+
+230
+00:08:35.360 --> 00:08:38.000
+mobile app here. You can access
+
+231
+00:08:36.880 --> 00:08:39.120
+browsers. There's a lot of cool stuff
+
+232
+00:08:38.000 --> 00:08:40.159
+you can do with this tool. We're not
+
+233
+00:08:39.120 --> 00:08:41.839
+going to cover all that. We're going to
+
+234
+00:08:40.159 --> 00:08:43.360
+focus on the problems we need to have
+
+235
+00:08:41.839 --> 00:08:45.519
+solved. Whenever I'm learning a new
+
+236
+00:08:43.360 --> 00:08:48.080
+tool, I like to start super simple,
+
+237
+00:08:45.519 --> 00:08:50.399
+understand the foundations of the tool,
+
+238
+00:08:48.080 --> 00:08:52.160
+and then move to more and more complex
+
+239
+00:08:50.399 --> 00:08:53.200
+scenarios. All right, so let's go ahead
+
+240
+00:08:52.160 --> 00:08:54.959
+and start from scratch here. I'm going
+
+241
+00:08:53.200 --> 00:08:57.200
+to open up a terminal, boot up a cloud
+
+242
+00:08:54.959 --> 00:08:58.800
+code opus window here. If you're working
+
+243
+00:08:57.200 --> 00:09:00.399
+in the future, you have access to Fable.
+
+244
+00:08:58.800 --> 00:09:01.760
+I am jealous of you right now. Can't
+
+245
+00:09:00.399 --> 00:09:03.120
+wait for that model to be turned back
+
+246
+00:09:01.760 --> 00:09:04.240
+online. Although, it looks like there's
+
+247
+00:09:03.120 --> 00:09:05.760
+going to be massive delays with getting
+
+248
+00:09:04.240 --> 00:09:07.200
+that back online. So I have a semox
+
+249
+00:09:05.760 --> 00:09:08.959
+skill that was built that just makes the
+
+250
+00:09:07.200 --> 00:09:10.959
+agent aware of the tool. Open a
+
+251
+00:09:08.959 --> 00:09:14.320
+workspace in a fresh temp directory.
+
+252
+00:09:10.959 --> 00:09:15.760
+Create 63A files lsla read the output
+
+253
+00:09:14.320 --> 00:09:17.200
+back and then continue from there. All
+
+254
+00:09:15.760 --> 00:09:20.240
+right. So we're just having our
+
+255
+00:09:17.200 --> 00:09:21.839
+orchestrator agent operate on cmox
+
+256
+00:09:20.240 --> 00:09:23.519
+windows. So let's see how this looks and
+
+257
+00:09:21.839 --> 00:09:25.040
+I'll hold them both open here at the
+
+258
+00:09:23.519 --> 00:09:27.440
+same time. So you can see here our
+
+259
+00:09:25.040 --> 00:09:30.240
+existing agent team window is open. My
+
+260
+00:09:27.440 --> 00:09:32.560
+agent is operating this window. Okay. So
+
+261
+00:09:30.240 --> 00:09:34.560
+we have a new workspace here. Inside the
+
+262
+00:09:32.560 --> 00:09:36.480
+window, we have a pane with a single
+
+263
+00:09:34.560 --> 00:09:37.839
+tab. You can see there's that ls. You
+
+264
+00:09:36.480 --> 00:09:40.160
+know, I'm not typing anything here. This
+
+265
+00:09:37.839 --> 00:09:41.600
+my agent operating a workspace to be
+
+266
+00:09:40.160 --> 00:09:44.240
+clear. This is bigger than a terminal.
+
+267
+00:09:41.600 --> 00:09:46.160
+It's done. Right? So, we had an ls all
+
+268
+00:09:44.240 --> 00:09:47.760
+these mock files it created. Right? If
+
+269
+00:09:46.160 --> 00:09:49.519
+we close this, do ls ourselves, we can
+
+270
+00:09:47.760 --> 00:09:51.760
+see them exactly. The great part about
+
+271
+00:09:49.519 --> 00:09:53.279
+tools like cmox and t-mox is that you
+
+272
+00:09:51.760 --> 00:09:55.519
+can jump in whenever you need to. Right?
+
+273
+00:09:53.279 --> 00:09:58.000
+The agent stopping black boxes when you
+
+274
+00:09:55.519 --> 00:10:00.160
+can actually touch and jump in to the
+
+275
+00:09:58.000 --> 00:10:01.760
+terminal window. Aentic access here is
+
+276
+00:10:00.160 --> 00:10:02.800
+super super important. very simple,
+
+277
+00:10:01.760 --> 00:10:04.399
+great place to start when you're
+
+278
+00:10:02.800 --> 00:10:06.160
+learning a new tool. Just show a basic
+
+279
+00:10:04.399 --> 00:10:07.920
+use case of the app. So, let's split
+
+280
+00:10:06.160 --> 00:10:10.000
+into a grid. I want to see a grid here.
+
+281
+00:10:07.920 --> 00:10:12.000
+So, I'm going to close our throwaway 60
+
+282
+00:10:10.000 --> 00:10:14.000
+and we'll work our way up to, you know,
+
+283
+00:10:12.000 --> 00:10:15.839
+a full multi- aent orchestration example
+
+284
+00:10:14.000 --> 00:10:19.959
+here. We're just setting the groundwork.
+
+285
+00:10:15.839 --> 00:10:19.959
+Always start with the fundamentals.
+
+286
+00:10:22.000 --> 00:10:27.680
+So, this is going to open a 2x two grid
+
+287
+00:10:24.560 --> 00:10:30.160
+in a new workspace.
+
+288
+00:10:27.680 --> 00:10:31.680
+There we go. And in each workspace, it's
+
+289
+00:10:30.160 --> 00:10:33.440
+going to run specific commands. On the
+
+290
+00:10:31.680 --> 00:10:35.839
+right here, it's just an empty terminal.
+
+291
+00:10:33.440 --> 00:10:37.680
+Here we have the date being updated per
+
+292
+00:10:35.839 --> 00:10:39.360
+second. And then we have a tick in the
+
+293
+00:10:37.680 --> 00:10:41.440
+bottom left. And then in the top left,
+
+294
+00:10:39.360 --> 00:10:43.519
+we have h top running. Each one of these
+
+295
+00:10:41.440 --> 00:10:45.360
+clearly documented in the workspace
+
+296
+00:10:43.519 --> 00:10:47.920
+name. You can see how this can be very
+
+297
+00:10:45.360 --> 00:10:49.839
+very powerful for agents. Right? So, not
+
+298
+00:10:47.920 --> 00:10:52.160
+only is this tool helping us move at the
+
+299
+00:10:49.839 --> 00:10:54.320
+agentic speed, it's giving us access to
+
+300
+00:10:52.160 --> 00:10:56.480
+quick start commands to run repeat
+
+301
+00:10:54.320 --> 00:10:57.760
+workflows. All right? So, boot up your
+
+302
+00:10:56.480 --> 00:10:58.800
+front end, boot up your back end, boot
+
+303
+00:10:57.760 --> 00:11:00.640
+up all your services, boot up your
+
+304
+00:10:58.800 --> 00:11:02.640
+database. Let's keep pushing to see how
+
+305
+00:11:00.640 --> 00:11:05.279
+this tool is differentiated from a tool
+
+306
+00:11:02.640 --> 00:11:06.640
+like T-Mox because T-Mox is the OG of
+
+307
+00:11:05.279 --> 00:11:08.480
+this. Let's go and tidy up. Let's have
+
+308
+00:11:06.640 --> 00:11:11.440
+our agent clean everything up. Take the
+
+309
+00:11:08.480 --> 00:11:13.760
+dash workspace, rename it, flash it, and
+
+310
+00:11:11.440 --> 00:11:15.279
+then start closing it. Okay, so this is
+
+311
+00:11:13.760 --> 00:11:17.680
+where we start pushing into the value
+
+312
+00:11:15.279 --> 00:11:19.839
+prop of CMX. It can control the PES and
+
+313
+00:11:17.680 --> 00:11:21.519
+the windows in a very, very precise way.
+
+314
+00:11:19.839 --> 00:11:23.839
+There's the flash. It updated the name
+
+315
+00:11:21.519 --> 00:11:26.079
+to retired. So we have live updates
+
+316
+00:11:23.839 --> 00:11:28.320
+happening at any point in time that we
+
+317
+00:11:26.079 --> 00:11:30.320
+can agentically program. We can prompt
+
+318
+00:11:28.320 --> 00:11:32.880
+engineer into the system to really
+
+319
+00:11:30.320 --> 00:11:34.880
+control the experience of agentic
+
+320
+00:11:32.880 --> 00:11:37.200
+engineering. And that's really where
+
+321
+00:11:34.880 --> 00:11:39.519
+this all goes, right? The ultimate user
+
+322
+00:11:37.200 --> 00:11:42.079
+interface for agentic engineering, the
+
+323
+00:11:39.519 --> 00:11:44.320
+DX for agentic engineering, it is not
+
+324
+00:11:42.079 --> 00:11:45.760
+set in stone yet. As much as everyone's
+
+325
+00:11:44.320 --> 00:11:47.920
+talking about loop engineering and
+
+326
+00:11:45.760 --> 00:11:49.920
+building these new DXs, there are no
+
+327
+00:11:47.920 --> 00:11:52.000
+winners yet. Okay? only experimenters,
+
+328
+00:11:49.920 --> 00:11:54.959
+only researchers, only those pushing
+
+329
+00:11:52.000 --> 00:11:57.200
+what they can do with agents. So, keep
+
+330
+00:11:54.959 --> 00:11:59.279
+looking for the optimal developer
+
+331
+00:11:57.200 --> 00:12:00.720
+experience for your work, for your
+
+332
+00:11:59.279 --> 00:12:02.079
+agent, so on and so forth. Right? And
+
+333
+00:12:00.720 --> 00:12:04.320
+that's what we're doing here. We're just
+
+334
+00:12:02.079 --> 00:12:07.440
+understanding the state space of the
+
+335
+00:12:04.320 --> 00:12:09.760
+available agentic tools. Okay? And as
+
+336
+00:12:07.440 --> 00:12:11.920
+you'll notice here, building blocks,
+
+337
+00:12:09.760 --> 00:12:15.760
+extensibility, adaptability,
+
+338
+00:12:11.920 --> 00:12:17.519
+pluggability is a key part of great
+
+339
+00:12:15.760 --> 00:12:19.200
+agentic technology, right? which is why
+
+340
+00:12:17.519 --> 00:12:21.200
+I'm drawn to CMOX in the first place.
+
+341
+00:12:19.200 --> 00:12:22.639
+Great. Agentic access renamed Flash.
+
+342
+00:12:21.200 --> 00:12:24.000
+Close the whole workspace. Great, you
+
+343
+00:12:22.639 --> 00:12:25.360
+get the picture. Let's get more complex
+
+344
+00:12:24.000 --> 00:12:27.360
+here. Let's boot up Cloud Code and the
+
+345
+00:12:25.360 --> 00:12:28.399
+PI coding agent side by side. We're
+
+346
+00:12:27.360 --> 00:12:30.320
+going to do this in a brand new
+
+347
+00:12:28.399 --> 00:12:32.000
+workspace. That's the mode I like to
+
+348
+00:12:30.320 --> 00:12:33.519
+work in here with CMU. So far, I'm
+
+349
+00:12:32.000 --> 00:12:35.839
+getting into this nice pattern of
+
+350
+00:12:33.519 --> 00:12:37.360
+creating new workspaces, not Windows.
+
+351
+00:12:35.839 --> 00:12:40.079
+Two columns here side by side. And one
+
+352
+00:12:37.360 --> 00:12:41.120
+is PI and one is Claude. And so, another
+
+353
+00:12:40.079 --> 00:12:43.279
+great piece about this, you can
+
+354
+00:12:41.120 --> 00:12:45.200
+orchestrate any agent coding tool you
+
+355
+00:12:43.279 --> 00:12:46.480
+want to. If you're a cloud code guy,
+
+356
+00:12:45.200 --> 00:12:48.160
+scale up your cloud codes. If you're a
+
+357
+00:12:46.480 --> 00:12:50.880
+Codeex fan, scale those up. If you're an
+
+358
+00:12:48.160 --> 00:12:52.399
+open code scrub, go for that. Just
+
+359
+00:12:50.880 --> 00:12:55.120
+kidding. Just kidding. If you're a PI
+
+360
+00:12:52.399 --> 00:12:56.399
+coding agent, elite agentic engineer
+
+361
+00:12:55.120 --> 00:12:58.320
+plugging and playing with your own
+
+362
+00:12:56.399 --> 00:13:00.320
+custom agent harnesses, then you'll go
+
+363
+00:12:58.320 --> 00:13:02.240
+for that, right? Opus 4.8, one of the
+
+364
+00:13:00.320 --> 00:13:04.240
+best orchestrator models in the game
+
+365
+00:13:02.240 --> 00:13:06.560
+until Fable supersedes it. You can see
+
+366
+00:13:04.240 --> 00:13:08.480
+here we are orchestrating multiple
+
+367
+00:13:06.560 --> 00:13:10.320
+coding agents with the orchestrator
+
+368
+00:13:08.480 --> 00:13:12.720
+agent. Okay, very, very powerful stuff.
+
+369
+00:13:10.320 --> 00:13:15.279
+I'm using IPI for my PI coding agent.
+
+370
+00:13:12.720 --> 00:13:16.959
+This is my customized PI coding agent
+
+371
+00:13:15.279 --> 00:13:19.040
+with several different extensions built
+
+372
+00:13:16.959 --> 00:13:20.959
+into it. This a specialized developer
+
+373
+00:13:19.040 --> 00:13:22.399
+experience as an agent harness. So we've
+
+374
+00:13:20.959 --> 00:13:25.040
+just asked a simple question here about
+
+375
+00:13:22.399 --> 00:13:26.480
+processes versus threads and they both
+
+376
+00:13:25.040 --> 00:13:29.040
+answered, right? So nothing special
+
+377
+00:13:26.480 --> 00:13:31.200
+there, but the value proposition is
+
+378
+00:13:29.040 --> 00:13:33.680
+obvious. You can boot up agents and you
+
+379
+00:13:31.200 --> 00:13:35.920
+can prompt agents using cmox and we can
+
+380
+00:13:33.680 --> 00:13:37.279
+continue to scale this. Okay, so let's
+
+381
+00:13:35.920 --> 00:13:40.000
+do exactly that. Let's start
+
+382
+00:13:37.279 --> 00:13:41.680
+orchestrating fleets of agents. Okay, so
+
+383
+00:13:40.000 --> 00:13:43.120
+let's do a 2x2 fleet. And a really
+
+384
+00:13:41.680 --> 00:13:44.880
+important piece here that you'll also
+
+385
+00:13:43.120 --> 00:13:48.160
+notice is that these agents have
+
+386
+00:13:44.880 --> 00:13:50.800
+completed. They then send a notification
+
+387
+00:13:48.160 --> 00:13:52.800
+to this top window. Okay? So, say you're
+
+388
+00:13:50.800 --> 00:13:54.880
+working over here getting things done on
+
+389
+00:13:52.800 --> 00:13:57.279
+another branch of work, another set of
+
+390
+00:13:54.880 --> 00:13:59.680
+work. CMU is going to notify you when
+
+391
+00:13:57.279 --> 00:14:01.600
+this set of agents or single agent if
+
+392
+00:13:59.680 --> 00:14:03.040
+you want to do one workspace per agent.
+
+393
+00:14:01.600 --> 00:14:04.399
+It'll let you know when that work is
+
+394
+00:14:03.040 --> 00:14:06.720
+done. Okay. But here we go. We have a
+
+395
+00:14:04.399 --> 00:14:08.720
+new fleet. This is our security fleet.
+
+396
+00:14:06.720 --> 00:14:11.440
+Send up four coding agents. Cloud Code,
+
+397
+00:14:08.720 --> 00:14:13.760
+Codeex, Pi with Minamax and GLM. Create
+
+398
+00:14:11.440 --> 00:14:15.839
+a fleet. List the top three security
+
+399
+00:14:13.760 --> 00:14:17.360
+vulnerabilities you can find in this
+
+400
+00:14:15.839 --> 00:14:18.800
+repository. So this is a simple mock
+
+401
+00:14:17.360 --> 00:14:20.399
+repository. This is a waste for these
+
+402
+00:14:18.800 --> 00:14:22.480
+agents. Not really going to do anything.
+
+403
+00:14:20.399 --> 00:14:24.800
+But you can see here this is a simple
+
+404
+00:14:22.480 --> 00:14:26.880
+important idea of literally scaling your
+
+405
+00:14:24.800 --> 00:14:27.839
+computer to scale your impact. Say you
+
+406
+00:14:26.880 --> 00:14:29.440
+were looking for security
+
+407
+00:14:27.839 --> 00:14:30.800
+vulnerabilities in your codebase. You
+
+408
+00:14:29.440 --> 00:14:32.800
+can spin up one agent and have sub
+
+409
+00:14:30.800 --> 00:14:34.800
+agents under it run. Or you could set up
+
+410
+00:14:32.800 --> 00:14:36.959
+different agentic coding tools with
+
+411
+00:14:34.800 --> 00:14:39.279
+their own unique advantages running
+
+412
+00:14:36.959 --> 00:14:41.120
+different agents to run the exact same
+
+413
+00:14:39.279 --> 00:14:44.079
+validation pattern, the exact same
+
+414
+00:14:41.120 --> 00:14:46.639
+security checks across your codebase.
+
+415
+00:14:44.079 --> 00:14:48.800
+Okay, this is the simplest clearest
+
+416
+00:14:46.639 --> 00:14:50.160
+example of scaling your compute to scale
+
+417
+00:14:48.800 --> 00:14:52.720
+your impact. The big difference here
+
+418
+00:14:50.160 --> 00:14:56.079
+with a tool like CMX or T-Mox is that
+
+419
+00:14:52.720 --> 00:14:59.360
+this is fully visible. Okay, so we have
+
+420
+00:14:56.079 --> 00:15:00.639
+Minamax M3 giving a shot at this GLM 5.2
+
+421
+00:14:59.360 --> 00:15:04.079
+and of course the state-of-the-art
+
+422
+00:15:00.639 --> 00:15:06.240
+models GPT 5.5 and Opus 4.8. They're all
+
+423
+00:15:04.079 --> 00:15:08.320
+applying their opinions, their
+
+424
+00:15:06.240 --> 00:15:10.720
+perspective, their expertise, their
+
+425
+00:15:08.320 --> 00:15:12.399
+specific model advantage against this
+
+426
+00:15:10.720 --> 00:15:14.800
+problem of checking for security
+
+427
+00:15:12.399 --> 00:15:16.959
+vulnerabilities, a big topic right now
+
+428
+00:15:14.800 --> 00:15:19.120
+in the age of agents. One of the key
+
+429
+00:15:16.959 --> 00:15:20.800
+pieces of this is now inside of our
+
+430
+00:15:19.120 --> 00:15:23.199
+orchestrator because remember the way
+
+431
+00:15:20.800 --> 00:15:25.279
+I'm looking at this tool is any point to
+
+432
+00:15:23.199 --> 00:15:28.480
+be able to use my orchestrator to drive
+
+433
+00:15:25.279 --> 00:15:30.399
+results in any one of my windows, any
+
+434
+00:15:28.480 --> 00:15:32.480
+one of my workspaces and then the
+
+435
+00:15:30.399 --> 00:15:35.040
+individual panes, but also have the
+
+436
+00:15:32.480 --> 00:15:38.160
+ability to go into any individual agents
+
+437
+00:15:35.040 --> 00:15:40.560
+and really just prompt out and dial into
+
+438
+00:15:38.160 --> 00:15:42.720
+any details we need to on an agent
+
+439
+00:15:40.560 --> 00:15:44.079
+level. Okay, so this is important. We
+
+440
+00:15:42.720 --> 00:15:45.760
+want to be able to jump into the process
+
+441
+00:15:44.079 --> 00:15:47.760
+at any point, understand what every
+
+442
+00:15:45.760 --> 00:15:49.120
+agent is doing, who's got the advantage,
+
+443
+00:15:47.760 --> 00:15:51.440
+who's running patterns we want to
+
+444
+00:15:49.120 --> 00:15:53.519
+replicate, and who's doing stupid
+
+445
+00:15:51.440 --> 00:15:56.240
+we don't want to do again. Okay? And
+
+446
+00:15:53.519 --> 00:15:58.399
+that's on a agent coding tool level, all
+
+447
+00:15:56.240 --> 00:16:00.560
+the way down to, of course, the model
+
+448
+00:15:58.399 --> 00:16:02.399
+level. And then further on down, right?
+
+449
+00:16:00.560 --> 00:16:04.560
+Context, model, prompt, tool, system
+
+450
+00:16:02.399 --> 00:16:06.639
+prompt, context. So great, these are all
+
+451
+00:16:04.560 --> 00:16:09.040
+done. And the orchestrator is reading it
+
+452
+00:16:06.639 --> 00:16:11.120
+back out. This is now in idle mode
+
+453
+00:16:09.040 --> 00:16:13.519
+because the orchestrator has read the
+
+454
+00:16:11.120 --> 00:16:15.279
+response. It's read the surface, right?
+
+455
+00:16:13.519 --> 00:16:17.600
+It knows that things are done. This is
+
+456
+00:16:15.279 --> 00:16:19.440
+where we start getting out of what T-Max
+
+457
+00:16:17.600 --> 00:16:21.040
+can do, right? We're working on multiple
+
+458
+00:16:19.440 --> 00:16:23.440
+problems. We're scaling our computer
+
+459
+00:16:21.040 --> 00:16:26.079
+scale impact and we can see everything
+
+460
+00:16:23.440 --> 00:16:28.320
+and we can understand everything. Okay,
+
+461
+00:16:26.079 --> 00:16:30.320
+fantastic. So, we are doing multi- aent
+
+462
+00:16:28.320 --> 00:16:32.959
+delegation, but of course, one of the
+
+463
+00:16:30.320 --> 00:16:34.800
+key things here is any agent can prompt
+
+464
+00:16:32.959 --> 00:16:36.160
+any other agent. So, I'll just try to do
+
+465
+00:16:34.800 --> 00:16:38.079
+something random here. Inside of this
+
+466
+00:16:36.160 --> 00:16:39.920
+cloud code worker, I'll type cmox to
+
+467
+00:16:38.079 --> 00:16:42.000
+activate the skill. Ping your other
+
+468
+00:16:39.920 --> 00:16:43.279
+fleet co-workers. So very powerful stuff
+
+469
+00:16:42.000 --> 00:16:44.880
+here. It's going to read the screen of
+
+470
+00:16:43.279 --> 00:16:46.720
+each surface. I've been seeing really
+
+471
+00:16:44.880 --> 00:16:48.720
+really great success with this three
+
+472
+00:16:46.720 --> 00:16:50.240
+tier architecture with my agents, right?
+
+473
+00:16:48.720 --> 00:16:52.480
+You have a top level orchestrator. You
+
+474
+00:16:50.240 --> 00:16:54.639
+then have team leads and then the leads
+
+475
+00:16:52.480 --> 00:16:56.560
+have workers that actually do the work.
+
+476
+00:16:54.639 --> 00:16:59.040
+Okay, so we're replicating traditional
+
+477
+00:16:56.560 --> 00:17:01.360
+hierarchy structures without the true
+
+478
+00:16:59.040 --> 00:17:02.880
+cons and true problems with hierarchies,
+
+479
+00:17:01.360 --> 00:17:04.880
+right? This is not a top- down
+
+480
+00:17:02.880 --> 00:17:06.880
+structure. Any agent can prompt any
+
+481
+00:17:04.880 --> 00:17:08.559
+agent. You can see that here thanks to
+
+482
+00:17:06.880 --> 00:17:10.720
+this skill here. We're going to do a
+
+483
+00:17:08.559 --> 00:17:13.520
+nice simple prompt coming into every
+
+484
+00:17:10.720 --> 00:17:15.439
+single agent from inside CMX, right? So,
+
+485
+00:17:13.520 --> 00:17:17.360
+our agents can prompt our agents. This
+
+486
+00:17:15.439 --> 00:17:19.120
+is a flat hierarchy even though there is
+
+487
+00:17:17.360 --> 00:17:20.640
+one orchard is at the top. And so, I
+
+488
+00:17:19.120 --> 00:17:21.839
+like to put my team lead on the left as
+
+489
+00:17:20.640 --> 00:17:23.520
+you'll see in a moment, but we can just
+
+490
+00:17:21.839 --> 00:17:25.760
+drag and drop this down here or we'll
+
+491
+00:17:23.520 --> 00:17:27.520
+move it over here. And this very quickly
+
+492
+00:17:25.760 --> 00:17:29.600
+kind of shows you the organizational
+
+493
+00:17:27.520 --> 00:17:31.280
+structure that you can build. Lead here,
+
+494
+00:17:29.600 --> 00:17:32.960
+workers here. And you can build any
+
+495
+00:17:31.280 --> 00:17:34.880
+structure you want. The point is is that
+
+496
+00:17:32.960 --> 00:17:36.400
+the communication channel is flat. All
+
+497
+00:17:34.880 --> 00:17:38.799
+right. So, fantastic. What else can we
+
+498
+00:17:36.400 --> 00:17:40.320
+do with this tool? Let's scale into
+
+499
+00:17:38.799 --> 00:17:41.360
+workspaces. Let's really push what we
+
+500
+00:17:40.320 --> 00:17:42.720
+can do with this. So, I'm going to copy
+
+501
+00:17:41.360 --> 00:17:44.080
+this larger prompt here. Going to have
+
+502
+00:17:42.720 --> 00:17:45.520
+my agent do this here. We're going to
+
+503
+00:17:44.080 --> 00:17:48.080
+showcase like the importance of
+
+504
+00:17:45.520 --> 00:17:49.440
+organization inside the workspace. You
+
+505
+00:17:48.080 --> 00:17:51.200
+can see here we're starting to already
+
+506
+00:17:49.440 --> 00:17:52.640
+have a lot more organization than normal
+
+507
+00:17:51.200 --> 00:17:53.919
+if we were just in a single terminal or
+
+508
+00:17:52.640 --> 00:17:55.919
+if we were using a single terminal with
+
+509
+00:17:53.919 --> 00:17:58.080
+tabs. We're getting notification events
+
+510
+00:17:55.919 --> 00:17:59.919
+which are pretty pluggable. You can do a
+
+511
+00:17:58.080 --> 00:18:01.600
+lot more with them than we are. You can
+
+512
+00:17:59.919 --> 00:18:03.200
+see here, imagine you're booting up
+
+513
+00:18:01.600 --> 00:18:05.280
+multiple teams to solve multiple
+
+514
+00:18:03.200 --> 00:18:06.880
+problems. We have gamma, beta, alpha. We
+
+515
+00:18:05.280 --> 00:18:08.160
+can jump into these and we can see our
+
+516
+00:18:06.880 --> 00:18:09.440
+let me pull up the orchestrator so we
+
+517
+00:18:08.160 --> 00:18:11.200
+can see what's going on here. Our
+
+518
+00:18:09.440 --> 00:18:13.679
+orchestrator getting work done booting
+
+519
+00:18:11.200 --> 00:18:15.840
+up sets of agents programmatically.
+
+520
+00:18:13.679 --> 00:18:17.840
+Let's close our security fleet here.
+
+521
+00:18:15.840 --> 00:18:20.400
+Okay, so we have gamma, we have beta,
+
+522
+00:18:17.840 --> 00:18:22.559
+and we have alpha booted up. Okay, so
+
+523
+00:18:20.400 --> 00:18:25.200
+you know, imagine any multi- aent
+
+524
+00:18:22.559 --> 00:18:26.880
+orchestration set of teams you want.
+
+525
+00:18:25.200 --> 00:18:28.640
+That's a key value proposition here. You
+
+526
+00:18:26.880 --> 00:18:30.640
+have multi- aent coordination at a
+
+527
+00:18:28.640 --> 00:18:32.799
+massive scale, right? Just an absolutely
+
+528
+00:18:30.640 --> 00:18:35.039
+massive scale and you're in control and
+
+529
+00:18:32.799 --> 00:18:36.480
+you have visibility into it. Okay, super
+
+530
+00:18:35.039 --> 00:18:37.919
+super important. If you hold command,
+
+531
+00:18:36.480 --> 00:18:40.640
+you can see all the hot keys for each
+
+532
+00:18:37.919 --> 00:18:42.799
+workspace. This is clearly the unit that
+
+533
+00:18:40.640 --> 00:18:44.160
+CMX sees as the most important to be
+
+534
+00:18:42.799 --> 00:18:45.760
+navigating. It's at that workspace
+
+535
+00:18:44.160 --> 00:18:48.320
+level. But of course, we can quickly
+
+536
+00:18:45.760 --> 00:18:50.160
+move through all of our surfaces as
+
+537
+00:18:48.320 --> 00:18:51.919
+well, right? So again, just expressing
+
+538
+00:18:50.160 --> 00:18:57.160
+the idea here. You can scale agents
+
+539
+00:18:51.919 --> 00:18:57.160
+across multiple workspaces as well.
+
+540
+00:18:59.039 --> 00:19:03.520
+So let's look at the scenario where you
+
+541
+00:19:01.280 --> 00:19:05.360
+need to fix a bug right away. Say
+
+542
+00:19:03.520 --> 00:19:07.840
+production's going down. Your customers
+
+543
+00:19:05.360 --> 00:19:10.080
+and your users are completely blocked.
+
+544
+00:19:07.840 --> 00:19:11.600
+So you're losing money by the second.
+
+545
+00:19:10.080 --> 00:19:13.600
+Okay. So I'm going to hit new here just
+
+546
+00:19:11.600 --> 00:19:15.280
+to reboot everything and then paste this
+
+547
+00:19:13.600 --> 00:19:17.120
+in here. There's a longer prompt, but
+
+548
+00:19:15.280 --> 00:19:18.320
+we're going to have agents race toward a
+
+549
+00:19:17.120 --> 00:19:19.679
+solution. Okay. So I'm going to close
+
+550
+00:19:18.320 --> 00:19:22.080
+all these windows here. Say there's a
+
+551
+00:19:19.679 --> 00:19:23.919
+production issue and you need to resolve
+
+552
+00:19:22.080 --> 00:19:26.160
+it yesterday. This is going to be a
+
+553
+00:19:23.919 --> 00:19:27.919
+differentiating agentic engineering
+
+554
+00:19:26.160 --> 00:19:29.280
+pattern that you can use. It's super
+
+555
+00:19:27.919 --> 00:19:31.360
+simple. Throw more compute at the
+
+556
+00:19:29.280 --> 00:19:32.880
+problem. Have your agents race toward a
+
+557
+00:19:31.360 --> 00:19:34.960
+solution. We're going to do a needle in
+
+558
+00:19:32.880 --> 00:19:37.120
+a haystack search. In reality, this will
+
+559
+00:19:34.960 --> 00:19:38.960
+be a hot fix. You'll need to deploy, but
+
+560
+00:19:37.120 --> 00:19:41.039
+you can just throw a bunch of agents at
+
+561
+00:19:38.960 --> 00:19:42.559
+a problem at the same time in parallel.
+
+562
+00:19:41.039 --> 00:19:44.160
+You want the first available answers so
+
+563
+00:19:42.559 --> 00:19:46.160
+you can deploy the fix back into
+
+564
+00:19:44.160 --> 00:19:47.520
+production. Okay. So, in this scenario,
+
+565
+00:19:46.160 --> 00:19:50.320
+we're going to boot up an eight agent
+
+566
+00:19:47.520 --> 00:19:52.160
+race to just race toward a solution. So,
+
+567
+00:19:50.320 --> 00:19:54.080
+there we go. All the windows popping
+
+568
+00:19:52.160 --> 00:19:56.720
+open here. And we're going to deploy a
+
+569
+00:19:54.080 --> 00:19:58.480
+variety of compute to get the job done.
+
+570
+00:19:56.720 --> 00:20:00.480
+This is needle in a hay stack. Capture
+
+571
+00:19:58.480 --> 00:20:03.360
+the flag. first agent to the goalpost
+
+572
+00:20:00.480 --> 00:20:05.200
+wins type of task. Okay. And multi- aent
+
+573
+00:20:03.360 --> 00:20:07.200
+orchestration lets you do this really
+
+574
+00:20:05.200 --> 00:20:09.520
+really well. Every context model prompt,
+
+575
+00:20:07.200 --> 00:20:11.440
+every agent coding tool is going to have
+
+576
+00:20:09.520 --> 00:20:13.280
+their unique advantages, strengths and
+
+577
+00:20:11.440 --> 00:20:14.559
+weaknesses. And so when you need to
+
+578
+00:20:13.280 --> 00:20:16.960
+deploy something quickly, when you have
+
+579
+00:20:14.559 --> 00:20:19.280
+a hot fix you need to deploy, throwing
+
+580
+00:20:16.960 --> 00:20:21.360
+different types of intelligence at the
+
+581
+00:20:19.280 --> 00:20:23.520
+problem is going to get you the better
+
+582
+00:20:21.360 --> 00:20:25.360
+result pretty much every single time if
+
+583
+00:20:23.520 --> 00:20:27.039
+you're willing to of course pay for the
+
+584
+00:20:25.360 --> 00:20:29.919
+compute. And so you can imagine, you
+
+585
+00:20:27.039 --> 00:20:31.600
+know, you have your red team agent race
+
+586
+00:20:29.919 --> 00:20:33.840
+here and then you might have another set
+
+587
+00:20:31.600 --> 00:20:35.440
+of agents in a, you know, your
+
+588
+00:20:33.840 --> 00:20:37.120
+infrastructure agents or your deploy
+
+589
+00:20:35.440 --> 00:20:39.919
+agents here. And then you might have
+
+590
+00:20:37.120 --> 00:20:42.240
+your review set of agents here to at
+
+591
+00:20:39.919 --> 00:20:44.640
+scale quickly review the issue so that
+
+592
+00:20:42.240 --> 00:20:46.559
+you can then hand it off to your infra
+
+593
+00:20:44.640 --> 00:20:48.320
+team of agents, right? Your deploy
+
+594
+00:20:46.559 --> 00:20:50.640
+agents. And now we have a bunch of
+
+595
+00:20:48.320 --> 00:20:52.640
+compute thrown at the problem. We've got
+
+596
+00:20:50.640 --> 00:20:53.919
+Opus, we've got Sonnet. And another
+
+597
+00:20:52.640 --> 00:20:55.520
+advantage here, you can see a couple of
+
+598
+00:20:53.919 --> 00:20:56.880
+my PI agents didn't even fire. It looks
+
+599
+00:20:55.520 --> 00:20:59.440
+like an environment variable setup
+
+600
+00:20:56.880 --> 00:21:01.520
+problem. That's fine. My local agent, my
+
+601
+00:20:59.440 --> 00:21:03.280
+local Quinn is working. All the codecs
+
+602
+00:21:01.520 --> 00:21:05.600
+and all the Sonnet models quickly found
+
+603
+00:21:03.280 --> 00:21:07.760
+the solution. That's done. And now this
+
+604
+00:21:05.600 --> 00:21:10.080
+issue can be reported. And now we're
+
+605
+00:21:07.760 --> 00:21:12.159
+waiting for that notification event for
+
+606
+00:21:10.080 --> 00:21:13.600
+my orchestrator and needs input. There
+
+607
+00:21:12.159 --> 00:21:15.520
+we go. Okay, so it finally triggered
+
+608
+00:21:13.600 --> 00:21:17.440
+there. And now our orchestrator should
+
+609
+00:21:15.520 --> 00:21:19.520
+pick this up. Let's go and see if it
+
+610
+00:21:17.440 --> 00:21:21.039
+does pick it up cuz all the agents are
+
+611
+00:21:19.520 --> 00:21:22.799
+complete. Maybe this is a good time for
+
+612
+00:21:21.039 --> 00:21:24.880
+us to transition a little bit and talk
+
+613
+00:21:22.799 --> 00:21:26.480
+about the pros and cons of this tool,
+
+614
+00:21:24.880 --> 00:21:27.760
+right? And maybe my agents just don't
+
+615
+00:21:26.480 --> 00:21:29.360
+don't understand the tool properly.
+
+616
+00:21:27.760 --> 00:21:30.799
+That's fine. It could be a mistake on my
+
+617
+00:21:29.360 --> 00:21:32.720
+part. When you're using tools like this,
+
+618
+00:21:30.799 --> 00:21:34.799
+these new tools, tools that are just
+
+619
+00:21:32.720 --> 00:21:36.559
+kind of appearing overnight, and I know
+
+620
+00:21:34.799 --> 00:21:37.919
+CMX deserves more credit than that. This
+
+621
+00:21:36.559 --> 00:21:39.919
+is a solid tool that's been around for a
+
+622
+00:21:37.919 --> 00:21:41.200
+while. There's a whole wave of agentic
+
+623
+00:21:39.919 --> 00:21:43.039
+tools coming. And you're always going to
+
+624
+00:21:41.200 --> 00:21:44.720
+want to compare that against tried and
+
+625
+00:21:43.039 --> 00:21:47.200
+true technology. So, when I sit down to
+
+626
+00:21:44.720 --> 00:21:49.520
+solve problems and learn with agents,
+
+627
+00:21:47.200 --> 00:21:51.120
+I'm always comparing against what else
+
+628
+00:21:49.520 --> 00:21:53.200
+exists. For a lot of the capability
+
+629
+00:21:51.120 --> 00:21:54.880
+we've looked at here, T-Max can do the
+
+630
+00:21:53.200 --> 00:21:58.000
+job. The thing is that it's not going to
+
+631
+00:21:54.880 --> 00:21:59.600
+be as customizable and aesthetic, and
+
+632
+00:21:58.000 --> 00:22:02.559
+the developer experience, I think, with
+
+633
+00:21:59.600 --> 00:22:04.000
+T-Max is a little harder to get right.
+
+634
+00:22:02.559 --> 00:22:07.200
+That's what CMOX does really, really
+
+635
+00:22:04.000 --> 00:22:09.919
+well. It's made for the modern era of
+
+636
+00:22:07.200 --> 00:22:12.240
+building with agents programmatically on
+
+637
+00:22:09.919 --> 00:22:13.360
+Mac devices. Okay, so yeah, probably
+
+638
+00:22:12.240 --> 00:22:15.360
+should have mentioned that earlier. If
+
+639
+00:22:13.360 --> 00:22:16.960
+you're on Linux, Windows, WSL, you know,
+
+640
+00:22:15.360 --> 00:22:19.520
+you're going to need to use a tool like
+
+641
+00:22:16.960 --> 00:22:21.360
+T-Mox. This is Mac only. The big problem
+
+642
+00:22:19.520 --> 00:22:23.840
+with this is just maturity, right? These
+
+643
+00:22:21.360 --> 00:22:25.440
+brand new tools have issues and it could
+
+644
+00:22:23.840 --> 00:22:27.360
+be me. But you can see here, you know,
+
+645
+00:22:25.440 --> 00:22:29.760
+in our red team response here, our
+
+646
+00:22:27.360 --> 00:22:31.919
+orchestrator has done nothing. Check and
+
+647
+00:22:29.760 --> 00:22:34.080
+understand why you stalled there, right?
+
+648
+00:22:31.919 --> 00:22:36.559
+Because really we wanted to ping on the
+
+649
+00:22:34.080 --> 00:22:39.120
+first completion of our tool, right? Our
+
+650
+00:22:36.559 --> 00:22:40.960
+first completion of any window. Okay, so
+
+651
+00:22:39.120 --> 00:22:42.880
+foreground 10 minute. Okay, very weird.
+
+652
+00:22:40.960 --> 00:22:44.640
+So we did get a notification event. uh
+
+653
+00:22:42.880 --> 00:22:46.559
+it just seems like our agent didn't
+
+654
+00:22:44.640 --> 00:22:47.840
+register it. This is one of the things I
+
+655
+00:22:46.559 --> 00:22:49.200
+need to spend more time on to make sure
+
+656
+00:22:47.840 --> 00:22:50.480
+I'm getting right and it's just one of
+
+657
+00:22:49.200 --> 00:22:52.240
+the things that you'll have to
+
+658
+00:22:50.480 --> 00:22:53.440
+understand when you're building and
+
+659
+00:22:52.240 --> 00:22:54.720
+teaching your agents how to use the
+
+660
+00:22:53.440 --> 00:22:56.720
+tool. Something can be improved there,
+
+661
+00:22:54.720 --> 00:22:58.080
+but the high level is still there. There
+
+662
+00:22:56.720 --> 00:23:00.960
+are notification events you can plug
+
+663
+00:22:58.080 --> 00:23:04.679
+your agents into to wait for responses
+
+664
+00:23:00.960 --> 00:23:04.679
+from your agents.
+
+665
+00:23:06.559 --> 00:23:10.080
+We're going to stand up eight agents
+
+666
+00:23:08.080 --> 00:23:11.600
+across four workspaces, two agents in
+
+667
+00:23:10.080 --> 00:23:13.440
+each. Give them each a two column
+
+668
+00:23:11.600 --> 00:23:15.440
+layout. The left is the agent and the
+
+669
+00:23:13.440 --> 00:23:17.520
+right is going to be a browser. Now,
+
+670
+00:23:15.440 --> 00:23:19.280
+this direction is fine. CMX is, you
+
+671
+00:23:17.520 --> 00:23:21.200
+know, trying to grow as a product, so it
+
+672
+00:23:19.280 --> 00:23:23.600
+has inapp browsers. That's really cool.
+
+673
+00:23:21.200 --> 00:23:25.360
+The real killer feature here is
+
+674
+00:23:23.600 --> 00:23:26.880
+programmability. This is the most
+
+675
+00:23:25.360 --> 00:23:28.240
+important thing. It's nice that it's
+
+676
+00:23:26.880 --> 00:23:30.400
+lightweight. Of course, open source is
+
+677
+00:23:28.240 --> 00:23:32.320
+super important, but customizability is
+
+678
+00:23:30.400 --> 00:23:35.360
+what comes next. And there's a whole
+
+679
+00:23:32.320 --> 00:23:38.640
+slew of customization you can build out
+
+680
+00:23:35.360 --> 00:23:40.640
+into your CMX application that we're
+
+681
+00:23:38.640 --> 00:23:42.240
+going to gloss over because these are
+
+682
+00:23:40.640 --> 00:23:44.159
+extra features. You can change the theme
+
+683
+00:23:42.240 --> 00:23:46.400
+and feel. You can add custom action
+
+684
+00:23:44.159 --> 00:23:49.120
+buttons. That's all well and good. The
+
+685
+00:23:46.400 --> 00:23:51.760
+most important thing here by far is a
+
+686
+00:23:49.120 --> 00:23:54.320
+gentic access, right? This is a huge
+
+687
+00:23:51.760 --> 00:23:56.159
+theme. This is one of the key pillars of
+
+688
+00:23:54.320 --> 00:23:59.039
+agentic engineering, right? is making
+
+689
+00:23:56.159 --> 00:24:00.720
+sure that you have a gentic access to
+
+690
+00:23:59.039 --> 00:24:02.480
+every tool to every service to every
+
+691
+00:24:00.720 --> 00:24:04.960
+product that you want to interact with
+
+692
+00:24:02.480 --> 00:24:06.720
+at the speed of agents not the speed of
+
+693
+00:24:04.960 --> 00:24:08.880
+humans. I think we can just say that
+
+694
+00:24:06.720 --> 00:24:11.279
+right in the digital world eventually
+
+695
+00:24:08.880 --> 00:24:13.520
+the physical world too we move very
+
+696
+00:24:11.279 --> 00:24:15.919
+slowly now and there are advantages to
+
+697
+00:24:13.520 --> 00:24:18.080
+moving slowly coding is not our domain
+
+698
+00:24:15.919 --> 00:24:20.400
+anymore that is the domain of agents
+
+699
+00:24:18.080 --> 00:24:21.919
+okay but orchestrating intelligence is
+
+700
+00:24:20.400 --> 00:24:23.360
+our domain this is one of the five
+
+701
+00:24:21.919 --> 00:24:24.720
+pillars of agentic engineering we've
+
+702
+00:24:23.360 --> 00:24:27.039
+covered this in a previous video I'll
+
+703
+00:24:24.720 --> 00:24:28.880
+link that below if you're interested
+
+704
+00:24:27.039 --> 00:24:30.480
+here's the kind of high level of the
+
+705
+00:24:28.880 --> 00:24:33.840
+five pillars I'm really really focusing
+
+706
+00:24:30.480 --> 00:24:36.480
+on right now over 2026 and aentic access
+
+707
+00:24:33.840 --> 00:24:38.159
+is number five Even your agents should
+
+708
+00:24:36.480 --> 00:24:40.799
+have agentic access, right? You want
+
+709
+00:24:38.159 --> 00:24:43.039
+that meta level of control. And this is
+
+710
+00:24:40.799 --> 00:24:45.679
+all to raise the ceiling of your agentic
+
+711
+00:24:43.039 --> 00:24:47.440
+engineering, not the floor of vibe
+
+712
+00:24:45.679 --> 00:24:48.960
+coding. When these mythos class models
+
+713
+00:24:47.440 --> 00:24:50.400
+come out, a lot of engineers are just
+
+714
+00:24:48.960 --> 00:24:51.679
+going to sit. They're going to get lazy.
+
+715
+00:24:50.400 --> 00:24:53.360
+They're going to stop thinking and just
+
+716
+00:24:51.679 --> 00:24:54.400
+hand the wheel to the agent. On this
+
+717
+00:24:53.360 --> 00:24:57.200
+channel, we're not going to be doing
+
+718
+00:24:54.400 --> 00:24:58.960
+that. If you agree with that ideology,
+
+719
+00:24:57.200 --> 00:25:01.120
+like, follow, subscribe, all that good
+
+720
+00:24:58.960 --> 00:25:03.039
+stuff. The kind of oneliner is if a tool
+
+721
+00:25:01.120 --> 00:25:04.799
+does not have programmatic access, I
+
+722
+00:25:03.039 --> 00:25:07.440
+just completely ignore it. Now I don't
+
+723
+00:25:04.799 --> 00:25:10.000
+give it another second of my time. Okay.
+
+724
+00:25:07.440 --> 00:25:12.640
+Agentic access gives you the agentic
+
+725
+00:25:10.000 --> 00:25:14.960
+speed. Let's see where our team is. FS
+
+726
+00:25:12.640 --> 00:25:16.799
+delta gamma beta alpha team. Imagine
+
+727
+00:25:14.960 --> 00:25:19.120
+these are you know the names of features
+
+728
+00:25:16.799 --> 00:25:20.320
+the names of bug fixes the names of
+
+729
+00:25:19.120 --> 00:25:22.159
+things you are actually building
+
+730
+00:25:20.320 --> 00:25:24.640
+against. We have a nice browser on the
+
+731
+00:25:22.159 --> 00:25:27.200
+side. And we have a two agent team per
+
+732
+00:25:24.640 --> 00:25:28.720
+workspace to work on that browser. Okay.
+
+733
+00:25:27.200 --> 00:25:31.520
+So you get the idea here, right? We have
+
+734
+00:25:28.720 --> 00:25:33.360
+a little custom theming here to help us
+
+735
+00:25:31.520 --> 00:25:35.600
+get back in the loop when we need to be
+
+736
+00:25:33.360 --> 00:25:37.279
+in the loop to orchestrate our agents.
+
+737
+00:25:35.600 --> 00:25:38.960
+So again, you know, having visual
+
+738
+00:25:37.279 --> 00:25:40.640
+identifiers improves your developer
+
+739
+00:25:38.960 --> 00:25:42.240
+experience, lets you focus on what
+
+740
+00:25:40.640 --> 00:25:45.039
+matters the most and then you can just
+
+741
+00:25:42.240 --> 00:25:47.520
+move on. The biggest risk with CMX is
+
+742
+00:25:45.039 --> 00:25:49.200
+that this is a new relatively fastmoving
+
+743
+00:25:47.520 --> 00:25:51.279
+tool. I'm going to be using both of
+
+744
+00:25:49.200 --> 00:25:54.000
+these tools side by side, not so much
+
+745
+00:25:51.279 --> 00:25:55.600
+using warp anymore, but CMX and T-Mox
+
+746
+00:25:54.000 --> 00:25:57.200
+I'm going to be spending some time on.
+
+747
+00:25:55.600 --> 00:25:59.039
+And that leads us to the kind of final
+
+748
+00:25:57.200 --> 00:26:01.120
+problem. I need to be able to quickly
+
+749
+00:25:59.039 --> 00:26:02.559
+launch agents for the thousandth time.
+
+750
+00:26:01.120 --> 00:26:07.159
+So, let me show you really concretely
+
+751
+00:26:02.559 --> 00:26:07.159
+how I'm using a tool like this. So,
+
+752
+00:26:08.880 --> 00:26:13.520
+I have a just file inside of my code
+
+753
+00:26:11.600 --> 00:26:15.600
+bases and this lets me give a really
+
+754
+00:26:13.520 --> 00:26:17.600
+quick onetap command to boot up new
+
+755
+00:26:15.600 --> 00:26:20.799
+agent teams. Okay, so I'll just type
+
+756
+00:26:17.600 --> 00:26:23.279
+jfast cc. If I hit enter here, I need to
+
+757
+00:26:20.799 --> 00:26:25.520
+pass in a feature. So, what's the focus
+
+758
+00:26:23.279 --> 00:26:28.640
+of this agent team? Okay, so I'll type
+
+759
+00:26:25.520 --> 00:26:30.400
+fast CC and then we'll call this SSC.
+
+760
+00:26:28.640 --> 00:26:32.480
+Let's assume we're adding server sent
+
+761
+00:26:30.400 --> 00:26:33.919
+events into our web server. Okay, so
+
+762
+00:26:32.480 --> 00:26:36.559
+we'll hit enter there and this is going
+
+763
+00:26:33.919 --> 00:26:39.120
+to pretty much instantly boot up an
+
+764
+00:26:36.559 --> 00:26:40.960
+agent team and this is a unique agent
+
+765
+00:26:39.120 --> 00:26:43.120
+team in the multi- aent orchestration
+
+766
+00:26:40.960 --> 00:26:44.720
+pattern that I like. This is three tier
+
+767
+00:26:43.120 --> 00:26:46.720
+multi- aent orchestration and it looks
+
+768
+00:26:44.720 --> 00:26:48.960
+like this. The orchestrator here, team
+
+769
+00:26:46.720 --> 00:26:51.120
+leads here. Every one of these is a team
+
+770
+00:26:48.960 --> 00:26:52.799
+lead in my workspace. And so this
+
+771
+00:26:51.120 --> 00:26:54.960
+specifically is the team lead. Right now
+
+772
+00:26:52.799 --> 00:26:57.679
+I'm using a GLM 5.2 two and then every
+
+773
+00:26:54.960 --> 00:27:00.000
+team lead gets access to worker agents.
+
+774
+00:26:57.679 --> 00:27:01.919
+Okay, so here's my plan agent, here's my
+
+775
+00:27:00.000 --> 00:27:04.000
+theoretical build agent, here's the
+
+776
+00:27:01.919 --> 00:27:06.159
+build front end, and here's the testing
+
+777
+00:27:04.000 --> 00:27:08.159
+agent. Might seem complex to add one
+
+778
+00:27:06.159 --> 00:27:11.440
+additional level of agent, but it helps
+
+779
+00:27:08.159 --> 00:27:13.520
+a lot. And I've needed a tool like CMX.
+
+780
+00:27:11.440 --> 00:27:15.520
+T-Max wasn't cutting it for the right
+
+781
+00:27:13.520 --> 00:27:17.279
+organizational structure. And so I'm
+
+782
+00:27:15.520 --> 00:27:18.960
+picking up a tool like CMUX to kind of
+
+783
+00:27:17.279 --> 00:27:21.039
+help me solve this multi- aent
+
+784
+00:27:18.960 --> 00:27:23.120
+orchestration problem. these sets of
+
+785
+00:27:21.039 --> 00:27:24.799
+problems. It's starting agents. It's
+
+786
+00:27:23.120 --> 00:27:26.559
+monitoring agents so you can improve
+
+787
+00:27:24.799 --> 00:27:29.120
+them. And then it's being able to scale
+
+788
+00:27:26.559 --> 00:27:31.120
+your orchestration to whatever level you
+
+789
+00:27:29.120 --> 00:27:33.679
+need to. And so, as mentioned, this is
+
+790
+00:27:31.120 --> 00:27:35.440
+not top-down agent communication, right?
+
+791
+00:27:33.679 --> 00:27:38.000
+Any agent can prompt any agent. I also
+
+792
+00:27:35.440 --> 00:27:40.159
+have my specialized comsnet PI agent
+
+793
+00:27:38.000 --> 00:27:42.400
+coding extension, but CMOX lets me push
+
+794
+00:27:40.159 --> 00:27:45.039
+outside of the extension and have any
+
+795
+00:27:42.400 --> 00:27:47.039
+agent decoding tool talk to any agent
+
+796
+00:27:45.039 --> 00:27:49.120
+decoding tool. Thanks to the semox
+
+797
+00:27:47.039 --> 00:27:50.880
+skill, birectional flat agent
+
+798
+00:27:49.120 --> 00:27:54.240
+communication is super important while
+
+799
+00:27:50.880 --> 00:27:56.960
+maintaining an orchestrator, a lead, and
+
+800
+00:27:54.240 --> 00:27:59.200
+then a worker level setup. And I'll link
+
+801
+00:27:56.960 --> 00:28:01.200
+the video where we go into multi-tiered
+
+802
+00:27:59.200 --> 00:28:02.399
+agent orchestration. This isn't for
+
+803
+00:28:01.200 --> 00:28:04.080
+everyone. A lot of engineers are going
+
+804
+00:28:02.399 --> 00:28:06.080
+to look at this and say, "Why do I need
+
+805
+00:28:04.080 --> 00:28:07.440
+this? It's slop. This isn't useful."
+
+806
+00:28:06.080 --> 00:28:08.720
+That's fine. It just means it's not for
+
+807
+00:28:07.440 --> 00:28:10.480
+you. Okay? As I mentioned in the
+
+808
+00:28:08.720 --> 00:28:12.320
+beginning, there's many ways to do this.
+
+809
+00:28:10.480 --> 00:28:14.159
+You can use the Ralph to-do list. You
+
+810
+00:28:12.320 --> 00:28:16.159
+can use the new loop engineering
+
+811
+00:28:14.159 --> 00:28:18.000
+patterns. And you can just use classic
+
+812
+00:28:16.159 --> 00:28:20.080
+cloud code subbasation delegation that's
+
+813
+00:28:18.000 --> 00:28:22.159
+fine right they have the slashworkspaces
+
+814
+00:28:20.080 --> 00:28:24.799
+they have slashloop they have slashgoal
+
+815
+00:28:22.159 --> 00:28:26.880
+right use whatever works for you my goal
+
+816
+00:28:24.799 --> 00:28:28.799
+here is just to show you the optionality
+
+817
+00:28:26.880 --> 00:28:32.159
+of what's available to you and to
+
+818
+00:28:28.799 --> 00:28:34.960
+reemphasize a gentic access and full
+
+819
+00:28:32.159 --> 00:28:36.799
+control over the primitives of agentic
+
+820
+00:28:34.960 --> 00:28:38.559
+engineering right context model prompt
+
+821
+00:28:36.799 --> 00:28:40.720
+tool once you have an agent up and
+
+822
+00:28:38.559 --> 00:28:42.880
+running you can scale it right now I
+
+823
+00:28:40.720 --> 00:28:45.200
+have a team here that has let's say
+
+824
+00:28:42.880 --> 00:28:47.279
+these are each 1 million contacts each
+
+825
+00:28:45.200 --> 00:28:49.279
+specialized, that gives me 5 million
+
+826
+00:28:47.279 --> 00:28:50.559
+tokens of context to work with, quite
+
+827
+00:28:49.279 --> 00:28:52.000
+literally, right? That's not an
+
+828
+00:28:50.559 --> 00:28:53.279
+exaggeration. When you put together your
+
+829
+00:28:52.000 --> 00:28:55.200
+agents in a way where they can all
+
+830
+00:28:53.279 --> 00:28:57.520
+communicate, you're getting a bigger
+
+831
+00:28:55.200 --> 00:29:00.080
+team of intelligence to work on your
+
+832
+00:28:57.520 --> 00:29:02.080
+behalf. Okay, so um you know, what's the
+
+833
+00:29:00.080 --> 00:29:04.080
+verdict? I like CMX. I'm going to be
+
+834
+00:29:02.080 --> 00:29:05.840
+using this tool. It stands up to T-Mox
+
+835
+00:29:04.080 --> 00:29:08.799
+pretty well. I'm going to be keeping my
+
+836
+00:29:05.840 --> 00:29:11.039
+eye on any glitches or bugs with this
+
+837
+00:29:08.799 --> 00:29:13.760
+tool, but so far, I'm a big fan. It's
+
+838
+00:29:11.039 --> 00:29:15.760
+the scriptable service API, the agentic
+
+839
+00:29:13.760 --> 00:29:16.799
+access that really matters with this
+
+840
+00:29:15.760 --> 00:29:18.880
+tool. There are a bunch of other
+
+841
+00:29:16.799 --> 00:29:21.360
+features here I didn't mention. I'm sure
+
+842
+00:29:18.880 --> 00:29:23.120
+some CMOX hardcore users are going to be
+
+843
+00:29:21.360 --> 00:29:25.279
+flaming me for this being so relatively
+
+844
+00:29:23.120 --> 00:29:27.039
+simple. But the key here is it's
+
+845
+00:29:25.279 --> 00:29:29.919
+programmable, right? That's the most
+
+846
+00:29:27.039 --> 00:29:33.520
+important thing by far. Aentic access is
+
+847
+00:29:29.919 --> 00:29:35.120
+a requirement for agentic engineering.
+
+848
+00:29:33.520 --> 00:29:37.840
+And this is going to compound. Every
+
+849
+00:29:35.120 --> 00:29:39.840
+single thing you set up here from this
+
+850
+00:29:37.840 --> 00:29:41.840
+five item list is going to give you a
+
+851
+00:29:39.840 --> 00:29:43.520
+compounding advantage for agentic
+
+852
+00:29:41.840 --> 00:29:46.159
+engineering. Once again, we want to be
+
+853
+00:29:43.520 --> 00:29:47.919
+moving up with the ceiling of agentic
+
+854
+00:29:46.159 --> 00:29:51.039
+engineering, not the floor of vibe
+
+855
+00:29:47.919 --> 00:29:52.880
+coding. All these ideas are big ideas we
+
+856
+00:29:51.039 --> 00:29:54.880
+talk about and really break down in
+
+857
+00:29:52.880 --> 00:29:56.559
+tactical agentic coding. I'll leave a
+
+858
+00:29:54.880 --> 00:29:58.320
+link in the description for that if
+
+859
+00:29:56.559 --> 00:30:00.000
+you're interested in paying a little bit
+
+860
+00:29:58.320 --> 00:30:01.679
+to get a massive advantage. If you're
+
+861
+00:30:00.000 --> 00:30:03.279
+not though, that's totally fine. I'm
+
+862
+00:30:01.679 --> 00:30:05.360
+going leave my entire guide code base
+
+863
+00:30:03.279 --> 00:30:06.480
+here to really break down Semox
+
+864
+00:30:05.360 --> 00:30:08.159
+capabilities. If you made it to the end
+
+865
+00:30:06.480 --> 00:30:09.760
+and you want to see more agentic
+
+866
+00:30:08.159 --> 00:30:11.279
+engineering content like this, drop a
+
+867
+00:30:09.760 --> 00:30:12.880
+like, share the video with a friend,
+
+868
+00:30:11.279 --> 00:30:15.200
+with a co-orker, and then comment down
+
+869
+00:30:12.880 --> 00:30:16.720
+below. How are you thinking about multi-
+
+870
+00:30:15.200 --> 00:30:18.799
+aent orchestration? Do you have any
+
+871
+00:30:16.720 --> 00:30:20.960
+unique experiments or tools you're
+
+872
+00:30:18.799 --> 00:30:22.399
+running to better scale your computer to
+
+873
+00:30:20.960 --> 00:30:24.320
+scale your impact? You know where to
+
+874
+00:30:22.399 --> 00:30:28.919
+find me every single Monday. Stay
+
+875
+00:30:24.320 --> 00:30:28.919
+focused and keep building.

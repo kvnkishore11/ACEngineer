@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first code companion to TAC-4: trace Dan's AFK agent from GitHub issue through deterministic orchestration, isolated Claude runs, durable evidence, commits, and pull request.">
+  <title>Code Deep-Dive · TAC-4 AFK Agents</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <style>
+    :root { --code-measure: 48rem; --map-max: 58rem; }
+    .skip-link { position:fixed; left:.5rem; top:.5rem; z-index:300; transform:translateY(-180%); padding:.45rem .7rem; border-radius:var(--radius-sm); color:var(--ink-inverse); background:var(--accent-ink); font-weight:700; }
+    .skip-link:focus { transform:none; }
+    .reading-progress { position:fixed; inset:0 0 auto; z-index:220; height:3px; }
+    .reading-progress span { display:block; width:0; height:100%; background:var(--accent); }
+    .site-bar { position:sticky; top:0; z-index:200; display:flex; justify-content:space-between; align-items:center; gap:1rem; border-bottom:var(--hairline); background:color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter:blur(12px); }
+    .site-bar a { color:var(--ink); text-decoration:none; font-weight:650; }
+    .site-bar__meta { color:var(--ink-mute); font-family:var(--font-mono); letter-spacing:.06em; text-transform:uppercase; }
+    .chapter-shell { display:grid; grid-template-columns:13.5rem minmax(0,1fr); gap:1.25rem; width:min(calc(100% - 1.5rem),72rem); margin-inline:auto; }
+    .chapter-rail { position:sticky; top:3rem; align-self:start; max-height:calc(100vh - 3.5rem); overflow:auto; padding:.85rem .4rem 1.5rem 0; }
+    .rail-kicker,.micro-label,.section-number,.eyebrow,.code-label,.tree-label,.card-kicker { color:var(--accent-ink); font-family:var(--font-mono); font-size:var(--text-xs); font-weight:750; letter-spacing:.07em; text-transform:uppercase; }
+    .chapter-rail h2 { margin:.25rem 0 .6rem; font-size:var(--text-base); }
+    .rail-progress { padding-bottom:.65rem; border-bottom:var(--hairline); }
+    .rail-progress__line { height:.3rem; overflow:hidden; border-radius:999px; background:var(--bg-inset); }
+    .rail-progress__fill { display:block; width:0; height:100%; background:var(--accent); }
+    .rail-progress__copy { display:flex; justify-content:space-between; margin-top:.25rem; color:var(--ink-mute); font-size:var(--text-xs); }
+    .chapter-nav ol { display:grid; gap:.1rem; padding:0; list-style:none; }
+    .chapter-nav a { display:grid; grid-template-columns:1.45rem 1fr; gap:.3rem; padding:.28rem .38rem; border-radius:var(--radius-sm); color:var(--ink-soft); text-decoration:none; font-size:var(--text-sm); line-height:1.25; }
+    .chapter-nav a:hover,.chapter-nav a[aria-current="location"] { color:var(--accent-ink); background:var(--accent-wash); }
+    .chapter-nav__n { color:var(--ink-mute); font-family:var(--font-mono); font-size:var(--text-xs); }
+    .chapter-main { min-width:0; padding-bottom:3rem; }
+    .hero { padding:1rem 0 1.15rem; border-bottom:var(--hairline); }
+    .hero h1 { margin:.25rem 0 .35rem; }
+    .hero__dek { max-width:58ch; color:var(--ink-soft); font-size:var(--text-md); }
+    .hero__meta { display:flex; flex-wrap:wrap; gap:.35rem; margin:.65rem 0 0; padding:0; list-style:none; }
+    .hero__meta li { padding:.18rem .48rem; border:var(--hairline); border-radius:999px; background:var(--bg-card); color:var(--ink-soft); font-size:var(--text-xs); }
+    .hero__promise { max-width:var(--code-measure); margin-top:.7rem; padding:.65rem .8rem; border-left:4px solid var(--accent); border-radius:var(--radius-sm); background:var(--accent-wash); }
+    .mobile-toc { display:none; margin:.65rem 0; }
+    .mobile-toc details { padding:.5rem .65rem; border:var(--hairline); border-radius:var(--radius-md); background:var(--bg-card); }
+    .mobile-toc ol { columns:2; margin:.5rem 0 0; }
+    .chapter-section { max-width:var(--code-measure); padding:1.2rem 0; scroll-margin-top:3.25rem; }
+    .chapter-section--wide { max-width:var(--map-max); }
+    .section-title { margin:.18rem 0 .4rem; }
+    .section-lead { max-width:62ch; color:var(--ink-soft); }
+    .chapter-section > * + * { margin-top:.8rem; }
+    .soft-card,.hook-card,.file-card,.lab-box,.teach-back,.fail-card,.flow-step,.ledger-group { border:var(--hairline); border-radius:var(--radius-md); background:var(--bg-card); box-shadow:var(--shadow-card); }
+    .hook-card { padding:.85rem 1rem; border-left:4px solid var(--accent); }
+    .hook-card h3,.soft-card h3 { margin:.15rem 0 .25rem; }
+    .hook-grid,.why-grid,.fail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
+    .soft-card,.fail-card { padding:.75rem .85rem; }
+    .soft-card p,.fail-card p { color:var(--ink-soft); }
+    .truth-strip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.45rem; }
+    .truth-strip div { padding:.6rem; border:var(--hairline); border-radius:var(--radius-md); background:var(--bg-inset); }
+    .truth-strip strong { display:block; color:var(--accent-ink); font-family:var(--font-mono); font-size:var(--text-xs); text-transform:uppercase; }
+    .truth-strip span { display:block; margin-top:.18rem; font-size:var(--text-sm); }
+    .repo-map { padding:.8rem; border:var(--hairline); border-radius:var(--radius-lg); background:var(--bg-card); box-shadow:var(--shadow-card); }
+    .piter-row { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); align-items:center; gap:.35rem; }
+    .map-node { min-height:6rem; padding:.6rem; border:1px solid var(--border-soft); border-top:4px solid var(--accent); border-radius:var(--radius-md); background:var(--accent-wash); }
+    .map-node:nth-of-type(2) { background:var(--teach-wash); border-top-color:var(--ink-soft); }
+    .map-node:nth-of-type(3) { background:var(--bg-inset); border-top-color:var(--ink-mute); }
+    .map-node:nth-of-type(4) { background:var(--ok-wash); border-top-color:var(--ok); }
+    .map-node b { display:block; font-size:var(--text-sm); }
+    .map-node p { margin-top:.2rem; color:var(--ink-soft); font-size:var(--text-xs); line-height:1.4; }
+    .map-arrow { color:var(--accent); text-align:center; font-weight:800; }
+    .spine { display:flex; align-items:center; gap:.28rem; margin-top:.7rem; padding:.6rem; overflow-x:auto; border-radius:var(--radius-md); background:var(--bg-inset); }
+    .spine span { flex:0 0 auto; padding:.28rem .45rem; border:1px solid var(--border); border-radius:999px; background:var(--bg-card); font-family:var(--font-mono); font-size:var(--text-xs); }
+    .spine i { color:var(--accent); font-style:normal; }
+    .layer-split { display:grid; grid-template-columns:1fr 1.35fr 1fr; gap:.5rem; margin-top:.65rem; }
+    .layer-split article { padding:.65rem; border:var(--hairline); border-radius:var(--radius-md); }
+    .layer-split h3 { margin:0; font-size:var(--text-base); }
+    .layer-split p { margin-top:.25rem; color:var(--ink-soft); font-size:var(--text-sm); }
+    .tree-card { padding:.8rem; border:var(--hairline); border-radius:var(--radius-md); background:var(--bg-card); box-shadow:var(--shadow-card); }
+    .tree-card pre { margin:0; padding:0; border:0; background:transparent; color:var(--ink-soft); font-size:var(--text-sm); line-height:1.55; }
+    .tree-card a { color:var(--accent-ink); font-weight:700; text-decoration:none; }
+    .tree-card a:hover { text-decoration:underline; }
+    .file-tools { display:flex; flex-wrap:wrap; gap:.4rem; }
+    .file-tools button { padding:.35rem .6rem; border:var(--hairline); border-radius:999px; background:var(--bg-card); color:var(--accent-ink); cursor:pointer; font:inherit; font-size:var(--text-sm); font-weight:700; }
+    .file-stack { display:grid; gap:.55rem; }
+    details.file-card { overflow:clip; }
+    .file-card summary { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.75rem; align-items:center; padding:.68rem .8rem; cursor:pointer; list-style:none; }
+    .file-card summary::-webkit-details-marker { display:none; }
+    .file-card summary::after { color:var(--accent); content:"＋"; font-size:1.15rem; }
+    .file-card[open] summary::after { content:"−"; }
+    .file-path { display:block; overflow-wrap:anywhere; color:var(--ink); font-family:var(--font-mono); font-size:var(--text-sm); font-weight:750; }
+    .file-role { display:block; margin-top:.15rem; color:var(--ink-mute); font-size:var(--text-xs); }
+    .file-body { padding:.1rem .8rem .85rem; border-top:1px solid var(--border-soft); animation:disclosure-in .2s ease both; }
+    .file-body > * + * { margin-top:.65rem; }
+    .walk-list { counter-reset:walk; display:grid; gap:.35rem; padding:0; list-style:none; }
+    .walk-list li { position:relative; padding-left:2rem; color:var(--ink-soft); }
+    .walk-list li::before { position:absolute; left:0; top:.05rem; display:grid; width:1.35rem; height:1.35rem; place-items:center; border-radius:50%; background:var(--accent-wash); color:var(--accent-ink); content:counter(walk); counter-increment:walk; font-family:var(--font-mono); font-size:var(--text-xs); font-weight:800; }
+    .code-shell { max-width:var(--code-measure); overflow:hidden; border:1px solid var(--terminal-border); border-radius:var(--radius-md); background:var(--bg-code); }
+    .code-shell__bar { display:flex; justify-content:space-between; gap:1rem; padding:.38rem .6rem; border-bottom:1px solid var(--terminal-border); background:var(--bg-inset); color:var(--ink-mute); font-family:var(--font-mono); font-size:var(--text-xs); }
+    pre.code { max-width:100%; margin:0; padding:.7rem .8rem; overflow-x:auto; background:var(--bg-code); color:var(--ink); font-family:var(--font-mono); font-size:var(--text-sm); line-height:1.5; tab-size:2; }
+    pre.code code { white-space:pre; }
+    .syn-k { color:var(--accent-ink); font-weight:700; } .syn-f { color:var(--ok); } .syn-s { color:var(--warn); } .syn-c { color:var(--ink-mute); font-style:italic; } .syn-n { color:var(--ink-soft); }
+    .annotation { padding:.55rem .65rem; border-left:3px solid var(--accent); background:var(--accent-wash); color:var(--ink-soft); font-size:var(--text-sm); }
+    .flow-list { display:grid; gap:.45rem; padding:0; list-style:none; counter-reset:flow; }
+    .flow-step { display:grid; grid-template-columns:2rem minmax(0,1fr); gap:.55rem; padding:.6rem .7rem; }
+    .flow-step::before { display:grid; width:1.7rem; height:1.7rem; place-items:center; border-radius:50%; background:var(--accent-wash); color:var(--accent-ink); content:counter(flow); counter-increment:flow; font-family:var(--font-mono); font-size:var(--text-xs); font-weight:800; }
+    .flow-step h3 { margin:0; font-size:var(--text-base); }
+    .flow-step p { margin-top:.18rem; color:var(--ink-soft); font-size:var(--text-sm); }
+    .flow-step code { overflow-wrap:anywhere; }
+    .evidence-table,.ledger-table { width:100%; border-collapse:collapse; font-size:var(--text-sm); }
+    .evidence-table th,.evidence-table td,.ledger-table th,.ledger-table td { padding:.45rem .5rem; border-bottom:1px solid var(--border-soft); text-align:left; vertical-align:top; }
+    .evidence-table th,.ledger-table th { color:var(--ink-mute); font-family:var(--font-mono); font-size:var(--text-xs); text-transform:uppercase; }
+    .group-row td { padding-top:.75rem; color:var(--accent-ink); font-family:var(--font-mono); font-size:var(--text-xs); font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+    .ledger-group { overflow:clip; }
+    .ledger-group summary { padding:.62rem .75rem; cursor:pointer; font-weight:750; }
+    .ledger-body { padding:0 .75rem .75rem; overflow-x:auto; }
+    .path-list { columns:2; gap:1.2rem; padding-left:1.1rem; }
+    .path-list li { break-inside:avoid; margin:.25rem 0; color:var(--ink-soft); font-size:var(--text-xs); }
+    .path-list code { overflow-wrap:anywhere; }
+    .lab-box,.teach-back { padding:.85rem 1rem; }
+    .lab-box h3,.teach-back h3 { margin-top:0; }
+    .lab-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; }
+    .lab-grid div { padding:.55rem; border:var(--hairline); border-radius:var(--radius-md); background:var(--bg-inset); }
+    .lab-grid strong { display:block; color:var(--accent-ink); font-size:var(--text-sm); }
+    .lab-grid span { display:block; margin-top:.2rem; color:var(--ink-soft); font-size:var(--text-xs); }
+    .retrieval-quiz { display:grid; gap:.45rem; }
+    .retrieval-quiz details { padding:.55rem .65rem; border:var(--hairline); border-radius:var(--radius-md); background:var(--bg-card); }
+    .retrieval-quiz summary { cursor:pointer; font-weight:700; }
+    .retrieval-quiz p { margin-top:.35rem; color:var(--ink-soft); }
+    .chapter-footer { max-width:var(--code-measure); margin-top:1rem; padding-top:1rem; border-top:var(--hairline); }
+    .chapter-footer__nav { display:flex; justify-content:space-between; flex-wrap:wrap; gap:.75rem; margin-top:.35rem; }
+    @keyframes disclosure-in { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+    @media (max-width:960px) { .chapter-shell { grid-template-columns:1fr; } .chapter-rail { display:none; } .mobile-toc { display:block; } }
+    @media (max-width:700px) { .hook-grid,.why-grid,.fail-grid,.layer-split,.lab-grid { grid-template-columns:1fr; } .truth-strip { grid-template-columns:repeat(2,1fr); } .piter-row { grid-template-columns:1fr; } .map-arrow { transform:rotate(90deg); } .path-list { columns:1; } .site-bar__meta { display:none; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
+  </style>
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to the code lesson</a>
+  <div class="reading-progress" aria-hidden="true"><span id="top-progress"></span></div>
+
+  <header class="site-bar">
+    <a class="site-bar__home" href="../vol-1-tac/04-afk-agents.html">← Chapter 04 · AFK Agents</a>
+    <span class="site-bar__meta">CODE DEEP-DIVE · TAC-4 · 148 TEXT FILES</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Code lesson navigation">
+      <p class="rail-kicker">TAC-4 · Companion</p>
+      <h2>How Dan moved the human out of the execution loop</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of explainer</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#hook"><span class="chapter-nav__n">00</span><span>Hook</span></a></li>
+          <li><a href="#map"><span class="chapter-nav__n">01</span><span>Map of the repo</span></a></li>
+          <li><a href="#tree"><span class="chapter-nav__n">02</span><span>File tree</span></a></li>
+          <li><a href="#walk"><span class="chapter-nav__n">03</span><span>Walk the code</span></a></li>
+          <li><a href="#flow"><span class="chapter-nav__n">04</span><span>End-to-end run</span></a></li>
+          <li><a href="#fails"><span class="chapter-nav__n">05</span><span>Common fails</span></a></li>
+          <li><a href="#ledger"><span class="chapter-nav__n">06</span><span>Every file</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">07</span><span>You try</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">08</span><span>Teach-back</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero">
+        <span class="hero__chapter">Code deep-dive · Issue → agents → pull request</span>
+        <h1>The agent is not the workflow</h1>
+        <p class="hero__dek">Dan’s AFK system works because ordinary Python keeps regaining control. It chooses the next bounded agent, checks the returned shape, persists evidence, and stops on error.</p>
+        <ul class="hero__meta" aria-label="Repository facts">
+          <li>148 eligible text files</li>
+          <li>23,453 logical lines</li>
+          <li>8 Claude calls per successful run</li>
+          <li>13 command templates</li>
+          <li>5 hook events</li>
+        </ul>
+        <p class="hero__promise"><strong>Your target:</strong> trace one issue number through the controller, name the artifact at every boundary, and explain why “let one agent do everything” is not this architecture.</p>
+      </header>
+
+      <div class="mobile-toc">
+        <details><summary>Code lesson contents</summary><ol><li><a href="#hook">Hook</a></li><li><a href="#map">Map</a></li><li><a href="#tree">Tree</a></li><li><a href="#walk">Code walk</a></li><li><a href="#flow">Run flow</a></li><li><a href="#fails">Failures</a></li><li><a href="#ledger">Every file</a></li><li><a href="#lab">Lab</a></li><li><a href="#teach-back">Teach-back</a></li></ol></details>
+      </div>
+
+      <section class="chapter-section" id="hook">
+        <span class="section-number">00 · HOOK</span>
+        <h2 class="section-title">Eight fresh agents finish one chore while the human is away</h2>
+        <p class="section-lead">The checked-in evidence contains a complete run: issue #9 enters at 05:19:07, PR #10 exists at 05:24:57, and run ID <code>5f2e861e</code> joins every prompt, result, log, commit, and review artifact.</p>
+
+        <div class="hook-card">
+          <p class="card-kicker">The surprising part</p>
+          <h3>No agent remembers the whole job</h3>
+          <p>The classifier returns only <code>/chore</code>. The branch agent returns only a branch name. The planner writes a plan. The implementer later receives only that plan path. Two commit agents return commit messages. The PR agent returns a URL. Python carries the sequence.</p>
+        </div>
+
+        <div class="truth-strip" aria-label="The four facts to remember">
+          <div><strong>Input</strong><span>GitHub issue JSON</span></div>
+          <div><strong>Control</strong><span><code>adw_plan_build.py</code></span></div>
+          <div><strong>Judgment</strong><span>fresh Claude CLI processes</span></div>
+          <div><strong>Evidence</strong><span>issue + files + commits + PR</span></div>
+        </div>
+
+        <div class="hook-grid">
+          <article class="soft-card"><p class="card-kicker">What “AFK” removes</p><h3>The human courier</h3><p>You no longer copy issue → planner → implementer → git → PR by hand.</p></article>
+          <article class="soft-card"><p class="card-kicker">What “AFK” keeps</p><h3>The human reviewer</h3><p>The pull request, plan, comments, and raw traces make the result inspectable.</p></article>
+        </div>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="map">
+        <span class="section-number">01 · DIAGRAM</span>
+        <h2 class="section-title">Map of the repo: PITER outside, deterministic spine inside</h2>
+        <p class="section-lead">First memorize the perimeter. Then zoom into the controller. The application is the work target; it is not the orchestration engine.</p>
+
+        <div class="repo-map" role="img" aria-label="GitHub issue enters through a webhook cron or manual trigger, runs in a bounded checkout, follows a deterministic agent workflow, and returns issue comments and a pull request for review">
+          <div class="piter-row">
+            <article class="map-node"><b>Prompt input</b><p>GitHub issue: title, body, number, metadata.</p></article>
+            <span class="map-arrow">→</span>
+            <article class="map-node"><b>Trigger</b><p>Webhook, polling cron, or a manual <code>uv run</code>.</p></article>
+            <span class="map-arrow">→</span>
+            <article class="map-node"><b>Environment</b><p>Repo checkout, Claude CLI, <code>gh</code>, keys, shell tools.</p></article>
+            <span class="map-arrow">→</span>
+            <article class="map-node"><b>Review</b><p>Issue feed, saved plan, commits, raw traces, pull request.</p></article>
+          </div>
+          <div class="spine" aria-label="Deterministic workflow spine">
+            <span>fetch</span><i>→</i><span>classify</span><i>→</i><span>branch</span><i>→</i><span>plan</span><i>→</i><span>find plan</span><i>→</i><span>commit</span><i>→</i><span>implement</span><i>→</i><span>commit</span><i>→</i><span>PR</span>
+          </div>
+          <div class="layer-split">
+            <article><h3>Agentic layer</h3><p><code>.claude/</code>, <code>adws/</code>, <code>agents/</code>, <code>logs/</code>, <code>scripts/</code>, <code>specs/</code>.</p></article>
+            <article><h3>Boundary function</h3><p><code>execute_template()</code> turns a slash command plus arguments into one isolated Claude process and one typed response.</p></article>
+            <article><h3>Application layer</h3><p><code>app/</code> is the FastAPI + Vite system the agents inspect and change.</p></article>
+          </div>
+        </div>
+
+        <aside class="callout callout--why"><p class="callout__label">Why this design</p><p>Non-deterministic reasoning is useful inside a step. Deterministic ownership is useful between steps. Dan combines both: Claude decides within a bounded prompt; Python decides whether the workflow may advance.</p></aside>
+      </section>
+
+      <section class="chapter-section" id="tree">
+        <span class="section-number">02 · FILE TREE</span>
+        <h2 class="section-title">Navigate by responsibility, not alphabetically</h2>
+        <p class="section-lead">The generated directories are not clutter. They are part of the review interface. The six <code>.pyc</code> files under cache directories are compiled binaries and are the only excluded artifacts.</p>
+
+        <div class="tree-card">
+<pre><code>tac-4/
+├── <a href="#file-commands">.claude/</a>       13 commands · 5 hook events · settings
+├── <a href="#file-controller">adws/</a>          deterministic controller, adapters, triggers, health
+├── <a href="#file-evidence">agents/</a>        prompts + JSONL + readable JSON + execution logs
+├── <a href="#file-hooks">logs/</a>          per-session lifecycle evidence from hooks
+├── <a href="#file-app">app/</a>
+│   ├── client/     Vite + TypeScript browser target
+│   └── server/     FastAPI + SQLite + LLM target
+├── <a href="#file-specs">specs/</a>         durable plans; planner output becomes implementer input
+├── <a href="#file-scripts">scripts/</a>       start/stop, webhook tunnel, demo cleanup utilities
+├── <a href="#file-ai-docs">ai_docs/</a>       local provider and sandbox reference corpus
+├── README.md      operator-facing project map
+└── .env.sample   configuration contract (live .env values stay private)</code></pre>
+        </div>
+        <p class="annotation"><strong>Reading rule:</strong> start in <code>adws/adw_plan_build.py</code>, jump to a called adapter, then inspect the command template and saved artifact for that one step. Do not begin with the 6,234 lines of hook logs.</p>
+      </section>
+
+      <section class="chapter-section" id="walk">
+        <span class="section-number">03 · WALK THE CODE</span>
+        <h2 class="section-title">Follow control, contracts, then evidence</h2>
+        <p class="section-lead">These are the files that explain the system’s behavior. Open or collapse the walkthroughs as you go.</p>
+        <div class="file-tools" aria-label="File disclosure controls"><button id="expand-files" type="button">Expand walkthroughs</button><button id="collapse-files" type="button">Collapse walkthroughs</button></div>
+
+        <div class="file-stack">
+          <details class="file-card" id="file-controller" open>
+            <summary><span><span class="file-path">adws/adw_plan_build.py</span><span class="file-role">The deterministic spine: order, gates, progress comments, and stop behavior</span></span></summary>
+            <div class="file-body">
+              <p><strong>Purpose.</strong> Accept an issue number and optional run ID, then own every transition until a PR URL exists or an error forces an exit.</p>
+              <ol class="walk-list"><li>Load environment, parse arguments, make or reuse an eight-character ADW ID, and create a per-run logger.</li><li>Resolve the GitHub remote and fetch a typed <code>GitHubIssue</code>.</li><li>Call eight narrow agent roles in a fixed order.</li><li>After each call, <code>check_error()</code> posts a failure comment and exits with status 1 if the boundary failed.</li><li>Post progress to the issue, leaving the full prompt and stream in <code>agents/{adw_id}/</code>.</li></ol>
+              <div class="code-shell"><div class="code-shell__bar"><span>controller shape</span><span>Python</span></div><pre class="code"><code><span class="syn-n">issue_command</span>, <span class="syn-n">error</span> = <span class="syn-f">classify_issue</span>(issue, adw_id, logger)
+<span class="syn-f">check_error</span>(error, issue_number, adw_id, <span class="syn-s">"ops"</span>, <span class="syn-s">"Error classifying issue"</span>, logger)
+
+<span class="syn-n">branch_name</span>, <span class="syn-n">error</span> = <span class="syn-f">git_branch</span>(issue, issue_command, adw_id, logger)
+<span class="syn-n">issue_plan_response</span> = <span class="syn-f">build_plan</span>(issue, issue_command, adw_id, logger)
+<span class="syn-n">plan_file_path</span>, <span class="syn-n">error</span> = <span class="syn-f">get_plan_file</span>(issue_plan_response.output, adw_id, logger)
+<span class="syn-n">commit_msg</span>, <span class="syn-n">error</span> = <span class="syn-f">git_commit</span>(AGENT_PLANNER, issue, issue_command, adw_id, logger)
+<span class="syn-n">implement_response</span> = <span class="syn-f">implement_plan</span>(plan_file_path, adw_id, logger)
+<span class="syn-n">commit_msg</span>, <span class="syn-n">error</span> = <span class="syn-f">git_commit</span>(AGENT_IMPLEMENTOR, issue, issue_command, adw_id, logger)
+<span class="syn-n">pr_url</span>, <span class="syn-n">error</span> = <span class="syn-f">pull_request</span>(branch_name, issue, plan_file_path, adw_id, logger)</code></pre></div>
+              <p class="annotation"><strong>Design choice:</strong> the controller never asks one session to “keep going.” Each return value is a boundary Python can validate and record.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-agent">
+            <summary><span><span class="file-path">adws/agent.py</span><span class="file-role">The execution membrane between typed Python and Claude Code programmable mode</span></span></summary>
+            <div class="file-body">
+              <p><strong>Purpose.</strong> Construct the exact prompt, save it, launch Claude, stream every event to JSONL, convert that stream to readable JSON, and return the last result message.</p>
+              <ol class="walk-list"><li><code>execute_template()</code> joins the slash command and arguments.</li><li><code>save_prompt()</code> persists the exact request before launch.</li><li><code>get_claude_env()</code> builds a small environment allowlist and maps <code>GITHUB_PAT</code> to <code>GH_TOKEN</code>.</li><li><code>prompt_claude_code()</code> runs <code>claude -p</code> with <code>stream-json</code>, verbose output, model selection, and skipped permissions.</li><li><code>parse_jsonl_output()</code> searches backward for the final <code>type: result</code>.</li></ol>
+              <div class="code-shell"><div class="code-shell__bar"><span>one micro-agent call</span><span>Python</span></div><pre class="code"><code><span class="syn-n">cmd</span> = [CLAUDE_PATH, <span class="syn-s">"-p"</span>, request.prompt]
+cmd.extend([<span class="syn-s">"--model"</span>, request.model])
+cmd.extend([<span class="syn-s">"--output-format"</span>, <span class="syn-s">"stream-json"</span>])
+cmd.append(<span class="syn-s">"--verbose"</span>)
+
+<span class="syn-k">if</span> request.dangerously_skip_permissions:
+    cmd.append(<span class="syn-s">"--dangerously-skip-permissions"</span>)
+
+<span class="syn-k">with</span> <span class="syn-f">open</span>(request.output_file, <span class="syn-s">"w"</span>) <span class="syn-k">as</span> f:
+    result = subprocess.run(cmd, stdout=f, stderr=subprocess.PIPE, text=<span class="syn-k">True</span>, env=env)</code></pre></div>
+              <p class="annotation"><strong>Important gap:</strong> the code catches <code>TimeoutExpired</code>, but this <code>subprocess.run</code> call supplies no <code>timeout=</code>. The apparent five-minute timeout message is therefore not enforced here.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-contracts">
+            <summary><span><span class="file-path">adws/data_types.py</span><span class="file-role">Pydantic contracts for GitHub input, agent requests, and agent results</span></span></summary>
+            <div class="file-body">
+              <p><strong>Purpose.</strong> Replace loose dictionaries at the main seams with named shapes. The issue class is restricted to three slash commands; models are restricted to <code>sonnet</code> or <code>opus</code>.</p>
+              <div class="code-shell"><div class="code-shell__bar"><span>the boundary vocabulary</span><span>Python</span></div><pre class="code"><code><span class="syn-n">IssueClassSlashCommand</span> = Literal[<span class="syn-s">"/chore"</span>, <span class="syn-s">"/bug"</span>, <span class="syn-s">"/feature"</span>]
+
+<span class="syn-k">class</span> <span class="syn-f">AgentTemplateRequest</span>(BaseModel):
+    agent_name: str
+    slash_command: SlashCommand
+    args: List[str]
+    adw_id: str
+    model: Literal[<span class="syn-s">"sonnet"</span>, <span class="syn-s">"opus"</span>] = <span class="syn-s">"sonnet"</span>
+
+<span class="syn-k">class</span> <span class="syn-f">AgentPromptResponse</span>(BaseModel):
+    output: str
+    success: bool
+    session_id: Optional[str] = <span class="syn-k">None</span></code></pre></div>
+              <p class="annotation"><code>ClaudeCodeResultMessage</code> documents the final stream shape, but the parser currently returns raw dictionaries instead of instantiating that model. The contract exists more strongly on paper than at runtime.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-github">
+            <summary><span><span class="file-path">adws/github.py</span><span class="file-role">The GitHub CLI adapter: remote discovery, issues, comments, labels, and polling data</span></span></summary>
+            <div class="file-body">
+              <p><strong>Purpose.</strong> Keep <code>gh</code> subprocess details out of the controller and translate JSON responses into Pydantic models.</p>
+              <ol class="walk-list"><li><code>get_repo_url()</code> asks git for <code>origin</code>; <code>extract_repo_path()</code> turns HTTPS URLs into <code>owner/repo</code>.</li><li><code>fetch_issue()</code> requests the full issue JSON shape used by the workflow.</li><li><code>make_issue_comment()</code> publishes the compact live feed.</li><li><code>fetch_open_issues()</code> and <code>fetch_issue_comments()</code> support the polling trigger.</li><li><code>mark_issue_in_progress()</code> exists, but the main workflow never calls it.</li></ol>
+              <p class="annotation"><strong>Why an adapter:</strong> the controller can speak in domain verbs—fetch issue, post comment—without knowing CLI flags or authentication environment rules.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-triggers">
+            <summary><span><span class="file-path">adws/trigger_webhook.py · adws/trigger_cron.py</span><span class="file-role">Two trigger shapes: immediate detached launch and serial polling</span></span></summary>
+            <div class="file-body">
+              <p><strong>Webhook.</strong> Accept an opened issue or a newly created comment whose normalized body is exactly <code>adw</code>. Generate the run ID before launch, then use <code>Popen</code> from the project root so GitHub receives an immediate response.</p>
+              <div class="code-shell"><div class="code-shell__bar"><span>trigger_webhook.py</span><span>Python</span></div><pre class="code"><code><span class="syn-n">cmd</span> = [<span class="syn-s">"uv"</span>, <span class="syn-s">"run"</span>, trigger_script, <span class="syn-f">str</span>(issue_number), adw_id]
+process = subprocess.Popen(
+    cmd,
+    cwd=project_root,
+    env=os.environ.copy()
+)</code></pre></div>
+              <p><strong>Cron.</strong> Every 20 seconds, fetch open issues; process issues with no comments or a latest comment exactly equal to <code>adw</code>. Its <code>subprocess.run</code> is blocking, so qualifying issues execute serially. Its processed sets live only in memory.</p>
+              <p class="annotation"><strong>Boundary warning:</strong> the webhook does not validate a GitHub signature or delivery ID. In this course tree, exposure through a public tunnel depends on environmental isolation, not authenticated webhook payloads.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-health-utils">
+            <summary><span><span class="file-path">adws/health_check.py · adws/utils.py · adws/README.md</span><span class="file-role">Preflight, trace IDs/logging, and operator documentation</span></span></summary>
+            <div class="file-body">
+              <p><code>health_check.py</code> checks required environment, git remote, <code>gh</code> authentication, and a live Claude 2+2 round-trip; it can post a compact result to an issue. <code>utils.py</code> creates the eight-character ID and a file-DEBUG/console-INFO logger under <code>agents/{id}/adw_plan_build/</code>.</p>
+              <p><code>adws/README.md</code> is useful orientation but not executable truth. It claims automatic retry with exponential backoff, points model selection to a stale line number, and documents a commit shape that differs from <code>.claude/commands/commit.md</code>. Read code when they disagree.</p>
+              <p class="annotation"><strong>Subtle mismatch:</strong> <code>agent.py</code> defaults <code>CLAUDE_CODE_PATH</code> to <code>claude</code>, and the health check treats a missing path as noncritical. The main workflow’s <code>check_env_vars()</code> still requires the variable.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-commands">
+            <summary><span><span class="file-path">.claude/commands/*.md</span><span class="file-role">Repository-specific instructions and strict return contracts for each micro-agent</span></span></summary>
+            <div class="file-body">
+              <p>The controller supplies <em>which</em> command and its arguments; these files supply <em>how this repository expects the work done</em>.</p>
+              <table class="evidence-table"><thead><tr><th>Files</th><th>Job</th><th>Return boundary</th></tr></thead><tbody>
+                <tr><td><code>classify_issue.md</code></td><td>Map issue JSON to the planning family.</td><td><code>/chore</code>, <code>/bug</code>, <code>/feature</code>, or <code>0</code></td></tr>
+                <tr><td><code>chore.md</code>, <code>bug.md</code>, <code>feature.md</code></td><td>Research the repo and create a class-specific plan under <code>specs/</code>.</td><td>Report containing the plan path</td></tr>
+                <tr><td><code>generate_branch_name.md</code></td><td>Update main, create a compliant branch.</td><td>Branch name only</td></tr>
+                <tr><td><code>find_plan_file.md</code></td><td>Locate the planner’s new artifact.</td><td>Path or <code>0</code></td></tr>
+                <tr><td><code>implement.md</code></td><td>Read and execute the durable plan.</td><td>Summary plus diff stat</td></tr>
+                <tr><td><code>commit.md</code></td><td>Inspect, stage, and commit.</td><td>Commit message only</td></tr>
+                <tr><td><code>pull_request.md</code></td><td>Inspect branch evidence, push, open PR.</td><td>PR URL only</td></tr>
+                <tr><td><code>install.md</code>, <code>prime.md</code>, <code>start.md</code>, <code>tools.md</code></td><td>Human-facing setup and utility commands.</td><td>Command-specific report</td></tr>
+              </tbody></table>
+              <p class="annotation"><strong>Why markdown is architecture:</strong> a false file claim or weak validation step can be repaired once in the owning template, then inherited by later runs.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-hooks">
+            <summary><span><span class="file-path">.claude/settings.json · .claude/hooks/</span><span class="file-role">Permission policy plus append-only lifecycle capture</span></span></summary>
+            <div class="file-body">
+              <p><code>settings.json</code> registers PreToolUse, PostToolUse, Notification, Stop, and SubagentStop hooks. Each script reads JSON on stdin and appends it beneath <code>logs/{session_id}/</code>. Stop also copies the JSONL transcript to readable <code>chat.json</code>.</p>
+              <p><code>pre_tool_use.py</code> is the only enforcing hook: it blocks dangerous recursive removals and access to live <code>.env</code> files. The other hooks are evidence collectors and deliberately exit cleanly on malformed input.</p>
+              <div class="code-shell"><div class="code-shell__bar"><span>pre_tool_use.py</span><span>Python</span></div><pre class="code"><code><span class="syn-k">if</span> <span class="syn-f">is_env_file_access</span>(tool_name, tool_input):
+    <span class="syn-f">print</span>(<span class="syn-s">"BLOCKED: Access to .env files containing sensitive data is prohibited"</span>, file=sys.stderr)
+    sys.exit(<span class="syn-n">2</span>)
+
+<span class="syn-k">if</span> tool_name == <span class="syn-s">"Bash"</span> <span class="syn-k">and</span> <span class="syn-f">is_dangerous_rm_command</span>(command):
+    sys.exit(<span class="syn-n">2</span>)</code></pre></div>
+              <p class="annotation"><code>notification.py --notify</code> records notification events but does not perform TTS or any other notification action in this version.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-evidence">
+            <summary><span><span class="file-path">agents/5f2e861e/ · logs/{session_id}/</span><span class="file-role">The saved request, event stream, reconstructed chat, tool events, and controller timeline</span></span></summary>
+            <div class="file-body">
+              <p>The successful saved run contains eight prompt files, eight raw JSONL streams, eight readable JSON arrays, and one controller execution log. The hook layer adds per-session chat, pre-tool, post-tool, stop, and notification evidence.</p>
+              <table class="evidence-table"><thead><tr><th>Agent</th><th>Turns</th><th>Saved result</th></tr></thead><tbody>
+                <tr><td>issue_classifier</td><td>3</td><td><code>/chore</code></td></tr>
+                <tr><td>branch_generator</td><td>9</td><td><code>chore-9-5f2e861e-update-readme-animation</code></td></tr>
+                <tr><td>sdlc_planner</td><td>25</td><td>plan report and path</td></tr>
+                <tr><td>plan_finder</td><td>4</td><td><code>specs/readme-animation-framework-update.md</code> (historical run output; absent from the current tree)</td></tr>
+                <tr><td>sdlc_planner_committer</td><td>8</td><td>planner commit message</td></tr>
+                <tr><td>sdlc_implementor</td><td>39</td><td>README change report</td></tr>
+                <tr><td>sdlc_implementor_committer</td><td>9</td><td>implementation commit message</td></tr>
+                <tr><td>pr_creator</td><td>14</td><td>PR #10 URL</td></tr>
+              </tbody></table>
+              <p class="annotation">A second run directory, <code>agents/338dc8a6/</code>, contains only an execution log: it stopped immediately because <code>ANTHROPIC_API_KEY</code> and <code>CLAUDE_CODE_PATH</code> were missing. Honest early failure is part of the design.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-app">
+            <summary><span><span class="file-path">app/server/ · app/client/</span><span class="file-role">The ordinary NL→SQL application the agentic layer operates</span></span></summary>
+            <div class="file-body">
+              <p><code>app/server/server.py</code> wires FastAPI routes for upload, query, schema, insights, health, and table deletion. Core modules convert CSV/JSON with pandas, inspect SQLite, call OpenAI or Anthropic, validate generated SQL, and compute insights. Pydantic contracts mirror <code>app/client/src/types.d.ts</code>.</p>
+              <p><code>app/client/src/main.ts</code> owns browser state and DOM events; <code>src/api/client.ts</code> owns typed HTTP calls; <code>vite.config.ts</code> proxies <code>/api</code> to port 8000. The app matters because plans and implementations must navigate a real codebase, but no application module triggers or coordinates an ADW.</p>
+              <p class="annotation"><strong>Separation of concerns:</strong> removing <code>adws/</code> would leave a manually operable web app. Removing <code>app/</code> would leave an orchestration shell with no product to change.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-specs">
+            <summary><span><span class="file-path">specs/</span><span class="file-role">Durable planning artifacts and the handoff seam between fresh contexts</span></span></summary>
+            <div class="file-body">
+              <p><code>init_nlq_to_sql_to_table.md</code> is the original 749-line application plan. <code>fix-sql-injection-vulnerabilities.md</code> and <code>replace-print-with-logging.md</code> correspond to implemented code. <code>query-history-panel.md</code> is a plan only—the files it proposes, such as <code>core/query_history.py</code>, do not exist in this repository.</p>
+              <p class="annotation"><strong>Key idea:</strong> the plan is not chat memory. It is a named, diffable asset the planner creates, a committer preserves, and a fresh implementer reads.</p>
+            </div>
+          </details>
+
+          <details class="file-card" id="file-scripts">
+            <summary><span><span class="file-path">scripts/</span><span class="file-role">Operational helpers for app lifecycle, webhook exposure, and demo cleanup</span></span></summary>
+            <div class="file-body"><p><code>start.sh</code> launches backend and frontend with child cleanup. <code>stop_apps.sh</code> and <code>kill_trigger_webhook.sh</code> stop local processes. <code>expose_webhook.sh</code> launches a Cloudflare tunnel. <code>copy_dot_env.sh</code> copies TAC-2 server configuration. <code>clear_issue_comments.sh</code> and <code>delete_pr.sh</code> reset GitHub demo artifacts with confirmation.</p></div>
+          </details>
+
+          <details class="file-card" id="file-ai-docs">
+            <summary><span><span class="file-path">ai_docs/</span><span class="file-role">Local course-era reference material, not imported runtime code</span></span></summary>
+            <div class="file-body"><p>The directory contains Anthropic and OpenAI quickstarts, Claude Code CLI/SDK reference, and an E2B sandbox guide. Nothing imports these files. They exist so an agent can research provider syntax and environment options without depending on conversation memory. Treat model names and API examples as repository-era evidence, not a promise of current provider behavior.</p></div>
+          </details>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="flow">
+        <span class="section-number">04 · END-TO-END FLOW</span>
+        <h2 class="section-title">How the saved run actually works</h2>
+        <p class="section-lead">Trace run <code>5f2e861e</code>. The artifacts prove the sequence; no single transcript proves the whole workflow.</p>
+        <ol class="flow-list">
+          <li class="flow-step"><div><h3>Issue #9 is fetched</h3><p><code>github.fetch_issue()</code> turns <code>gh issue view --json …</code> into a typed <code>GitHubIssue</code>. The controller posts “Starting ADW workflow.”</p></div></li>
+          <li class="flow-step"><div><h3>The classifier chooses the plan family</h3><p><code>/classify_issue {issue JSON}</code> runs in session <code>7ba9…</code> and returns exactly <code>/chore</code>.</p></div></li>
+          <li class="flow-step"><div><h3>The branch agent changes git state</h3><p><code>/generate_branch_name</code> checks out and updates main, creates <code>chore-9-5f2e861e-update-readme-animation</code>, and returns that name.</p></div></li>
+          <li class="flow-step"><div><h3>The planner creates a durable specification</h3><p><code>/chore</code> reads repository context and reports a new plan at <code>specs/readme-animation-framework-update.md</code>. The saved run proves that historical handoff path; the plan is not present in today’s checked-in tree.</p></div></li>
+          <li class="flow-step"><div><h3>A separate agent resolves the path</h3><p><code>/find_plan_file</code> converts the planner’s prose report into the exact relative path the controller needs.</p></div></li>
+          <li class="flow-step"><div><h3>The first commit freezes the plan</h3><p><code>/commit sdlc_planner chore …</code> stages the working tree and returns <code>sdlc_planner: chore: update readme animation framework</code>.</p></div></li>
+          <li class="flow-step"><div><h3>A fresh implementer reads only the plan path</h3><p><code>/implement specs/readme-animation-framework-update.md</code> edits <code>README.md</code> and reports 75 inserted lines. Its hidden reasoning is not handed forward.</p></div></li>
+          <li class="flow-step"><div><h3>The second commit preserves the implementation</h3><p>A new committer returns <code>sdlc_implementor: chore: add animation framework documentation</code>.</p></div></li>
+          <li class="flow-step"><div><h3>The PR agent builds the review surface</h3><p>It inspects diff and commits, pushes the branch, opens PR #10, and returns its URL. The controller posts completion at 05:24:57.</p></div></li>
+        </ol>
+        <aside class="callout callout--tactic"><p class="callout__label">Control flow versus data flow</p><p><strong>Control</strong> stays in Python: call, check, comment, advance, or exit. <strong>Data</strong> crosses as issue JSON, a slash command, branch name, plan path, commit message, implementation report, and PR URL. Prompts and streams are copied to disk as evidence beside that flow.</p></aside>
+      </section>
+
+      <section class="chapter-section" id="fails">
+        <span class="section-number">05 · COMMON FAIL + FIX</span>
+        <h2 class="section-title">Where weak AFK systems fool you</h2>
+        <p class="section-lead">These are visible in the checked-in code and artifacts, not generic warnings.</p>
+        <div class="fail-grid">
+          <article class="fail-card"><p class="card-kicker">Fail 1</p><h3>“The README says it retries”</h3><p>The controller exits on the first failed boundary. There is no exponential backoff or resume loop. <strong>Fix:</strong> treat executable code and saved traces as truth; repair drift in docs.</p></article>
+          <article class="fail-card"><p class="card-kicker">Fail 2</p><h3>“The timeout will stop a hung agent”</h3><p>The exception handler exists, but the subprocess has no timeout argument. <strong>Fix:</strong> wire a real timeout, kill the child safely, and test the failure path.</p></article>
+          <article class="fail-card"><p class="card-kicker">Fail 3</p><h3>“The webhook came from GitHub”</h3><p>The endpoint trusts headers and JSON without verifying a signature. <strong>Fix:</strong> validate the webhook secret before launching any process.</p></article>
+          <article class="fail-card"><p class="card-kicker">Fail 4</p><h3>“No final result still means success”</h3><p>If JSONL has no result event, <code>agent.py</code> returns the raw stream with <code>success=True</code>. <strong>Fix:</strong> make a missing result an explicit failure contract.</p></article>
+          <article class="fail-card"><p class="card-kicker">Fail 5</p><h3>“Skipped permissions is an agent feature”</h3><p>It is a host permission decision. <strong>Fix:</strong> use a disposable checkout without production credentials and keep review as the gate.</p></article>
+          <article class="fail-card"><p class="card-kicker">Fail 6</p><h3>“Generated prose must be true”</h3><p>The saved run documents Motion One without installing it; other course artifacts name plausible files that do not exist. <strong>Fix:</strong> review claims against the diff and push the rule back into the template.</p></article>
+        </div>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="ledger">
+        <span class="section-number">06 · EVERY FILE</span>
+        <h2 class="section-title">Complete 148-file responsibility ledger</h2>
+        <p class="section-lead">Every eligible text file was read. Repeated runtime files are grouped by a naming rule, but every path below is real. Live <code>.env</code> values were not reproduced; only its configuration shape was inspected.</p>
+
+        <div class="file-stack">
+          <details class="ledger-group" open><summary>Repository root · 4 files · 310 lines</summary><div class="ledger-body"><table class="ledger-table"><tbody>
+            <tr><td><code>.env</code></td><td>Live ADW/provider/GitHub/tunnel configuration; key names inspected, secret values redacted.</td></tr>
+            <tr><td><code>.env.sample</code></td><td>Shareable root configuration contract.</td></tr>
+            <tr><td><code>.gitignore</code></td><td>Excludes secrets, caches, databases, logs, and generated agent output.</td></tr>
+            <tr><td><code>README.md</code></td><td>Application setup, ADW entry points, API/security notes, and repo map.</td></tr>
+          </tbody></table></div></details>
+
+          <details class="ledger-group"><summary>.claude · 22 files · 1,249 lines</summary><div class="ledger-body"><table class="ledger-table"><tbody>
+            <tr class="group-row"><td colspan="2">Command templates</td></tr>
+            <tr><td><code>.claude/commands/bug.md</code></td><td>Bug-plan research, root-cause, minimal-fix, and validation contract.</td></tr>
+            <tr><td><code>.claude/commands/chore.md</code></td><td>Chore-plan format and repository-scoped research rules.</td></tr>
+            <tr><td><code>.claude/commands/classify_issue.md</code></td><td>Issue-to-command classifier with a four-value return contract.</td></tr>
+            <tr><td><code>.claude/commands/commit.md</code></td><td>Inspect, stage, commit, and return the used message only.</td></tr>
+            <tr><td><code>.claude/commands/feature.md</code></td><td>Feature plan, testing strategy, acceptance criteria, and validation contract.</td></tr>
+            <tr><td><code>.claude/commands/find_plan_file.md</code></td><td>Resolve the new plan path from git state and prior output.</td></tr>
+            <tr><td><code>.claude/commands/generate_branch_name.md</code></td><td>Update main, create a run-scoped branch, return its name.</td></tr>
+            <tr><td><code>.claude/commands/implement.md</code></td><td>Implement a plan file and report summary plus diff stat.</td></tr>
+            <tr><td><code>.claude/commands/install.md</code></td><td>Initialize a learner fork, install dependencies, and explain remaining setup.</td></tr>
+            <tr><td><code>.claude/commands/prime.md</code></td><td>List tracked files and read the root README.</td></tr>
+            <tr><td><code>.claude/commands/pull_request.md</code></td><td>Inspect branch evidence, push, open a linked PR, return URL.</td></tr>
+            <tr><td><code>.claude/commands/start.md</code></td><td>Thin alias for <code>scripts/start.sh</code> with a 300-second allowance.</td></tr>
+            <tr><td><code>.claude/commands/tools.md</code></td><td>Ask Claude to enumerate built-in development tools.</td></tr>
+            <tr class="group-row"><td colspan="2">Hooks and settings</td></tr>
+            <tr><td><code>.claude/hooks/notification.py</code></td><td>Append Notification hook input; <code>--notify</code> has no side effect here.</td></tr>
+            <tr><td><code>.claude/hooks/post_tool_use.py</code></td><td>Append completed tool-call payloads per session.</td></tr>
+            <tr><td><code>.claude/hooks/pre_tool_use.py</code></td><td>Block live env access and dangerous removal, then log allowed calls.</td></tr>
+            <tr><td><code>.claude/hooks/stop.py</code></td><td>Record Stop and optionally reconstruct <code>chat.json</code> from transcript JSONL.</td></tr>
+            <tr><td><code>.claude/hooks/subagent_stop.py</code></td><td>Record SubagentStop and optionally copy a transcript.</td></tr>
+            <tr><td><code>.claude/hooks/utils/constants.py</code></td><td>Resolve and create <code>logs/{session_id}</code>.</td></tr>
+            <tr><td><code>.claude/hooks/utils/llm/anth.py</code></td><td>Small Anthropic completion-message helper, not wired into notification.</td></tr>
+            <tr><td><code>.claude/hooks/utils/llm/oai.py</code></td><td>Equivalent OpenAI completion-message helper.</td></tr>
+            <tr><td><code>.claude/settings.json</code></td><td>Allow/deny tool policy and five lifecycle-hook registrations.</td></tr>
+          </tbody></table></div></details>
+
+          <details class="ledger-group"><summary>adws · 9 files · 2,394 lines</summary><div class="ledger-body"><table class="ledger-table"><tbody>
+            <tr><td><code>adws/README.md</code></td><td>Operator overview; helpful but demonstrably drifted from code.</td></tr>
+            <tr><td><code>adws/adw_plan_build.py</code></td><td>Plan/build/commit/PR controller and error gate.</td></tr>
+            <tr><td><code>adws/agent.py</code></td><td>Claude CLI adapter, prompt persistence, JSONL parsing, and result conversion.</td></tr>
+            <tr><td><code>adws/data_types.py</code></td><td>GitHub and agent Pydantic contracts plus slash-command literals.</td></tr>
+            <tr><td><code>adws/github.py</code></td><td>Git remote and <code>gh</code> issue/comment/list operations.</td></tr>
+            <tr><td><code>adws/health_check.py</code></td><td>Environment, git, GitHub CLI, and live Claude preflight.</td></tr>
+            <tr><td><code>adws/trigger_cron.py</code></td><td>Twenty-second open-issue polling and serial workflow launch.</td></tr>
+            <tr><td><code>adws/trigger_webhook.py</code></td><td>FastAPI webhook receiver, detached launch, and health endpoint.</td></tr>
+            <tr><td><code>adws/utils.py</code></td><td>ADW ID creation and dual-destination logging.</td></tr>
+          </tbody></table></div></details>
+
+          <details class="ledger-group"><summary>app/client · 15 files · 2,479 lines</summary><div class="ledger-body"><table class="ledger-table"><tbody>
+            <tr><td><code>app/client/.gitignore</code></td><td>Client build, package, editor, and log exclusions.</td></tr>
+            <tr><td><code>app/client/index.html</code></td><td>Static query, results, table catalog, and upload-modal DOM.</td></tr>
+            <tr><td><code>app/client/package-lock.json</code></td><td>npm lock v3 resolving Vite 6.3.5, TypeScript 5.8.3, and build transitive packages.</td></tr>
+            <tr><td><code>app/client/package.json</code></td><td>Vite dev/build/preview scripts and direct dev dependencies.</td></tr>
+            <tr><td><code>app/client/public/sample-data/orders_(32).csv</code></td><td>Thirty-two-row orders fixture; not exposed by the two sample buttons.</td></tr>
+            <tr><td><code>app/client/public/sample-data/products.csv</code></td><td>Thirty-two-row product inventory sample.</td></tr>
+            <tr><td><code>app/client/public/sample-data/users.json</code></td><td>Twenty-user JSON sample.</td></tr>
+            <tr><td><code>app/client/public/vite.svg</code></td><td>Default Vite favicon asset.</td></tr>
+            <tr><td><code>app/client/src/api/client.ts</code></td><td>Generic fetch wrapper and five typed API methods.</td></tr>
+            <tr><td><code>app/client/src/main.ts</code></td><td>DOM initialization, query/upload/table rendering, modal, and sample-data behavior.</td></tr>
+            <tr><td><code>app/client/src/style.css</code></td><td>Application palette, layout, tables, modal, and interaction styling.</td></tr>
+            <tr><td><code>app/client/src/types.d.ts</code></td><td>Global TypeScript request/response contracts mirroring Pydantic.</td></tr>
+            <tr><td><code>app/client/src/vite-env.d.ts</code></td><td>Vite client type reference.</td></tr>
+            <tr><td><code>app/client/tsconfig.json</code></td><td>Strict ES2020 bundler-mode TypeScript configuration.</td></tr>
+            <tr><td><code>app/client/vite.config.ts</code></td><td>Development <code>/api</code> proxy to FastAPI on port 8000.</td></tr>
+          </tbody></table></div></details>
+
+          <details class="ledger-group"><summary>app/server · 23 files · 3,060 lines</summary><div class="ledger-body"><table class="ledger-table"><tbody>
+            <tr><td><code>app/server/.env.sample</code></td><td>OpenAI/Anthropic application key template.</td></tr>
+            <tr><td><code>app/server/.python-version</code></td><td>Python 3.12 toolchain hint.</td></tr>
+            <tr><td><code>app/server/core/__init__.py</code></td><td>Core package marker.</td></tr>
+            <tr><td><code>app/server/core/data_models.py</code></td><td>Pydantic API contracts for upload, query, schema, insights, and health.</td></tr>
+            <tr><td><code>app/server/core/file_processor.py</code></td><td>Sanitize names and convert CSV/JSON bytes into SQLite tables.</td></tr>
+            <tr><td><code>app/server/core/insights.py</code></td><td>Secure distinct/null/numeric/frequency statistics per column.</td></tr>
+            <tr><td><code>app/server/core/llm_processor.py</code></td><td>Schema prompt, provider calls, SQL cleanup, and key-first routing.</td></tr>
+            <tr><td><code>app/server/core/sql_processor.py</code></td><td>Generated-SQL validation/execution and schema discovery.</td></tr>
+            <tr><td><code>app/server/core/sql_security.py</code></td><td>Identifier validation, escaping, safe execution, and injection blocklist.</td></tr>
+            <tr><td><code>app/server/main.py</code></td><td>Small logging-configured “Hello from server” entry point.</td></tr>
+            <tr><td><code>app/server/pyproject.toml</code></td><td>Pinned server/runtime/test dependencies and pytest discovery.</td></tr>
+            <tr><td><code>app/server/server.py</code></td><td>FastAPI routes, CORS, logging, uptime, and core orchestration.</td></tr>
+            <tr><td><code>app/server/tests/__init__.py</code></td><td>Zero-byte tests package marker.</td></tr>
+            <tr><td><code>app/server/tests/assets/column_names.csv</code></td><td>Header-normalization fixture.</td></tr>
+            <tr><td><code>app/server/tests/assets/invalid.csv</code></td><td>Inconsistent-row CSV error fixture.</td></tr>
+            <tr><td><code>app/server/tests/assets/test_products.json</code></td><td>Three-product JSON conversion fixture.</td></tr>
+            <tr><td><code>app/server/tests/assets/test_users.csv</code></td><td>Four-user CSV conversion fixture.</td></tr>
+            <tr><td><code>app/server/tests/core/__init__.py</code></td><td>Zero-byte mirrored core-test package marker.</td></tr>
+            <tr><td><code>app/server/tests/core/test_file_processor.py</code></td><td>In-memory conversion, normalization, and malformed-input tests.</td></tr>
+            <tr><td><code>app/server/tests/core/test_llm_processor.py</code></td><td>Mocked providers, cleanup, prompt formatting, error, and routing tests.</td></tr>
+            <tr><td><code>app/server/tests/core/test_sql_processor.py</code></td><td>In-memory SELECT, blocking, error, and schema tests.</td></tr>
+            <tr><td><code>app/server/tests/test_sql_injection.py</code></td><td>Security utility, processor, file, insights, and end-to-end injection tests.</td></tr>
+            <tr><td><code>app/server/uv.lock</code></td><td>Resolved Python dependency graph and hashes across version markers.</td></tr>
+          </tbody></table></div></details>
+
+          <details class="ledger-group"><summary>scripts + specs + ai_docs · 16 files · 3,571 lines</summary><div class="ledger-body"><table class="ledger-table"><tbody>
+            <tr class="group-row"><td colspan="2">Scripts</td></tr>
+            <tr><td><code>scripts/clear_issue_comments.sh</code></td><td>Confirm and delete every comment on one issue.</td></tr>
+            <tr><td><code>scripts/copy_dot_env.sh</code></td><td>Copy TAC-2 server env into this application.</td></tr>
+            <tr><td><code>scripts/delete_pr.sh</code></td><td>Confirm, close a PR, and optionally delete its branch.</td></tr>
+            <tr><td><code>scripts/expose_webhook.sh</code></td><td>Run the configured Cloudflare tunnel.</td></tr>
+            <tr><td><code>scripts/kill_trigger_webhook.sh</code></td><td>Stop webhook process and clear port 8001.</td></tr>
+            <tr><td><code>scripts/start.sh</code></td><td>Start, health-check, and jointly clean up backend/frontend processes.</td></tr>
+            <tr><td><code>scripts/stop_apps.sh</code></td><td>Force-stop app and webhook processes/ports.</td></tr>
+            <tr class="group-row"><td colspan="2">Specifications</td></tr>
+            <tr><td><code>specs/fix-sql-injection-vulnerabilities.md</code></td><td>Implemented security bug plan.</td></tr>
+            <tr><td><code>specs/init_nlq_to_sql_to_table.md</code></td><td>Original application architecture and UI plan.</td></tr>
+            <tr><td><code>specs/query-history-panel.md</code></td><td>Unimplemented future feature plan.</td></tr>
+            <tr><td><code>specs/replace-print-with-logging.md</code></td><td>Implemented logging chore plan.</td></tr>
+            <tr class="group-row"><td colspan="2">AI references</td></tr>
+            <tr><td><code>ai_docs/anthropic_quick_start.md</code></td><td>Anthropic API setup and basic call reference.</td></tr>
+            <tr><td><code>ai_docs/claude_code_cli_reference.md</code></td><td>Claude Code command and flag reference.</td></tr>
+            <tr><td><code>ai_docs/claude_code_sdk.md</code></td><td>Programmable CLI/SDK, streaming, sessions, MCP, and message schemas.</td></tr>
+            <tr><td><code>ai_docs/e2b.md</code></td><td>Sandbox creation, packages, files, servers, LLM examples, and env guidance.</td></tr>
+            <tr><td><code>ai_docs/openai_quick_start.md</code></td><td>OpenAI text, image, tool, streaming, and agent examples.</td></tr>
+          </tbody></table></div></details>
+
+          <details class="ledger-group"><summary>agents · 26 generated evidence files · 4,156 lines</summary><div class="ledger-body">
+            <p>For every agent stage, <code>prompts/*.txt</code> is the exact request, <code>raw_output.jsonl</code> is the original event stream, and <code>raw_output.json</code> is the same stream as a readable array.</p>
+            <ul class="path-list">
+              <li><code>agents/338dc8a6/adw_plan_build/execution.log</code> — failed preflight timeline.</li>
+              <li><code>agents/5f2e861e/adw_plan_build/execution.log</code> — successful controller timeline.</li>
+              <li><code>agents/5f2e861e/branch_generator/prompts/generate_branch_name.txt</code></li>
+              <li><code>agents/5f2e861e/branch_generator/raw_output.json</code></li>
+              <li><code>agents/5f2e861e/branch_generator/raw_output.jsonl</code></li>
+              <li><code>agents/5f2e861e/issue_classifier/prompts/classify_issue.txt</code></li>
+              <li><code>agents/5f2e861e/issue_classifier/raw_output.json</code></li>
+              <li><code>agents/5f2e861e/issue_classifier/raw_output.jsonl</code></li>
+              <li><code>agents/5f2e861e/plan_finder/prompts/find_plan_file.txt</code></li>
+              <li><code>agents/5f2e861e/plan_finder/raw_output.json</code></li>
+              <li><code>agents/5f2e861e/plan_finder/raw_output.jsonl</code></li>
+              <li><code>agents/5f2e861e/pr_creator/prompts/pull_request.txt</code></li>
+              <li><code>agents/5f2e861e/pr_creator/raw_output.json</code></li>
+              <li><code>agents/5f2e861e/pr_creator/raw_output.jsonl</code></li>
+              <li><code>agents/5f2e861e/sdlc_implementor/prompts/implement.txt</code></li>
+              <li><code>agents/5f2e861e/sdlc_implementor/raw_output.json</code></li>
+              <li><code>agents/5f2e861e/sdlc_implementor/raw_output.jsonl</code></li>
+              <li><code>agents/5f2e861e/sdlc_implementor_committer/prompts/commit.txt</code></li>
+              <li><code>agents/5f2e861e/sdlc_implementor_committer/raw_output.json</code></li>
+              <li><code>agents/5f2e861e/sdlc_implementor_committer/raw_output.jsonl</code></li>
+              <li><code>agents/5f2e861e/sdlc_planner/prompts/chore.txt</code></li>
+              <li><code>agents/5f2e861e/sdlc_planner/raw_output.json</code></li>
+              <li><code>agents/5f2e861e/sdlc_planner/raw_output.jsonl</code></li>
+              <li><code>agents/5f2e861e/sdlc_planner_committer/prompts/commit.txt</code></li>
+              <li><code>agents/5f2e861e/sdlc_planner_committer/raw_output.json</code></li>
+              <li><code>agents/5f2e861e/sdlc_planner_committer/raw_output.jsonl</code></li>
+            </ul>
+          </div></details>
+
+          <details class="ledger-group"><summary>logs · 33 generated hook files · 6,234 lines</summary><div class="ledger-body">
+            <p>Suffix job: <code>chat.json</code> is the reconstructed conversation; <code>pre_tool_use.json</code> and <code>post_tool_use.json</code> are requested/completed tool events; <code>stop.json</code> is the terminal hook event; <code>notification.json</code> is a notification event. Each session below belongs to one saved micro-agent or standalone hook exercise.</p>
+            <ul class="path-list">
+              <li><code>logs/12ce3ab2-537a-4a3d-bc11-856c68063b5a/chat.json</code></li><li><code>logs/12ce3ab2-537a-4a3d-bc11-856c68063b5a/post_tool_use.json</code></li><li><code>logs/12ce3ab2-537a-4a3d-bc11-856c68063b5a/pre_tool_use.json</code></li><li><code>logs/12ce3ab2-537a-4a3d-bc11-856c68063b5a/stop.json</code></li>
+              <li><code>logs/3430bdec-2ae0-43a8-abbc-f0ef72981ce5/chat.json</code></li><li><code>logs/3430bdec-2ae0-43a8-abbc-f0ef72981ce5/post_tool_use.json</code></li><li><code>logs/3430bdec-2ae0-43a8-abbc-f0ef72981ce5/pre_tool_use.json</code></li><li><code>logs/3430bdec-2ae0-43a8-abbc-f0ef72981ce5/stop.json</code></li>
+              <li><code>logs/4f2f6443-bae5-4a27-9c3c-e4f3d256b83a/chat.json</code></li><li><code>logs/4f2f6443-bae5-4a27-9c3c-e4f3d256b83a/post_tool_use.json</code></li><li><code>logs/4f2f6443-bae5-4a27-9c3c-e4f3d256b83a/pre_tool_use.json</code></li><li><code>logs/4f2f6443-bae5-4a27-9c3c-e4f3d256b83a/stop.json</code></li>
+              <li><code>logs/5912273e-2d47-4a54-8b4c-08a8de70086d/chat.json</code></li><li><code>logs/5912273e-2d47-4a54-8b4c-08a8de70086d/post_tool_use.json</code></li><li><code>logs/5912273e-2d47-4a54-8b4c-08a8de70086d/pre_tool_use.json</code></li><li><code>logs/5912273e-2d47-4a54-8b4c-08a8de70086d/stop.json</code></li>
+              <li><code>logs/7ba9b61c-6763-4c79-8486-0a1e9948989d/chat.json</code></li><li><code>logs/7ba9b61c-6763-4c79-8486-0a1e9948989d/stop.json</code></li>
+              <li><code>logs/845feb65-4467-4109-9fd9-4a3832480c3e/chat.json</code></li><li><code>logs/845feb65-4467-4109-9fd9-4a3832480c3e/post_tool_use.json</code></li><li><code>logs/845feb65-4467-4109-9fd9-4a3832480c3e/pre_tool_use.json</code></li><li><code>logs/845feb65-4467-4109-9fd9-4a3832480c3e/stop.json</code></li>
+              <li><code>logs/8c977a65-4e02-45c3-b6ee-e87d49dd8940/chat.json</code></li><li><code>logs/8c977a65-4e02-45c3-b6ee-e87d49dd8940/post_tool_use.json</code></li><li><code>logs/8c977a65-4e02-45c3-b6ee-e87d49dd8940/pre_tool_use.json</code></li><li><code>logs/8c977a65-4e02-45c3-b6ee-e87d49dd8940/stop.json</code></li>
+              <li><code>logs/bb43b789-2709-462e-abba-1c54a6ab731f/chat.json</code></li><li><code>logs/bb43b789-2709-462e-abba-1c54a6ab731f/notification.json</code></li><li><code>logs/bb43b789-2709-462e-abba-1c54a6ab731f/stop.json</code></li>
+              <li><code>logs/ceeebbb7-3c87-4dae-8daf-c759f5efbb0c/chat.json</code></li><li><code>logs/ceeebbb7-3c87-4dae-8daf-c759f5efbb0c/post_tool_use.json</code></li><li><code>logs/ceeebbb7-3c87-4dae-8daf-c759f5efbb0c/pre_tool_use.json</code></li><li><code>logs/ceeebbb7-3c87-4dae-8daf-c759f5efbb0c/stop.json</code></li>
+            </ul>
+          </div></details>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">07 · YOU TRY</span>
+        <h2 class="section-title">Lab: strengthen the trace ID without touching the workflow</h2>
+        <p class="section-lead">Change one small seam, then prove its contract locally. This lab avoids GitHub and provider calls.</p>
+        <section class="lab-box">
+          <h3>Modify one thing</h3>
+          <ol>
+            <li>Open <code>adws/utils.py</code>.</li>
+            <li>Change <code>make_adw_id()</code> from the first eight characters of a hyphenated UUID string to the first twelve hexadecimal characters: <code>uuid.uuid4().hex[:12]</code>.</li>
+            <li>Update its docstring from “8-character” to “12-character hexadecimal.”</li>
+            <li>Run the local contract check below from the TAC-4 root.</li>
+          </ol>
+          <div class="code-shell"><div class="code-shell__bar"><span>verify without network access</span><span>shell</span></div><pre class="code"><code>python3 -c "import re,sys; sys.path.insert(0,'adws'); from utils import make_adw_id; ids={make_adw_id() for _ in range(10000)}; assert len(ids)==10000; assert all(re.fullmatch(r'[0-9a-f]{12}', x) for x in ids); print('trace-id contract: pass')"</code></pre></div>
+          <div class="lab-grid"><div><strong>Shape</strong><span>Every ID is exactly 12 lowercase hex characters.</span></div><div><strong>Sample</strong><span>10,000 generated IDs are distinct in this check.</span></div><div><strong>Compatibility</strong><span>Branch names and directory paths accept the longer token unchanged.</span></div></div>
+          <aside class="callout callout--warning"><p class="callout__label">Do not overclaim</p><p>This reduces collision risk; it does not make IDs cryptographic authentication. Webhook verification is a separate boundary.</p></aside>
+        </section>
+      </section>
+
+      <section class="chapter-section" id="teach-back">
+        <span class="section-number">08 · TEACH-BACK</span>
+        <h2 class="section-title">Explain the system without saying “the agent handles it”</h2>
+        <p class="section-lead">Pass when every vague verb becomes a file, function, artifact, or return contract.</p>
+        <div class="teach-back">
+          <h3>Your 90-second explanation</h3>
+          <ol><li>What turns an opened issue into a background process?</li><li>Which file owns step order, and which file owns one Claude invocation?</li><li>Why is the plan a better handoff than the planner’s conversation?</li><li>Where are the exact prompt, raw stream, readable stream, chat transcript, and controller timeline stored?</li><li>What does <code>check_error()</code> do on a failed boundary?</li><li>Why are <code>app/</code> and <code>adws/</code> separate layers?</li><li>What is unsafe about the webhook and skipped-permission configuration?</li><li>Which saved artifact proves that a missing environment fails before agent work begins?</li></ol>
+          <details><summary>Reveal the answer spine</summary><p><code>trigger_webhook.py</code> validates the event shape loosely, makes an ADW ID, and launches <code>adw_plan_build.py</code> with <code>Popen</code>. The controller owns order; <code>agent.execute_template()</code> owns one isolated Claude run. The plan is a named, committed artifact that a fresh implementer can read. Exact prompts and streams live under <code>agents/{id}/{agent}/</code>; reconstructed chats and hook events live under <code>logs/{session}/</code>; the controller timeline is <code>agents/{id}/adw_plan_build/execution.log</code>. <code>check_error()</code> logs, comments, and exits. <code>app/</code> is the target product; <code>adws/</code> is the operating layer. The webhook lacks signature verification, and skipped permissions require a disposable environment. Run <code>338dc8a6</code> proves preflight failure.</p></details>
+        </div>
+        <section class="retrieval-quiz">
+          <details><summary>Why does the plan finder exist if the planner already reports a path?</summary><p>It converts free-form planner output and git state into the narrow relative-path contract the controller needs. It is an extra model call because the planner report is not machine-typed.</p></details>
+          <details><summary>Why are there two commit agents?</summary><p>Plan and implementation are separate reviewable checkpoints. Each fresh committer inspects the current diff, creates one commit, and returns the exact message.</p></details>
+          <details><summary>What makes the live issue feed insufficient for debugging?</summary><p>It reports compact milestones. The exact prompt, tool events, raw stream, reconstructed chat, and controller debug log live in the filesystem evidence layers.</p></details>
+        </section>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">IndyDevDan Expert Book · Code companion</p>
+        <div class="chapter-footer__nav"><a href="../vol-1-tac/04-afk-agents.html">← Return to Chapter 04</a><a href="index.html">Code library →</a><a href="../index.html">Book hub →</a></div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const navLinks = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = navLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let framePending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const ratio = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(ratio * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestProgress = () => {
+        if (framePending) return;
+        framePending = true;
+        requestAnimationFrame(() => { updateProgress(); framePending = false; });
+      };
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (!visible) return;
+        navLinks.forEach(link => {
+          if (link.getAttribute('href') === `#${visible.target.id}`) link.setAttribute('aria-current','location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin:'-18% 0px -68% 0px' });
+
+      sections.forEach(section => observer.observe(section));
+      window.addEventListener('scroll', requestProgress, { passive:true });
+      window.addEventListener('resize', requestProgress);
+      updateProgress();
+
+      const cards = [...document.querySelectorAll('details.file-card')];
+      document.getElementById('expand-files').addEventListener('click', () => cards.forEach(card => { card.open = true; }));
+      document.getElementById('collapse-files').addEventListener('click', () => cards.forEach(card => { card.open = false; }));
+    })();
+  </script>
+</body>
+</html>

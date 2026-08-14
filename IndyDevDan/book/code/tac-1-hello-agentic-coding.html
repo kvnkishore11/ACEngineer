@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An agent-systems companion to TAC-1 Hello Agentic Coding: roles, prompt contracts, permissions, launchers, control loops, verification, and recovery.">
+  <title>Agent OS Companion · TAC-1 Hello Agentic Coding</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="tac-1-hello-agentic-coding.assets.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+
+  <header class="site-bar">
+    <a class="site-bar__brand" href="../vol-1-tac/01-hello-agentic-coding.html">AGENT SYSTEMS · TAC-1</a>
+    <nav class="site-bar__links" aria-label="Companion links">
+      <a href="../vol-1-tac/01-hello-agentic-coding.html">← Chapter</a>
+      <a href="index.html">Code library</a>
+      <a href="../index.html">Book hub</a>
+    </nav>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Companion navigation">
+      <p class="rail-kicker">Agent OS companion</p>
+      <h2>Hello Agentic Coding</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of companion</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#mission"><span class="chapter-nav__n">00</span><span>Agent mission</span></a></li>
+          <li><a href="#cast"><span class="chapter-nav__n">01</span><span>Cast of agents</span></a></li>
+          <li><a href="#surface"><span class="chapter-nav__n">02</span><span>Surface map</span></a></li>
+          <li><a href="#loop"><span class="chapter-nav__n">03</span><span>Control loop</span></a></li>
+          <li><a href="#contracts"><span class="chapter-nav__n">04</span><span>Agent contracts</span></a></li>
+          <li><a href="#operate"><span class="chapter-nav__n">05</span><span>Operate like Dan</span></a></li>
+          <li><a href="#failures"><span class="chapter-nav__n">06</span><span>Failure modes</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">07</span><span>Agent ops lab</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">08</span><span>Six-sentence teach-back</span></a></li>
+          <li><a href="#appendix"><span class="chapter-nav__n">09</span><span>Raw file index</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero" id="mission">
+        <span class="hero__chapter">Agent systems lens · Tactic #1</span>
+        <h1>Hello Agentic Coding</h1>
+        <p class="hero__dek">Do not tour the seven files as code. Read them as a tiny operating system for one agent: intent enters through a prompt, authority enters through settings, execution enters through a launcher, and trust enters through returned evidence.</p>
+        <ul class="hero__meta" aria-label="Lesson system facts">
+          <li>7 committed files</li>
+          <li>1 CLI agent</li>
+          <li>3 launchers</li>
+          <li>0 declared subagents</li>
+        </ul>
+        <div class="mission-card">
+          <span class="mission-card__mark" aria-hidden="true">A</span>
+          <p><strong>Agent mission</strong>Train the move from “ask for code” to “command a bounded worker.” The human specifies the outcome, authority, and checks; Claude Code carries the branch → create → run → commit → report chain; the returned evidence lets the human review the system and improve the next run.</p>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Companion contents</summary>
+          <ol>
+            <li><a href="#mission">Agent mission</a></li>
+            <li><a href="#cast">Cast of agents</a></li>
+            <li><a href="#surface">Agent surface map</a></li>
+            <li><a href="#loop">Control loop</a></li>
+            <li><a href="#contracts">Why these files exist for agents</a></li>
+            <li><a href="#operate">Operate like Dan</a></li>
+            <li><a href="#failures">Common agent failures</a></li>
+            <li><a href="#lab">Agent ops lab</a></li>
+            <li><a href="#teach-back">Six-sentence teach-back</a></li>
+            <li><a href="#appendix">Raw file index</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section chapter-section--wide" id="cast">
+        <span class="section-number">01 · Who acts?</span>
+        <h2 class="section-title">The cast is smaller than the hype</h2>
+        <p class="section-lead">TAC-1 has one actual agent. The human, launcher, and verification commands surround it with direction, placement, and judgment. Naming those roles correctly is the first systems skill.</p>
+
+        <div class="card-grid">
+          <article class="agent-card">
+            <span class="agent-card__status">Commander · human</span>
+            <h3>Chooses the mission and owns the risk</h3>
+            <p>Audits permissions, selects the interactive or headless path, establishes clean Git state, reviews traces and diffs, and decides whether the evidence is good enough.</p>
+          </article>
+          <article class="agent-card agent-card--blue">
+            <span class="agent-card__status">Worker · Claude Code CLI</span>
+            <h3>Plans and carries the tool chain</h3>
+            <p>Interprets the runbook, reads and writes files, invokes UV and Git through allowed tools, observes results, preserves progress, and returns a report.</p>
+          </article>
+          <article class="agent-card agent-card--plum">
+            <span class="agent-card__status">Placement · launcher script</span>
+            <h3>Calls the agent; it is not the agent</h3>
+            <p>Shell, Python, and TypeScript read the same prompt and invoke <code>claude -p</code>. They decide where the worker can be fired and how output or failure reaches the caller.</p>
+          </article>
+          <article class="agent-card agent-card--mute">
+            <span class="agent-card__status">Judgment · verifier role</span>
+            <h3>Checks claims against repository reality</h3>
+            <p>The agent runs the programs, but TAC-1 has no separate verifier agent. The human independently checks branch, outputs, and commit. Verification is a role here, not a file.</p>
+          </article>
+        </div>
+
+        <table class="role-table" aria-label="Presence of agent system roles in TAC-1">
+          <thead><tr><th>Role</th><th>What exists in this lesson</th><th>System consequence</th></tr></thead>
+          <tbody>
+            <tr><td>Subagents</td><td class="not-present">None declared</td><td>One serial worker carries the whole prompt; parallel delegation is outside this lesson.</td></tr>
+            <tr><td>Hooks</td><td class="not-present">None in <code>tac/tac-1</code></td><td>No automatic pre-tool gate or post-tool check exists beyond the settings allowlist.</td></tr>
+            <tr><td>Skills</td><td class="not-present">None in <code>tac/tac-1</code></td><td>Reusable behavior lives in a raw <code>prompt.md</code>, discovered and launched manually.</td></tr>
+            <tr><td>Memory file</td><td class="not-present">No lesson-local <code>CLAUDE.md</code></td><td>Working context comes from the prompt, current repo state, and files the agent reads during the run.</td></tr>
+          </tbody>
+        </table>
+
+        <aside class="compact-note"><strong>Dan’s leverage move:</strong> make every supporting role replaceable. The prompt can change without rewriting the launcher; the launcher language can change without rewriting the workflow; the agent product can eventually change if another runtime satisfies the same contracts.</aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="surface">
+        <span class="section-number">02 · Agent surface map</span>
+        <h2 class="section-title">The repo is shaped as interfaces around a worker</h2>
+        <p class="section-lead">The useful map is not “which folder contains which file?” It is “which boundary does the agent cross, what enters there, and what evidence comes back?”</p>
+
+        <figure class="system-figure">
+          <div class="system-figure__canvas">
+            <svg class="draw" viewBox="0 0 980 470" role="img" aria-labelledby="surface-title surface-desc">
+              <title id="surface-title">TAC-1 agent surface map</title>
+              <desc id="surface-desc">A human commander provides prompt and launch choice to Claude Code. Project settings gate file, UV, Git, and web tools. The agent changes repository state and returns execution and Git evidence for human review.</desc>
+              <defs>
+                <marker id="arrow-clay" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="var(--accent)"/></marker>
+                <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="var(--ok)"/></marker>
+              </defs>
+
+              <rect x="20" y="165" width="150" height="92" rx="16" class="node node--human"/>
+              <text x="95" y="202" text-anchor="middle" class="label">Human commander</text>
+              <text x="95" y="226" text-anchor="middle" class="sub">goal · risk · review</text>
+
+              <rect x="220" y="30" width="190" height="76" rx="14" class="node"/>
+              <text x="315" y="63" text-anchor="middle" class="label">Interactive prompt</text>
+              <text x="315" y="86" text-anchor="middle" class="sub">README.md</text>
+
+              <rect x="220" y="141" width="190" height="76" rx="14" class="node node--tool"/>
+              <text x="315" y="174" text-anchor="middle" class="label">Headless trigger</text>
+              <text x="315" y="197" text-anchor="middle" class="sub">*.sh · *.py · *.ts</text>
+
+              <rect x="220" y="252" width="190" height="76" rx="14" class="node"/>
+              <text x="315" y="285" text-anchor="middle" class="label">Workflow contract</text>
+              <text x="315" y="308" text-anchor="middle" class="sub">programmable/prompt.md</text>
+
+              <rect x="468" y="141" width="170" height="102" rx="22" class="node node--agent"/>
+              <text x="553" y="181" text-anchor="middle" class="label">Claude Code</text>
+              <text x="553" y="205" text-anchor="middle" class="sub">plan · call · observe</text>
+              <text x="553" y="222" text-anchor="middle" class="sub">continue · report</text>
+
+              <rect x="445" y="300" width="216" height="70" rx="14" class="node node--tool"/>
+              <text x="553" y="330" text-anchor="middle" class="label">Permission contract</text>
+              <text x="553" y="352" text-anchor="middle" class="sub">.claude/settings.json</text>
+
+              <rect x="700" y="28" width="252" height="326" rx="22" class="boundary"/>
+              <text x="826" y="17" text-anchor="middle" class="boundary-label">BOUNDED ACTION SURFACE</text>
+
+              <rect x="728" y="58" width="196" height="58" rx="12" class="node node--tool"/>
+              <text x="826" y="83" text-anchor="middle" class="label">Files</text>
+              <text x="826" y="102" text-anchor="middle" class="sub">Read · Write · Edit</text>
+
+              <rect x="728" y="136" width="196" height="58" rx="12" class="node node--tool"/>
+              <text x="826" y="161" text-anchor="middle" class="label">Execution</text>
+              <text x="826" y="180" text-anchor="middle" class="sub">Bash(uv run:*)</text>
+
+              <rect x="728" y="214" width="196" height="58" rx="12" class="node node--tool"/>
+              <text x="826" y="239" text-anchor="middle" class="label">Repository state</text>
+              <text x="826" y="258" text-anchor="middle" class="sub">checkout · branch · add · commit</text>
+
+              <rect x="728" y="292" width="196" height="42" rx="12" class="node node--tool"/>
+              <text x="826" y="318" text-anchor="middle" class="sub">WebSearch · allowed, not required</text>
+
+              <rect x="468" y="406" width="358" height="46" rx="12" class="node node--evidence"/>
+              <text x="647" y="434" text-anchor="middle" class="label">Evidence: outputs · branch · commit · return status</text>
+
+              <path d="M170 197 C190 197 192 68 220 68" class="flow" marker-end="url(#arrow-clay)"/>
+              <path d="M170 211 H220" class="flow" marker-end="url(#arrow-clay)"/>
+              <path d="M170 225 C190 225 192 290 220 290" class="flow" marker-end="url(#arrow-clay)"/>
+              <path d="M410 68 C445 68 440 163 468 163" class="flow" marker-end="url(#arrow-clay)"/>
+              <path d="M410 179 H468" class="flow" marker-end="url(#arrow-clay)"/>
+              <path d="M410 290 C444 290 438 220 468 220" class="flow" marker-end="url(#arrow-clay)"/>
+              <path d="M553 300 V249" class="flow" marker-end="url(#arrow-clay)"/>
+              <path d="M638 190 H700" class="flow" marker-end="url(#arrow-clay)"/>
+              <path d="M826 354 V406" class="flow flow--return" marker-end="url(#arrow-green)"/>
+              <path d="M468 429 C295 429 95 360 95 257" class="flow flow--return" marker-end="url(#arrow-green)"/>
+            </svg>
+          </div>
+          <figcaption><strong>Read clockwise.</strong> Intent and placement converge on one agent; settings bound action; repository observations return as evidence to the commander.</figcaption>
+        </figure>
+
+        <table class="surface-matrix" aria-label="Agent interfaces and their contracts">
+          <thead><tr><th>Interface</th><th>Real lesson path</th><th>Question it answers</th></tr></thead>
+          <tbody>
+            <tr><td>Intent</td><td><code>README.md</code> and <code>programmable/prompt.md</code></td><td>What outcome and ordered actions should the worker carry?</td></tr>
+            <tr><td>Context</td><td>Prompt text plus the current <code>tac/tac-1</code> repository state</td><td>What can the worker see and reason over right now?</td></tr>
+            <tr><td>Model</td><td class="not-present">Not pinned in the repo</td><td>Which reasoning engine does the installed CLI choose?</td></tr>
+            <tr><td>Authority</td><td><code>.claude/settings.json</code></td><td>Which actions may the worker take without crossing a permission boundary?</td></tr>
+            <tr><td>Placement</td><td><code>programmable/programmable.sh</code>, <code>.py</code>, <code>.ts</code></td><td>Where can the worker be invoked without an interactive chat?</td></tr>
+            <tr><td>Credential seam</td><td><code>.env.sample</code></td><td>What secret may a headless environment need? The launchers do not load this file themselves.</td></tr>
+            <tr><td>Evidence</td><td>REPORT text, UV output, branch state, Git commit, process status</td><td>What observable facts let a human decide whether the run succeeded?</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="loop">
+        <span class="section-number">03 · Control loop</span>
+        <h2 class="section-title">Plan → act → observe → return → recover</h2>
+        <p class="section-lead">The same inner agent loop runs in two placements. Interactive mode keeps the commander beside the run. <code>claude -p</code> moves the commander outside the execution path and makes the report the hand-off boundary.</p>
+
+        <figure class="system-figure">
+          <div class="system-figure__canvas">
+            <svg class="draw" viewBox="0 0 980 390" role="img" aria-labelledby="loop-title loop-desc">
+              <title id="loop-title">TAC-1 control loop in interactive and headless modes</title>
+              <desc id="loop-desc">A human frames the work and audits permissions, then launches interactively or headlessly. Claude Code plans, acts with tools, observes results, and either continues or returns evidence. Failed evidence sends the human back to prompt, permissions, or starting state before a rerun.</desc>
+              <defs>
+                <marker id="loop-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="var(--accent)"/></marker>
+                <marker id="loop-green" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="var(--ok)"/></marker>
+              </defs>
+
+              <rect x="22" y="130" width="144" height="82" rx="15" class="node node--human"/>
+              <text x="94" y="163" text-anchor="middle" class="label">1 · Frame</text>
+              <text x="94" y="186" text-anchor="middle" class="sub">goal · bounds · checks</text>
+
+              <rect x="206" y="100" width="160" height="62" rx="13" class="node"/>
+              <text x="286" y="128" text-anchor="middle" class="label">In-loop start</text>
+              <text x="286" y="148" text-anchor="middle" class="sub">paste in claude</text>
+
+              <rect x="206" y="190" width="160" height="62" rx="13" class="node node--tool"/>
+              <text x="286" y="218" text-anchor="middle" class="label">Out-of-loop start</text>
+              <text x="286" y="238" text-anchor="middle" class="sub">launcher → claude -p</text>
+
+              <rect x="416" y="40" width="126" height="66" rx="13" class="node node--agent"/>
+              <text x="479" y="69" text-anchor="middle" class="label">2 · Plan</text>
+              <text x="479" y="90" text-anchor="middle" class="sub">sequence + todos</text>
+
+              <rect x="606" y="40" width="126" height="66" rx="13" class="node node--agent"/>
+              <text x="669" y="69" text-anchor="middle" class="label">3 · Act</text>
+              <text x="669" y="90" text-anchor="middle" class="sub">file · uv · git</text>
+
+              <rect x="796" y="40" width="142" height="66" rx="13" class="node node--agent"/>
+              <text x="867" y="69" text-anchor="middle" class="label">4 · Observe</text>
+              <text x="867" y="90" text-anchor="middle" class="sub">stdout · state · error</text>
+
+              <rect x="606" y="180" width="126" height="66" rx="13" class="node node--agent"/>
+              <text x="669" y="209" text-anchor="middle" class="label">5 · Continue</text>
+              <text x="669" y="230" text-anchor="middle" class="sub">next tool or stop</text>
+
+              <rect x="796" y="180" width="142" height="66" rx="13" class="node node--evidence"/>
+              <text x="867" y="209" text-anchor="middle" class="label">6 · Return</text>
+              <text x="867" y="230" text-anchor="middle" class="sub">REPORT + status</text>
+
+              <rect x="416" y="290" width="316" height="70" rx="15" class="node node--human"/>
+              <text x="574" y="319" text-anchor="middle" class="label">7 · Human verify or recover</text>
+              <text x="574" y="341" text-anchor="middle" class="sub">check reality → adjust prompt, permission, or start state → rerun</text>
+
+              <path d="M166 151 H206" class="flow" marker-end="url(#loop-arrow)"/>
+              <path d="M166 191 H206" class="flow" marker-end="url(#loop-arrow)"/>
+              <path d="M366 131 C394 131 390 73 416 73" class="flow" marker-end="url(#loop-arrow)"/>
+              <path d="M366 221 C395 221 390 91 416 91" class="flow" marker-end="url(#loop-arrow)"/>
+              <path d="M542 73 H606" class="flow" marker-end="url(#loop-arrow)"/>
+              <path d="M732 73 H796" class="flow" marker-end="url(#loop-arrow)"/>
+              <path d="M867 106 C867 145 732 145 701 180" class="flow" marker-end="url(#loop-arrow)"/>
+              <path d="M637 180 C579 150 578 107 637 106" class="flow" marker-end="url(#loop-arrow)"/>
+              <path d="M732 213 H796" class="flow flow--return" marker-end="url(#loop-green)"/>
+              <path d="M867 246 C867 325 770 325 732 325" class="flow flow--return" marker-end="url(#loop-green)"/>
+              <path d="M416 325 C240 325 92 278 92 212" class="flow flow--return" marker-end="url(#loop-green)"/>
+            </svg>
+          </div>
+          <figcaption><strong>One inner loop, two placements.</strong> The launcher removes mid-run human relay; it does not remove human judgment at the boundary.</figcaption>
+        </figure>
+
+        <div class="loop-legend" aria-label="Control loop legend">
+          <span>Human decision</span><span class="loop-legend--agent">Agent-internal move</span><span class="loop-legend--return">Evidence and recovery path</span>
+        </div>
+
+        <div class="loop-note">
+          <div>
+            <h3>In-loop move</h3>
+            <p>The commander starts <code>claude</code>, pastes the README prompt, watches the checklist, and can answer or redirect. Good for learning the trace; expensive as a permanent operating model.</p>
+          </div>
+          <div>
+            <h3>Out-of-loop move</h3>
+            <p>A launcher reads <code>prompt.md</code>, calls <code>claude -p</code>, waits, and returns output. The human is absent during execution, so starting state, permissions, evidence, and process status matter more.</p>
+          </div>
+        </div>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Do not overstate the closure</p>
+          <p>TAC-1 has an observable loop, not a fully self-healing one. The agent runs the files and REPORT returns their outputs, but no separate verifier automatically compares claims to reality or repairs a mismatch. The human closes that outer loop.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="contracts">
+        <span class="section-number">04 · Why these files exist for agents</span>
+        <h2 class="section-title">Four contracts make the worker operable</h2>
+        <p class="section-lead">The code is evidence here, not the subject. Each snippet proves one system contract: understanding, authority, invocation, or trust.</p>
+
+        <div class="contract-stack">
+          <article class="contract-panel">
+            <header class="contract-panel__head">
+              <span class="contract-panel__n">1</span>
+              <div><h3>Prompt contract</h3><p>What the agent must understand and carry</p></div>
+            </header>
+            <div class="contract-panel__body">
+              <div>
+                <p>The shared prompt is a compact workflow specification. Its headings expose state transitions instead of hiding them in prose. The headless variant creates both runtime files, so it does not depend on the earlier interactive demo, and REPORT declares what must cross back to the caller.</p>
+                <div class="design-intent"><strong>Dan’s design intent</strong>Turn a prompt from a text request into a repeatable unit of engineering work. The important artifact is the action sequence, not the two print statements.</div>
+              </div>
+              <div class="code-frame contract-code--prompt">
+                <div class="code-frame__bar"><span>programmable/prompt.md</span><span>workflow evidence</span></div>
+                <pre><code><span class="tok-label">RUN:</span>
+    <span class="tok-action">checkout a new/existing "demo-agentic-coding" git branch</span>
+
+<span class="tok-omit">⋮ CREATE blocks omitted here ⋮</span>
+
+<span class="tok-label">RUN:</span>
+    <span class="tok-action">uv run main_aic.py</span>
+    <span class="tok-action">uv run main_tac.py</span>
+    <span class="tok-action">git add .</span>
+    <span class="tok-action">git commit -m "Demo agentic coding capabilities"</span>
+
+<span class="tok-label">REPORT:</span>
+    <span class="tok-action">respond with the exact output of both .py files</span></code></pre>
+              </div>
+            </div>
+          </article>
+
+          <article class="contract-panel">
+            <header class="contract-panel__head">
+              <span class="contract-panel__n">2</span>
+              <div><h3>Tool and permission contract</h3><p>What the agent can actually do</p></div>
+            </header>
+            <div class="contract-panel__body">
+              <div>
+                <p>The allowlist predicts the reachable workflow before the run begins. File tools permit inspection and change; UV turns code into observed behavior; the four Git patterns isolate and record the result. <code>git push</code> is absent. WebSearch is allowed, although this prompt does not require it.</p>
+                <div class="design-intent"><strong>Dan’s design intent</strong>Read settings before letting the worker loose. A perfect prompt cannot cross a missing permission, and a broad permission is still authority you must be prepared to defend.</div>
+              </div>
+              <div class="code-frame contract-code--json">
+                <div class="code-frame__bar"><span>.claude/settings.json</span><span>authority evidence</span></div>
+                <pre><code><span class="tok-punc">{</span> <span class="tok-key">"permissions"</span><span class="tok-punc">:</span> <span class="tok-punc">{</span> <span class="tok-key">"allow"</span><span class="tok-punc">:</span> <span class="tok-punc">[</span>
+  <span class="tok-string">"Read"</span><span class="tok-punc">,</span> <span class="tok-string">"Write"</span><span class="tok-punc">,</span> <span class="tok-string">"Edit"</span><span class="tok-punc">,</span>
+  <span class="tok-string">"Bash(uv run:*)"</span><span class="tok-punc">,</span>
+  <span class="tok-string">"Bash(git checkout:*)"</span><span class="tok-punc">,</span>
+  <span class="tok-string">"Bash(git branch:*)"</span><span class="tok-punc">,</span>
+  <span class="tok-string">"Bash(git add:*)"</span><span class="tok-punc">,</span>
+  <span class="tok-string">"Bash(git commit:*)"</span><span class="tok-punc">,</span>
+  <span class="tok-string">"WebSearch"</span>
+<span class="tok-punc">]</span> <span class="tok-punc">}</span> <span class="tok-punc">}</span></code></pre>
+              </div>
+            </div>
+          </article>
+
+          <article class="contract-panel">
+            <header class="contract-panel__head">
+              <span class="contract-panel__n">3</span>
+              <div><h3>Harness and launcher contract</h3><p>How a larger system calls the agent</p></div>
+            </header>
+            <div class="contract-panel__body">
+              <div>
+                <p>All three launchers share one shape: read the prompt, invoke the terminal agent, return output. That tiny seam is the lesson’s systems breakthrough. It relocates the worker from an app you visit to a component a program can call.</p>
+                <p>The wrappers differ at the failure boundary: Python prints stderr and propagates Claude’s return code; Bun catches failure and exits 1; the minimal Shell wrapper echoes stdout but its final <code>echo</code> can hide the child’s non-zero status.</p>
+                <div class="design-intent"><strong>Dan’s design intent</strong>Make host language replaceable. The workflow belongs to <code>prompt.md</code>; Shell, Python, and TypeScript are interchangeable placements around the same agent.</div>
+              </div>
+              <div class="code-frame">
+                <div class="code-frame__bar"><span>programmable/programmable.sh</span><span>invocation evidence</span></div>
+                <pre><code>PROMPT_CONTENT="$(cat programmable/prompt.md)"
+OUTPUT="$(claude -p "$PROMPT_CONTENT")"
+echo "$OUTPUT"</code></pre>
+              </div>
+            </div>
+          </article>
+
+          <article class="contract-panel">
+            <header class="contract-panel__head">
+              <span class="contract-panel__n">4</span>
+              <div><h3>Verification contract</h3><p>How you know the agent succeeded</p></div>
+            </header>
+            <div class="contract-panel__body">
+              <div>
+                <p>REPORT makes the invisible run legible, but report-back is still a claim. The commander checks the claim against independent observations: current branch, actual program outputs, and the most recent commit subject.</p>
+                <div class="design-intent"><strong>Dan’s design intent</strong>Close the first observability loop. Headless work must return something a person—or later, another program—can inspect. Trust grows from evidence, not from a confident completion sentence.</div>
+              </div>
+              <div class="terminal" aria-label="Independent verification commands">
+                <div class="terminal__bar"><span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span></div>
+                <pre><code>$ git branch --show-current
+$ uv run main_aic.py
+$ uv run main_tac.py
+$ git log --oneline -1</code></pre>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="current-practice">
+          <p class="current-practice__label">Course-era seam, modern destination</p>
+          <p>The lesson extracts flag three evolutions: raw prompt files can now be packaged as skills; bare <code>claude -p</code> can grow into richer headless or SDK integration; flat allowlists can grow into modes, hooks, and sandboxing. Keep TAC-1’s primitive visible first: behavior, authority, placement, evidence.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="operate">
+        <span class="section-number">05 · Operate like Dan</span>
+        <h2 class="section-title">Run the system, then inspect the wake</h2>
+        <p class="section-lead">The weak-student path is intentionally concrete: see one small workflow, run it interactively, remove yourself from the execution path, then prove what changed.</p>
+
+        <ol class="runbook">
+          <li><div class="runbook__body"><strong>Enter the lesson root and audit authority.</strong><p>Work from <code>tac/tac-1</code>. Read <code>.claude/settings.json</code> before starting. The launchers use relative paths, so the current working directory is part of the harness contract.</p></div></li>
+          <li><div class="runbook__body"><strong>Run the interactive A/B.</strong><p>Start <code>claude</code>. Paste the README’s small AI Coding Prompt, then its Agentic Coding Prompt. Compare transitions—not just final files: branch, creation, execution, staging, commit, and report.</p></div></li>
+          <li><div class="runbook__body"><strong>Reset to a known starting state.</strong><p>For a clean reproduction, return to <code>main</code> and remove <code>demo-agentic-coding</code>. Starting state is input. An existing branch is valid under “new/existing,” but it makes the rerun harder to reason about.</p></div></li>
+          <li><div class="runbook__body"><strong>Fire one launcher with no mid-run relay.</strong><p>Choose any real README command below. Watch the repository change while the host program waits for <code>claude -p</code> to return.</p></div></li>
+          <li><div class="runbook__body"><strong>Verify outside the agent’s story.</strong><p>Compare REPORT with real program output, current branch, and commit history. If a claim fails, change the agent system—prompt, permission, starting state, or launcher error handling—then rerun.</p></div></li>
+        </ol>
+
+        <p class="eyebrow">Exact programmable commands from README.md</p>
+        <div class="command-grid">
+          <article class="command-card"><h3>Shell</h3><p>Smallest proof of the invocation seam.</p><code>sh programmable/programmable.sh</code></article>
+          <article class="command-card"><h3>Bun + TypeScript</h3><p>Same worker, a different host runtime.</p><code>bun run programmable/programmable.ts</code></article>
+          <article class="command-card"><h3>UV + Python</h3><p>The most explicit stdout, stderr, and status handling.</p><code>uv run python programmable/programmable.py</code></article>
+        </div>
+
+        <div class="callout callout--why">
+          <p class="callout__label">Pattern name</p>
+          <p><strong>Programmable agentic coding:</strong> a program supplies a workflow prompt to a bounded agent and receives evidence back. The three languages prove replaceability; the shared prompt and runtime carry the semantics.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="failures">
+        <span class="section-number">06 · Common agent failures</span>
+        <h2 class="section-title">When the Agent OS is wrong, better code generation does not save it</h2>
+        <p class="section-lead">Diagnose the surrounding system before blaming intelligence. Most TAC-1 failures are contract mismatches at a boundary.</p>
+
+        <table class="failure-table" aria-label="TAC-1 agent system failure modes">
+          <thead><tr><th>Failure</th><th>What is misconfigured</th><th>Recovery move</th></tr></thead>
+          <tbody>
+            <tr><td>Prompt too small</td><td>The request describes an artifact but not the branch, execution, commit, or evidence path.</td><td>Rewrite it as ordered state transitions with an explicit REPORT.</td></tr>
+            <tr><td>Missing permission</td><td>The prompt asks for a transition—such as commit—that the allowlist cannot authorize.</td><td>Inspect settings, decide whether that authority is justified, change deliberately, and rerun.</td></tr>
+            <tr><td>Over-permission</td><td>The worker receives actions unrelated to the mission. WebSearch, for example, is allowed here but unnecessary for the demo.</td><td>For production, grant only the smallest tool surface that carries the verified chain.</td></tr>
+            <tr><td>State drift</td><td>The demo branch already exists or the launcher begins from the wrong branch.</td><td>Declare and verify starting state; reset comparable runs from <code>main</code>.</td></tr>
+            <tr><td>Wrong working directory</td><td>The launcher cannot resolve <code>programmable/prompt.md</code> because its path is relative.</td><td>Run from the lesson root or make path resolution explicit in a future harness.</td></tr>
+            <tr><td>Report worship</td><td>A fluent completion message is treated as proof even though no independent check agrees with it.</td><td>Compare returned claims with UV output, branch state, Git history, and exit status.</td></tr>
+            <tr><td>Hidden process failure</td><td>The minimal Shell wrapper ends with <code>echo</code>, which can obscure Claude’s failing status.</td><td>Prefer explicit status propagation like the Python launcher when another system depends on success/failure.</td></tr>
+            <tr><td>Human stays in-loop</td><td>The operator keeps pasting, rescuing, or hand-editing, so the workflow never becomes callable.</td><td>Run the headless launcher hands-off; return only at the evidence boundary.</td></tr>
+            <tr><td>Imaginary architecture</td><td>The operator assumes subagents, hooks, a skill, or a verifier exist because modern agent systems often have them.</td><td>Design from the real repo: one serial agent, one allowlist, one shared prompt, three callers, human verification.</td></tr>
+          </tbody>
+        </table>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">Core Four debugging scan</p>
+          <p>Ask, in order: <strong>Context</strong>—did it see the right state? <strong>Model</strong>—could it reason through the exception? <strong>Prompt</strong>—was the transition and check explicit? <strong>Tools</strong>—did the required action exist and have permission?</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="lab">
+        <span class="section-number">07 · Lab · Agent ops</span>
+        <h2 class="section-title">Change the Agent OS, not the toy application</h2>
+        <p class="section-lead">The lab changes the report contract, fires the real headless harness, and grades externally visible evidence. The two generated print programs remain deliberately boring.</p>
+
+        <div class="lab-contract">
+          <section class="lab-box">
+            <h3 class="lab-box__title">Lab 1A · Add branch identity to REPORT</h3>
+            <ol class="lab-box__steps">
+              <li>From the TAC-1 lesson root, start Claude Code. Do not edit files directly.</li>
+              <li>Ask the agent to change <code>programmable/prompt.md</code> so REPORT still includes the exact output of both Python files and also includes the current Git branch name.</li>
+              <li>Review the prompt diff. Confirm the existing branch, create, run, add, and commit instructions are unchanged.</li>
+              <li>Return to <code>main</code> and remove the existing <code>demo-agentic-coding</code> branch so the run begins cleanly.</li>
+              <li>Run <code>uv run python programmable/programmable.py</code> with no mid-run interaction.</li>
+              <li>Compare the report’s branch with <code>git branch --show-current</code>, then compare both reported outputs with independent UV runs.</li>
+            </ol>
+          </section>
+
+          <div>
+            <div class="pass-card">
+              <h3>Observable pass criteria</h3>
+              <ul>
+                <li>The prompt still requires both exact outputs.</li>
+                <li>REPORT includes <code>demo-agentic-coding</code>.</li>
+                <li>The branch claim matches Git reality.</li>
+                <li>Both output claims match independent execution.</li>
+                <li>The required commit exists.</li>
+                <li>The Python launcher exits successfully.</li>
+                <li>No application code was typed by hand.</li>
+              </ul>
+            </div>
+            <aside class="callout callout--warning">
+              <p class="callout__label">Optional failure injection</p>
+              <p>Through Claude Code, temporarily remove <code>Bash(git commit:*)</code>, rerun, and record the exact blocked transition. Restore the permission before finishing. Pass only if you explain why prompt correctness could not overcome the tool boundary.</p>
+            </aside>
+          </div>
+        </div>
+
+        <figure class="system-figure">
+          <div class="system-figure__canvas">
+            <svg class="draw" viewBox="0 0 900 230" role="img" aria-labelledby="lab-title lab-desc">
+              <title id="lab-title">Agent operations experiment</title>
+              <desc id="lab-desc">Change the report contract, rerun the same Python launcher, and compare the new report claim against repository reality.</desc>
+              <defs><marker id="lab-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="var(--accent)"/></marker></defs>
+              <rect x="24" y="70" width="190" height="88" rx="15" class="node node--human"/>
+              <text x="119" y="104" text-anchor="middle" class="label">Change contract</text>
+              <text x="119" y="128" text-anchor="middle" class="sub">REPORT + current branch</text>
+              <rect x="270" y="70" width="170" height="88" rx="15" class="node node--tool"/>
+              <text x="355" y="104" text-anchor="middle" class="label">Same harness</text>
+              <text x="355" y="128" text-anchor="middle" class="sub">programmable.py</text>
+              <rect x="496" y="70" width="170" height="88" rx="15" class="node node--agent"/>
+              <text x="581" y="104" text-anchor="middle" class="label">Fresh run</text>
+              <text x="581" y="128" text-anchor="middle" class="sub">claude -p</text>
+              <rect x="722" y="70" width="154" height="88" rx="15" class="node node--evidence"/>
+              <text x="799" y="104" text-anchor="middle" class="label">Compare</text>
+              <text x="799" y="128" text-anchor="middle" class="sub">report ↔ Git reality</text>
+              <path d="M214 114 H270" class="flow" marker-end="url(#lab-arrow)"/>
+              <path d="M440 114 H496" class="flow" marker-end="url(#lab-arrow)"/>
+              <path d="M666 114 H722" class="flow" marker-end="url(#lab-arrow)"/>
+            </svg>
+          </div>
+          <figcaption><strong>The experimental variable is the agent contract.</strong> The application behavior stays fixed so the new evidence field is easy to observe.</figcaption>
+        </figure>
+      </section>
+
+      <section class="chapter-section" id="teach-back">
+        <span class="section-number">08 · Teach-back</span>
+        <h2 class="section-title">Explain the Agent OS in exactly six sentences</h2>
+        <p class="section-lead">Close the page first. One sentence per boundary; no definitions by slogan.</p>
+
+        <div class="teach-six" aria-label="Six sentence teach-back scaffold">
+          <p>State what the human commander owns.</p>
+          <p>Name the only actual agent and distinguish it from the launchers.</p>
+          <p>Explain where intent and working context enter.</p>
+          <p>Explain how authority is bounded.</p>
+          <p>Explain what <code>claude -p</code> changes about placement.</p>
+          <p>Close with evidence, recovery, and rerun.</p>
+        </div>
+
+        <details class="answer-key">
+          <summary>Reveal one six-sentence model answer</summary>
+          <div class="answer-key__body">
+            <ol>
+              <li>The human commander chooses the outcome, audits authority, starts the run, and judges the evidence.</li>
+              <li>Claude Code is the only actual agent in TAC-1; the three scripts merely call it.</li>
+              <li><code>README.md</code> or <code>programmable/prompt.md</code> supplies a workflow-shaped prompt, while repository state supplies working context.</li>
+              <li><code>.claude/settings.json</code> bounds what the agent can do with files, UV, Git, and WebSearch.</li>
+              <li>A launcher turns that prompt into an out-of-loop call by passing it to <code>claude -p</code>.</li>
+              <li>The agent plans, acts, observes, commits, and reports, after which the human verifies and repairs the prompt, permissions, or starting state before rerunning.</li>
+            </ol>
+          </div>
+        </details>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Mastery test</p>
+          <p>Pass if a listener can draw the surface map from your six sentences and can predict what happens when <code>Bash(git commit:*)</code> disappears.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section raw-index" id="appendix">
+        <span class="section-number">09 · Optional appendix</span>
+        <h2 class="section-title">Raw file index for the curious</h2>
+        <p class="section-lead">Seven real files, one line each. This is an index, not the teaching lens.</p>
+
+        <details>
+          <summary>Open the seven-file index</summary>
+          <div class="raw-index__body">
+            <ul>
+              <li><code>README.md</code> — interactive A/B prompts, the three real launcher commands, and the pointer to enabled tools.</li>
+              <li><code>.claude/settings.json</code> — project permission allowlist for file, UV, Git, and WebSearch actions.</li>
+              <li><code>.env.sample</code> — an empty <code>ANTHROPIC_API_KEY</code> placeholder; none of the three launchers loads it explicitly.</li>
+              <li><code>programmable/prompt.md</code> — the self-contained headless workflow and REPORT contract shared by every launcher.</li>
+              <li><code>programmable/programmable.sh</code> — minimal Shell reader → <code>claude -p</code> → stdout wrapper.</li>
+              <li><code>programmable/programmable.py</code> — Python wrapper with stdout/stderr capture, exception handling, and return-code propagation.</li>
+              <li><code>programmable/programmable.ts</code> — Bun TypeScript wrapper using the same shared prompt and a simple failure exit.</li>
+            </ul>
+          </div>
+        </details>
+
+        <aside class="compact-note"><strong>Generated during a run, not committed source:</strong> the prompt creates <code>main_aic.py</code>, <code>main_tac.py</code>, the <code>demo-agentic-coding</code> branch, and the named Git commit. They are outputs of the Agent OS, not additional interfaces in the starting repository.</aside>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">TAC-1 · Agent systems companion</p>
+        <div class="chapter-footer__nav">
+          <a href="../vol-1-tac/01-hello-agentic-coding.html">← Read the conceptual chapter</a>
+          <a href="index.html">Browse the code library →</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          progressFramePending = false;
+        });
+      };
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => {
+          const active = link.getAttribute('href') === `#${visible.target.id}`;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-18% 0px -68% 0px', threshold: [0, .1, .45] });
+
+      sections.forEach(section => observer.observe(section));
+      updateProgress();
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+    })();
+  </script>
+</body>
+</html>

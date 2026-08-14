@@ -1,0 +1,2989 @@
+WEBVTT
+
+1
+00:00:00.240 --> 00:00:04.080
+What's up engineers? Indie Devdan here.
+
+2
+00:00:02.159 --> 00:00:05.920
+So, you're planning a new feature for
+
+3
+00:00:04.080 --> 00:00:08.000
+your product. The first question is,
+
+4
+00:00:05.920 --> 00:00:09.519
+what type of spec should you use? You
+
+5
+00:00:08.000 --> 00:00:12.000
+remember the viral post on the
+
+6
+00:00:09.519 --> 00:00:13.840
+unreasonable effectiveness of HTML put
+
+7
+00:00:12.000 --> 00:00:15.839
+out by anthropic engineers? And you
+
+8
+00:00:13.840 --> 00:00:18.240
+remember that OpenAI released a
+
+9
+00:00:15.839 --> 00:00:21.359
+benchmark gapping image model that
+
+10
+00:00:18.240 --> 00:00:23.920
+generates nearperfect images. So, what
+
+11
+00:00:21.359 --> 00:00:26.320
+should you use? Markdown specs, HTML
+
+12
+00:00:23.920 --> 00:00:28.400
+specs, or something else entirely? The
+
+13
+00:00:26.320 --> 00:00:31.119
+answer here is the same as it's always
+
+14
+00:00:28.400 --> 00:00:33.520
+been. More useful tokens outperforms
+
+15
+00:00:31.119 --> 00:00:36.320
+fewer useful tokens. The key word here
+
+16
+00:00:33.520 --> 00:00:39.040
+is useful. As you and I build more
+
+17
+00:00:36.320 --> 00:00:41.600
+engineering agents and product agents,
+
+18
+00:00:39.040 --> 00:00:43.760
+the question isn't just what's better.
+
+19
+00:00:41.600 --> 00:00:46.559
+The question is, what's the trade-off
+
+20
+00:00:43.760 --> 00:00:49.360
+between performance, speed, and cost of
+
+21
+00:00:46.559 --> 00:00:52.960
+this agentic solution? I've got three
+
+22
+00:00:49.360 --> 00:00:55.680
+Gemini 3.5 Flash PI coding agents and a
+
+23
+00:00:52.960 --> 00:00:58.239
+PI observability dashboard that can help
+
+24
+00:00:55.680 --> 00:01:00.480
+us answer that very question. We're
+
+25
+00:00:58.239 --> 00:01:04.080
+going to test three unique specs,
+
+26
+00:01:00.480 --> 00:01:06.000
+markdown, HTML, and an enhanced HTML
+
+27
+00:01:04.080 --> 00:01:08.560
+version. And here, this is going to
+
+28
+00:01:06.000 --> 00:01:10.880
+enable us to measure the trade-off
+
+29
+00:01:08.560 --> 00:01:13.360
+triangle of three different spec types
+
+30
+00:01:10.880 --> 00:01:15.360
+with the exact same prompt. You can see
+
+31
+00:01:13.360 --> 00:01:18.400
+our agents getting to work here. Every
+
+32
+00:01:15.360 --> 00:01:20.799
+event, every turn, every tool call is
+
+33
+00:01:18.400 --> 00:01:22.400
+coming in with every single agent. Here,
+
+34
+00:01:20.799 --> 00:01:24.159
+we can see everything. We can observe
+
+35
+00:01:22.400 --> 00:01:25.680
+everything. And that means we can
+
+36
+00:01:24.159 --> 00:01:27.759
+improve everything. I've been
+
+37
+00:01:25.680 --> 00:01:30.400
+engineering for over 15 years now. And
+
+38
+00:01:27.759 --> 00:01:32.000
+some rules of engineering never change.
+
+39
+00:01:30.400 --> 00:01:34.240
+This is one of them. If you don't
+
+40
+00:01:32.000 --> 00:01:36.799
+measure, you won't improve. In this
+
+41
+00:01:34.240 --> 00:01:39.040
+video, we measure the tradeoff triangle
+
+42
+00:01:36.799 --> 00:01:43.720
+of these three different types of specs
+
+43
+00:01:39.040 --> 00:01:43.720
+using PI agent observability.
+
+44
+00:01:46.560 --> 00:01:50.960
+Agent observability is simple and this
+
+45
+00:01:48.960 --> 00:01:52.640
+application is just simple. You have a
+
+46
+00:01:50.960 --> 00:01:54.720
+centralized server that you stream
+
+47
+00:01:52.640 --> 00:01:56.880
+events to. You have a UI that reads
+
+48
+00:01:54.720 --> 00:01:59.600
+those events and then you the engineer
+
+49
+00:01:56.880 --> 00:02:01.439
+the developer can intake the information
+
+50
+00:01:59.600 --> 00:02:03.200
+creating a closed loop structure where
+
+51
+00:02:01.439 --> 00:02:05.600
+you can then improve not just your
+
+52
+00:02:03.200 --> 00:02:08.560
+engineering agents in the terminal and
+
+53
+00:02:05.600 --> 00:02:11.599
+in your software factory but also your
+
+54
+00:02:08.560 --> 00:02:13.599
+outloop products. Observability is
+
+55
+00:02:11.599 --> 00:02:15.680
+essential for understanding the
+
+56
+00:02:13.599 --> 00:02:17.280
+performance, speed, and cost trade-offs
+
+57
+00:02:15.680 --> 00:02:20.239
+for both your engineering work, but
+
+58
+00:02:17.280 --> 00:02:22.319
+especially your out the loop products,
+
+59
+00:02:20.239 --> 00:02:23.920
+right? Your product agents. Our two
+
+60
+00:02:22.319 --> 00:02:25.520
+agents have already completed their
+
+61
+00:02:23.920 --> 00:02:27.840
+work, and you can see the associated
+
+62
+00:02:25.520 --> 00:02:30.560
+costs with that. Surprisingly, our
+
+63
+00:02:27.840 --> 00:02:33.040
+markdown agent has used more tokens than
+
+64
+00:02:30.560 --> 00:02:35.200
+our HTML agent. And our HTML agent has
+
+65
+00:02:33.040 --> 00:02:37.519
+used a little bit more context. This may
+
+66
+00:02:35.200 --> 00:02:39.519
+be variance within the model, but it
+
+67
+00:02:37.519 --> 00:02:41.360
+could also be how the specs were
+
+68
+00:02:39.519 --> 00:02:43.760
+written. themselves. Our markdown agent
+
+69
+00:02:41.360 --> 00:02:45.519
+used a total of 29 turns. So, it could
+
+70
+00:02:43.760 --> 00:02:47.680
+just be that the markdown agent did a
+
+71
+00:02:45.519 --> 00:02:49.440
+much better job of understanding the
+
+72
+00:02:47.680 --> 00:02:51.519
+code base. This is one of those things
+
+73
+00:02:49.440 --> 00:02:53.360
+where if you don't actually look at what
+
+74
+00:02:51.519 --> 00:02:55.440
+your agents are doing, you'll never know
+
+75
+00:02:53.360 --> 00:02:57.519
+the key differences between any prompt
+
+76
+00:02:55.440 --> 00:02:58.800
+that you're writing. VPL agent looks
+
+77
+00:02:57.519 --> 00:03:01.280
+like it just finished here. This is our
+
+78
+00:02:58.800 --> 00:03:03.280
+VLAN agent. This is our HTML plan agent.
+
+79
+00:03:01.280 --> 00:03:06.560
+Here's our markdown planning agent. This
+
+80
+00:03:03.280 --> 00:03:09.280
+agent used 25 terms. HTML agent used 17.
+
+81
+00:03:06.560 --> 00:03:11.440
+And this one used 29. So what exactly
+
+82
+00:03:09.280 --> 00:03:13.360
+did our agents just plan out? They each
+
+83
+00:03:11.440 --> 00:03:14.800
+created their own spec. And so they're
+
+84
+00:03:13.360 --> 00:03:16.319
+working on this application called
+
+85
+00:03:14.800 --> 00:03:18.800
+Steelman. Let's go and just open this
+
+86
+00:03:16.319 --> 00:03:20.959
+up. So this is where we dig into our
+
+87
+00:03:18.800 --> 00:03:22.480
+product agent. Classic engineering
+
+88
+00:03:20.959 --> 00:03:23.840
+agents where you're in the terminal or
+
+89
+00:03:22.480 --> 00:03:25.599
+you're building your software factory,
+
+90
+00:03:23.840 --> 00:03:27.040
+your ADW, so on and so forth. These are
+
+91
+00:03:25.599 --> 00:03:28.480
+great. You and I as engineers, we're
+
+92
+00:03:27.040 --> 00:03:30.480
+going to be using these a lot. But the
+
+93
+00:03:28.480 --> 00:03:32.480
+next kind of very important agent that
+
+94
+00:03:30.480 --> 00:03:34.319
+you and I are building is our product
+
+95
+00:03:32.480 --> 00:03:36.879
+focus agent. We're going to present a
+
+96
+00:03:34.319 --> 00:03:38.879
+bull thesis for some company, for some
+
+97
+00:03:36.879 --> 00:03:40.879
+stock. Here we're talking about Apple as
+
+98
+00:03:38.879 --> 00:03:42.799
+an underappreciated AI distribution
+
+99
+00:03:40.879 --> 00:03:44.480
+winner. And this agent is going to do
+
+100
+00:03:42.799 --> 00:03:45.920
+everything it can to counter this,
+
+101
+00:03:44.480 --> 00:03:47.200
+right? It's going to give me the bare
+
+102
+00:03:45.920 --> 00:03:48.640
+thesis of everything. So, we're going to
+
+103
+00:03:47.200 --> 00:03:50.560
+start the Steelman agent here. It's
+
+104
+00:03:48.640 --> 00:03:53.200
+going to generate a bunch of UI that
+
+105
+00:03:50.560 --> 00:03:55.200
+aids its barecase argument. The whole
+
+106
+00:03:53.200 --> 00:03:56.959
+idea here is to strengthen your thesis
+
+107
+00:03:55.200 --> 00:03:58.720
+as to whether you should invest, you
+
+108
+00:03:56.959 --> 00:04:01.519
+shouldn't invest. It's really here to
+
+109
+00:03:58.720 --> 00:04:03.680
+poke holes in what you think is right or
+
+110
+00:04:01.519 --> 00:04:05.840
+what you think is wrong. Agents of today
+
+111
+00:04:03.680 --> 00:04:08.080
+are very cyclopantic, right? So, they're
+
+112
+00:04:05.840 --> 00:04:09.519
+going to by nature, by default, tell you
+
+113
+00:04:08.080 --> 00:04:11.040
+what you want to hear. Some of the great
+
+114
+00:04:09.519 --> 00:04:13.360
+engineering models are a little better
+
+115
+00:04:11.040 --> 00:04:15.280
+at this. By default, these agents want
+
+116
+00:04:13.360 --> 00:04:17.040
+you to be happy with the results. So,
+
+117
+00:04:15.280 --> 00:04:18.479
+they lean into everything that you're
+
+118
+00:04:17.040 --> 00:04:20.560
+saying. Here's our executive summary
+
+119
+00:04:18.479 --> 00:04:23.040
+coming in here on why we shouldn't bet
+
+120
+00:04:20.560 --> 00:04:24.800
+on Apple as a AI distribution leader.
+
+121
+00:04:23.040 --> 00:04:26.880
+Great response. Here we have generative
+
+122
+00:04:24.800 --> 00:04:28.479
+UI components that were generated here
+
+123
+00:04:26.880 --> 00:04:30.080
+on the left. Back to our engineering
+
+124
+00:04:28.479 --> 00:04:32.080
+agents. What are these actually doing?
+
+125
+00:04:30.080 --> 00:04:34.479
+These are going to create three new
+
+126
+00:04:32.080 --> 00:04:36.400
+generative AI components for us to use.
+
+127
+00:04:34.479 --> 00:04:38.320
+Right? So a quote, a catalyst timeline,
+
+128
+00:04:36.400 --> 00:04:40.560
+and a valuation gauge. They're going to
+
+129
+00:04:38.320 --> 00:04:42.960
+add that to our existing set. So this is
+
+130
+00:04:40.560 --> 00:04:44.639
+our table bar chart that our agents can
+
+131
+00:04:42.960 --> 00:04:47.040
+populate arbitrarily with any
+
+132
+00:04:44.639 --> 00:04:49.360
+information. We have scorecards here.
+
+133
+00:04:47.040 --> 00:04:52.160
+And then we have raw HTML. And the whole
+
+134
+00:04:49.360 --> 00:04:53.840
+point here again is to steal man, the
+
+135
+00:04:52.160 --> 00:04:55.440
+opposite side of whatever you are
+
+136
+00:04:53.840 --> 00:04:57.440
+saying. Our starter prompt here, you
+
+137
+00:04:55.440 --> 00:04:59.440
+know, we said Apple is an unappreciated
+
+138
+00:04:57.440 --> 00:05:01.600
+AI distribution winner. We asked, you
+
+139
+00:04:59.440 --> 00:05:03.440
+know, how valuable was that Mac Mini
+
+140
+00:05:01.600 --> 00:05:04.960
+claw trend to Apple? And then it's
+
+141
+00:05:03.440 --> 00:05:06.880
+breaking it all down here. You know, we
+
+142
+00:05:04.960 --> 00:05:08.800
+can dig into that specific clause here.
+
+143
+00:05:06.880 --> 00:05:11.199
+Deconstructing the open clutter claw
+
+144
+00:05:08.800 --> 00:05:13.759
+trend. This was confirmed. However, the
+
+145
+00:05:11.199 --> 00:05:16.080
+financial and strategic value of this to
+
+146
+00:05:13.759 --> 00:05:17.680
+Apple must be heavily qualified. Very
+
+147
+00:05:16.080 --> 00:05:19.919
+interesting here. Mac Mini represents
+
+148
+00:05:17.680 --> 00:05:22.080
+less than 2% of Apple's total corporate
+
+149
+00:05:19.919 --> 00:05:24.560
+revenue. Not a huge impact, right? Not
+
+150
+00:05:22.080 --> 00:05:26.560
+as big as you might think. There's some
+
+151
+00:05:24.560 --> 00:05:28.400
+irony to this which the agent points
+
+152
+00:05:26.560 --> 00:05:30.400
+out. A lot of people miss this in
+
+153
+00:05:28.400 --> 00:05:32.479
+betting on Apple. The claw trend proves
+
+154
+00:05:30.400 --> 00:05:34.560
+that developers want a decentralized
+
+155
+00:05:32.479 --> 00:05:36.479
+local open- source AI that operates
+
+156
+00:05:34.560 --> 00:05:38.400
+independently from anyone, right? Just
+
+157
+00:05:36.479 --> 00:05:40.400
+because Apple's delivering this doesn't
+
+158
+00:05:38.400 --> 00:05:42.000
+mean that selling this cheap, low margin
+
+159
+00:05:40.400 --> 00:05:43.520
+silicon box is going to be good for
+
+160
+00:05:42.000 --> 00:05:45.120
+Apple over the long term, right? It's a
+
+161
+00:05:43.520 --> 00:05:47.120
+one-time purchase. What Apple is looking
+
+162
+00:05:45.120 --> 00:05:48.320
+for is like repeat revenue, right? And
+
+163
+00:05:47.120 --> 00:05:49.680
+any company's looking for that repeat
+
+164
+00:05:48.320 --> 00:05:51.520
+revenue. But anyway, we have a decent
+
+165
+00:05:49.680 --> 00:05:53.520
+tool, 40 references. So, it didn't just
+
+166
+00:05:51.520 --> 00:05:55.680
+make this stuff up out of its ass. It
+
+167
+00:05:53.520 --> 00:05:57.919
+really did research via tool calling and
+
+168
+00:05:55.680 --> 00:06:00.800
+then it made references and put together
+
+169
+00:05:57.919 --> 00:06:02.720
+a proper bare thesis for us. Okay, so I
+
+170
+00:06:00.800 --> 00:06:04.160
+built this just to really showcase the
+
+171
+00:06:02.720 --> 00:06:05.759
+idea. Well, first off, cuz this is
+
+172
+00:06:04.160 --> 00:06:07.360
+actually valuable, but second off
+
+173
+00:06:05.759 --> 00:06:09.680
+because I wanted to showcase this idea
+
+174
+00:06:07.360 --> 00:06:11.680
+of a product focused agent. If we hop
+
+175
+00:06:09.680 --> 00:06:13.919
+back to our agent observability, we can
+
+176
+00:06:11.680 --> 00:06:15.600
+see that our steelman agent has
+
+177
+00:06:13.919 --> 00:06:17.120
+executed. Okay, so you can see
+
+178
+00:06:15.600 --> 00:06:18.880
+everything going on inside of our
+
+179
+00:06:17.120 --> 00:06:20.560
+product focus agent. Right now, we're in
+
+180
+00:06:18.880 --> 00:06:22.479
+the swim lane view. We can go ahead and
+
+181
+00:06:20.560 --> 00:06:24.639
+switch to our single view and let me
+
+182
+00:06:22.479 --> 00:06:26.800
+click our Steelman Asian and we can see
+
+183
+00:06:24.639 --> 00:06:29.759
+a great breakdown of everything going on
+
+184
+00:06:26.800 --> 00:06:32.240
+here. Uh we got that cracked Gemini 3.5
+
+185
+00:06:29.759 --> 00:06:34.080
+flash tokens per second speed. So when
+
+186
+00:06:32.240 --> 00:06:35.840
+you're looking at selecting the model
+
+187
+00:06:34.080 --> 00:06:37.360
+for your product, you're going to want
+
+188
+00:06:35.840 --> 00:06:39.120
+something like this. We have a cost
+
+189
+00:06:37.360 --> 00:06:41.440
+breakdown. We have tokens per second
+
+190
+00:06:39.120 --> 00:06:43.199
+breakdown and we understand the context
+
+191
+00:06:41.440 --> 00:06:45.280
+of the agent that we're running. You can
+
+192
+00:06:43.199 --> 00:06:47.039
+see here very clearly Gemini 3.5 flash
+
+193
+00:06:45.280 --> 00:06:48.240
+running. We can see everything that
+
+194
+00:06:47.039 --> 00:06:49.759
+happened. All right, so bunch of
+
+195
+00:06:48.240 --> 00:06:51.440
+research happening here. There's the
+
+196
+00:06:49.759 --> 00:06:53.199
+start. Here's the end. And you can see
+
+197
+00:06:51.440 --> 00:06:55.039
+all the artifacts generated, right? And
+
+198
+00:06:53.199 --> 00:06:57.120
+of course, we can click into anything,
+
+199
+00:06:55.039 --> 00:06:58.479
+see the exact tool call arguments. We
+
+200
+00:06:57.120 --> 00:07:00.319
+can see everything that built our
+
+201
+00:06:58.479 --> 00:07:02.560
+generative UI components, assistant
+
+202
+00:07:00.319 --> 00:07:04.080
+message, we can see the results and all
+
+203
+00:07:02.560 --> 00:07:06.479
+the thinking, so on and so forth. You
+
+204
+00:07:04.080 --> 00:07:07.919
+know, classic agent observability. If
+
+205
+00:07:06.479 --> 00:07:09.759
+you don't measure what your agents are
+
+206
+00:07:07.919 --> 00:07:11.840
+doing, you cannot improve them. This is
+
+207
+00:07:09.759 --> 00:07:14.000
+just a fact. Um, a lot of vibes out
+
+208
+00:07:11.840 --> 00:07:15.360
+there, a lot of vibe coding going on out
+
+209
+00:07:14.000 --> 00:07:16.880
+there that will get you to a certain
+
+210
+00:07:15.360 --> 00:07:18.240
+level of very, you know, lowle
+
+211
+00:07:16.880 --> 00:07:20.479
+performance. But if you want to go all
+
+212
+00:07:18.240 --> 00:07:23.039
+the way, if you want to truly agentic
+
+213
+00:07:20.479 --> 00:07:25.120
+engineer systems, especially in your
+
+214
+00:07:23.039 --> 00:07:27.440
+products and services, but also for
+
+215
+00:07:25.120 --> 00:07:29.680
+engineering work, it's very valuable to
+
+216
+00:07:27.440 --> 00:07:32.880
+understand the tradeoffs between the
+
+217
+00:07:29.680 --> 00:07:35.199
+trade-off trifecta, performance, speed,
+
+218
+00:07:32.880 --> 00:07:37.199
+and cost. Just a quick note on Gemini
+
+219
+00:07:35.199 --> 00:07:39.599
+3.5 Flash, having a really great time
+
+220
+00:07:37.199 --> 00:07:41.199
+using this model. It is uh I would say
+
+221
+00:07:39.599 --> 00:07:42.880
+near state-of-the-art. It really
+
+222
+00:07:41.199 --> 00:07:44.800
+surprised me in a lot of cases because
+
+223
+00:07:42.880 --> 00:07:46.479
+specifically for that cost if you're
+
+224
+00:07:44.800 --> 00:07:49.280
+thinking about building out product
+
+225
+00:07:46.479 --> 00:07:52.319
+focus agents the performance speed cost
+
+226
+00:07:49.280 --> 00:07:53.840
+trade-off is really really great and I
+
+227
+00:07:52.319 --> 00:07:56.720
+know everyone's complaining about the uh
+
+228
+00:07:53.840 --> 00:07:57.919
+you know Gemini 3.5 flash price came in
+
+229
+00:07:56.720 --> 00:07:59.599
+definitely higher than people were
+
+230
+00:07:57.919 --> 00:08:01.680
+expecting. It's not so much a flash
+
+231
+00:07:59.599 --> 00:08:03.039
+model anymore. I think for the
+
+232
+00:08:01.680 --> 00:08:05.759
+performance you're getting out of this
+
+233
+00:08:03.039 --> 00:08:08.800
+thing it's pretty fantastic. I'd like to
+
+234
+00:08:05.759 --> 00:08:10.720
+think about cost per intelligence versus
+
+235
+00:08:08.800 --> 00:08:12.800
+cost per token. What you really want is
+
+236
+00:08:10.720 --> 00:08:14.400
+the intelligence and the performance.
+
+237
+00:08:12.800 --> 00:08:16.240
+And if it's worth it, I'm certainly
+
+238
+00:08:14.400 --> 00:08:18.240
+willing to pay more. Obviously, we'd all
+
+239
+00:08:16.240 --> 00:08:19.599
+love every model, all the best models to
+
+240
+00:08:18.240 --> 00:08:20.879
+be dirt cheap. But that's just not the
+
+241
+00:08:19.599 --> 00:08:22.639
+case. Got to play with the cards we're
+
+242
+00:08:20.879 --> 00:08:24.080
+dealt. So, this is agent observability.
+
+243
+00:08:22.639 --> 00:08:25.919
+This is the core idea. If you stop the
+
+244
+00:08:24.080 --> 00:08:28.080
+video now, I think you get the idea. If
+
+245
+00:08:25.919 --> 00:08:30.319
+you don't measure, you can't improve.
+
+246
+00:08:28.080 --> 00:08:32.399
+And this is especially important once
+
+247
+00:08:30.319 --> 00:08:34.640
+you start building products where your
+
+248
+00:08:32.399 --> 00:08:36.240
+agents are executing thousands and tens
+
+249
+00:08:34.640 --> 00:08:38.640
+of thousands and hundreds of thousands
+
+250
+00:08:36.240 --> 00:08:40.000
+of times over the course of some period,
+
+251
+00:08:38.640 --> 00:08:42.240
+right? a day, a week, so on and so
+
+252
+00:08:40.000 --> 00:08:45.120
+forth. If you can run a 3.5 Flash or a
+
+253
+00:08:42.240 --> 00:08:47.760
+Deepseek V4 Pro and you can save and
+
+254
+00:08:45.120 --> 00:08:50.320
+still get the results and still call all
+
+255
+00:08:47.760 --> 00:08:52.000
+the right tools, you should absolutely
+
+256
+00:08:50.320 --> 00:08:54.000
+do that. Okay? Like there's just no
+
+257
+00:08:52.000 --> 00:08:56.800
+debate there. Like you should absolutely
+
+258
+00:08:54.000 --> 00:08:58.000
+understand that and make sure that uh
+
+259
+00:08:56.800 --> 00:08:59.440
+you have that in place in your
+
+260
+00:08:58.000 --> 00:09:00.640
+production system. So that's the idea,
+
+261
+00:08:59.440 --> 00:09:02.160
+right? That's the core idea here. You
+
+262
+00:09:00.640 --> 00:09:03.839
+know, the architecture is exactly what
+
+263
+00:09:02.160 --> 00:09:05.600
+you would think. You stream events to
+
+264
+00:09:03.839 --> 00:09:07.279
+some server. The server also stores this
+
+265
+00:09:05.600 --> 00:09:09.120
+into DB. So, you know, we can refresh
+
+266
+00:09:07.279 --> 00:09:10.560
+this, get everything back. Couple nice
+
+267
+00:09:09.120 --> 00:09:12.160
+things I built into the system. You
+
+268
+00:09:10.560 --> 00:09:13.920
+know, I have a function mode where we
+
+269
+00:09:12.160 --> 00:09:15.760
+can really get things super compressed.
+
+270
+00:09:13.920 --> 00:09:17.600
+And then I have a form mode to be more
+
+271
+00:09:15.760 --> 00:09:19.200
+visually aesthetically pleasing. We have
+
+272
+00:09:17.600 --> 00:09:20.560
+single lane mode here in our
+
+273
+00:09:19.200 --> 00:09:22.000
+observability system. Let's go to that
+
+274
+00:09:20.560 --> 00:09:23.600
+steelman agent. So, we can really get
+
+275
+00:09:22.000 --> 00:09:26.640
+some more detailed results, right? That
+
+276
+00:09:23.600 --> 00:09:28.240
+one run took 79 events. Total 1 minute
+
+277
+00:09:26.640 --> 00:09:29.760
+duration. You can see the cost so on and
+
+278
+00:09:28.240 --> 00:09:31.360
+so forth. And then we have race mode
+
+279
+00:09:29.760 --> 00:09:33.360
+which I think is really interesting. So,
+
+280
+00:09:31.360 --> 00:09:34.959
+this is a left to right kind of race
+
+281
+00:09:33.360 --> 00:09:36.640
+situation where you can see the events
+
+282
+00:09:34.959 --> 00:09:38.560
+side by side. You can see every set of
+
+283
+00:09:36.640 --> 00:09:40.560
+events chunked by turn, right? And then
+
+284
+00:09:38.560 --> 00:09:42.640
+we can dial into these. And again, it's
+
+285
+00:09:40.560 --> 00:09:44.560
+just about understanding what our agent
+
+286
+00:09:42.640 --> 00:09:46.240
+is doing and when it's doing it. And of
+
+287
+00:09:44.560 --> 00:09:49.600
+course, we can stack. So let's say we
+
+288
+00:09:46.240 --> 00:09:51.760
+want to erase our planning agent and we
+
+289
+00:09:49.600 --> 00:09:53.040
+want to see our HTML and V plan. And we
+
+290
+00:09:51.760 --> 00:09:54.640
+we'll go ahead and dive into the results
+
+291
+00:09:53.040 --> 00:09:56.240
+of these agents in just a second here.
+
+292
+00:09:54.640 --> 00:09:58.560
+Again, agent observability is so
+
+293
+00:09:56.240 --> 00:10:00.000
+important because in the start event, if
+
+294
+00:09:58.560 --> 00:10:02.399
+I click into this, you can see we have
+
+295
+00:10:00.000 --> 00:10:04.000
+all the details of this agent on boot
+
+296
+00:10:02.399 --> 00:10:06.320
+up. I'll just pull this out. You want to
+
+297
+00:10:04.000 --> 00:10:08.080
+know what your agent system prompt is,
+
+298
+00:10:06.320 --> 00:10:09.360
+right? And a lot of times if you're
+
+299
+00:10:08.080 --> 00:10:10.640
+building production agents or you're,
+
+300
+00:10:09.360 --> 00:10:12.080
+you know, customizing your system
+
+301
+00:10:10.640 --> 00:10:13.440
+prompt, you're going to be templating
+
+302
+00:10:12.080 --> 00:10:14.399
+strings into your system prompt. So
+
+303
+00:10:13.440 --> 00:10:16.640
+you're going to want to see what the
+
+304
+00:10:14.399 --> 00:10:18.560
+real results are. Have you actually seen
+
+305
+00:10:16.640 --> 00:10:19.839
+the full system prompt of your agent?
+
+306
+00:10:18.560 --> 00:10:21.360
+Like do you know what it looks like?
+
+307
+00:10:19.839 --> 00:10:23.040
+Even the pi coding agent, which I'm
+
+308
+00:10:21.360 --> 00:10:24.079
+using a lot more now, as you know, if
+
+309
+00:10:23.040 --> 00:10:25.920
+you've been watching the channel, this
+
+310
+00:10:24.079 --> 00:10:27.440
+is a decent size prompt. Of course, it
+
+311
+00:10:25.920 --> 00:10:29.279
+has all the skills that I'm adding a
+
+312
+00:10:27.440 --> 00:10:30.720
+decent chunk of context is just showing
+
+313
+00:10:29.279 --> 00:10:32.560
+off all the skills. You can see your
+
+314
+00:10:30.720 --> 00:10:34.240
+session file, session ID. You're going
+
+315
+00:10:32.560 --> 00:10:36.000
+to want to know all the tools that your
+
+316
+00:10:34.240 --> 00:10:38.079
+agent actually has loaded. You can see
+
+317
+00:10:36.000 --> 00:10:40.560
+our communication tools from a previous
+
+318
+00:10:38.079 --> 00:10:42.240
+video where we talked about flat pietoi
+
+319
+00:10:40.560 --> 00:10:44.079
+agent communication not sub aent
+
+320
+00:10:42.240 --> 00:10:46.079
+delegation but you can see that I also
+
+321
+00:10:44.079 --> 00:10:47.680
+have sub aent delegation ready via
+
+322
+00:10:46.079 --> 00:10:49.279
+another pi coding agent extension and
+
+323
+00:10:47.680 --> 00:10:51.200
+then I have this session digging
+
+324
+00:10:49.279 --> 00:10:52.720
+capability all the classic tools and
+
+325
+00:10:51.200 --> 00:10:54.720
+then you know tool snippets prompt
+
+326
+00:10:52.720 --> 00:10:56.480
+guidelines and then all my skills here.
+
+327
+00:10:54.720 --> 00:10:58.480
+You can really see here that by loading
+
+328
+00:10:56.480 --> 00:11:00.880
+a bunch of these skills, it's also kind
+
+329
+00:10:58.480 --> 00:11:02.640
+of bloating up my system prompt. Just
+
+330
+00:11:00.880 --> 00:11:04.880
+important small pieces of information
+
+331
+00:11:02.640 --> 00:11:06.800
+like that, you only understand and you
+
+332
+00:11:04.880 --> 00:11:10.920
+only know if you're looking and if
+
+333
+00:11:06.800 --> 00:11:10.920
+you're inspecting your agent.
+
+334
+00:11:13.360 --> 00:11:17.760
+So, PI agent observability very
+
+335
+00:11:15.120 --> 00:11:19.600
+powerful. And how you observe and ingest
+
+336
+00:11:17.760 --> 00:11:21.200
+that information is also very important.
+
+337
+00:11:19.600 --> 00:11:22.959
+Let's see what's going on in turn five
+
+338
+00:11:21.200 --> 00:11:24.560
+here for each agent. Right? Looks like
+
+339
+00:11:22.959 --> 00:11:26.320
+they're roughly on the same track.
+
+340
+00:11:24.560 --> 00:11:28.480
+Making tool calls, understanding the
+
+341
+00:11:26.320 --> 00:11:31.600
+codebase to build the spec. We're on
+
+342
+00:11:28.480 --> 00:11:33.360
+style CSS and we're on the app. Everyone
+
+343
+00:11:31.600 --> 00:11:34.880
+understands engineering agents. This is
+
+344
+00:11:33.360 --> 00:11:36.480
+like table stakes. This becomes
+
+345
+00:11:34.880 --> 00:11:38.240
+exponentially more important when you're
+
+346
+00:11:36.480 --> 00:11:39.120
+building out product focused agents. You
+
+347
+00:11:38.240 --> 00:11:40.480
+know, let's do a couple things here.
+
+348
+00:11:39.120 --> 00:11:43.360
+Let's run another prompt here and then
+
+349
+00:11:40.480 --> 00:11:46.240
+let's understand the differences between
+
+350
+00:11:43.360 --> 00:11:48.800
+the spec markdown prompt, right? classic
+
+351
+00:11:46.240 --> 00:11:51.760
+markdown prompt are HTML plan which is
+
+352
+00:11:48.800 --> 00:11:53.760
+using more tokens to generate HTML which
+
+353
+00:11:51.760 --> 00:11:55.440
+you can understand better your team can
+
+354
+00:11:53.760 --> 00:11:57.519
+understand better and your agents can
+
+355
+00:11:55.440 --> 00:12:00.160
+understand better and then an expanded
+
+356
+00:11:57.519 --> 00:12:02.480
+what I like to call Vspec or V plan
+
+357
+00:12:00.160 --> 00:12:03.839
+where we add visuals so we'll go ahead
+
+358
+00:12:02.480 --> 00:12:05.600
+and open these up in a second but first
+
+359
+00:12:03.839 --> 00:12:08.160
+let's kick off question here for our
+
+360
+00:12:05.600 --> 00:12:10.000
+product um what I want to see here as
+
+361
+00:12:08.160 --> 00:12:12.240
+I'm thinking about purchasing Apple and
+
+362
+00:12:10.000 --> 00:12:15.279
+I want to get a good bare thesis
+
+363
+00:12:12.240 --> 00:12:18.399
+breakdown is show me Apple's revenue
+
+364
+00:12:15.279 --> 00:12:20.320
+venue a Mac Mini versus all their other
+
+365
+00:12:18.399 --> 00:12:22.160
+product lines. I'll just say visually
+
+366
+00:12:20.320 --> 00:12:23.440
+just so it's super clear. Of course, we
+
+367
+00:12:22.160 --> 00:12:25.200
+can just dial into this. Let me go ahead
+
+368
+00:12:23.440 --> 00:12:28.079
+and show you the live stream of this
+
+369
+00:12:25.200 --> 00:12:30.959
+steel man, right? Doing research using
+
+370
+00:12:28.079 --> 00:12:33.200
+tokens inside the product calling the
+
+371
+00:12:30.959 --> 00:12:34.959
+tools that you set up for your product.
+
+372
+00:12:33.200 --> 00:12:36.639
+There it is. Emitting the artifact.
+
+373
+00:12:34.959 --> 00:12:38.480
+Let's go and see what that artifact was.
+
+374
+00:12:36.639 --> 00:12:41.040
+There we go. We got a nice pie chart.
+
+375
+00:12:38.480 --> 00:12:44.720
+And you know, Mac Mini sells basically
+
+376
+00:12:41.040 --> 00:12:48.399
+zero. Was the Mac Mini craze really that
+
+377
+00:12:44.720 --> 00:12:49.600
+crazy? Uh, no it wasn't. And you know,
+
+378
+00:12:48.399 --> 00:12:51.440
+really interesting. You know, you can
+
+379
+00:12:49.600 --> 00:12:53.760
+hear and listen to all the hype, but
+
+380
+00:12:51.440 --> 00:12:55.600
+even with viral events like this, it's
+
+381
+00:12:53.760 --> 00:12:57.200
+not that important to Apple's total
+
+382
+00:12:55.600 --> 00:12:59.279
+topline revenue. Now, of course, things
+
+383
+00:12:57.200 --> 00:13:01.600
+can change. These can grow. The Mac Mini
+
+384
+00:12:59.279 --> 00:13:03.760
+claw craze, it certainly is a signal,
+
+385
+00:13:01.600 --> 00:13:06.399
+and I'm sure Apple is betting on a
+
+386
+00:13:03.760 --> 00:13:08.320
+larger trend of AI in some shape or
+
+387
+00:13:06.399 --> 00:13:09.920
+form. They certainly need to act on that
+
+388
+00:13:08.320 --> 00:13:11.839
+a little bit more. But just looking at
+
+389
+00:13:09.920 --> 00:13:13.600
+the raw numbers, right? We can see our
+
+390
+00:13:11.839 --> 00:13:15.200
+core references here, right? Apple's
+
+391
+00:13:13.600 --> 00:13:16.399
+first quarter results, right? I mean, we
+
+392
+00:13:15.200 --> 00:13:18.639
+can click into this. This is like
+
+393
+00:13:16.399 --> 00:13:20.000
+legitimate sourcing, right? January
+
+394
+00:13:18.639 --> 00:13:21.279
+29th, you know, we're getting the latest
+
+395
+00:13:20.000 --> 00:13:24.639
+information here thanks to our agents
+
+396
+00:13:21.279 --> 00:13:26.160
+and our tools. Having a bear, a
+
+397
+00:13:24.639 --> 00:13:28.000
+counterpositional
+
+398
+00:13:26.160 --> 00:13:29.680
+agent is super super powerful for
+
+399
+00:13:28.000 --> 00:13:32.000
+getting that opposite perspective.
+
+400
+00:13:29.680 --> 00:13:33.440
+Anyway, back to our agents. So, we can
+
+401
+00:13:32.000 --> 00:13:35.279
+see again, we're just continuing to
+
+402
+00:13:33.440 --> 00:13:37.600
+trail and understand the tokens per
+
+403
+00:13:35.279 --> 00:13:39.360
+second, which my god, Gemini Flash is a
+
+404
+00:13:37.600 --> 00:13:41.120
+beast here. My tokens per second
+
+405
+00:13:39.360 --> 00:13:43.440
+calculation is a little off here. I had
+
+406
+00:13:41.120 --> 00:13:44.639
+to do some inference on this because PI
+
+407
+00:13:43.440 --> 00:13:45.839
+coding agent doesn't come with this out
+
+408
+00:13:44.639 --> 00:13:47.279
+of the box at least that I know of.
+
+409
+00:13:45.839 --> 00:13:48.959
+Comment down below if I miss something.
+
+410
+00:13:47.279 --> 00:13:50.639
+Yeah, just great performance here all
+
+411
+00:13:48.959 --> 00:13:52.399
+around. There's another really powerful
+
+412
+00:13:50.639 --> 00:13:55.040
+tool that I want to show you in addition
+
+413
+00:13:52.399 --> 00:13:57.839
+to the PI agent observability system and
+
+414
+00:13:55.040 --> 00:13:59.680
+that is GBT image 2.0. The Anthropic
+
+415
+00:13:57.839 --> 00:14:01.680
+team put out this great post on the
+
+416
+00:13:59.680 --> 00:14:03.680
+unreasonable effectiveness of HTML. It's
+
+417
+00:14:01.680 --> 00:14:05.440
+about using HTML with specs, right? Give
+
+418
+00:14:03.680 --> 00:14:07.440
+your agents more tokens and they'll
+
+419
+00:14:05.440 --> 00:14:09.040
+perform better. That's the top line for
+
+420
+00:14:07.440 --> 00:14:10.880
+this, right? more useful tokens. I've
+
+421
+00:14:09.040 --> 00:14:13.279
+been using and leveraging that idea in a
+
+422
+00:14:10.880 --> 00:14:14.560
+different way, specifically with images.
+
+423
+00:14:13.279 --> 00:14:16.000
+Let's go and just dive into our plans
+
+424
+00:14:14.560 --> 00:14:18.399
+here. So, we have our markdown spec
+
+425
+00:14:16.000 --> 00:14:20.560
+here. We have our HTML spec and we have
+
+426
+00:14:18.399 --> 00:14:22.959
+our HTML vspec. And you'll notice
+
+427
+00:14:20.560 --> 00:14:24.720
+something here. The VSpec contains
+
+428
+00:14:22.959 --> 00:14:26.320
+images. All right? So, you can see very,
+
+429
+00:14:24.720 --> 00:14:28.480
+very quickly where this is all going.
+
+430
+00:14:26.320 --> 00:14:30.880
+And so, you know, classic markdown spec,
+
+431
+00:14:28.480 --> 00:14:34.320
+tried and true, simple, best for
+
+432
+00:14:30.880 --> 00:14:35.920
+preserving tokens and having a text
+
+433
+00:14:34.320 --> 00:14:38.000
+focused result. Okay, so this is my
+
+434
+00:14:35.920 --> 00:14:39.680
+classic spec planning prompt. I have
+
+435
+00:14:38.000 --> 00:14:41.440
+templated my engineering into these
+
+436
+00:14:39.680 --> 00:14:43.680
+sections, right? Task, objective,
+
+437
+00:14:41.440 --> 00:14:44.880
+problem, solution, relevant files, blah
+
+438
+00:14:43.680 --> 00:14:46.000
+blah blah. Classic stuff here. We're
+
+439
+00:14:44.880 --> 00:14:48.399
+building these three new types of
+
+440
+00:14:46.000 --> 00:14:50.399
+generative AI that our steelman agent
+
+441
+00:14:48.399 --> 00:14:51.760
+can respond with. So, very important
+
+442
+00:14:50.399 --> 00:14:53.839
+stuff there. Let's go and see another
+
+443
+00:14:51.760 --> 00:14:55.760
+version. Okay, so let's talk about HTML,
+
+444
+00:14:53.839 --> 00:14:57.040
+right? What does that HTML look like?
+
+445
+00:14:55.760 --> 00:14:58.560
+Just want to get the reference to this
+
+446
+00:14:57.040 --> 00:15:01.279
+and I'm just going to fire Chrome on
+
+447
+00:14:58.560 --> 00:15:03.360
+this. Here is my HTML version of that.
+
+448
+00:15:01.279 --> 00:15:04.639
+Okay, and so relatively bare bones. As
+
+449
+00:15:03.360 --> 00:15:08.320
+you can see, I'm not using a ton of
+
+450
+00:15:04.639 --> 00:15:09.519
+tokens to use every HTML tag under the
+
+451
+00:15:08.320 --> 00:15:13.199
+sun. But you can see here, we're getting
+
+452
+00:15:09.519 --> 00:15:16.480
+a more visual rich portrayal of very
+
+453
+00:15:13.199 --> 00:15:18.720
+importantly here, our UIs. With the HTML
+
+454
+00:15:16.480 --> 00:15:20.399
+spec, my agent is starting to dial into
+
+455
+00:15:18.720 --> 00:15:22.560
+what the HTML components look like.
+
+456
+00:15:20.399 --> 00:15:24.800
+Here's our quote component it mocked
+
+457
+00:15:22.560 --> 00:15:28.000
+out. Here's our timeline component. And
+
+458
+00:15:24.800 --> 00:15:29.199
+then here is our valuation gauge that it
+
+459
+00:15:28.000 --> 00:15:31.120
+mocked out. And then a couple more
+
+460
+00:15:29.199 --> 00:15:33.279
+notes. So, I could be doing a lot more
+
+461
+00:15:31.120 --> 00:15:35.440
+here with the HTML spec. you can push
+
+462
+00:15:33.279 --> 00:15:37.120
+this really really far and be more
+
+463
+00:15:35.440 --> 00:15:39.440
+prescriptive. Basically, I just have my
+
+464
+00:15:37.120 --> 00:15:41.680
+same markdown spec in HTML which gives
+
+465
+00:15:39.440 --> 00:15:43.920
+it a few additional capabilities to
+
+466
+00:15:41.680 --> 00:15:46.560
+communicate the information in a more
+
+467
+00:15:43.920 --> 00:15:48.000
+accurate way at the cost of tokens.
+
+468
+00:15:46.560 --> 00:15:50.720
+Interestingly, if we go back to our swim
+
+469
+00:15:48.000 --> 00:15:53.759
+lane and we drop steel man and we drop
+
+470
+00:15:50.720 --> 00:15:56.000
+VLAN and just compare our markdown and
+
+471
+00:15:53.759 --> 00:15:58.320
+HTML spec, now we can see very clearly
+
+472
+00:15:56.000 --> 00:16:02.240
+markdown actually used more tokens this
+
+473
+00:15:58.320 --> 00:16:04.880
+run. It used 170 events versus 100
+
+474
+00:16:02.240 --> 00:16:07.839
+events and it used about the same
+
+475
+00:16:04.880 --> 00:16:10.079
+context. Okay. So, what happened here?
+
+476
+00:16:07.839 --> 00:16:12.480
+Is this just variance? Is this our agent
+
+477
+00:16:10.079 --> 00:16:13.920
+being more focused on the actual plan
+
+478
+00:16:12.480 --> 00:16:15.600
+and doing more research? Assistant
+
+479
+00:16:13.920 --> 00:16:18.079
+doesn't have to think about outputting
+
+480
+00:16:15.600 --> 00:16:21.440
+in markdown. It's unclear. But now we
+
+481
+00:16:18.079 --> 00:16:22.800
+can see right now we can understand that
+
+482
+00:16:21.440 --> 00:16:24.320
+there is some difference here. And
+
+483
+00:16:22.800 --> 00:16:26.399
+obviously the right thing to do here is
+
+484
+00:16:24.320 --> 00:16:27.920
+to turn this into an eval. run it over
+
+485
+00:16:26.399 --> 00:16:29.839
+and over and over again to look for the
+
+486
+00:16:27.920 --> 00:16:31.600
+average performance results. And you
+
+487
+00:16:29.839 --> 00:16:33.279
+know, hint hint, that's what comes next
+
+488
+00:16:31.600 --> 00:16:34.880
+after you have observability. After
+
+489
+00:16:33.279 --> 00:16:36.720
+you're building out your product focus
+
+490
+00:16:34.880 --> 00:16:39.360
+agents, you're then going to want to
+
+491
+00:16:36.720 --> 00:16:40.880
+scale your repeat work into eval. But
+
+492
+00:16:39.360 --> 00:16:41.920
+step one is just measure. So that's what
+
+493
+00:16:40.880 --> 00:16:44.639
+we're doing here. Okay. So I'm going to
+
+494
+00:16:41.920 --> 00:16:46.959
+do Chrome on our HTML V version. Open
+
+495
+00:16:44.639 --> 00:16:49.040
+this up. Very similar version except we
+
+496
+00:16:46.959 --> 00:16:53.199
+have images embedded. We're using that
+
+497
+00:16:49.040 --> 00:16:56.480
+powerful GBT image 2 model. And per plan
+
+498
+00:16:53.199 --> 00:16:58.639
+now you can embed images to enrich your
+
+499
+00:16:56.480 --> 00:17:00.399
+planning experience not just for your
+
+500
+00:16:58.639 --> 00:17:01.839
+agent. Our agent is going to read this.
+
+501
+00:17:00.399 --> 00:17:04.000
+It is going to execute this. We've
+
+502
+00:17:01.839 --> 00:17:06.400
+updated our build prompt to say if there
+
+503
+00:17:04.000 --> 00:17:08.640
+are any images inside the plan you must
+
+504
+00:17:06.400 --> 00:17:11.199
+read them. Image tokens are very useful
+
+505
+00:17:08.640 --> 00:17:14.559
+for your agent especially very powerful
+
+506
+00:17:11.199 --> 00:17:16.880
+multimodal models like Gemini 3.5 flash.
+
+507
+00:17:14.559 --> 00:17:18.559
+If we jump down to MMLU and all these
+
+508
+00:17:16.880 --> 00:17:19.919
+multimodal benchmarks, this model is
+
+509
+00:17:18.559 --> 00:17:22.400
+going to be really, really great with
+
+510
+00:17:19.919 --> 00:17:25.600
+these Vspecs, these visual specs, these
+
+511
+00:17:22.400 --> 00:17:27.360
+HTML specs, these image specs, Gemini
+
+512
+00:17:25.600 --> 00:17:29.280
+wins on multimodal. We know for a fact
+
+513
+00:17:27.360 --> 00:17:32.240
+that not only will this improve your
+
+514
+00:17:29.280 --> 00:17:34.960
+agents, but the more I plan with Vspecs,
+
+515
+00:17:32.240 --> 00:17:37.919
+visual specs, it's so helpful to see
+
+516
+00:17:34.960 --> 00:17:39.919
+interfaces to spec with and images to
+
+517
+00:17:37.919 --> 00:17:41.600
+spec with, right? I can clearly see
+
+518
+00:17:39.919 --> 00:17:44.000
+exactly what my model's thinking in a
+
+519
+00:17:41.600 --> 00:17:45.679
+visual way. And this is all possible. I
+
+520
+00:17:44.000 --> 00:17:47.760
+think it was nearly impossible before
+
+521
+00:17:45.679 --> 00:17:48.880
+the GPT image 2 model. Now this is a
+
+522
+00:17:47.760 --> 00:17:51.360
+reality. Let me just make this super
+
+523
+00:17:48.880 --> 00:17:53.919
+clear. All my plans now are VSpecs.
+
+524
+00:17:51.360 --> 00:17:55.360
+They're visual specs. Now HTML is an
+
+525
+00:17:53.919 --> 00:17:57.520
+enhancement to that. Sometimes I use
+
+526
+00:17:55.360 --> 00:17:59.440
+HTML. Sometimes I just use markdown that
+
+527
+00:17:57.520 --> 00:18:01.360
+reference images. But I am always
+
+528
+00:17:59.440 --> 00:18:02.720
+planning with images now. And of course
+
+529
+00:18:01.360 --> 00:18:04.640
+this is more expensive. You know
+
+530
+00:18:02.720 --> 00:18:06.640
+something that our observability tool
+
+531
+00:18:04.640 --> 00:18:08.720
+did completely miss is that it's not
+
+532
+00:18:06.640 --> 00:18:11.760
+capturing the cost of generating each
+
+533
+00:18:08.720 --> 00:18:14.799
+image. I mean this actually costs1 or $2
+
+534
+00:18:11.760 --> 00:18:16.240
+or $3 total to generate all the images.
+
+535
+00:18:14.799 --> 00:18:19.280
+But you can see here that this
+
+536
+00:18:16.240 --> 00:18:21.440
+experience of a gentic engineering with
+
+537
+00:18:19.280 --> 00:18:22.960
+this type of plan is superior. I mean
+
+538
+00:18:21.440 --> 00:18:24.880
+it's just better. I'm quickly
+
+539
+00:18:22.960 --> 00:18:27.520
+understanding the plan. Okay, nice. So
+
+540
+00:18:24.880 --> 00:18:30.240
+thanks to the HTML spec portion of this.
+
+541
+00:18:27.520 --> 00:18:31.600
+We also have a free form breakdown part
+
+542
+00:18:30.240 --> 00:18:33.520
+of this plan where we're actually
+
+543
+00:18:31.600 --> 00:18:35.039
+writing out what these components will
+
+544
+00:18:33.520 --> 00:18:37.200
+look like. So same deal, right? We're
+
+545
+00:18:35.039 --> 00:18:39.120
+creating steelman generative AI
+
+546
+00:18:37.200 --> 00:18:40.799
+components. Here's a quote. Here's a
+
+547
+00:18:39.120 --> 00:18:42.880
+timeline component. And here's a
+
+548
+00:18:40.799 --> 00:18:44.160
+valuation marker. So, I didn't get it
+
+549
+00:18:42.880 --> 00:18:45.840
+perfect, but you can see here it's even
+
+550
+00:18:44.160 --> 00:18:47.760
+a little bit dynamic. We can play this a
+
+551
+00:18:45.840 --> 00:18:50.080
+little bit. And this is where HTML specs
+
+552
+00:18:47.760 --> 00:18:52.960
+really shine is that you can get some
+
+553
+00:18:50.080 --> 00:18:54.799
+like demo proof of concepts for specific
+
+554
+00:18:52.960 --> 00:18:56.960
+parts of your work. Even if you're doing
+
+555
+00:18:54.799 --> 00:18:59.280
+backend work, DevOps work, product work,
+
+556
+00:18:56.960 --> 00:19:02.960
+and of course UI work. It's nice to have
+
+557
+00:18:59.280 --> 00:19:05.120
+HTML prototypes rendered into your plan.
+
+558
+00:19:02.960 --> 00:19:07.039
+I'm using visual prompts a lot more and
+
+559
+00:19:05.120 --> 00:19:08.559
+I'm throwing in some HTML where it makes
+
+560
+00:19:07.039 --> 00:19:11.039
+sense right especially for front-end
+
+561
+00:19:08.559 --> 00:19:13.520
+work HTML specs very powerful but a lot
+
+562
+00:19:11.039 --> 00:19:15.200
+of the times text is enough in agentic
+
+563
+00:19:13.520 --> 00:19:16.880
+engineering if you're doing it right
+
+564
+00:19:15.200 --> 00:19:18.400
+you're probably stuck in one of two
+
+565
+00:19:16.880 --> 00:19:20.480
+places right there are two constraints
+
+566
+00:19:18.400 --> 00:19:22.640
+of agentic engineering it's planning and
+
+567
+00:19:20.480 --> 00:19:25.440
+reviewing these types of visual specs
+
+568
+00:19:22.640 --> 00:19:27.679
+these HTML specs they really really help
+
+569
+00:19:25.440 --> 00:19:29.679
+with the planning side of things and it
+
+570
+00:19:27.679 --> 00:19:32.559
+just comes down to the fact of do you
+
+571
+00:19:29.679 --> 00:19:34.480
+know the performance speed cost tradeoff
+
+572
+00:19:32.559 --> 00:19:36.880
+off of using each one of these different
+
+573
+00:19:34.480 --> 00:19:39.520
+plan types with each different prompt
+
+574
+00:19:36.880 --> 00:19:41.360
+you're comparing against and skills and
+
+575
+00:19:39.520 --> 00:19:42.799
+agentic workflows and software factories
+
+576
+00:19:41.360 --> 00:19:45.360
+and so on and so forth. It all comes
+
+577
+00:19:42.799 --> 00:19:48.640
+back to your ability to truly understand
+
+578
+00:19:45.360 --> 00:19:50.400
+the internals and the uh trace of how
+
+579
+00:19:48.640 --> 00:19:52.160
+your agent got to the result and what it
+
+580
+00:19:50.400 --> 00:19:55.200
+cost them to get that result. Agent
+
+581
+00:19:52.160 --> 00:19:58.000
+observability is at the center of this.
+
+582
+00:19:55.200 --> 00:19:59.919
+I myself need this for engineering but
+
+583
+00:19:58.000 --> 00:20:01.520
+specifically for product work that I
+
+584
+00:19:59.919 --> 00:20:03.360
+have upcoming that I'm working on. I'm
+
+585
+00:20:01.520 --> 00:20:05.360
+getting into that really important phase
+
+586
+00:20:03.360 --> 00:20:07.360
+where I need to compare the performance
+
+587
+00:20:05.360 --> 00:20:09.440
+of different models. Not just on can
+
+588
+00:20:07.360 --> 00:20:11.600
+they do the job, but how quickly and how
+
+589
+00:20:09.440 --> 00:20:13.840
+much does it cost. This is the trade-off
+
+590
+00:20:11.600 --> 00:20:15.600
+trifecta. You need to understand the
+
+591
+00:20:13.840 --> 00:20:17.200
+tradeoffs, right? Engineering is all
+
+592
+00:20:15.600 --> 00:20:18.720
+about making the right trade-offs for
+
+593
+00:20:17.200 --> 00:20:20.000
+your work, for your products, for your
+
+594
+00:20:18.720 --> 00:20:22.000
+customers, for your users, for your
+
+595
+00:20:20.000 --> 00:20:24.400
+company. Again, just one more time, you
+
+596
+00:20:22.000 --> 00:20:25.840
+know, there's a million observability
+
+597
+00:20:24.400 --> 00:20:27.440
+tools. I'm not trying to sell you on
+
+598
+00:20:25.840 --> 00:20:29.280
+mine. I'm just trying to communicate the
+
+599
+00:20:27.440 --> 00:20:31.200
+importance and the idea here. If you
+
+600
+00:20:29.280 --> 00:20:32.480
+don't measure it, you cannot improve it.
+
+601
+00:20:31.200 --> 00:20:34.559
+Uh if you like this video, if you like
+
+602
+00:20:32.480 --> 00:20:37.200
+this idea, like, subscribe, join the
+
+603
+00:20:34.559 --> 00:20:39.360
+journey. With a single PI coding agent
+
+604
+00:20:37.200 --> 00:20:42.320
+extension that we can pull up right
+
+605
+00:20:39.360 --> 00:20:45.360
+here, extension PI observability and
+
+606
+00:20:42.320 --> 00:20:48.000
+with a single user interface, I'm able
+
+607
+00:20:45.360 --> 00:20:49.440
+to now capture all the events of every
+
+608
+00:20:48.000 --> 00:20:50.720
+one of my agents that executes. And
+
+609
+00:20:49.440 --> 00:20:52.799
+again, you know, refocusing on the PI
+
+610
+00:20:50.720 --> 00:20:56.159
+coding agent, this tool allows us to
+
+611
+00:20:52.799 --> 00:20:58.320
+build and use extensible software. It
+
+612
+00:20:56.159 --> 00:21:00.799
+allows us to build our own custom Asian
+
+613
+00:20:58.320 --> 00:21:03.280
+harnesses and customize them just like
+
+614
+00:21:00.799 --> 00:21:06.240
+we need to. This really helps us get at
+
+615
+00:21:03.280 --> 00:21:08.960
+that idea of understanding the uh
+
+616
+00:21:06.240 --> 00:21:10.559
+tokconomics of the work we're doing. In
+
+617
+00:21:08.960 --> 00:21:11.919
+our previous video, we talked about the
+
+618
+00:21:10.559 --> 00:21:13.440
+single most important thing for senior
+
+619
+00:21:11.919 --> 00:21:15.039
+engineers to be focused on. And this was
+
+620
+00:21:13.440 --> 00:21:17.280
+one of the key ideas. The first step
+
+621
+00:21:15.039 --> 00:21:18.960
+here is to use more tokens. The next
+
+622
+00:21:17.280 --> 00:21:20.640
+step is to generate value from the
+
+623
+00:21:18.960 --> 00:21:23.360
+tokens you've created. And then the
+
+624
+00:21:20.640 --> 00:21:25.520
+final step is to actually arbitrage your
+
+625
+00:21:23.360 --> 00:21:27.120
+tokens is to capture the revenue, right?
+
+626
+00:21:25.520 --> 00:21:28.880
+capture the value that you're generating
+
+627
+00:21:27.120 --> 00:21:30.320
+usually in the form of of cash, right?
+
+628
+00:21:28.880 --> 00:21:31.840
+Revenue from your product. This is the
+
+629
+00:21:30.320 --> 00:21:33.679
+agentic value chain, right? This is
+
+630
+00:21:31.840 --> 00:21:35.120
+tokconomics, right? You want to move up
+
+631
+00:21:33.679 --> 00:21:36.960
+this chain. You don't want to just be
+
+632
+00:21:35.120 --> 00:21:39.120
+stuck at the bottom here token maxing.
+
+633
+00:21:36.960 --> 00:21:40.720
+You want to move upwards. And the only
+
+634
+00:21:39.120 --> 00:21:42.000
+way to do this, right? We talked about
+
+635
+00:21:40.720 --> 00:21:43.600
+this last week and we're doubling down
+
+636
+00:21:42.000 --> 00:21:46.240
+on this idea. Everything is connected
+
+637
+00:21:43.600 --> 00:21:48.400
+here. This channel is a chain of steps
+
+638
+00:21:46.240 --> 00:21:50.559
+to become the greatest agentic engineer
+
+639
+00:21:48.400 --> 00:21:52.640
+possible. We need agent observability to
+
+640
+00:21:50.559 --> 00:21:55.280
+help us get to this place where we can
+
+641
+00:21:52.640 --> 00:21:56.880
+arbitrage our tokens. It's not enough to
+
+642
+00:21:55.280 --> 00:21:58.159
+be able to just run a bunch of agents,
+
+643
+00:21:56.880 --> 00:22:00.000
+right? That's cool. Great place to
+
+644
+00:21:58.159 --> 00:22:01.600
+start. Terrible place to end. We need
+
+645
+00:22:00.000 --> 00:22:03.360
+valuable agents and then we need to
+
+646
+00:22:01.600 --> 00:22:05.760
+capture the value of the agents. Step
+
+647
+00:22:03.360 --> 00:22:07.280
+one, use the tokens. Step two, generate
+
+648
+00:22:05.760 --> 00:22:09.360
+value from the tokens. Step three,
+
+649
+00:22:07.280 --> 00:22:11.520
+capture the revenue of the value
+
+650
+00:22:09.360 --> 00:22:13.840
+generated from your tokens. I have this
+
+651
+00:22:11.520 --> 00:22:15.760
+on now in every single agent by just
+
+652
+00:22:13.840 --> 00:22:17.919
+plugging in this extension where we're
+
+653
+00:22:15.760 --> 00:22:19.760
+building slices of composable
+
+654
+00:22:17.919 --> 00:22:21.600
+customization thanks to the PI agent
+
+655
+00:22:19.760 --> 00:22:23.039
+harness. I'm stacking up these extension
+
+656
+00:22:21.600 --> 00:22:24.960
+as I mentioned, you know, and this is
+
+657
+00:22:23.039 --> 00:22:26.159
+true. Uh maybe you can tell from
+
+658
+00:22:24.960 --> 00:22:28.400
+watching, you know, videos week after
+
+659
+00:22:26.159 --> 00:22:30.000
+week. I'm building a new agent harness
+
+660
+00:22:28.400 --> 00:22:32.559
+every single week. I'm building a new
+
+661
+00:22:30.000 --> 00:22:34.159
+slice of composibility that I'm adding.
+
+662
+00:22:32.559 --> 00:22:35.600
+Some are hitters, some are losers,
+
+663
+00:22:34.159 --> 00:22:38.320
+right? If I show you my terminal here,
+
+664
+00:22:35.600 --> 00:22:40.480
+right? I've got my PI communications
+
+665
+00:22:38.320 --> 00:22:42.880
+network here that has been super super
+
+666
+00:22:40.480 --> 00:22:44.960
+valuable, right? Paying agents via com
+
+667
+00:22:42.880 --> 00:22:47.120
+system. Say hi. This has been ultra
+
+668
+00:22:44.960 --> 00:22:49.120
+valuable. Any agent can coordinate with
+
+669
+00:22:47.120 --> 00:22:50.480
+any other agent and this is just on all
+
+670
+00:22:49.120 --> 00:22:52.000
+the time, right? So you can see there my
+
+671
+00:22:50.480 --> 00:22:53.840
+agents talking to each other. This is a
+
+672
+00:22:52.000 --> 00:22:55.520
+flat agent communication. I'll link this
+
+673
+00:22:53.840 --> 00:22:58.000
+video. You can see the responses came
+
+674
+00:22:55.520 --> 00:23:00.159
+back. And this is just, you know, one
+
+675
+00:22:58.000 --> 00:23:01.760
+additional advantage I'm stacking up for
+
+676
+00:23:00.159 --> 00:23:03.440
+my agents and I want to share it all
+
+677
+00:23:01.760 --> 00:23:05.280
+here with you on the channel. So links
+
+678
+00:23:03.440 --> 00:23:06.640
+to the PI observability codebase is
+
+679
+00:23:05.280 --> 00:23:08.480
+going to be in the description for you.
+
+680
+00:23:06.640 --> 00:23:10.559
+We didn't go into too much of the prompt
+
+681
+00:23:08.480 --> 00:23:12.320
+details because it's here for you. If
+
+682
+00:23:10.559 --> 00:23:14.960
+you look at docloud skills, you'll see
+
+683
+00:23:12.320 --> 00:23:18.240
+HTML spec, you'll see HTML vspec, visual
+
+684
+00:23:14.960 --> 00:23:20.480
+spec, and I have my markdown vspec
+
+685
+00:23:18.240 --> 00:23:22.400
+prompt that I use to generate markdown
+
+686
+00:23:20.480 --> 00:23:24.640
+prompts with images. So, still
+
+687
+00:23:22.400 --> 00:23:26.320
+generating useful, valuable tokens
+
+688
+00:23:24.640 --> 00:23:27.600
+inside of the plan, inside this
+
+689
+00:23:26.320 --> 00:23:28.640
+codebase. We'll have the extension here.
+
+690
+00:23:27.600 --> 00:23:31.280
+And of course, you'll also have access
+
+691
+00:23:28.640 --> 00:23:32.640
+to the Steelman web UI. So, you can just
+
+692
+00:23:31.280 --> 00:23:34.080
+test this out. Um, you know, it's a
+
+693
+00:23:32.640 --> 00:23:35.760
+starting place. I highly recommend you
+
+694
+00:23:34.080 --> 00:23:37.360
+think of every piece of code you see,
+
+695
+00:23:35.760 --> 00:23:40.000
+every open source project, everything
+
+696
+00:23:37.360 --> 00:23:41.600
+you're intaking as an option. With the
+
+697
+00:23:40.000 --> 00:23:43.200
+option, you can take it, you can adapt
+
+698
+00:23:41.600 --> 00:23:44.480
+it with your agents. Take it, make it
+
+699
+00:23:43.200 --> 00:23:45.760
+your own, improve it, do your thing with
+
+700
+00:23:44.480 --> 00:23:47.360
+it. I'm going to do the exact same
+
+701
+00:23:45.760 --> 00:23:50.320
+thing. I'm going to specialize the PI
+
+702
+00:23:47.360 --> 00:23:52.559
+observability UI and agents and push
+
+703
+00:23:50.320 --> 00:23:54.720
+them uh to really serve the exact use
+
+704
+00:23:52.559 --> 00:23:57.520
+cases I need solved. If we look at the
+
+705
+00:23:54.720 --> 00:23:58.880
+future of where this is going, I think a
+
+706
+00:23:57.520 --> 00:24:00.559
+lot of things are just going to be the
+
+707
+00:23:58.880 --> 00:24:01.520
+same, but a little better and a little
+
+708
+00:24:00.559 --> 00:24:03.039
+better and a little better.
+
+709
+00:24:01.520 --> 00:24:05.120
+Specifically, when we talk about specs,
+
+710
+00:24:03.039 --> 00:24:08.799
+it's clear that multimodal specs, giving
+
+711
+00:24:05.120 --> 00:24:10.320
+your agents text, image, audio, video as
+
+712
+00:24:08.799 --> 00:24:12.559
+part of your plans is going to be more
+
+713
+00:24:10.320 --> 00:24:14.640
+and more valuable. And the leader here
+
+714
+00:24:12.559 --> 00:24:16.799
+is going to be the Gemini models, right?
+
+715
+00:24:14.640 --> 00:24:19.039
+They just have the advantage on
+
+716
+00:24:16.799 --> 00:24:20.480
+multimodal. I mean, they have YouTube to
+
+717
+00:24:19.039 --> 00:24:22.400
+train on for God's sake, right? The
+
+718
+00:24:20.480 --> 00:24:24.400
+advantage is going to remain there. It
+
+719
+00:24:22.400 --> 00:24:27.279
+is pretty clear that uh these models are
+
+720
+00:24:24.400 --> 00:24:29.039
+starting to specialize and really start
+
+721
+00:24:27.279 --> 00:24:31.600
+carving out their own areas of
+
+722
+00:24:29.039 --> 00:24:33.600
+expertise. you know, Gemini 3.5 flash
+
+723
+00:24:31.600 --> 00:24:36.400
+top tier model. Pretty impressive that
+
+724
+00:24:33.600 --> 00:24:38.240
+OpenAI is doing a GBT 5.5, you know,
+
+725
+00:24:36.400 --> 00:24:40.320
+pretty cracked engineering model and
+
+726
+00:24:38.240 --> 00:24:42.159
+they're still putting out insane image
+
+727
+00:24:40.320 --> 00:24:44.720
+models. And of course, Gemini put out
+
+728
+00:24:42.159 --> 00:24:46.799
+that new Omni model. So, you know, lots
+
+729
+00:24:44.720 --> 00:24:48.640
+going on, lots more to see. This is our
+
+730
+00:24:46.799 --> 00:24:51.520
+bread and butter here, guys. We ingest
+
+731
+00:24:48.640 --> 00:24:53.840
+every model. We ingest every aentic
+
+732
+00:24:51.520 --> 00:24:55.840
+engineering idea on this channel and
+
+733
+00:24:53.840 --> 00:24:57.600
+then we synthesize to make it useful and
+
+734
+00:24:55.840 --> 00:24:59.679
+valuable. None of this stuff matters if
+
+735
+00:24:57.600 --> 00:25:01.919
+you can't build it into your work for
+
+736
+00:24:59.679 --> 00:25:03.679
+you, your team, your company, and
+
+737
+00:25:01.919 --> 00:25:05.279
+ultimately your customers. If you want
+
+738
+00:25:03.679 --> 00:25:06.400
+to win, you got to measure this stuff,
+
+739
+00:25:05.279 --> 00:25:08.320
+especially if you want to get your
+
+740
+00:25:06.400 --> 00:25:10.400
+agents into products. You want to
+
+741
+00:25:08.320 --> 00:25:12.799
+balance the trade-off trifecta,
+
+742
+00:25:10.400 --> 00:25:14.320
+performance, speed, and cost. You don't
+
+743
+00:25:12.799 --> 00:25:17.120
+just want to spend tokens. You want to
+
+744
+00:25:14.320 --> 00:25:19.679
+spend tokens that are valuable, and then
+
+745
+00:25:17.120 --> 00:25:20.720
+arbitrage that value. All right, you
+
+746
+00:25:19.679 --> 00:25:25.880
+know where to find me every single
+
+747
+00:25:20.720 --> 00:25:25.880
+Monday. Stay focused and keep building.

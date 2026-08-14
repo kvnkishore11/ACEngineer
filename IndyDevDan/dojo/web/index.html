@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Agentic Dojo</title>
+<style>
+:root{
+  --paper:#faf6ef; --paper-2:#f1ead9; --ink:#2b2620; --dim:#8a7f6e;
+  --clay:#c05b3c; --clay-2:#d97757; --olive:#6a7f3f; --blue:#3f6a8a; --amber:#b98a2f; --rose:#a8455a;
+  --dark:#221d17; --on-dark:#efe7d8; --line:#e2d8c3; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);height:100vh;display:flex;overflow:hidden}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:7px 14px;transition:all .15s}
+button:hover{border-color:var(--clay);color:var(--clay)}
+button:active{transform:translateY(1px)}
+button.primary{background:var(--clay);border-color:var(--clay);color:#fff;font-weight:600}
+button.primary:hover{background:var(--clay-2);color:#fff}
+button:disabled{opacity:.45;cursor:default;transform:none}
+kbd{font-family:var(--mono);font-size:11px;background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+
+/* ---- rail ---- */
+#rail{width:284px;min-width:284px;background:var(--dark);color:var(--on-dark);display:flex;flex-direction:column;padding:18px 0}
+.brand{display:flex;gap:12px;align-items:center;padding:4px 18px 14px}
+.mark{width:40px;height:40px;border-radius:10px;background:var(--clay);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-family:var(--serif)}
+.bt{font-weight:650;font-size:15px}.bs{font-size:11.5px;color:#a99e8c}
+.progresswrap{padding:0 18px 14px}
+.pbar{height:6px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--clay),var(--clay-2));border-radius:4px;transition:width .5s ease}
+.plabel{font-family:var(--mono);font-size:11px;color:#a99e8c;margin-top:6px}
+#lessonlist{flex:1;overflow-y:auto;padding:4px 10px}
+.litem{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;color:var(--on-dark);
+  padding:9px 10px;border-radius:8px;font-size:13px;margin:1px 0}
+.litem:hover{background:rgba(255,255,255,.07);color:var(--on-dark)}
+.litem.active{background:rgba(217,119,87,.18)}
+.dot{width:9px;min-width:9px;height:9px;border-radius:50%;border:1.5px solid #6d6252;background:transparent}
+.dot.passed{background:var(--olive);border-color:var(--olive)}
+.dot.failing{background:var(--clay);border-color:var(--clay)}
+.lnn{font-family:var(--mono);font-size:11px;color:#a99e8c;min-width:18px}
+.lname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lblanks{font-family:var(--mono);font-size:10px;color:#847a68}
+.railfoot{padding:12px 18px 2px;font-size:11px;color:#847a68;line-height:1.7;border-top:1px solid rgba(255,255,255,.08)}
+
+/* ---- main ---- */
+#main{flex:1;display:flex;flex-direction:column;min-width:0}
+#topbar{display:flex;align-items:center;gap:10px;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--paper)}
+#lessontitle{font-family:var(--serif);font-size:20px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lessontitle em{color:var(--clay);font-style:italic}
+#tabs{display:flex;gap:2px;padding:10px 22px 0;border-bottom:1px solid var(--line);background:var(--paper)}
+.tab{border:1px solid transparent;border-bottom:none;background:none;border-radius:8px 8px 0 0;padding:8px 16px;font-size:13px;color:var(--dim)}
+.tab.active{background:#fff;border-color:var(--line);color:var(--ink);font-weight:600}
+#content{flex:1;display:flex;flex-direction:row;min-height:0;background:#fff}
+#colmain{flex:1;display:flex;flex-direction:column;min-height:0;min-width:0}
+
+/* mission panel */
+#mission{width:310px;min-width:270px;border-left:1px solid var(--line);background:var(--paper);padding:20px 18px;overflow-y:auto}
+#mission h3{font-family:var(--serif);font-size:16px;margin-bottom:12px;color:var(--clay)}
+.mstep{display:flex;gap:10px;margin:0 0 14px}
+.msn{width:22px;min-width:22px;height:22px;border-radius:50%;background:var(--clay);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.mstep.done .msn{background:var(--olive)}
+.msb{font-size:13px;line-height:1.5}
+.msb b{font-weight:650}
+.mfile{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font-family:var(--mono);font-size:12px;
+  padding:6px 10px;margin:5px 0;border-radius:8px;background:#fff}
+.mfile .mb{margin-left:auto;background:var(--amber);color:#fff;border-radius:8px;padding:0 7px;font-size:10.5px;font-weight:700}
+.mfile.clear .mb{background:var(--olive)}
+.mgo{width:100%;margin-top:6px}
+.mnote{font-size:12px;color:var(--dim);line-height:1.55;margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:1100px){#mission{display:none}}
+
+/* brief */
+#brief{display:none;flex:1;min-height:0;overflow-y:auto;padding:28px 40px;line-height:1.65;font-size:15px}
+#brief > *{max-width:780px;margin-left:auto;margin-right:auto}
+#brief h1{font-family:var(--serif);font-size:28px;margin:4px auto 14px}
+#brief h2{font-family:var(--serif);font-size:19px;margin:26px auto 8px;color:var(--clay)}
+#brief p{margin:10px auto}
+#brief ul,#brief ol{margin:10px auto;padding-left:24px}
+#brief li{margin:4px 0}
+#brief code{font-family:var(--mono);font-size:12.5px;background:var(--paper-2);padding:1px 6px;border-radius:5px}
+#brief pre{background:var(--dark);color:var(--on-dark);padding:14px 16px;border-radius:10px;overflow-x:auto;margin:12px auto;font-family:var(--mono);font-size:12.5px;line-height:1.55}
+#brief pre code{background:none;color:inherit;padding:0}
+#brief blockquote{border-left:3px solid var(--clay);padding-left:14px;color:var(--dim);font-style:italic;margin:12px auto}
+#brief table{border-collapse:collapse;margin:12px auto;font-size:13.5px}
+#brief th,#brief td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+#brief th{background:var(--paper-2)}
+
+/* files */
+#files{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}
+#filechips{display:flex;gap:6px;flex-wrap:wrap;padding:12px 22px;border-bottom:1px solid var(--line)}
+.chip{font-family:var(--mono);font-size:12px;padding:5px 12px;border-radius:16px}
+.chip.mission{border-color:var(--clay)}
+.chip.active{background:var(--clay);border-color:var(--clay);color:#fff}
+.chip .b{display:inline-block;margin-left:7px;background:var(--amber);color:#fff;border-radius:8px;padding:0 6px;font-size:10px}
+.chip.active .b{background:rgba(255,255,255,.3)}
+.chip.ro{opacity:.6}
+#editorwrap{flex:1;display:flex;min-height:0;position:relative}
+#editor{flex:1;font-family:var(--mono);font-size:13px;line-height:1.6;padding:18px 22px;border:none;outline:none;resize:none;
+  background:#fffdf8;color:var(--ink);white-space:pre;overflow:auto;tab-size:4}
+#editor:read-only{background:var(--paper-2);color:var(--dim)}
+#editorbar{display:flex;align-items:center;gap:12px;padding:8px 22px;border-top:1px solid var(--line);font-size:12px;color:var(--dim)}
+#dirty{color:var(--amber);font-weight:600;visibility:hidden}
+#roflag{color:var(--dim);display:none}
+
+/* console */
+#console{height:230px;min-height:120px;background:var(--dark);color:var(--on-dark);display:flex;flex-direction:column;border-top:3px solid var(--clay)}
+#conshead{display:flex;align-items:center;gap:10px;padding:8px 18px;font-family:var(--mono);font-size:11px;color:#a99e8c;border-bottom:1px solid rgba(255,255,255,.08)}
+#consout{flex:1;overflow-y:auto;padding:12px 18px;font-family:var(--mono);font-size:12.5px;line-height:1.6;white-space:pre-wrap}
+#consout .pass{color:#9fbf6a;font-weight:700}
+#consout .fail{color:#e88b6f;font-weight:700}
+#consout .add{color:#9fbf6a}
+#consout .del{color:#e88b6f}
+#consout .hunk{color:#7da7c7}
+#consout .hint-h{color:var(--clay-2);font-weight:700}
+#consout .muted{color:#847a68}
+
+/* pass banner */
+#banner{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-80px);background:var(--olive);color:#fff;
+  padding:12px 26px;border-radius:12px;font-weight:650;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .4s cubic-bezier(.2,1.4,.4,1);z-index:50}
+#banner.show{transform:translateX(-50%) translateY(0)}
+#banner.oops{background:var(--rose)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<aside id="rail">
+  <div class="brand">
+    <div class="mark">道</div>
+    <div><div class="bt">The Agentic Dojo</div><div class="bs">learn to think like Dan</div></div>
+  </div>
+  <div class="progresswrap">
+    <div class="pbar"><i id="pfill" style="width:0%"></i></div>
+    <div class="plabel" id="plabel">…</div>
+  </div>
+  <nav id="lessonlist"></nav>
+  <div class="railfoot">
+    <kbd>⌘S</kbd> save · <kbd>⌘⏎</kbd> check<br>
+    fill the blanks · close the loop · climb
+  </div>
+</aside>
+
+<main id="main">
+  <div id="topbar">
+    <div id="lessontitle">loading…</div>
+    <button id="btnhint">Hint <span id="hintcount"></span></button>
+    <button id="btndiff">Diff</button>
+    <button id="btnreset">Reset</button>
+    <button id="btncheck" class="primary">Check ▸</button>
+  </div>
+  <div id="tabs">
+    <button class="tab active" data-tab="brief">Brief</button>
+    <button class="tab" data-tab="files">Files</button>
+  </div>
+  <div id="content">
+    <div id="colmain">
+      <div id="brief"></div>
+      <div id="files">
+        <div id="filechips"></div>
+        <div id="editorwrap"><textarea id="editor" spellcheck="false"></textarea></div>
+        <div id="editorbar">
+          <span id="filelabel"></span>
+          <span id="dirty">● unsaved</span>
+          <span id="roflag">read-only — part of the dojo itself</span>
+          <span style="flex:1"></span>
+          <button id="btnblank">→ next blank</button>
+          <button id="btnsave">Save</button>
+        </div>
+      </div>
+    </div>
+    <aside id="mission"></aside>
+  </div>
+  <div id="console">
+    <div id="conshead"><span>closed loop</span><span id="consstate"></span></div>
+    <div id="consout"><span class="muted">Pick a lesson, fill the blanks in Files, then hit Check ▸ — the failures teach.</span></div>
+  </div>
+</main>
+
+<div id="banner"></div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const api = async (path, opts) => {
+  const r = await fetch(path, opts);
+  const j = await r.json().catch(() => ({error:'bad response'}));
+  if (!r.ok) throw new Error(j.error || r.status);
+  return j;
+};
+
+let state = { lesson:null, files:[], active:null, dirtyPaths:new Set(), hintsSeen:0, hintsTotal:0, status:null };
+
+/* ---------- markdown mini-renderer ---------- */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function inline(s){
+  return s
+    .replace(/`([^`]+)`/g, (_,c)=>'<code>'+c+'</code>')
+    .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g,'<em>$1</em>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>');
+}
+function mdRender(src){
+  const lines = src.split('\n'); const out=[]; let i=0;
+  while(i<lines.length){
+    let L=lines[i];
+    if(L.startsWith('```')){ const buf=[]; i++;
+      while(i<lines.length && !lines[i].startsWith('```')){buf.push(lines[i]);i++;}
+      i++; out.push('<pre><code>'+esc(buf.join('\n'))+'</code></pre>'); continue; }
+    if(/^#{1,3} /.test(L)){ const n=L.match(/^#+/)[0].length;
+      out.push(`<h${n}>`+inline(esc(L.replace(/^#+ /,'')))+`</h${n}>`); i++; continue; }
+    if(/^\s*[-*] /.test(L)){ const buf=[];
+      while(i<lines.length && /^\s*[-*] /.test(lines[i])){buf.push('<li>'+inline(esc(lines[i].replace(/^\s*[-*] /,'')))+'</li>');i++;}
+      out.push('<ul>'+buf.join('')+'</ul>'); continue; }
+    if(/^\s*\d+\. /.test(L)){ const buf=[];
+      while(i<lines.length && /^\s*\d+\. /.test(lines[i])){buf.push('<li>'+inline(esc(lines[i].replace(/^\s*\d+\. /,'')))+'</li>');i++;}
+      out.push('<ol>'+buf.join('')+'</ol>'); continue; }
+    if(/^\|/.test(L)){ const rows=[];
+      while(i<lines.length && /^\|/.test(lines[i])){rows.push(lines[i]);i++;}
+      const cells=r=>r.replace(/^\||\|$/g,'').split('|').map(c=>inline(esc(c.trim())));
+      let html='<table>';
+      rows.forEach((r,ri)=>{ if(/^\|[\s:-]+\|/.test(r)&&ri===1) return;
+        const tag = ri===0?'th':'td';
+        html+='<tr>'+cells(r).map(c=>`<${tag}>`+c+`</${tag}>`).join('')+'</tr>'; });
+      out.push(html+'</table>'); continue; }
+    if(/^> /.test(L)){ const buf=[];
+      while(i<lines.length && /^> /.test(lines[i])){buf.push(inline(esc(lines[i].slice(2))));i++;}
+      out.push('<blockquote>'+buf.join('<br>')+'</blockquote>'); continue; }
+    if(L.trim()===''){ i++; continue; }
+    const buf=[];
+    while(i<lines.length && lines[i].trim()!=='' && !/^(#{1,3} |```|[-*] |\d+\. |\||> )/.test(lines[i])){buf.push(lines[i]);i++;}
+    out.push('<p>'+inline(esc(buf.join(' ')))+'</p>');
+  }
+  return out.join('\n');
+}
+
+/* ---------- console ---------- */
+function consoleWrite(text, kind){
+  const el = $('consout'); el.innerHTML='';
+  const frag = document.createDocumentFragment();
+  text.split('\n').forEach(line=>{
+    const span=document.createElement('span');
+    if(kind==='diff'){
+      span.className = line.startsWith('+')?'add':line.startsWith('-')?'del':line.startsWith('@@')?'hunk':'muted';
+    } else if(kind==='hint'){
+      span.className = line.startsWith('##')?'hint-h':'';
+    } else {
+      span.className = line.includes('✅')?'pass':line.includes('❌')?'fail':'';
+    }
+    span.textContent=line+'\n'; frag.appendChild(span);
+  });
+  el.appendChild(frag); el.scrollTop=0;
+}
+function banner(msg, oops){
+  const b=$('banner'); b.textContent=msg; b.className=oops?'oops show':'show';
+  clearTimeout(banner._t); banner._t=setTimeout(()=>b.classList.remove('show'), 2600);
+}
+
+/* ---------- rail / status ---------- */
+async function refreshStatus(keepSelection){
+  const s = await api('/api/status'); state.status=s;
+  $('pfill').style.width = (100*s.passed/s.total)+'%';
+  $('plabel').textContent = `${s.passed}/${s.total} lessons passed`;
+  const list=$('lessonlist'); list.innerHTML='';
+  s.lessons.forEach(l=>{
+    const b=document.createElement('button'); b.className='litem'+(state.lesson===l.name?' active':'');
+    b.innerHTML=`<span class="dot ${l.state}"></span><span class="lnn">${l.nn}</span>
+      <span class="lname">${l.name.slice(3).replace(/-/g,' ')}</span>
+      <span class="lblanks">${l.state==='passed'?'✓':(l.blanks? l.blanks+' ▢':'')}</span>`;
+    b.onclick=()=>loadLesson(l.nn);
+    list.appendChild(b);
+  });
+  if(!keepSelection && !state.lesson && s.next) loadLesson(s.next.slice(0,2));
+}
+
+/* ---------- lesson ---------- */
+async function loadLesson(nn){
+  const d = await api('/api/lesson/'+nn);
+  state.lesson=d.name; state.files=d.files; state.dirtyPaths.clear();
+  state.hintsSeen=d.hints_seen; state.hintsTotal=d.hints_total;
+  $('hintcount').textContent = `${Math.min(state.hintsSeen,state.hintsTotal)}/${state.hintsTotal}`;
+  const title=d.readme.split('\n').find(l=>l.startsWith('# '))||('# '+d.name);
+  $('lessontitle').innerHTML=inline(esc(title.slice(2)));
+  $('brief').innerHTML=mdRender(d.readme);
+  buildChips();
+  const firstMission=state.files.find(f=>f.mission&&f.editable)||state.files[0];
+  openFile(firstMission?firstMission.path:null);
+  showTab('brief');
+  await refreshStatus(true);
+  renderMission();
+  consoleWrite('Lesson '+d.name+' loaded. Read the Brief, fill the blanks in Files, then Check ▸.','');
+}
+function buildChips(){
+  const wrap=$('filechips'); wrap.innerHTML='';
+  state.files.forEach(f=>{
+    const c=document.createElement('button');
+    c.className='chip'+(f.mission?' mission':'')+(f.path===state.active?' active':'')+(f.editable?'':' ro');
+    c.innerHTML=esc(f.path)+(f.blanks?`<span class="b">${f.blanks}</span>`:'');
+    c.onclick=()=>{maybeSaveThen(()=>openFile(f.path));};
+    wrap.appendChild(c);
+  });
+}
+function renderMission(){
+  const m=$('mission'); if(!state.lesson){m.innerHTML='';return;}
+  const missionFiles=state.files.filter(f=>f.mission&&f.editable);
+  const totalBlanks=missionFiles.reduce((n,f)=>n+f.blanks,0);
+  const passed=state.status&&state.status.lessons.find(l=>l.name===state.lesson&&l.state==='passed');
+  const fileRows=missionFiles.map(f=>
+    `<button class="mfile ${f.blanks===0?'clear':''}" data-open="${esc(f.path)}">${esc(f.path)}
+       <span class="mb">${f.blanks===0?'✓ filled':f.blanks+' blank'+(f.blanks>1?'s':'')}</span></button>`).join('');
+  m.innerHTML=`
+    <h3>What to do now</h3>
+    <div class="mstep"><span class="msn">1</span><div class="msb">
+      <b>Read the Brief</b> — the idea, what Dan did, and your mission.
+      <button class="mgo" data-act="brief">Open the Brief</button></div></div>
+    <div class="mstep ${totalBlanks===0?'done':''}"><span class="msn">2</span><div class="msb">
+      <b>Fill the blanks</b> — every <span style="font-family:var(--mono)">____</span> has a
+      <span style="font-family:var(--mono)">YOUR TURN:</span> comment telling you what goes there.
+      ${fileRows}</div></div>
+    <div class="mstep ${passed?'done':''}"><span class="msn">3</span><div class="msb">
+      <b>Run the check</b> — failures are the teacher; read them, fix, run again.
+      <button class="mgo primary" data-act="check">Check ▸</button></div></div>
+    <div class="mnote">Stuck? <b>Hint</b> (top right) reveals progressively — nudge first, near-answer last.
+      <b>Diff</b> shows the solution; save it for a last resort. <b>Reset</b> restores the starter.<br><br>
+      Pass all 12 and you'll have built Dan's entire toolkit with your own hands.</div>`;
+  m.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{showTab('files');maybeSaveThen(()=>openFile(b.dataset.open));});
+  m.querySelector('[data-act="brief"]').onclick=()=>showTab('brief');
+  m.querySelector('[data-act="check"]').onclick=doCheck;
+}
+function jumpToBlank(){
+  const ed=$('editor'); const from=ed.selectionEnd||0;
+  let idx=ed.value.indexOf('____', from);
+  if(idx===-1) idx=ed.value.indexOf('____');
+  if(idx===-1){banner('no blanks left in this file — hit Check ▸');return;}
+  ed.focus(); ed.setSelectionRange(idx, idx+4);
+  const line=ed.value.slice(0,idx).split('\n').length;
+  ed.scrollTop=Math.max(0,(line-6)*parseFloat(getComputedStyle(ed).lineHeight||'21'));
+}
+function currentFile(){ return state.files.find(f=>f.path===state.active); }
+function openFile(path){
+  state.active=path; const f=currentFile(); buildChips();
+  const ed=$('editor');
+  if(!f){ed.value='';return;}
+  ed.value=f.content; ed.readOnly=!f.editable;
+  $('filelabel').textContent=f.path; $('roflag').style.display=f.editable?'none':'inline';
+  $('dirty').style.visibility='hidden';
+}
+async function saveActive(){
+  const f=currentFile(); if(!f||!f.editable) return true;
+  const content=$('editor').value;
+  if(content===f.content){$('dirty').style.visibility='hidden';return true;}
+  try{
+    const r=await api('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({lesson:state.lesson,path:f.path,content})});
+    f.content=content; f.blanks=r.blanks; f.mission=f.mission||r.blanks>0;
+    state.dirtyPaths.delete(f.path); $('dirty').style.visibility='hidden'; buildChips(); renderMission();
+    return true;
+  }catch(e){banner('save failed: '+e.message,true);return false;}
+}
+function maybeSaveThen(fn){ saveActive().then(ok=>{if(ok)fn();}); }
+
+/* ---------- actions ---------- */
+async function doCheck(){
+  const btn=$('btncheck'); btn.disabled=true; btn.innerHTML='Checking <span class="spin"></span>';
+  $('consstate').textContent='running check.py …';
+  try{
+    await saveActive();
+    const nn=state.lesson.slice(0,2);
+    const r=await api('/api/check/'+nn,{method:'POST'});
+    consoleWrite(r.output,'check');
+    $('consstate').textContent=r.pass?'PASS':'FAIL';
+    if(r.pass){ banner('✅ Lesson passed — press Next in the rail or pick the next dot');
+      await refreshStatus(true); renderMission();
+      const s=state.status;
+      if(s.next && s.next!==state.lesson) setTimeout(()=>{ if(confirm('Passed! Jump to '+s.next+'?')) loadLesson(s.next.slice(0,2)); }, 600);
+      else if(!s.next) banner('🏆 12/12 — the dojo is complete. Go build your own layer.');
+    } else { banner('❌ Not yet — read the failures below',true); refreshStatus(true); }
+  }catch(e){ consoleWrite('error: '+e.message,''); }
+  btn.disabled=false; btn.textContent='Check ▸';
+}
+async function doHint(){
+  const k=Math.min(state.hintsSeen+1, state.hintsTotal);
+  const nn=state.lesson.slice(0,2);
+  const r=await api(`/api/hint/${nn}/${k}`);
+  state.hintsSeen=Math.max(state.hintsSeen,r.k);
+  $('hintcount').textContent=`${state.hintsSeen}/${r.total}`;
+  consoleWrite(r.hint+`\n\n(${r.k}/${r.total} — hints cost you nothing but glory)`,'hint');
+}
+async function doDiff(){
+  if(!confirm('Diff shows the reference solution — the last resort. Sure?')) return;
+  const r=await api('/api/diff/'+state.lesson.slice(0,2));
+  consoleWrite(r.diff,'diff');
+}
+async function doReset(){
+  if(!confirm('Reset restores the starter files. Your edits to this lesson are lost. Sure?')) return;
+  const r=await api('/api/reset/'+state.lesson.slice(0,2),{method:'POST'});
+  state.files=r.files; state.dirtyPaths.clear(); openFile(state.active); buildChips(); renderMission();
+  banner('lesson restored to its starter state');
+  refreshStatus(true);
+}
+
+/* ---------- tabs, editor niceties ---------- */
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  $('brief').style.display = name==='brief'?'block':'none';
+  $('files').style.display = name==='files'?'flex':'none';
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>showTab(t.dataset.tab));
+$('editor').addEventListener('input',()=>{$('dirty').style.visibility='visible';});
+$('editor').addEventListener('keydown',e=>{
+  if(e.key==='Tab'){e.preventDefault();
+    const ed=e.target,s=ed.selectionStart;
+    ed.setRangeText('    ',s,ed.selectionEnd,'end');
+    $('dirty').style.visibility='visible';}
+});
+document.addEventListener('keydown',e=>{
+  const meta=e.metaKey||e.ctrlKey;
+  if(meta&&e.key==='s'){e.preventDefault();saveActive().then(ok=>ok&&banner('saved'));}
+  if(meta&&e.key==='Enter'){e.preventDefault();doCheck();}
+});
+$('btncheck').onclick=doCheck; $('btnhint').onclick=doHint;
+$('btndiff').onclick=doDiff; $('btnreset').onclick=doReset; $('btnsave').onclick=()=>saveActive().then(ok=>ok&&banner('saved'));
+$('btnblank').onclick=jumpToBlank;
+
+refreshStatus(false);
+</script>
+</body>
+</html>

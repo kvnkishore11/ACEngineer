@@ -1,0 +1,155 @@
+{
+  "lesson_key": "ah-3-building-domain-specific-agents",
+  "video_file": "ah-3-building-domain-specific-agents/video/ah-3-building-domain-specific-agents.mp4",
+  "video_duration_seconds": 4030,
+  "video_resolution": "1920x1080",
+  "frames_dir": "media/frames/ah-3-building-domain-specific-agents",
+  "status": "complete",
+  "notes": "12 frames extracted this session at native 1920x1080 (ffmpeg -ss <t> -i -frames:v 1 -q:v 2). Every frame was visually verified in-session and is confirmed on disk. Coverage spans the full arc: thesis title card, agents 1-8 (each represented by its highest-signal terminal/UI/code beat), and cross-cutting concepts (system prompt, disallowed_tools, hooks, consistent architecture, multi-agent orchestration). Talking-head and B-roll beats are intentionally unframed (see unframed_beats_by_design); the 'when to build custom' decision framework is narrated over B-roll and should be rendered as a designed decision box, not a frame. A candidate for the read_stream_file chunk-reader code (~59:00) landed on B-roll and was dropped in favor of the Ultra Stream code being shown as an annotated excerpt in the chapter.",
+  "frames": [
+    {
+      "t_seconds": 18,
+      "timestamp": "0:18",
+      "label": "the-agentic-path",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t0018-the-agentic-path.jpg",
+      "vtt_anchor": "0:07-0:20 \"Agentic engineering leads every engineer down one single path. Better agents, more agents, and then custom agents.\"",
+      "why_for_weak_student": "'The Agentic Path' title card (Base -> Better -> More -> Custom user-icons over the keyboard) is the whole lesson's scaffold in one image; a weak learner needs the destination named before the eight demos make sense.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "overhead laptop shot, screen reads 'The Agentic Path'; glowing user icons labeled Base / Better / More; caption 'and then... agents, and then custom'."
+    },
+    {
+      "t_seconds": 225,
+      "timestamp": "3:45",
+      "label": "pong-run-session-stats",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t0225-pong-run-session-stats.jpg",
+      "vtt_anchor": "3:24-4:30 \"Let's start simple with the Pong agent... No matter what we prompt here, the response is always pong.\"",
+      "why_for_weak_student": "Terminal proof that user prompt 'hello' -> Agent Response 'pong' with a real Session ID, Duration 1483ms, Cost $0.003629 — the smallest possible agent made concrete, so 'the system prompt controls everything' lands as observation, not claim.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "VS Code terminal: green 'Agent Response: pong' panel, Session Stats table (Session ID bad09241..., 1483ms, $0.003629), 'Pong agent working correctly!', User Prompt 'hello'."
+    },
+    {
+      "t_seconds": 300,
+      "timestamp": "5:00",
+      "label": "pong-system-prompt",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t0300-pong-system-prompt.jpg",
+      "vtt_anchor": "5:03-5:10 \"The system prompt is the most important element of your custom agents, with zero exceptions.\"",
+      "why_for_weak_student": "The entire behavior-defining artifact on screen — a 3-line PONG_AGENT_SYSTEM_PROMPT.md ('Always respond with exactly pong to ANY input'). Shows a weak student that 'custom agent' does not mean 'lots of code'; it means the right system prompt.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "editor open on prompts/PONG_AGENT_SYSTEM_PROMPT.md, breadcrumb apps > custom_1_pong_agent > prompts; 7 lines, the 3-line Purpose visible; Tokens: 60 (52 selected)."
+    },
+    {
+      "t_seconds": 565,
+      "timestamp": "9:25",
+      "label": "echo-mcp-server-model",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t0565-echo-mcp-server-model.jpg",
+      "vtt_anchor": "9:20-9:30 \"We're running Claude Haiku. We have downgraded our model to a cheaper, less intelligent, but much faster model.\"",
+      "why_for_weak_student": "One screen shows create_sdk_mcp_server(tools=[echo_tool]), allowed_tools=[mcp__echo__echo], system_prompt, and the model line (green-highlighted) = claude-3-5-haiku-20241022 — three core-four moves (tools, MCP, model) in context. Also visibly reads ClaudeCodeOptions, anchoring the SDK-rename note.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "echo_agent.py lines 98-124; options = ClaudeCodeOptions(mcp_servers, allowed_tools=[\"mcp__echo__echo\"], model=\"claude-3-5-haiku-20241022\" highlighted); async with ClaudeSDKClient."
+    },
+    {
+      "t_seconds": 1040,
+      "timestamp": "17:20",
+      "label": "calc-disallowed-tools",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t1040-calc-disallowed-tools.jpg",
+      "vtt_anchor": "17:10-17:20 \"So you can see here we have this big disallow tools block. Our agent is specifically not allowed to use these tools. These tools do not end up in its context window.\"",
+      "why_for_weak_student": "The full disallowed_tools block (Read/Write/Edit/MultiEdit/.../Bash/KillShell) plus allowed_tools (2 calculator tools), system_prompt, model sonnet-4, and resume=current_session_id. Makes 'control your context' concrete: this is HOW you strip the 15 built-in tools out of the agent's mind.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "calc_agent.py lines 280-307 in run_calculator_repl; ClaudeCodeOptions with allowed mcp__calculator__* tools and a 15-item disallowed_tools list; resume=current_session_id (KEY comment)."
+    },
+    {
+      "t_seconds": 1360,
+      "timestamp": "22:40",
+      "label": "social-hype-stream",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t1360-social-hype-stream.jpg",
+      "vtt_anchor": "22:03-24:00 \"we're looking at the blue sky fire hose web socket... our agent is now going to pick up the keywords and then run a sentiment analysis.\"",
+      "why_for_weak_student": "A live worked example of a data-stream agent end to end: Match #5 (chatgpt) -> Agent Response summary (Zencoder pivoting...) + Sentiment positive -> Tool Called: submit_analysis (Keyword: openai) -> Tool Called: notify (New OpenAI Tech Release, urgency high). Deterministic filter -> LLM analysis -> tool action, all visible.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "terminal firehose: Processed 4457 | Matched 5 | Analyzed 1 | Notified 1; green Agent Response, cyan 'Tool Called: submit_analysis', purple 'Tool Called: notify'."
+    },
+    {
+      "t_seconds": 1852,
+      "timestamp": "30:52",
+      "label": "consistent-codebase-architecture",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t1852-consistent-codebase-architecture.jpg",
+      "vtt_anchor": "25:37-25:44 (concept) \"We want consistent code-based architecture for our agents, for ourselves, for our teams\"; frame at ~30:52 as the QA agent folder is opened.",
+      "why_for_weak_student": "The VS Code explorer shows apps/custom_1_pong ... custom_6_tri_copy_writer plus the identical prompts/ + agent.py + README + .env.sample layout inside custom_5_qa_agent — the 'consistent codebase architecture' leverage point made visible: same shape every agent, easy for humans AND agents to read.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "EXPLORER tree: apps/ expanded (custom_1..custom_6), custom_5_qa_agent open showing .claude, prompts, .env.sample, .mcp.json.firecrawl_4k, qa_agent.py, README.md, test_inline_hooks.py."
+    },
+    {
+      "t_seconds": 2170,
+      "timestamp": "36:10",
+      "label": "qa-hook-block-env",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t2170-qa-hook-block-env.jpg",
+      "vtt_anchor": "35:41-36:10 \"when we match the read command, block environment variable files... our hook blocked reading dot env in the file path.\"",
+      "why_for_weak_student": "The block_env_files hook source: `if '.env' in file_path:` -> SECURITY HOOK panel -> return {hookSpecificOutput: {permissionDecision: 'deny', permissionDecisionReason: 'Security policy: .env files are blocked...'}}. A weak student sees exactly how governance/permissions are wired in code, not hand-waved.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "qa_agent.py block_env_files (lines 54-90): tool_name/tool_input/file_path parsing, 'if .env in file_path', console SECURITY HOOK, return hookSpecificOutput permissionDecision deny."
+    },
+    {
+      "t_seconds": 2265,
+      "timestamp": "37:45",
+      "label": "tri-copy-writer-ui",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t2265-tri-copy-writer-ui.jpg",
+      "vtt_anchor": "37:18-38:47 \"one prompt is getting scaled up by our agent... We have six versions.\"",
+      "why_for_weak_student": "The Vue web UI with SIX copy variations from ONE prompt ('write a blog post title for our script between 30 and 60 chars'), a session cost line (6 variations | $0.011856), a drag-dropped elite_context_engineer file, and Generating... panels — the 'agents in UIs / one prompt -> N variations' idea shown as a product. Browser tabs foreshadow Micro SDLC and Ultra Stream.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "browser at 127.0.0.1:5173, 'Tri-Copy-Writer' header, Version 1-6 cards, 'You: write a blog post title...', Session a2e44207 | 4410ms | 6 variations | $0.011856."
+    },
+    {
+      "t_seconds": 2565,
+      "timestamp": "42:45",
+      "label": "micro-sdlc-kanban-board",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t2565-micro-sdlc-kanban-board.jpg",
+      "vtt_anchor": "42:29-43:00 \"custom seven micro SDLC agent... an agent by agent task board where we hand off work from one agent to another agent in a kind of micro software development life cycle.\"",
+      "why_for_weak_student": "The Plan -> Build -> Review -> Ship kanban board (IDLE/PLAN/BUILD/REVIEW/SHIPPED/ERRORED columns) with per-agent PLAN/BUILD/REVIEW message+tool counts and SONNET badges — multi-agent orchestration made legible: a weak learner can literally watch work flow between specialized agents.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "browser at 127.0.0.1:5174, 'Micro SDLC Agent' + 'Plan -> Build -> Review -> Ship'; columns with tickets #9/#8/#7 etc., SONNET badges, MESSAGES/TOOLS PER AGENT counts."
+    },
+    {
+      "t_seconds": 2825,
+      "timestamp": "47:05",
+      "label": "planner-write-hook",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t2825-planner-write-hook.jpg",
+      "vtt_anchor": "46:00-48:00 \"we're making sure that our writer agent can only write to our plan directory... via permission checks via hooks.\"",
+      "why_for_weak_student": "agent_orchestrator.py breadcrumb (run_planner_agent > planner_write_hook) over a live 'Write Request -> Write Allowed: Allowing write to plan directory .../specs/update-application-titles.md -> Tool Allowed' trace, ending in 'PLANNER: THINKING Perfect! I've successfully created a comprehensive implementation plan'. Path-restricted write governance in a real multi-agent run — the payoff of the hook concept.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "agent_orchestrator.py tab, breadcrumb run_planner_agent > planner_write_hook; terminal Write Request / green 'Write Allowed' to specs/ / 'Tool Allowed' / PLANNER Response path."
+    },
+    {
+      "t_seconds": 3060,
+      "timestamp": "51:00",
+      "label": "ultra-stream-dual-panel",
+      "file": "media/frames/ah-3-building-domain-specific-agents/t3060-ultra-stream-dual-panel.jpg",
+      "vtt_anchor": "50:11-52:00 \"We have our streaming agent on the right and we have our chat interface on the left... I can dial into this with our inspector agent on the left.\"",
+      "why_for_weak_student": "The flagship dual-agent UI: Inspector Agent (left, with a red ALERT: TrackEvent timeout for user usr_JLL8..., Indices 3-3) beside the Stream Agent (right, live severity-tagged log feed #1-#6 LOW/HIGH/MEDIUM, Logs:7 Index:7, footer High 1 / Medium 2 / Low 4 / Total 7). One image captures 'one agent produces, another consumes' plus severity classification and alerting.",
+      "diagram_instead": false,
+      "extracted": "this-session",
+      "verified_visual": "browser 'Ultra Stream Agent', Stream: Active / Inspector: Active; left red ALERT panel; right stream feed with severity pills and per-user tags; totals footer."
+    }
+  ],
+  "alternates_extracted_not_selected": [
+    { "t_seconds": 700, "label": "echo-list-tools", "reason": "Query 'list your available tools' shown but the 15-tool response had not yet rendered; the model/MCP frame (t0565) carries the Echo agent better." },
+    { "t_seconds": 2690, "label": "sdlc-board-workflow-running", "reason": "Same board with '1 workflow running' + highlighted 'Update titles' ticket in REVIEW; near-duplicate of t2565 (chose the cleaner full-board view)." },
+    { "t_seconds": 3130, "label": "ultra-stream-notify-support", "reason": "Inspector calling mcp__inspector__notify_support_team ('Support team notified: HIGH SEVERITY...'); strong alternate to t3060 if the chapter wants a second Ultra Stream beat showing team notification." }
+  ],
+  "unframed_beats_by_design": [
+    { "range": "0:20-3:24", "beat": "mismatch problem, where-the-alpha-is, core-four, protect-your-codebase, when-NOT-to intro monologue", "reason": "talking-head/B-roll; chapter should use designed diagrams (the path ladder, the core-four control table)." },
+    { "range": "6:45-9:20", "beat": "Echo run + tool-call blocks explanation", "reason": "covered by t0565 code frame; remainder is narration over the same screen." },
+    { "range": "58:00-1:00:00", "beat": "read_stream_file chunked-read + clear_context explanation", "reason": "the token-efficient chunk read is best shown as a small annotated code excerpt in the chapter (sed subprocess + raw_log_cache); the on-camera moment is intercut with B-roll." },
+    { "range": "1:00:00-1:03:00", "beat": "when-to-build-custom vs when-to-use-out-of-box decision framework", "reason": "narrated over B-roll (glowing data-tunnel clip), no decision slide on screen; render as a designed decision box from the transcript's two bulleted lists." },
+    { "range": "1:03:00-1:07:11", "beat": "extend-vs-custom recap, vote-on-next-lesson, closing 'better/more/custom'", "reason": "talking head + outro; the closing beat is covered conceptually by the t0018 path title card." }
+  ]
+}

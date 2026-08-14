@@ -1,0 +1,582 @@
+{
+  "lesson_key": "tac-8-the-agentic-layer",
+  "title": "The Agentic Layer",
+  "course": "TAC",
+  "order": 8,
+  "lesson_url": "https://agenticengineer.com/tactical-agentic-coding/course/the-agentic-layer",
+  "lesson_subtitle": "Learn the one meta-tactic to rule them all. The single idea you need to become irreplaceable in phase 2 of the Generative AI age.",
+  "level": "Advanced",
+  "video": {
+    "file": "tac-8-the-agentic-layer/video/tac-8-the-agentic-layer.mp4",
+    "duration_seconds": 3799,
+    "duration_display": "63:19",
+    "capture_defect": "The screen-capture video freezes at ~34:30 (t~2070s): from ~t2150s to the end the video track cycles 4 stale frames while audio continues normally. Everything after ~35:45 (Notion board zoom-out, MCP sysinfo demo completion, the entire app5 AEA demo, the tactics recap, PITER-to-PITE, the final-question reveal, and the close) is audio-only in this capture. Frames were selected exclusively from the live region; lost visual beats are flagged diagram_instead in frame_plan."
+  },
+  "tactic": {
+    "name": "Prioritize Agentics",
+    "number": 8,
+    "one_liner": "Spend the majority of your engineering time on the agentic layer — the ring of prompts, template meta prompts, and AI developer workflows wrapped around your codebase — because every hour invested there teaches compute to do the application-layer work for you.",
+    "why_uncomfortable": "It demands you stop doing the very work that feels most productive. Writing application code, fixing the bug yourself, shipping the feature by hand — all of it is now, by default, the wrong layer. Dan's rule of thumb is that at least half your engineering time (more when bootstrapping) goes to infrastructure that doesn't ship user-visible value directly, on the promise that the return is parabolic: 10 minutes in, two hours out. And it carries a humbling corollary: 'Do not make the mistake of thinking you're smarter than your best engineering practices templated into your agentic layer' — you must trust the encoded system over your in-the-moment self, because a template meta prompt running in an ADW that kicks off five to ten agents per problem will out-execute you.",
+    "compresses_all_tactics": "Dan states this tactic 'has been staring us in the face the entire time' and 'represents all others, from target zero-touch engineering all the way back to stop coding. All tactics are compressed into this tactic.'"
+  },
+  "mission": "Close the loop on TAC: cement the primitives (prompts up through ADWs) as tool-agnostic building blocks, walk four working agentic layers hands-on so you have concrete V1 starting points, then compress every KPI, leverage point, and tactic into one daily guiding question — 'Am I working on the agentic layer or the application layer?' — and send you off to build the system that builds the system.",
+  "agentic_layer": {
+    "definition_dan_words": "\"What is the agentic layer? It is the combination of traditional deterministic code that is stored in your ADWs directory as a scriptable layer that combines deterministic code with the new non-deterministic agentic technology — the language model, the agent, Claude Code, and whatever variants are gonna come next. You combine these two things. This makes up your agentic layer, the old world of deterministic code and the new world of agentic prompts.\" (~50:20)",
+    "ring_metaphor": "Imagine a ring around your codebase. At first it's thin, then it becomes thicker as you scale agentics into your codebase — machines that operate with your judgment, shipping your way, getting work done autonomously in your product. (~1:05; visualized on screen as a green pixel ring)",
+    "vs_application_layer": "Two layers only. The application layer is deliberately vague — DevOps, infrastructure, database, and the raw application all live under it. The agentic layer is the separate, isolated ring (prompts + ADWs + plans) that operates ON the application layer. Dan is emphatic about the separation: 'Our application and our agents — they're distinctly different… keep it isolated and separated. This is not the application layer.'",
+    "time_allocation": "As a general rule at least half of your engineering time goes to the agentic layer (more up-front when building it initially); the ratio fluctuates but the more you invest, the more problem classes the layer solves on your behalf. (~4:00)",
+    "parabolic_roi": "\"When you have a product that you're maintaining, building an agentic layer is parabolic… put 10 minutes in, get two hours of value out or more.\" It starts thin and not very useful; value compounds as you add ADWs, template your engineering, and always add feedback loops so agents can ship and auto-improve. (~15:38)",
+    "micro_codebase_warning": "As it scales, the agentic layer becomes its own micro codebase — a wrangle layer around your codebase — so apply real engineering patterns to it, while keeping it separated from apps/. (~27:45)"
+  },
+  "guiding_question": {
+    "question": "Am I working on the agentic layer or am I working in the application layer?",
+    "framing": "Revealed at ~52:39 as 'the final question… a final meta tactic' and earlier teased as 'the oil of this course' (~2:14) — all Agentic KPIs, every leverage point, and all eight tactics compress into it. 'Even if you forget all eight tactics, this is all you need to think about.'",
+    "right_answer": "The majority of your time should be on the agentic layer, because you can teach compute how to build, teach compute how to engineer your way, and scale compute beyond comprehension — orchestrating intelligence.",
+    "acceptable_reasons_for_application_layer": [
+      "A deadline forces direct work",
+      "You're testing something by hand",
+      "You're running your prompts in the loop specifically to verify they'll work out of the loop"
+    ],
+    "otherwise": "\"Or else you're moving in the wrong direction. You're going sideways while other engineers… will be moving up.\""
+  },
+  "minimum_viable_agentic_layer": {
+    "pieces": [
+      "adws/ — AI Developer Workflow directory: scripts that fuse deterministic code with agent calls (the highest abstraction level)",
+      ".claude/commands/ — your prompts as markdown slash commands (using Claude Code; any prompt store works)",
+      "specs/ — plans: the markdown output of planning prompts that implementation prompts consume"
+    ],
+    "scripting_layer_rule": "Any scripting layer works — UV single-file Python scripts (used throughout TAC), Bun if you like TypeScript, shell if you're old school. The ONLY requirements: you can compose code, reference other files, and keep it isolated from the application layer.",
+    "starter_prompts": "A /prime command to set the agent up (standalone, reusable, with different priming variants per codebase section), a /start command to boot your app (uv run + bun run here, as complex as needed), /chore + /feature template meta prompts to plan, and /implement (a higher-order prompt taking a plan as its argument) to build.",
+    "quote": "\"For your minimum viable agentic layer, you really only need these pieces.\" (~7:00, over tac8_app1's README)"
+  },
+  "core_concepts": [
+    {
+      "id": "prioritize-agentics",
+      "name": "Tactic #8: Prioritize Agentics",
+      "plain_english": "The final tactic and the compression of all seven before it: direct your engineering time at the agentic layer, not the application layer. It drives daily ROI decisions — every task you do by hand is a problem class you failed to teach your agents.",
+      "dan_words": "\"It's simple. It's everything. Prioritize agentics. More specifically, prioritize your agentic layer.\" (~3:16)",
+      "misconception": "That prioritizing agentics means neglecting your product. Dan closes the loop explicitly: 'By investing in your agentic layer, you're actually investing in your application layer — it's all about your users, your product, and your company. Never forget who this is all for.'"
+    },
+    {
+      "id": "agentic-layer-vs-application-layer",
+      "name": "The two-layer model of a codebase",
+      "plain_english": "Every codebase now has exactly two layers that matter: the application layer (app, database, infra, DevOps — everything classical) and the agentic layer (prompts, templates, plans, ADWs, triggers) that operates on it. The layers must stay physically separated — apps/ in its own directory that the agentic ring operates around.",
+      "dan_words": "\"There's the agentic layer, and then there's the application layer… I recommend more than half of your time should be focused on the agentic layer.\" (~3:50–4:31)",
+      "misconception": "Treating the agentic layer as part of the app (mixing agent scripts into application code). The isolation is the point: the same agentic-layer shape wraps ANY application layer — a Jupyter data-science app (app2), a Vue observability dashboard (app3), a prototyping factory (app4), a FastAPI+Vite product (app5)."
+    },
+    {
+      "id": "primitives-over-tools",
+      "name": "Keep your eyes on the primitives",
+      "plain_english": "The composable units — individual agentic prompts up to composed multi-step ADWs — are what matters. Not the software developer lifecycle, not a model, not a tool, not Claude Code. Tools are the current vehicle; the primitives transfer.",
+      "dan_words": "\"Claude Code represents the first viable engineering tool that unlocks agentic engineering… but it won't be the last. We know tools will change and models will improve. We can't fixate on these… I've talked very little on Claude Code specifically — this is very intentional. This is not a Claude Code course.\" (~5:00–6:00)",
+      "misconception": "That TAC's value expires with its tooling. The whole lesson is built to survive tool churn: every codebase teaches prompt/plan/template/ADW composition that any agent runtime can execute."
+    },
+    {
+      "id": "minimum-viable-agentic-layer",
+      "name": "The Minimum Viable Agentic Layer (MVAL)",
+      "plain_english": "Three directories bootstrap everything: prompts (.claude/commands/), plans (specs/), workflows (adws/). app1 (tac8_app1__agent_layer_primitives) is a nearly-empty codebase shipping exactly this starting point plus a two-file apps/ layer to operate on.",
+      "dan_words": "\"This is the minimum set of pieces of information that you need… The only thing that matters is that you can compose code and reference other files and have this be isolated from your application layer.\" (~7:00–7:40)",
+      "misconception": "That you need the scaled version (hooks, triggers, state, worktrees, observability) on day one. app1's README shows both shapes — minimum viable and scaled — and the lesson's order is explicit: start thin, thicken the ring as value compounds."
+    },
+    {
+      "id": "gateway-script",
+      "name": "The gateway script (adw_prompt.py)",
+      "plain_english": "A single script that takes a prompt string, calls one Claude Code instance programmatically, and manages all the surrounding state — unique ADW ID, output capture to agents/{adw_id}/{agent_name}/ as JSONL stream → JSON array → final object → custom summary. It is the smallest possible ADW and the on-ramp to everything else.",
+      "dan_words": "\"This script is the gateway into agentic coding… It's the minimal version of what you need to get started. This ADW is calling an agent — this is distinctly different from any other type of code.\" (~13:39)",
+      "misconception": "That it's a trivial wrapper. The 'surrounding state' IS the value: reproducible IDs, streamed logs you can tail, a final object you can parse, and a summary you can build yourself — the observability layer that later multi-agent systems depend on."
+    },
+    {
+      "id": "template-meta-prompts",
+      "name": "Template meta prompts (prompts that generate prompts)",
+      "plain_english": "Markdown prompts (/chore, /feature, /plan, /plan_uv_mcp…) that take a high-level request plus an adw_id and output a PLAN in a rigidly specified 'Plan Format' — metadata, description, relevant files, step-by-step tasks executed top to bottom, and validation commands. The plan file is itself a prompt for /implement. This is how you template your engineering.",
+      "dan_words": "\"These are meta prompts. They template out what your engineering workflows look like… Do not underestimate the plan format… This is a prompt that generates a prompt.\" (~9:49–11:10)",
+      "misconception": "That the general /plan is the end state. It's the floor: 'You will be able to outperform these by going more specific' — app4's /plan_uv_mcp, /plan_vite_vue, /plan_uv_script, /plan_bun_scripts each encode framework-specific expertise plus ai_docs references, which is why one concise prompt can produce a working MCP server."
+    },
+    {
+      "id": "problem-classes",
+      "name": "Solve problem classes, not one-off fixes",
+      "plain_english": "The unit of agentic-layer work is the CLASS of problems (all chores, all MCP-server builds, all data-set updates), not the instance. Templating the engineering pattern once means every future instance is a one-line prompt.",
+      "dan_words": "\"We're focusing on problem classes, not one-off fixes… I have solved the problem class of building Astral UV model context protocol servers. I've solved it. It's done.\" (~10:50 and ~38:50)",
+      "misconception": "Writing a prompt so specific it solves only today's task. The tell that you templated a class: a teammate (or an agent) can run it against a request you never anticipated and get your team's engineering standards in the output."
+    },
+    {
+      "id": "in-loop-out-loop-progression",
+      "name": "In-loop → out-loop: a great place to start, a terrible place to stay",
+      "plain_english": "The maturity ladder inside every codebase in this lesson: (1) type prompts in a Claude Code session (in-loop), (2) fire the same prompts via ADW scripts (slightly out-loop, no conversation, no responding), (3) let triggers — cron, task files, Notion boards, embedded servers — fire the ADWs without you (out-loop), (4) target ZTE where even review drops away.",
+      "dan_words": "\"By creating a script that can surround the application… we are slowly moving out the loop. I'm not responding here. I'm not having a conversation with the agent… [In-loop] is a great place to start. It's a great place to do deep work… It's a terrible place to stay. So many engineers are going to miss this mark.\" (~15:00–15:25)",
+      "misconception": "That out-loop means abandoning in-loop entirely. Dan runs /prime and /start in-loop on camera first — in-loop remains where you build and debug the agentic layer itself; it's the place you operate FROM, not the place work ships from."
+    },
+    {
+      "id": "trigger-based-multi-agent",
+      "name": "Triggers + a two-way task file = a multi-agent system in one or two files",
+      "plain_english": "app2's whole orchestration layer is a cron trigger polling tasks.md every 5 seconds. The markdown file is a two-way interface: humans write tasks grouped under '## Git Worktree <name>' headers with optional {tags}; agents rewrite the same lines through states [] → [🟡, adw_id] → [✅ commit_hash, adw_id] or [❌, adw_id] // Failed: reason, with [⏰] tasks blocked until every task above them succeeds. Tags flip behavior: {opus} upgrades the model, {adw_plan_implement_update_task} upgrades the workflow from build-update to plan-implement-update.",
+      "dan_words": "\"Every five seconds, our trigger is going to pick up on tasks that need to be operated… It found seven tasks to kick off… I'm not doing this by the way — this is all our ADWs and our agents starting to pick up work… We're pushing past the overkilled chat-based UI. We have a two-way task list.\" (~21:48–23:30)",
+      "misconception": "That multi-agent requires heavy infrastructure. 'This is a small tweak. This is one or two files… and all of a sudden we're able to do a lot more with a multi-agent dedicated workspace system.' The trigger itself delegates parsing to a /process_tasks prompt that returns eligible task groups as JSON — the agent is the parser."
+    },
+    {
+      "id": "worktree-isolation",
+      "name": "Git worktrees with sparse checkout as agent environments",
+      "plain_english": "Each worktree name in tasks.md becomes trees/<name> — a real git worktree on its own branch with sparse checkout of ONLY the target app directory, .env copied in, and an empty initial commit. Every agent gets an entire isolated copy of the environment for exactly its set of work; parallel experiments (perfect for data-science variants) can't collide.",
+      "dan_words": "\"These are dedicated environments for agents to work in… we have a sparse checkout of just this directory… an entire copy of this environment of this codebase for this agent to do just this set of work in.\" (~22:00, ~28:37)",
+      "misconception": "That isolation is only for safety. It's also for THROUGHPUT (5 worktrees × parallel agents) and for review ergonomics — Dan opens trees/enhance-training-data as its own editor window, greps tweets_positive_only.csv, and validates one agent's work without touching the others."
+    },
+    {
+      "id": "piter-framework",
+      "name": "PITER applied: Prompt input, Trigger, Environment, Review",
+      "plain_english": "The lesson-7 out-loop framework recurs in every codebase here. app4 names it explicitly: Prompt input = the Notion page; Trigger = adw_trigger_cron_notion_tasks.py polling every 15 seconds; Environment = dedicated worktrees under trees/; Review = the board's Human-in-the-loop column plus live status updates written back to the task page.",
+      "dan_words": "\"Remember the PITER framework. You have prompt input — for us, it's this Notion page. Environment — this is going to operate inside the trees directory… And then we have the review system.\" (~30:54)",
+      "misconception": "That the review system must be a dashboard. It's whatever surface you already look at: a Notion board on your phone, the tasks.md diff, the worktree in your editor, or (app5) a chat window inside your own product."
+    },
+    {
+      "id": "one-agent-one-prompt-one-purpose",
+      "name": "One agent, one prompt, one purpose — and its single exception",
+      "plain_english": "The controversial rule for reliability under small context windows: each Claude Code instance runs exactly one prompt for one purpose, making agents focused, reproducible, testable, and improvable. Across every TAC codebase there is exactly one exception: app5's AEA server passes the stored cc_session_id back with --resume to continue a conversation, because an embedded product agent needs conversational continuity.",
+      "dan_words": "\"One agent, one prompt, one purpose… We're running one Claude Code instance with only one exception… where we are actually passing back in the session ID back into this agent to continue the conversation. Every other prompt we ran, we have one agent, one prompt, one purpose.\" (~47:53–48:36)",
+      "misconception": "Hearing 'one purpose' as 'one tool call' or 'tiny prompts'. The purpose can be as large as 'implement this whole plan' — what's prohibited is the sprawling multi-topic conversation whose context window becomes unreproducible."
+    },
+    {
+      "id": "peter-to-pete",
+      "name": "From PITER to PITE: drop the R",
+      "plain_english": "The ZTE end-state restated for the agentic layer: once a dialed-in ADW ships end-to-end reliably, human review becomes the bottleneck — so you remove it. Prompt input, trigger, environment… no review. It happens gradually (small chores first), and only because you always added feedback loops and taught agents a concrete review step (images, videos, multi-step review ADWs).",
+      "dan_words": "\"You realize you're the bottleneck and then you'll convert the out-loop framework from PITER to PITE… You'll drop the R off… Not only will you stay out the loop — getting in the loop will be harmful. You will let your product ship itself.\" (~49:21–50:15)",
+      "misconception": "That dropping review is recklessness. The sequence is strict: feedback loops first ('There is a validation, a set of validations in your codebase that once run ensures everything works perfectly — the only question is, do you know what it is?'), then reliability streaks, THEN removing yourself."
+    },
+    {
+      "id": "aea-agent-embedded-application",
+      "name": "AEA: the agent embedded in the application",
+      "plain_english": "app5 breaks the layer-separation rule on purpose: a FastAPI 'AEA server' (port 8743) lives inside the ADW triggers directory, persists agents in SQLite (agent_id, cc_session_id, conversation), and the product's own UI opens chat windows (Cmd+P → /aea) where named agents (Nexus, Roon on camera) answer questions about the codebase and ship changes to the running app. Out-loop, here, means INSIDE the application.",
+      "dan_words": "\"We have an agent inside of our app… The power of agents isn't in one, it's in many… How does this work? We broke one of our rules… We have a dedicated agent embedded application server so that we can access this outside the loop. In this case, outside the loop is inside the application.\" (~40:18–42:00)",
+      "misconception": "That AEA is a chatbot feature. It's presentational scaffolding for a bigger idea: 'You can make your own fully built out agents inside your application that can operate your domain… better and faster than you or any engineer on your team can.' The demo agent literally edits the app's own button while chatting."
+    },
+    {
+      "id": "commoditization-of-implementation",
+      "name": "The commoditization of implementation",
+      "plain_english": "Phase-1 commoditized code; the agentic layer commoditizes IMPLEMENTATION — the whole act of turning intent into shipped changes — with early signs of commoditizing engineering itself. Value moves up the stack: system design, architecture, encoding domain expertise for agents, quality control and validation review systems, and above all creative problem decomposition, which you then encode into ADWs.",
+      "dan_words": "\"AI coding is not enough. With agentic coding, not only is code a commodity, but the implementation as well. This is only a net negative if you show up late to the party. You are here very early… The value of engineering is actively moving up the stack.\" (~56:39–57:30)",
+      "misconception": "Reading this as doom. Dan frames it as asymmetric opportunity — 'This is bigger than a course. This is a manifesto for the next phase of software engineering… the codex for agentic engineering' — for those who internalize it early."
+    }
+  ],
+  "twelve_leverage_points_recap": {
+    "in_agent_core_four": ["Context", "Model", "Prompt", "Tools"],
+    "through_agent": ["Standard Output", "Types", "Docs", "Tests", "Architecture", "Plans", "Templates", "AI Developer Workflows"],
+    "note": "Printed verbatim in app1's and app2's READMEs as the course's canonical list; the lesson recaps them at ~11:38 and ~44:00 with ADWs named 'the highest level of composition — code plus agentics.'"
+  },
+  "agentic_kpis_recap": {
+    "attempts": "Decrease the attempts it takes to deliver work with your agents",
+    "size": "Increase the size of work you can hand off",
+    "streak": "Increase the streak of successful work shipped without mistakes",
+    "presence": "Drop your presence — showing up to prompt, review, babysit — to the bare minimum, target zero (stay out the loop)"
+  },
+  "tactics_recap_all_eight": [
+    "1. Stop coding — 'the irreplaceable engineer of the future is not writing a single line of code' (~43:34)",
+    "2. Adopt your agent's perspective — build with the core four (context, model, prompt, tools) so agents have what they need",
+    "3. (12 leverage points) Layer them on and hand them to your agent at the right time in the right place — in-agent and through-agent",
+    "4. Template your engineering — template meta prompts: prompts that output prompts with specific formats, rules, files to read, conditional docs",
+    "5. Increase your Agentic KPIs — attempts down, size up, streak up, presence to zero",
+    "6. Always add feedback loops — validation commands agents run to confirm their own work; 'the big three Gen AI companies… have these insane feedback loops… you can do this on your codebase' (~47:14)",
+    "7. Target zero-touch engineering — the North Star; PITER loses its R as reliability compounds",
+    "8. Prioritize agentics — the meta-tactic that contains them all"
+  ],
+  "four_codebases": [
+    {
+      "app": "tac8_app1__agent_layer_primitives",
+      "covered_on_camera": true,
+      "teaches": "The minimum viable agentic layer, piece by piece: prompts (/prime, /start, /chore, /feature, /implement), the gateway ADW (adw_prompt.py), slash-command ADW (adw_slash_command.py), the first composed ADW (adw_chore_implement.py: /chore → extract plan path → /implement), plus SDK variants (agent_sdk.py, adw_sdk_prompt.py). Application layer is deliberately trivial: apps/main.py + apps/main.ts printing 'Hello, agentic coding world!'.",
+      "on_camera_demo": "Dan primes in-loop, fires adw_prompt.py with 'list all files in the adws directory and a concise output of their purpose', runs /start through adw_slash_command.py, then runs adw_chore_implement.py with 'create a .sh version of main in apps/*' — the planner writes specs/chore-eae01d83-create-sh-version-main.md, the builder implements apps/main.sh and validates it."
+    },
+    {
+      "app": "tac8_app2__multi_agent_todone",
+      "covered_on_camera": true,
+      "teaches": "Multi-agent 'Todone' (to-do → to-DONE) task delegation: tasks.md as a two-way emoji-state task board grouped by git worktree, a 5-second cron trigger, /process_tasks returning eligible work as JSON, /mark_in_progress + /update_task rewriting states, /init_worktree building sparse-checkout worktrees under trees/, and two workflow tiers (adw_build_update_task.py default; adw_plan_implement_update_task.py via tag). Application layer: a Jupyter sentiment-classification project over tweets_v1.csv.",
+      "on_camera_demo": "Dan pastes a fresh task list across five worktrees, starts the trigger, and watches 7 tasks kick off — worktrees created, 🟡+ADW-ID markers appear, ✅ with commit hashes roll in, ⏰ blocked tasks release only after the tasks above them succeed; he validates trees/enhance-training-data (sparse checkout) and the generated tweets_positive_only.csv."
+    },
+    {
+      "app": "tac8_app3__out_loop_multi_agent_task_board",
+      "covered_on_camera": false,
+      "teaches": "Skipped on camera ('I'll let you open that up on your own'). It is the multi-agent observability system: Claude Code hooks (pre/post tool use, notification, stop, subagent stop, user prompt submit) POSTing events through send_event.py to a Bun+SQLite server with a Vue 3 live dashboard (WebSocket stream, pulse chart, chat transcripts). The agentic-layer lesson embedded in it: observability is what makes fleets of out-loop agents reviewable.",
+      "on_camera_demo": null
+    },
+    {
+      "app": "tac8_app4__agentic_prototyping",
+      "covered_on_camera": true,
+      "teaches": "Fully out-loop rapid prototyping driven from a Notion board: a 15-second cron trigger picks up tasks with 'execute' triggers, claims them ('In progress' + adw_id), generates worktree names (/make_worktree_name), creates isolated worktrees, routes {{prototype: uv_script|vite_vue|bun_scripts|uv_mcp}} tags to specialized template meta prompts (/plan_uv_mcp etc. + ai_docs/), implements, and writes results back to Notion (statuses: Not started / In progress / HIL Review / Failed / Done; iterate via 'continue - <prompt>'). Agents spawn as detached subprocesses so the monitor never blocks.",
+      "on_camera_demo": "Dan opens the 'Agentic Prototyper' Notion board (Test Vite Vue counter, UV Script file watcher, Bun Scripts JSON formatter, UV MCP system-info server), runs the trigger with --once, watches tasks get claimed and moved agentically, then (audio; video frozen by this point) shows the completed feat-mcp-sysinfo worktree, wires .mcp.json, and calls the generated get_memory_info / get_cpu / get_disk MCP tools from Claude Code — 'we created an entire MCP server with a single prompt.'"
+    },
+    {
+      "app": "tac8_app5__nlq_to_sql_aea",
+      "covered_on_camera": true,
+      "teaches": "The course's Natural-Language-SQL app (FastAPI + Vite/TS, the TAC-5/6/7 SDLC ADW system intact underneath: iso workflows, cron/webhook triggers, e2e test prompts, KPI tracking) upgraded with AEA — Agent Embedded Application. A FastAPI AEA server (port 8743, SQLite persistence of agent_id/cc_session_id/conversation) launches adw_aea_patch.py per prompt; the client dev console (Cmd+P: /aea, /list, /toggle-view, /close-all) opens chat windows with named agents that answer codebase questions and implement changes, resuming sessions via --resume. The one sanctioned exception to one-agent-one-prompt-one-purpose.",
+      "on_camera_demo": "Audio-only in this capture (video frozen): Dan runs scripts/start.sh + scripts/aea_server_start.sh, opens the app, Cmd+P → /aea to meet 'Nexus', spins up a second agent 'Roon' ('the power of agents isn't in one, it's in many'), asks what the codebase is about while telling the other agent to rename the 'generate random query' button — both work in parallel and the button updates live."
+    }
+  ],
+  "loot_box_mentions": [
+    "Lesson 8 ships 12 loot notes (captured in course-notes.md): The Agentic Layer Ring; The Single Guiding Question; Tactic #8 Prioritize Agentics; 50%+ Time on Agentic Layer; Agentic Layer vs Application Layer; the tac-8 repo clone; Focus on the Primitives; Minimum Viable Agentic Layer; Problem Classes Not One-Offs; The Gateway Script; Moving Out of the Loop; Parabolic Value of the Agentic Layer.",
+    "Codebase: git clone https://github.com/disler/tac-8.git",
+    "In-lesson pointer at ~39:29: 'check your loot box, all this is going to be available to you — don't fixate on the exact details, focus on the agentic layer.'"
+  ],
+  "step_by_step_demo": [
+    "(0:00–3:00) Cold open: final lesson; the agentic-layer ring metaphor (green ring animation ~1:10); 'build the system that builds the system' = the new agentic layer; single-guiding-question teaser ('the oil of this course').",
+    "(3:00–4:31) Tactic #8 reveal: Prioritize Agentics — compresses all tactics; at least half your time on the agentic layer; application layer defined broadly (DevOps/infra/database/app).",
+    "(4:31–6:07) Keep your eyes on the primitives; Claude Code is the first viable tool, not the last; 'this is not a Claude Code course.'",
+    "(6:07–6:30) Terminal: clone tac-8, cd, ls → five distinct application directories (frame t0385).",
+    "(6:39–8:29) app1 README: the minimum viable agentic layer — adws/ + .claude/commands/ + specs/; any scripting layer (UV/Bun/shell); isolation from apps/ (frame t0430).",
+    "(8:29–9:30) In-loop warm-up: claude → /prime (git ls-files + README reads + report; frame t0515); /start boots apps/main.py + apps/main.ts.",
+    "(9:36–11:38) /implement is a higher-order prompt (takes a plan); templates = meta prompts; chore.md walkthrough with its Plan Format (frame t0610); think from your agent's perspective; problem classes not one-offs; feature.md as the richer variant; 12-leverage-points recap.",
+    "(11:54–14:30) The highest abstraction: ADWs. adw_prompt.py = the gateway script; Dan fires 'list all files in the adws directory and a concise output of their purpose' (frame t0810); notes the Claude Code SDK alternative (agent_sdk.py / adw_sdk_prompt.py) while TAC drives the CLI directly for full control.",
+    "(14:30–16:00) Agent completes with concise output + session ID + output files (agents/{adw_id}/…); adw_slash_command.py fires /start out-loop — 'I'm not responding here… slowly moving out the loop'; in-loop is a great place to start, a terrible place to stay; parabolic ROI (10 minutes → 2 hours).",
+    "(16:00–16:38) Extraction logs tour: cc_raw_output.jsonl → cc_raw_output.json → cc_final_object.json → custom_summary_output.json — 'this layer of control is really important.'",
+    "(16:38–19:00) adw_chore_implement.py: /chore (planner) → plan path parsed from output → /implement (builder). Dan runs 'create a .sh version of main in apps/*'; plan lands at specs/chore-eae01d83-create-sh-version-main.md; apps/main.sh appears and validates (frame t1131). 'You want complete control over your agentic workflow… fuse [prompts] with the deterministic world of raw code.'",
+    "(19:47–21:23) app2 'Todone': Jupyter sentiment-classification app layer (tweets CSV, ~50/50 sentiment); tasks.md = multi-agent git-worktree task system; Dan pastes a new task set across five worktrees.",
+    "(21:23–22:00) The trigger is how you stay out the loop: adw_trigger_cron_todone.py polls every 5 seconds → 'Starting 7 Tasks' panel (frame t1320); worktrees get created as dedicated agent environments.",
+    "(22:30–23:30) Task tags pass arbitrary config into ADWs: {opus} upgrades the model, {adw_plan_implement_update_task} switches to the plan-implement workflow; tasks flip to [🟡, adw_id] with per-phase Build Inputs panels (frame t1400); 'I'm not doing this by the way.'",
+    "(23:30–26:00) Work rolls in: [✅ commit_hash, adw_id] markers, ⏰ blocked tasks release only when everything above is ✅ (frame t1540); same primitive stack underneath (ADW prompt, slash command, composed workflows); /build = research→implement→test→commit quick patch; plan-implement = architect + editor, 'ultra powerful pattern' with template meta prompts.",
+    "(26:00–28:14) 'Don't do the work by yourself. Teach your agents to do it… Build the system that builds the system'; ADWs subdivided into adw_triggers/ etc. — the agentic layer becomes its own micro codebase; keep it separated from apps.",
+    "(28:14–29:50) Validation pass: open trees/enhance-training-data (sparse checkout of only the app2 directory; frame t1720), grep tweets_positive_only.csv — positive-only confirmed; another agent stacks an augmented model on prior work.",
+    "(29:50–31:43) Skip app3 (self-study); app4 agentic prototyping: Notion 'Agentic Prototyper' board (frame t1835); PITER mapped: prompt input = Notion page, environment = trees/, review = board + live updates; trigger adw_trigger_cron_notion_tasks.py polls every 15 seconds; Dan reruns with --once for testing.",
+    "(31:43–34:11) Pattern recognition drill: find prompts by searching '/'; get_notion_tasks, make_worktree_name, init_worktree, update_notion_task; cron claims a task and moves it on the board agentically; multiple agents in isolated environments.",
+    "(34:11–35:45) /plan_uv_mcp: a specialized template meta prompt with an on-the-fly app_name variable, a dedicated Workflow (uv init --package), Codebase Structure pointing at ai_docs/mcp-python-sdk.md, and the standard Plan Format (frame t2065). [Video capture freezes ~34:30; remaining beats are audio-verified.]",
+    "(35:45–39:50, audio) Board zoom-out (Not started / In progress / Human in the loop review / Failed / Done); three tasks picked up; phase-2 implementation success: MCP system-info server in trees/feat-mcp-sysinfo; Dan wires .mcp.json, opens Claude Code, and calls get_memory_info (128GB total / 32 used / 93 available), get_cpu, get_disk; reads the one concise prompt that produced it — 'I have solved the problem class of building Astral UV MCP servers… Our velocity is absolutely mind-blowing.'",
+    "(39:50–43:00, audio) app5: scripts/start.sh + scripts/aea_server_start.sh; the familiar natural-language SQL app — but Cmd+P → /aea spawns agent 'Nexus' inside the app; a second /aea spawns 'Roon'; one explains the codebase while the other renames the Generate-Random-Query button; 'we broke one of our rules… outside the loop is inside the application.'",
+    "(43:00–50:15, audio) Full tactics recap: stop coding; agent's perspective + core four; 12 leverage points; template your engineering; Agentic KPIs (attempts/size/streak/presence); stay out the loop; always add feedback loops; one agent, one prompt, one purpose (app5's session-resume named as the only exception); target ZTE → PITER drops the R → PITE.",
+    "(50:15–53:57, audio) The agentic layer defined (deterministic ADW code + non-deterministic agentic prompts); 'don't compete with a template metaprompt running in an ADW that kicks off five to ten agents per problem — your place of competition is net new innovation'; the final question revealed: 'Am I working on the agentic layer or am I working in the application layer?'",
+    "(53:57–63:19, audio) When to allow application-layer work (deadline, testing, in-loop verification); commoditization of implementation; value moves up the stack (system design, domain encoding, quality control, creative problem decomposition → encoded in ADWs); 'a manifesto… the codex for agentic engineering'; share-the-course ask; YouTube channel cadence; the close: 'When the agents arrived, something changed. We weren't just AI coding anymore. We started orchestrating intelligence.'"
+  ],
+  "quotes": [
+    { "text": "Imagine a ring around your codebase. At first it's thin, then it becomes thicker as you scale agentics into your codebase. Machines that operate with your judgment, shipping your way, getting work done autonomously in your product.", "approx_timestamp": "1:05" },
+    { "text": "This guiding question represents the oil of this course. All the Agentic KPIs, every tactic, it compresses all of it into a single question.", "approx_timestamp": "2:14" },
+    { "text": "Prioritize agentics. This tactic has been staring us in the face the entire time.", "approx_timestamp": "3:01" },
+    { "text": "As a good starting point, I recommend half of your engineering time, at least half, should be spent on the new agentic layer.", "approx_timestamp": "4:00" },
+    { "text": "Keep your eyes on the primitives… It's the primitives, right? Claude Code represents the first viable engineering tool that unlocks agentic engineering… but it won't be the last.", "approx_timestamp": "4:50" },
+    { "text": "The only thing that matters is that you can compose code and reference other files and have this be isolated from your application layer.", "approx_timestamp": "7:35" },
+    { "text": "These are meta prompts. They template out what your engineering workflows look like… This is a prompt that generates a prompt.", "approx_timestamp": "9:49" },
+    { "text": "This script is the gateway into agentic coding… This ADW is calling an agent. This is distinctly different from any other type of code.", "approx_timestamp": "13:39" },
+    { "text": "By creating a script that can surround the application, that can surround any unit of code, we are slowly moving out the loop.", "approx_timestamp": "15:01" },
+    { "text": "It's a great place to start. It's a great place to do deep work… It's a terrible place to stay, okay? So many engineers are going to miss this mark.", "approx_timestamp": "15:20" },
+    { "text": "Building an agentic layer is parabolic. It's absolutely parabolic. Put 10 minutes in, get two hours of value out or more.", "approx_timestamp": "15:38" },
+    { "text": "Remember: prioritize agentics. Prioritize the agentic layer of your codebase. Don't do the work by yourself. Teach your agents to do it. Teach them how to solve the problem class. Build the system that builds the system.", "approx_timestamp": "26:26" },
+    { "text": "You will get to a point where your ADWs, in combination with your prompts, is its own kind of micro codebase — a wrangle layer around your codebase.", "approx_timestamp": "27:45" },
+    { "text": "I have solved the problem class of building Astral UV model context protocol servers. I've solved it. It's done.", "approx_timestamp": "38:50" },
+    { "text": "The power of agents isn't in one, it's in many.", "approx_timestamp": "40:38" },
+    { "text": "One agent, one prompt, one purpose… This creates focused agents, focused context windows, that are reproducible and easily testable, validatable, and improvable.", "approx_timestamp": "47:53" },
+    { "text": "You realize you're the bottleneck and then you'll convert the out-loop framework from PITER to PITE… You'll drop the R off… You will let your product ship itself.", "approx_timestamp": "49:21" },
+    { "text": "Don't make the mistake of thinking that you can outperform your team's best engineering practices encoded into a template metaprompt that runs in an AI developer workflow that kicks off five to ten agents per problem.", "approx_timestamp": "51:30" },
+    { "text": "Am I working on the agentic layer or am I working in the application layer? That's it. On a day-to-day tactical level, even if you forget all eight tactics, this is all you need to think about.", "approx_timestamp": "52:39" },
+    { "text": "There is no competing with an agentic engineer. You must have fleets of agents operating on your behalf to compete with an agentic engineer.", "approx_timestamp": "53:40" },
+    { "text": "An agentic engineer operates on living pieces of software that work while they sleep.", "approx_timestamp": "55:34" },
+    { "text": "What we're seeing here… is the commoditization of implementation and early signs of the commoditization of engineering.", "approx_timestamp": "56:53" },
+    { "text": "This is bigger than a course. This is a manifesto for the next phase of software engineering… the codex for agentic engineering.", "approx_timestamp": "57:45" },
+    { "text": "When the agents arrived, something changed. We weren't just AI coding anymore. We started orchestrating intelligence.", "approx_timestamp": "1:02:20" }
+  ],
+  "prerequisites_tools": [
+    "TAC lessons 1–7 (this lesson recaps and compresses all prior tactics, KPIs, and leverage points)",
+    "Claude Code with API funds or a plan (ADWs run with --dangerously-skip-permissions in programmatic mode; ANTHROPIC_API_KEY via .env)",
+    "Python + UV (all ADWs are uv single-file scripts with inline dependency blocks)",
+    "Bun (app1 /start, app3 server/client, app4 bun prototypes) and Node.js 18+",
+    "Git with worktree support (app2/app4/app5 isolation) and the GitHub CLI for app5's issue-driven ADWs",
+    "Optional per app: Notion account + @notionhq/notion-mcp-server via .mcp.json and NOTION_AGENTIC_TASK_TABLE_ID (app4); OpenAI/Anthropic keys for the NLQ-to-SQL app; ElevenLabs/OpenAI keys for app3 TTS hooks",
+    "An IDE (Dan uses VS Code windows per worktree: `code trees/<name>`)"
+  ],
+  "what_student_must_internalize": [
+    "Every codebase has two layers now: the application layer (everything classical) and the agentic layer (prompts + plans + ADWs + triggers) that operates on it — and they must stay physically separated.",
+    "Tactic #8 contains all others: prioritize agentics. At least half your engineering time on the agentic layer; the return is parabolic (10 minutes in → 2 hours out).",
+    "The minimum viable agentic layer is three directories: .claude/commands/ (prompts), specs/ (plans), adws/ (workflows) — in any scripting language that can compose code and reference files.",
+    "An ADW is deterministic code that calls agents: the gateway script (one prompt, managed state, structured outputs under agents/{adw_id}/) is the seed; composition (chore→implement, build→update, plan→implement→update) is the growth pattern.",
+    "Template meta prompts ARE templated engineering: a Plan Format with step-by-step tasks and validation commands turns your best practices into a reusable artifact; specialize them per problem class (/plan_uv_mcp beats /plan for MCP servers).",
+    "Solve problem classes, not one-offs — the test is whether one concise prompt now produces an entire correct artifact (Dan: an MCP server end to end).",
+    "In-loop is for building and debugging the agentic layer; work ships from out-loop. The ladder: prompt → slash command → ADW script → trigger (cron/task-file/board/embedded server) → ZTE.",
+    "A two-way task file plus a cron trigger is a complete multi-agent system: states [] / [⏰] / [🟡, adw_id] / [✅ hash, adw_id] / [❌, adw_id], tags ({opus}, {adw_plan_implement_update_task}) as per-task config, worktrees with sparse checkout as dedicated agent environments.",
+    "PITER structures every out-loop system (prompt input, trigger, environment, review) — and the ZTE end-state is PITE: you drop the R once feedback loops and streaks prove you're the bottleneck.",
+    "One agent, one prompt, one purpose — reproducible, testable context windows; the sole exception in all of TAC is app5's session resume (--resume with a stored cc_session_id) for the in-app conversational agent.",
+    "Always add feedback loops: your codebase already has a set of validations that proves everything works — the only question is whether you know what it is; encode it so agents can self-verify.",
+    "The daily compass: 'Am I working on the agentic layer or the application layer?' Application-layer work needs a reason (deadline, testing, in-loop verification of prompts) or you're moving sideways.",
+    "Implementation is being commoditized; your value moves up the stack — system design, domain encoding, quality control, creative problem decomposition — all of which you then encode into your agentic layer."
+  ],
+  "common_weak_student_failures": [
+    "Nodding at the ratio, then spending 100% of the week in the application layer 'just to hit the deadline' — never bootstrapping the layer that would have hit the next ten deadlines. The tactic is a time-allocation change, not a belief.",
+    "Cloning tac-8 and reading the code instead of RUNNING it: the lesson's value is watching a trigger pick up work you didn't dispatch by hand ('I'm not doing this by the way').",
+    "Building prompts but no ADW directory — staying a prompt collector. If you're only operating with prompts, you're missing out on tons of capabilities; the fusion of deterministic code with prompts IS the layer.",
+    "Copy-pasting Dan's directory shapes as gospel. He says the opposite three times: 'this is just an arbitrary agentic layer… you can build it any way you want' — the invariants are isolation, composability, observability, feedback loops.",
+    "Mixing the layers: agent scripts inside apps/, or agents writing directly to main without worktrees — then concluding multi-agent 'doesn't work' when parallel edits collide.",
+    "Skipping the tags/blocking semantics in tasks.md and writing one giant task — never seeing dependencies (⏰), model upgrades ({opus}), or workflow routing ({adw_plan_implement_update_task}) that make the board a real orchestrator.",
+    "Treating one-agent-one-prompt-one-purpose as optional and building a sprawling conversational mega-agent — losing reproducibility and testability, the exact failure the rule prevents (context windows are still small).",
+    "Dropping review before adding feedback loops — PITE without validation commands is not zero-touch engineering, it's unsupervised risk. The R is REPLACED by encoded review, never merely deleted.",
+    "Fixating on the exact tools (Claude Code flags, Notion, VS Code) instead of the primitives — the lesson explicitly de-emphasizes Claude Code, and 'don't fixate on the exact details, focus on the agentic layer.'",
+    "Answering the guiding question honestly but only once. It's a DAILY question — 'every day when you sit down to work' — not a course-completion checkbox."
+  ],
+  "teach_back_prompt": "Explain to a colleague, without notes: (1) what the agentic layer is — Dan's exact two-ingredient definition — and how it differs from the application layer; (2) the minimum viable agentic layer's three pieces and why isolation from apps/ is non-negotiable; (3) how tac8_app1's adw_chore_implement.py fuses deterministic code with two agentic prompts, including how the plan path travels from /chore's output into /implement's argument; (4) how tasks.md + a 5-second cron trigger becomes a multi-agent system — walk the emoji state machine and what {opus} and {adw_plan_implement_update_task} tags do; (5) the one exception to one-agent-one-prompt-one-purpose and why it's justified; and (6) the final guiding question, the three acceptable reasons to be in the application layer, and why Dan calls the layer's ROI parabolic.",
+  "retrieval_questions": [
+    { "q": "What is Tactic #8, and what does Dan say it contains?", "a": "Prioritize agentics — prioritize your agentic layer. It represents and compresses ALL other tactics, 'from target zero-touch engineering all the way back to stop coding.'" },
+    { "q": "Define the agentic layer in Dan's two-ingredient formulation.", "a": "Traditional deterministic code (stored in your ADWs directory as a scriptable layer) combined with the new non-deterministic agentic technology (the language model / agent, e.g. Claude Code and its successors). Old world of code + new world of agentic prompts." },
+    { "q": "What are the three pieces of the minimum viable agentic layer, and the one rule about the scripting layer?", "a": "An adws/ AI-developer-workflow directory, prompts (.claude/commands/), and plans (specs/). Any scripting language qualifies (UV Python, Bun TS, shell) as long as you can compose code, reference other files, and keep it isolated from the application layer." },
+    { "q": "How much engineering time does Dan recommend for the agentic layer, and what's the stated ROI shape?", "a": "At least half — more when bootstrapping. The ROI is parabolic: put 10 minutes in, get two hours (or more) of value out." },
+    { "q": "What is 'the gateway script' and what does it manage beyond calling the agent?", "a": "adw_prompt.py — a UV single-file ADW that runs one adhoc Claude Code prompt. It manages the surrounding state: a unique ADW ID, retry logic, and structured outputs under agents/{adw_id}/{agent_name}/ (raw JSONL stream, JSON array, final object, custom summary)." },
+    { "q": "Walk the emoji state machine of app2's tasks.md, including blocking.", "a": "[] pending → [🟡, adw_id] in progress → [✅ commit_hash, adw_id] success or [❌, adw_id] … // Failed: reason. [⏰] tasks are blocked and only become eligible when EVERY task above them in the same worktree is ✅; a ❌ above permanently blocks them." },
+    { "q": "What do the task tags {opus} and {adw_plan_implement_update_task} do?", "a": "{opus} upgrades the model for that task (default sonnet); {adw_plan_implement_update_task} routes the task from the default build-update workflow (/build → /update_task) to the full plan-implement-update workflow (/plan → /implement → /update_task)." },
+    { "q": "How does a plan travel through adw_chore_implement.py?", "a": "Phase 1 runs /chore with [adw_id, prompt]; the planner agent writes specs/chore-{adw_id}-{name}.md and reports the path; the script regex-extracts that path from the agent's output and passes it as the argument to /implement, which the builder agent executes." },
+    { "q": "How do agents get isolated environments in app2/app4, mechanically?", "a": "/init_worktree creates trees/<name> via git worktree add --no-checkout on a new branch, configures cone sparse-checkout of only the target app directory, checks out, copies .env in, and makes an empty initial commit — a dedicated per-agent copy of just the relevant slice." },
+    { "q": "Map PITER onto app4's prototyping system.", "a": "Prompt input = the Notion task page; Trigger = adw_trigger_cron_notion_tasks.py polling every 15 seconds (with --once for testing); Environment = sparse-checkout worktrees under trees/; Review = the board's columns (Not started / In progress / HIL Review / Failed / Done) plus live status updates written back to Notion." },
+    { "q": "State the one-agent rule and the single exception in all of TAC.", "a": "One agent, one prompt, one purpose — focused, reproducible, testable context windows. The only exception is app5's AEA system, which stores cc_session_id in SQLite and passes it back with --resume so the in-app agent can hold a conversation." },
+    { "q": "What is PITER-to-PITE, and what must exist before you drop the R?", "a": "The ZTE conversion: once a dialed-in ADW ships end-to-end and review stops catching anything, you remove the Review step (Prompt input, Trigger, Environment). Prerequisites: you always added feedback loops (validation commands agents run) and taught agents a concrete review step — the R is replaced by encoded review, not deleted." },
+    { "q": "What is the final guiding question, and the three acceptable reasons to answer 'application layer'?", "a": "'Am I working on the agentic layer or am I working in the application layer?' Acceptable application-layer reasons: a deadline, testing something, or running prompts in-loop specifically to verify they'll work out-loop." },
+    { "q": "What did one concise prompt produce in app4's demo, and what does Dan conclude from it?", "a": "A complete, working Astral-UV Python MCP server (system info: get_memory_info, get_cpu, get_disk) planned by /plan_uv_mcp with ai_docs references, built in an isolated worktree, wired via .mcp.json. Conclusion: 'I have solved the problem class of building Astral UV MCP servers' — template meta prompts turn classes of engineering into one-prompt operations." }
+  ],
+  "codebase_map": {
+    "layout_note": "The tac-8 repo contains five sibling app directories, each a complete agentic-layer example (~370 files total). Mapped below are the load-bearing files per app — everything shown or referenced on camera plus the pieces needed to run the labs. Every path verified on disk under tac/tac-8/.",
+    "files": [
+      "tac8_app1__agent_layer_primitives/README.md",
+      "tac8_app1__agent_layer_primitives/.claude/commands/prime.md",
+      "tac8_app1__agent_layer_primitives/.claude/commands/start.md",
+      "tac8_app1__agent_layer_primitives/.claude/commands/chore.md",
+      "tac8_app1__agent_layer_primitives/.claude/commands/feature.md",
+      "tac8_app1__agent_layer_primitives/.claude/commands/implement.md",
+      "tac8_app1__agent_layer_primitives/adws/README.md",
+      "tac8_app1__agent_layer_primitives/adws/adw_prompt.py",
+      "tac8_app1__agent_layer_primitives/adws/adw_slash_command.py",
+      "tac8_app1__agent_layer_primitives/adws/adw_chore_implement.py",
+      "tac8_app1__agent_layer_primitives/adws/adw_sdk_prompt.py",
+      "tac8_app1__agent_layer_primitives/adws/adw_modules/agent.py",
+      "tac8_app1__agent_layer_primitives/adws/adw_modules/agent_sdk.py",
+      "tac8_app1__agent_layer_primitives/apps/main.py",
+      "tac8_app1__agent_layer_primitives/apps/main.ts",
+      "tac8_app1__agent_layer_primitives/specs/chore-8faf73eb-minimal-fastapi-server.md",
+      "tac8_app1__agent_layer_primitives/specs/chore-580d3737-add-health-check-endpoint.md",
+      "tac8_app1__agent_layer_primitives/.env.sample",
+      "tac8_app2__multi_agent_todone/README.md",
+      "tac8_app2__multi_agent_todone/tasks.md",
+      "tac8_app2__multi_agent_todone/adws/adw_triggers/adw_trigger_cron_todone.py",
+      "tac8_app2__multi_agent_todone/adws/adw_build_update_task.py",
+      "tac8_app2__multi_agent_todone/adws/adw_plan_implement_update_task.py",
+      "tac8_app2__multi_agent_todone/adws/adw_modules/agent.py",
+      "tac8_app2__multi_agent_todone/adws/adw_modules/data_models.py",
+      "tac8_app2__multi_agent_todone/adws/adw_modules/utils.py",
+      "tac8_app2__multi_agent_todone/.claude/commands/process_tasks.md",
+      "tac8_app2__multi_agent_todone/.claude/commands/mark_in_progress.md",
+      "tac8_app2__multi_agent_todone/.claude/commands/update_task.md",
+      "tac8_app2__multi_agent_todone/.claude/commands/init_worktree.md",
+      "tac8_app2__multi_agent_todone/.claude/commands/build.md",
+      "tac8_app2__multi_agent_todone/.claude/commands/plan.md",
+      "tac8_app2__multi_agent_todone/apps/sentiment_classification/README.md",
+      "tac8_app2__multi_agent_todone/apps/sentiment_classification/data/tweets_v1.csv",
+      "tac8_app2__multi_agent_todone/apps/sentiment_classification/notebooks/01_sentiment_classification_example.ipynb",
+      "tac8_app2__multi_agent_todone/specs/plan-adw01-multi-agent-task-list.md",
+      "tac8_app3__out_loop_multi_agent_task_board/README.md",
+      "tac8_app3__out_loop_multi_agent_task_board/.claude/hooks/send_event.py",
+      "tac8_app3__out_loop_multi_agent_task_board/.claude/settings.json",
+      "tac8_app3__out_loop_multi_agent_task_board/apps/server/src/index.ts",
+      "tac8_app3__out_loop_multi_agent_task_board/apps/client/src/App.vue",
+      "tac8_app3__out_loop_multi_agent_task_board/scripts/start-system.sh",
+      "tac8_app4__agentic_prototyping/README.md",
+      "tac8_app4__agentic_prototyping/adws/adw_triggers/adw_trigger_cron_notion_tasks.py",
+      "tac8_app4__agentic_prototyping/adws/adw_build_update_notion_task.py",
+      "tac8_app4__agentic_prototyping/adws/adw_plan_implement_update_notion_task.py",
+      "tac8_app4__agentic_prototyping/.claude/commands/plan_uv_mcp.md",
+      "tac8_app4__agentic_prototyping/.claude/commands/plan_vite_vue.md",
+      "tac8_app4__agentic_prototyping/.claude/commands/plan_uv_script.md",
+      "tac8_app4__agentic_prototyping/.claude/commands/plan_bun_scripts.md",
+      "tac8_app4__agentic_prototyping/.claude/commands/get_notion_tasks.md",
+      "tac8_app4__agentic_prototyping/.claude/commands/update_notion_task.md",
+      "tac8_app4__agentic_prototyping/.claude/commands/make_worktree_name.md",
+      "tac8_app4__agentic_prototyping/.claude/commands/init_worktree.md",
+      "tac8_app4__agentic_prototyping/ai_docs/mcp-python-sdk.md",
+      "tac8_app4__agentic_prototyping/.mcp.sample.json",
+      "tac8_app4__agentic_prototyping/deep_specs/init-notion-multi-agent.md",
+      "tac8_app4__agentic_prototyping/scripts/kill_notion_cron.sh",
+      "tac8_app4__agentic_prototyping/scripts/prune_worktrees.sh",
+      "tac8_app5__nlq_to_sql_aea/README.md",
+      "tac8_app5__nlq_to_sql_aea/adws/README.md",
+      "tac8_app5__nlq_to_sql_aea/adws/adw_triggers/adw_trigger_aea_server.py",
+      "tac8_app5__nlq_to_sql_aea/adws/adw_aea_patch.py",
+      "tac8_app5__nlq_to_sql_aea/adws/adw_modules/aea_data_types.py",
+      "tac8_app5__nlq_to_sql_aea/adws/adw_sdlc_zte_iso.py",
+      "tac8_app5__nlq_to_sql_aea/app/client/src/aeaDevConsole.ts",
+      "tac8_app5__nlq_to_sql_aea/app/client/src/aeaChatWindow.ts",
+      "tac8_app5__nlq_to_sql_aea/app/client/src/aeaWindowManager.ts",
+      "tac8_app5__nlq_to_sql_aea/app/client/src/aeaPolling.ts",
+      "tac8_app5__nlq_to_sql_aea/app/server/server.py",
+      "tac8_app5__nlq_to_sql_aea/scripts/start.sh",
+      "tac8_app5__nlq_to_sql_aea/scripts/aea_server_start.sh"
+    ],
+    "what_each_does": {
+      "tac8_app1__agent_layer_primitives/README.md": "The MVAL artifact Dan reads on camera: value proposition ('template our engineering and teach agents how to operate our codebases'), the Minimum Viable vs Scaled agentic-layer trees, the agentic/application layer split, and the canonical 12-leverage-points list.",
+      "tac8_app1__agent_layer_primitives/.claude/commands/prime.md": "The V1 priming prompt: Run (git ls-files), Read (README.md, adws/README.md), Report (summarize understanding). Dan: keep it a standalone file; you'll grow multiple priming variants.",
+      "tac8_app1__agent_layer_primitives/.claude/commands/start.md": "Boots the application layer: uv run apps/main.py + bun run apps/main.ts — 'as complex as you need it to be'; agents manage/restart your processes.",
+      "tac8_app1__agent_layer_primitives/.claude/commands/chore.md": "The V1 template meta prompt: Variables (adw_id, prompt), research-the-codebase instructions, Codebase Structure, and the Plan Format (metadata, description, relevant files, step-by-step tasks, validation commands). Reports back the plan path — the contract adw_chore_implement.py depends on.",
+      "tac8_app1__agent_layer_primitives/.claude/commands/feature.md": "The richer sibling of chore.md: adds user story, problem/solution statements, 3-phase implementation plan, testing strategy — same meta-prompt pattern, bigger problem class.",
+      "tac8_app1__agent_layer_primitives/.claude/commands/implement.md": "The higher-order prompt: takes a plan (path or content) as $ARGUMENTS, thinks hard, implements, then reports with a bullet summary + git diff --stat.",
+      "tac8_app1__agent_layer_primitives/adws/README.md": "The ADW manifesto: 'the highest compositional level of the agentic layer'; minimum vs scaled adws/ trees; agents/{adw_id}/{agent} output structure; retry/env-safety/rich-UI features; SDK-vs-subprocess comparison table.",
+      "tac8_app1__agent_layer_primitives/adws/adw_prompt.py": "THE GATEWAY SCRIPT: uv single-file ADW; click CLI (--model sonnet|opus, --working-dir, --no-retry, --agent-name); generates an 8-char adw_id; calls prompt_claude_code(_with_retry); rich Inputs/Success/Failed panels; writes JSONL stream, JSON array, final object, and custom_summary_output.json under agents/{adw_id}/{agent_name}/.",
+      "tac8_app1__agent_layer_primitives/adws/adw_slash_command.py": "Same gateway pattern but fires predefined slash commands from .claude/commands/ (e.g. ./adws/adw_slash_command.py /start) — the bridge from in-loop slash commands to out-loop execution.",
+      "tac8_app1__agent_layer_primitives/adws/adw_chore_implement.py": "The first composed ADW: Phase 1 execute_template(/chore [adw_id, prompt]) as agent 'planner'; extract_plan_path() regex-parses specs/chore-*.md from the output; Phase 2 execute_template(/implement [plan_path]) as agent 'builder'; per-phase summaries plus workflow_summary.json; exit code reflects overall success.",
+      "tac8_app1__agent_layer_primitives/adws/adw_modules/agent.py": "The core module every app copies: AgentPromptRequest/Response models; cmd = [claude, '-p', prompt, '--output-format', 'stream-json', '--model', …, '--dangerously-skip-permissions']; safe subprocess env filtering; retry codes; JSONL→JSON→final-object parsing; execute_template() composing '/{command} {args}' and routing output to agents/{adw_id}/{agent_name}/.",
+      "tac8_app1__agent_layer_primitives/adws/adw_modules/agent_sdk.py": "The Claude Code Python SDK variant Dan mentions at ~14:15: simple_query(), query_with_tools(), create_session() context manager, safe_query() — typed messages and native async instead of subprocess.",
+      "tac8_app1__agent_layer_primitives/apps/main.py": "The entire Python application layer: print('Hello, agentic coding world!') — deliberately trivial so all attention stays on the ring around it.",
+      "tac8_app1__agent_layer_primitives/apps/main.ts": "Bun twin of main.py (console.log) — exists so /start exercises two runtimes.",
+      "tac8_app1__agent_layer_primitives/specs/chore-8faf73eb-minimal-fastapi-server.md": "Committed example output of the /chore meta prompt (a real plan with step-by-step tasks + validation commands) — shows students what the Plan Format produces before they run anything.",
+      "tac8_app2__multi_agent_todone/README.md": "Documents the Todone system: tasks.md status syntax, the cron trigger, both task-processing workflows, tag routing, and the same 12-leverage-points list.",
+      "tac8_app2__multi_agent_todone/tasks.md": "The two-way task board itself (header '# ATL' — Agentic Task List): worktree-grouped tasks in their final committed state, full of [✅ hash, adw_id] lines and {opus}/{sonnet,adw_plan_implement_update_task} tags from the on-camera run.",
+      "tac8_app2__multi_agent_todone/adws/adw_triggers/adw_trigger_cron_todone.py": "The 5-second cron trigger (schedule lib; --interval/--once/--dry-run/--max-tasks 5): regex pre-check for pending work, /process_tasks → JSON worktree groups, /init_worktree for missing trees, /mark_in_progress per task, then subprocess.Popen of the chosen workflow script with --adw-id/--worktree-name/--task/--model.",
+      "tac8_app2__multi_agent_todone/adws/adw_build_update_task.py": "Default per-task workflow: ensures the worktree exists (/init_worktree), runs /build (prime → analyze → implement → test → commit) inside trees/{worktree}/{app}, then /update_task to flip the tasks.md line to ✅+hash or ❌+reason; timestamped panel logging keyed by adw_id|worktree|phase.",
+      "tac8_app2__multi_agent_todone/adws/adw_plan_implement_update_task.py": "The upgraded workflow behind the {adw_plan_implement_update_task} tag: /plan → regex-extract specs/plan-*.md → /implement → /update_task — the architect+editor pattern Dan calls 'ultra powerful… especially when you combine it with template meta prompts.'",
+      "tac8_app2__multi_agent_todone/adws/adw_modules/data_models.py": "Pydantic models for the board: Task, Worktree, WorktreeTaskGroup, ProcessTasksResponse, CronTriggerConfig, and SystemTag (extracts model/workflow choices from {tags}).",
+      "tac8_app2__multi_agent_todone/.claude/commands/process_tasks.md": "Agent-as-parser: reads tasks.md, applies eligibility rules ([] always; [⏰] only if ALL above are ✅; skip 🟡; ❌ terminal), extracts tags, returns a strict JSON array of {worktree_name, tasks_to_start[]} — the trigger consumes this JSON.",
+      "tac8_app2__multi_agent_todone/.claude/commands/mark_in_progress.md": "Flips [] or [⏰] to [🟡, adw_id] in place, preserving tags/formatting with atomic write semantics.",
+      "tac8_app2__multi_agent_todone/.claude/commands/update_task.md": "The completion write-back contract: [✅ <commit_hash>, <adw_id>] on success; [❌, <adw_id>] … // Failed: <error> on failure; only updates the matching 🟡 line.",
+      "tac8_app2__multi_agent_todone/.claude/commands/init_worktree.md": "The isolation recipe: mkdir trees; git worktree add --no-checkout trees/<name> -b <name>; sparse-checkout init --cone + set <target_dir>; checkout; copy .env; empty initial commit; verification steps. Notes the double isolation: worktree + sparse checkout.",
+      "tac8_app2__multi_agent_todone/.claude/commands/build.md": "The quick-patch prompt: prime with context, analyze, implement directly, validate, commit — 'research, implement, test, commit… more of a quick patch' in Dan's words.",
+      "tac8_app2__multi_agent_todone/apps/sentiment_classification/notebooks/01_sentiment_classification_example.ipynb": "The application layer Dan executes top-to-bottom on camera: classical Jupyter data exploration + sentiment classification over data/tweets_v1.csv ('sentiment distribution 50/50 — definitely not the true distribution').",
+      "tac8_app3__out_loop_multi_agent_task_board/README.md": "The self-study app: multi-agent observability — hooks → HTTP POST → Bun server → SQLite → WebSocket → Vue client; setup for copying .claude/ into any repo with --source-app tagging; links Dan's hooks-mastery material.",
+      "tac8_app3__out_loop_multi_agent_task_board/.claude/hooks/send_event.py": "Universal event sender every hook calls — the mechanism that makes fleets of agents observable in real time (the Review leg of PITER at scale).",
+      "tac8_app4__agentic_prototyping/README.md": "Full documentation of the Notion prototyping factory: architecture, task eligibility (Not started/HIL Review + execute or 'continue - …'), {{prototype:}} routing table, worktree management, detached-subprocess execution model, and prototype-writing best practices.",
+      "tac8_app4__agentic_prototyping/adws/adw_triggers/adw_trigger_cron_notion_tasks.py": "The out-loop trigger: polls Notion every 15s (--interval, --once, --dry-run, --max-tasks 3), claims tasks instantly ('In progress' + adw_id JSON), routes prototype/workflow tags, spawns workflows via subprocess.Popen(start_new_session=True) so agents survive monitor restarts; writes a live feed file.",
+      "tac8_app4__agentic_prototyping/.claude/commands/plan_uv_mcp.md": "The specialized template meta prompt of the MCP demo: on-the-fly app_name variable, Workflow (uv init --package --python 3.10 under apps/{app_name}/), Codebase Structure pointing at ai_docs/mcp-python-sdk.md, ULTRATHINK instruction, Plan Format, and 'exclusively return the plan path' report contract.",
+      "tac8_app4__agentic_prototyping/.claude/commands/make_worktree_name.md": "Single-purpose naming agent with a strict output contract (ONLY the name, e.g. feat-user-auth) — a clean example of one-agent-one-prompt-one-purpose.",
+      "tac8_app4__agentic_prototyping/ai_docs/mcp-python-sdk.md": "Pasted-in MCP Python SDK reference — the 'auxiliary directory' pattern: give agents the docs they need, conditionally, in-repo.",
+      "tac8_app4__agentic_prototyping/.mcp.sample.json": "Notion MCP server wiring (@notionhq/notion-mcp-server with bearer token) — how the agents read/write the board.",
+      "tac8_app5__nlq_to_sql_aea/README.md": "The NLQ-to-SQL product docs (FastAPI + Vite/TS, SQL-injection defense in depth) plus the GitHub-issue-driven ADW system carried forward from earlier lessons (manual/cron/webhook modes).",
+      "tac8_app5__nlq_to_sql_aea/adws/adw_triggers/adw_trigger_aea_server.py": "The AEA server: FastAPI on port 8743; SQLite (adw_data/aea_agents.db) persisting agent_id, cc_session_id, conversation, state; endpoints for new-agent/prompt/poll/end; launches adw_aea_patch.py as a background subprocess per prompt; agents survive app refreshes via agent_id reconnect.",
+      "tac8_app5__nlq_to_sql_aea/adws/adw_aea_patch.py": "The per-prompt workflow: fetches the agent from the DB, builds claude -p <prompt> with --dangerously-skip-permissions, adds --resume <cc_session_id> when one exists (THE exception to one-agent-one-prompt-one-purpose), captures/stores the new session id and simplified response back into the conversation.",
+      "tac8_app5__nlq_to_sql_aea/app/client/src/aeaDevConsole.ts": "The in-app entry point: Cmd/Ctrl+P toggles the dev console; commands /aea (new agent), /list (restore agents), /toggle-view, /close-all; checks server health and points you at scripts/aea_server_start.sh if it's down.",
+      "tac8_app5__nlq_to_sql_aea/app/client/src/aeaChatWindow.ts": "A per-agent chat window with its own polling service — the 'talking directly to our agents from inside the application' UI where Nexus and Roon appear.",
+      "tac8_app5__nlq_to_sql_aea/scripts/aea_server_start.sh": "Boot script Dan runs on camera: kills stale PID/port 8743, exports CLAUDE_CODE_PATH, starts the AEA server under uv with logs to logs/aea_server.log."
+    },
+    "generated_not_committed": {
+      "tac8_app1__agent_layer_primitives/apps/main.sh": "Created live by the adw_chore_implement.py demo ('create a .sh version of main in apps/*') — visible in frame t1131; not part of the committed repo.",
+      "tac8_app1__agent_layer_primitives/specs/chore-eae01d83-create-sh-version-main.md": "The plan the on-camera planner agent wrote; the two committed chore-*.md specs are from earlier runs.",
+      "agents/{adw_id}/{agent_name}/*": "Every ADW run generates cc_raw_output.jsonl, cc_raw_output.json, cc_final_object.json, custom_summary_output.json (+ workflow_summary.json for composed ADWs) — gitignored observability artifacts.",
+      "trees/<worktree_name>/": "Sparse-checkout git worktrees created by /init_worktree during app2/app4 runs (e.g. trees/enhance-training-data, trees/feat-mcp-sysinfo) — environments, not source.",
+      "tac8_app5__nlq_to_sql_aea/adws/adw_data/aea_agents.db": "SQLite store of AEA agents/conversations, created on first server start.",
+      "tac8_app4__agentic_prototyping/apps/<generated prototypes>": "Prototype outputs (the MCP system-info server, UV file watcher, Bun JSON formatter, Vue counter) are generated into worktrees/apps at runtime — the committed repo ships only the factory, not its products."
+    }
+  },
+  "current_practice_gaps": [
+    {
+      "gap": "Slash-command prompt libraries → Agent Skills",
+      "why": "tac-8 encodes every reusable behavior as .claude/commands/*.md invoked by name from ADWs. Current Claude Code packages reusable expertise as Agent Skills (SKILL.md with frontmatter, trigger descriptions, on-demand loading, shareable across repos/teams) — the modern answer to 'template your engineering.' The lesson's meta-prompt concept maps 1:1; the packaging and discovery upgraded.",
+      "yt_candidates": ["X2ciJedw2vU"]
+    },
+    {
+      "gap": "Hand-rolled subprocess agent.py → Claude Agent SDK",
+      "why": "Every app copies a ~630-line agent.py that shells out to `claude -p --output-format stream-json` and hand-parses JSONL. Dan already plants the successor on camera (agent_sdk.py, 'they support both a Python version and a bun version'). That SDK matured into the Claude Agent SDK (Python/TS): typed messages, sessions, hooks, subagents, structured outputs — production ADWs today start there, while the subprocess form remains the clearest teaching form.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "--dangerously-skip-permissions everywhere → permission modes, sandboxing, hooks",
+      "why": "All tac-8 ADWs run agents with permissions fully bypassed (fine for isolated demo repos, risky as a habit). Current practice gates headless agents with allowlists, permission modes, sandboxed bash, and pre/post tool-use hooks — and worktree isolation (which the lesson DOES teach) is now complemented by first-class sandboxing. The lesson's isolation instinct is right; the bypass flag is the dated part.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "DIY cron/polling triggers → native background agents, scheduled runs, CI hooks",
+      "why": "app2/app4 poll with `schedule` loops in long-running terminal processes; app5 hand-rolls a FastAPI server. The trigger CONCEPT is timeless, but current tooling offers headless CI invocation, background tasks, scheduled cloud agents, and webhook-native integrations out of the box — a modern reader should map 'trigger' to those services rather than assume a hand-rolled poller is required.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "One serial agent per task → first-class parallel subagents and orchestration",
+      "why": "tac-8 achieves parallelism at the OS level: detached subprocesses per task, one Claude instance each, coordinated by markdown/Notion state. Current tools offer in-band multi-agent primitives (subagents, parallel tool fan-out, worktree-isolated background agents, orchestration frameworks), so the lesson's parallel patterns can now be expressed inside the agent runtime itself — same architecture, less scaffolding.",
+      "yt_candidates": ["fop_yxV-mPo"]
+    },
+    {
+      "gap": "Model/tool period detail",
+      "why": "Scripts toggle sonnet|opus of the course era; the app5 start script hard-codes Dan's local claude path; the Notion MCP server and .mcp.json format are course-era versions. All incidental: swap in current model names/paths and everything runs. Dan future-proofs this explicitly ('tools will change and models will improve — we can't fixate').",
+      "yt_candidates": []
+    },
+    {
+      "gap": "AEA foreshadows in-product agents",
+      "why": "app5's agent-embedded-application (SQLite session store + resume + in-app chat windows) is a hand-built preview of what the Agent SDK now supports directly: embedding long-lived, session-resuming agents into products. The 'outside the loop is inside the application' idea has gone from demo to standard architecture.",
+      "yt_candidates": []
+    }
+  ],
+  "yt_overlay_candidates": [
+    {
+      "video_id": "fop_yxV-mPo",
+      "title": "Codebase Singularity",
+      "maps_to": "operationalizes tactic",
+      "include_in_phase1": true,
+      "rationale": "The free-channel treatment of exactly this lesson's end-state: the codebase that increasingly runs itself as the agentic layer thickens. Was explicitly deferred from the TAC-1 chapter ('reserve for a later chapter') — TAC-8 is that chapter; zero topic drift from 'prioritize your agentic layer.'"
+    },
+    {
+      "video_id": "hGg3nWp7afg",
+      "title": "3 Codebase Folders",
+      "maps_to": "named hole",
+      "include_in_phase1": true,
+      "rationale": "Directly expands the minimum-viable-agentic-layer directory story (prompts/plans/ai_docs-style folders that serve agents) — the lesson names the MVAL pieces but moves fast; this overlay slows down on the folder-level reasoning. Also deferred from TAC-1 to the context/structure lesson family."
+    },
+    {
+      "video_id": "X2ciJedw2vU",
+      "title": "RAW Agentic Coding: ZERO to Agent SKILL",
+      "maps_to": "corrects outdated",
+      "include_in_phase1": false,
+      "rationale": "Upgrades .claude/commands prompt-library thinking to Agent Skills packaging — the lesson's biggest current-practice gap — but it already anchors the TAC-1 chapter's overlay set; listed here for the volume map, not for double placement."
+    }
+  ],
+  "frame_plan": [
+    { "t_seconds": 385, "label": "terminal-five-apps", "file": "media/frames/tac-8-the-agentic-layer/t0385-terminal-five-apps.jpg", "why_for_weak_student": "Orientation in one glance: `ls` inside tac-8 showing all five app directories — the lesson's map. Kills 'where am I?' before any concept lands.", "diagram_instead": false },
+    { "t_seconds": 430, "label": "app1-readme-mval", "file": "media/frames/tac-8-the-agentic-layer/t0430-app1-readme-mval.jpg", "why_for_weak_student": "The Minimum Viable Agentic Layer as an actual artifact: specs/ + .claude/commands/ + adws/ trees with per-line comments, on screen exactly when Dan says 'you really only need these pieces.'", "diagram_instead": false },
+    { "t_seconds": 515, "label": "prime-command-run", "file": "media/frames/tac-8-the-agentic-layer/t0515-prime-command-run.jpg", "why_for_weak_student": "In-loop ground truth: prime.md open, /prime running in Claude Code (git ls-files, README reads, token counts) — what 'setting your agent up' concretely looks like before any out-loop machinery.", "diagram_instead": false },
+    { "t_seconds": 610, "label": "chore-template-plan-format", "file": "media/frames/tac-8-the-agentic-layer/t0610-chore-template-plan-format.jpg", "why_for_weak_student": "THE template meta prompt: chore.md with Variables, Instructions, and the Plan Format visible — the 'prompt that generates a prompt' students must be able to point at.", "diagram_instead": false },
+    { "t_seconds": 810, "label": "adw-prompt-gateway-run", "file": "media/frames/tac-8-the-agentic-layer/t0810-adw-prompt-gateway-run.jpg", "why_for_weak_student": "The gateway script mid-flight: adw_prompt.py source + the rich Inputs panel (ADW ID, prompt, model, working dir, output path) for Dan's 'list all files in the adws directory' run — deterministic code calling an agent, visibly.", "diagram_instead": false },
+    { "t_seconds": 1131, "label": "chore-implement-pipeline-main-sh", "file": "media/frames/tac-8-the-agentic-layer/t1131-main-sh-implemented.jpg", "why_for_weak_student": "The whole composed-ADW story in one screen: Planning Success with the plan path, Phase 2 Implement Inputs consuming that exact path, the generated spec open in the editor, and apps/main.sh newly in the tree.", "diagram_instead": false },
+    { "t_seconds": 1320, "label": "trigger-starting-7-tasks", "file": "media/frames/tac-8-the-agentic-layer/t1320-trigger-seven-tasks.jpg", "why_for_weak_student": "The multi-agent ignition moment: tasks.md (worktree-grouped tasks, {opus, adw_plan_implement_update_task} tag visible) above the trigger's 'Starting 7 Tasks' panel and 'Creating Worktree' — proof no human dispatched anything.", "diagram_instead": false },
+    { "t_seconds": 1400, "label": "tasks-md-in-progress-build-inputs", "file": "media/frames/tac-8-the-agentic-layer/t1400-tasks-md-in-progress.jpg", "why_for_weak_student": "The two-way task file mid-update: [🟡, adw_id] markers on tasks while the terminal shows that agent's Build Inputs (/build, worktree, model, agent name) — the emoji state machine in action.", "diagram_instead": false },
+    { "t_seconds": 1540, "label": "tasks-rolling-in-states", "file": "media/frames/tac-8-the-agentic-layer/t1540-tasks-rolling-in.jpg", "why_for_weak_student": "The full state vocabulary in one file: ✅ with commit hashes, 🟡 in flight, ⏰ blocked, plus the trees/ directory in the explorer — 'agents are just rolling in work.'", "diagram_instead": false },
+    { "t_seconds": 1720, "label": "sparse-checkout-worktree", "file": "media/frames/tac-8-the-agentic-layer/t1720-sparse-checkout-tree.jpg", "why_for_weak_student": "Isolation made visible: a second editor window rooted at trees/enhance-training-data containing ONLY the app2 directory — what 'a dedicated environment for this agent's set of work' actually is.", "diagram_instead": false },
+    { "t_seconds": 1835, "label": "notion-board-view", "file": "media/frames/tac-8-the-agentic-layer/t1835-notion-board-view.jpg", "why_for_weak_student": "The out-loop prompt-input surface: the Agentic Prototyper Notion board with four prototype tasks and an open card showing 'workflow:plan prototype:vite_vue' + 'execute' — prompts living entirely outside any coding tool.", "diagram_instead": false },
+    { "t_seconds": 2065, "label": "plan-uv-mcp-template", "file": "media/frames/tac-8-the-agentic-layer/t2065-plan-uv-mcp-template.jpg", "why_for_weak_student": "Specialization of the meta prompt: plan_uv_mcp.md's Instructions/Workflow (uv init --package) and ai_docs/mcp-python-sdk.md reference — why one concise prompt can produce a whole MCP server.", "diagram_instead": false },
+    { "t_seconds": 70, "label": "agentic-layer-ring", "file": null, "why_for_weak_student": "The ring metaphor (thin → thick ring around the codebase) appears only as a green pixel animation over B-roll — render as a designed two-layer ring diagram (application core, agentic ring, triggers/ADWs on the ring).", "diagram_instead": true },
+    { "t_seconds": 2450, "label": "aea-two-agents-in-app", "file": null, "why_for_weak_student": "Nexus + Roon chatting inside the NLQ app is lost to the capture freeze — render as a designed mock of the app with two chat windows (Cmd+P → /aea) annotated with the AEA server/SQLite/--resume flow.", "diagram_instead": true },
+    { "t_seconds": 2961, "label": "piter-to-pite", "file": null, "why_for_weak_student": "The 'drop the R' beat (audio-only region) — render as a designed PITER → PITE transformation graphic with the R crossed out and replaced by encoded feedback loops.", "diagram_instead": true },
+    { "t_seconds": 3159, "label": "the-final-question", "file": null, "why_for_weak_student": "The course-compressing question reveal (audio-only region) — render as a full-bleed designed pull-quote: 'Am I working on the agentic layer or am I working in the application layer?'", "diagram_instead": true },
+    { "t_seconds": 3020, "label": "agentic-layer-definition", "file": null, "why_for_weak_student": "Dan's two-ingredient definition (deterministic ADW code + non-deterministic agentic prompts) lands in the audio-only region — render as a designed equation card: old world + new world = the agentic layer.", "diagram_instead": true }
+  ],
+  "lab": {
+    "setup": [
+      "Clone the course repo: git clone https://github.com/disler/tac-8.git && cd tac-8 (catalog mirror: tac/tac-8)",
+      "Verify the toolbelt: claude --version, uv --version, bun --version, git --version",
+      "In tac8_app1__agent_layer_primitives: cp .env.sample .env and set ANTHROPIC_API_KEY (plus CLAUDE_CODE_PATH if `claude` isn't on PATH)",
+      "Read app1's README.md end to end — name the three MVAL pieces and the two layers before running anything",
+      "Safety note: these ADWs run Claude with --dangerously-skip-permissions; stay inside the cloned repo and read each prompt file before firing it"
+    ],
+    "reproduce_dan": [
+      "app1 in-loop: run `claude`, then /prime; confirm it runs git ls-files, reads both READMEs, and reports. Then /start; confirm both hello-world outputs.",
+      "app1 gateway: ./adws/adw_prompt.py \"list all files in the adws directory and a concise output of their purpose\" — read the Inputs panel, then inspect all four files under agents/<adw_id>/oneoff/.",
+      "app1 slash-out-loop: ./adws/adw_slash_command.py /start — same prompt as in-loop, zero conversation.",
+      "app1 composed ADW (Dan's exact run): ./adws/adw_chore_implement.py \"create a .sh version of main in apps/*\" — verify specs/chore-<id>-*.md exists, apps/main.sh exists and runs (sh apps/main.sh), and agents/<adw_id>/ contains planner/ + builder/ + workflow_summary.json.",
+      "app2 board: replace tasks.md content with your own '# ATL' list — two worktrees, three tasks each, last task of one worktree marked [⏰], one task tagged {opus} and one tagged {sonnet,adw_plan_implement_update_task}.",
+      "app2 trigger once: ./adws/adw_triggers/adw_trigger_cron_todone.py --once --dry-run first (read what WOULD happen), then --once for real; watch worktree creation and 🟡 markers appear in tasks.md.",
+      "app2 continuous: run the trigger with defaults (5s poll) and let it drain the board; verify ✅ lines carry real commit hashes (git -C trees/<name> log --oneline) and the ⏰ task started only after everything above it succeeded.",
+      "app2 validation pass: open trees/<worktree> (code trees/<worktree>) and confirm the sparse checkout contains only tac8_app2__multi_agent_todone; validate one agent's artifact by hand exactly like Dan validated tweets_positive_only.csv.",
+      "app4 (no Notion needed): read adw_trigger_cron_notion_tasks.py's claim/route/spawn flow and .claude/commands/plan_uv_mcp.md; then run the meta prompt in-loop: claude → /plan_uv_mcp test0001 \"Create a concise and minimal MCP server that provides system information: memory, cpu, disk\" — read the generated specs/plan-*-uv-mcp.md and check it against the Plan Format contract.",
+      "app4 stretch target check: confirm the routing table maps {{prototype: uv_mcp}} → /plan_uv_mcp and 'continue - <prompt>' → HIL iteration (README §How It Works).",
+      "app5 AEA: cp app/server/.env.sample app/server/.env (add keys); ./scripts/start.sh; in a second terminal ./scripts/aea_server_start.sh (edit CLAUDE_CODE_PATH for your machine); open http://localhost:5173, press Cmd+P, run /aea; ask 'what is this codebase about?'; open a second agent with /aea and give it a small UI change; refresh the page and verify both agents reconnect with history (SQLite persistence + --resume)."
+    ],
+    "stretch": [
+      "S1 — New problem class (app1): copy chore.md to a new template meta prompt (e.g. /bugfix or /docs) with its own Plan Format; wire a composed ADW that chains it into /implement; run it end to end. Pass = your team-specific standards appear in the generated plan.",
+      "S2 — Blocked-chain proof (app2): craft a worktree where task 2 is [⏰] and task 1 is designed to FAIL (e.g. impossible validation); run the trigger and verify task 2 never starts and task 1 records [❌, adw_id] … // Failed: <reason>.",
+      "S3 — Trigger surgery (app2): change the polling interval and --max-tasks, then add a third workflow tag of your own design routed in delegate_task() — one new elif and one new ADW script.",
+      "S4 — Real Notion factory (app4): create a Notion DB, wire .mcp.json from .mcp.sample.json + NOTION_AGENTIC_TASK_TABLE_ID, run the trigger with --once, and ship one {{prototype: uv_script}} task from board to Done.",
+      "S5 — AEA to your codebase (app5): point the AEA server pattern at any repo of yours — the server + patch script + dev console are self-contained; verify session resume across a server restart.",
+      "S6 — The audit (capstone): for one real workweek, keep a two-column log answering the guiding question each work block. Compute your agentic-layer percentage; if under 50%, pick the problem class you did most often by hand and template it."
+    ],
+    "pass_criteria": [
+      "Zero application code typed by hand anywhere in the lab (agents write main.sh, datasets, prototypes; you write prompts, plans, tasks, and ADW glue)",
+      "agents/<adw_id>/ observability tree produced and explained: you can say what the JSONL stream, JSON array, final object, and custom summary each contain",
+      "adw_chore_implement.py run: plan file exists in specs/, apps/main.sh exists and runs, workflow_summary.json shows both phases succeeded",
+      "app2 board drained: every task reached ✅ (with verifiable commit hash in its worktree) or ❌ (with reason); the ⏰ dependency provably held; sparse checkout verified (worktree contains only the app2 directory)",
+      "app4: a Plan-Format-conformant specs/plan-*-uv-mcp.md generated from one concise prompt (in-loop acceptable; Notion path is stretch)",
+      "app5: two concurrent AEA agents, one Q&A and one code change, both surviving a page refresh via session resume",
+      "Closing oral check, no notes: the two layers and the ≥50% rule; the MVAL's three pieces; the tasks.md state machine incl. tags; PITER→PITE and its prerequisite; the one-agent rule + its exception; and the final guiding question with its three acceptable application-layer reasons"
+    ]
+  },
+  "estimated_print_pages_when_expanded": 52,
+  "confidence_notes": [
+    "VIDEO CAPTURE DEFECT (material): the lesson video's screen content is live only until ~34:30; from ~35:45 to the end (63:19) the video track cycles 4 stale frames while audio continues. All 12 extracted frames come from the verified-live region; five lost visual beats are flagged diagram_instead (file: null) in frame_plan. Claims about on-screen content after ~34:30 (Notion board columns, MCP tool outputs like the 128GB memory reading, Nexus/Roon windows) are transcript-derived, not frame-verified. Re-capture of 34:30–63:19 would allow frame upgrades.",
+    "All quotes cross-checked against the 12,042-line VTT; timestamps accurate to within ~5 seconds (capture starts ~1.4s into the lesson player; drift is negligible at this precision).",
+    "Transcript is auto-generated; canonical corrections applied: 'clog code'/'Cloud Code' → Claude Code; 'bond run' → bun run; 'Prong trigger' → cron trigger; 'tech eight' → TAC-8; 'sjson array' → JSON array; 'code trees, feet, MCP' → `code trees/feat-mcp-sysinfo`; 'ad developer workflow' → AI developer workflow; 'agents to glare' → agentic layer; 'to done' → Todone (app2's name); 'Peter/Pete' → PITER/PITE (lesson-7 framework); 'Nexus' and 'Roon' are AEA agent display names.",
+    "Every codebase path in codebase_map verified to exist under tac/tac-8 (the catalog symlink target). The repo holds ~370 files across five apps; the map covers the on-camera and lab-critical subset plus directory-level descriptions — it is intentionally not a 370-file inventory.",
+    "Technical mechanics verified by reading source, not the video: trigger intervals (app2 default 5s, app4 default 15s, max-tasks 5/3), tag routing via SystemTag, /process_tasks JSON contract, sparse-checkout recipe, plan-path regexes in both composed ADWs, agent.py's claude -p --output-format stream-json --dangerously-skip-permissions invocation, AEA port 8743 + --resume session flow, and Cmd/Ctrl+P dev-console commands (/aea, /list, /toggle-view, /close-all).",
+    "tasks.md in the committed repo shows the POST-run state (✅ lines with hashes) — Dan pastes a fresh task list on camera; students should author their own, as the lab directs.",
+    "The 'four unique codebases' phrasing from the lesson open resolves to five directories on disk; Dan works apps 1, 2, 4, 5 on camera and explicitly assigns app3 (observability) as self-study. The extract mirrors that split.",
+    "Loot box inventory (12 notes) taken from the captured course-notes.md; the last note's text includes site-navigation noise from capture — trimmed here to the note's actual content.",
+    "YT overlay IDs come from the orchestration seed list (two were explicitly deferred from TAC-1 'to a later chapter' — this chapter); verify via oembed before publishing links, per the gold-review checklist.",
+    "current_practice_gaps written against Claude Code / Agent SDK as of mid-2026 (Skills, permission modes, sandboxing, background agents); this axis moves fast — re-verify at publish time."
+  ]
+}

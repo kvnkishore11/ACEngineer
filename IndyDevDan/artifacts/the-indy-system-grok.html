@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>The Indy System · grok</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+:root{
+  --bg:#f3eee4; --card:#fffcf6; --ink:#1e1a16; --mute:#6b6358;
+  --clay:#c75b39; --clay2:#e8a48a; --blue:#2f6f9f; --green:#4a7c3f;
+  --amber:#c48a20; --plum:#6e4a86; --line:#ddd4c4;
+  --serif:Fraunces,Georgia,serif; --sans:Inter,system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:
+  radial-gradient(circle at 8% 0%,rgba(199,91,57,.09),transparent 42%),
+  radial-gradient(circle at 92% 8%,rgba(110,74,134,.08),transparent 38%),
+  var(--bg);color:var(--ink);line-height:1.45}
+code{font-family:var(--mono);font-size:12px;background:#f0e9dc;padding:1px 6px;border-radius:5px}
+.top{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:rgba(243,238,228,.92);
+  border-bottom:1px solid var(--line);padding:10px 16px}
+.top-in{max-width:1040px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px}
+.logo b{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#e07a55,var(--clay));
+  color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:17px}
+.logo span{font-family:var(--serif);font-weight:600;font-size:16px}
+.logo small{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs a{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--mute);text-decoration:none}
+.tabs a:hover,.tabs a.on{background:var(--clay);border-color:var(--clay);color:#fff}
+.wrap{max-width:1040px;margin:0 auto;padding:26px 16px 90px}
+.hero h1{font-family:var(--serif);font-size:clamp(30px,5.5vw,46px);line-height:1.05;margin:0 0 10px;letter-spacing:-.02em}
+.hero h1 i{color:var(--clay);font-style:italic}
+.hero p{font-size:17px;color:var(--mute);max-width:40ch;margin:0 0 18px}
+.sec{margin:36px 0;scroll-margin-top:70px}
+.sec h2{font-family:var(--serif);font-size:clamp(24px,3.5vw,30px);margin:0 0 6px}
+.sec h2 i{color:var(--clay);font-style:italic}
+.sec .sub{color:var(--mute);margin:0 0 14px;font-size:14.5px}
+.mantra{background:linear-gradient(135deg,#2a211c,#1c1813);color:#f5ebe0;border-radius:18px;padding:22px 20px;text-align:center;margin:18px 0 24px}
+.mantra p{font-family:var(--serif);font-size:clamp(18px,3vw,24px);line-height:1.3;margin:0;font-style:italic}
+.mantra small{display:block;margin-top:10px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#a89888}
+.grid{display:grid;gap:10px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.g4{grid-template-columns:1fr 1fr 1fr 1fr}
+.g5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:800px){.g2,.g3,.g4,.g5{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px 15px}
+.card h3{font-family:var(--serif);font-size:16px;margin:0 0 6px}
+.card p{margin:0;color:var(--mute);font-size:13.5px}
+.emoji{font-size:26px;line-height:1;margin-bottom:6px}
+.num{font-family:var(--mono);font-size:10px;color:var(--clay);letter-spacing:.1em;margin-bottom:4px}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0}
+.box{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-width:78px;text-align:center}
+.box strong{display:block;font-family:var(--mono);font-size:10px;color:var(--clay)}
+.box span{font-size:12.5px;font-weight:600}
+.arr{color:var(--mute)}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:700px){.pick{grid-template-columns:1fr}}
+.pick .card{cursor:default;transition:border-color .15s}
+.pick .card.a{border-color:#e8a48a;background:linear-gradient(160deg,#fffcf6,#fdeee8)}
+.pick .card.b{border-color:#c4b0d4;background:linear-gradient(160deg,#fffcf6,#f3eef8)}
+.method{border:1.5px solid var(--line);border-radius:18px;overflow:hidden;margin:0 0 14px;background:var(--card)}
+.method .hd{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.method .hd .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none}
+.method .hd h3{margin:0;font-family:var(--serif);font-size:18px}
+.method .hd p{margin:2px 0 0;font-size:12.5px;color:var(--mute)}
+.method .bd{padding:14px 16px}
+.steps-mini{display:grid;gap:8px}
+.steps-mini .s{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.steps-mini .s i{width:28px;height:28px;border-radius:8px;background:var(--clay);color:#fff;display:grid;place-items:center;
+  font-family:var(--mono);font-size:12px;font-style:normal;font-weight:600}
+.steps-mini .s p{margin:0;font-size:13.5px;color:var(--mute);padding-top:4px}
+.steps-mini .s p b{color:var(--ink)}
+.seats{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.seat{font-size:12px;padding:5px 10px;border-radius:999px;background:#f0e9dc;border:1px solid var(--line)}
+.tier{display:flex;flex-direction:column;align-items:center;gap:6px;margin:12px 0}
+.tier .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.tier .t{padding:10px 14px;border-radius:12px;font-size:13px;font-weight:600;text-align:center;min-width:100px;border:1.5px solid var(--line);background:var(--card)}
+.tier .t.o{background:#2a211c;color:#f5ebe0;border-color:#2a211c}
+.tier .t.l{background:rgba(47,111,159,.12);border-color:rgba(47,111,159,.35);color:var(--blue)}
+.tier .t.w{background:rgba(95,113,56,.12);border-color:rgba(95,113,56,.35);color:var(--green)}
+.ladder{display:flex;flex-direction:column;gap:0;position:relative;padding-left:4px}
+.ladder::before{content:"";position:absolute;left:23px;top:14px;bottom:14px;width:3px;background:linear-gradient(var(--clay),var(--plum));border-radius:2px}
+.rung{display:grid;grid-template-columns:36px 1fr;gap:10px;margin:0 0 8px}
+.dot{width:36px;height:36px;border-radius:50%;background:var(--card);border:3px solid var(--clay);display:grid;place-items:center;
+  font-family:var(--mono);font-size:10px;font-weight:600;color:var(--clay);z-index:1}
+.rung-b{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px}
+.rung-b strong{display:block;font-size:13.5px}
+.rung-b span{color:var(--mute);font-size:12.5px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.vs{grid-template-columns:1fr}}
+.bad{background:#fdf0ee;border:1.5px solid #e8b4a8;border-radius:16px;padding:14px}
+.good{background:#eef6ea;border:1.5px solid #b5d4a8;border-radius:16px;padding:14px}
+.bad h3,.good h3{margin:0 0 8px;font-size:14px}
+.bad li,.good li{margin:0 0 4px;font-size:13px;color:var(--mute)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+@media(max-width:800px){.days{grid-template-columns:1fr 1fr}}
+.day{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px;text-align:center;min-height:96px}
+.day .d{font-family:var(--mono);font-size:9.5px;color:var(--clay);letter-spacing:.08em}
+.day strong{display:block;font-size:12px;margin:4px 0 2px}
+.day span{font-size:11px;color:var(--mute)}
+.tree{font-family:var(--mono);font-size:12px;background:#1c1813;color:#e8dfd0;padding:16px;border-radius:14px;line-height:1.6;overflow-x:auto}
+.tree .f{color:#e07a55}.tree .c{color:#6e6558}
+.chip{display:inline-block;font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:6px;background:#f0e9dc;color:var(--mute);margin:2px 2px 0 0}
+.chip.clay{background:rgba(199,91,57,.15);color:var(--clay)}
+.chip.plum{background:rgba(110,74,134,.15);color:var(--plum)}
+.chip.blue{background:rgba(47,111,159,.12);color:var(--blue)}
+.tl{font-family:var(--mono);font-size:11.5px;background:var(--card);border:1.5px dashed var(--line);border-radius:12px;padding:12px 14px;color:var(--mute);line-height:1.7}
+.tl b{color:var(--ink)}
+.foot{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10.5px;color:var(--mute);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.plug{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px;overflow-x:auto}
+.plug pre{margin:0;font-family:var(--mono);font-size:11.5px;line-height:1.55;color:var(--mute);white-space:pre}
+.plug pre .h{color:var(--clay);font-weight:600}
+.step-row{display:grid;grid-template-columns:52px 1fr;gap:10px;margin:0 0 8px}
+.step-n{background:var(--clay);color:#fff;border-radius:14px;display:grid;place-items:center;font-family:var(--serif);font-size:22px}
+.step-b{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px}
+.step-b h3{margin:0 0 3px;font-size:15px}
+.step-b p{margin:0;color:var(--mute);font-size:13.5px}
+.if{margin-top:6px;font-size:12.5px;background:#fff6e8;border:1px solid #f0d9a8;color:#7a5a10;padding:6px 9px;border-radius:8px}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div class="logo"><b>I</b><div><span>The Indy System</span><small>by grok · code + multi-agent</small></div></div>
+  <nav class="tabs">
+    <a href="#map">Map</a>
+    <a href="#cpbpp">Code loop</a>
+    <a href="#choose">Chooser</a>
+    <a href="#ceo">CEO</a>
+    <a href="#lead">Lead</a>
+    <a href="#ui">UI</a>
+    <a href="#ver">Verifier</a>
+    <a href="#pi">Pi</a>
+    <a href="#trust">Trust ladder</a>
+    <a href="#week">Week 1</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>One brain.<br>Two toolkits.<br><i>Still systematic.</i></h1>
+    <p>Code work has one loop (CPBPP). Decisions, teams, and trust have multi-agent methods on Pi. Same Dan. Different machine for different job.</p>
+  </section>
+
+  <div class="mantra" id="map">
+    <p>Code tickets → CPBPP.<br>Hard decisions → CEO board.<br>Big codebase teams → Lead.<br>Product at N scale → UI teams.<br>Don’t trust claims → Verifier.</p>
+    <small>pick the machine · don’t invent a new one</small>
+  </div>
+
+  <!-- BIG MAP -->
+  <section class="sec">
+    <h2>Big picture · <i>two toolkits</i></h2>
+    <p class="sub">You don’t use a CEO board to rename a variable. You don’t use a single chat for a $12M decision.</p>
+    <div class="pick">
+      <div class="card a">
+        <div class="emoji">🧱</div>
+        <div class="num">TOOLKIT A · CODE WORK</div>
+        <h3>CPBPP loop</h3>
+        <p>Chores, bugs, features. Plan → build → prove. Agentic layer: <code>.claude/</code> + <code>adws/</code> + <code>specs/</code>.</p>
+        <div style="margin-top:8px"><span class="chip clay">TAC 1–8</span><span class="chip clay">ADW</span><span class="chip clay">ZTE</span></div>
+      </div>
+      <div class="card b">
+        <div class="emoji">🧠</div>
+        <div class="num">TOOLKIT B · MULTI-AGENT (Pi)</div>
+        <h3>CEO · Lead · UI · Verifier</h3>
+        <p>Decisions, multi-team coding, product ops, trust. Own the harness. Theme of 2026: <b>trust &amp; scale</b>.</p>
+        <div style="margin-top:8px"><span class="chip plum">MA 1–4</span><span class="chip plum">Pi</span><span class="chip plum">YouTube</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CPBPP compact -->
+  <section class="sec" id="cpbpp">
+    <h2>Toolkit A · <i>code loop</i></h2>
+    <p class="sub">Same as before. Tattoo this for every ticket.</p>
+    <div class="flow">
+      <div class="box"><strong>0</strong><span>Done-when?</span></div><div class="arr">→</div>
+      <div class="box"><strong>1</strong><span>Classify</span></div><div class="arr">→</div>
+      <div class="box"><strong>2</strong><span>Leverage</span></div><div class="arr">→</div>
+      <div class="box"><strong>3</strong><span>Plan</span></div><div class="arr">→</div>
+      <div class="box"><strong>4</strong><span>Build</span></div><div class="arr">→</div>
+      <div class="box"><strong>5</strong><span>Prove</span></div><div class="arr">→</div>
+      <div class="box"><strong>6</strong><span>Capture</span></div><div class="arr">→</div>
+      <div class="box"><strong>7</strong><span>Promote</span></div>
+    </div>
+    <div class="grid g4">
+      <div class="card"><div class="emoji">🧹</div><h3>chore</h3><p>boring cleanup</p></div>
+      <div class="card"><div class="emoji">🐛</div><h3>bug</h3><p>it’s broken</p></div>
+      <div class="card"><div class="emoji">✨</div><h3>feature</h3><p>new thing</p></div>
+      <div class="card"><div class="emoji">🩹</div><h3>patch</h3><p>tiny review fix</p></div>
+    </div>
+    <div class="tl" style="margin-top:12px">
+      <b>Fresh agent</b> for plan · <b>fresh agent</b> for build · plan lives in <b>specs/</b> · fail → fix <b>template</b>, not only the app · <b>3×</b> → permanent command
+    </div>
+  </section>
+
+  <!-- CHOOSER -->
+  <section class="sec" id="choose">
+    <h2>Chooser · <i>what am I doing?</i></h2>
+    <p class="sub">One glance. Pick the row. Run that method. Stop freestyling.</p>
+    <div class="grid" style="gap:8px">
+      <div class="card" style="display:grid;grid-template-columns:1fr 1.2fr;gap:8px;align-items:center">
+        <div><b>Cleanup / bug / feature</b><br><span style="color:var(--mute);font-size:13px">clear domain, one writer</span></div>
+        <div><span class="chip clay">→ CPBPP / ADW</span></div>
+      </div>
+      <div class="card" style="display:grid;grid-template-columns:1fr 1.2fr;gap:8px;align-items:center">
+        <div><b>Hard strategic choice</b><br><span style="color:var(--mute);font-size:13px">pricing, acquire, stack bet, career</span></div>
+        <div><span class="chip plum">→ CEO + Board</span></div>
+      </div>
+      <div class="card" style="display:grid;grid-template-columns:1fr 1.2fr;gap:8px;align-items:center">
+        <div><b>Multi-domain code change</b><br><span style="color:var(--mute);font-size:13px">plan + eng + validate, mid/large repo</span></div>
+        <div><span class="chip blue">→ Lead teams</span></div>
+      </div>
+      <div class="card" style="display:grid;grid-template-columns:1fr 1.2fr;gap:8px;align-items:center">
+        <div><b>Problem class at N scale</b><br><span style="color:var(--mute);font-size:13px">infinite UIs, team operates product</span></div>
+        <div><span class="chip blue">→ UI agents</span></div>
+      </div>
+      <div class="card" style="display:grid;grid-template-columns:1fr 1.2fr;gap:8px;align-items:center">
+        <div><b>“Did it actually do that?”</b><br><span style="color:var(--mute);font-size:13px">review is the bottleneck</span></div>
+        <div><span class="chip plum">→ Builder + Verifier</span></div>
+      </div>
+    </div>
+    <div class="if" style="margin-top:12px">⚠️ Don’t multi-agent until CPBPP + closed loops work. Fleet without tests = vibe automation.</div>
+  </section>
+
+  <!-- CEO -->
+  <section class="sec" id="ceo">
+    <h2>Method · <i>CEO + Board</i></h2>
+    <p class="sub">Uncertainty in → decision out. Not a coding agent. A board meeting that runs itself.</p>
+    <div class="method">
+      <div class="hd">
+        <div class="ic" style="background:rgba(110,74,134,.15)">👔</div>
+        <div><h3>CEO + adversarial board</h3><p>MA-1 · Pi extension · one command: <code>ceo begin</code></p></div>
+      </div>
+      <div class="bd">
+        <div class="num">FUNCTION</div>
+        <p style="margin:0 0 12px;font-size:15px"><b>brief → deliberation → memo</b></p>
+        <div class="num">BRIEF MUST HAVE (or harness rejects it)</div>
+        <div class="grid g4" style="margin:8px 0 14px">
+          <div class="card" style="padding:10px;text-align:center"><b>Situation</b><p>facts only</p></div>
+          <div class="card" style="padding:10px;text-align:center"><b>Stakes</b><p>upside / downside</p></div>
+          <div class="card" style="padding:10px;text-align:center"><b>Constraints</b><p>time $ team legal</p></div>
+          <div class="card" style="padding:10px;text-align:center"><b>Key Question</b><p>one sentence</p></div>
+        </div>
+        <div class="num">BOARD SEATS (they must disagree)</div>
+        <div class="seats">
+          <span class="seat">👔 CEO</span>
+          <span class="seat">💰 Revenue (90d cash)</span>
+          <span class="seat">🏗 Architect</span>
+          <span class="seat">📈 Compounder</span>
+          <span class="seat">🎯 Product</span>
+          <span class="seat">🔥 Contrarian</span>
+          <span class="seat">🚀 Moonshot</span>
+        </div>
+        <div class="num" style="margin-top:12px">POCKET STEPS</div>
+        <div class="steps-mini" style="margin-top:8px">
+          <div class="s"><i>1</i><p><b>Write brief</b> with 4 sections + context files</p></div>
+          <div class="s"><i>2</i><p><b>just ceo</b> → <code>ceo begin</code></p></div>
+          <div class="s"><i>3</i><p>CEO frames → board argues <b>in parallel</b></p></div>
+          <div class="s"><i>4</i><p>Time + $ caps force finals (Contrarian last)</p></div>
+          <div class="s"><i>5</i><p><b>Memo out</b>: rec + stances + dissent + next actions</p></div>
+          <div class="s"><i>6</i><p>Leave expertise files alone — they compound</p></div>
+        </div>
+        <div class="if">Done-when: memo has ≥1 dissent, unresolved tensions, and next actions. No dissent = broken board.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEAD -->
+  <section class="sec" id="lead">
+    <h2>Method · <i>Lead teams</i></h2>
+    <p class="sub">One agent is not enough. You talk to one orchestrator. It runs a company of specialists.</p>
+    <div class="method">
+      <div class="hd">
+        <div class="ic" style="background:rgba(47,111,159,.12)">🏗️</div>
+        <div><h3>Orchestrator → Leads → Workers</h3><p>MA-2 · three tiers · domain lock · single chat</p></div>
+      </div>
+      <div class="bd">
+        <div class="tier">
+          <div class="row"><div class="t o">YOU</div></div>
+          <div class="arr">↓ one chat</div>
+          <div class="row"><div class="t o">Orchestrator (thinks)</div></div>
+          <div class="arr">↓ delegate</div>
+          <div class="row">
+            <div class="t l">Plan lead</div>
+            <div class="t l">Eng lead</div>
+            <div class="t l">Validate lead</div>
+          </div>
+          <div class="arr">↓</div>
+          <div class="row">
+            <div class="t w">FE worker</div>
+            <div class="t w">BE worker</div>
+            <div class="t w">QA worker</div>
+          </div>
+        </div>
+        <div class="grid g3" style="margin-top:8px">
+          <div class="card" style="padding:10px"><h3>Domain lock</h3><p>FE can’t write BE. Hook blocks it. Holy grail for big repos.</p></div>
+          <div class="card" style="padding:10px"><h3>Zero micro</h3><p>Leads plan &amp; delegate. Never write code themselves.</p></div>
+          <div class="card" style="padding:10px"><h3>Mental models</h3><p>Each agent keeps expertise.yaml. You never hand-edit.</p></div>
+        </div>
+        <div class="num" style="margin-top:12px">POCKET STEPS</div>
+        <div class="steps-mini" style="margin-top:8px">
+          <div class="s"><i>1</i><p>YAML: orch + plan/eng/val teams</p></div>
+          <div class="s"><i>2</i><p>Front matter: model · domain · expertise · tools</p></div>
+          <div class="s"><i>3</i><p>Hook: domain deny + “delegate to X”</p></div>
+          <div class="s"><i>4</i><p>One prompt: <b>plan → engineer → validate</b></p></div>
+          <div class="s"><i>5</i><p>Prove with tests. Cognitive load stays flat.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UI -->
+  <section class="sec" id="ui">
+    <h2>Method · <i>UI / product teams</i></h2>
+    <p class="sub">Same 3-tier machine — pointed at a product. Solves a <b>class</b> (infinite brand-consistent UIs), not one ticket.</p>
+    <div class="method">
+      <div class="hd">
+        <div class="ic" style="background:rgba(95,113,56,.12)">🎨</div>
+        <div><h3>Infinite UI / product operators</h3><p>MA-3 · harness engineering · till-done lists</p></div>
+      </div>
+      <div class="bd">
+        <div class="flow">
+          <div class="box"><strong>1</strong><span>Brand tokens</span></div><div class="arr">→</div>
+          <div class="box"><strong>2</strong><span>Till-done list</span></div><div class="arr">→</div>
+          <div class="box"><strong>3</strong><span>Teams A/B/C parallel</span></div><div class="arr">→</div>
+          <div class="box"><strong>4</strong><span>Validate</span></div><div class="arr">→</div>
+          <div class="box"><strong>5</strong><span>Fix till empty</span></div>
+        </div>
+        <p style="font-size:13.5px;color:var(--mute);margin:8px 0">Command shape: <code>/generate brand product tree N "brief"</code></p>
+        <div class="grid g2">
+          <div class="card" style="padding:10px"><h3>Orchestrator = prompt engineer</h3><p>Writes full prompts to teams. Keeps re-delegating until till-done is empty.</p></div>
+          <div class="card" style="padding:10px"><h3>Resilience</h3><p>One model dies → another team finishes. Task must complete.</p></div>
+        </div>
+        <div class="if">Big idea: the harness is the product. Models get cheap. Your structure is the edge.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERIFIER -->
+  <section class="sec" id="ver">
+    <h2>Method · <i>Builder + Verifier</i></h2>
+    <p class="sub">Simplest multi-agent system. Highest bang for buck. Attacks the <b>review</b> constraint. Put this in your pocket.</p>
+    <div class="method">
+      <div class="hd">
+        <div class="ic" style="background:rgba(196,138,32,.15)">✅</div>
+        <div><h3>Unpromptable observer</h3><p>MA-4 · builder doesn’t know it exists · AND models not OR</p></div>
+      </div>
+      <div class="bd">
+        <div class="flow">
+          <div class="box"><strong>YOU</strong><span>prompt builder</span></div><div class="arr">→</div>
+          <div class="box"><strong>BUILDER</strong><span>writes code</span></div><div class="arr">→</div>
+          <div class="box"><strong>STOP</strong><span>socket event</span></div><div class="arr">→</div>
+          <div class="box"><strong>VERIFIER</strong><span>atomic claims</span></div><div class="arr">→</div>
+          <div class="box"><strong>≤3 loops</strong><span>or human</span></div>
+        </div>
+        <div class="grid g2" style="margin:12px 0">
+          <div class="card" style="padding:10px"><h3>Atomic claims</h3><p>Break “done” into tiny true/false bits. One big PASS that hides 3 lies is worse than 3 FAILs.</p></div>
+          <div class="card" style="padding:10px"><h3>Read-only</h3><p>No write tools. Bash = one allowlisted script. Different model than builder.</p></div>
+        </div>
+        <div class="num">CONFIDENCE LADDER</div>
+        <div class="flow" style="margin-top:6px">
+          <div class="box"><span>PERFECT</span></div><div class="arr">→</div>
+          <div class="box"><span>VERIFIED</span></div><div class="arr">→</div>
+          <div class="box"><span>PARTIAL</span></div><div class="arr">→</div>
+          <div class="box"><span>FEEDBACK</span></div><div class="arr">→</div>
+          <div class="box"><span>FAILED</span></div>
+        </div>
+        <div class="num" style="margin-top:12px">POCKET STEPS</div>
+        <div class="steps-mini" style="margin-top:8px">
+          <div class="s"><i>1</i><p>Builder works → stop</p></div>
+          <div class="s"><i>2</i><p>Verifier atomizes claims</p></div>
+          <div class="s"><i>3</i><p>Each claim: evidence or FAIL</p></div>
+          <div class="s"><i>4</i><p>FAIL → auto re-prompt builder (≤3)</p></div>
+          <div class="s"><i>5</i><p>“What couldn’t you verify?” → improve system</p></div>
+        </div>
+        <div class="if">Stack domain verifiers: SQL · Python · image · … One purpose each. <b>Spend tokens to save time.</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PI -->
+  <section class="sec" id="pi">
+    <h2>Own the harness · <i>Pi</i></h2>
+    <p class="sub">Claude Code = great floor + meta-builder. Pi = “this one is mine.” Dan builds CEO / Lead / UI / Verifier as Pi extensions.</p>
+    <div class="grid g2">
+      <div class="card">
+        <div class="num">CLAUDE CODE</div>
+        <h3>Floor + meta-builder</h3>
+        <p>~80% of Dan’s time building systems still uses it. Strong defaults. Stock for everyday CPBPP.</p>
+      </div>
+      <div class="card">
+        <div class="num">PI</div>
+        <h3>Your specialized machine</h3>
+        <p>Minimal core. TypeScript extensions. Multi-vendor models. Force structure (unpromptable verifier, brief validation, domain locks).</p>
+      </div>
+    </div>
+    <div class="tree" style="margin-top:12px">
+<span class="c"># CEO example layout under Pi</span>
+<span class="f">.pi/ceo-agents/</span>
+├── agents/          <span class="c"># CEO + board personas</span>
+├── briefs/          <span class="c"># Situation / Stakes / Constraints / Q</span>
+├── deliberations/   <span class="c"># conversation.jsonl</span>
+├── memos/           <span class="c"># decisions out</span>
+├── expertise/       <span class="c"># compounds over time</span>
+└── config.yaml      <span class="c"># time + $ caps in CODE</span>
+    </div>
+    <p class="sub" style="margin-top:10px"><b>AND not OR</b> — stack models, stack harnesses. Benchmarks test one model alone. Real systems combine them.</p>
+  </section>
+
+  <!-- HOW THEY PLUG -->
+  <section class="sec">
+    <h2>How it plugs into CPBPP</h2>
+    <p class="sub">Multi-agent does <b>not</b> replace the code loop. Classify picks the machine.</p>
+    <div class="plug"><pre>
+<span class="h">CPBPP always:</span>  Done-when → Classify → … → Promote
+                      │
+         Classify picks the EXECUTION MACHINE
+                      │
+     ┌────────┬───────┴───────┬──────────┬──────────┐
+     ▼        ▼               ▼          ▼          ▼
+  chore    decision      multi-domain  product    trust
+  bug      CEO board     Lead teams    UI teams   Verifier
+  feature  brief→memo    orch→workers  till-done  on builder
+  ADW      (no BFC)      domain lock   N variants claims
+     │        │               │          │          │
+     └────────┴───────────────┴──────────┴──────────┘
+                      │
+              Prove still required
+              Promote still required
+</pre></div>
+  </section>
+
+  <!-- TRUST LADDER -->
+  <section class="sec" id="trust">
+    <h2>Trust &amp; scale ladder · <i>climb in order</i></h2>
+    <p class="sub">2026 theme. Don’t skip rungs.</p>
+    <div class="ladder">
+      <div class="rung"><div class="dot">1</div><div class="rung-b"><strong>Single agent + CPBPP</strong><span>plan → build · closed loops</span></div></div>
+      <div class="rung"><div class="dot">2</div><div class="rung-b"><strong>Closed loops solid</strong><span>agent self-heals from tests</span></div></div>
+      <div class="rung"><div class="dot">3</div><div class="rung-b"><strong>Builder + Verifier</strong><span>first multi-agent · review off your back</span></div></div>
+      <div class="rung"><div class="dot">4</div><div class="rung-b"><strong>Lead teams</strong><span>orch → leads → workers · domain lock</span></div></div>
+      <div class="rung"><div class="dot">5</div><div class="rung-b"><strong>CEO board</strong><span>hard decisions · brief → memo</span></div></div>
+      <div class="rung"><div class="dot">6</div><div class="rung-b"><strong>UI / product teams</strong><span>teams operate a product domain</span></div></div>
+      <div class="rung"><div class="dot">7</div><div class="rung-b"><strong>Factory / ADWs</strong><span>code owns sequence · agents in phases</span></div></div>
+      <div class="rung"><div class="dot">8</div><div class="rung-b"><strong>ZTE (earned)</strong><span>only when streak proves the class</span></div></div>
+    </div>
+  </section>
+
+  <!-- MULTI-AGENT LAWS -->
+  <section class="sec">
+    <h2>Multi-agent laws · <i>always</i></h2>
+    <div class="grid g3">
+      <div class="card"><div class="num">01</div><h3>Own the harness</h3><p>Stock chat is the floor.</p></div>
+      <div class="card"><div class="num">02</div><h3>1 · 1 · 1</h3><p>One agent. One prompt. One job.</p></div>
+      <div class="card"><div class="num">03</div><h3>Force conflict</h3><p>Board of Chads = useless.</p></div>
+      <div class="card"><div class="num">04</div><h3>Thinkers ≠ doers</h3><p>Leads don’t write code.</p></div>
+      <div class="card"><div class="num">05</div><h3>Domain lock in code</h3><p>Hooks, not hope.</p></div>
+      <div class="card"><div class="num">06</div><h3>Flat input</h3><p>One chat even with 15 agents.</p></div>
+      <div class="card"><div class="num">07</div><h3>Observe or it didn’t happen</h3><p>jsonl · costs · gauges</p></div>
+      <div class="card"><div class="num">08</div><h3>AND not OR</h3><p>Stack models. Stack verifiers.</p></div>
+      <div class="card"><div class="num">09</div><h3>Expertise compounds</h3><p>You don’t hand-edit it.</p></div>
+    </div>
+  </section>
+
+  <!-- DON'T VS DO -->
+  <section class="sec">
+    <h2>Don’t · <i>vs</i> · Do</h2>
+    <div class="vs">
+      <div class="bad">
+        <h3>😵 Breaks multi-agent</h3>
+        <ul>
+          <li>Fleet before closed loops</li>
+          <li>God-agent does everything</li>
+          <li>Same model “verifies” itself</li>
+          <li>Verifier that writes code</li>
+          <li>Leads that execute</li>
+          <li>No domain lock</li>
+          <li>Identical board personas</li>
+          <li>Open bash everywhere</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>🔥 Runs multi-agent</h3>
+        <ul>
+          <li>CPBPP solid first</li>
+          <li>Specialists only</li>
+          <li>Builder AND different verifier</li>
+          <li>Verifier read-only + unpromptable</li>
+          <li>Leads only delegate</li>
+          <li>Hooks enforce paths</li>
+          <li>Adversarial seats</li>
+          <li>Script-only bash policy</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- WEEK -->
+  <section class="sec" id="week">
+    <h2>Week 1 · <i>code first</i></h2>
+    <p class="sub">Still start with CPBPP. Multi-agent later.</p>
+    <div class="days">
+      <div class="day"><div class="d">D1</div><strong>Folders</strong><span>MVAL skeleton</span></div>
+      <div class="day"><div class="d">D2</div><strong>/prime</strong><span>map the repo</span></div>
+      <div class="day"><div class="d">D3</div><strong>BFC</strong><span>chore+implement</span></div>
+      <div class="day"><div class="d">D4</div><strong>Ship</strong><span>2-prompt chore</span></div>
+      <div class="day"><div class="d">D5</div><strong>Loop</strong><span>self-heal tests</span></div>
+      <div class="day"><div class="d">D6</div><strong>ADW</strong><span>first AFK</span></div>
+      <div class="day"><div class="d">D7</div><strong>Promote</strong><span>save a command</span></div>
+    </div>
+    <p class="sub" style="margin-top:14px"><b>Week 3–4:</b> add Builder+Verifier.<br>
+    <b>Week 5+:</b> Lead teams on a real multi-domain task.<br>
+    <b>When a real decision hurts:</b> write a CEO brief.</p>
+  </section>
+
+  <div class="mantra">
+    <p>Am I on the agentic layer<br>or the application layer?</p>
+    <small>ask every hour · ≥50% agentics</small>
+  </div>
+
+  <section class="sec">
+    <h2>Copy from · <i>when stuck</i></h2>
+    <div class="grid g2">
+      <div class="card"><div class="emoji">🧱</div><h3>Code MVAL</h3><p><code>tac/tac-8/tac8_app1__agent_layer_primitives/</code></p></div>
+      <div class="card"><div class="emoji">👔</div><h3>CEO agents</h3><p><code>agentic-horizon-extras/ceo-agents/</code></p></div>
+      <div class="card"><div class="emoji">🏗️</div><h3>Lead teams</h3><p><code>agentic-horizon-extras/lead-agents/</code></p></div>
+      <div class="card"><div class="emoji">🎨</div><h3>UI agents</h3><p><code>agentic-horizon-extras/ui-agents/</code></p></div>
+      <div class="card"><div class="emoji">✅</div><h3>Verifier</h3><p><code>agentic-horizon-extras/the-verifier-agent-system/</code></p></div>
+      <div class="card"><div class="emoji">🥋</div><h3>Dojo drills</h3><p><code>IndyDevDan/dojo/lessons/01–12</code></p></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>the-indy-system-grok.html</span>
+    <span>code loop + multi-agent · made by <b>grok</b> · IndyDevDan TAC/AH/MA/YT</span>
+  </div>
+</main>
+</body>
+</html>

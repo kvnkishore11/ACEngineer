@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first code deep dive into the seven-file TAC-1 Hello Agentic Coding repository: prompt, permissions, three launchers, and the complete run flow.">
+  <title>Code Deep Dive · TAC-1 Hello Agentic Coding</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <style>
+    :root {
+      --rail-width: 13.5rem;
+      --chapter-max: 72rem;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 88% 2%, color-mix(in srgb, var(--accent-wash) 68%, transparent) 0 14rem, transparent 34rem),
+        var(--bg);
+    }
+
+    .reading-progress {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 100;
+      height: 4px;
+      background: var(--border-soft);
+    }
+
+    .reading-progress__bar {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--accent);
+      transition: width 80ms linear;
+    }
+
+    .site-bar {
+      position: sticky;
+      top: 4px;
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      min-height: 3.25rem;
+      padding: var(--space-2) max(var(--space-4), calc((100vw - var(--chapter-max)) / 2));
+      border-bottom: var(--hairline);
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(12px);
+    }
+
+    .site-bar__home,
+    .site-bar__chapter {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .site-bar__links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .site-bar__meta {
+      color: var(--ink-mute);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+    }
+
+    .chapter-shell {
+      display: grid;
+      grid-template-columns: var(--rail-width) minmax(0, 1fr);
+      gap: var(--space-8);
+      width: min(calc(100% - 2rem), var(--chapter-max));
+      margin-inline: auto;
+    }
+
+    .chapter-rail {
+      position: sticky;
+      top: 4.5rem;
+      align-self: start;
+      max-height: calc(100vh - 5.5rem);
+      padding: var(--space-6) var(--space-4) var(--space-6) 0;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    .rail-kicker,
+    .eyebrow,
+    .section-number,
+    .micro-label {
+      color: var(--accent-ink);
+      font-size: var(--text-xs);
+      font-weight: 750;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .chapter-rail h2 {
+      margin-top: var(--space-2);
+      font-family: var(--font-body);
+      font-size: var(--text-md);
+      letter-spacing: 0;
+    }
+
+    .rail-progress {
+      margin-top: var(--space-4);
+      padding-bottom: var(--space-4);
+      border-bottom: var(--hairline);
+    }
+
+    .rail-progress__line {
+      height: .45rem;
+      margin-top: var(--space-2);
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--bg-inset);
+    }
+
+    .rail-progress__fill {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .rail-progress__copy {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--space-2);
+      color: var(--ink-mute);
+      font-size: var(--text-xs);
+    }
+
+    .chapter-nav { margin-top: var(--space-4); }
+    .chapter-nav ol { padding: 0; list-style: none; }
+    .chapter-nav li + li { margin-top: var(--space-1); }
+
+    .chapter-nav a {
+      display: grid;
+      grid-template-columns: 1.5rem 1fr;
+      gap: var(--space-2);
+      padding: .38rem .45rem;
+      border-radius: var(--radius-sm);
+      color: var(--ink-soft);
+      font-size: var(--text-sm);
+      line-height: 1.3;
+      text-decoration: none;
+    }
+
+    .chapter-nav a:hover,
+    .chapter-nav a[aria-current="location"] {
+      color: var(--accent-ink);
+      background: var(--accent-wash);
+    }
+
+    .chapter-nav__n {
+      color: var(--ink-mute);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+    }
+
+    .chapter-main {
+      min-width: 0;
+      padding-bottom: var(--space-12);
+    }
+
+    .hero,
+    .chapter-section,
+    .chapter-footer {
+      max-width: 48rem;
+      margin-inline: auto;
+    }
+
+    .hero {
+      margin-block: var(--space-6) var(--space-5);
+      padding: var(--space-6);
+      border: var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-card);
+    }
+
+    .hero__chapter {
+      display: inline-flex;
+      padding: .2rem .6rem;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      color: var(--accent-ink);
+      font-size: var(--text-xs);
+      font-weight: 750;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 { max-width: none; }
+    .hero__dek { color: var(--ink-soft); }
+
+    .hero__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      padding: 0;
+      list-style: none;
+    }
+
+    .hero__meta li {
+      padding: .15rem .5rem;
+      border-radius: 999px;
+      color: var(--ink-soft);
+      background: var(--bg-inset);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+    }
+
+    .hero__promise {
+      padding: var(--space-3) var(--space-4);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--radius-sm);
+      background: var(--accent-wash);
+      font-size: var(--text-sm);
+    }
+
+    .chapter-section {
+      padding-block: var(--space-6);
+      border-top: 1px solid var(--border-soft);
+      scroll-margin-top: 3.5rem;
+    }
+
+    .chapter-section > * + * { margin-top: var(--space-4); }
+    .section-title { margin-top: var(--space-1); }
+    .section-lead { color: var(--ink-soft); font-size: var(--text-md); }
+
+    .mobile-toc { display: none; max-width: 48rem; margin: 0 auto var(--space-5); }
+    .mobile-toc details { border: var(--hairline); border-radius: var(--radius-md); background: var(--bg-card); }
+    .mobile-toc summary { cursor: pointer; padding: var(--space-3) var(--space-4); font-weight: 700; }
+    .mobile-toc ol { padding: 0 var(--space-6) var(--space-4) 2.5rem; }
+
+    .repo-map {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) auto minmax(0, 1.25fr) auto minmax(0, 1fr);
+      align-items: stretch;
+      gap: var(--space-2);
+      padding: var(--space-5);
+      border: var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-card);
+    }
+
+    .repo-map__stack { display: grid; gap: var(--space-2); }
+
+    .repo-map__node {
+      display: flex;
+      min-height: 4.6rem;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-3);
+      border: var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--bg-inset);
+      text-align: center;
+    }
+
+    .repo-map__node--core { border-color: var(--accent); background: var(--accent-wash); }
+    .repo-map__node--result { border-color: var(--ok); background: var(--ok-wash); }
+    .repo-map__node strong { font-size: var(--text-sm); }
+    .repo-map__node code { margin-top: var(--space-1); font-size: var(--text-xs); }
+
+    .repo-map__arrow {
+      display: grid;
+      place-items: center;
+      color: var(--accent-ink);
+      font-family: var(--font-mono);
+      font-weight: 800;
+    }
+
+    .repo-map__note {
+      grid-column: 1 / -1;
+      padding-top: var(--space-3);
+      border-top: 1px dashed var(--border);
+      color: var(--ink-mute);
+      font-size: var(--text-sm);
+      text-align: center;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2) var(--space-4);
+      color: var(--ink-mute);
+      font-size: var(--text-xs);
+    }
+
+    .legend span::before {
+      display: inline-block;
+      width: .65rem;
+      height: .65rem;
+      margin-right: var(--space-1);
+      border: var(--hairline);
+      border-radius: 2px;
+      background: var(--bg-inset);
+      content: "";
+    }
+
+    .legend .legend--core::before { border-color: var(--accent); background: var(--accent-wash); }
+    .legend .legend--result::before { border-color: var(--ok); background: var(--ok-wash); }
+
+    .tree-card {
+      padding: var(--space-5);
+      border: var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-card);
+    }
+
+    .file-tree {
+      padding: 0;
+      list-style: none;
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      line-height: 1.75;
+    }
+
+    .file-tree li { margin: 0; }
+    .file-tree .depth-1 { padding-left: 1.35rem; }
+    .file-tree .depth-2 { padding-left: 2.7rem; }
+    .file-tree a { text-decoration: none; }
+    .file-tree a:hover { text-decoration: underline; }
+    .file-tree__meta { color: var(--ink-mute); font-family: var(--font-body); font-size: var(--text-xs); }
+
+    .job-table td:first-child { width: 34%; white-space: nowrap; }
+
+    .file-card {
+      overflow: clip;
+      border: var(--hairline);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      box-shadow: var(--shadow-card);
+      scroll-margin-top: 3.5rem;
+    }
+
+    .file-card > summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+
+    .file-card > summary::-webkit-details-marker { display: none; }
+    .file-card > summary:hover { background: color-mix(in srgb, var(--accent-wash) 55%, transparent); }
+
+    .file-card__path {
+      overflow-wrap: anywhere;
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      font-weight: 700;
+    }
+
+    .file-card__role {
+      color: var(--ink-mute);
+      font-size: var(--text-xs);
+      font-weight: 600;
+    }
+
+    .file-card__chevron {
+      color: var(--accent-ink);
+      font-size: var(--text-md);
+      transition: transform .22s ease;
+    }
+
+    .file-card[open] .file-card__chevron { transform: rotate(45deg); }
+
+    .file-body {
+      padding: 0 var(--space-5) var(--space-5);
+      border-top: 1px solid var(--border-soft);
+      animation: reveal .24s ease both;
+    }
+
+    .file-body > * + * { margin-top: var(--space-4); }
+
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .purpose {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--space-3);
+      padding-top: var(--space-4);
+    }
+
+    .purpose__label {
+      color: var(--accent-ink);
+      font-size: var(--text-xs);
+      font-weight: 750;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .code-frame {
+      overflow: hidden;
+      border: var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--bg-code);
+    }
+
+    .code-frame__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      padding: var(--space-2) var(--space-3);
+      border-bottom: var(--hairline);
+      color: var(--ink-mute);
+      background: var(--bg-inset);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+    }
+
+    .code-frame pre {
+      max-width: 100%;
+      margin: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      tab-size: 4;
+    }
+
+    .code-frame code { white-space: pre; }
+
+    .line-notes {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--space-2) var(--space-3);
+      margin: 0;
+    }
+
+    .line-notes dt {
+      align-self: start;
+      min-width: 4.6rem;
+      padding: .12rem .42rem;
+      border-radius: 999px;
+      color: var(--accent-ink);
+      background: var(--accent-wash);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-align: center;
+    }
+
+    .line-notes dd { margin: 0; color: var(--ink-soft); font-size: var(--text-sm); }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-3);
+    }
+
+    .compare-card {
+      padding: var(--space-4);
+      border: var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+    }
+
+    .compare-card h3 { margin: 0; font-family: var(--font-body); font-size: var(--text-base); }
+    .compare-card p { margin-top: var(--space-2); color: var(--ink-soft); font-size: var(--text-sm); }
+    .compare-card__signal { display: inline-block; margin-top: var(--space-3); color: var(--accent-ink); font-family: var(--font-mono); font-size: var(--text-xs); }
+
+    .flow-list {
+      position: relative;
+      display: grid;
+      gap: var(--space-3);
+      padding: 0;
+      list-style: none;
+      counter-reset: flow;
+    }
+
+    .flow-list li {
+      position: relative;
+      display: grid;
+      grid-template-columns: 2.2rem 1fr;
+      gap: var(--space-3);
+      max-width: none;
+      margin: 0;
+      counter-increment: flow;
+    }
+
+    .flow-list li::before {
+      display: grid;
+      z-index: 1;
+      width: 2.2rem;
+      height: 2.2rem;
+      place-items: center;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      color: var(--accent-ink);
+      background: var(--bg);
+      content: counter(flow, decimal-leading-zero);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 800;
+    }
+
+    .flow-list li:not(:last-child)::after {
+      position: absolute;
+      top: 2rem;
+      bottom: calc(-1 * var(--space-3) - .3rem);
+      left: 1.05rem;
+      width: 2px;
+      background: var(--border);
+      content: "";
+    }
+
+    .flow-list__body {
+      padding: var(--space-3) var(--space-4);
+      border: var(--hairline);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+    }
+
+    .flow-list__body strong { display: block; }
+    .flow-list__body p { margin-top: var(--space-1); color: var(--ink-soft); font-size: var(--text-sm); }
+
+    .failure-table td:first-child { color: var(--warn); font-weight: 700; }
+
+    .teach-back {
+      padding: var(--space-5);
+      border: 1px dashed var(--accent);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+    }
+
+    .teach-back > * + * { margin-top: var(--space-3); }
+
+    .chapter-footer {
+      margin-top: var(--space-6);
+      padding: var(--space-5) 0;
+      border-top: var(--hairline);
+    }
+
+    .chapter-footer__nav {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-top: var(--space-2);
+      font-size: var(--text-sm);
+    }
+
+    /* Highlight.js receives these semantic classes after loading. Raw code remains readable without JavaScript. */
+    .hljs-comment,
+    .hljs-quote { color: var(--ink-mute); font-style: italic; }
+    .hljs-keyword,
+    .hljs-selector-tag,
+    .hljs-literal,
+    .hljs-meta { color: var(--accent-ink); font-weight: 700; }
+    .hljs-string,
+    .hljs-attr,
+    .hljs-template-variable { color: var(--ok); }
+    .hljs-title,
+    .hljs-section,
+    .hljs-function .hljs-title { color: var(--accent); }
+    .hljs-number,
+    .hljs-built_in,
+    .hljs-variable { color: var(--warn); }
+    .hljs-name,
+    .hljs-attribute { color: var(--ink-soft); }
+
+    @media (max-width: 960px) {
+      .chapter-shell { grid-template-columns: 1fr; }
+      .chapter-rail { display: none; }
+      .mobile-toc { display: block; }
+    }
+
+    @media (max-width: 720px) {
+      .site-bar__meta { display: none; }
+      .site-bar__links { gap: var(--space-2); }
+      .site-bar__home,
+      .site-bar__chapter { font-size: var(--text-xs); }
+      .repo-map { grid-template-columns: 1fr; }
+      .repo-map__arrow { transform: rotate(90deg); }
+      .repo-map__note { grid-column: 1; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .file-card > summary { grid-template-columns: minmax(0, 1fr) auto; }
+      .file-card__role { display: none; }
+      .purpose { grid-template-columns: 1fr; gap: var(--space-1); }
+      .line-notes { grid-template-columns: 1fr; }
+      .line-notes dt { width: max-content; }
+      .chapter-footer__nav { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
+    @media print {
+      .chapter-rail,
+      .site-bar,
+      .reading-progress,
+      .mobile-toc { display: none !important; }
+      .chapter-shell { display: block !important; width: 100% !important; }
+      .file-card:not([open]) .file-body { display: block; }
+    }
+  </style>
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+
+  <header class="site-bar">
+    <div class="site-bar__links">
+      <a class="site-bar__home" href="../index.html">← Book hub</a>
+      <a class="site-bar__chapter" href="../vol-1-tac/01-hello-agentic-coding.html">Read chapter</a>
+    </div>
+    <span class="site-bar__meta">CODE COMPANION · TAC-1</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Code companion navigation">
+      <p class="rail-kicker">TAC-1 · Code deep dive</p>
+      <h2>Hello Agentic Coding</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of companion</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#hook"><span class="chapter-nav__n">00</span><span>The hook</span></a></li>
+          <li><a href="#map"><span class="chapter-nav__n">01</span><span>Map of the repo</span></a></li>
+          <li><a href="#tree"><span class="chapter-nav__n">02</span><span>File tree</span></a></li>
+          <li><a href="#walk"><span class="chapter-nav__n">03</span><span>Walk every file</span></a></li>
+          <li><a href="#wrappers"><span class="chapter-nav__n">04</span><span>Compare launchers</span></a></li>
+          <li><a href="#run"><span class="chapter-nav__n">05</span><span>One complete run</span></a></li>
+          <li><a href="#fails"><span class="chapter-nav__n">06</span><span>Common failures</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">07</span><span>You try</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">08</span><span>Teach-back</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero">
+        <span class="hero__chapter">Code companion · Lesson 01</span>
+        <h1>Hello Agentic Coding</h1>
+        <p class="hero__dek">Seven small files make one large move: the prompt stops being text you paste and becomes behavior a program can invoke.</p>
+        <ul class="hero__meta" aria-label="Codebase details">
+          <li>7 real files</li>
+          <li>124 logical lines</li>
+          <li>3 launchers</li>
+          <li>1 shared prompt</li>
+        </ul>
+        <p class="hero__promise"><strong>Read this page for one mental model:</strong> the launchers are adapters, the prompt is the workflow, the settings are the safety boundary, and the Claude CLI is the runtime that turns words into repository actions.</p>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Companion contents</summary>
+          <ol>
+            <li><a href="#hook">The hook</a></li>
+            <li><a href="#map">Map of the repo</a></li>
+            <li><a href="#tree">File tree</a></li>
+            <li><a href="#walk">Walk every file</a></li>
+            <li><a href="#wrappers">Compare launchers</a></li>
+            <li><a href="#run">One complete run</a></li>
+            <li><a href="#fails">Common failures</a></li>
+            <li><a href="#lab">You try</a></li>
+            <li><a href="#teach-back">Teach-back</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="hook">
+        <span class="section-number">00 · Hook</span>
+        <h2 class="section-title">The interesting code is not the code that gets created</h2>
+        <p class="section-lead">A beginner opens this repo expecting an application. There is no application yet. There is a mechanism that asks an agent to create one, run it, commit it, and report the evidence.</p>
+
+        <p>The eventual <code>main_aic.py</code> and <code>main_tac.py</code> are intentionally absent from the starting codebase. They are <strong>runtime artifacts</strong>. Dan keeps the programs trivial so you look at the real architecture: where behavior is described, which tools the agent may use, how an outside program starts the agent, and what comes back.</p>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The design in one sentence</p>
+          <p><code>prompt.md</code> says <em>what work to perform</em>; each launcher says <em>how this host language starts Claude</em>; project settings say <em>which actions Claude may take</em>.</p>
+        </aside>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">The beginner trap</p>
+          <p>The README demo is sequential: its first prompt creates <code>main_aic.py</code>, and its second prompt later runs that file. The headless <code>programmable/prompt.md</code> fixes that dependency by creating both Python files itself.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="map">
+        <span class="section-number">01 · Picture</span>
+        <h2 class="section-title">Map of the repo</h2>
+        <p class="section-lead">Follow the arrows left to right. The host code is thin; the shared prompt and agent runtime carry the meaning.</p>
+
+        <figure class="diagram">
+          <div class="repo-map" role="img" aria-label="The README points a human to one of three launchers. A launcher reads the shared prompt and invokes Claude. Claude reads project permissions and performs file, UV, and Git actions in the repository before returning a report.">
+            <div class="repo-map__stack">
+              <div class="repo-map__node"><strong>Human entry point</strong><code>README.md</code></div>
+              <div class="repo-map__node"><strong>Auth contract</strong><code>.env.sample</code></div>
+            </div>
+            <div class="repo-map__arrow" aria-hidden="true">→</div>
+            <div class="repo-map__stack">
+              <div class="repo-map__node"><strong>Shell adapter</strong><code>programmable.sh</code></div>
+              <div class="repo-map__node"><strong>Bun adapter</strong><code>programmable.ts</code></div>
+              <div class="repo-map__node"><strong>Python adapter</strong><code>programmable.py</code></div>
+            </div>
+            <div class="repo-map__arrow" aria-hidden="true">→</div>
+            <div class="repo-map__stack">
+              <div class="repo-map__node repo-map__node--core"><strong>Behavior</strong><code>prompt.md</code></div>
+              <div class="repo-map__node repo-map__node--core"><strong>Agent runtime</strong><code>claude -p</code></div>
+              <div class="repo-map__node"><strong>Capability policy</strong><code>.claude/settings.json</code></div>
+              <div class="repo-map__node repo-map__node--result"><strong>Side effects + report</strong><code>files · uv · git · stdout</code></div>
+            </div>
+            <p class="repo-map__note"><strong>Important boundary:</strong> the wrappers do not create files or run Git themselves. They pass the prompt to Claude; Claude chooses and executes the allowed tools.</p>
+          </div>
+          <figcaption>One workflow, three host-language doors. That is why the language is replaceable while the prompt is central.</figcaption>
+        </figure>
+
+        <div class="legend" aria-label="Diagram legend">
+          <span>documentation or adapter</span>
+          <span class="legend--core">behavioral center</span>
+          <span class="legend--result">observable outcome</span>
+        </div>
+
+        <h3>Why Dan split it this way</h3>
+        <table class="job-table">
+          <thead><tr><th>Design choice</th><th>What it buys</th></tr></thead>
+          <tbody>
+            <tr><td>One prompt file</td><td>Change the workflow once; Shell, Bun, and Python all receive the same new behavior.</td></tr>
+            <tr><td>Thin launchers</td><td>Proves programmability is not tied to a special SDK or language. Terminal access is enough.</td></tr>
+            <tr><td>Policy outside prompt</td><td>The request can describe actions, while settings independently decide which actions are allowed.</td></tr>
+            <tr><td>Exact report contract</td><td>A headless caller gets evidence, not merely “done.” This is the first seed of a feedback loop.</td></tr>
+            <tr><td>Trivial generated programs</td><td>Removes application complexity so the delegation boundary is impossible to miss.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="chapter-section" id="tree">
+        <span class="section-number">02 · Orient</span>
+        <h2 class="section-title">File tree with jobs and jump links</h2>
+        <p class="section-lead">Every real file in <code>tac/tac-1</code> appears here. Generated <code>main_*.py</code> files do not: they are absent before a run.</p>
+
+        <div class="tree-card">
+          <ul class="file-tree" aria-label="Complete TAC-1 file tree">
+            <li><span aria-hidden="true">tac-1/</span></li>
+            <li class="depth-1"><a href="#file-env">├── .env.sample</a> <span class="file-tree__meta">— API-key placeholder</span></li>
+            <li class="depth-1"><span aria-hidden="true">├── .claude/</span></li>
+            <li class="depth-2"><a href="#file-settings">│&nbsp;&nbsp; └── settings.json</a> <span class="file-tree__meta">— allowed tools</span></li>
+            <li class="depth-1"><a href="#file-readme">├── README.md</a> <span class="file-tree__meta">— lesson and entry points</span></li>
+            <li class="depth-1"><span aria-hidden="true">└── programmable/</span></li>
+            <li class="depth-2"><a href="#file-python">&nbsp;&nbsp;&nbsp; ├── programmable.py</a> <span class="file-tree__meta">— robust process adapter</span></li>
+            <li class="depth-2"><a href="#file-shell">&nbsp;&nbsp;&nbsp; ├── programmable.sh</a> <span class="file-tree__meta">— minimal process adapter</span></li>
+            <li class="depth-2"><a href="#file-typescript">&nbsp;&nbsp;&nbsp; ├── programmable.ts</a> <span class="file-tree__meta">— Bun process adapter</span></li>
+            <li class="depth-2"><a href="#file-prompt">&nbsp;&nbsp;&nbsp; └── prompt.md</a> <span class="file-tree__meta">— shared workflow</span></li>
+          </ul>
+        </div>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Coverage note</p>
+          <p>The seven collapsible sections below reproduce all 124 logical source lines. Five files omit a final newline, so <code>wc -l</code> reports 119 newline characters; the status file records both counts.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="walk">
+        <span class="section-number">03 · Walk the code</span>
+        <h2 class="section-title">Start at the behavioral center, then work outward</h2>
+        <p class="section-lead">Open any file. Each panel gives its job, the complete source, and line-range notes. The first three are expanded because they form the core contract.</p>
+
+        <details class="file-card" id="file-prompt" open>
+          <summary>
+            <span class="file-card__path">programmable/prompt.md</span>
+            <span class="file-card__role">behavior · 18 lines</span>
+            <span class="file-card__chevron" aria-hidden="true">+</span>
+          </summary>
+          <div class="file-body">
+            <div class="purpose"><span class="purpose__label">Purpose</span><p>The single reusable specification. It declares the starting Git move, two file outcomes, validation commands, a commit, and the evidence the caller must receive.</p></div>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>programmable/prompt.md</span><span>complete source · 18 logical lines</span></div>
+              <pre><code class="language-markdown">RUN:
+    checkout a new/existing "demo-agentic-coding" git branch
+
+CREATE main_aic.py:
+    print "goodbye ai coding"
+
+CREATE main_tac.py:
+    print "hello agentic coding"
+    print a concise explanation of the definition of ai agents
+
+RUN:
+    uv run main_aic.py
+    uv run main_tac.py
+    git add .
+    git commit -m "Demo agentic coding capabilities"
+
+REPORT:
+    respond with the exact output of both .py files</code></pre>
+            </div>
+            <dl class="line-notes">
+              <dt>1–2</dt><dd><strong>Establish mutable state.</strong> “New/existing” makes the instruction work on a fresh run or a repeated demo, but it does not guarantee a clean starting branch.</dd>
+              <dt>4–9</dt><dd><strong>Describe outcomes, not implementation syntax.</strong> Claude decides how to create the files. Both runtime artifacts are included, so this prompt is self-contained.</dd>
+              <dt>11–15</dt><dd><strong>Validate before preserving.</strong> The agent runs both programs before staging and committing everything in the working tree.</dd>
+              <dt>17–18</dt><dd><strong>Define the return value.</strong> Exact program output gives the outer caller concrete evidence. Without REPORT, stdout could be a vague narrative.</dd>
+            </dl>
+            <aside class="callout callout--warning">
+              <p class="callout__label">Hidden assumption</p>
+              <p><code>git add .</code> stages every unignored change under the current directory. Run this only from a clean, disposable lesson checkout—not beside unrelated work.</p>
+            </aside>
+          </div>
+        </details>
+
+        <details class="file-card" id="file-settings" open>
+          <summary>
+            <span class="file-card__path">.claude/settings.json</span>
+            <span class="file-card__role">policy · 15 lines</span>
+            <span class="file-card__chevron" aria-hidden="true">+</span>
+          </summary>
+          <div class="file-body">
+            <div class="purpose"><span class="purpose__label">Purpose</span><p>The project-level capability boundary. It allows the file, UV, selected Git, and web tools the agent may need; it notably does not grant an unrestricted shell or Git push.</p></div>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>.claude/settings.json</span><span>complete source · 15 logical lines</span></div>
+              <pre><code class="language-json">{
+    "permissions": {
+      "allow": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash(uv run:*)",
+        "Bash(git checkout:*)",
+        "Bash(git branch:*)",
+        "Bash(git add:*)",
+        "Bash(git commit:*)",
+        "WebSearch"
+      ]
+    }
+  }</code></pre>
+            </div>
+            <dl class="line-notes">
+              <dt>1–3</dt><dd>Open the project permission document and its allowlist. This is configuration, not an instruction sequence.</dd>
+              <dt>4–6</dt><dd><code>Read</code>, <code>Write</code>, and <code>Edit</code> let the agent inspect and create the requested Python files.</dd>
+              <dt>7</dt><dd>The scoped UV pattern covers the two validation commands. The <code>:*</code> suffix permits arguments after <code>uv run</code>.</dd>
+              <dt>8–11</dt><dd>Only the Git verbs used by the workflow are named: checkout, branch, add, and commit. There is no push permission.</dd>
+              <dt>12–15</dt><dd><code>WebSearch</code> is available but unused by this prompt. The closing lines complete the JSON structure.</dd>
+            </dl>
+            <aside class="callout callout--why">
+              <p class="callout__label">Why separate policy from prompt?</p>
+              <p>A prompt can <em>request</em> a commit; the policy independently decides whether the runtime may execute it. Intent and authority are different concerns.</p>
+            </aside>
+          </div>
+        </details>
+
+        <details class="file-card" id="file-python" open>
+          <summary>
+            <span class="file-card__path">programmable/programmable.py</span>
+            <span class="file-card__role">adapter · 31 lines</span>
+            <span class="file-card__chevron" aria-hidden="true">+</span>
+          </summary>
+          <div class="file-body">
+            <div class="purpose"><span class="purpose__label">Purpose</span><p>The most explicit launcher. It reads the prompt, invokes Claude without a shell, separates stdout from stderr, and preserves Claude’s exact exit code.</p></div>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>programmable/programmable.py</span><span>complete source · 31 lines</span></div>
+              <pre><code class="language-python">import subprocess
+import sys
+
+
+def main():
+    with open("programmable/prompt.md", "r") as f:
+        prompt_content = f.read()
+
+    command = [
+        "claude",
+        "-p",
+        prompt_content,
+    ]
+
+    try:
+        result = subprocess.run(command, capture_output=True, text=True)
+
+        print(result.stdout)
+
+        if result.stderr:
+            print(result.stderr, file=sys.stderr)
+
+        sys.exit(result.returncode)
+
+    except Exception as e:
+        print(f"Error executing command: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+            </div>
+            <dl class="line-notes">
+              <dt>1–2</dt><dd><code>subprocess</code> starts the external CLI; <code>sys</code> provides stderr and process exit.</dd>
+              <dt>5–7</dt><dd>Read the shared behavior as one string. The relative path means the expected working directory is the <code>tac-1</code> root.</dd>
+              <dt>9–13</dt><dd>Build an argument vector. Passing a list avoids shell parsing: the complete multiline prompt is one argument after <code>-p</code>.</dd>
+              <dt>15–23</dt><dd>Run synchronously, capture both channels as text, print each to the matching host channel, then exit with the child’s return code.</dd>
+              <dt>25–27</dt><dd>Catch launch-time failures such as a missing <code>claude</code> executable and convert them into a readable error plus status 1.</dd>
+              <dt>30–31</dt><dd>The main guard runs the workflow only when this file is executed directly, not when imported.</dd>
+            </dl>
+            <aside class="callout callout--warning">
+              <p class="callout__label">Precise edge case</p>
+              <p>The <code>open(...)</code> call occurs <em>before</em> the <code>try</code>. If you launch from the wrong directory and the prompt path is missing, Python emits an uncaught traceback; the friendly “Error executing command” handler does not run.</p>
+            </aside>
+          </div>
+        </details>
+
+        <details class="file-card" id="file-shell">
+          <summary>
+            <span class="file-card__path">programmable/programmable.sh</span>
+            <span class="file-card__role">adapter · 5 lines</span>
+            <span class="file-card__chevron" aria-hidden="true">+</span>
+          </summary>
+          <div class="file-body">
+            <div class="purpose"><span class="purpose__label">Purpose</span><p>The smallest proof of programmability: read text, call a terminal program with that text, print the returned text.</p></div>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>programmable/programmable.sh</span><span>complete source · 5 logical lines</span></div>
+              <pre><code class="language-bash">PROMPT_CONTENT="$(cat programmable/prompt.md)"
+
+OUTPUT="$(claude -p "$PROMPT_CONTENT")"
+
+echo "$OUTPUT"</code></pre>
+            </div>
+            <dl class="line-notes">
+              <dt>1</dt><dd>Command substitution reads the whole prompt. The surrounding quotes preserve internal spaces and newlines when stored.</dd>
+              <dt>2, 4</dt><dd>Blank lines visually separate the three-stage pipeline: input, invocation, output.</dd>
+              <dt>3</dt><dd>Invoke Claude in print mode. Quoting passes the multiline content as a single argument. Claude’s stdout is captured; stderr still flows to the terminal.</dd>
+              <dt>5</dt><dd>Print captured stdout. Command substitution removes trailing newlines, then <code>echo</code> adds one back.</dd>
+            </dl>
+            <aside class="callout callout--warning">
+              <p class="callout__label">Failure signal is lossy</p>
+              <p>There is no <code>set -e</code> or saved <code>$?</code>. If Claude exits nonzero, the script still reaches <code>echo</code>; the script’s final status is usually the successful echo, masking Claude’s failure from an outer caller.</p>
+            </aside>
+          </div>
+        </details>
+
+        <details class="file-card" id="file-typescript">
+          <summary>
+            <span class="file-card__path">programmable/programmable.ts</span>
+            <span class="file-card__role">adapter · 19 lines</span>
+            <span class="file-card__chevron" aria-hidden="true">+</span>
+          </summary>
+          <div class="file-body">
+            <div class="purpose"><span class="purpose__label">Purpose</span><p>The Bun-flavored adapter. It keeps the same read → invoke → print shape while expressing async process execution and explicit error handling.</p></div>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>programmable/programmable.ts</span><span>complete source · 19 logical lines</span></div>
+              <pre><code class="language-typescript">import { $ } from "bun";
+import { readFileSync } from "fs";
+
+async function main() {
+    try {
+        const promptContent = readFileSync("programmable/prompt.md", "utf-8");
+
+        const output = await $`claude -p ${promptContent}`.text();
+
+        console.log(output);
+    } catch (error) {
+        console.error(`Error executing command: ${error}`);
+        process.exit(1);
+    }
+}
+
+if (import.meta.main) {
+    main();
+}</code></pre>
+            </div>
+            <dl class="line-notes">
+              <dt>1–2</dt><dd>Import Bun’s shell template and Node-compatible synchronous file reading.</dd>
+              <dt>4–6</dt><dd>Enter an async main function and read the same root-relative prompt as UTF-8. Unlike Python, this read is inside the <code>try</code>.</dd>
+              <dt>8–10</dt><dd>Await Claude, collect stdout as text, then log it. The prompt file—not the template wrapper—still owns the workflow.</dd>
+              <dt>11–14</dt><dd>Convert read or process failures into a console error and exit status 1. This preserves failure as a signal, though not Claude’s specific nonzero code.</dd>
+              <dt>17–19</dt><dd>Bun’s direct-execution guard prevents the launcher from firing if another module imports it.</dd>
+            </dl>
+          </div>
+        </details>
+
+        <details class="file-card" id="file-readme">
+          <summary>
+            <span class="file-card__path">README.md</span>
+            <span class="file-card__role">lesson entry · 35 lines</span>
+            <span class="file-card__chevron" aria-hidden="true">+</span>
+          </summary>
+          <div class="file-body">
+            <div class="purpose"><span class="purpose__label">Purpose</span><p>The lesson script for a human. It contrasts one-file AI coding with a multi-action agentic prompt, then shows three ways to launch the packaged version.</p></div>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>README.md</span><span>complete source · 35 lines</span></div>
+              <pre><code class="language-markdown"># Tactical Agentic Coding - Lesson: #1
+
+## AI Coding Prompt
+
+```md
+CREATE main_aic.py:
+    print goodbye ai coding
+```
+
+## Agentic Coding Prompt
+
+```md
+RUN:
+    checkout a new/existing "demo-agentic-coding" git branch
+
+CREATE main_tac.py:
+    print "hello agentic coding"
+    print a concise explanation of the definition of ai agents
+
+RUN:
+    uv run main_aic.py
+    uv run main_tac.py
+    git add .
+    git commit -m "Demo agentic coding capabilities"
+```
+
+### Programmable Agentic Coding
+
+- `sh programmable/programmable.sh`
+- `bun run programmable/programmable.ts`
+- `uv run python programmable/programmable.py`
+
+### Enabled Tools
+
+See [.claude/settings.json](.claude/settings.json):</code></pre>
+            </div>
+            <dl class="line-notes">
+              <dt>1</dt><dd>Name the course and lesson. The repository is teaching material, not a packaged application.</dd>
+              <dt>3–8</dt><dd>The “AI Coding” prompt delegates only artifact creation. <code>print goodbye ai coding</code> is natural-language intent for the agent, not literal Python syntax.</dd>
+              <dt>10–25</dt><dd>The “Agentic Coding” prompt adds branch management, file creation, execution, staging, and commit. It assumes the prior demo already created <code>main_aic.py</code>.</dd>
+              <dt>27–31</dt><dd>Three commands expose the same headless behavior through Shell, Bun, or Python.</dd>
+              <dt>33–35</dt><dd>Point the learner to the capability policy. The trailing colon invites inspection; no tool list is duplicated here.</dd>
+            </dl>
+            <aside class="callout callout--why">
+              <p class="callout__label">Teaching sequence versus reusable workflow</p>
+              <p>The README deliberately stages an A/B comparison. <code>prompt.md</code> deliberately removes that staging dependency. One is optimized for explanation; the other is optimized for unattended invocation.</p>
+            </aside>
+          </div>
+        </details>
+
+        <details class="file-card" id="file-env">
+          <summary>
+            <span class="file-card__path">.env.sample</span>
+            <span class="file-card__role">environment contract · 1 line</span>
+            <span class="file-card__chevron" aria-hidden="true">+</span>
+          </summary>
+          <div class="file-body">
+            <div class="purpose"><span class="purpose__label">Purpose</span><p>Documents the environment variable name for API-key authentication without committing a secret value.</p></div>
+            <div class="code-frame">
+              <div class="code-frame__bar"><span>.env.sample</span><span>complete source · 1 logical line</span></div>
+              <pre><code class="language-ini">ANTHROPIC_API_KEY=</code></pre>
+            </div>
+            <dl class="line-notes">
+              <dt>1</dt><dd>The empty right-hand side is a placeholder. A learner copies the name into their own environment configuration and supplies the value privately.</dd>
+            </dl>
+            <aside class="callout callout--warning">
+              <p class="callout__label">Do not assume dotenv loading</p>
+              <p>None of the three launchers reads this file or imports a dotenv library. The Claude CLI must already be authenticated through its own login or process environment. The sample documents a contract; it does not load credentials.</p>
+            </aside>
+          </div>
+        </details>
+      </section>
+
+      <section class="chapter-section" id="wrappers">
+        <span class="section-number">04 · Compare</span>
+        <h2 class="section-title">Same agentic behavior, different host guarantees</h2>
+        <p class="section-lead">The language does not change what Claude is asked to do. It does change what the calling system can learn when something goes wrong.</p>
+
+        <div class="compare-grid">
+          <article class="compare-card">
+            <h3>Shell · 3 operations</h3>
+            <p>Smallest concept demo. Captures stdout, inherits stderr, but normally loses Claude’s failing exit status after the final echo.</p>
+            <span class="compare-card__signal">failure fidelity: low</span>
+          </article>
+          <article class="compare-card">
+            <h3>Bun · async wrapper</h3>
+            <p>Catches read or invocation errors and returns status 1. Clear and compact, but collapses specific child failure codes.</p>
+            <span class="compare-card__signal">failure fidelity: medium</span>
+          </article>
+          <article class="compare-card">
+            <h3>Python · subprocess</h3>
+            <p>Separates output channels and propagates Claude’s exact return code. Its prompt-file read still sits outside the handler.</p>
+            <span class="compare-card__signal">failure fidelity: highest</span>
+          </article>
+        </div>
+
+        <table>
+          <thead><tr><th>Concern</th><th>Shell</th><th>Bun</th><th>Python</th></tr></thead>
+          <tbody>
+            <tr><td>Reads shared prompt</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+            <tr><td>Calls <code>claude -p</code></td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+            <tr><td>Prints stdout</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+            <tr><td>Handles stderr explicitly</td><td>No; inherited</td><td>No separate stream; catch logs the error</td><td>Yes; separate stream</td></tr>
+            <tr><td>Exit behavior</td><td>Final echo can mask failure</td><td>Failure → 1</td><td>Claude’s exact return code</td></tr>
+            <tr><td>Missing prompt</td><td>Continues unless shell configured to stop</td><td>Caught</td><td>Uncaught before <code>try</code></td></tr>
+          </tbody>
+        </table>
+
+        <aside class="callout callout--term">
+          <p class="callout__label">Name the pattern</p>
+          <p>These files are <strong>process adapters</strong>: tiny pieces of host-language code that translate “run our workflow” into a call to an external agent runtime. They should stay boring. The workflow belongs in the shared prompt.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="run">
+        <span class="section-number">05 · End to end</span>
+        <h2 class="section-title">How one programmable run works</h2>
+        <p class="section-lead">This is control flow and data flow together. Notice when responsibility crosses from your launcher into the agent.</p>
+
+        <ol class="flow-list">
+          <li><div class="flow-list__body"><strong>You start one adapter from the repository root.</strong><p>For example, <code>uv run python programmable/programmable.py</code>. The current working directory matters because prompt and project settings are located relative to the repo.</p></div></li>
+          <li><div class="flow-list__body"><strong>The adapter loads <code>prompt.md</code> as data.</strong><p>No launcher interprets RUN, CREATE, or REPORT. It merely preserves the text and passes it forward.</p></div></li>
+          <li><div class="flow-list__body"><strong>The adapter starts <code>claude -p</code>.</strong><p>The multiline prompt becomes the print-mode request. At this point the host program waits for the child process.</p></div></li>
+          <li><div class="flow-list__body"><strong>Claude combines request, repository context, and allowed tools.</strong><p>The prompt supplies intent. <code>.claude/settings.json</code> supplies project permissions. The model/runtime decides the concrete tool-call sequence.</p></div></li>
+          <li><div class="flow-list__body"><strong>The agent mutates Git and the working tree.</strong><p>It checks out or creates <code>demo-agentic-coding</code>, creates both Python programs, runs them with UV, stages the working tree, and commits.</p></div></li>
+          <li><div class="flow-list__body"><strong>Execution results become observations.</strong><p>The outputs from both generated programs are available to the agent. REPORT tells it which observations must cross back to the caller.</p></div></li>
+          <li><div class="flow-list__body"><strong>Claude returns text and a process status.</strong><p>The report arrives on stdout; diagnostics may arrive on stderr; success or failure arrives as an exit code.</p></div></li>
+          <li><div class="flow-list__body"><strong>The adapter translates the result for its own caller.</strong><p>All three print a result, but only Python preserves the exact child status. This last boundary determines whether automation above the launcher can respond reliably.</p></div></li>
+        </ol>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Where is the “agent”?</p>
+          <p>Not in the Python, Shell, or TypeScript logic. Those files only create a process. Agency appears inside the Claude runtime’s repeated loop: interpret → choose a tool → act → observe → continue until the report contract is satisfied.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="fails">
+        <span class="section-number">06 · Common fail + fix</span>
+        <h2 class="section-title">Four ways a tiny demo still breaks</h2>
+        <p class="section-lead">Most failures are boundary failures—starting state, working directory, authority, or error propagation—not mistakes in the generated print statements.</p>
+
+        <table class="failure-table">
+          <thead><tr><th>Symptom</th><th>Cause</th><th>Repair</th></tr></thead>
+          <tbody>
+            <tr><td><code>prompt.md</code> not found</td><td>You launched outside the <code>tac-1</code> root; all wrappers use the same root-relative path.</td><td><code>cd</code> to the lesson root before running the documented command.</td></tr>
+            <tr><td><code>main_aic.py</code> is missing</td><td>You ran only the README’s second, sequential prompt instead of first performing the AI coding demo.</td><td>Run the README prompts in order, or use the self-contained programmable prompt.</td></tr>
+            <tr><td>Claude asks for authorization or cannot act</td><td>Authentication or tool permissions are unavailable; text in a prompt does not itself grant authority.</td><td>Authenticate the CLI, inspect project settings, and grant only the bounded capabilities you intend.</td></tr>
+            <tr><td>Shell caller says success after Claude failed</td><td>The final <code>echo</code> overwrote the useful child exit status.</td><td>For automation, use the Python wrapper or explicitly capture and return Claude’s status in Shell.</td></tr>
+            <tr><td>Unexpected files enter the commit</td><td><code>git add .</code> staged pre-existing changes alongside generated artifacts.</td><td>Begin from a clean disposable checkout and inspect <code>git status</code> before firing the workflow.</td></tr>
+          </tbody>
+        </table>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">A permission list is not a safety proof</p>
+          <p>The allowlist is a useful boundary, but <code>git add .</code> and <code>git commit</code> still have broad effects inside the checkout. Bounded verbs, clean starting state, and post-run verification work together.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">07 · You try</span>
+        <h2 class="section-title">Lab: make the report prove its branch</h2>
+        <p class="section-lead">Modify one behavioral requirement, then verify the change traveled through the unchanged Python adapter.</p>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">One prompt edit · one headless verification</h3>
+          <ol class="lab-box__steps">
+            <li>Work in a clean, disposable copy of <code>tac/tac-1</code>. Confirm with <code>git status --short</code>.</li>
+            <li>Ask your coding agent—not your editor—to add one REPORT requirement to <code>programmable/prompt.md</code>: return the current Git branch name before the two program outputs.</li>
+            <li>Do not edit <code>programmable.py</code>. Predict why the launcher should require no change.</li>
+            <li>From the lesson root, run <code>uv run python programmable/programmable.py</code>.</li>
+            <li>Verify independently with <code>git branch --show-current</code>, <code>uv run main_aic.py</code>, and <code>uv run main_tac.py</code>.</li>
+            <li>Compare those three observations with the returned report. Then inspect <code>git log -1 --oneline</code> and <code>git status --short</code>.</li>
+          </ol>
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <ul>
+              <li>The report names <code>demo-agentic-coding</code> and includes both exact program outputs.</li>
+              <li>The three launchers remain untouched; behavior changed only in the shared prompt.</li>
+              <li>The latest commit has the requested lesson message and the working tree contains no surprise files.</li>
+              <li>You can explain why this edit affects every launcher.</li>
+            </ul>
+          </div>
+        </section>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">What the lab proves</p>
+          <p>The adapters transport behavior; they do not own it. A new report field belongs in <code>prompt.md</code>, so Shell, Bun, and Python inherit it without coordinated code changes.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="teach-back">
+        <span class="section-number">08 · Teach-back</span>
+        <h2 class="section-title">Close the page and explain the system</h2>
+        <p class="section-lead">If you can answer these without file names becoming a blur, you understand the architecture rather than merely recognizing it.</p>
+
+        <section class="retrieval-quiz" aria-label="TAC-1 code teach-back questions">
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">1. Why are there three launchers if all three do the same thing?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>To prove the agent is callable from any language with terminal access. The wrappers are replaceable adapters; the shared prompt carries the workflow.</p></details>
+          </div>
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">2. What is the difference between the README’s agentic prompt and <code>programmable/prompt.md</code>?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The README prompt is the second half of a staged demo and assumes <code>main_aic.py</code> already exists. The programmable prompt creates both files and adds an exact-output REPORT, so it can run unattended.</p></details>
+          </div>
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">3. Why is Python the strongest wrapper here?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It keeps stdout and stderr distinct and exits with Claude’s exact return code. An outer system can therefore distinguish success from failure more precisely.</p></details>
+          </div>
+          <div class="retrieval-quiz__item">
+            <p class="retrieval-quiz__q">4. Does the prompt grant permission to commit?</p>
+            <details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. The prompt expresses intent. <code>.claude/settings.json</code> separately allows the Git commit command. Request and authority are different layers.</p></details>
+          </div>
+        </section>
+
+        <div class="teach-back">
+          <p class="eyebrow">60-second challenge</p>
+          <p><strong>Teach the repo from memory:</strong> “A caller enters through one of three doors. Then…” Continue through prompt loading, Claude’s tool loop, repository side effects, report, and exit status.</p>
+          <p class="fine">Pass if you name the behavior/policy/adapter boundaries and one wrapper failure difference. Bonus: explain why <code>main_aic.py</code> is absent before the run.</p>
+        </div>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">Keep the concept connected</p>
+        <div class="chapter-footer__nav">
+          <a href="../vol-1-tac/01-hello-agentic-coding.html">← Back to Chapter 1</a>
+          <a href="../index.html">Book hub →</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let progressFramePending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestProgressUpdate = () => {
+        if (progressFramePending) return;
+        progressFramePending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          progressFramePending = false;
+        });
+      };
+
+      const revealHashTarget = () => {
+        if (!window.location.hash) return;
+        const target = document.querySelector(window.location.hash);
+        if (target instanceof HTMLDetailsElement) target.open = true;
+        const parent = target?.closest('details');
+        if (parent) parent.open = true;
+      };
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => {
+          const active = link.getAttribute('href') === `#${visible.target.id}`;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+
+      sections.forEach(section => observer.observe(section));
+      revealHashTarget();
+      window.addEventListener('hashchange', revealHashTarget);
+      window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+      window.addEventListener('resize', requestProgressUpdate);
+      document.querySelectorAll('.file-card').forEach(card => card.addEventListener('toggle', requestProgressUpdate));
+
+      if (window.hljs) window.hljs.highlightAll();
+      updateProgress();
+    })();
+  </script>
+</body>
+</html>

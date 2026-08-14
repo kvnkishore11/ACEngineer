@@ -1,0 +1,533 @@
+<section class="chapter" id="ch21">
+<div class="wrap wide">
+<span class="chapnum reveal">21 — The Vault · Videos 10–18</span>
+<div class="kicker reveal">the vault · prompt formats, custom agents, skills, beyond mcp</div>
+<h2 class="title reveal d1" style="max-width:26ch">Nine videos, one spine: <em>teach your agents</em>, then get out of the loop.</h2>
+<p class="lede reveal d2">Seven levels of prompt formats, custom agents on the SDK, five bets on 2026, composable commands, a big-3 super agent, Haiku as cheap compute, skills cracked, the orchestrator — and finally, ditching MCP servers.</p>
+<div class="pillrow reveal d2"><span class="pill clay">videos 10–18</span><span class="pill blue">prompt engineering</span><span class="pill olive">custom agents</span><span class="pill plum">skills</span><span class="pill amber">beyond MCP</span><span class="pill rose">orchestration</span></div>
+
+<div class="chapnav reveal">
+<span class="cnl">In this chapter</span>
+<a href="#ch21-s1"><b>1</b>Prompt Formats</a>
+<a href="#ch21-s2"><b>2</b>SDK Agents</a>
+<a href="#ch21-s3"><b>3</b>Five Bets</a>
+<a href="#ch21-s4"><b>4</b>CC 2.0 Compose</a>
+<a href="#ch21-s5"><b>5</b>Big-3 Agent</a>
+<a href="#ch21-s6"><b>6</b>Haiku 4.5</a>
+<a href="#ch21-s7"><b>7</b>Agent Skills</a>
+<a href="#ch21-s8"><b>8</b>Orchestrator</a>
+<a href="#ch21-s9"><b>9</b>Beyond MCP</a>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal" id="ch21-s1"><span class="sn">1</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Prompt Is the Fundamental Unit</h2></div>
+<div class="kicker reveal">YT-10 · Agentic Prompt Engineering with Claude Code (For you, your team, and your AGENTS)</div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">"The prompt is now the fundamental unit of engineering." The 2–100x returns come from engineering every reusable prompt for the stakeholder trifecta — you, your team, and your agents: "There's a new user... it's your agent."</p>
+<p>Seven levelled formats built from swappable Lego-block sections. Workflow is S-tier usefulness at C-tier difficulty — "the most important section you'll write is the workflow" — the play your agent maps straight into its todo list.</p>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 640 240" role="img" aria-label="Anatomy of an agentic prompt: input, workflow, output">
+<text x="320" y="26" text-anchor="middle" class="s-title">every reusable prompt reduces to three moves</text>
+<text x="105" y="66" text-anchor="middle" class="s-label-sm">A-tier · variables</text>
+<rect x="20" y="78" width="170" height="84" rx="10" class="s-blue-f"/>
+<text x="105" y="112" text-anchor="middle" class="s-title">INPUT</text>
+<text x="105" y="134" text-anchor="middle" class="s-label-sm">$1 · $ARGUMENTS · statics</text>
+<path d="M196 120 H 234" class="s-flow"/><path d="M244 120 l-9 -6 0 12 z" class="s-clay"/>
+<text x="338" y="58" text-anchor="middle" class="s-label-sm">S-tier · write this first</text>
+<rect x="250" y="70" width="176" height="100" rx="10" class="s-clay-f"/>
+<text x="338" y="104" text-anchor="middle" class="s-title">WORKFLOW</text>
+<text x="338" y="126" text-anchor="middle" class="s-label-sm">numbered steps the agent</text>
+<text x="338" y="142" text-anchor="middle" class="s-label-sm">maps into its todo list</text>
+<path d="M432 120 H 470" class="s-flow"/><path d="M480 120 l-9 -6 0 12 z" class="s-clay"/>
+<text x="553" y="66" text-anchor="middle" class="s-label-sm">the Report section</text>
+<rect x="486" y="78" width="134" height="84" rx="10" class="s-olive-f"/>
+<text x="553" y="112" text-anchor="middle" class="s-title">OUTPUT</text>
+<text x="553" y="134" text-anchor="middle" class="s-label-sm">what comes back</text>
+<path d="M20 196 H 620" class="s-line" style="stroke-dasharray:4 5"/>
+<text x="320" y="222" text-anchor="middle" class="s-label">input, workflow, output — the pattern under all seven levels</text>
+</svg>
+<div class="fcap"><b>Variables in, Workflow works, Report defines what returns.</b></div>
+</div>
+</div>
+
+<div class="spread reveal d2" style="align-items:start">
+<div class="prose"><ul>
+<li>"One well-crafted prompt can generate tens and hundreds of hours of productive work. One bad prompt compounds failure at the same rate."</li>
+<li>Variables are "super underappreciated" (A-tier): dynamic ($1, $ARGUMENTS) take input; statics are defined once, referenced everywhere — change one line, the whole prompt updates.</li>
+<li>Metadata and Codebase Structure are C-tier — the latter is really "a context map" that spares the agent burning tokens on search.</li>
+<li>Instructions are guardrails around the steps — "a lot more valuable for your system prompt versus your workflow."</li>
+<li>Control flow (level 3) is plain natural language: "If no path to plan is provided, immediately stop and ask the user to provide it."</li>
+<li>Only add sections you need — composable pieces; no output requirements, no Report section.</li>
+</ul></div>
+<div class="prose"><ul>
+<li>Delegate prompts (level 4, S-tier): "we're writing prompts that write prompts" — your primary agent becomes its subagents' prompt engineer; nondeterminism becomes a feature when you fan out N agents.</li>
+<li>"Consistency is the greatest weapon against confusion for both you and your agent." "Consistency beats complexity."</li>
+<li>"Great prompting is great communicating" — the coworker test: could a colleague run your prompt top to bottom?</li>
+<li>Information-dense keywords (IMPORTANT, exclusively) when the agent must not deviate.</li>
+<li>Push to B-tier to "capture most of the value"; levels 3–4 cover 90% — template metaprompts (level 6, "the prompt that builds the prompt") scale velocity hardest.</li>
+<li>CRUD your reusable prompts "at light speed at the right level" — delegation is the D in R&amp;D (Reduce &amp; Delegate).</li>
+</ul></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">slash commands</span><span class="t">YAML frontmatter</span><span class="t">$ARGUMENTS</span><span class="t">parallel subagents</span><span class="t">background CC via CLI</span><span class="t">Replicate MCP demo</span><span class="t">Claude Code SDK</span></div>
+<div class="callout reveal"><span class="ci">REPO</span><span class="cc"><strong>agentic-prompt-engineering</strong> (agentic-horizon) — the 7 levels (High Level → Workflow → Control Flow → Delegate → Higher Order → Template Metaprompt → Self-Improving), working commands in .claude/commands/, a 12-section prompt dictionary, a system-vs-user-prompt guide.</span></div>
+
+<h4 class="reveal">Drill</h4>
+<ol class="steps reveal">
+<li><h4>Prime</h4><p>.claude/commands/prime.md as level-2: Metadata, Title, Purpose, numbered Workflow, Report.</p></li>
+<li><h4>Guarded build</h4><p>build.md with $1 = path-to-plan throughout; no path → stop and ask.</p></li>
+<li><h4>Static variable</h4><p>quick-plan.md with one static output dir in several steps; change it once, the prompt follows.</p></li>
+<li><h4>Delegate</h4><p>parallel_subagents.md: prompt-request + count; the primary designs input/workflow/output prompts per subagent.</p></li>
+<li><h4>Verify</h4><p>Run all four; each behaves per its Report section.</p></li>
+</ol>
+<div class="callout ok reveal"><span class="ci">DONE WHEN</span><span class="cc">/build with no argument early-returns asking for the plan path, and /parallel_subagents &lt;task&gt; 5 fires 5 subagents reporting in your format.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal blue" id="ch21-s2"><span class="sn">2</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Custom Agents Are the Endgame</h2></div>
+<div class="kicker reveal">YT-11 · Agentic Coding ENDGAME: Build your Claude Code SDK Custom Agents</div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">The single path: better agents → more agents → custom agents. Out-of-the-box tools are "built for everyone's codebase, not yours" — the endgame is your own specialized agents on the Claude Code SDK, starting with the system prompt.</p>
+<p>Overwrite it and "the Claude Code agent that you know and love is now gone... This is not Claude Code anymore." Two modes — overwrite for a true custom agent, append to merely extend Claude Code. Both valid; know which you're doing.</p>
+</div>
+<div><div class="quote big"><p>"The system prompt is the most important element of your custom agents with zero exceptions."</p><span class="cite" style="display:block;margin-top:10px">— "all of your work is multiplied by your system prompt"</span></div></div>
+</div>
+
+<div class="spread reveal d2" style="align-items:start">
+<div class="prose"><ul>
+<li>The SDK loop: "you set up your options, you set up your agent... you run the query, and then you handle the response" — all incrementally adoptable.</li>
+<li>query for one-off prompts; ClaudeSDKClient for continuous conversations with memory.</li>
+<li>Custom tools ship as an in-memory MCP server (create_sdk_mcp_server) — "the description of your tool tells your agent how to use it."</li>
+<li>The default toolset leaks: ask "list your available tools" and find ~15 you didn't ask for. "Everything that's going into your agent winds up in the context window... it consumes space in your agent's mind." Fix with allowed_tools.</li>
+<li>Downgrade the model when the job is simple — the echo agent runs Haiku: "It doesn't need powerful intelligence."</li>
+</ul></div>
+<div class="prose"><ul>
+<li>"Keep track of the core four [context, model, prompt, tools]... you will understand compute."</li>
+<li>Micro SDLC: planner → builder → reviewer on a kanban, streaming via WebSockets, on their own codebase — "this work shipped with a single prompt outside the loop" (in-loop → out-loop → ZTE).</li>
+<li>"If you're doing one-size-fits-all work, use the out-of-the-box agent." Custom agents are for specialized, high-ROI work — "this is where all the alpha is in engineering."</li>
+<li>"Agentic coding is not so much about what we can do anymore. It's about what we can teach our agents to do."</li>
+</ul></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">Claude Agent SDK (Python)</span><span class="t">override vs append</span><span class="t">query vs ClaudeSDKClient</span><span class="t">create_sdk_mcp_server</span><span class="t">allowed_tools</span><span class="t">uv single-file scripts</span><span class="t">FastAPI + Vue UIs</span></div>
+<div class="callout reveal"><span class="ci">REPO</span><span class="cc"><strong>building-specialized-agents</strong> (agentic-horizon) — 8 custom agents, one concept each: pong (system prompt override), echo (custom tool), calculator (REPL + resume), social hype (Bluesky firehose), QA agent, tri-copy-writer (structured JSON web app), micro SDLC (kanban), ultra stream (dual-agent logs).</span></div>
+
+<h4 class="reveal">Drill</h4>
+<ol class="steps reveal">
+<li><h4>Pong</h4><p>uv single-file script: overwrite the system prompt with three lines ("Always respond exactly with pong."), run query, parse the blocks.</p></li>
+<li><h4>Echo</h4><p>One custom tool (message, repeat, transform) via create_sdk_mcp_server, model on Haiku.</p></li>
+<li><h4>Audit the leak</h4><p>"List your available tools" — count the baked-ins, strip with allowed_tools, verify context shrinks.</p></li>
+<li><h4>Memory</h4><p>Swap query for ClaudeSDKClient; a follow-up summarizes the conversation.</p></li>
+<li><h4>Out-loop</h4><p>Run the micro SDLC kanban, drag a ticket to Plan, watch it ship hands-off.</p></li>
+</ol>
+<div class="callout ok reveal"><span class="ci">DONE WHEN</span><span class="cc">Pong answers "pong" to everything, echo runs on Haiku with only your tool exposed, and one kanban ticket ships end-to-end untouched.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal olive" id="ch21-s3"><span class="sn">3</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Five Bets on the Future</h2></div>
+<div class="kicker reveal">YT-12 · My TOP 5 Agentic Engineering Bets: Anthropic, Custom Agents, &amp; Multi-Agent UI (Not for beginners)</div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">"Every plan is a bet on the future." Five bets for 2026 — where to put your agents, time, money, and compute. The mission behind them: "Build living software that works for us while we sleep."</p>
+<p>ChatGPT Pulse validates the two-way-prompt prediction — "at some point the conversation will flip and our agents will prompt us more than we prompt them." And: "In 2026, we're going to see our first compute crunch."</p>
+</div>
+<div><div class="quote big"><p>"You, the engineer, are the bottleneck, not the models, not the tools, not the agents... It's a skill issue."</p><span class="cite" style="display:block;margin-top:10px">— the thread through all five bets</span></div></div>
+</div>
+
+<div class="spread reveal d2" style="align-items:start">
+<div class="prose"><ul>
+<li><strong>Bet 1 — custom agents.</strong> "The 80/20 of software engineering can be summarized in one word: agents." In production they put you "immediately in the top 1% of engineers" — "repeatable problem solving with compute."</li>
+<li><strong>Bet 2 — deprecate old skills.</strong> The pencil: "growth isn't just about writing the next line, but knowing when to erase and start again." "We have guaranteed skill atrophy. Think about the calculator. Think about Google Maps." "It's not about your skills. It's about what you can teach your agents to do."</li>
+<li><strong>Bet 3 — limit break the constraints.</strong> "Planning and reviewing. These are the constraints of agentic coding." Custom agents inside ADWs are "the most powerful abstraction that exists for engineers right now" — "a 1 to 2 order of magnitude improvement" awaits, but "you cannot teach something to do something that you do not know how to do." This filters the vibe coders.</li>
+</ul></div>
+<div class="prose"><ul>
+<li><strong>Bet 4 — multi-agent UIs + voice.</strong> "The chat interface is the laziest and most overused interface for agents." Raise the information rate — voice. "Not another Claude Code wrapper... Everyone's going way too wide. It's time to go deep" — use-case-specific UIs in your own product.</li>
+<li><strong>Bet 5 — compute maxing.</strong> "Unless you have an always-on 24/7 agent solving problems for you on your behalf all the time, you can and should be using more compute."</li>
+<li><strong>The announcement.</strong> Tactical Agentic Coding phase 2 (8 lessons/8 tactics) + Agentic Horizon — "become an engineer that builds the system that builds the system"; guiding question: "What if your codebase could ship itself?"</li>
+</ul></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">custom agents</span><span class="t">ADWs</span><span class="t">multi-agent UIs</span><span class="t">voice interfaces</span><span class="t">always-on agents</span><span class="t">ChatGPT Pulse</span><span class="t">Qwen (cheap-compute bet)</span></div>
+
+<h4 class="reveal">Drill</h4>
+<ol class="steps reveal">
+<li><h4>Name the constraints</h4><p>Planning and reviewing — every tooling investment should attack one of them.</p></li>
+<li><h4>See the progression</h4><p>Single agent → custom agents in production → always-on compute maxing; each step a deliberate bet whose risks you accept on purpose.</p></li>
+<li><h4>Write your own</h4><p>Your own 5-bet plan for the year — "those who plan the future tend to create it."</p></li>
+</ol>
+<div class="callout idea reveal"><span class="ci">WATCH &amp; ABSORB</span><span class="cc">No public codebase — a strategy video, not a build video. The drill is internalization: if these three points don't change where your next month goes, rewatch.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal plum" id="ch21-s4"><span class="sn">4</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Composable Commands: Scout, Plan, Build</h2></div>
+<div class="kicker reveal">YT-13 · Claude Code 2.0 Agentic Coding: No, other agents aren't even close.</div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">"CodeX CLI, Gemini CLI, they're nowhere near as close as you think they are... You can't be close to the leader when you just copy their feature set over and over."</p>
+<p>CC 2.0's killer feature: slash commands can call slash commands — "You can compose your agentic prompts. Okay, this is huge." One /scout_plan_build chains /scout → /plan_w_docs → /build. The scout protects the planner: "There are only two ways to manage your context window, R&amp;D, reduce and delegate."</p>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 660 270" role="img" aria-label="Scout, plan, build composed workflow">
+<text x="330" y="24" text-anchor="middle" class="s-title">/scout_plan_build — commands calling commands</text>
+<text x="78" y="50" text-anchor="middle" class="s-label-sm">4 cheap parallel scouts</text>
+<rect x="20" y="60" width="116" height="30" rx="8" class="s-blue-f"/><text x="78" y="79" text-anchor="middle" class="s-label-sm">gemini flash</text>
+<rect x="20" y="98" width="116" height="30" rx="8" class="s-blue-f"/><text x="78" y="117" text-anchor="middle" class="s-label-sm">codex</text>
+<rect x="20" y="136" width="116" height="30" rx="8" class="s-blue-f"/><text x="78" y="155" text-anchor="middle" class="s-label-sm">opencode</text>
+<rect x="20" y="174" width="116" height="30" rx="8" class="s-blue-f"/><text x="78" y="193" text-anchor="middle" class="s-label-sm">haiku</text>
+<path d="M136 75 C 170 75 168 124 196 124" class="s-line"/>
+<path d="M136 113 C 166 113 170 128 196 128" class="s-line"/>
+<path d="M136 151 C 166 151 170 138 196 138" class="s-line"/>
+<path d="M136 189 C 170 189 168 142 196 142" class="s-line"/>
+<rect x="198" y="100" width="150" height="66" rx="10" class="s-card"/>
+<text x="273" y="128" text-anchor="middle" class="s-label">relevant_files.md</text>
+<text x="273" y="147" text-anchor="middle" class="s-label-sm">offsets + read lengths</text>
+<path d="M348 133 H 386" class="s-flow"/><path d="M396 133 l-9 -6 0 12 z" class="s-clay"/>
+<rect x="400" y="100" width="110" height="66" rx="10" class="s-plum-f"/>
+<text x="455" y="128" text-anchor="middle" class="s-title">plan</text>
+<text x="455" y="147" text-anchor="middle" class="s-label-sm">/plan_w_docs</text>
+<path d="M510 133 H 548" class="s-flow"/><path d="M558 133 l-9 -6 0 12 z" class="s-clay"/>
+<rect x="562" y="100" width="84" height="66" rx="10" class="s-clay-f"/>
+<text x="604" y="128" text-anchor="middle" class="s-title">build</text>
+<text x="604" y="147" text-anchor="middle" class="s-label-sm">/build</text>
+<path d="M20 222 H 640" class="s-line" style="stroke-dasharray:4 5"/>
+<text x="330" y="250" text-anchor="middle" class="s-label">scouts spend cheap tokens so the planner's window stays free to plan</text>
+</svg>
+<div class="fcap"><b>Mixed model families on purpose.</b> Scouts emit byte offsets, not just filenames.</div>
+</div>
+</div>
+
+<div class="spread reveal d2" style="align-items:start">
+<div class="prose"><ul>
+<li>"Looking through files isn't exactly planning" — keep the planner's window free to actually plan.</li>
+<li>Manage the "core four" — context, model, prompt, tools — for every agent you spin up.</li>
+<li>"Prompt engineering... is just as important as context engineering." "I can guarantee you you're not pushing your prompts far enough."</li>
+<li>Adopt your agent's perspective in high-level prompts — you'll catch what it will miss (the system-prompt-no-longer-default gotcha in the Agent SDK migration).</li>
+<li>Auto-compact ate 22% of the window ("absolutely cooked") — off via /config for ~91% free. "You want a focused, clear agent with as many tokens as you can spend."</li>
+<li>Even with delegation the chain burned ~51% — the hard limit of in-loop agents; the escape hatch is out-loop ADWs with isolated windows.</li>
+</ul></div>
+<div class="prose"><ul>
+<li>Agent device: an /AFK agents handoff sent plan → build → ship to an M4 Mac mini that built and git-pushed three OpenAI Agents SDK prototypes, polling every 60s. "You don't need to sit in the loop for every single task."</li>
+<li>Rapid-prototyping ladder: build simple, validate, step up — like managing a junior engineer.</li>
+<li>CC 2.0 truncating output makes it "the tool for everyone, not just the tool for engineers" — countered with a custom Observable output style (tools + diffs + TTS).</li>
+<li>Higher-order prompts: /build "passes a prompt into a prompt."</li>
+<li>"There is a direct causal link between your ability to control, build, and use agents, and your engineering output." "Build the system that builds the system" — "What if your code base could ship itself?"</li>
+</ul></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">CC 2.0 composable commands</span><span class="t">/context · /config</span><span class="t">output styles</span><span class="t">Agent SDK migration</span><span class="t">Gemini/Codex/opencode/Haiku scouts</span><span class="t">Firecrawl MCP</span><span class="t">ElevenLabs TTS</span><span class="t">M4 Mac mini</span></div>
+<div class="callout reveal"><span class="ci">REPO</span><span class="cc">gist <strong>disler/c7719b79a107</strong> — one file: the "Observable — Tools + Diffs + TTS" output style (git-diff report, chronological tool-call listing in TypeScript-interface syntax, ElevenLabs TTS summary). The scout/plan/build codebase itself is private course material.</span></div>
+
+<h4 class="reveal">Drill</h4>
+<ol class="steps reveal">
+<li><h4>/scout</h4><p>3–4 parallel sub-agents (mix models) write relevant_files.md with offsets.</p></li>
+<li><h4>/plan_w_docs</h4><p>Read relevant_files.md, scrape doc URLs into ai_docs/, write a plan.</p></li>
+<li><h4>/build</h4><p>A higher-order prompt that executes the plan.</p></li>
+<li><h4>Compose</h4><p>/scout_plan_build &lt;prompt&gt; &lt;doc-urls&gt;; run on a small real migration.</p></li>
+<li><h4>Measure</h4><p>Auto-compact off; /context before and after to verify the savings.</p></li>
+<li><h4>Optional</h4><p>Drop the gist's output style into ~/.claude/output-styles/; wire your own TTS.</p></li>
+</ol>
+<div class="callout ok reveal"><span class="ci">DONE WHEN</span><span class="cc">One /scout_plan_build invocation completes the task end-to-end and /context shows your primary agent kept a majority of its window free.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal amber" id="ch21-s5"><span class="sn">5</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Think in Ands, Not Ors</h2></div>
+<div class="kicker reveal">YT-14 · BIG 3 SUPER AGENT: Gemini 2.5 Computer Use, OpenAI Realtime API, Claude Code</div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">Stop picking one lab. Compose OpenAI Realtime voice, Claude Code coders, and Gemini 2.5 Computer Use browser agents into one voice-orchestrated system — "in order to scale your impact, you must scale your compute."</p>
+<p>Provider loyalty optimizes for their business model, not your capability. The ladder: "First we have better agents, then we have more agents, then we have custom agents, and then we need to conduct them and orchestrate them in the best way."</p>
+</div>
+<div><div class="quote big"><p>"Loyalty in the generative AI age is not the winning strategy. The winning play is to use them all. Think in ands, not ors."</p><span class="cite" style="display:block;margin-top:10px">— voice orchestrator "Ada" commanding coders Sony &amp; Blink</span></div></div>
+</div>
+
+<div class="spread reveal d2" style="align-items:start">
+<div class="prose"><ul>
+<li>Keep orchestration super thin — "basically CRUD against agents" (list, create, command, delete) — agent-agnostic, ready for "whatever tool or model is coming next."</li>
+<li>Closed loops are the killer feature: Claude Code validates its own work through a Gemini browser tool, getting concrete success/failure back. "Teach your agents how to correct their own work."</li>
+<li>"If you can't see what your agents are doing at scale, you will not be able to scale your compute" — live hook event stream with cheap-model summaries; "only dive in if something goes wrong."</li>
+<li>Slash commands are "reusable compute for your agents" — one agent prompts another to run /plan or /build.</li>
+<li>Outputs loop back into inputs: "Build for you, your team, and your agents at the same time" — expose text AND voice so agents can satisfy the feedback loop too.</li>
+<li>Boundaries matter: Sony (backend) trampled Blink's frontend because scope wasn't explicit — unclear boundaries produce duplicate code.</li>
+</ul></div>
+<div class="prose"><ul>
+<li>Make workflows prompt-activatable so your agents can test the tool for you.</li>
+<li>"Build the system that builds the system" — Dan built the orchestration layer, then prompted it to build the Sora content-gen app end to end.</li>
+<li>"You, the engineer, are the bottleneck. It's not the tools, it's not the models, it's not the agents."</li>
+<li>"Voice-based agentic coding is right around the corner" — build fleet-control wrappers now for the edge; keep text workflows for the conditionals.</li>
+<li>"There is a direct causal relationship between your compute use and your engineering output."</li>
+<li>Expect failure: the voice agent crashed mid-demo, but session registries and logged work let it restart and relist all agents instantly. "Think in the gray... the people that are experimenting have more answers than the others."</li>
+</ul></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">OpenAI Realtime API</span><span class="t">Claude Code 2 + Sonnet 4.5</span><span class="t">Gemini 2.5 Computer Use + Playwright</span><span class="t">Sora 2 API</span><span class="t">hooks observability</span><span class="t">/plan · /build</span><span class="t">FastAPI + Vue</span></div>
+<div class="callout reveal"><span class="ci">REPO</span><span class="cc"><strong>disler/big-3-super-agent</strong> — voice-controlled orchestrator (big_three_realtime_agents.py, 3000+ lines: GeminiBrowserAgent, ClaudeCodeAgenticCoder, OpenAIRealtimeVoiceAgent) exposing create_agent, command_agent, list_agents, browser_use; agents build a Sora video app in apps/content-gen/ with session registries and hook observability.</span></div>
+
+<h4 class="reveal">Drill</h4>
+<ol class="steps reveal">
+<li><h4>Boot text mode</h4><p>Clone, set OpenAI/Anthropic/Gemini keys, playwright install, then uv run big_three_realtime_agents.py --input text --output text.</p></li>
+<li><h4>Observability up</h4><p>Run the dashboard (npm install &amp;&amp; npm run dev); hook events on localhost:3000.</p></li>
+<li><h4>Two scoped agents</h4><p>Create two named coders; one /plans a feature into specs/ with explicit backend-only vs frontend-only boundaries.</p></li>
+<li><h4>Build watched</h4><p>The second /builds from the spec — watch both sessions in the dashboard, not the terminals.</p></li>
+<li><h4>Close the loop</h4><p>One agent validates via browser_use against the dev server; read the success/failure it gets back.</p></li>
+<li><h4>Go voice</h4><p>Retry the whole flow with --voice, typing nothing.</p></li>
+</ol>
+<div class="callout ok reveal"><span class="ci">DONE WHEN</span><span class="cc">Two independently-scoped agents plan, build, and browser-validate a feature end to end with every tool call visible in the dashboard.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal blue" id="ch21-s6"><span class="sn">6</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Cheap Fast Compute for Agents</h2></div>
+<div class="kicker reveal">YT-15 · Claude HAIKU 4.5 is LIGHT SPEED Agentic Coding… BUT can it BEAT Sonnet?</div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">Haiku 4.5 is "cheap fast compute for agents" — the skill is knowing which work to offload down your model stack and which still demands Sonnet.</p>
+<p>"For every Sonnet prompt you write, you could have written three Haiku prompts" — and caching drops the price further: "this model is cheaper than you think it is." Performance, speed, and cost are "the three dials you and I have as engineers to tweak and tune."</p>
+</div>
+<div><div class="stats">
+<div class="stat"><div class="sv">2×</div><div class="sl">faster than Sonnet 4.5 — ~1s quicker between tool calls</div></div>
+<div class="stat blue"><div class="sv">⅓</div><div class="sl">the price, cheaper still with caching</div></div>
+<div class="stat amber"><div class="sv">3%</div><div class="sl">failure rate — missed 1 of 32 files</div></div>
+<div class="stat plum"><div class="sv">½</div><div class="sl">Sonnet's time on find-and-summarize</div></div>
+</div></div>
+</div>
+
+<div class="spread reveal d2" style="align-items:start">
+<div class="prose"><ul>
+<li>The 3% miss is "completely unacceptable" in some domains, "more than enough" in others — know yours.</li>
+<li>Haiku loses instruction detail under complexity: ignored the two-sentence summary rule (2 hits vs Sonnet's 12) and violated an explicit "do not use sub-agents."</li>
+<li>"Haiku is a fast hard worker, but it won't work for very long" — plans a third to a quarter of Sonnet's length; "Haiku is not a good planner."</li>
+<li>A "scouter model": search, summarization, structured-data extraction, docs gathering, pattern matching, simple codegen.</li>
+<li>Build test: a working regex search bar and 10-minute pulse timer shipped — but three new UI themes were created and never wired up. "Would Sonnet have missed this? Absolutely not."</li>
+<li>Capability passes down the stack each release: "there are problems that Haiku can now solve that only Sonnet or Opus could solve."</li>
+</ul></div>
+<div class="prose"><ul>
+<li>Build a model portfolio — "an agent model stack, weak, base, strong" — vendor-agnostic; what matters is "the optionality to use the right one at the right time."</li>
+<li>"To scale your impact, scale your compute" — tool calls are a rough corollary for results, assuming the work is worth doing.</li>
+<li>The split: Haiku for summarization, docs, simple codegen, patterns; Sonnet for planning, architecture, debugging, long pipelines — Sonnet plans, Haiku executes, Sonnet double-checks on cheap read tokens.</li>
+<li>Habit shift: "I stop and I first ask myself, do I even need Sonnet for this, or can I drop down to Haiku?"</li>
+<li>Verdict: "a notch below Sonnet 4" — ~3.5/3.7-Sonnet level, not a replacement.</li>
+<li>Dogfooding: the dashboard itself uses Haiku 4.5 to summarize hundreds of hook events live — "a perfect use case." "Observability and orchestration is the next frontier for agents" — without it you're vibe coding at scale.</li>
+</ul></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">Haiku 4.5 vs Sonnet 4.5</span><span class="t">hooks</span><span class="t">ultrathink</span><span class="t">sub-agents · plugins · skills</span><span class="t">swim-lane dashboard</span><span class="t">higher-order /build</span><span class="t">model distillation</span></div>
+<div class="callout reveal"><span class="ci">REPO</span><span class="cc"><strong>disler/claude-code-hooks-multi-agent-observability</strong> — real-time monitoring via all 12 hook events: Python/uv scripts POST to a Bun+SQLite server broadcasting over WebSocket to a Vue 3 dashboard with swim lanes, pulse chart, filtering, and Haiku-run event summaries.</span></div>
+
+<h4 class="reveal">Drill</h4>
+<ol class="steps reveal">
+<li><h4>Run the dashboard</h4><p>Clone, just start (Bun on :4000, Vue on :5173).</p></li>
+<li><h4>Wire your project</h4><p>Copy the .claude directory in; set a unique --source-app in settings.json.</p></li>
+<li><h4>Race the models</h4><p>One agentic prompt ("find and summarize all TS files, two-sentence summaries") in two instances: Haiku vs Sonnet.</p></li>
+<li><h4>Compare lanes</h4><p>Time between tool calls, totals, completion; diff outputs for missed files and dropped instructions.</p></li>
+<li><h4>Raise the stakes</h4><p>Repeat with a planning + /build task; note where the cheap model loses wiring details.</p></li>
+</ol>
+<div class="callout ok reveal"><span class="ci">DONE WHEN</span><span class="cc">You can name two task types you'll route to Haiku and two you'll keep on Sonnet, backed by your own dashboard evidence.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal olive" id="ch21-s7"><span class="sn">7</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Skills Are Composition, Not Replacement</h2></div>
+<div class="kicker reveal">YT-16 · I finally CRACKED Claude Agent Skills (Breakdown For Engineers)</div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">Skills don't replace MCP, sub-agents, or slash commands — they're a higher-level compositional unit for packaging repeat, agent-invoked solutions. The prompt remains the primitive underneath everything.</p>
+<p>What distinguishes them: agent-triggered + context-efficient + a "dedicated modular directory structure" — "the approach that's new," not the capability. Progressive disclosure is the killer feature: metadata, SKILL.md, on-demand resources. "Unlike MCP servers, which just straight-up tortures context window."</p>
+</div>
+<div><div class="grid grid-2">
+<div class="card olive"><p class="ctitle">Skills</p><p class="cbody">Automatic, agent-invoked behavior.</p></div>
+<div class="card blue"><p class="ctitle">MCP</p><p class="cbody">External integrations — Jira, DBs, weather APIs.</p></div>
+<div class="card plum"><p class="ctitle">Sub-agents</p><p class="cbody">Isolated, parallelizable workflows.</p></div>
+<div class="card amber"><p class="ctitle">Slash commands</p><p class="cbody">Manual triggers — the "super primitive".</p></div>
+</div></div>
+</div>
+
+<div class="spread reveal d2" style="align-items:start">
+<div class="prose"><ul>
+<li>"Whenever you see parallel, you should always just think, just jump to sub-agents" — nothing else runs parallel; accept losing that context afterward.</li>
+<li>Converting all your slash commands to skills is "a huge mistake" — never use a skill for a one-off a prompt or sub-agent can do.</li>
+<li>The graduation rule: one prompt creates a worktree; managing worktrees (create, list, remove, merge) is a problem set — "this is where one prompt is not enough" — that's a skill.</li>
+<li>"Do not give away the prompt. The prompt is the fundamental unit of knowledge work and of programming. If you don't know how to build and manage prompts, you will lose."</li>
+<li>"Every agent is the core four" — context, model, prompt, tools; every feature is built on top of them.</li>
+<li>Hierarchy: skills at the top (they can use prompts, other skills, MCP servers, sub-agents); MCP lower; slash commands both primitive and composer; sub-agents can't nest sub-agents.</li>
+</ul></div>
+<div class="prose"><ul>
+<li>The worktree-manager skill's instructions literally say "use the {slash} command tool" — skill composes prompt.</li>
+<li>Starting out? "Just build a prompt. Don't build a skill. Don't build a sub agent. Don't build out an MCP server. Keep it simple."</li>
+<li>Biggest complaint: skills "don't go all the way" — no commands/ or agents/ directories inside the bundle for nesting.</li>
+<li>Reliability: an explicit slash-command sequence runs in order, guaranteed; a chain of five skills isn't (yet).</li>
+<li>Hot take: "skills are effectively opinionated prompt engineering plus modularity... What's actually new here? I think the answer is not that much" — still a solid 8/10.</li>
+<li>"Build the thing that builds the thing" — the meta-skill (a skill that creates skills) is "a very, very, very powerful agentic abstraction." Hooks stay the deterministic lifecycle layer — balance agent judgment with determinism (the ADW theme).</li>
+</ul></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">SKILL.md + progressive disclosure</span><span class="t">slash commands</span><span class="t">sub-agents</span><span class="t">MCP servers</span><span class="t">hooks · plugins</span><span class="t">git worktrees</span><span class="t">SlashCommand tool</span></div>
+<div class="callout reveal"><span class="ci">REPO</span><span class="cc"><strong>disler/claude-code-hooks-multi-agent-observability</strong> — the demo codebase: .claude/skills/ ships the four skills Dan builds (create-worktree-skill, worktree-manager-skill, meta-skill, video-processor); its red/blue/yellow/purple worktrees with port offsets are the skill-vs-subagent-vs-command playground.</span></div>
+
+<h4 class="reveal">Drill</h4>
+<ol class="steps reveal">
+<li><h4>Three ways, one job</h4><p>Create a worktree via /create_worktree, via a sub-agent calling it, and via create-worktree-skill — confirm identical trees.</p></li>
+<li><h4>Read the composition</h4><p>worktree-manager-skill/SKILL.md — note how it delegates to slash commands.</p></li>
+<li><h4>Force a chain</h4><p>One request: "remove red tree, create purple tree with port offset 4, list all trees."</p></li>
+<li><h4>Meta-skill</h4><p>Generate a brand-new skill for a repeat workflow of your own (e.g., transcript processing).</p></li>
+</ol>
+<div class="callout ok reveal"><span class="ci">DONE WHEN</span><span class="cc">The manager skill auto-triggers from plain English, runs all three worktree operations in order via composed slash commands, and your meta-skill-generated skill triggers in a fresh session.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal plum" id="ch21-s8"><span class="sn">8</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">One Agent to Command the Fleet</h2></div>
+<div class="kicker reveal">YT-17 · The One Agent to RULE them ALL - Advanced Agentic Coding</div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">After custom agents: multi-agent orchestration — one orchestrator with CRUD over a fleet of focused, disposable agents, plus real-time observability, so you scale compute instead of your own presence.</p>
+<p>"The rate at which you can create and command your agents becomes the constraint of your engineering output. When your agents are slow, you're slow." The orchestrator is "the single interface pattern applied to your fleet of agents" — a decades-old paradigm, applied to agents.</p>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 640 300" role="img" aria-label="Progression ladder from better agents to orchestrator">
+<text x="320" y="26" text-anchor="middle" class="s-title">the progression — scale compute to scale impact</text>
+<rect x="24" y="216" width="136" height="46" rx="10" class="s-blue-f"/>
+<text x="92" y="238" text-anchor="middle" class="s-title">better agents</text>
+<text x="92" y="254" text-anchor="middle" class="s-label-sm">one great agent</text>
+<rect x="178" y="166" width="136" height="46" rx="10" class="s-olive-f"/>
+<text x="246" y="188" text-anchor="middle" class="s-title">more agents</text>
+<text x="246" y="204" text-anchor="middle" class="s-label-sm">parallel fleets</text>
+<rect x="332" y="116" width="136" height="46" rx="10" class="s-plum-f"/>
+<text x="400" y="138" text-anchor="middle" class="s-title">custom agents</text>
+<text x="400" y="154" text-anchor="middle" class="s-label-sm">top 1% territory</text>
+<rect x="486" y="66" width="136" height="46" rx="10" class="s-clay-f"/>
+<text x="554" y="88" text-anchor="middle" class="s-title">orchestrator</text>
+<text x="554" y="104" text-anchor="middle" class="s-label-sm">CRUD your fleet</text>
+<path d="M160 224 L 182 200" class="s-flow"/>
+<path d="M314 174 L 336 150" class="s-flow"/>
+<path d="M468 124 L 490 100" class="s-flow"/>
+<text x="320" y="288" text-anchor="middle" class="s-label">persistent primaries, not sub-agents — command them until done, then delete them</text>
+</svg>
+<div class="fcap"><b>Base → better → more → custom → orchestrator.</b> "At each step, you scale your compute to scale your impact."</div>
+</div>
+</div>
+
+<div class="spread reveal d2" style="align-items:start">
+<div class="prose"><ul>
+<li>Three pillars combine: orchestrator as unified interface, CRUD for agents (create/command/check/delete), observability for performance, cost, and results.</li>
+<li>"If you can't measure it, you can't improve it... If you have 10 agents doing the wrong thing, does it matter that you have 10? Of course not." That's why the orchestrator comes last, after custom agents.</li>
+<li>These are NOT sub-agents: persistent primary agents you "tap into over and over until that specific job is done" — context isn't blown away.</li>
+<li>Protect the orchestrator's window: it creates and commands but "is not always observing the logs. It cannot be." It never does the work itself.</li>
+<li>The core four underlies every agent UI any lab ships: "Don't let anyone confuse you." Monitor the core four of every agent you boot up.</li>
+<li>"200k context window is plenty. You're just stuffing a single agent with too much work, just like your boss did to you at your last job." Force focus, then "let the agents go home" — delete them.</li>
+</ul></div>
+<div class="prose"><ul>
+<li>The code journey ends in deletion — "the best code is no code at all" — so "treat your agents as deletable, temporary resources that serve a single purpose."</li>
+<li>The orchestrator does "serious prompt engineering": your high-level prompt becomes far more detailed per-agent instructions; scout → builder → reviewer chains pass plans, logs, and results along.</li>
+<li>Sleep-loop pattern: fire agents, sleep, poll check_agent_status every ~15 seconds.</li>
+<li>"Compute can solve so many of your engineering problems if you put the compute to work" — more compute buys confidence and trust.</li>
+<li>"These [cloud] tools are designed for everyone's codebase, not yours. When you build something like this, you get specialization all the way down."</li>
+<li>Every agent "must produce a concrete result. Otherwise, what's the point?" The UI shows consumed vs produced assets per agent; PR-based systems "miss a lot of the story." Trade-off: upfront plumbing buys out-of-loop plus the option to "hop in the loop" — a spectrum of modes.</li>
+</ul></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">Claude Agent SDK</span><span class="t">Sonnet orchestrator + Haiku agents</span><span class="t">8 MCP management tools</span><span class="t">FastAPI + asyncpg</span><span class="t">Vue 3 + Pinia</span><span class="t">PostgreSQL/NeonDB</span><span class="t">R&amp;D framework</span></div>
+<div class="callout reveal"><span class="ci">REPO</span><span class="cc"><strong>multi-agent-orchestration</strong> (agentic-horizon) — production-ready platform: orchestrator managing a fleet via 8 MCP tools, 3-column Vue UI (agents / event stream / chat), Postgres persistence, per-agent token/USD cost tracking, AI-summarized logs, git-diff file tracking, session resumption.</span></div>
+
+<h4 class="reveal">Drill</h4>
+<ol class="steps reveal">
+<li><h4>Provision</h4><p>Clone; free NeonDB Postgres; set ANTHROPIC_API_KEY + DATABASE_URL; run the migrations.</p></li>
+<li><h4>Boot the UI</h4><p>./start_be.sh (:9403), ./start_fe.sh (:5175); open the 3-column UI.</p></li>
+<li><h4>Spin the fleet</h4><p>Create three agents (two Haiku scouts split FE/BE, one Sonnet primary); command a codebase summary — watch the 6 tool calls stream.</p></li>
+<li><h4>Chain</h4><p>Scout → builder on a small UI change; observe the sleep/poll loop and the detailed prompts written to the builder.</p></li>
+<li><h4>Audit and delete</h4><p>List agents, check status, inspect consumed vs produced assets, then delete all agents.</p></li>
+</ol>
+<div class="callout ok reveal"><span class="ci">DONE WHEN</span><span class="cc">A single high-level prompt spins up multiple agents, produces concrete file artifacts visible in the stream with per-agent costs, and all agents are deleted afterward.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal amber" id="ch21-s9"><span class="sn">9</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Beyond MCP: Raw Code as Tools</h2></div>
+<div class="kicker reveal">YT-18 · Why are top engineers DITCHING MCP Servers? (3 PROVEN Solutions)</div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">"My MCP server just ate 10,000 tokens before my agent even started working." One modest server burns ~5% of context; "stack up two or three more MCP servers, and I'll be bleeding 20% plus context in no time."</p>
+<p>Three raw-code alternatives — CLI + prime prompt, file-system scripts, and skills — give the same tool access with progressive disclosure, full control, and a fraction of the cost. The unifying theme: "use raw code as tools." Everything reduces to the core four.</p>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 640 260" role="img" aria-label="Context cost of MCP versus CLI, scripts and skills">
+<text x="320" y="24" text-anchor="middle" class="s-title">context burned before any real work</text>
+<text x="150" y="67" text-anchor="end" class="s-label">mcp server</text>
+<rect x="164" y="50" width="400" height="26" rx="6" class="s-clay-f"/>
+<text x="364" y="67" text-anchor="middle" class="s-label-sm">~10% of the window · 10k tokens</text>
+<text x="150" y="117" text-anchor="end" class="s-label">cli + prime</text>
+<rect x="164" y="100" width="224" height="26" rx="6" class="s-amber-f"/>
+<text x="398" y="117" class="s-label-sm">~5.6% — you control every read</text>
+<text x="150" y="167" text-anchor="end" class="s-label">fs scripts</text>
+<rect x="164" y="150" width="40" height="26" rx="6" class="s-olive-f"/>
+<text x="214" y="167" class="s-label-sm">&lt;1% · ~2k tokens — "10% of the original"</text>
+<text x="150" y="217" text-anchor="end" class="s-label">skill</text>
+<rect x="164" y="200" width="44" height="26" rx="6" class="s-blue-f"/>
+<text x="218" y="217" class="s-label-sm">same scripts, model-invoked via SKILL.md</text>
+<text x="320" y="252" text-anchor="middle" class="s-label">same Kalshi toolset, four builds — disler/beyond-mcp</text>
+</svg>
+<div class="fcap"><b>Four implementations, one API.</b> Less garbage context, better agent.</div>
+</div>
+</div>
+
+<div class="spread reveal d2" style="align-items:start">
+<div class="prose"><ul>
+<li>CLI approach: a ~25-line prime prompt (/prime_kalshi_cli_tools) reads ONLY a README + the CLI file — "do not read any other Python files" — cutting context from ~10% to ~5.6%.</li>
+<li>Scripts approach: a README maps "a condition mapped to files — this is a powerful agentic data structure you can use to activate or ignore context" — under 1%, ~2K tokens.</li>
+<li>The trick: "I will not read scripts themselves unless --help doesn't provide information needed" — progressive disclosure by hand, "and it's not a complex prompt."</li>
+<li>"Even before context comes prompt engineering… it is THE critical skill for engineers in 2025 and beyond. The prompt shows up before the context gets in your context window."</li>
+<li>Skills = same scripts, different invocation: "with a skill, the prime prompt is the skill.md file" — model-invoked, self-contained, but "a Claude-specific lock-in mechanism."</li>
+<li>Anthropic's "code execution with MCP" blog wraps scripts around MCP calls; Dan and Mario Zechner: "you can just cut the MCP server out completely" — benchmarks show "no degradation in quality by going right for scripts."</li>
+</ul></div>
+<div class="prose"><ul>
+<li>Single-file UV scripts (deps declared at top) buy isolation and portability; the duplication is worth it — "when you have less garbage context, your agent can perform better."</li>
+<li>MCP still wins on features engineers gloss over — "tools, resources, prompts, elicitation, completion, sampling" — and zero-effort setup for external servers.</li>
+<li>External tools: 80% just use MCP ("don't waste your time trying to reinvent the wheel"), 15% CLI when you must control tools and context, 5% scripts/skills for serious context preservation.</li>
+<li>New tools: 80% CLI-first — "CLI works for you, your team, and your agents. The trifecta." 10% wrap that CLI in MCP for agents at scale, 10% scripts/skills.</li>
+<li>"You can sidestep every single context engineering problem by just focusing your agents on one problem and then you delete them when they're done."</li>
+<li>Bonus mental model: prediction markets as "info finance" (Vitalik) — agents reading Kalshi order books "help us understand the future before it occurs."</li>
+</ul></div>
+</div>
+
+<div class="tag-list reveal"><span class="t">Haiku 4.5 driver</span><span class="t">FastMCP</span><span class="t">/context · /mcp</span><span class="t">prime prompts</span><span class="t">SKILL.md</span><span class="t">UV single-file scripts</span><span class="t">click/typer CLIs</span><span class="t">Kalshi API</span></div>
+<div class="callout reveal"><span class="ci">REPO</span><span class="cc"><strong>disler/beyond-mcp</strong> — four parallel builds of one Kalshi toolset: 1_mcp_server (15 FastMCP tools), 2_cli (13 typer commands), 3_file_system_scripts (10 UV scripts + prime prompt), 4_skill (scripts under a SKILL.md) — plus a trade-off matrix and the 80/15/5 and 80/10/10 heuristics.</span></div>
+
+<h4 class="reveal">Drill</h4>
+<ol class="steps reveal">
+<li><h4>Baseline MCP</h4><p>cp .mcp.testing .mcp.json &amp;&amp; claude --mcp-config .mcp.json; record /context before any work.</p></li>
+<li><h4>CLI + prime</h4><p>Restart without MCP, /prime_kalshi_cli_tools, prompt "kalshi: search markets &lt;topic&gt;"; record /context again.</p></li>
+<li><h4>Scripts</h4><p>/prime_file_system_scripts — watch the agent use --help instead of reading script bodies; check /context a third time.</p></li>
+<li><h4>Skill</h4><p>cd apps/4_skill &amp;&amp; claude; trigger with "kalshi markets: ..." and watch model-invoked progressive disclosure.</p></li>
+<li><h4>Make it yours</h4><p>Rebuild on an API you actually use: one UV script + a 5-line prime prompt.</p></li>
+</ol>
+<div class="callout ok reveal"><span class="ci">DONE WHEN</span><span class="cc">You have a table of context consumption across all four approaches and your own CLI-or-script toolset an agent can drive without an MCP server.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal" id="ch21-s10"><span class="sn">Σ</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Spine Across Nine Videos</h2></div>
+
+<div class="spread reveal d1" style="align-items:center">
+<div class="prose">
+<p class="lead-in">One spine runs through the batch: the core four (context, model, prompt, tools) → the ladder (better → more → custom → orchestrator) → "scale your compute to scale your impact" → "build the system that builds the system."</p>
+<p>Prompt formats give you the primitive, the SDK gives you custom agents, skills and raw-code tools keep context lean, and the orchestrator turns it all into a fleet.</p>
+</div>
+<div><div class="quote big"><p>"What if your codebase could ship itself?"</p><span class="cite" style="display:block;margin-top:10px">— the question the whole spine points at</span></div></div>
+</div>
+
+<div class="grid grid-3 reveal d2">
+<div class="card olive"><span class="cnum">01</span><p class="ctitle">Clone and run first</p><p class="cbody">Highest replication value: YT-18 (beyond-mcp 4-way context A/B), YT-17 (orchestrator platform), YT-15 (drop-in observability dashboard), YT-14 (voice orchestration + closed-loop browser validation).</p></div>
+<div class="card blue"><span class="cnum">02</span><p class="ctitle">Rebuild from the transcript</p><p class="cbody">YT-10 (the prompt-format ladder — foundational), YT-16 (skills graduation ladder in the observability repo), YT-11 (pong → echo → SDLC, easy to rebuild). YT-13 is medium: high-value pattern, private codebase, one public gist.</p></div>
+<div class="card plum"><span class="cnum">03</span><p class="ctitle">Watch and absorb</p><p class="cbody">YT-12 has no codebase — it's the strategy layer. Its job is to reorder your priorities: attack planning and reviewing, bet deliberately, write your own five bets.</p></div>
+</div>
+
+<a class="jump reveal" href="#ch22">Next · Videos 19–27 &nbsp;&rarr;</a>
+</div>
+</section>

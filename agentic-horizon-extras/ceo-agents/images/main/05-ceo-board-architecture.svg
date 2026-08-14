@@ -1,0 +1,350 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <defs>
+    <!-- Glowing filters -->
+    <filter id="glow-pink" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feFlood flood-color="#ff7edb" flood-opacity="0.6" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#36f9f6" flood-opacity="0.35" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-line" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Gradient for background -->
+    <radialGradient id="bg-grad" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#000000"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+
+    <!-- Dot marker for traveling dots -->
+    <circle id="dot" r="3"/>
+
+    <!-- Board member colors as gradients for depth -->
+    <linearGradient id="grad-revenue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff7edb"/><stop offset="100%" stop-color="#cc5aaf"/>
+    </linearGradient>
+    <linearGradient id="grad-product" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fede5d"/><stop offset="100%" stop-color="#c9b044"/>
+    </linearGradient>
+    <linearGradient id="grad-tech" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff6e96"/><stop offset="100%" stop-color="#cc5777"/>
+    </linearGradient>
+    <linearGradient id="grad-contrarian" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff9e64"/><stop offset="100%" stop-color="#cc7e50"/>
+    </linearGradient>
+    <linearGradient id="grad-compounder" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#72f1b8"/><stop offset="100%" stop-color="#5ac193"/>
+    </linearGradient>
+    <linearGradient id="grad-customer" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#36f9f6"/><stop offset="100%" stop-color="#2bc7c5"/>
+    </linearGradient>
+    <linearGradient id="grad-market" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b893ce"/><stop offset="100%" stop-color="#9375a5"/>
+    </linearGradient>
+    <linearGradient id="grad-moonshot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7dcfff"/><stop offset="100%" stop-color="#64a6cc"/>
+    </linearGradient>
+
+    <!-- ======================== ANIMATIONS ======================== -->
+    <style>
+      /* Phase 1: Staggered fade-ins */
+      .human       { opacity: 0; animation: fadeIn 0.8s ease-out 0.6s forwards; }
+      .pi-ext      { opacity: 0; animation: fadeIn 0.8s ease-out 1.6s forwards; }
+      .ceo-node    { opacity: 0; animation: fadeInScale 0.9s cubic-bezier(.22,1,.36,1) 2.6s forwards; }
+
+      .board-0     { opacity: 0; animation: fadeInUp 0.6s ease-out 3.0s forwards; }
+      .board-1     { opacity: 0; animation: fadeInUp 0.6s ease-out 3.3s forwards; }
+      .board-2     { opacity: 0; animation: fadeInUp 0.6s ease-out 3.6s forwards; }
+      .board-3     { opacity: 0; animation: fadeInUp 0.6s ease-out 3.9s forwards; }
+      .board-4     { opacity: 0; animation: fadeInUp 0.6s ease-out 4.2s forwards; }
+      .board-5     { opacity: 0; animation: fadeInUp 0.6s ease-out 4.5s forwards; }
+      .board-6     { opacity: 0; animation: fadeInUp 0.6s ease-out 4.8s forwards; }
+      .board-7     { opacity: 0; animation: fadeInUp 0.6s ease-out 5.1s forwards; }
+
+      /* Phase 1: Connector lines */
+      .conn-human  { opacity: 0; animation: fadeIn 0.5s ease-out 1.2s forwards; }
+      .conn-pi     { opacity: 0; animation: fadeIn 0.5s ease-out 2.2s forwards; }
+      .conn-board  { opacity: 0; animation: fadeIn 0.4s ease-out 5.6s forwards; }
+
+      /* Phase 2: Pulsing connections */
+      .pulse-line {
+        animation: linePulse 3s ease-in-out 6.5s infinite;
+      }
+
+      .travel-dot-0 { opacity: 0; animation: fadeIn 0.1s ease 6.5s forwards, travelDown0 2.0s ease-in-out 6.5s infinite; }
+      .travel-dot-1 { opacity: 0; animation: fadeIn 0.1s ease 6.8s forwards, travelDown1 2.2s ease-in-out 6.8s infinite; }
+      .travel-dot-2 { opacity: 0; animation: fadeIn 0.1s ease 7.1s forwards, travelDown2 2.4s ease-in-out 7.1s infinite; }
+      .travel-dot-3 { opacity: 0; animation: fadeIn 0.1s ease 7.4s forwards, travelDown3 2.6s ease-in-out 7.4s infinite; }
+      .travel-dot-4 { opacity: 0; animation: fadeIn 0.1s ease 7.7s forwards, travelDown4 2.0s ease-in-out 7.7s infinite; }
+      .travel-dot-5 { opacity: 0; animation: fadeIn 0.1s ease 8.0s forwards, travelDown5 2.3s ease-in-out 8.0s infinite; }
+      .travel-dot-6 { opacity: 0; animation: fadeIn 0.1s ease 8.3s forwards, travelDown6 2.5s ease-in-out 8.3s infinite; }
+      .travel-dot-7 { opacity: 0; animation: fadeIn 0.1s ease 8.6s forwards, travelDown7 2.1s ease-in-out 8.6s infinite; }
+
+      .ceo-ring {
+        opacity: 0;
+        animation: fadeIn 0.1s ease 6.5s forwards, ringPulse 2.5s ease-in-out 6.5s infinite;
+        transform-origin: 400px 225px;
+      }
+
+      /* Label animation */
+      .label-converse {
+        opacity: 0;
+        animation: fadeIn 0.5s ease-out 5.8s forwards, labelFloat 4s ease-in-out 5.8s infinite;
+      }
+
+      /* =================== KEYFRAMES =================== */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+      }
+      @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.5); }
+        to   { opacity: 1; transform: scale(1); }
+      }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes linePulse {
+        0%, 100% { opacity: 0.45; }
+        50%      { opacity: 1; }
+      }
+      @keyframes ringPulse {
+        0%, 100% { transform: scale(1); opacity: 0.6; }
+        50%      { transform: scale(1.12); opacity: 0.15; }
+      }
+      @keyframes labelFloat {
+        0%, 100% { opacity: 0.7; }
+        50%      { opacity: 1; }
+      }
+
+      /* Traveling dot keyframes for each board member path */
+      @keyframes travelDown0 {
+        0%   { offset-distance: 0%; opacity: 1; }
+        50%  { offset-distance: 100%; opacity: 1; }
+        51%  { offset-distance: 100%; opacity: 0.6; }
+        100% { offset-distance: 0%; opacity: 0.6; }
+      }
+      @keyframes travelDown1 {
+        0%   { offset-distance: 0%; opacity: 1; }
+        50%  { offset-distance: 100%; opacity: 1; }
+        51%  { offset-distance: 100%; opacity: 0.6; }
+        100% { offset-distance: 0%; opacity: 0.6; }
+      }
+      @keyframes travelDown2 {
+        0%   { offset-distance: 0%; opacity: 1; }
+        50%  { offset-distance: 100%; opacity: 1; }
+        51%  { offset-distance: 100%; opacity: 0.6; }
+        100% { offset-distance: 0%; opacity: 0.6; }
+      }
+      @keyframes travelDown3 {
+        0%   { offset-distance: 0%; opacity: 1; }
+        50%  { offset-distance: 100%; opacity: 1; }
+        51%  { offset-distance: 100%; opacity: 0.6; }
+        100% { offset-distance: 0%; opacity: 0.6; }
+      }
+      @keyframes travelDown4 {
+        0%   { offset-distance: 0%; opacity: 1; }
+        50%  { offset-distance: 100%; opacity: 1; }
+        51%  { offset-distance: 100%; opacity: 0.6; }
+        100% { offset-distance: 0%; opacity: 0.6; }
+      }
+      @keyframes travelDown5 {
+        0%   { offset-distance: 0%; opacity: 1; }
+        50%  { offset-distance: 100%; opacity: 1; }
+        51%  { offset-distance: 100%; opacity: 0.6; }
+        100% { offset-distance: 0%; opacity: 0.6; }
+      }
+      @keyframes travelDown6 {
+        0%   { offset-distance: 0%; opacity: 1; }
+        50%  { offset-distance: 100%; opacity: 1; }
+        51%  { offset-distance: 100%; opacity: 0.6; }
+        100% { offset-distance: 0%; opacity: 0.6; }
+      }
+      @keyframes travelDown7 {
+        0%   { offset-distance: 0%; opacity: 1; }
+        50%  { offset-distance: 100%; opacity: 1; }
+        51%  { offset-distance: 100%; opacity: 0.6; }
+        100% { offset-distance: 0%; opacity: 0.6; }
+      }
+    </style>
+  </defs>
+
+  <!-- ======================== BACKGROUND ======================== -->
+  <rect width="800" height="500" fill="url(#bg-grad)"/>
+  <!-- Subtle grid -->
+  <g opacity="0.04" stroke="#36f9f6" stroke-width="0.5">
+    <line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="200" x2="800" y2="200"/>
+    <line x1="0" y1="300" x2="800" y2="300"/><line x1="0" y1="400" x2="800" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/><line x1="600" y1="0" x2="600" y2="500"/>
+    <line x1="700" y1="0" x2="700" y2="500"/><line x1="800" y1="0" x2="800" y2="500"/>
+  </g>
+
+  <!-- Title -->
+  <text x="400" y="28" text-anchor="middle" fill="#36f9f6" font-size="15" font-weight="700" letter-spacing="2" opacity="0.85" class="human">CEO &amp; BOARD AGENT ARCHITECTURE</text>
+
+  <!-- ======================== HUMAN NODE ======================== -->
+  <g class="human">
+    <!-- Human icon: head -->
+    <circle cx="400" cy="53" r="5" fill="#e0e0e0"/>
+    <!-- Human icon: shoulders -->
+    <path d="M389 68 Q389 61 395 61 L405 61 Q411 61 411 68" fill="none" stroke="#e0e0e0" stroke-width="1.5" stroke-linecap="round"/>
+    <text x="400" y="82" text-anchor="middle" fill="#e0e0e0" font-size="9" font-weight="600">You, the Engineer</text>
+  </g>
+
+  <!-- Connector: Human -> Pi Extension -->
+  <g class="conn-human">
+    <line x1="400" y1="88" x2="400" y2="108" stroke="#555" stroke-width="1" stroke-dasharray="3,3"/>
+    <polygon points="396,106 400,112 404,106" fill="#555"/>
+  </g>
+
+  <!-- ======================== PI EXTENSION NODE ======================== -->
+  <g class="pi-ext">
+    <rect x="330" y="112" width="140" height="32" rx="6" fill="#161630" stroke="#36f9f6" stroke-width="1.2"/>
+    <text x="400" y="133" text-anchor="middle" fill="#36f9f6" font-size="11" font-weight="600">Pi Extension</text>
+  </g>
+
+  <!-- Connector: Pi Extension -> CEO -->
+  <g class="conn-pi">
+    <line x1="400" y1="144" x2="400" y2="192" stroke="#555" stroke-width="1" stroke-dasharray="3,3"/>
+    <polygon points="396,190 400,196 404,190" fill="#555"/>
+  </g>
+
+  <!-- ======================== CEO AGENT NODE ======================== -->
+  <g class="ceo-node" style="transform-origin: 400px 225px;">
+    <!-- Outer glow ring -->
+    <circle class="ceo-ring" cx="400" cy="225" r="42" fill="none" stroke="#ff7edb" stroke-width="1.5" opacity="0.3"/>
+    <!-- Main circle -->
+    <circle cx="400" cy="225" r="34" fill="#1a0e22" stroke="#ff7edb" stroke-width="2.2" filter="url(#glow-pink)"/>
+    <!-- Inner accent ring -->
+    <circle cx="400" cy="225" r="28" fill="none" stroke="#ff7edb" stroke-width="0.4" opacity="0.4"/>
+    <text x="400" y="228" text-anchor="middle" fill="#ff7edb" font-size="11" font-weight="700">CEO</text>
+  </g>
+
+  <!-- ======================== CONNECTION PATHS (CEO -> Board) ======================== -->
+  <!-- Board member positions on a semicircle: cx values evenly from ~90 to ~710, cy ~ 370 arc -->
+  <!-- Positions:
+       0: Revenue       (115, 362)
+       1: Product        (210, 388)
+       2: Tech Architect (305, 402)
+       3: Contrarian     (390, 407)
+       4: Compounder     (475, 402)
+       5: Customer       (560, 388)
+       6: Market         (645, 362)
+       7: Moonshot       (720, 326)
+  -->
+
+  <!-- Define paths for traveling dots -->
+  <defs>
+    <path id="path0" d="M400,259 Q258,300 115,340"/>
+    <path id="path1" d="M400,259 Q305,318 210,366"/>
+    <path id="path2" d="M400,259 Q352,326 305,380"/>
+    <path id="path3" d="M400,259 Q395,330 390,385"/>
+    <path id="path4" d="M400,259 Q437,326 475,380"/>
+    <path id="path5" d="M400,259 Q480,318 560,366"/>
+    <path id="path6" d="M400,259 Q522,300 645,340"/>
+    <path id="path7" d="M400,259 Q560,282 720,304"/>
+  </defs>
+
+  <!-- Connection lines -->
+  <g class="conn-board" stroke-width="1.2" fill="none">
+    <path d="M400,259 Q258,300 115,340"  stroke="#ff7edb" opacity="0.45" class="pulse-line"/>
+    <path d="M400,259 Q305,318 210,366"  stroke="#fede5d" opacity="0.45" class="pulse-line" style="animation-delay: 6.8s"/>
+    <path d="M400,259 Q352,326 305,380"  stroke="#ff6e96" opacity="0.45" class="pulse-line" style="animation-delay: 7.1s"/>
+    <path d="M400,259 Q395,330 390,385"  stroke="#ff9e64" opacity="0.45" class="pulse-line" style="animation-delay: 7.4s"/>
+    <path d="M400,259 Q437,326 475,380"  stroke="#72f1b8" opacity="0.45" class="pulse-line" style="animation-delay: 7.7s"/>
+    <path d="M400,259 Q480,318 560,366"  stroke="#36f9f6" opacity="0.45" class="pulse-line" style="animation-delay: 8.0s"/>
+    <path d="M400,259 Q522,300 645,340"  stroke="#b893ce" opacity="0.45" class="pulse-line" style="animation-delay: 8.3s"/>
+    <path d="M400,259 Q560,282 720,304"  stroke="#7dcfff" opacity="0.45" class="pulse-line" style="animation-delay: 8.6s"/>
+  </g>
+
+  <!-- converse() labels -->
+  <g class="label-converse">
+    <text x="248" y="290" text-anchor="middle" fill="#aaa" font-size="7.5" font-style="italic" transform="rotate(-18,248,290)">converse()</text>
+    <text x="540" y="290" text-anchor="middle" fill="#aaa" font-size="7.5" font-style="italic" transform="rotate(18,540,290)">converse()</text>
+    <text x="400" y="310" text-anchor="middle" fill="#aaa" font-size="7.5" font-style="italic">converse()</text>
+  </g>
+
+  <!-- Traveling dots -->
+  <circle r="3" fill="#ff7edb" class="travel-dot-0" style="offset-path: path('M400,259 Q258,300 115,340');" filter="url(#glow-line)"/>
+  <circle r="3" fill="#fede5d" class="travel-dot-1" style="offset-path: path('M400,259 Q305,318 210,366');" filter="url(#glow-line)"/>
+  <circle r="3" fill="#ff6e96" class="travel-dot-2" style="offset-path: path('M400,259 Q352,326 305,380');" filter="url(#glow-line)"/>
+  <circle r="3" fill="#ff9e64" class="travel-dot-3" style="offset-path: path('M400,259 Q395,330 390,385');" filter="url(#glow-line)"/>
+  <circle r="3" fill="#72f1b8" class="travel-dot-4" style="offset-path: path('M400,259 Q437,326 475,380');" filter="url(#glow-line)"/>
+  <circle r="3" fill="#36f9f6" class="travel-dot-5" style="offset-path: path('M400,259 Q480,318 560,366');" filter="url(#glow-line)"/>
+  <circle r="3" fill="#b893ce" class="travel-dot-6" style="offset-path: path('M400,259 Q522,300 645,340');" filter="url(#glow-line)"/>
+  <circle r="3" fill="#7dcfff" class="travel-dot-7" style="offset-path: path('M400,259 Q560,282 720,304');" filter="url(#glow-line)"/>
+
+  <!-- ======================== BOARD MEMBER NODES ======================== -->
+
+  <!-- 0: Revenue -->
+  <g class="board-0">
+    <text x="115" y="332" text-anchor="middle" fill="#ff7edb" font-size="7.5" font-weight="700">Revenue</text>
+    <circle cx="115" cy="362" r="22" fill="#1a0e22" stroke="url(#grad-revenue)" stroke-width="1.8"/>
+    <circle cx="115" cy="362" r="4" fill="#ff7edb" opacity="0.9"/>
+  </g>
+
+  <!-- 1: Product Strategist -->
+  <g class="board-1">
+    <text x="210" y="355" text-anchor="middle" fill="#fede5d" font-size="7" font-weight="700">Product</text>
+    <text x="210" y="364" text-anchor="middle" fill="#fede5d" font-size="6" font-weight="600">Strategist</text>
+    <circle cx="210" cy="388" r="22" fill="#1a0e22" stroke="url(#grad-product)" stroke-width="1.8"/>
+    <circle cx="210" cy="388" r="4" fill="#fede5d" opacity="0.9"/>
+  </g>
+
+  <!-- 2: Technical Architect -->
+  <g class="board-2">
+    <text x="305" y="369" text-anchor="middle" fill="#ff6e96" font-size="7" font-weight="700">Technical</text>
+    <text x="305" y="378" text-anchor="middle" fill="#ff6e96" font-size="6" font-weight="600">Architect</text>
+    <circle cx="305" cy="402" r="22" fill="#1a0e22" stroke="url(#grad-tech)" stroke-width="1.8"/>
+    <circle cx="305" cy="402" r="4" fill="#ff6e96" opacity="0.9"/>
+  </g>
+
+  <!-- 3: Contrarian -->
+  <g class="board-3">
+    <text x="390" y="377" text-anchor="middle" fill="#ff9e64" font-size="7.5" font-weight="700">Contrarian</text>
+    <circle cx="390" cy="407" r="22" fill="#1a0e22" stroke="url(#grad-contrarian)" stroke-width="1.8"/>
+    <circle cx="390" cy="407" r="4" fill="#ff9e64" opacity="0.9"/>
+  </g>
+
+  <!-- 4: Compounder -->
+  <g class="board-4">
+    <text x="475" y="372" text-anchor="middle" fill="#72f1b8" font-size="7.5" font-weight="700">Compounder</text>
+    <circle cx="475" cy="402" r="22" fill="#1a0e22" stroke="url(#grad-compounder)" stroke-width="1.8"/>
+    <circle cx="475" cy="402" r="4" fill="#72f1b8" opacity="0.9"/>
+  </g>
+
+  <!-- 5: Customer Oracle -->
+  <g class="board-5">
+    <text x="560" y="355" text-anchor="middle" fill="#36f9f6" font-size="7" font-weight="700">Customer</text>
+    <text x="560" y="364" text-anchor="middle" fill="#36f9f6" font-size="6" font-weight="600">Oracle</text>
+    <circle cx="560" cy="388" r="22" fill="#1a0e22" stroke="url(#grad-customer)" stroke-width="1.8"/>
+    <circle cx="560" cy="388" r="4" fill="#36f9f6" opacity="0.9"/>
+  </g>
+
+  <!-- 6: Market Strategist -->
+  <g class="board-6">
+    <text x="645" y="332" text-anchor="middle" fill="#b893ce" font-size="7" font-weight="700">Market</text>
+    <text x="645" y="341" text-anchor="middle" fill="#b893ce" font-size="6" font-weight="600">Strategist</text>
+    <circle cx="645" cy="362" r="22" fill="#1a0e22" stroke="url(#grad-market)" stroke-width="1.8"/>
+    <circle cx="645" cy="362" r="4" fill="#b893ce" opacity="0.9"/>
+  </g>
+
+  <!-- 7: Moonshot -->
+  <g class="board-7">
+    <text x="720" y="296" text-anchor="middle" fill="#7dcfff" font-size="7.5" font-weight="700">Moonshot</text>
+    <circle cx="720" cy="326" r="22" fill="#1a0e22" stroke="url(#grad-moonshot)" stroke-width="1.8"/>
+    <circle cx="720" cy="326" r="4" fill="#7dcfff" opacity="0.9"/>
+  </g>
+
+</svg>

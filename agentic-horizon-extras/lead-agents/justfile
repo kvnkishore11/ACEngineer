@@ -1,0 +1,50 @@
+set dotenv-load := true
+set shell := ["bash", "-lc"]
+
+default:
+    @just --list
+
+# Kick off CC meta agent (use `just metacc small` for opus without 1M context)
+metacc size="large":
+    claude --dangerously-skip-permissions --model "{{ if size == "small" { "opus" } else { "opus[1m]" } }}" --system-prompt "$(cat .claude/agents/meta-pi-agent.md)" "/prime"
+
+# Kick off Pi meta agent
+metapi:
+    $(command -v ipi || echo pi) --model "anthropic/claude-opus-4-6" --system-prompt "$(cat .claude/agents/meta-pi-agent.md)" "/prime"
+
+# Install Multi-Team Chat
+install:
+    claude --dangerously-skip-permissions "/install"
+
+# Deploy a fresh team config into another codebase
+install-into-codebase:
+    claude --dangerously-skip-permissions "/install-into-codebase"
+
+# Launch Multi-Team Chat with the default team config
+team:
+    cd apps/multi-team-chat && [ -d node_modules ] || bun install && pi -e extensions/multi-team-chat.ts
+
+# Launch Multi-Team Chat with a custom config file (path relative to project root)
+# Usage: just teamc .pi/ml-team/ml-team-config.yaml
+teamc config:
+    cd apps/multi-team-chat && [ -d node_modules ] || bun install && pi -e extensions/multi-team-chat.ts --team {{config}}
+
+# Launch Engineering-only team
+team-eng:
+    cd apps/multi-team-chat && [ -d node_modules ] || bun install && pi -e extensions/multi-team-chat.ts --team .pi/multi-team/engineering-config.yaml
+
+# Launch Planning + Engineering team
+team-pe:
+    cd apps/multi-team-chat && [ -d node_modules ] || bun install && pi -e extensions/multi-team-chat.ts --team .pi/multi-team/planning-and-engineering-config.yaml
+
+# Launch Planning + 3x Scaled Engineering teams
+team-scale:
+    cd apps/multi-team-chat && [ -d node_modules ] || bun install && pi -e extensions/multi-team-chat.ts --team .pi/multi-team/plan-and-scale-engineering-config.yaml
+
+# Launch Open-source / multi-provider team (diverse models)
+team-oss:
+    cd apps/multi-team-chat && [ -d node_modules ] || bun install && pi -e extensions/multi-team-chat.ts --team .pi/multi-team/opensource-team-config.yaml
+
+# List all available team configs
+team-list:
+    cd apps/multi-team-chat && [ -d node_modules ] || bun install && pi -e extensions/multi-team-chat.ts --list

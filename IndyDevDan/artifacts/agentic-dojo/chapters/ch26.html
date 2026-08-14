@@ -1,0 +1,231 @@
+<section class="chapter" id="ch26">
+  <div class="wrap wide">
+    <span class="chapnum reveal">26 — The Repo Gym · Patterns</span>
+    <div class="kicker reveal">twenty-six repos, one repeating skeleton</div>
+    <h2 class="title reveal d1" style="max-width:24ch">How Dan structures <em>every repo he ships</em>.</h2>
+    <p class="lede reveal d2">Clone anything from github.com/disler and you land in familiar territory: the agentic layer at the root, the code in apps/, and a /prime command waiting to warm the agent up. Learn the skeleton once — and you can read every repo for free.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">26 repos</span><span class="pill blue">20 recurring patterns</span><span class="pill olive">2025 → 2026</span><span class="pill plum">github.com/disler</span></div>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch26-s1"><b>1</b>The Catalog</a>
+      <a href="#ch26-s2"><b>2</b>The Recurring Patterns</a>
+      <a href="#ch26-s3"><b>3</b>The Canonical Layout</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch26-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Catalog — the whole gym floor</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">These repos are video artifacts, and that changes how you read them.</p>
+        <p>Dan ships <strong>whole ideas per commit</strong>: the initial drop is labeled <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">🚀</span> and usually contains the entire working system; later commits are <em>progress</em> polish plus the occasional real feature drop with a meaningful message. So don't read these repos like products with long histories — read them like <strong>26 finished exercises</strong>, each one training a specific muscle.</p>
+        <p>Six zones cover the floor: hooks and observability, orchestration, skills, security, benchmarking, and infrastructure. Every repo below sits in one of them.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 480 320" role="img" aria-label="Map of six repo themes with counts">
+          <text x="24" y="18" class="s-label">the gym floor — 26 repos in six zones</text>
+          <rect x="24" y="34" width="208" height="80" rx="10" class="s-clay-f"/>
+          <text x="38" y="58" class="s-title">Hooks &amp; observability</text>
+          <text x="38" y="76" class="s-label-sm">hooks-mastery · observability · +4</text>
+          <text x="38" y="100" class="s-label">6 repos</text>
+          <rect x="248" y="34" width="208" height="80" rx="10" class="s-blue-f"/>
+          <text x="262" y="58" class="s-title">Orchestration &amp; teams</text>
+          <text x="262" y="76" class="s-label-sm">infinite-loop · big-3 · cmux · +2</text>
+          <text x="262" y="100" class="s-label">5 repos</text>
+          <rect x="24" y="128" width="208" height="80" rx="10" class="s-olive-f"/>
+          <text x="38" y="152" class="s-title">Skills &amp; packaging</text>
+          <text x="38" y="170" class="s-label-sm">bowser · planf3 · the-library · +3</text>
+          <text x="38" y="194" class="s-label">6 repos</text>
+          <rect x="248" y="128" width="208" height="80" rx="10" class="s-amber-f"/>
+          <text x="262" y="152" class="s-title">Security &amp; guardrails</text>
+          <text x="262" y="170" class="s-label-sm">damage-control · bash-damage · +1</text>
+          <text x="262" y="194" class="s-label">3 repos</text>
+          <rect x="24" y="222" width="208" height="80" rx="10" class="s-plum-f"/>
+          <text x="38" y="246" class="s-title">Benchmarking &amp; evals</text>
+          <text x="38" y="264" class="s-label-sm">nano-agent · live-bench · +2</text>
+          <text x="38" y="288" class="s-label">4 repos</text>
+          <rect x="248" y="222" width="208" height="80" rx="10" class="s-card"/>
+          <text x="262" y="246" class="s-title">Infra &amp; automation</text>
+          <text x="262" y="264" class="s-label-sm">drop-zones · install+maintain</text>
+          <text x="262" y="288" class="s-label">2 repos</text>
+        </svg>
+        <div class="fcap"><b>Six zones, one gym.</b> Every disler repo trains one theme — and reuses the same skeleton underneath.</div>
+      </div>
+    </div>
+
+    <div class="kicker reveal">zone 1 · hooks, validation &amp; observability</div>
+    <div class="grid grid-3">
+      <div class="card accent reveal"><p class="ctitle">claude-code-hooks-mastery</p><p class="cbody">The canonical hooks reference: all 13 lifecycle hooks as uv single-file scripts, plus sub-agents, 8 output styles, 9 status lines.</p><div class="tag-list"><span class="t">exit-code contract</span><span class="t">meta-agent</span><span class="t">model tiers</span></div></div>
+      <div class="card accent reveal d1"><p class="ctitle">…multi-agent-observability</p><p class="cbody">Every hook POSTs JSON to a Bun server; SQLite persists, WebSocket broadcasts, a Vue 3 client renders filters and swim lanes.</p><div class="tag-list"><span class="t">telemetry bus</span><span class="t">Haiku summaries</span><span class="t">HIL</span></div></div>
+      <div class="card accent reveal d2"><p class="ctitle">pi-agent-observability</p><p class="cbody">The observability system rebuilt for Pi: a drop-in extension, three views — single, swimlane, race — plus spec-format A/B skills.</p><div class="tag-list"><span class="t">race view</span><span class="t">spec A/B</span></div></div>
+      <div class="card accent reveal"><p class="ctitle">the-verifier-agent</p><p class="cbody">Two-agent observer on Pi: an input-locked Verifier re-checks every Builder turn with read-only tools — max 3 loops, then human escalation.</p><div class="tag-list"><span class="t">verification first-class</span><span class="t">un-promptable agents</span></div></div>
+      <div class="card accent reveal d1"><p class="ctitle">agentic-finance-review</p><p class="cbody">A multi-agent pipeline over bank CSVs where each sub-agent carries its own embedded hooks running deterministic Python validators.</p><div class="tag-list"><span class="t">agent-scoped hooks</span><span class="t">trusted automation</span></div></div>
+      <div class="card accent reveal d2"><p class="ctitle">hooks-mastery gist</p><p class="cbody">One file: the observable-tools-diffs-tts output style shared as a gist — a distribution vehicle for a single artifact.</p><div class="tag-list"><span class="t">output style</span><span class="t">share one file</span></div></div>
+    </div>
+
+    <div class="kicker reveal">zone 2 · orchestration &amp; multi-agent</div>
+    <div class="grid grid-3">
+      <div class="card blue reveal"><p class="ctitle">infinite-agentic-loop</p><p class="cbody">A /project:infinite slash command orchestrates waves of parallel sub-agents generating evolving UI iterations from a versioned spec.</p><div class="tag-list"><span class="t">spec-driven</span><span class="t">waves</span><span class="t">$ARGUMENTS</span></div></div>
+      <div class="card blue reveal d1"><p class="ctitle">big-3-super-agent</p><p class="cbody">Voice-controlled super-agent: OpenAI Realtime orchestrates Claude Code coders and Gemini browser agents via create/command/list tools.</p><div class="tag-list"><span class="t">voice orchestration</span><span class="t">agent registry</span></div></div>
+      <div class="card blue reveal d2"><p class="ctitle">learning-cmux-with-agents</p><p class="cbody">31 natural-language prompts prove an orchestrator can stand up, prompt, observe, and tear down agent fleets inside cmux terminals.</p><div class="tag-list"><span class="t">prompts as product</span><span class="t">3-tier teams</span></div></div>
+      <div class="card blue reveal"><p class="ctitle">pi-vs-claude-code</p><p class="cbody">~19 TypeScript extensions rebuild Claude Code's feature set on the Pi agent — teams, chains, damage control, pi-to-pi comms.</p><div class="tag-list"><span class="t">harness hacking</span><span class="t">agent-to-agent coms</span></div></div>
+      <div class="card blue reveal d1"><p class="ctitle">agent-experts</p><p class="cbody">ACT → LEARN → REUSE: domain experts own an expertise.yaml mental model plus question / plan / self-improve prompt chains.</p><div class="tag-list"><span class="t">expertise files</span><span class="t">self-improve</span></div></div>
+    </div>
+
+    <div class="kicker reveal">zone 3 · skills &amp; packaging</div>
+    <div class="grid grid-3">
+      <div class="card olive reveal"><p class="ctitle">agent-sandbox-skill</p><p class="cbody">One portable skill with an embedded sandbox CLI, prompts, and cookbook — works in Claude Code, Gemini CLI, and Codex.</p><div class="tag-list"><span class="t">embedded CLI</span><span class="t">cross-agent</span></div></div>
+      <div class="card olive reveal d1"><p class="ctitle">fork-repository-skill</p><p class="cbody">A skill that spawns new terminal windows running Claude Code, Codex, Gemini, or raw CLIs — with optional context handoff.</p><div class="tag-list"><span class="t">forking primitive</span><span class="t">fast / heavy tiers</span></div></div>
+      <div class="card olive reveal d2"><p class="ctitle">the-library</p><p class="cbody">package.json for agentics: library.yaml catalogs skills, agents, and prompts with typed dependencies. No code — the agent is the runtime.</p><div class="tag-list"><span class="t">markdown-only</span><span class="t">typed deps</span></div></div>
+      <div class="card olive reveal"><p class="ctitle">planf3</p><p class="cbody">A planning meta-skill: /planf3 emits a self-contained HTML plan into specs/ from a rigid template, one generated diagram per section.</p><div class="tag-list"><span class="t">templated engineering</span><span class="t">living plans</span></div></div>
+      <div class="card olive reveal d1"><p class="ctitle">bowser</p><p class="cbody">Browser automation and UI testing as a four-layer composable stack: Skill → Subagent → Command → justfile. Enter at any layer.</p><div class="tag-list"><span class="t">composability</span><span class="t">headed vs headless</span></div></div>
+      <div class="card olive reveal d2"><p class="ctitle">mac-mini-agent</p><p class="cbody">macOS computer use: Steer (Swift CLI), Drive (tmux orchestration), and voice — each wrapped as a skill so agents operate the machine.</p><div class="tag-list"><span class="t">OCR as equalizer</span><span class="t">skills wrap CLIs</span></div></div>
+    </div>
+
+    <div class="kicker reveal">zone 4 · security &amp; guardrails</div>
+    <div class="grid grid-3">
+      <div class="card amber reveal"><p class="ctitle">claude-code-damage-control</p><p class="cbody">Defense-in-depth PreToolUse hooks driven by patterns.yaml with three protection levels, shipped as a skill with install cookbooks.</p><div class="tag-list"><span class="t">config-not-code</span><span class="t">sentient tests</span></div></div>
+      <div class="card amber reveal d1"><p class="ctitle">bash-damage-from-within</p><p class="cbody">Five runnable security levels around the bash tool, built side-by-side for Claude Code and Pi, each attacked with the same catalog.</p><div class="tag-list"><span class="t">security ladder</span><span class="t">attack prompts</span></div></div>
+      <div class="card amber reveal d2"><p class="ctitle">agent-sandboxes</p><p class="cbody">E2B exploration monorepo: 13 numbered fundamentals, a CLI, an MCP wrapper, agent forks, and Claude Code running inside a sandbox.</p><div class="tag-list"><span class="t">isolation · scale · agency</span><span class="t">agent forks</span></div></div>
+    </div>
+
+    <div class="kicker reveal">zone 5 · benchmarking &amp; evals</div>
+    <div class="grid grid-4">
+      <div class="card plum reveal"><p class="ctitle">nano-agent</p><p class="cbody">An MCP server wrapping a minimal agent loop so Claude Code delegates one task to 9 models in parallel — and grades them.</p><div class="tag-list"><span class="t">HOP/LOP</span><span class="t">trade-off trifecta</span></div></div>
+      <div class="card plum reveal d1"><p class="ctitle">live-bench</p><p class="cbody">LAN-only live benchmarking for local models: YAML benchmarks, a CLI posting datapoints, FastAPI + SQLite, Vue bars over SSE.</p><div class="tag-list"><span class="t">charts-as-YAML</span><span class="t">wall-clock wins</span></div></div>
+      <div class="card plum reveal d2"><p class="ctitle">beyond-mcp</p><p class="cbody">One domain built four ways — MCP server, CLI, file-system scripts, skill — to expose the real trade-offs of each interface.</p><div class="tag-list"><span class="t">context cost</span><span class="t">/prime_* per approach</span></div></div>
+      <div class="card plum reveal d3"><p class="ctitle">max-your-cc-sub</p><p class="cbody">Policy-as-repo: a green/gray/red usage-tier framework with runnable scripts diffing OAuth vs API-key auth signals.</p><div class="tag-list"><span class="t">runnable compliance</span><span class="t">just compare</span></div></div>
+    </div>
+
+    <div class="kicker reveal">zone 6 · infra &amp; automation</div>
+    <div class="grid grid-2">
+      <div class="card glow reveal"><p class="ctitle">agentic-drop-zones</p><p class="cbody">Drop a file into a watched zone and a configured agent fires with a prompt template against it — one Python file, one YAML config.</p><div class="tag-list"><span class="t">single-file-script</span><span class="t">declarative zones</span></div></div>
+      <div class="card glow reveal d1"><p class="ctitle">install-and-maintain</p><p class="cbody">The living document that executes: one deterministic setup script exposed as SessionStart hook flags, agentic prompts, and interactive prompts.</p><div class="tag-list"><span class="t">deterministic / agentic / interactive</span></div></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch26-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Recurring Patterns</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Twenty patterns repeat across the catalog — ten of them so consistently they amount to a house architecture.</p>
+        <p>The most telling one is pattern №1: a <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/prime</span> context-priming command — read the README, run <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">git ls-files</span>, scan the key directories, report understanding — exists in <strong>virtually every repo</strong>, with variants like prime_cc, prime_obox, and prime_tts.</p>
+      </div>
+      <div class="quote big"><p>Dan never lets an agent start cold.</p><span class="cite" style="display:block;margin-top:10px">— pattern №1, /prime — present across all 26 repos</span></div>
+    </div>
+
+    <div class="fig reveal d1">
+      <svg class="draw" viewBox="0 0 880 340" role="img" aria-label="Anatomy of the canonical disler repo: .claude directory, ai_docs, specs, apps, justfile, CLAUDE.md">
+        <text x="20" y="18" class="s-label">anatomy — the repo Dan ships every time</text>
+        <rect x="16" y="30" width="848" height="292" rx="14" class="s-card"/>
+        <text x="36" y="58" class="s-title">any-disler-repo/</text>
+        <rect x="36" y="72" width="270" height="232" rx="12" class="s-clay-f"/>
+        <text x="52" y="94" class="s-title">.claude/</text>
+        <text x="130" y="94" class="s-label-sm">the agentic layer</text>
+        <rect x="52" y="106" width="238" height="30" rx="8" class="s-card"/>
+        <text x="64" y="126" class="s-label">commands/ — prime · HOP</text>
+        <rect x="52" y="144" width="238" height="30" rx="8" class="s-card"/>
+        <text x="64" y="164" class="s-label">agents/ — meta-agent · team/</text>
+        <rect x="52" y="182" width="238" height="30" rx="8" class="s-card"/>
+        <text x="64" y="202" class="s-label">hooks/ — 13 uv scripts</text>
+        <rect x="52" y="220" width="238" height="30" rx="8" class="s-card"/>
+        <text x="64" y="240" class="s-label">skills/ — SKILL.md + cookbook</text>
+        <rect x="52" y="258" width="238" height="30" rx="8" class="s-card"/>
+        <text x="64" y="278" class="s-label">settings.json — wiring</text>
+        <rect x="336" y="72" width="170" height="64" rx="10" class="s-blue-f"/>
+        <text x="350" y="96" class="s-title">ai_docs/</text>
+        <text x="350" y="116" class="s-label-sm">curated docs → context</text>
+        <rect x="336" y="152" width="170" height="64" rx="10" class="s-plum-f"/>
+        <text x="350" y="176" class="s-title">specs/</text>
+        <text x="350" y="196" class="s-label-sm">plans drive generation</text>
+        <rect x="336" y="232" width="170" height="64" rx="10" class="s-amber-f"/>
+        <text x="350" y="256" class="s-title">justfile</text>
+        <text x="350" y="276" class="s-label-sm">humans · agents · CI</text>
+        <rect x="536" y="72" width="304" height="140" rx="10" class="s-olive-f"/>
+        <text x="552" y="96" class="s-title">apps/</text>
+        <text x="612" y="96" class="s-label-sm">the code layer</text>
+        <rect x="552" y="110" width="128" height="42" rx="8" class="s-card"/>
+        <text x="564" y="128" class="s-label">server/</text>
+        <text x="564" y="144" class="s-label-sm">pyproject.toml</text>
+        <rect x="694" y="110" width="128" height="42" rx="8" class="s-card"/>
+        <text x="706" y="128" class="s-label">client/</text>
+        <text x="706" y="144" class="s-label-sm">package.json</text>
+        <text x="552" y="188" class="s-label-sm">one dir per runnable app — root stays agentic</text>
+        <rect x="536" y="232" width="304" height="64" rx="10" class="s-card"/>
+        <text x="552" y="256" class="s-title">CLAUDE.md</text>
+        <text x="552" y="276" class="s-label-sm">+ AGENTS.md + GEMINI.md — cross-agent</text>
+        <path d="M336 104 H314" class="s-flow"/>
+        <path d="M310 104 l9 -6 0 12 z" class="s-clay"/>
+        <path d="M506 184 H530" class="s-flow"/>
+        <path d="M536 184 l-9 -6 0 12 z" class="s-clay"/>
+        <text x="440" y="316" text-anchor="middle" class="s-label-sm">root = agentic layer · apps/ = code layer · prompts operate the apps</text>
+      </svg>
+      <div class="fcap"><b>The canonical anatomy.</b> Docs feed context left into .claude/; specs feed plans right into apps/. Every repo below is a variation of this drawing.</div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card accent reveal"><span class="cnum">01</span><p class="ctitle">/prime context priming</p><p class="cbody">Read README, git ls-files, key dirs, report understanding — in virtually every repo, with per-domain variants. The agent never starts cold.</p></div>
+      <div class="card blue reveal d1"><span class="cnum">02</span><p class="ctitle">uv single-file Python scripts</p><p class="cbody">PEP 723 inline deps: every hook, validator, and tool is standalone uv-runnable; whole apps ship as one file (sfs_agentic_drop_zone.py).</p></div>
+      <div class="card olive reveal"><span class="cnum">03</span><p class="ctitle">The copied hooks stack</p><p class="cbody">pre/post_tool_use, stop, notification, subagent_stop, user_prompt_submit + llm/tts utils with fallback chains, logging every payload to logs/. A portable artifact carried repo to repo.</p></div>
+      <div class="card plum reveal d1"><span class="cnum">04</span><p class="ctitle">send_event.py observability bus</p><p class="cbody">Hooks POST summarized events (--source-app, --event-type) to a local server; SQLite + WebSocket/SSE + a Vue dashboard. Rebuilt for Pi too.</p></div>
+      <div class="card amber reveal"><span class="cnum">05</span><p class="ctitle">apps/ monorepo layout</p><p class="cbody">Every runnable codebase lives at apps/&lt;name&gt; with its own pyproject.toml or package.json; the repo root is the agentic layer.</p></div>
+      <div class="card accent reveal d1"><span class="cnum">06</span><p class="ctitle">ai_docs/ curated documentation</p><p class="cbody">Scraped, condensed third-party docs checked into the repo for /load_ai_docs — often maintained by a docs-scraper sub-agent.</p></div>
+      <div class="card blue reveal"><span class="cnum">07</span><p class="ctitle">specs/ plan-first directory</p><p class="cbody">Plans as markdown (later HTML) that drive generation — versioned specs v1 → v4 in infinite-loop. Great planning is great engineering.</p></div>
+      <div class="card olive reveal d1"><span class="cnum">08</span><p class="ctitle">justfile + agentic /install</p><p class="cbody">just recipes for humans, agents, and CI; an /install slash command does toolchain checks and setup interactively.</p></div>
+      <div class="card plum reveal"><span class="cnum">09</span><p class="ctitle">HOP/LOP prompt orchestration</p><p class="cbody">One higher-order prompt fans out to N parameterized lower-order prompts and aggregates results — nano-agent's perf evals, /infinite, /ui-review, /review-finances.</p></div>
+      <div class="card amber reveal d1"><span class="cnum">10</span><p class="ctitle">Skills that ship their own tooling</p><p class="cbody">SKILL.md + cookbook/ + prompts/ + an embedded CLI or scripts dir; progressive disclosure so the agent only reads what it needs.</p></div>
+    </div>
+
+    <h4 class="reveal" style="margin-top:28px">…and the other ten, in brief</h4>
+    <div class="spread reveal d1" style="align-items:start">
+      <div class="prose">
+        <p><strong>11 · Meta-agents &amp; meta-skills</strong> — things that generate the things: meta-agent.md writes agents, planf3 writes plans, the-library manages skills.</p>
+        <p><strong>12 · Model-tier variants</strong> — the same prompt at haiku / sonnet / opus; the performance-speed-cost trifecta as a file-naming discipline.</p>
+        <p><strong>13 · The safety ladder</strong> — bypassPermissions only inside sandboxes or watched zones; otherwise blacklist → whitelist → no-bash custom tools.</p>
+        <p><strong>14 · Deterministic validation</strong> — agents validate their work with scripts, not vibes: validator hooks, committed eval results, QA reports in ai_review/.</p>
+        <p><strong>15 · Cross-agent portability</strong> — CLAUDE.md + AGENTS.md + GEMINI.md triplets; Dan builds for the category, not one vendor.</p>
+      </div>
+      <div class="prose">
+        <p><strong>16 · TTS + personalization</strong> — completion announcements with your ENGINEER_NAME; fallback chain ElevenLabs → OpenAI → pyttsx3.</p>
+        <p><strong>17 · Output styles + status lines</strong> — versioned status lines (v1 → v9) and portable style sets as an observability UI.</p>
+        <p><strong>18 · README as video companion</strong> — one-line hook, YouTube link in the first five lines, hero image, Quick Start, "Master AI Coding" footer.</p>
+        <p><strong>19 · Team agent patterns</strong> — builder + validator team dirs, plan_w_team commands, lead/worker 3-tier cmux teams.</p>
+        <p><strong>20 · Emoji/terse commits</strong> — 🚀 for the initial drop, progress for iteration, meaningful messages reserved for real feature drops.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch26-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Canonical Layout</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="filetree"><span class="d">any-disler-repo/</span>
+  <span class="d">.claude/</span>
+    <span class="d">commands/</span>       <span class="c"># prime.md · install.md · hop_*.md — prompts as programs</span>
+    <span class="d">agents/</span>         <span class="c"># sub-agents · meta-agent.md · team/ builder+validator</span>
+    <span class="d">hooks/</span>          <span class="c"># pre_tool_use.py … uv single-file scripts + utils/llm, utils/tts</span>
+    <span class="d">skills/</span>         <span class="c"># SKILL.md + cookbook/ + embedded tooling</span>
+    <span class="f">settings.json</span>   <span class="c"># hook wiring + permission allowlists</span>
+  <span class="d">ai_docs/</span>          <span class="c"># curated third-party docs — /load_ai_docs</span>
+  <span class="d">specs/</span>            <span class="c"># plans drive generation (markdown, later HTML)</span>
+  <span class="d">apps/</span>             <span class="c"># every runnable codebase — own pyproject/package.json</span>
+  <span class="d">logs/</span>             <span class="c"># every hook payload, logged as JSON</span>
+  <span class="d">images/</span>           <span class="c"># README hero + architecture diagram</span>
+  <span class="f">justfile</span>          <span class="c"># the launch pad — humans, agents, CI</span>
+  <span class="hl">CLAUDE.md</span>         <span class="c"># + AGENTS.md + GEMINI.md — cross-agent portability</span>
+  <span class="f">README.md</span>         <span class="c"># the video companion</span></div>
+      <div class="prose">
+        <p class="lead-in">This tree is why the patterns travel so well.</p>
+        <p>Because the root is <strong>always the agentic layer</strong> and the code always lives under <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">apps/</span>, whole subsystems copy cleanly between repos. The hooks stack, the TTS utils, the meta-agent, the observability bus — each is a <strong>portable artifact</strong> that appears near-identical in hooks-mastery, observability, nano-agent, big-3, and agent-experts.</p>
+        <p>When you build your own repos this way, you get the same effect: every new project starts at 80%, because the agentic layer comes with you.</p>
+        <div class="callout idea" style="margin-top:18px"><span class="ci">NEWCOMER NOTE</span>
+          <span class="cc">Exploring any disler repo? Run <strong>/prime</strong> first, then read <strong>.claude/commands/</strong> before the code — the prompts are the architecture; the apps are just what they operate.</span></div>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch27">Next · Rebuild Paths, Commit by Commit &nbsp;&rarr;</a>
+  </div>
+</section>

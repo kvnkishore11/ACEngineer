@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An agent-systems companion to TAC-3: Success is Planned. Learn the human, agent, prompt, permission, harness, and verification contracts around the code.">
+  <title>TAC-3 Agent OS · Success is Planned — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="tac-3-success-is-planned.assets.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to the agent systems lesson</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+
+  <header class="site-bar">
+    <a class="site-bar__brand" href="../vol-1-tac/03-success-is-planned.html">AGENT SYSTEMS · TAC-3</a>
+    <nav class="site-bar__links" aria-label="Companion links">
+      <a href="../vol-1-tac/03-success-is-planned.html">Chapter</a>
+      <a href="index.html">Code library</a>
+      <a href="../index.html">Book hub</a>
+    </nav>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Agent systems navigation">
+      <p class="rail-kicker">Agent OS companion</p>
+      <h2>Success is Planned</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of lesson</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#mission"><span class="chapter-nav__n">00</span><span>Agent mission</span></a></li>
+          <li><a href="#cast"><span class="chapter-nav__n">01</span><span>Cast of agents</span></a></li>
+          <li><a href="#surface"><span class="chapter-nav__n">02</span><span>Surface map</span></a></li>
+          <li><a href="#loop"><span class="chapter-nav__n">03</span><span>Control loop</span></a></li>
+          <li><a href="#contracts"><span class="chapter-nav__n">04</span><span>Four contracts</span></a></li>
+          <li><a href="#operate"><span class="chapter-nav__n">05</span><span>Operate like Dan</span></a></li>
+          <li><a href="#failures"><span class="chapter-nav__n">06</span><span>Agent failures</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">07</span><span>Agent ops lab</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">08</span><span>Six-sentence test</span></a></li>
+          <li><a href="#appendix"><span class="chapter-nav__n">09</span><span>Raw file index</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero" id="mission">
+        <span class="hero__chapter">Tactic #3 · Template Your Engineering</span>
+        <h1>The agent OS around the code</h1>
+        <p class="hero__dek">The application is the workbench. The lesson is the operating system that turns one human intention into a plan, a fresh agent run, and observable proof.</p>
+        <ul class="hero__meta" aria-label="Lesson facts">
+          <li>Lens · agent systems</li>
+          <li>Repo · tac/tac-3</li>
+          <li>Agent interfaces · 8 commands + settings + scripts</li>
+          <li>Source files audited · 56</li>
+        </ul>
+        <div class="mission-card">
+          <span class="mission-card__mark" aria-hidden="true">OS</span>
+          <div class="mission-card__copy">
+            <strong>Agent mission</strong>
+            <p>Train a human commander to encode a class of engineering work into a reusable planning prompt, hand the resulting spec to a fresh implementation agent, and close the loop with tests, behavior, and a diff—so success depends on versioned interfaces rather than the human staying in the conversation.</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Agent systems contents</summary>
+          <ol>
+            <li><a href="#mission">Agent mission</a></li>
+            <li><a href="#cast">Cast of agents</a></li>
+            <li><a href="#surface">Agent surface map</a></li>
+            <li><a href="#loop">Control loop</a></li>
+            <li><a href="#contracts">Four contracts</a></li>
+            <li><a href="#operate">Operate like Dan</a></li>
+            <li><a href="#failures">Common agent failures</a></li>
+            <li><a href="#lab">Agent ops lab</a></li>
+            <li><a href="#teach-back">Teach-back</a></li>
+            <li><a href="#appendix">Raw file index</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="cast">
+        <span class="section-number">01 · WHO ACTS?</span>
+        <h2 class="section-title">A cast with sharp boundaries</h2>
+        <p class="section-lead">Do not call every moving part “the agent.” TAC-3 works because judgment, action, and proof have different owners.</p>
+
+        <div class="cast-grid">
+          <article class="cast-card" data-index="01">
+            <p class="cast-card__role">In the loop</p>
+            <h3>Human commander</h3>
+            <p>Names the outcome, chooses chore vs bug vs feature, reviews the generated plan, controls authority, repeats the key checks, and improves the reusable prompt when the run misses.</p>
+          </article>
+          <article class="cast-card" data-index="02">
+            <p class="cast-card__role">Planning phase</p>
+            <h3>Fresh Claude Code planner</h3>
+            <p>Receives <code>/chore</code>, <code>/bug</code>, or <code>/feature</code>; starts from <code>README.md</code>; researches the declared file surface; writes a durable plan under <code>specs/</code>. It does not implement.</p>
+          </article>
+          <article class="cast-card" data-index="03">
+            <p class="cast-card__role">Building phase</p>
+            <h3>Fresh Claude Code implementer</h3>
+            <p>Boots without the planning conversation. <code>/implement</code> passes in the spec, the agent changes code, runs plan-defined checks, and reports a summary plus diff stat. Any deeper self-review is observed behavior, not guaranteed by this prompt.</p>
+          </article>
+          <article class="cast-card" data-index="04">
+            <p class="cast-card__role">Deterministic helpers</p>
+            <h3>Scripts as agent tools</h3>
+            <p><code>copy_dot_env.sh</code>, <code>start.sh</code>, and <code>stop_apps.sh</code> package repeated environment actions. They are not reasoning agents; they are callable, observable capabilities.</p>
+          </article>
+          <article class="cast-card" data-index="05">
+            <p class="cast-card__role">Verification role</p>
+            <h3>Agent self-check + human check</h3>
+            <p>There is no shipped verifier-agent file. The plan instructs the implementer to run embedded validation; the commander independently inspects the evidence and repeats the decisive test or behavior.</p>
+          </article>
+          <article class="cast-card cast-card--absence" data-index="Ø">
+            <p class="cast-card__role">Not configured here</p>
+            <h3>No subagent fleet</h3>
+            <p><code>agents/README.md</code> and <code>adws/README.md</code> are empty. TAC-3 achieves isolation with fresh top-level CLI processes; headless chaining is previewed, not implemented in this repo.</p>
+          </article>
+        </div>
+
+      </section>
+
+      <section class="chapter-section" id="surface">
+        <span class="section-number">02 · WHAT CAN THE AGENT TOUCH?</span>
+        <h2 class="section-title">The repository is shaped as an agent surface</h2>
+        <p class="section-lead">The useful map is not every directory. It is the chain of interfaces that tells an agent what to know, what it may do, how it is invoked, what it must leave behind, and how failure travels upstream.</p>
+
+        <figure class="agent-surface wide-breakout" aria-labelledby="surface-caption">
+          <div class="surface-head">
+            <strong>Intent → evidence surface</strong>
+            <span>CONTROL PLANE AROUND app/**</span>
+          </div>
+          <div class="surface-flow">
+            <article class="surface-node">
+              <span class="surface-node__n">01</span>
+              <strong>Prompt entry</strong>
+              <code>.claude/commands/{chore,bug,feature}.md</code>
+              <p>Classifies work and turns one sentence into a plan.</p>
+            </article>
+            <article class="surface-node surface-node--memory">
+              <span class="surface-node__n">02</span>
+              <strong>Boot context</strong>
+              <code>prime.md → git ls-files + README.md</code>
+              <p>Starts from repository truth, not remembered chat.</p>
+            </article>
+            <article class="surface-node surface-node--policy">
+              <span class="surface-node__n">03</span>
+              <strong>Authority</strong>
+              <code>.claude/settings.json</code>
+              <p>Pre-approves 12 capabilities and denies 3 command patterns.</p>
+            </article>
+            <article class="surface-node">
+              <span class="surface-node__n">04</span>
+              <strong>Durable handoff</strong>
+              <code>specs/*.md</code>
+              <p>The plan carries context across a fresh process boundary.</p>
+            </article>
+            <article class="surface-node">
+              <span class="surface-node__n">05</span>
+              <strong>Execution harness</strong>
+              <code>implement.md + scripts/*.sh</code>
+              <p>A tiny HOP passes the plan to an actor with repeatable tools.</p>
+            </article>
+            <article class="surface-node surface-node--verify">
+              <span class="surface-node__n">06</span>
+              <strong>Evidence</strong>
+              <code>pytest + behavior + git diff --stat</code>
+              <p>Observations decide success or a repair upstream.</p>
+            </article>
+          </div>
+          <div class="surface-note">
+            <strong>ABSENCE IS DATA</strong>
+            <span>No <code>CLAUDE.md</code>, hooks, skills, or subagent definition exists in TAC-3. Commands, settings, README, specs, and scripts are the agent interfaces actually on disk.</span>
+          </div>
+          <figcaption id="surface-caption">The application sits inside the loop, but the surrounding interfaces determine whether a general model can operate it predictably.</figcaption>
+        </figure>
+      </section>
+
+      <section class="chapter-section" id="loop">
+        <span class="section-number">03 · HOW DOES CONTROL MOVE?</span>
+        <h2 class="section-title">Plan → act → verify → recover</h2>
+        <p class="section-lead">Dan moves the human to high-leverage boundaries. The agent gets long stretches of work; the commander retains classification, approval, and acceptance.</p>
+
+        <figure class="loop-board wide-breakout" aria-labelledby="loop-caption">
+          <div class="loop-legend">
+            <span>Human move · in-loop</span>
+            <span>Reasoning agent · out-of-loop work</span>
+            <span>Deterministic tool · machine check</span>
+          </div>
+          <div class="loop-lanes">
+            <div class="loop-lane">
+              <div class="loop-lane__label">Planning</div>
+              <article class="loop-step loop-step--human"><span class="loop-step__owner">HUMAN</span><strong>Classify</strong><p>Choose chore, bug, or feature and state the outcome.</p></article>
+              <article class="loop-step loop-step--agent"><span class="loop-step__owner">AGENT</span><strong>Research</strong><p>Read README, inspect the declared file surface, reason.</p></article>
+              <article class="loop-step loop-step--agent"><span class="loop-step__owner">AGENT</span><strong>Write spec</strong><p>Fill the exact Plan Format under specs/.</p></article>
+              <article class="loop-step loop-step--human"><span class="loop-step__owner">HUMAN</span><strong>Review gate</strong><p>Reject placeholders, wrong scope, or weak validation.</p></article>
+              <article class="loop-step loop-step--human"><span class="loop-step__owner">HUMAN</span><strong>Checkpoint</strong><p>Preserve the reviewed plan as the phase handoff.</p></article>
+            </div>
+            <div class="loop-lane">
+              <div class="loop-lane__label">Building</div>
+              <article class="loop-step loop-step--human"><span class="loop-step__owner">HUMAN</span><strong>Fresh boot</strong><p>Open a new instance and pass only /implement + plan.</p></article>
+              <article class="loop-step loop-step--agent"><span class="loop-step__owner">AGENT</span><strong>Act</strong><p>Execute ordered tasks without the planner's chat history.</p></article>
+              <article class="loop-step loop-step--machine"><span class="loop-step__owner">TOOL</span><strong>Verify</strong><p>Run plan commands and inspect the resulting diff.</p></article>
+              <article class="loop-step loop-step--human"><span class="loop-step__owner">HUMAN</span><strong>Recover</strong><p>Use failed evidence to repair the plan or reusable template.</p></article>
+              <article class="loop-step loop-step--human"><span class="loop-step__owner">HUMAN</span><strong>Accept</strong><p>Repeat the decisive check; compare evidence to intent.</p></article>
+            </div>
+          </div>
+          <div class="loop-return">If evidence fails, repair the plan or reusable template, then re-fire with a fresh agent.</div>
+          <figcaption id="loop-caption">In-loop does not mean “watch every tool call.” It means the human owns the decisions that change class, authority, and acceptance.</figcaption>
+        </figure>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Why fresh agents matter</p>
+          <p>The process boundary is a test. If the implementer needs the old conversation, the plan is not yet a reusable asset. Freshness buys focus, exposes hidden dependencies, and prepares the same phase for headless invocation.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="contracts">
+        <span class="section-number">04 · WHY THESE FILES EXIST</span>
+        <h2 class="section-title">Four contracts make the agent capable</h2>
+        <p class="section-lead">Each contract answers a different systems question: What should the agent understand? What may it do? How is it called? What counts as done?</p>
+
+        <div class="contract-stack">
+          <article class="contract-card">
+            <div class="contract-card__copy">
+              <h3>1. Prompt contract · turn a class into a plan</h3>
+              <p><code>chore.md</code>, <code>bug.md</code>, and <code>feature.md</code> are meta-prompts. Each fixes a research boundary and output shape while <code>$ARGUMENTS</code> supplies the unique request. Their differences encode engineering judgment: bugs require reproduction and root cause; features require user value, phases, tests, and acceptance.</p>
+              <p><strong>Era note:</strong> <code>THINK HARD</code> was a course-era information-dense reasoning trigger. Keep the principle—allocate more reasoning to planning-grade work—but use the explicit thinking controls available in your current agent runtime.</p>
+              <div class="intent-note"><strong>Dan's design intent</strong>The agent should not improvise how your team plans every time. Solve the class once in the template; let each run fill the facts.</div>
+            </div>
+            <div class="code-shell" aria-label="Abridged prompt contract from chore.md">
+              <div class="code-label"><span>.claude/commands/chore.md</span><span>abridged · exact headings</span></div>
+              <pre><code><span class="tok-heading"># Chore Planning</span>
+
+Create a new plan in <span class="tok-string">specs/*.md</span> using the exact
+specified markdown <span class="tok-key">Plan Format</span>.
+
+<span class="tok-heading">## Instructions</span>
+- Start your research by reading the <span class="tok-string">README.md</span> file.
+- Use your reasoning model: <span class="tok-key">THINK HARD</span> about the plan.
+
+<span class="tok-heading">## Chore</span>
+<span class="tok-var">$ARGUMENTS</span></code></pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-card__copy">
+              <h3>2. Tool and permission contract · bound capability</h3>
+              <p><code>.claude/settings.json</code> pre-approves 12 patterns: selected shell operations, <code>npm</code>/<code>uv</code>, file writes, and the environment-copy script. It explicitly denies force-push variants and <code>rm -rf</code>. A command outside the allow list is not thereby granted; it remains outside the pre-approved set.</p>
+              <div class="intent-note"><strong>Dan's design intent</strong>Capability should be programmable and reviewable. Give repeated safe work a smooth path, and make destructive shortcuts hit a hard boundary.</div>
+            </div>
+            <div class="code-shell" aria-label="Abridged permission settings with complete deny list">
+              <div class="code-label"><span>.claude/settings.json</span><span>selected allow · complete deny</span></div>
+              <pre><code>{
+  <span class="tok-key">"permissions"</span>: {
+    <span class="tok-key">"allow"</span>: [
+      <span class="tok-string">"Bash(uv:*)"</span>, <span class="tok-string">"Bash(npm:*)"</span>,
+      <span class="tok-string">"Write"</span>,
+      <span class="tok-string">"Bash(./scripts/copy_dot_env.sh:*)"</span>
+      <span class="tok-comment">// 8 more entries on disk</span>
+    ],
+    <span class="tok-key">"deny"</span>: [
+      <span class="tok-danger">"Bash(git push --force:*)"</span>,
+      <span class="tok-danger">"Bash(git push -f:*)"</span>,
+      <span class="tok-danger">"Bash(rm -rf:*)"</span>
+    ]
+  }
+}</code></pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-card__copy">
+              <h3>3. Harness and launcher · call the system repeatedly</h3>
+              <p><code>install.md</code> composes priming, dependency installation, and <code>copy_dot_env.sh</code>. <code>start.md</code> delegates to <code>scripts/start.sh</code>, which checks environment state, launches backend and frontend, tests that both processes survived startup, prints their URLs, and traps shutdown.</p>
+              <p>The executor is even smaller: <code>implement.md</code> is a higher-order prompt. It accepts the plan path through <code>$ARGUMENTS</code>, tells the agent to implement it, and requires a summary plus <code>git diff --stat</code>.</p>
+              <div class="intent-note"><strong>Dan's design intent</strong>Keep the launcher generic and put task detail in the plan. Replaceability comes from a stable call shape, not from a giant omniscient prompt.</div>
+            </div>
+            <div class="code-shell" aria-label="Higher-order implement prompt">
+              <div class="code-label"><span>.claude/commands/implement.md</span><span>complete contract</span></div>
+              <pre><code><span class="tok-heading"># Implement the following plan</span>
+Follow the <span class="tok-key">Instructions</span> to implement the <span class="tok-key">Plan</span>
+then <span class="tok-key">Report</span> the completed work.
+
+<span class="tok-heading">## Instructions</span>
+- Read the plan, think hard about the plan and implement it.
+
+<span class="tok-heading">## Plan</span>
+<span class="tok-var">$ARGUMENTS</span>
+
+<span class="tok-heading">## Report</span>
+- Summarize the work in concise bullets.
+- Report files and total lines with <span class="tok-string">git diff --stat</span>.</code></pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-card__copy">
+              <h3>4. Verification contract · convert claims into evidence</h3>
+              <p>Every planning template includes <strong>Validation Commands</strong> before its closing Notes section and requires the final step-by-step task to run them. The shipped floor is <code>cd app/server &amp;&amp; uv run pytest</code>. The implementation report adds the diff stat. The commander still restarts the app and repeats the behavior or reproduction that matters.</p>
+              <div class="intent-note"><strong>Dan's design intent</strong>An agent report is a claim, not proof. Close the loop with commands and observations that can contradict the agent; the human then repairs the plan or template and re-fires.</div>
+            </div>
+            <div class="code-shell" aria-label="Verification contract from planning templates">
+              <div class="code-label"><span>Plan Format · shared floor</span><span>prompt evidence</span></div>
+              <pre><code><span class="tok-heading">## Validation Commands</span>
+Execute every command to validate the work with
+<span class="tok-key">zero regressions</span>.
+
+- <span class="tok-string">cd app/server &amp;&amp; uv run pytest</span>
+
+<span class="tok-comment">The last Step by Step Task must run these commands.</span></code></pre>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="operate">
+        <span class="section-number">05 · WORKED AGENT RUN</span>
+        <h2 class="section-title">Operate like Dan</h2>
+        <p class="section-lead">First establish a trustworthy machine, then separate planning from building. The setup commands below come from the repository README; the agent commands come from the shipped command files.</p>
+
+        <ol class="operate-list">
+          <li>
+            <div>
+              <h3>Establish the runtime</h3>
+              <p>Install both dependency sets and create the server environment file. Add at least one API key before starting.</p>
+              <div class="terminal">
+                <div class="terminal__bar">README · setup</div>
+                <pre><code>cd app/server
+uv sync --all-extras
+cp .env.sample .env
+# edit .env: add OPENAI_API_KEY or ANTHROPIC_API_KEY
+
+cd ../client
+npm install
+cd ../..
+./scripts/start.sh</code></pre>
+              </div>
+              <span class="source-stamp">SOURCE · README.md §§ Setup, Quick Start</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Prove the baseline before delegating</h3>
+              <p>At <code>http://localhost:5173</code>, load <code>users.json</code> from the sample-data UI and run <strong>“Show users with age between 20 and 40.”</strong> Record the working behavior and current stdout messages. This gives the later logging chore something observable to preserve.</p>
+              <span class="source-stamp">SOURCE · README.md § Usage + course run</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Generate a plan in a fresh agent</h3>
+              <p>Choose the work-class interface. This invocation asks the planner to research and write a spec; it does not authorize implementation.</p>
+              <div class="terminal">
+                <div class="terminal__bar">fresh agent A · planning only</div>
+                <pre><code>claude
+/chore "Replace all server print statements with proper python logging. Use proper log levels. Preserve the exact same log output. Make sure all output is written to standard out"</code></pre>
+              </div>
+              <p>Open the new <code>specs/*.md</code>. Reject it if any placeholder remains, if the 18 prints in <code>server.py</code> plus one in <code>main.py</code> are not accounted for, or if the validation cannot prove stdout behavior and zero regressions.</p>
+              <span class="source-stamp">SOURCE · .claude/commands/chore.md + audited repo</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Cross the phase boundary</h3>
+              <p>Open a new agent with no planning conversation. Invoke <code>/implement</code> with the exact plan path returned by the planner. Do not re-explain the chore; missing context belongs in the plan. This companion does not print a pretend path because the shipped tree contains only the initial application spec.</p>
+              <span class="source-stamp">SOURCE · .claude/commands/implement.md</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Grade evidence, then improve upstream</h3>
+              <p>Require the plan's tests, a zero-hit search for remaining target prints, the same app behavior through <code>scripts/start.sh</code>, and a diff that matches scope. If a check fails, amend the plan or template and re-run with another fresh agent.</p>
+              <div class="terminal">
+                <div class="terminal__bar">commander · independent checks</div>
+                <pre><code>cd app/server &amp;&amp; uv run pytest
+cd ../..
+rg -n 'print\(' app/server/server.py app/server/main.py
+git diff --stat</code></pre>
+              </div>
+              <p class="fine">The shipped repo has 37 <code>test_*</code> function definitions, of which three are fixtures. Grade zero regressions and the intended behavior—not a video run's magic test total.</p>
+            </div>
+          </li>
+        </ol>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">Now name the pattern</p>
+          <p><strong>One phase, one fresh agent, one durable handoff.</strong> The planner produces the plan; the implementer consumes it; evidence decides whether the human accepts or repairs and re-fires.</p>
+        </aside>
+
+        <aside class="current-practice">
+          <p class="current-practice__label">Programmatic preview · course-era command</p>
+          <p>The lesson then invokes the same <code>/feature</code> planner through <code>claude -p</code>, streams JSONL, and produces a plan without an interactive session. That demonstrates a machine interface. The filmed <code>--dangerously-skip-permissions</code> flag removed a control for a narrowly scoped planning demo; treat it as historical evidence, not the default production posture. Prefer scoped tools, isolation, and explicit policy.</p>
+          <div class="terminal">
+            <div class="terminal__bar">filmed shape · stream emitted to stdout</div>
+            <pre><code>claude -p "/feature \"&lt;feature description&gt;\"" \
+  --output-format stream-json \
+  --dangerously-skip-permissions \
+  --model &lt;available-model&gt; \
+  --verbose</code></pre>
+          </div>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="failures">
+        <span class="section-number">06 · FAIL CLOSED</span>
+        <h2 class="section-title">Common agent-system failures</h2>
+        <p class="section-lead">Most misses are not “the model was bad.” They are broken contracts around the model.</p>
+
+        <div class="failure-table-wrap">
+          <table class="failure-table">
+            <caption>Misconfiguration diagnosis matrix</caption>
+            <thead>
+              <tr><th>Failure signal</th><th>System cause</th><th>Repair</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>The build only works in the planning chat</td><td>The plan depends on hidden conversational memory.</td><td>Move the missing facts into the spec; retest with a fresh implementer.</td></tr>
+              <tr><td><code>/chore</code> starts editing code</td><td>The planning/execution role boundary was blurred.</td><td>Reassert the output contract: planner writes <code>specs/*.md</code>; <code>/implement</code> acts later.</td></tr>
+              <tr><td>A copied template produces generic mush</td><td><code>Relevant Files</code> still names another repo's surface, or one format is used for every work class.</td><td>Specialize paths, questions, and acceptance evidence before re-firing.</td></tr>
+              <tr><td>The report says “done,” but behavior is wrong</td><td>Validation checked activity or tests alone, not the user-visible claim.</td><td>Add a claim-to-check matrix and repeat the decisive behavior independently.</td></tr>
+              <tr><td>The agent asks for broad permission bypass</td><td>The harness confuses convenience with required capability.</td><td>Narrow tools, filesystem, credentials, and environment; preserve explicit denies.</td></tr>
+              <tr><td>The commander watches and corrects every move</td><td>Presence is masking weak prompts and a missing recovery loop.</td><td>Let the phase run, inspect artifacts at the boundary, then improve the reusable interface.</td></tr>
+              <tr><td>Setup guidance contradicts policy</td><td>The README suggests <code>rm -rf node_modules</code>, but settings deny <code>rm -rf</code>; it also says Python 3.10+ while troubleshooting says 3.12+.</td><td>Let the deny rule win for agent actions and trust the executable manifest's <code>&gt;=3.10</code>; repair documentation drift.</td></tr>
+              <tr><td>The planner claims 20 prints or requires 52 tests</td><td>A run-specific narration was mistaken for a repository invariant.</td><td>Count current disk evidence: 18 + 1 prints; require zero regressions and meaningful coverage.</td></tr>
+              <tr><td>Someone expects subagents or hooks to rescue the run</td><td>No such interface exists in TAC-3.</td><td>Operate the shipped system: fresh CLI agents, command files, settings, scripts, specs, and human gates.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Failure injection</p>
+          <p>Give a fresh implementer a thin plan and resist the urge to explain. Its questions are useful telemetry: every missing fact points to the exact upstream artifact that failed.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="lab">
+        <span class="section-number">07 · LAB · AGENT OPS</span>
+        <h2 class="section-title">Change the system, not the application</h2>
+        <p class="section-lead">Harden the chore planner so every generated plan assigns proof to an owner. No application logic may change.</p>
+
+        <section class="lab-box">
+          <h3 class="lab-box__title">Lab · add an evidence contract to <code>chore.md</code></h3>
+          <p><strong>Hook:</strong> the current template seeds pytest, but it does not force every requested behavior to name an observable check or distinguish agent-run proof from the commander's independent check.</p>
+
+          <ol class="lab-box__steps lab-steps">
+            <li class="lab-step">
+              <span class="lab-step__n">01 · BASELINE</span>
+              <h3>Run the old interface</h3>
+              <p>In a disposable branch or clone, fire the logging <code>/chore</code> request with a fresh planner. Inspect the plan. Can you map each claim—no prints, same message shape, stdout, zero regressions—to a named check and owner?</p>
+            </li>
+            <li class="lab-step">
+              <span class="lab-step__n">02 · CHANGE</span>
+              <h3>Edit one agent interface</h3>
+              <p>Modify only <code>.claude/commands/chore.md</code>. Add <code>## Verification Matrix</code> to its Plan Format. Require one row per behavioral claim with columns for claim, check, expected observation, and owner (<em>agent</em> or <em>human</em>).</p>
+            </li>
+            <li class="lab-step">
+              <span class="lab-step__n">03 · RE-FIRE</span>
+              <h3>Test replaceability</h3>
+              <p>Open another fresh planner and send the exact same logging request. Do not mention the new section in chat. The template—not conversational memory—must cause the stronger output.</p>
+            </li>
+          </ol>
+
+          <p>In a plain shell, set <code>PLAN_PATH</code> to the exact generated path the second planner reports, then run these checks.</p>
+          <div class="terminal">
+            <div class="terminal__bar">observable checks · PLAN_PATH is the real path returned by the planner</div>
+            <pre><code>rg -n '^## Verification Matrix$' "$PLAN_PATH"
+rg -n '&lt;[^&gt;]+&gt;' "$PLAN_PATH"
+git diff -- .claude/commands/chore.md specs/
+git diff --quiet -- app/; echo $?</code></pre>
+          </div>
+
+          <div class="lab-box__pass">
+            <h4>Pass criteria</h4>
+            <ul class="pass-grid">
+              <li>✓ The new spec contains exactly one <code>## Verification Matrix</code>.</li>
+              <li>✓ No angle-bracket placeholder remains in the generated plan.</li>
+              <li>✓ The matrix covers pytest, remaining-print search, stdout, and message-shape behavior.</li>
+              <li>✓ At least one check belongs to the agent and one to the human commander.</li>
+              <li>✓ <code>git diff --quiet -- app/</code> exits <code>0</code>: no application code changed.</li>
+              <li>✓ A fresh planner produced the improvement without being coached about the new section.</li>
+            </ul>
+          </div>
+        </section>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">What the lab proves</p>
+          <p>A one-time chat correction helps one run. A template correction changes every future run of that class. That is the leverage move.</p>
+        </aside>
+      </section>
+
+      <section class="chapter-section" id="teach-back">
+        <span class="section-number">08 · RETRIEVAL</span>
+        <h2 class="section-title">Explain this agent OS in six sentences</h2>
+        <p class="section-lead">Close the page. No notes, no “the AI handles it,” and exactly six sentences.</p>
+
+        <div class="teach-back">
+          <h3>Your six-sentence frame</h3>
+          <ol class="sentence-grid">
+            <li>State what the human commander owns and why that is a leverage boundary.</li>
+            <li>Explain what the chore/bug/feature planner consumes and what it must produce.</li>
+            <li>Explain how README, Relevant Files, and a durable spec replace conversation memory.</li>
+            <li>Name the permission file, what its allow/deny boundary does, and why broad bypass is a separate decision.</li>
+            <li>Explain how <code>/implement</code> plus scripts turns the reviewed plan into repeatable action by a fresh agent.</li>
+            <li>Finish with the verification and recovery loop: evidence, independent check, upstream repair, re-fire.</li>
+          </ol>
+          <details>
+            <summary>Reveal the pass test</summary>
+            <p>Pass if a listener can draw the loop, place the human at review/authority/acceptance gates, identify the real files at every interface, and predict why same-session success is weaker evidence than a fresh-agent rerun.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="appendix">
+        <span class="section-number">09 · OPTIONAL APPENDIX</span>
+        <h2 class="section-title">Raw file index</h2>
+        <p class="section-lead">One line per real file in the audited TAC-3 tree. This is a lookup ledger, not the lesson.</p>
+
+        <details class="raw-index">
+          <summary>Open all 56 file roles</summary>
+          <div class="raw-groups">
+            <section class="raw-group">
+              <h3>Agent control plane · 16</h3>
+              <ul>
+                <li><code>.claude/commands/bug.md</code>Bug-class planner with reproduction and root-cause contract.</li>
+                <li><code>.claude/commands/chore.md</code>Maintenance-class planner with compact plan format.</li>
+                <li><code>.claude/commands/feature.md</code>Feature-class planner with phases, testing, and acceptance.</li>
+                <li><code>.claude/commands/implement.md</code>Higher-order prompt that consumes any reviewed plan.</li>
+                <li><code>.claude/commands/install.md</code>Agent runbook for priming, dependencies, and environment copy.</li>
+                <li><code>.claude/commands/prime.md</code>Boot-context command: list tracked files, then read README.</li>
+                <li><code>.claude/commands/start.md</code>Thin command wrapper around the system launcher.</li>
+                <li><code>.claude/commands/tools.md</code>Prompt for listing built-in development tools.</li>
+                <li><code>.claude/settings.json</code>Repository-local allow and deny policy.</li>
+                <li><code>.env.sample</code>Root API-key template.</li>
+                <li><code>.gitignore</code>Secrets, generated state, databases, and build-output exclusions.</li>
+                <li><code>README.md</code>Human and agent orientation, setup, run, usage, and commands.</li>
+                <li><code>adws/README.md</code>Empty placeholder for the next workflow-composition lesson.</li>
+                <li><code>agents/README.md</code>Empty placeholder; no subagent definition ships here.</li>
+                <li><code>ai_docs/anthropic_quick_start.md</code>Bundled Anthropic API integration reference.</li>
+                <li><code>ai_docs/openai_quick_start.md</code>Bundled OpenAI API and agents quick-start reference.</li>
+              </ul>
+            </section>
+
+            <section class="raw-group">
+              <h3>Client · 15</h3>
+              <ul>
+                <li><code>app/client/.gitignore</code>Client-specific generated-file exclusions.</li>
+                <li><code>app/client/index.html</code>Static application shell and upload/query controls.</li>
+                <li><code>app/client/package-lock.json</code>Exact npm dependency graph.</li>
+                <li><code>app/client/package.json</code>Vite/TypeScript scripts and top-level dependencies.</li>
+                <li><code>app/client/public/sample-data/orders_(32).csv</code>Thirty-two-row order dataset.</li>
+                <li><code>app/client/public/sample-data/products.csv</code>Thirty-two-row product dataset.</li>
+                <li><code>app/client/public/sample-data/users.json</code>Twenty-row user dataset used by the lesson.</li>
+                <li><code>app/client/public/vite.svg</code>Vite starter icon asset.</li>
+                <li><code>app/client/src/api/client.ts</code>Typed fetch wrapper for backend endpoints.</li>
+                <li><code>app/client/src/main.ts</code>DOM state, upload, query, schema, table, and modal behavior.</li>
+                <li><code>app/client/src/style.css</code>Application presentation and interaction styling.</li>
+                <li><code>app/client/src/types.d.ts</code>Client request/response contracts matching Pydantic models.</li>
+                <li><code>app/client/src/vite-env.d.ts</code>Vite client type reference.</li>
+                <li><code>app/client/tsconfig.json</code>Strict TypeScript compiler policy.</li>
+                <li><code>app/client/vite.config.ts</code>Development proxy from <code>/api</code> to port 8000.</li>
+              </ul>
+            </section>
+
+            <section class="raw-group">
+              <h3>Server and tests · 21</h3>
+              <ul>
+                <li><code>app/server/.env.sample</code>Server API-key template checked by the launcher.</li>
+                <li><code>app/server/.python-version</code>Local Python version selector.</li>
+                <li><code>app/server/core/__init__.py</code>Core package marker.</li>
+                <li><code>app/server/core/data_models.py</code>Pydantic request and response types.</li>
+                <li><code>app/server/core/file_processor.py</code>CSV/JSON parsing and SQLite table creation.</li>
+                <li><code>app/server/core/insights.py</code>Column-level SQLite statistics.</li>
+                <li><code>app/server/core/llm_processor.py</code>Provider routing, prompts, and SQL generation.</li>
+                <li><code>app/server/core/sql_processor.py</code>Query blocklist, execution, and schema inspection.</li>
+                <li><code>app/server/main.py</code>Small generated entry-point stub with one print.</li>
+                <li><code>app/server/pyproject.toml</code>Python requirement and runtime/dev dependencies.</li>
+                <li><code>app/server/server.py</code>FastAPI routes, process startup, and lesson logging target.</li>
+                <li><code>app/server/tests/__init__.py</code>Empty test package marker.</li>
+                <li><code>app/server/tests/assets/column_names.csv</code>Column-normalization fixture.</li>
+                <li><code>app/server/tests/assets/invalid.csv</code>Malformed-row CSV fixture.</li>
+                <li><code>app/server/tests/assets/test_products.json</code>JSON conversion fixture.</li>
+                <li><code>app/server/tests/assets/test_users.csv</code>CSV conversion fixture.</li>
+                <li><code>app/server/tests/core/__init__.py</code>Empty core-test package marker.</li>
+                <li><code>app/server/tests/core/test_file_processor.py</code>File conversion and validation coverage.</li>
+                <li><code>app/server/tests/core/test_llm_processor.py</code>Provider, routing, prompt-format, and error coverage.</li>
+                <li><code>app/server/tests/core/test_sql_processor.py</code>Query guard and schema coverage.</li>
+                <li><code>app/server/uv.lock</code>Exact Python dependency and artifact lock.</li>
+              </ul>
+            </section>
+
+            <section class="raw-group">
+              <h3>Harness and durable intent · 4</h3>
+              <ul>
+                <li><code>scripts/copy_dot_env.sh</code>Copies the sibling TAC-2 server environment or exits visibly.</li>
+                <li><code>scripts/start.sh</code>Checks environment, launches two services, and traps cleanup.</li>
+                <li><code>scripts/stop_apps.sh</code>Stops launcher processes and the two development ports.</li>
+                <li><code>specs/init_nlq_to_sql_to_table.md</code>The 749-line natural-language plan that carried the application build.</li>
+              </ul>
+            </section>
+          </div>
+        </details>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">Agent Systems · TAC-3</p>
+        <div class="chapter-footer__nav">
+          <a href="../vol-1-tac/03-success-is-planned.html">← Conceptual chapter</a>
+          <a href="index.html">Code library</a>
+          <a href="../index.html">Book hub →</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('top-progress');
+      const railBar = document.getElementById('rail-progress');
+      const label = document.getElementById('progress-label');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let pending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        const percent = `${Math.round(value * 100)}%`;
+        topBar.style.width = percent;
+        railBar.style.width = percent;
+        label.textContent = percent;
+      };
+
+      const requestUpdate = () => {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {
+          updateProgress();
+          pending = false;
+        });
+      };
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+          const visible = entries
+            .filter(entry => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+          links.forEach(link => {
+            if (link.getAttribute('href') === `#${visible.target.id}`) {
+              link.setAttribute('aria-current', 'location');
+            } else {
+              link.removeAttribute('aria-current');
+            }
+          });
+        }, { rootMargin: '-18% 0px -68% 0px', threshold: [0, .1, .5] });
+        sections.forEach(section => observer.observe(section));
+      }
+
+      updateProgress();
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate);
+    })();
+  </script>
+</body>
+</html>

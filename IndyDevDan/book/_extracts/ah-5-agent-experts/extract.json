@@ -1,0 +1,512 @@
+{
+  "lesson_key": "ah-5-agent-experts",
+  "title": "Agent Experts",
+  "course": "AH",
+  "course_full": "Agentic Horizon",
+  "order": 13,
+  "lesson_url": "https://agenticengineer.com/tactical-agentic-coding/course/agent-experts",
+  "video": {
+    "file": "ah-5-agent-experts/video/ah-5-agent-experts.mp4",
+    "duration_seconds": 3749,
+    "duration_display": "62:29",
+    "resolution": "1920x1080"
+  },
+  "tactic": {
+    "name": "Build Agents That Learn (Act · Learn · Reuse)",
+    "one_liner": "Stop deploying agents that execute and forget. Wrap your agentic prompts in a self-improving loop so each useful action becomes reusable expertise — a mental model the agent stores and reuses at runtime, with no human in the loop.",
+    "why_uncomfortable": "Dan opens by calling this \"likely the most controversial lesson of Agentic Horizon\" and names three buckets of engineers: those who dismiss the idea, those who give it a shot, and those who say \"this is what I've been looking for.\" It's uncomfortable because it asks you to (1) accept that a file the AGENT writes and maintains itself — a YAML/markdown \"mental model\" — is a legitimate, valuable engineering artifact and NOT just \"another source of truth\" to distrust; (2) hand the maintenance of that knowledge entirely to the agent and never hand-edit it; (3) pay a real up-front cost — writing self-improve prompts to teach your agents how to learn — instead of re-prompting by hand forever; and (4) trust learning artifacts in exactly the highest-stakes systems (billing, security) where false expertise is scariest. The reframe that makes it coherent: you already run on a fuzzy, self-updating mental model; you're just giving your agents the same thing, in a file."
+  },
+  "mission": "Move up the stack one more time: stop building the application and build the system that builds the system — the agentic layer around your codebase. Give that layer agents that never stop learning, so the higher the complexity and risk of a system, the MORE valuable your agents become instead of less. The irreplaceable agentic engineer deploys experts that remember and improve, not generalists that boot up, forget, and force you to babysit memory files by hand. Agent experts are one of the killer building blocks of that layer — for your codebase (billing, security, database, integrations) and, as a seed of a whole new product class, for your users (per-user adaptive experiences).",
+  "controversy_framing": {
+    "dan_words": "There will be three buckets of engineers that watch this lesson. Those who dismiss this idea, those who give it a shot, and those who say, this is what I've been looking for.",
+    "the_persistent_problem": "Traditional software improves as it's used — it stores analytics, usage data, and patterns that become algorithms. Agents of today don't. No matter how great your context engineering or agentic prompt engineering becomes, one massive problem persists: your agents forget, and that means your agents don't learn.",
+    "why_existing_tools_fall_short": "Memory files are global forced context that always loads (expertise requires breaking rules when the time is right) and must be manually updated. Prime prompts, sub-agents, and skills are powerful, but they too must be manually updated to steer agents in a new direction. None of them learn on their own."
+  },
+  "act_learn_reuse": {
+    "summary": "The whole pattern boils down to three concrete steps. An agent expert is any agent wired to do all three; miss one and you have a partial expert.",
+    "act": "The agent takes a USEFUL action (keyword: useful) — e.g. builds/updates code, or a user views/adds/checks-out a product. In the codebase experts, 'act' = the build step that modifies the source of truth.",
+    "learn": "The agent stores new information: the expertise file gets updated. This is what the self-improve prompt does — it syncs the mental model with the ground truth (the code) after a useful action.",
+    "reuse": "On the next execution the agent reuses that information directly from its mental model — the question/plan prompts read the expertise file FIRST and validate it against the codebase, so there's no blind searching.",
+    "keyword": "useful — experts only learn from useful actions; and 'after your thorough search, there may be nothing to do — this is perfectly acceptable.'",
+    "dan_words": "Agent experts have three concrete steps... Act, learn, reuse. Act. First, our agents take a useful action. The keyword there is useful. Then our agents learn and store new information... Then they reuse that information during the next execution directly from that mental model."
+  },
+  "self_improving_template_meta_prompt": {
+    "headline": "An agent expert is a concrete form of a self-improving template meta prompt. Understand meta prompts and you understand agent experts.",
+    "meta_prompt": "A prompt that builds other prompts.",
+    "template_meta_prompt": "A prompt that builds other prompts with a specific purpose and structure. (A key leverage point of agentic coding introduced in TAC lesson 3.) This is how you teach agents to operate and build as you do.",
+    "self_improving_prompt": "A prompt that updates itself, related prompts, or an isolated file with new information to be used during the agent's next execution.",
+    "combined": "Put them together — a prompt with a specific purpose/structure that updates an isolated file (the expertise) for next time — and you get a self-improving template meta prompt. That is the agent expert, mechanically.",
+    "dan_words": "The agent expert is a concrete form of a self improving template meta prompt. That's a mouthful. Let's break this down because if you understand meta prompts, you will understand agent experts."
+  },
+  "meta_agentics": {
+    "definition": "Meta-agentics = meta prompts, meta agents (sub-agents), and meta skills. Plainly: prompts writing prompts, agents building agents, skills building skills. They are the atoms of the agent expert AND the building blocks of your entire agentic layer.",
+    "why_it_matters": "They greatly increase your output as an agentic engineer, with or without agent experts — they let you build more of your agentic layer faster and serve as the foundation for quickly spinning up new agentic layers (the topic of the final AH lesson).",
+    "dan_rule": "There is no code base I create that does not have meta agentics. Every codebase must have meta agentics. Always have a stack of these ready to go.",
+    "meta_prompt": {
+      "file": ".claude/commands/meta_prompt.md",
+      "does": "Takes a request and writes a NEW prompt (custom slash command) in a fixed 'Specified Format' (frontmatter + Purpose/Variables/Instructions/Workflow/Report). Prefers $1,$2 over $ARGUMENTS; ultra-thinks; uses parallel Task+WebFetch to pull the current slash-command docs.",
+      "demo_artifact": ".claude/commands/question-w-mermaid-diagrams.md (a question prompt that always enriches answers with mermaid diagrams)."
+    },
+    "meta_agent": {
+      "file": ".claude/agents/meta-agent.md",
+      "does": "An agent that generates other agents: takes a description and writes a complete sub-agent config to .claude/agents/<name>.md (real YAML frontmatter, minimal tools, exactly 4 sections). model: opus.",
+      "demo_artifact": ".claude/agents/planner.md (a lightweight agent that reads an existing prompt and fires it — it delegates straight to /plan via SlashCommand — so you can scale planning to many agents in parallel)."
+    },
+    "meta_skill": {
+      "file": ".claude/skills/meta-skill/SKILL.md",
+      "skill_name_in_frontmatter": "creating-new-skills",
+      "does": "A skill that creates new Agent Skills: reads the bundled Anthropic skills docs (docs/*.md) then scaffolds a SKILL.md following best practices (progressive disclosure, gerund naming, third-person description).",
+      "demo_artifact": ".claude/skills/start-orchestrator/SKILL.md (turns the manual 'start the orchestrator FE+BE' process into a concrete skill — flags for --cwd/--session, background start commands, and it even opens the UI in Chrome when done)."
+    },
+    "the_catch": "Meta-agentics ACT but they do not LEARN — nothing inside the meta prompt, meta agent, or meta skill updates automatically; they don't become more proficient over time. Therefore they are NOT agent experts. Agent experts must learn on their own."
+  },
+  "core_concepts": [
+    {
+      "id": "agents-forget",
+      "name": "The persistent problem: agents forget",
+      "plain_english": "Traditional software gets better as people use it (analytics, usage data, patterns → algorithms). Agents don't — they start fresh every session and forget everything. Great context and prompt engineering don't fix this; it's a category problem, and it's the one agent experts exist to solve.",
+      "dan_words": "\"Your agents forget. And that means your agents don't learn.\"",
+      "misconception": "That better prompts or bigger context windows eventually solve forgetting. They don't — forgetting is structural. What you need is a mechanism that turns actions into stored, reusable expertise."
+    },
+    {
+      "id": "executes-and-learns",
+      "name": "Generic agent vs agent expert: forgets vs learns",
+      "plain_english": "The entire difference is one word. A generic agent executes and forgets. An agent expert executes and LEARNS. You don't have to tell an expert to learn each time — learning is built into how it operates. Real experts never stop updating their mental model of the one domain that matters most.",
+      "dan_words": "\"The difference between a generic agent and an agent expert is simple. One executes and forgets, the other executes and learns... You don't need to tell an expert to learn. It's in their DNA.\"",
+      "misconception": "That an 'expert' means a bigger/smarter model or a longer system prompt. No — it's an ordinary agent wired into an Act→Learn→Reuse loop over a persistent mental model. The two experts in this lesson use no custom tools and no specialized system prompt."
+    },
+    {
+      "id": "mental-model",
+      "name": "The mental model (a data structure that evolves)",
+      "plain_english": "Expertise is a mental model, and a mental model is simply a data structure that evolves over time. With each useful action you accumulate information, examples, and expertise about ONE domain — not every problem, the one that matters to you, your business, your customers. Give your agents the same: an expertise file.",
+      "dan_words": "\"This mental model is simply put a data structure that evolves over time... You and everyone you admire has a strong mental model around a specific domain down to individual problems.\"",
+      "misconception": "That you should build a general 'know-everything' agent. Experts are narrow by design — you pick the domain (database, websockets, billing) and go deep."
+    },
+    {
+      "id": "not-a-source-of-truth",
+      "name": "The expertise file is a mental model, NOT a source of truth",
+      "plain_english": "The single most-repeated point: the expertise file is not documentation, not a second source of truth, not a duplicate of the code. It's the agent's working memory — a rough approximation it constantly re-validates. Your mind isn't a source of truth either; it's a mental model you refresh when you dive into an area.",
+      "dan_words": "\"This is not a source of truth, okay?... You don't have a source of truth in your mind. You have a working memory file. You have a mental model.\"",
+      "misconception": "\"Now I have to maintain the code, the comments, the PRDs, the plans, AND an expertise file — another source of truth to drift.\" No: it's a mental model, the agent maintains it via self-improve, and it always re-validates against the real source of truth."
+    },
+    {
+      "id": "source-of-truth-is-code",
+      "name": "The true source of truth is always the code",
+      "plain_english": "The mental model is valuable, but the code is what actually runs and builds the product — not the comments, not the docs, not the plans. So every expert prompt reads its expertise FIRST, then validates that mental model against the live codebase before acting or answering.",
+      "dan_words": "\"The true source of truth is always the code. You and I know that. Not the comments, not the documentation, not the plans. It is the code.\"",
+      "misconception": "That the expertise file can be trusted blindly to save time. It can't — it's a fast index, but the workflow always confirms it against code (that's why 'validate against the codebase' appears twice in the question prompt)."
+    },
+    {
+      "id": "self-improving-template-meta-prompt",
+      "name": "Self-improving template meta prompt (the definition)",
+      "plain_english": "Meta prompt = a prompt that builds prompts. Template meta prompt = does it with a fixed purpose/structure. Self-improving = updates an isolated file with new info for next time. Combine all three and you have the formal definition of an agent expert.",
+      "dan_words": "\"Meta prompts are prompts that build other prompts. Template meta prompts are prompts that build other prompts with a specific purpose and structure... When we put it all together, you get a self-improving template metaprompt.\"",
+      "misconception": "That 'meta prompt' is jargon for hype. It's mechanical and concrete: a prompt whose output is another prompt or an updated knowledge file."
+    },
+    {
+      "id": "meta-agentics",
+      "name": "Meta-agentics: prompts building prompts, agents building agents, skills building skills",
+      "plain_english": "Before experts, learn the building blocks: meta prompts, meta agents, meta skills. They let you produce your agentic layer faster. They ACT (they build things) but they don't LEARN — so they're the atoms of an expert, not experts themselves.",
+      "dan_words": "\"There is no code base I create that does not have meta agentics. Every codebase must have meta agentics.\"",
+      "misconception": "That meta-agentics are already agent experts because they 'do work.' They're missing the learn step — nothing about them improves automatically."
+    },
+    {
+      "id": "the-act-step-distinguisher",
+      "name": "The missing 'act' step: partial expert vs complete expert",
+      "plain_english": "The database expert has Reuse (the question prompt) and Learn (self-improve) but NO Act — no prompt that changes code, so nothing new happens to learn from. That's a fine, acceptable partial expert. The websocket expert adds Act (a build step that edits code), which makes it a complete Act→Learn→Reuse expert.",
+      "dan_words": "\"Looking at our database expert... We have a reuse step... We also have a learn step... Now, where's our act step? We don't actually have any action prompts here. Nothing is changing.\"",
+      "misconception": "That an expert must always modify code. Read-only experts (question/answer over a mental model) are legitimate and useful — they just have reuse+learn without act."
+    },
+    {
+      "id": "self-improve-prompt",
+      "name": "The self-improve prompt (the learn mechanism)",
+      "plain_english": "A ~99-190 line template meta prompt that keeps the mental model synced with the code: optionally read the git diff, read current expertise, validate against the codebase, list discrepancies, update the file, enforce a hard line limit, and validate the YAML compiles. It's a closed-loop prompt — the agent must know how to manage its own memory.",
+      "dan_words": "\"This self improve prompt is telling us that our agents mental model is synced with the ground truth. This is the equivalent of you going to the codebase, refreshing your memory on a feature before you start building.\"",
+      "misconception": "That you must prescribe exactly what to store. Dan deliberately doesn't — he seeds loosely and lets the agent define and maintain the structure ('it's their mental model, not yours'), steering toward autonomy."
+    },
+    {
+      "id": "never-edit-expertise-directly",
+      "name": "Never hand-edit the expertise file — fix the self-improve step",
+      "plain_english": "When the mental model is wrong, the temptation is to open the file and fix it. Don't. Update the self-improve prompt (or the agentics that operate the code) so the agent maintains it correctly. This is the literal act of building the system that builds the system.",
+      "dan_words": "\"We're not going to update the expertise file... You wanna update the self-improve step that operates your expertise... Build the system that builds the system. Do not work on the application layer. You're wasting your time.\"",
+      "misconception": "That editing the file directly is a harmless shortcut. It quietly returns you to manual memory maintenance — the exact problem experts exist to remove — and doesn't fix the root cause (the learning rubric)."
+    },
+    {
+      "id": "scale-compute-confidence",
+      "name": "Scale compute for confidence (deploy N experts)",
+      "plain_english": "Because experts are cheap prompts, you can fire the same question at 3, 5, or 10 of them and co-locate on the right answer. More compute = more confidence. Sometimes only one of five completes, or one finds what the others missed, and you compose the results.",
+      "dan_words": "\"Instead of having one agent answer something for you, have three, have five, have 10... more compute equals more confidence.\"",
+      "misconception": "That parallel experts are wasteful. For high-stakes answers, redundancy is the point — non-deterministic agents surface different evidence; composing them beats a single run."
+    },
+    {
+      "id": "product-agent-experts",
+      "name": "Product agent experts (per-user mental models + generative UI)",
+      "plain_english": "The same pattern applied to users: a per-user expertise file (viewed / added-to-cart / checked-out) plus a prompt that generates UI on the fly = personalization to the max. When a user acts, the agent learns; on the next page it reuses to stream an adaptive experience. A seed of a whole new product class.",
+      "dan_words": "\"user-specific data, right, down to that action level, so that when they act, your agent learns, and then it reuses to enhance the experience... This is personalization to the max, especially when you combine that with generative UI.\"",
+      "misconception": "That this demo (Nile) is a production recommendation engine. Dan is explicit it isn't — agents are too slow for that today; it's a rough seed showing the act/learn/reuse pattern inside a product UI."
+    },
+    {
+      "id": "everything-is-the-core-four",
+      "name": "Every abstraction boils down to the core four",
+      "plain_english": "Skill, sub-agent, MCP server, custom system prompt — build whatever abstraction fits you and your team. Underneath, an agent expert is still just context, model, prompt, tools with a little tooling and structure. Stay close to bare metal; don't let a new pattern get tangled in other abstractions.",
+      "dan_words": "\"Everything becomes the core four. Context, model, prompt, tools. Every abstraction on top of that... It's just that. It's an abstraction. It boils down to the same thing.\"",
+      "misconception": "That you must pick the 'right' container (skill vs agent vs MCP) for an expert. It doesn't matter — they all reduce to the core four; choose by ergonomics (e.g. sub-agent to parallelize)."
+    }
+  ],
+  "generic_agent_vs_agent_expert": {
+    "generic_agent": "Executes and forgets. Boots up cold, searches the codebase from scratch, solves the task, and retains nothing. Fine for problems that don't evolve, simple/new codebases, or when a fresh look is actually valuable.",
+    "agent_expert": "Executes and LEARNS. Opens with a working mental model, validates it against the code instantly (no searching), acts, then updates its mental model for next time — all with no human in the loop.",
+    "difference_that_matters": "Not the model, not the system prompt, not custom tools. The difference is the Act→Learn→Reuse loop over a persistent, self-maintained expertise file. Dan's closing question: do you want a generalist that forgets every time, or an expert that shows up already understanding the system?"
+  },
+  "expertise_file_anatomy": {
+    "what_it_is": "An isolated file (per domain, or per user) holding the agent's mental model of a problem space — an approximation the agent re-validates against code.",
+    "what_it_is_not": "Not documentation, not a PRD, not a second source of truth, not a duplicate of the code.",
+    "format": "Dan uses YAML ('I've seen great results with YAML') but is explicit any structure works — TOML, JSON, CSV, or JSONB blobs in a database for product experts. Pick the one that's easiest for your agents to read.",
+    "database_expert_structure_example": [
+      "overview: Postgres + asyncpg pooling; lightweight Pydantic models over raw SQL (no heavy ORM); idempotent SQL migrations",
+      "core_implementation: database_module (connection pool lifecycle, config), query_patterns ($1/$2 parameter substitution, JSONB via json.dumps/loads)",
+      "data_models: 6 Pydantic models = 6 tables; distribution via sync_models.py",
+      "schema_migrations: numbered SQL files 0..8, CREATE ... IF NOT EXISTS idempotency"
+    ],
+    "websocket_expert_structure_spine": "overview → core_implementation → event_types → streaming_architecture → concurrency_patterns → frontend_integration → monitoring → configuration → testing → best_practices → known_issues → potential_enhancements → key_file_locations → architecture_summary (677 lines total; Dan rounds to '650 lines').",
+    "exact_line_references": "The expertise carries precise file:line references (Dan notes '44 instances of specific line numbers' in the database file) so the agent can jump straight to the right code and re-validate quickly. When the codebase shifts, self-improve updates those references.",
+    "line_limit": "A hard MAX_LINES (1000) is set in the self-improve prompt and re-enforced by the agent on itself (wc -l, then trim least-critical content). Dan stays under ~1000 lines in the systems he operates.",
+    "dan_words": "\"This is a mental model. It's not a source of truth... give your agents a mental model by giving them an expertise file.\""
+  },
+  "two_experts_compared": {
+    "database_expert_partial": {
+      "location": ".claude/commands/experts/database/",
+      "files": "question.md (reuse), self-improve.md (learn), expertise.yaml (mental model, 412 lines)",
+      "act": "MISSING — no prompt modifies database code, so there's no useful action to learn from.",
+      "learn": "self-improve.md — validates and syncs expertise.yaml against models.py + migrations.",
+      "reuse": "question.md — reads expertise.yaml first, validates vs code, then answers (read-only; DO NOT write/edit).",
+      "verdict": "A perfectly acceptable partial expert. Great when you mostly want to query a domain's mental model."
+    },
+    "websocket_expert_complete": {
+      "location": ".claude/commands/experts/websocket/",
+      "files": "plan_build_improve.md (the Act→Learn→Reuse orchestrator), plan.md (reuse HOP), question.md (reuse), self-improve.md (learn), expertise.yaml (mental model, 676 lines)",
+      "act": "PRESENT — the build step edits real websocket code (e.g. adds a session-based nav-bar counter).",
+      "learn": "self-improve.md run with check_git_diff=true — reads the diff of the work just done and updates expertise.yaml.",
+      "reuse": "plan.md / question.md — load expertise, validate vs code, then plan/answer.",
+      "orchestration": "plan_build_improve.md fires three sub-agents in sequence via the Task tool (each starts fresh, protecting the top agent's context): /experts:websocket:plan → /build <plan> → /experts:websocket:self-improve true, then compiles a report.",
+      "verdict": "A complete agent expert — useful action taken, expertise synced, ready to reuse."
+    },
+    "the_missing_act_step": "The single lesson that separates the two: an expert needs a useful action to learn from. Add a build/act step and reuse+learn become a full loop."
+  },
+  "product_agent_experts": {
+    "app": "Nile — a mock shopping application ('nile-adoptive-shopping-v2') the agents built.",
+    "explicit_caveat": "A seed of an idea, not production. Dan is blunt: agents aren't ready to be shopping recommendation engines yet — they're too slow, and there are better/faster ways to do recommendations today. The point is the pattern inside a UI.",
+    "per_user_expertise": "One expertise (mental model) PER USER. Backend model apps/nile/server/src/models/expertise.py stores expertise_data as JSON: viewed_products, added_to_cart, checked_out, plus total_improvements and last_improvement_at. Persisted in the DB (JSONB-style blob).",
+    "act_learn_reuse_in_ui": "ACT: user searches/views/adds-to-cart/checks-out (Dan searches 'Nvidia DGX' and adds it). LEARN: that action is recorded into the per-user expertise. REUSE: the home page regenerates a personalized, streamed generative UI ('Welcome back! Based on your interest in AI workstations'). A 'Control-K' panel exposes the expertise (viewed/added/checked-out) blatantly for teaching.",
+    "generative_ui_system_prompt": {
+      "file": "apps/nile/server/src/prompts/experts/shopping_expert_streaming_system_prompt.md",
+      "dynamic_variables": ["TOTAL_IMPROVEMENTS", "CHECKED_OUT_PRODUCTS (highest signal)", "ADDED_TO_CART_PRODUCTS (medium)", "VIEWED_PRODUCTS (low)", "AVAILABLE_CATEGORIES", "AVAILABLE_BRANDS"],
+      "static_variables": ["SECTIONS_RANGE: 4-6", "PRODUCTS_PER_SECTION_RANGE: 6-12", "TOTAL_PRODUCTS = sections × products"],
+      "tools": ["stream_section (renders a UI section immediately)", "find_related_products"],
+      "components": ["specific-slogan", "specific-upsell", "carousel", "card", "super-card", "basic-square", "generic-slogan (for new users)"],
+      "note": "A single prompt guides adaptive UX by generating components on the fly; new users get a generic-slogan, returning users get personalized sections. Powered by the Claude Agent SDK (agent_expert.py). Dan drops the model from Opus to Haiku on-camera for speed."
+    }
+  },
+  "challenges_tradeoffs": [
+    { "name": "Seeding", "problem": "What does the first version of the expertise look like?", "mitigation": "Stay hands-off unless you know the shape you want. Ideally run self-improve from a blank file and let the agent seed the structure; then tweak the self-improve prompt and rerun until the agent stops finding new things (the mental model locks in with a smart-enough model)." },
+    { "name": "\"Another source of truth\"", "problem": "\"Now I have to maintain yet another artifact that drifts.\"", "mitigation": "It's a mental model, not a source of truth — and the agent maintains it via a good self-improve prompt. The real ask is to invest in teaching your agents; that investment is where winners separate from those still hand-prompting." },
+    { "name": "Finite context", "problem": "The file cannot grow forever.", "mitigation": "A hard MAX_LINES limit reinforced in the self-improve prompt and enforced by the agent on itself (wc -l, trim least-critical). Under ~1000 lines is plenty; use more compressed formats or DB JSONB blobs (product experts) as needed. Your own mental model doesn't grow infinitely either." },
+    { "name": "False expertise", "problem": "The agent updates the mental model with something wrong.", "mitigation": "Expect it — humans have false expertise too, and models are trained on human patterns. Error rates drop as models improve; sophisticated fact-checkers help; but this never fully goes away. Design for it." },
+    { "name": "Too-granular expertise", "problem": "The file becomes verbose documentation.", "mitigation": "A prompt-engineering problem. Add lines like 'prioritize actionable, high-value expertise over verbose documentation'; specify how vague/granular to be. Steer toward autonomy — let the agent decide what matters." },
+    { "name": "Too many experts", "problem": "Once you see the power you'll build many; when do you use an expert vs a fresh generic agent?", "mitigation": "Build routers/reminders; roll experts into skills/agents auto-picked by their description. Simplest practice: look at the expertise file before starting work in an area, and make that a team habit. Solve it when it's actually a problem." }
+  ],
+  "when_to_use": [
+    "User-specific products / agent-first apps (a per-user expertise the agent executes on) — Dan bets great products of the future are agent-expert driven.",
+    "High-risk, high-intensity areas: billing systems and security layers — Dan builds no billing or security layer without an expert; they've caught revenue-changing and security-specific details.",
+    "The database — the foundational layer everything else builds on.",
+    "DevOps, tricky in-house/third-party integrations (esp. 3–4-way), ML/data-science (datasets, AI tooling, sandboxes, available compute), APIs (keep front/back in sync), and data-models/types kept in sync across 1..N codebases and microservices (a great FIRST expert — just a handful of type files to reference).",
+    "Areas with high agent error rates — deploy an expert and be prescriptive in the self-improve prompt about what must be in the mental model.",
+    "Growing, complex, niche systems with far-apart interconnected parts — the more complexity/size, the more valuable the expert."
+  ],
+  "when_not_to_use": [
+    "The problem doesn't evolve or change over time — no need for a dynamic, learning agent; deploy a generic good-engineering agent.",
+    "Simple or brand-new codebases — the model has likely already seen that shape; experts pay off once the codebase generates unique value.",
+    "When YOU don't have a mental model of the area — you can't judge whether the expert performs, and it'll make problems worse, not better.",
+    "When a fresh, forgetful look is actually the more valuable thing."
+  ],
+  "loot_box_mentions": [
+    "Lesson ships 12 loot notes (per captured course-notes).",
+    "Codebase: git clone https://github.com/disler/agent-experts.git",
+    "Idea notes distilling the lesson: the massive problem (agents forget); the Act-Learn-Reuse pattern; mental models as the data structure of expertise; self-improving template meta prompts; meta-agentics (build the system that builds); expertise files as external mental models; never update expertise files directly; codebase experts for high-risk systems (billing/security/database); product-focused agent experts; the tactic (build agents that learn); when to build agent experts."
+  ],
+  "step_by_step_demo": [
+    "(5:41–6:51) Meta-agentics intro: fire the meta prompt to build a new 'question-w-mermaid-diagrams' prompt; fire the meta agent to build a new 'planner' agent that reads+fires the /plan prompt (so planning scales to many parallel agents); use the meta skill to build a 'start-orchestrator' skill that boots the multi-agent app's front+back end.",
+    "(7:32–8:36) Review the three generated artifacts in VS Code — question-w-mermaid-diagrams.md (classic agentic-prompt format; always adds mermaid), planner.md (reads an existing prompt and fires it as a sub-agent), start-orchestrator/SKILL.md (flags, start commands, opens Chrome).",
+    "(8:36–9:00) Key question: are meta-agentics agent experts? No — they act but never learn; nothing updates automatically. Agent experts must learn on their own.",
+    "(9:32–10:00) Open .claude/commands/experts/database/: two prompts (question, self-improve) + expertise.yaml.",
+    "(10:00–10:40) Fire /question → database question: \"does information flow between our database tables, write your report in this temp file.\" First action: Read expertise.yaml (413 lines) — the mental model — THEN validate against the code (models.py, migrations 0–8) instantly, no searching.",
+    "(11:58–12:35) Open the rendered database_flow.md preview: six Postgres tables, parent-child cascade deletes, a mermaid ER diagram, three-way user↔orchestrator↔agent communication. The agent used its mental model and validated it against the source of truth (the code).",
+    "(13:00–16:10) Walk the expertise.yaml anatomy: overview (Postgres, asyncpg, Pydantic-over-raw-SQL, idempotent migrations), core_implementation (connection pool, query patterns, JSONB), data_models (6 tables + sync distribution), schema_migrations. Emphasis: this is a mental model, not a source of truth.",
+    "(16:10–17:10) Open self-improve.md (the learn prompt / template meta prompt) and run /self-improve database with no flags. The agent validates top-to-bottom, checks the line count, and compiles the YAML.",
+    "(17:10–21:05) Walk self-improve.md: (optional) git diff → read current expertise → validate against codebase → identify discrepancies → update expertise → enforce line limit → validate YAML. Closed-loop; not over-prescriptive (seed loosely, let the agent own the structure); 'after your search there may be nothing to do — perfectly acceptable.' Result: expertise accurate & up to date, ~44 exact line references intact. A 99-line self-improve prompt.",
+    "(21:40–22:35) Boil it down: Act, Learn, Reuse. The database expert has Reuse (question) + Learn (self-improve) but NO Act — a fine partial expert.",
+    "(22:35–23:52) The missing act = modifying database code. Enter the WebSocket expert, which has actions.",
+    "(23:52–24:35) Fire /experts:websocket:plan_build_improve: \"Add a session-based counter to the app nav bar that displays the total number of WebSocket events.\" The expert knows exactly where everything is — no searching, just validating its mental model.",
+    "(24:35–25:51) In the orchestrator UI, fire the websocket question prompt \"what WebSocket events exist,\" then scale it: \"create three agents and run\" — 3 WebSocket experts deployed to co-locate on the answer (more compute = more confidence).",
+    "(25:51–26:50) Open plan_build_improve.md: a three-step workflow (plan → build → self-improve), each step a sub-agent; it composes /plan, /build, /self-improve into a single one-shot prompt.",
+    "(26:50–28:32) Step 3 runs the self-improve prompt — same structure as the database one (nudge: a meta expert generated both; 'three times marks a pattern').",
+    "(28:32–31:20) The three orchestrator agents return; websocket-3 failed (that's the value of scale-up); ~21 WebSocket event types across categories. Context delegation: the plan step took ~80K tokens while the top agent's context stayed protected; the build passes its git diff into self-improve.",
+    "(31:20–33:18) self-improve runs with true (check git diff). Build done: ~61K tokens, 41 tool uses. New expertise lines appear (onMessageReceived, websocketEventCount); session_state now tracks the counter for all WebSocket messages.",
+    "(33:18–34:25) Refresh the orchestrator UI: the nav-bar counter shows ~167 WebSocket events. One-shotted — the guarantee came from an expert that knows this code better than anyone.",
+    "(34:25–36:40) Surgical changes report (5/17/9/4 lines — 'I get hyped when agents change just the right things'). git diff the expertise file to see the exact mental-model updates; ~650 lines mapping the WebSocket capability.",
+    "(36:40–38:20) If the mental model is wrong, DON'T edit the expertise file — update the self-improve step (build the system that builds the system). Lock in Act (build) / Learn (self-improve) / Reuse (plan + question).",
+    "(38:20–40:30) Favorite codebase experts: billing (caught revenue-changing details), database, DevOps, integrations, ML/data-science, API, and data-models/types-in-sync (a great first expert). Note: these two experts are simple — no custom tools, no specialized system prompt — just the beginning.",
+    "(40:30–45:00) Product agent experts in Nile: Control-K shows the blatant per-user expertise panel (new user = no expertise = generic UI). Search 'Nvidia DGX', add to cart, return → the agent streams a personalized overview UI. 'Recent actions' (viewed/added/checked-out) feed the per-user expertise; regeneration = reuse.",
+    "(45:00–47:20) Open the raw shopping-expert system prompt: dynamic variables (checked-out/added/viewed products, categories/brands) and static variables (products-per-section, sections-range). A single prompt drives adaptive UX by generating components on the fly.",
+    "(48:09–53:45) Challenges & trade-offs: seeding, the 'another source of truth' objection, finite context (max-line limit), false expertise, too-granular expertise, too-many-experts (routers/reminders).",
+    "(53:45–59:20) When to use (user-specific, high-risk/complex, high-error-rate, growing niche systems) vs when NOT (static, simple/new, or when you lack a mental model).",
+    "(59:20–62:29) You can build experts as memory files, skills, or sub-agents — doesn't matter; everything is the core four. Closing: generalist that forgets vs expert that learns. Next lesson (AH-6): codebase architecture. We build the system that builds the system."
+  ],
+  "quotes": [
+    { "text": "This will likely be the most controversial lesson of Agentic Horizon.", "approx_timestamp": "0:11" },
+    { "text": "Your agents forget. And that means your agents don't learn.", "approx_timestamp": "0:53" },
+    { "text": "The difference between a generic agent and an agent expert is simple. One executes and forgets, the other executes and learns.", "approx_timestamp": "2:02" },
+    { "text": "You don't need to tell an expert to learn. It's in their DNA.", "approx_timestamp": "2:18" },
+    { "text": "This mental model is a data structure that helps you solve problems better and faster as you act, learn, and reuse that expertise.", "approx_timestamp": "3:11" },
+    { "text": "The agent expert is a concrete form of a self improving template meta prompt.", "approx_timestamp": "3:25" },
+    { "text": "Meta prompts are prompts that build other prompts. Template meta prompts are prompts that build other prompts with a specific purpose and structure.", "approx_timestamp": "3:39" },
+    { "text": "There is no code base I create that does not have meta agentics. Every codebase must have meta agentics.", "approx_timestamp": "7:05" },
+    { "text": "This is a key factor of what makes an agent expert, they must learn on their own.", "approx_timestamp": "8:44" },
+    { "text": "The expertise file is the mental model of the problem space for your agent expert.", "approx_timestamp": "10:11" },
+    { "text": "This is not a source of truth. This is your agent's mental model.", "approx_timestamp": "11:20" },
+    { "text": "The true source of truth is always the code. You and I know that. Not the comments, not the documentation, not the plans.", "approx_timestamp": "12:38" },
+    { "text": "Give your agents a mental model by giving them an expertise file.", "approx_timestamp": "16:08" },
+    { "text": "Once you start building something repeatedly in your system, you wanna move that into automation. Three times marks a pattern. I in fact do have a meta expert.", "approx_timestamp": "28:15" },
+    { "text": "Act, learn, reuse. Act. First, our agents take a useful action. The keyword there is useful.", "approx_timestamp": "21:41" },
+    { "text": "We can now plan, build and improve anything related to WebSocket functionality in this code base with a single one shot prompt.", "approx_timestamp": "26:31" },
+    { "text": "I get super hyped when agents change just the right things. I wanna see surgical changes like this.", "approx_timestamp": "34:53" },
+    { "text": "We're not going to update the expertise file. Teach your agents how to directly update it so they can maintain it.", "approx_timestamp": "37:00" },
+    { "text": "Build the system that builds the system. Do not work on the application layer. You're wasting your time.", "approx_timestamp": "37:10" },
+    { "text": "My Agentic Experts have caught revenue changing details in these systems and security specific details because they were experts.", "approx_timestamp": "40:40" },
+    { "text": "As the complexity, as the size of your codebase grows, the agent expert becomes more valuable.", "approx_timestamp": "56:50" },
+    { "text": "Do you want a generalist working on your codebase that forgets every time they work? Or do you want an expert that remembers and learns from the work done?", "approx_timestamp": "61:29" },
+    { "text": "You and I, the Agentic engineer, we build the system that builds the system.", "approx_timestamp": "62:10" }
+  ],
+  "prerequisites_tools": [
+    "Claude Code (with a Claude plan or API funds — the demos run Opus/Sonnet/Haiku across many agents)",
+    "Git (the self-improve step reads git diff)",
+    "Python + Astral UV (backend: FastAPI, asyncpg; run everything via uv, never raw python)",
+    "PostgreSQL (orchestrator app data layer; NeonDB recommended)",
+    "Node.js + npm (Vue/Vite frontends)",
+    "An IDE (Dan uses VS Code; Cmd+J terminal, Cmd+P quick-open, Cmd+K panels)",
+    "Prior lessons: TAC-3 (template meta prompts), TAC-6 (one agent / one prompt / one purpose), AH-1 (agentic prompt engineering), AH-4 (the multi-agent orchestrator this lesson operates)"
+  ],
+  "what_student_must_internalize": [
+    "The problem is structural: agents forget, therefore they don't learn. Better prompts/context don't fix it — a self-improving loop does.",
+    "An agent expert = a generic agent wired into Act → Learn → Reuse over a persistent expertise file. No special model, system prompt, or tools required.",
+    "Mechanically, an agent expert is a self-improving template meta prompt: a structured prompt that updates an isolated knowledge file for next time.",
+    "The expertise file is a MENTAL MODEL, not a source of truth. The code is the only source of truth; every expert prompt re-validates its mental model against the code.",
+    "Reuse = read expertise first, validate vs code, then answer/plan. Learn = self-improve syncs the file to the code. Act = a build step that changes the code (the piece a 'partial' expert lacks).",
+    "Never hand-edit the expertise file — fix the self-improve prompt so the agent maintains it. That IS building the system that builds the system.",
+    "Seed loosely and let the agent own its data structure; enforce a hard line limit; expect and design for false expertise.",
+    "Build experts for high-risk/high-complexity/high-error areas (billing, security, database, integrations) and for per-user product experiences — not for static, simple, or brand-new code, and not for areas where you lack a mental model.",
+    "Every abstraction (skill, sub-agent, MCP) reduces to the core four — pick by ergonomics, stay close to bare metal."
+  ],
+  "common_weak_student_failures": [
+    "Treating the expertise file as documentation or a second source of truth — then either distrusting it or letting it drift — instead of a self-maintained mental model the agent re-validates against code.",
+    "Hand-editing the expertise file when it's wrong. This silently restores manual memory maintenance (the exact problem) and never fixes the real cause — the self-improve prompt.",
+    "Building only reuse+learn (a partial expert) and expecting compounding improvement, without an Act step there's no useful action to learn from.",
+    "Skipping the 'validate against the codebase' discipline and trusting the mental model blindly — the file is a fast index, not ground truth.",
+    "Over-prescribing the expertise structure up front instead of seeding loosely and letting the agent define/maintain it (steer toward autonomy).",
+    "Letting the expertise file grow unbounded — no MAX_LINES, no self-enforced trim — until context bloats.",
+    "Confusing meta-agentics with agent experts: meta prompts/agents/skills ACT but don't LEARN.",
+    "Deploying experts where they don't belong (static/simple/new code, or a domain you don't understand) and getting worse results than a generic agent.",
+    "Mistaking the Nile demo for a production recommendation engine (Dan says explicitly it isn't) instead of studying the act/learn/reuse-in-a-UI pattern.",
+    "Refusing to pay the up-front cost of writing good self-improve prompts — and staying stuck hand-prompting the same thing for months."
+  ],
+  "teach_back_prompt": "Explain to a teammate, without notes: (1) why agents 'forgetting' is a structural problem that context/prompt engineering can't fix, and what an agent expert adds; (2) the exact definition of a self-improving template meta prompt, and map its three parts onto Act/Learn/Reuse; (3) using the database vs websocket experts, show which one is 'partial' and why — name the missing step and what supplies it; (4) why the expertise file is a mental model and NOT a source of truth, and what the agent validates it against; and (5) why you fix the self-improve prompt instead of hand-editing the expertise file. Finish by naming two systems in your own codebase where you'd build an expert — and one where you wouldn't — with the reason for each.",
+  "retrieval_questions": [
+    { "q": "What is the one massive problem with today's agents that great context/prompt engineering can't solve?", "a": "They forget, so they don't learn. Traditional software improves with use; agents start cold every time." },
+    { "q": "Define an agent expert in one sentence.", "a": "A generic agent wired into an Act → Learn → Reuse loop over a persistent expertise file (mental model) that it maintains itself — it executes and learns, rather than executes and forgets." },
+    { "q": "What are the three parts of a 'self-improving template meta prompt'?", "a": "Meta prompt (a prompt that builds prompts) + template (a specific purpose/structure) + self-improving (updates an isolated file with new info for next time)." },
+    { "q": "What are the three steps of the pattern, and what's the keyword?", "a": "Act, Learn, Reuse. The keyword is 'useful' — experts learn only from useful actions." },
+    { "q": "The database expert is a 'partial' expert. Which step is missing and why?", "a": "The Act step — it has no prompt that modifies code, so nothing changes for it to learn from. It has Reuse (question) and Learn (self-improve) only." },
+    { "q": "In the websocket expert, which step maps to plan, build, and self-improve?", "a": "Plan = Reuse (load + validate the mental model), Build = Act (edit the code), Self-improve = Learn (sync the expertise to the git diff)." },
+    { "q": "Is the expertise file a source of truth? What is?", "a": "No — it's a mental model. The code is the only source of truth; the expert re-validates its mental model against the code every time." },
+    { "q": "The mental model is wrong. What do you change — and what do you NOT change?", "a": "Change the self-improve prompt (or the agentics operating the code). Do NOT hand-edit the expertise file — that returns you to manual memory maintenance and skips the root cause." },
+    { "q": "How is the finite-context problem handled?", "a": "A hard MAX_LINES (1000) declared in the self-improve prompt and enforced by the agent on itself (wc -l, trim least-critical), keeping the file well under ~1000 lines." },
+    { "q": "Name three great places to build a codebase expert and one place not to.", "a": "Build: billing, security, database (also DevOps, integrations, ML, API, data-types-in-sync). Don't: static/unchanging problems (also simple/new codebases, or areas where you lack a mental model)." },
+    { "q": "What is 'seeding' and how does Dan recommend doing it?", "a": "Creating the first version of the expertise. Stay hands-off: run self-improve from blank, let the agent define the structure, tweak the self-improve prompt, and rerun until the agent stops finding new things." },
+    { "q": "In the Nile product expert, what is the per-user 'mental model' and how does Act/Learn/Reuse show up?", "a": "A per-user expertise (viewed/added-to-cart/checked-out, stored as JSON). Act = user browses/buys; Learn = the action is recorded; Reuse = the home page regenerates a personalized, streamed generative UI." },
+    { "q": "Why deploy three (or five) experts on the same question?", "a": "More compute = more confidence. Non-deterministic agents surface different evidence; sometimes only one completes or finds the missing detail, and you compose the results." },
+    { "q": "Meta-agentics act — why aren't they agent experts?", "a": "They don't learn: nothing in the meta prompt/agent/skill updates automatically or gets more proficient over time." }
+  ],
+  "codebase_map": {
+    "repo": "agentic-horizon/agent-experts (symlinked as ah-5-agent-experts/codebase)",
+    "meta_agentics": {
+      ".claude/commands/meta_prompt.md": "Meta PROMPT (68 lines): builds a new custom slash command in a fixed Specified Format (frontmatter + Purpose/Variables/Instructions/Workflow/Report); prefers $1/$2; ultra-thinks; parallel Task+WebFetch to read current slash-command docs.",
+      ".claude/agents/meta-agent.md": "Meta AGENT (64 lines): generates a complete sub-agent config to .claude/agents/<name>.md (real YAML frontmatter, minimal tools, exactly 4 sections); model: opus.",
+      ".claude/skills/meta-skill/SKILL.md": "Meta SKILL (435 lines, frontmatter name 'creating-new-skills'): scaffolds new Agent Skills following Anthropic best practices (progressive disclosure, gerund naming, third-person description).",
+      ".claude/skills/meta-skill/docs/*.md": "Three bundled Anthropic docs the meta-skill reads first (claude_code_agent_skills.md, claude_code_agent_skills_overview.md, blog_equipping_agents_with_skills.md).",
+      ".claude/commands/question-w-mermaid-diagrams.md": "ARTIFACT of the meta prompt (65 lines): a question prompt that always enriches answers with mermaid diagrams (model: opus).",
+      ".claude/agents/planner.md": "ARTIFACT of the meta agent (27 lines): a lightweight agent that delegates straight to /plan via SlashCommand — lets planning scale to parallel agents.",
+      ".claude/skills/start-orchestrator/SKILL.md": "ARTIFACT of the meta skill (183 lines): boots the orchestrator app (backend port 8002, frontend 5175) with --cwd/--session flags and opens the UI in Chrome."
+    },
+    "base_prompts_composed_by_experts": {
+      ".claude/commands/plan.md": "Quick Plan (123 lines): writes a structured implementation plan to specs/<name>.md; called by the websocket expert's plan step and the planner agent.",
+      ".claude/commands/build.md": "Build (29 lines): reads a plan and implements it top-to-bottom, ending with validation commands; the Act step of the websocket expert.",
+      ".claude/commands/question.md": "Base question prompt (40 lines)."
+    },
+    "database_expert": {
+      "location": ".claude/commands/experts/database/",
+      ".../question.md": "REUSE (34 lines): allowed-tools Bash/Read/Grep/Glob/TodoWrite (no writes). Reads EXPERTISE_PATH, validates vs code, answers about schema/Pydantic models/asyncpg/migrations. 'DO NOT write, edit, or create any files.'",
+      ".../self-improve.md": "LEARN (179 lines): 7-step workflow (git diff → read expertise → validate vs codebase → identify discrepancies → update → enforce MAX_LINES 1000 via wc -l → validate YAML compiles). Vars: CHECK_GIT_DIFF, FOCUS_AREA. 'there may be nothing to be done — this is perfectly acceptable.'",
+      ".../expertise.yaml": "MENTAL MODEL (412 lines): overview, core_implementation (connection pool, query patterns, JSONB), data_models (6 models=6 tables) + distribution via sync_models, schema_migrations (0..8)."
+    },
+    "websocket_expert": {
+      "location": ".claude/commands/experts/websocket/",
+      ".../plan_build_improve.md": "ACT+LEARN+REUSE orchestrator (88 lines): allowed-tools Task/TaskOutput/TodoWrite. Chains three fresh sub-agents — /experts:websocket:plan → /build <plan> → /experts:websocket:self-improve true — then reports. Vars: USER_PROMPT, HUMAN_IN_THE_LOOP.",
+      ".../plan.md": "REUSE HOP (40 lines): loads expertise.yaml + critical files, then delegates to /plan so planning is expertise-informed.",
+      ".../question.md": "REUSE (34 lines): read-only Q&A over the websocket mental model.",
+      ".../self-improve.md": "LEARN (190 lines): same 7-step structure as the database self-improve (a meta expert generated both).",
+      ".../expertise.yaml": "MENTAL MODEL (676 lines; Dan says ~650): overview → core_implementation → event_types → streaming_architecture → concurrency_patterns → frontend_integration → monitoring → configuration → testing → best_practices → known_issues → potential_enhancements → key_file_locations → architecture_summary, with exact file:line references."
+    },
+    "apps_operated_on": {
+      "apps/orchestrator_3_stream/": "The multi-agent orchestration app from AH-4 that the codebase experts operate on. Backend (FastAPI + asyncpg + Pydantic) key files the experts reference: backend/modules/websocket_manager.py (260 lines; connect/disconnect/broadcast), backend/modules/database.py (connection pool), backend/modules/orchestrator_service.py, backend/main.py (@app.websocket('/ws')), frontend/src/stores/orchestratorStore.ts (Pinia, session_state.websocketEventCount), frontend/src/services/chatService.ts, frontend/src/components/AppHeader.vue (where the counter was added).",
+      "apps/orchestrator_db/": "Shared data layer: models.py (6 Pydantic models = 6 tables), sync_models.py (distributes models into apps), run_migrations.py, migrations/{0..8}_*.sql."
+    },
+    "product_expert_nile": {
+      "apps/nile/server/src/services/agent_expert.py": "ShoppingAgentExpert (1143 lines): uses the Claude Agent SDK (tool, create_sdk_mcp_server, ClaudeSDKClient) with a stream_section + find_related_products tool server; loads the system/user prompt templates; per-user session continuity. Model configurable (Opus/Sonnet/Haiku on camera).",
+      "apps/nile/server/src/models/expertise.py": "Per-user Expertise model (28 lines): expertise_data JSON = {viewed_products, added_to_cart, checked_out}, plus total_improvements + last_improvement_at. Docstring: \"the Agent Expert's 'mental model'.\"",
+      "apps/nile/server/src/prompts/experts/shopping_expert_streaming_system_prompt.md": "The generative-UI system prompt (169 lines): dynamic vars (checked-out/added/viewed products, categories, brands), static vars (SECTIONS_RANGE 4-6, PRODUCTS_PER_SECTION_RANGE 6-12), stream_section tool, component rules.",
+      "apps/nile/server/src/prompts/experts/shopping_expert_user_prompt.md": "User prompt template (currently empty/placeholder — 0 lines).",
+      "apps/nile/server/src/{routers,schemas}/expertise.py": "REST + Pydantic schemas exposing the per-user expertise.",
+      "apps/nile/server/src/services/websocket_manager.py": "Streams generated sections to the client.",
+      "apps/nile/client/src/components/layout/ExpertisePanel.vue": "The 'Control-K' blatant expertise panel (975 lines) that visualizes act/learn/reuse in the UI.",
+      "apps/nile/client/src/stores/expertise.ts": "Front-end expertise store.",
+      "apps/nile/client/src/components/products/*.vue": "Generative-UI components streamed by the expert: BasicSquare, GenericSlogan, SpecificSlogan, SpecificUpsell, SuperCard, ProductCarousel, ProductCard."
+    },
+    "supporting_context_not_central": [
+      ".claude/commands/{prime,prime_cc,prime_nile,load_ai_docs,load_bundle,find_and_summarize,all_tools,parallel_subagents,build_in_parallel,plan_w_scouters,quick-plan,start_nile}.md",
+      ".claude/agents/{build-agent,docs-scraper,playwright-validator,scout-report-suggest,scout-report-suggest-fast}.md",
+      "scripts/copy_claude.py; CLAUDE.md (engineering rules: no mock tests, keep models.py in sync with migrations, use uv, prefer Pydantic over dicts, don't commit unless asked)"
+    ],
+    "generated_or_runtime": {
+      "database_flow report (temp .md)": "Written at runtime by the database question prompt (the mermaid ER-diagram report shown on-screen).",
+      "specs/<plan>.md": "Written at runtime by the plan step of the websocket expert.",
+      "nav-bar WebSocket counter": "Built at runtime by the websocket expert's build step (AppHeader.vue + orchestratorStore.ts); shows ~167 events after the run.",
+      "expertise.yaml updates": "Written at runtime by the self-improve step (visible via git diff of the expertise files).",
+      "per-user Expertise rows (Nile DB)": "Created/updated at runtime as users view/add/checkout."
+    }
+  },
+  "current_practice_gaps": [
+    {
+      "gap": "Expertise files vs Claude Code's built-in memory / CLAUDE.md and the memory tool",
+      "why": "Dan deliberately uses a dedicated, detached expertise file instead of always-loaded memory files (CLAUDE.md), because 'expertise requires breaking rules when the time is right' and forced global context can't detach. Current Claude Code adds richer memory affordances (CLAUDE.md imports, and an Anthropic 'memory' tool/pattern for cross-session state). The lesson's argument — topic-scoped, agent-maintained, on-demand memory beats always-on memory — is exactly the design conversation to have with today's memory features. Concept stands; compare-and-contrast is the overlay.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Agent expertise vs Agent Skills as the packaging",
+      "why": "Dan says explicitly you can encode an expert as a skill or sub-agent — 'skills boil down to prompts.' Modern Claude Code makes Skills the first-class, discoverable, on-demand encoding (SKILL.md + progressive disclosure), which is a natural home for an expert (a skill whose body loads an expertise file and a self-improve routine). The meta-skill in this very repo already scaffolds skills. Teach the raw prompt-file expert first (no magic), then show the Skill packaging.",
+      "yt_candidates": ["X2ciJedw2vU"]
+    },
+    {
+      "gap": "Self-improve orchestration via slash commands + Task vs the Claude Agent SDK",
+      "why": "The codebase experts orchestrate with in-Claude-Code primitives (SlashCommand inside Task, TaskOutput). The Nile product expert already uses the Claude Agent SDK (ClaudeSDKClient, @tool, create_sdk_mcp_server) for structured streaming. For production experts, the SDK (Python/TS) with hooks, structured output, and subagents is the current way to wrap Act/Learn/Reuse outside an interactive session. Same pattern; richer machinery.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Model drift (course-era Claude 4.5 family)",
+      "why": "On-camera model IDs are course-era: claude-opus-4-5-20251101, claude-sonnet-4-5-20250929, claude-haiku-4-5-20251001 (Dan drops Opus→Haiku for speed). Newer families (Opus 4.x→5, etc.) change nothing about the pattern — treat specific IDs as period detail. 'More compute = more confidence' and 'as models improve, false-expertise error rates drop' are the timeless claims.",
+      "yt_candidates": []
+    },
+    {
+      "gap": "False expertise → evaluation & drift-control at scale",
+      "why": "Dan flags false expertise as inherent and says 'there will be great sophisticated models to fact check things.' Current practice for high-stakes experts adds evals, periodic re-seeding, and diff-review gates on the expertise file (treat self-improve output like a PR). The lesson raises the risk; the book should add the current mitigation playbook (this axis moves fast).",
+      "yt_candidates": []
+    },
+    {
+      "gap": "Product/generative-UI experts and latency",
+      "why": "Dan is explicit the Nile demo is a seed, not production (agents too slow for real-time recommendations), and calls out the need for 'UI hacks' — loading bars, streamed sections — to keep users engaged while the agent works. Current generative-UI patterns (streaming component protocols, tool-driven UI) and faster small models make this more viable than at recording; still latency-bound. Frame as 'emerging class,' not 'ship this.'",
+      "yt_candidates": []
+    }
+  ],
+  "yt_overlay_candidates": [
+    {
+      "video_id": null,
+      "id_status": "NEEDS LOOKUP — no verified ID available in this pass; strongest topical match, source before publishing",
+      "title": "(IndyDevDan public video on agent MEMORY / 'agents that learn' / self-improving agents)",
+      "maps_to": "operationalizes tactic",
+      "include_in_phase1": true,
+      "rationale": "The lesson's exact thesis — agents forget, so build agents that learn — is a recurring IndyDevDan public theme. This is the #1 overlay to source: a free-channel treatment of memory/self-improving agents that reinforces Act→Learn→Reuse. Do NOT publish until the specific video/ID is confirmed to match."
+    },
+    {
+      "video_id": "X2ciJedw2vU",
+      "id_status": "inherited from the TAC-1 orchestration seed list — verify it resolves and matches before publishing",
+      "title": "RAW Agentic Coding: ZERO to Agent SKILL",
+      "maps_to": "named hole (packaging an expert as a Skill)",
+      "include_in_phase1": true,
+      "rationale": "Dan says an agent expert can be built as a skill and 'skills boil down to prompts'; the repo's meta-skill already scaffolds Skills. This video covers Agent Skills as the modern encoding — the natural home for a self-improving expert — and bridges the raw prompt-file expert to the current SKILL.md idiom."
+    },
+    {
+      "video_id": "fop_yxV-mPo",
+      "id_status": "inherited from the TAC-1 orchestration seed list — verify before publishing",
+      "title": "Codebase Singularity",
+      "maps_to": "named hole (build the system that builds the system / agentic layer)",
+      "include_in_phase1": false,
+      "rationale": "Maps to Dan's repeated 'build the system that builds the system' and the agentic-layer end-state — but that vision is the subject of the FINAL Agentic Horizon lesson (AH-6, codebase architecture). Reserve for that chapter so it doesn't front-run the payoff here."
+    }
+  ],
+  "frame_plan": [
+    { "t_seconds": 456, "label": "meta-prompt-artifact-question-mermaid", "file": "media/frames/ah-5-agent-experts/t0456-question-mermaid-prompt.jpg", "why_for_weak_student": "A real prompt written BY a prompt — makes 'meta prompt' concrete.", "diagram_instead": false },
+    { "t_seconds": 508, "label": "meta-skill-artifact-start-orchestrator", "file": "media/frames/ah-5-agent-experts/t0508-start-orchestrator-skill.jpg", "why_for_weak_student": "A real SKILL.md written BY the meta skill; tabs show the whole meta-agentics family.", "diagram_instead": false },
+    { "t_seconds": 580, "label": "experts-directory-tree", "file": "media/frames/ah-5-agent-experts/t0580-database-experts-dir.jpg", "why_for_weak_student": "Where experts physically live in a codebase (.claude/commands/experts).", "diagram_instead": false },
+    { "t_seconds": 628, "label": "database-expert-reuse-reads-expertise-validates-code", "file": "media/frames/ah-5-agent-experts/t0628-database-question-reads-expertise.jpg", "why_for_weak_student": "Reuse in action: reads expertise.yaml FIRST, then validates against models.py + migrations — no blind searching.", "diagram_instead": false },
+    { "t_seconds": 742, "label": "database-expert-answer-er-diagram", "file": "media/frames/ah-5-agent-experts/t0742-database-erdiagram-render.jpg", "why_for_weak_student": "The expert's answer as a rendered mermaid ER diagram — architecture recalled from a mental model and validated against code.", "diagram_instead": false },
+    { "t_seconds": 1255, "label": "self-improve-prompt-learn-rubric", "file": "media/frames/ah-5-agent-experts/t1255-self-improve-prompt-workflow.jpg", "why_for_weak_student": "The Learn step is a readable rubric (update / enforce line limit / validate), not magic.", "diagram_instead": false },
+    { "t_seconds": 1305, "label": "act-learn-reuse-core", "file": "media/frames/ah-5-agent-experts/t1305-act-learn-reuse-core.jpg", "why_for_weak_student": "THE image to memorize — Act/Learn/Reuse overlaid on a real expert prompt.", "diagram_instead": false },
+    { "t_seconds": 1598, "label": "websocket-plan-build-improve-composition", "file": "media/frames/ah-5-agent-experts/t1598-websocket-pbi-composition.jpg", "why_for_weak_student": "The complete expert in one file: plan_build_improve chains reuse→act→learn as a single one-shot prompt.", "diagram_instead": false },
+    { "t_seconds": 2019, "label": "websocket-pipeline-metrics-context-isolation", "file": "media/frames/ah-5-agent-experts/t2019-websocket-pipeline-metrics.jpg", "why_for_weak_student": "Act/Learn/Reuse executing with real numbers (plan 81.8k / build 61.4k tokens) as isolated sub-agents — context delegation made visible.", "diagram_instead": false },
+    { "t_seconds": 2182, "label": "websocket-expertise-file-anatomy", "file": "media/frames/ah-5-agent-experts/t2182-websocket-expertise-structure.jpg", "why_for_weak_student": "What an expertise file physically looks like: the 677-line section spine of a mental model.", "diagram_instead": false },
+    { "t_seconds": 2545, "label": "product-expert-new-user-generic", "file": "media/frames/ah-5-agent-experts/t2545-nile-new-user-welcome.jpg", "why_for_weak_student": "The 'before': a new user with zero expertise gets a generic UI.", "diagram_instead": false },
+    { "t_seconds": 2588, "label": "product-expert-personalized-generative-ui", "file": "media/frames/ah-5-agent-experts/t2588-nile-streaming-genui.jpg", "why_for_weak_student": "The 'after': one action → the agent learned → reused a per-user mental model to stream a personalized generative UI.", "diagram_instead": false }
+  ],
+  "lab": {
+    "setup": [
+      "Clone the course repo: git clone https://github.com/disler/agent-experts.git && cd agent-experts",
+      "Read CLAUDE.md (engineering rules: use uv never raw python; keep models.py in sync with migrations; prefer Pydantic over dicts; don't commit unless asked).",
+      "Open .claude/commands/experts/ and read BOTH experts end to end: database/{question,self-improve,expertise.yaml} and websocket/{plan_build_improve,plan,question,self-improve,expertise.yaml}. Say out loud which file is Act, which is Learn, which is Reuse.",
+      "Start the orchestrator app the experts operate on (use the start-orchestrator skill, or ./apps/orchestrator_3_stream/start_be.sh and start_fe.sh); confirm Postgres is running."
+    ],
+    "reproduce_dan": [
+      "Meta-agentics: run the meta prompt to generate a new prompt; run the meta agent to generate a new sub-agent; run the meta skill to generate a new skill. Confirm each wrote a real file (.claude/commands|agents|skills/...). State why these ACT but don't LEARN.",
+      "Database expert — Reuse: run /experts:database:question \"does information flow between our database tables?\" Watch it Read expertise.yaml FIRST, then validate against models.py + migrations. Confirm the answer cites exact files/lines.",
+      "Database expert — Learn: run /experts:database:self-improve. Confirm it validates top-to-bottom, enforces the line limit (wc -l), compiles the YAML, and reports discrepancies (or reports 'nothing to do').",
+      "WebSocket expert — full loop: run /experts:websocket:plan_build_improve \"Add a session-based counter to the app nav bar that displays the total number of WebSocket events.\" Watch the three sub-agents (plan → build → self-improve true).",
+      "Verify the Act: the counter appears in the app nav bar and increments on WebSocket events. Verify the Learn: git diff .claude/commands/experts/websocket/expertise.yaml shows the mental model updated (e.g. a websocketEventCount / session_state entry) with accurate line references.",
+      "Scale compute: fire the same websocket question at three agents in the orchestrator UI and compare answers — note non-determinism and whether one agent found something the others missed."
+    ],
+    "stretch": [
+      "Seed a NEW expert from blank: create .claude/commands/experts/<domain>/ with an empty expertise.yaml plus copied-and-edited question.md and self-improve.md pointing at a real subsystem (e.g. the orchestrator's cost tracking, or Nile's cart). Run self-improve repeatedly until it stops finding new things. Do NOT hand-write the expertise — let the agent seed it.",
+      "Break-then-heal: manually corrupt one line-number reference in an expertise.yaml, then run self-improve with check_git_diff=false and confirm it detects and fixes the drift. Then intentionally leave a wrong fact and observe false-expertise risk.",
+      "Never-edit discipline: find something you don't like in an expertise file. Instead of editing it, edit the self-improve prompt (add a prescriptive line, e.g. 'always record reset_on line numbers'), rerun, and confirm the agent produces the change itself.",
+      "Line-limit stress: lower MAX_LINES in a self-improve prompt to something small; rerun and watch the agent trim least-critical content while preserving key operations. Report what it dropped and whether performance held.",
+      "Product expert: in Nile, browse/add/checkout as a user, open the Control-K expertise panel, and correlate your actions with expertise_data (viewed/added/checked-out) and the regenerated personalized sections. Change SECTIONS_RANGE / PRODUCTS_PER_SECTION_RANGE in the system prompt and observe the UI change.",
+      "When-NOT-to-use judgment: pick a static/simple part of the repo, argue in writing why an expert would NOT help there, and solve the same task with a plain generic agent for comparison."
+    ],
+    "pass_criteria": [
+      "You can point at each expert file and label it Act, Learn, or Reuse without hesitation, and explain why the database expert is 'partial' (no Act).",
+      "The database question ran read-only, read expertise.yaml first, and validated against the codebase (cited files/lines).",
+      "The websocket plan_build_improve completed all three steps; the nav-bar counter works AND the expertise.yaml git diff shows a real, accurate mental-model update.",
+      "You seeded at least one new expertise file entirely via self-improve (zero hand-written expertise), and it stabilized (self-improve eventually reports 'nothing to do').",
+      "You demonstrated the never-edit-directly discipline: a change you wanted appeared by editing the self-improve prompt, not the expertise file.",
+      "You can state, without notes: the Act/Learn/Reuse definition; why the expertise file is a mental model not a source of truth; and two systems you'd build an expert for plus one you wouldn't, with reasons."
+    ]
+  },
+  "estimated_print_pages_when_expanded": 46,
+  "confidence_notes": [
+    "All quotes cross-checked against the 2991-cue VTT; timestamps accurate to within ~3 seconds. Auto-generated transcript quirks: 'Niall' = Nile, 'RAR SQL' = raw SQL, 'JSNP' = JSONB, 'dot claw' = .claude, 'loop box' = loot box.",
+    "Line counts verified via wc -l: database expertise.yaml 412, websocket expertise.yaml 676 (Dan rounds to '650'); on-screen the reader showed 413 and 677 (1-based display / trailing newline). self-improve prompts 179 (database) and 190 (websocket); Dan calls the database one a '99 line prompt' — that refers to an earlier/abridged version or the visible workflow portion, current file is 179 lines. Flagged for the chapter.",
+    "codebase_map covers every file demonstrated on-screen plus the apps the experts operate on; all paths verified to exist under agentic-horizon/agent-experts. shopping_expert_user_prompt.md is present but empty (0 lines) — documented as a placeholder.",
+    "All 12 frame images visually verified in-session (content described in frame-plan.json verified_visual). Native 1920x1080; the recording composites Dan's faint overhead desk-cam over the screen throughout (authentic course style) — content remains legible.",
+    "YouTube overlays: only ONE ID pair is inherited from the TAC-1 orchestration seed list (X2ciJedw2vU, fop_yxV-mPo); the strongest thesis-matching overlay (agent memory / self-improving agents) has NO verified ID and is marked video_id: null / NEEDS LOOKUP. Exactly 2 include_in_phase1: true, within the 1–3 limit, but the null-ID one must be sourced before publishing. No video fetching performed, per brief.",
+    "Model IDs on-screen are course-era Claude 4.5 family (opus-4-5-20251101, sonnet-4-5-20250929, haiku-4-5-20251001); treat as period detail.",
+    "current_practice_gaps written against Claude Code / Anthropic tooling as of mid-2026 (Skills, Agent SDK, memory tool, permission modes); revisit at publish time — this axis moves fast.",
+    "Loot box inventory (12 notes) taken from the captured course-notes.md; count/items reflect capture time and may have changed on agenticengineer.com."
+  ]
+}

@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A teaching-first companion to Agentic Horizon lesson 5: build agent experts that Act, Learn, and Reuse a self-maintained mental model.">
+  <title>AH-5 · Agent Experts — IndyDevDan Expert Book</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <link rel="stylesheet" href="../vol-1-tac/01-hello-agentic-coding.assets.css">
+  <link rel="stylesheet" href="13-agent-experts.assets.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to chapter content</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="top-progress"></span></div>
+  <header class="site-bar">
+    <a class="site-bar__home" href="../index.html" aria-label="Back to the book hub">← IndyDevDan Expert Book</a>
+    <span class="site-bar__meta">VOL II · AH · LESSON 13</span>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="Chapter navigation">
+      <p class="rail-kicker">Volume II · Agentic Horizon</p>
+      <h2>Agent Experts</h2>
+      <div class="rail-progress">
+        <p class="micro-label">Reading progress</p>
+        <div class="rail-progress__line"><span class="rail-progress__fill" id="rail-progress"></span></div>
+        <p class="rail-progress__copy"><span id="progress-label">0%</span><span>of chapter</span></p>
+      </div>
+      <nav class="chapter-nav" aria-label="On this page">
+        <ol>
+          <li><a href="#orientation"><span class="chapter-nav__n">00</span><span>Orientation</span></a></li>
+          <li><a href="#agents-forget"><span class="chapter-nav__n">01</span><span>Agents forget</span></a></li>
+          <li><a href="#expert-definition"><span class="chapter-nav__n">02</span><span>The verb: learns</span></a></li>
+          <li><a href="#mental-model"><span class="chapter-nav__n">03</span><span>Mental model, not truth</span></a></li>
+          <li><a href="#meta-prompt"><span class="chapter-nav__n">04</span><span>The mechanism</span></a></li>
+          <li><a href="#meta-agentics"><span class="chapter-nav__n">05</span><span>Meta-agentics</span></a></li>
+          <li><a href="#act-learn-reuse"><span class="chapter-nav__n">06</span><span>Act · Learn · Reuse</span></a></li>
+          <li><a href="#expertise-anatomy"><span class="chapter-nav__n">07</span><span>Expertise anatomy</span></a></li>
+          <li><a href="#self-improve"><span class="chapter-nav__n">08</span><span>The Learn mechanism</span></a></li>
+          <li><a href="#partial-complete"><span class="chapter-nav__n">09</span><span>Partial vs complete</span></a></li>
+          <li><a href="#context-delegation"><span class="chapter-nav__n">10</span><span>Delegate context</span></a></li>
+          <li><a href="#product-experts"><span class="chapter-nav__n">11</span><span>Product experts</span></a></li>
+          <li><a href="#when-to-use"><span class="chapter-nav__n">12</span><span>When to build</span></a></li>
+          <li><a href="#current-practice"><span class="chapter-nav__n">13</span><span>Current practice</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">14</span><span>Graded lab</span></a></li>
+          <li><a href="#mastery"><span class="chapter-nav__n">15</span><span>Cumulative mastery</span></a></li>
+          <li><a href="#glossary"><span class="chapter-nav__n">16</span><span>Glossary</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <header class="hero hero--experts">
+        <span class="hero__chapter">Agentic Horizon · Lesson 13 · Tactic: Build Agents That Learn</span>
+        <h1>Agent Experts</h1>
+        <p class="hero__dek">Stop deploying agents that execute and forget. Give a narrow agent a self-maintained mental model, close the Act → Learn → Reuse loop, and make useful work improve the next run.</p>
+        <ul class="hero__meta" aria-label="Chapter details">
+          <li>Video spine · 62:29</li>
+          <li>Core lab · 60–90 min</li>
+          <li>Course repo · agent-experts</li>
+          <li>12 verified 1920×1080 frames</li>
+        </ul>
+        <p class="hero__promise"><strong>Mastery promise.</strong> By the end, you will be able to distinguish an expert from an ordinary agent or a meta-agentic builder, trace the complete learning loop through real course files, treat expertise as a fallible mental model rather than truth, improve the learning mechanism without hand-editing its output, and defend where an expert is worth the risk.</p>
+
+        <div class="hero-loop" role="img" aria-label="An agent expert takes a useful action, learns by updating a mental model, and reuses that model after validating it against the code">
+          <div class="hero-loop__step hero-loop__step--act"><b>Act</b><span>Take one useful, domain-changing action against the real system.</span></div>
+          <div class="hero-loop__step hero-loop__step--learn"><b>Learn</b><span>Run a self-improve rubric that updates an isolated expertise file.</span></div>
+          <div class="hero-loop__step hero-loop__step--reuse"><b>Reuse</b><span>Load that mental model first, revalidate it against code, then answer or act.</span></div>
+        </div>
+      </header>
+
+      <div class="mobile-toc">
+        <details>
+          <summary>Chapter contents</summary>
+          <ol>
+            <li><a href="#orientation">Orientation</a></li><li><a href="#agents-forget">Agents forget</a></li><li><a href="#expert-definition">The verb: learns</a></li><li><a href="#mental-model">Mental model, not truth</a></li><li><a href="#meta-prompt">The mechanism</a></li><li><a href="#meta-agentics">Meta-agentics</a></li><li><a href="#act-learn-reuse">Act · Learn · Reuse</a></li><li><a href="#expertise-anatomy">Expertise anatomy</a></li><li><a href="#self-improve">The Learn mechanism</a></li><li><a href="#partial-complete">Partial vs complete</a></li><li><a href="#context-delegation">Delegate context</a></li><li><a href="#product-experts">Product experts</a></li><li><a href="#when-to-use">When to build</a></li><li><a href="#current-practice">Current practice</a></li><li><a href="#lab">Graded lab</a></li><li><a href="#mastery">Cumulative mastery</a></li><li><a href="#glossary">Glossary</a></li>
+          </ol>
+        </details>
+      </div>
+
+      <section class="chapter-section" id="orientation">
+        <span class="section-number">00</span>
+        <h2 class="section-title">Begin with the cold start</h2>
+        <p class="section-lead">Imagine hiring the same specialist one thousand times, but erasing their working knowledge after every shift. They may be brilliant. They may have excellent tools. They may even solve each request. Yet the organization does not become more capable because the specialist carries nothing useful into the next run.</p>
+
+        <p>That is the structural failure this lesson names. Context engineering can give an agent a better starting packet. Agentic prompt engineering can give it a better procedure. Sub-agents can isolate purposes. Skills can package repeatable work. None of those moves, by itself, causes the system to learn from the useful work it just performed. If the next run begins from the same starting state, execution scales but expertise does not compound.</p>
+        <p>Dan calls this the most controversial lesson of Agentic Horizon because the repair asks you to accept an unusual artifact: a file the agent writes and maintains as its own topic-specific mental model. The file is not documentation. It is not the source of truth. It may be incomplete or wrong. The agent loads it as a fast index, checks it against the code that actually runs, performs useful work, and then updates the index through a controlled self-improve prompt. The value lives in the operating loop, not in pretending the file is perfect.</p>
+
+        <aside class="callout callout--tactic">
+          <p class="callout__label">The chapter in one sentence</p>
+          <p>An agent expert is an ordinary narrow agent wired into <strong>Act → Learn → Reuse</strong> over a persistent expertise file that it maintains itself and revalidates against the code.</p>
+        </aside>
+
+        <h3>What you are training</h3>
+        <ul class="learning-objectives">
+          <li><strong>Discriminate</strong>Tell an expert from a large model, a long prompt, a memory file, a Skill, or a meta-agentic artifact.</li>
+          <li><strong>Trace</strong>Point to the exact course files that supply Act, Learn, Reuse, orchestration, and the mental model.</li>
+          <li><strong>Operate</strong>Run read-only Reuse and self-improving Learn without violating repository rules.</li>
+          <li><strong>Govern</strong>Validate expertise against code, inspect learned-state diffs, respect size limits, and expect false expertise.</li>
+          <li><strong>Judge</strong>Choose high-value domains for experts and refuse the pattern where nothing evolves or you cannot evaluate it.</li>
+        </ul>
+
+        <h3>The evidence boundary</h3>
+        <p>This chapter follows the final checked-out course tree at <code>agentic-horizon/agent-experts</code>, not only the screen recording. That distinction matters. The recording shows the WebSocket event counter being built; the final repository already contains the counter, its plan, and the learned expertise entries. The lab therefore treats that demo as completed-loop archaeology and grades a fresh seed separately. The recording calls one self-improve prompt 99 lines; the current files are 179 and 190 lines. The chapter reports both honestly and uses the repository counts for operations.</p>
+
+        <div class="prime-directive" role="note" aria-label="Lab prime directive">
+          <div class="prime-directive__mark">!</div>
+          <div><strong>Never hand-edit a non-empty expertise file.</strong><p>If the mental model is wrong, improve the self-improve rubric and rerun it. Editing <code>expertise.yaml</code> directly repairs one artifact while leaving the learning system broken.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="agents-forget">
+        <span class="section-number">01</span>
+        <h2 class="section-title">The problem is structural: agents forget</h2>
+        <p class="section-lead">A normal agent can produce an excellent answer and still fail as a learning system. The test is not whether run one succeeds. The test is whether run one changes the starting position of run two.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — run one thousand</p>
+          <h3>The same expensive rediscovery, forever</h3>
+          <p>Point a fresh agent at billing. It finds the calculation path, notices the migration that changed a revenue field, understands which Pydantic model mirrors the table, and answers correctly. The session ends. Tomorrow, another fresh agent repeats the same search. Nothing about yesterday’s useful investigation is available as a starting model. By run one thousand, you have purchased one thousand rediscoveries.</p>
+          <p>This is worse than ordinary forgetfulness because repeated use normally creates organizational advantage. A product records analytics, exposes patterns, and improves an algorithm. A team captures review findings and changes a checklist. A specialist remembers where the sharp edges are. A cold-start agent can execute more work without creating any of that compounding state.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — flatline versus climb</p>
+          <h3>Usage is not learning</h3>
+          <div class="forget-map" role="img" aria-label="A cold-start agent repeats the same capability level while a learning system climbs after each run">
+            <article><h3>Execute → forget</h3><p>Every run can be good, but the next run starts from the same generic state.</p><div class="run-line run-line--flat"><span></span><span></span><span></span><span></span></div></article>
+            <article><h3>Execute → store → reuse</h3><p>Each useful action can refine a reusable mental model for the next execution.</p><div class="run-line run-line--climb"><span></span><span></span><span></span><span></span></div></article>
+          </div>
+          <p>The right-hand path does not promise monotonic truth. A mental model can contain false expertise. The diagram shows a changed starting point, not guaranteed correctness. Correctness still comes from revalidating the model against the live code.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — Dan names the missing capability</p>
+          <h3>The opening claim is deliberately plain</h3>
+          <p>Between roughly 0:11 and 3:25, the video stays on the conceptual problem rather than a code artifact. Dan contrasts software that gets better through use with agents that start fresh, then compresses the failure into one sentence: <em>“Your agents forget. And that means your agents don’t learn.”</em> The frame plan intentionally leaves this beat unframed; a screenshot of narration would add less than the flatline map above.</p>
+          <p>The important word is not <em>forget</em> alone. A clean session can be desirable. Context isolation protects focus. The failure is that the system has no deliberate path for carrying validated, domain-specific learning forward. Forgetting becomes fatal when nothing outside the transient context captures the useful result.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Structural forgetting</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s diagnosis · 0:53</p><p><strong>“Your agents forget. And that means your agents don’t learn.”</strong></p></aside>
+          <p>Structural forgetting means the execution architecture discards domain understanding at the session boundary. It is not a complaint that the context window is too small, the prompt is weak, or the model is unintelligent. Those dimensions affect a run. A learning path affects what survives between runs.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — repeated database archaeology</p>
+          <h3>What the database expert avoids</h3>
+          <p>Without expertise, a database question begins with broad search: locate model files, find migrations, infer table relationships, identify query patterns, and reconstruct how shared models reach apps. The course database expert instead begins at <code>.claude/commands/experts/database/expertise.yaml</code>. That file already points toward the six Pydantic/table models, migrations, connection and query patterns, and synchronization mechanism.</p>
+          <p>The agent does not stop at the summary. It uses the summary to choose which real files to read, then verifies claims against <code>apps/orchestrator_db/models.py</code>, migrations, and related implementation. Reuse changes the search from “discover the whole domain blindly” to “start from a compact map and test it.” Learn later updates that map when validation finds meaningful drift.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — find your rediscovery tax</p>
+          <h3>Name one repeated cold start</h3>
+          <ol>
+            <li>Choose one course-repository question you have asked an agent more than once.</li>
+            <li>List the same files, terms, or relationships the agent must rediscover each time.</li>
+            <li>Circle only facts that are narrow to one domain and useful as navigation.</li>
+            <li>Write what code would need to be checked before any circled fact could be trusted.</li>
+          </ol>
+          <p>You have identified an expertise candidate only if the stored map would reduce rediscovery <em>and</em> you can name the ground truth used to validate it.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: buy a larger context window</h3>
+          <p><strong>Symptom:</strong> every fresh run receives more raw repository content, but no mechanism records what the previous run found useful. Token volume rises; the cold-start architecture stays unchanged.</p>
+          <p><strong>Fix:</strong> separate transient working context from persistent learned state. Store a narrow mental model outside the conversation, load it only when the domain is active, validate it against code, and update it through an explicit Learn step.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Built-in memory changes the options, not the design question</h3>
+          <aside class="current-practice"><p class="current-practice__label">Current practice · verified July 2026</p><p>Claude Code now distinguishes human-written <code>CLAUDE.md</code> instructions from agent-written auto memory, and loads both at session start. That makes cross-session state easier. It does not make all memory equivalent. Dan’s expertise file is deliberately topic-scoped, loaded on demand by one expert, and governed by a domain-specific validation rubric. Choose always-on instructions, auto memory, a Skill, or detached expertise by scope and lifecycle—not by the generic desire to “give the agent memory.”</p></aside>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Structural forgetting retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What problem can excellent context and prompt engineering fail to solve?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They can improve the current execution while still leaving no mechanism that stores validated domain learning for the next run.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is a clean context window not itself the enemy?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Fresh context can protect focus. The problem is having no deliberate persistent channel for useful learning outside that transient context.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What two conditions make stored expertise valuable rather than stale documentation?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It is loaded as a narrow navigation model, and its claims are revalidated against the live code before use.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Explain the run-one/run-one-thousand thought experiment in ninety seconds.</strong> Pass if your listener understands why higher answer quality does not create compounding expertise and can name the missing persistent channel.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="expert-definition">
+        <span class="section-number">02</span>
+        <h2 class="section-title">The differentiating verb is <em>learns</em></h2>
+        <p class="section-lead">An expert is not a model tier or a prompt length. It is a generic agent whose operating procedure makes learning unavoidable after useful work.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — remove the costume</p>
+          <h3>No special system prompt. No custom tools.</h3>
+          <p>It is tempting to imagine an expert as a heavily customized agent: a larger model, a domain persona, a long system prompt, a library of tools, perhaps a vector database. Dan’s two codebase examples remove that costume. They use ordinary agents. Their expertise comes from a persistent topic model and a procedure that reads, validates, acts, and updates.</p>
+          <p>This is useful because it makes the mechanism portable. You can later package it as a command, Skill, sub-agent, SDK workflow, or another abstraction. If the loop is missing, the package does not create expertise. If the loop is present, a plain prompt file can teach the idea without hidden machinery.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — one changed arrow</p>
+          <h3>Same agent, different lifecycle</h3>
+          <div class="definition-map" role="img" aria-label="A generic agent executes and forgets while an agent expert executes, learns, and begins the next run with a validated mental model">
+            <article><h3>Generic agent</h3><p><code>prompt → execute → answer → session ends</code></p><p>The result may be excellent; no topic model is maintained for next time.</p></article>
+            <article><h3>Agent expert</h3><p><code>reuse → act → learn ↻</code></p><p>Useful work updates a mental model that the next execution loads and checks.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the whole distinction in one word</p>
+          <h3>Dan refuses the model-size explanation</h3>
+          <p>At about 2:02, Dan says, <em>“One executes and forgets, the other executes and learns.”</em> He adds that you do not need to tell an expert to learn every time; learning is in its DNA. In implementation terms, “DNA” is not mystical. It means the Learn step is part of the reusable workflow rather than an optional reminder a human remembers to type.</p>
+          <p>A human specialist does not become an expert by receiving a larger inbox. They update a narrow mental model through repeated contact with one domain. The agent expert mirrors that shape: narrow scope, repeated validation, useful action, persistent revision.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Agent expert</h3>
+          <aside class="callout callout--term"><p class="callout__label">Operational definition</p><p><strong>Agent expert:</strong> a generic agent wired into Act → Learn → Reuse over a persistent topic-specific expertise file it maintains itself.</p></aside>
+          <p>The definition excludes three common look-alikes. A strong generic agent is not an expert if it forgets. A memory file is not an expert because a file cannot operate the loop. A meta-agentic builder is not an expert merely because it creates prompts or agents. Expertise names a lifecycle.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — classify the database agent</p>
+          <h3>Useful, learning, and still partial</h3>
+          <p>The database directory contains <code>question.md</code>, <code>self-improve.md</code>, and <code>expertise.yaml</code>. The question prompt supplies Reuse: read the mental model, validate it, then answer without changing files. The self-improve prompt supplies Learn: compare the model with implementation and update discrepancies. No prompt inside that expert performs a database code change, so the expert lacks its own Act step.</p>
+          <p>Dan still calls that arrangement acceptable. A read-only domain questioner can be extremely valuable. Precision matters: it is a partial expert because its own workflow has Reuse and Learn but no domain-changing Act. It can still learn from database changes made elsewhere when self-improve runs.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — define without status words</p>
+          <h3>Ban “smart,” “powerful,” and “bigger”</h3>
+          <p>Write one sentence that defines an agent expert using only observable architecture. Your sentence must name the persistent artifact, how it is maintained, and what happens before the artifact is trusted. Then test it against three cases: a large model with no memory, a Skill that generates prompts, and the database partial expert.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: expertise by branding</h3>
+          <p><strong>Symptom:</strong> a prompt is named <code>security-expert.md</code>, given an authoritative persona, and run on a premium model. It never updates a topic model after work.</p>
+          <p><strong>Fix:</strong> ignore the name and trace the lifecycle. Where is the mental model? Which prompt reads it? Which step validates it? Which useful action creates new evidence? Which controlled step updates it? Missing answers reveal the actual architecture.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Choose the container after the loop</h3>
+          <p>Commands, Skills, sub-agents, MCP-backed tools, SDK processes, and managed agents can all host parts of this pattern. Dan’s own closing lens is the core four: context, model, prompt, tools. Packaging should improve discovery, isolation, or deployment. It should not obscure whether learned state is narrow, validated, updated, and reused.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Agent expert definition retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What one verb distinguishes Dan’s expert from a generic agent?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Learns: useful execution updates a persistent mental model for later reuse.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why are model size and prompt length insufficient definitions?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They can improve a single execution without creating any persistent learning lifecycle between runs.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why can the database agent be both an expert and partial?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It maintains and reuses expertise, but its own workflow does not perform a domain-changing Act.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Complete this aloud: “An agent expert is not ___; it is ___.”</strong> Pass if you replace status language with a traceable lifecycle and explain the partial-expert nuance.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="mental-model">
+        <span class="section-number">03</span>
+        <h2 class="section-title">Expertise is a mental model, not the source of truth</h2>
+        <p class="section-lead">The right objection arrives immediately: “Now I have code, comments, plans, documentation, and another file that can drift.” The answer is not to deny drift. It is to give the file a different job.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the duplicate-docs alarm</p>
+          <h3>Another source of truth would be a bad design</h3>
+          <p>If <code>expertise.yaml</code> claimed authority over the database, every code change would create a synchronization burden and every disagreement would become ambiguous. Which artifact wins? Dan rejects that architecture. The code that runs remains the source of truth. Expertise is a deliberately compressed, fallible working model that helps an agent navigate toward the right code faster.</p>
+          <p>Your own memory works similarly. You do not carry an executable source of truth for a codebase in your head. You remember boundaries, names, risks, and places to look. When precision matters, you reopen the implementation. The expertise file externalizes that working model for an agent.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — authority and navigation</p>
+          <h3>Keep the arrows one-way</h3>
+          <div class="truth-stack" role="img" aria-label="The expertise mental model points the agent to code, the agent validates the model against code, and only then produces an answer">
+            <div class="truth-stack__model"><b>Expertise file · mental model</b><span>Compact topic map, known patterns, exact file and line references, possible drift.</span></div>
+            <div class="truth-stack__arrow">↓ choose evidence · revalidate ↓</div>
+            <div class="truth-stack__code"><b>Running code · source of truth</b><span>Models, migrations, queries, stores, services, and components that determine behavior.</span></div>
+            <div class="truth-stack__arrow">↓ answer from verified evidence ↓</div>
+            <div class="truth-stack__answer"><b>Report or action</b><span>Cites real files and lines; discrepancies feed the later Learn step.</span></div>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — watch Reuse become safe</p>
+          <h3>Read the map first, then test it</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-5-agent-experts/t0628-database-question-reads-expertise.jpg" alt="Claude Code database expert reading expertise.yaml before models.py and migrations" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">10:28</span>The first substantive domain read is the 413-line editor view of database expertise; the agent then opens <code>models.py</code> and migrations to validate its map. The repository file itself contains 412 lines.</figcaption>
+          </figure>
+          <p>The question prompt encodes the safety rail twice: use expert knowledge to validate the expertise path against the codebase, then review, validate, and confirm it during the workflow. That repetition is the difference between a quick index and a hallucination cache.</p>
+
+          <figure class="frame-card">
+            <img src="../media/frames/ah-5-agent-experts/t0742-database-erdiagram-render.jpg" alt="Rendered Mermaid entity relationship diagram produced by the database expert after code validation" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">12:22</span>The payoff: a rendered relationship report over six Postgres tables. The diagram is an answer artifact, produced after expertise-guided validation; it is not a replacement for the implementation.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Mental model and ground truth</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s distinction · 11:20–12:38</p><p><strong>“This is not a source of truth. This is your agent’s mental model.”</strong> The true source of truth is the code—not comments, documentation, or plans.</p></aside>
+          <p>A <strong>mental model</strong> is an evolving data structure that helps one agent reason about one domain. It is useful because it is smaller and more navigable than the codebase. It is safe only when the workflow treats every stored claim as a hypothesis to confirm.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — a real drift signal</p>
+          <h3>194 in the map, 193 in the file</h3>
+          <p>The final WebSocket expertise file says <code>chatService.ts</code> contains 194 lines in two locations. The checked-out source contains 193. This is not evidence that expertise is useless; it is evidence that the mental-model framing is necessary. A line count is a navigation hint with a drift surface, not executable truth.</p>
+          <p>A safe expert opens the cited file, sees the current line layout, and bases its answer on the implementation. A later self-improve pass may repair the stale count if it is worth preserving. If an engineer trusted the YAML blindly because it looked precise, the extra precision would make the failure worse.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — perform the four-step trace</p>
+          <h3>Map → code → correction → answer</h3>
+          <ol>
+            <li>Open <code>.claude/commands/experts/websocket/expertise.yaml</code> and find a <code>chatService.ts</code> reference.</li>
+            <li>Run <code>wc -l</code> on the actual source file.</li>
+            <li>Classify the discrepancy: behavioral, structural, or navigational.</li>
+            <li>Explain which artifact governs an answer about current behavior.</li>
+          </ol>
+          <p>Do not edit the expertise file. You are practicing validation, not bypassing the learning mechanism.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Two symmetrical mistakes</h3>
+          <p><strong>Reject everything:</strong> call expertise duplicated documentation and throw away the navigation advantage. <strong>Trust everything:</strong> treat exact-looking YAML as authoritative and skip code validation. Both mistakes assign the file the wrong role.</p>
+          <p><strong>Fix:</strong> preserve the asymmetry. The mental model proposes where to look. The code decides what is true. The answer cites the code. The Learn step updates the model through its maintenance prompt.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>On-demand knowledge is now a first-class choice</h3>
+          <p>Current Claude Code documentation explicitly recommends Skills for multi-step procedures that do not need to live in startup context, while <code>CLAUDE.md</code> holds facts and rules that should guide every session. That strengthens Dan’s design conversation: broad always-on instructions, automatic repository memory, and a detached domain model have different loading and maintenance semantics. Use the smallest scope that matches the job.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Mental model retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the source of truth in this lesson?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The code that actually runs, including models, migrations, services, stores, and components.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the expertise file for?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A compact, evolving mental model that helps the agent navigate to relevant evidence quickly.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is the 194-versus-193 mismatch pedagogically valuable?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It demonstrates real drift and proves that exact-looking expertise must still be checked against source.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Use your own memory as the analogy.</strong> Explain how a mental model makes you faster without becoming authoritative, then map each part of the analogy to <code>expertise.yaml</code>, code validation, and the final answer.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="meta-prompt">
+        <span class="section-number">04</span>
+        <h2 class="section-title">The mechanism: a self-improving template meta prompt</h2>
+        <p class="section-lead">The name sounds abstract until you split it into three jobs. Each job is already visible in the course repository; the expert is their composition.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — unpack the mouthful</p>
+          <h3>No magic term survives contact with the files</h3>
+          <p>“Self-improving template meta prompt” can sound like a label placed on ordinary prompting after the fact. Dan makes it mechanical. A meta prompt builds another prompt. A template gives the output a fixed purpose and structure. A self-improving prompt updates itself, related prompts, or an isolated file with information needed on a later execution. Combine the three and you have the maintenance machinery around expertise.</p>
+          <p>The decomposition matters because each part has a failure it prevents. Meta-generation prevents you from hand-authoring every artifact. A template prevents generated artifacts from becoming shapeless. Self-improvement prevents the useful structure from freezing at the moment it was created.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the three-part equation</p>
+          <h3>Build, constrain, update</h3>
+          <div class="meta-equation" role="img" aria-label="Meta prompt plus template plus self-improving behavior results in an agent expert">
+            <div class="meta-equation__part"><b>Meta prompt</b><span>Builds another prompt.</span></div><div class="meta-equation__op">+</div>
+            <div class="meta-equation__part"><b>Template</b><span>Fixes purpose and structure.</span></div><div class="meta-equation__op">+</div>
+            <div class="meta-equation__part"><b>Self-improving</b><span>Updates isolated knowledge for next time.</span></div><div class="meta-equation__op">=</div>
+            <div class="meta-equation__part meta-equation__part--result"><b>Agent expert</b><span>Runs a durable learning loop over expertise.</span></div>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — a prompt builds a prompt</p>
+          <h3>Start with a visible artifact</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-5-agent-experts/t0456-question-mermaid-prompt.jpg" alt="VS Code showing the generated question-with-Mermaid custom command with frontmatter and structured sections" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">7:36</span><code>meta_prompt.md</code> produced <code>question-w-mermaid-diagrams.md</code>, including frontmatter, purpose, variables, instructions, workflow, and report. This is “prompts build prompts” as a file, not a metaphor.</figcaption>
+          </figure>
+          <p>The artifact demonstrates meta plus template: another prompt was generated, and it follows a specified shape. It does not yet demonstrate self-improvement. Nothing about that new command updates automatically after it answers a question. The missing property prepares the next section’s distinction between meta-agentics and experts.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Self-improving template meta prompt</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s formal definition · 3:25–3:39</p><p><strong>An agent expert is a concrete form of a self-improving template meta prompt.</strong> Meta prompts build prompts; template meta prompts build them for a specific purpose and structure; self-improvement carries information to a later run.</p></aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — map the definition to files</p>
+          <h3>The database expert as a file-level composition</h3>
+          <div class="file-map">
+            <div class="file-map__item"><code>.claude/commands/meta_prompt.md</code><p>Shows the meta pattern: produce a command in a specified format.</p></div>
+            <div class="file-map__item"><code>experts/database/question.md</code><p>Shows the template: a stable purpose, variables, instructions, workflow, and report for read-only reuse.</p></div>
+            <div class="file-map__item"><code>experts/database/self-improve.md</code><p>Shows self-improvement: compare expertise with code and update the isolated YAML for next time.</p></div>
+            <div class="file-map__item"><code>experts/database/expertise.yaml</code><p>Holds the evolving topic model. It is the maintained output, not the learning procedure.</p></div>
+          </div>
+          <p>Do not over-literalize the phrase “prompt that builds prompts.” In the expert, the self-improve prompt may output a revised knowledge file rather than a brand-new command. The durable idea is a structured prompt system that produces or updates the agentic artifact used on a later execution.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — label the repository</p>
+          <h3>Point before you define</h3>
+          <ol>
+            <li>Open the four files above.</li>
+            <li>For each, write exactly one role: generator, reusable template, learning procedure, or learned state.</li>
+            <li>Find the fixed report structure in the generated Mermaid question command.</li>
+            <li>Find the exact variable that points self-improve at its expertise file.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: collapse procedure and state</h3>
+          <p><strong>Symptom:</strong> you call <code>expertise.yaml</code> the self-improving prompt, or assume the file can maintain itself. When it drifts, you edit the state directly because no learning procedure is conceptually separate.</p>
+          <p><strong>Fix:</strong> keep two artifacts distinct. The expertise file is mutable learned state. The self-improve prompt is the stable maintenance rubric that reads code, decides what matters, updates state, enforces limits, and validates syntax.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Raw commands remain valid; Skills add a discoverable package</h3>
+          <p>Current Claude Code documentation says custom commands have been merged into Skills while existing <code>.claude/commands/</code> files continue to work. A Skill can bundle <code>SKILL.md</code>, reference files, and invocation controls, making it a natural container for an expert. The raw command files in this lesson remain the clearer first teaching form because every stage is visible without packaging magic.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Self-improving template meta prompt retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does the meta part do?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It builds another prompt or agentic artifact.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What does the template part add?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A fixed purpose and structure rather than unconstrained generated text.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What makes the system self-improving?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A controlled prompt updates isolated learned state for a later execution.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Teach the phrase without using the phrase.</strong> Describe the generator, fixed structure, maintenance procedure, and learned-state artifact. Then reveal the formal name only after your listener can point to each role.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="meta-agentics">
+        <span class="section-number">05</span>
+        <h2 class="section-title">Meta-agentics act, but they do not learn</h2>
+        <p class="section-lead">A prompt can build prompts, an agent can build agents, and a Skill can build Skills. All three are powerful. None is automatically an expert.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — useful output is not learning</p>
+          <h3>The factory ships a product and stays the same</h3>
+          <p>Run a meta prompt and it writes a useful command. Run a meta agent and it creates a planner. Run a meta Skill and it scaffolds a startup workflow. Each system takes action and increases your engineering output. Yet after shipping the artifact, its own model of how to do the job has not changed. Repeating the same request tomorrow begins from the same factory instructions.</p>
+          <p>This is the trap Dan stages before introducing experts. If “creates something” were enough, every code-writing agent would qualify. Learning requires a state transition that survives the run and is reused by the system later.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — three factories, one missing wire</p>
+          <h3>Act is present; Learn is absent</h3>
+          <div class="factory-map" role="img" aria-label="A meta prompt builds a prompt, a meta agent builds an agent, and a meta skill builds a skill, but none has a Learn step">
+            <article><b>Meta prompt</b><code>request → command.md</code><p>Generates a structured custom command.</p></article>
+            <article><b>Meta agent</b><code>description → agent.md</code><p>Generates a sub-agent with frontmatter and purpose.</p></article>
+            <article><b>Meta Skill</b><code>workflow → SKILL.md</code><p>Generates a reusable Skill package.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — follow the artifacts into the tree</p>
+          <h3>From generators to real repository files</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-5-agent-experts/t0508-start-orchestrator-skill.jpg" alt="VS Code showing the generated start-orchestrator Skill with flags and backend startup workflow" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">8:28</span>The meta Skill produced <code>.claude/skills/start-orchestrator/SKILL.md</code>, including flags and startup commands. It is a reusable artifact, but generating it did not update the generator’s expertise.</figcaption>
+          </figure>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-5-agent-experts/t0580-database-experts-dir.jpg" alt="VS Code Explorer showing the experts directory beside other generated command artifacts" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">9:40</span>The <code>experts</code> directory appears beside the meta-agentic artifacts. Physical proximity does not erase the lifecycle distinction: the experts add persistent learned state and maintenance prompts.</figcaption>
+          </figure>
+          <p>The third artifact is <code>.claude/agents/planner.md</code>, generated by <code>meta-agent.md</code>. It delegates to the base planning command, making it easy to scale planning through sub-agents. Like the generated question command and startup Skill, it acts. Nothing in its own workflow records what it learned about planning for the next invocation.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Meta-agentics</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s rule · 7:05</p><p><strong>Meta-agentics:</strong> meta prompts, meta agents, and meta Skills—prompts building prompts, agents building agents, Skills building Skills. Dan says every codebase he creates has them.</p></aside>
+          <p>Meta-agentics are atoms of the agentic layer. They increase how quickly you can create repeatable mechanisms. An expert may be built from those atoms, but the category changes only when Learn and later Reuse are wired into the lifecycle.</p>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — apply the expert test</p>
+          <h3>Interrogate <code>start-orchestrator</code></h3>
+          <p>The Skill knows how to start the backend and frontend and open the application. That is a useful, repeatable action. Ask the expert test: after it encounters a stale port, does it update a narrow mental model through a controlled maintenance step? Does the next run load and validate that learned state? In the demonstrated artifact, no.</p>
+          <p>The final repository even contains evidence of drift: the Skill claims a backend port of 8002 with a fallback, while <code>.env.sample</code>, the README, and <code>start_be.sh</code> establish 9403 as the default. This does not make Skills bad. It shows exactly what a Learn/validation loop would need to address.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — run the two-question test</p>
+          <h3>What did it build? What did it retain?</h3>
+          <p>For <code>meta_prompt.md</code>, <code>meta-agent.md</code>, and <code>meta-skill/SKILL.md</code>, write two answers: the artifact each one produces, and the persistent state it automatically updates for its next execution. The second answer should be “none” for all three shipped demonstrations. If you find a file, prove that a later run reads it and that a maintenance rubric updates it.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: confuse generation with improvement</h3>
+          <p><strong>Symptom:</strong> the system produced a better prompt than you expected, so you say it learned. But no durable state changed; you merely observed a strong stochastic output.</p>
+          <p><strong>Fix:</strong> demand an artifact-level trace. Name the state before the run, the useful evidence produced during the run, the persisted update after the run, and the read path on the next run. Without all four, improvement is an impression.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>A Skill can host an expert; it does not confer expertise</h3>
+          <p>Current Skills load on demand and can carry supporting files, which makes them a good packaging surface for topic-scoped expertise. The lifecycle test still wins. A Skill containing a static procedure is a reusable procedure. A Skill that loads, validates, updates, and reuses a narrow mental model can host an expert.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Meta-agentics retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What are the three meta-agentic factories?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Meta prompts build prompts, meta agents build agents, and meta Skills build Skills.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why are the demonstrated factories not agent experts?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They act by creating artifacts but do not automatically update and later reuse persistent learned state.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What repository drift makes the distinction concrete?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The generated start-orchestrator Skill’s backend-port claim differs from the final repository’s 9403 default.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Compare a factory with a craftsperson.</strong> The factory can repeatedly produce an artifact; the craftsperson updates a mental model from the work. Map the analogy to one meta-agentic file and one expert directory.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="act-learn-reuse">
+        <span class="section-number">06</span>
+        <h2 class="section-title">Act · Learn · Reuse: the loop to memorize</h2>
+        <p class="section-lead">Everything in the lesson collapses to three verbs. The verbs are simple enough to remember and strict enough to expose a fake expert.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — three boxes or it does not compound</p>
+          <h3>Where does the useful work go?</h3>
+          <p>Suppose an agent builds a correct WebSocket feature. If no Learn step turns that change into updated domain knowledge, the next agent must rediscover it. Suppose self-improve updates a YAML file but no Reuse step reads the file before later work. The knowledge exists but has no effect. Suppose Reuse and Learn exist but the expert never performs a domain-changing action. The system can query and refresh expertise, but its own loop is partial.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the minimal learning machine</p>
+          <h3>Each arrow is a contract</h3>
+          <div class="loop-diagram" role="img" aria-label="Act takes a useful action, Learn stores validated new information, and Reuse loads and checks that information on the next execution">
+            <article class="loop-diagram__act"><b>Act</b><span>Modify or operate the real domain in a useful, observable way.</span></article>
+            <article class="loop-diagram__learn"><b>Learn</b><span>Compare the mental model with ground truth and update only useful expertise.</span></article>
+            <article class="loop-diagram__reuse"><b>Reuse</b><span>Load the model first, validate it, then plan, answer, or act.</span></article>
+          </div>
+          <p>The loop returns from Reuse to a later Act. The mental model shortens navigation; code validation protects correctness; useful action creates new evidence; self-improve decides whether that evidence deserves persistence.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the branded frame</p>
+          <h3>The image to keep after the details fade</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-5-agent-experts/t1305-act-learn-reuse-core.jpg" alt="Large Act Learn Reuse graphic over the database expert question prompt" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">21:45</span>Dan places the three-step loop directly over a real expert prompt. The key word in Act is <strong>useful</strong>; the Learn pass is allowed to find nothing worth changing after thorough validation.</figcaption>
+          </figure>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Act → Learn → Reuse</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s compression · 21:41</p><p><strong>“Act, learn, reuse.”</strong> Act means take a <em>useful</em> action. Learn means store useful new information. Reuse means pull that mental model into the next execution.</p></aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — the counter loop</p>
+          <h3>Trace one feature through all three stages</h3>
+          <ol>
+            <li><strong>Reuse:</strong> the WebSocket plan prompt loads <code>expertise.yaml</code> and critical files before delegating to the base plan command.</li>
+            <li><strong>Act:</strong> <code>plan_build_improve.md</code> passes the generated plan to <code>.claude/commands/build.md</code>, which changes the real frontend so every WebSocket message increments a session counter shown in the header.</li>
+            <li><strong>Learn:</strong> the workflow runs <code>/experts:websocket:self-improve true</code>, using the Git diff and code validation to update WebSocket expertise.</li>
+            <li><strong>Reuse again:</strong> future question and plan prompts can jump to the store, service, composable, and header entries, then confirm them against current source.</li>
+          </ol>
+          <p>The final course tree preserves every layer: the plan in <code>specs/websocket-event-counter-nav-bar.md</code>, the source changes across <code>chatService.ts</code>, <code>orchestratorStore.ts</code>, <code>useHeaderBar.ts</code>, and <code>AppHeader.vue</code>, plus learned entries in WebSocket expertise.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — classify before reading labels</p>
+          <h3>Build a three-column evidence ledger</h3>
+          <p>Write Act, Learn, and Reuse as column headers. Place <code>build.md</code>, both <code>self-improve.md</code> files, both <code>question.md</code> files, WebSocket <code>plan.md</code>, and <code>plan_build_improve.md</code> into the ledger. For the orchestrator, distinguish “contains a stage” from “is the base prompt that performs the stage.”</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: force a Learn diff every time</h3>
+          <p><strong>Symptom:</strong> self-improve reports that expertise is already aligned, so you assume learning failed and demand a file change. The agent adds low-value prose merely to satisfy the expectation.</p>
+          <p><strong>Fix:</strong> grade the validation procedure, not diff size. The shipped self-improve prompt explicitly says a thorough search may find nothing to do and that this is perfectly acceptable. Useful restraint is part of expertise maintenance.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The primitive survives new orchestration surfaces</h3>
+          <p>A command chain, a Skill, an SDK process, or a managed session can implement the loop. Modern surfaces add structured outputs, hooks, permissions, deployment, and persistent sessions. None changes the diagnostic. Find the useful action, the validated update to learned state, and the path that loads that state next time.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Act Learn Reuse retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name the loop and the key adjective attached to Act.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Act, Learn, Reuse; the action must be useful.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is a valid outcome of a Learn pass?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>After thorough validation, it may report that there is nothing useful to update.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is stored expertise without Reuse incomplete?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The knowledge has no path into later decisions, so it cannot improve the next execution.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Teach the loop without naming Claude, YAML, commands, or Skills.</strong> Pass if your listener can apply the three-stage test to an unfamiliar learning agent in another technology.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="expertise-anatomy">
+        <span class="section-number">07</span>
+        <h2 class="section-title">Anatomy of an expertise file</h2>
+        <p class="section-lead">A useful mental model is precise enough to navigate and incomplete enough to fit. Its structure should reflect the domain, not your urge to write comprehensive documentation.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — what belongs in the file?</p>
+          <h3>Store the map, not the territory</h3>
+          <p>If you copy every implementation detail into expertise, you create a slower duplicate of the code with a larger drift surface. If you store only a one-paragraph overview, the agent still has to search blindly. The useful middle contains architecture, high-value operations, sharp edges, and exact locations that help the agent reach ground truth quickly.</p>
+          <p>The shape is domain-owned. A database model emphasizes tables, migrations, queries, and synchronization. A WebSocket model emphasizes event types, connection lifecycle, broadcast paths, frontend stores, monitoring, and known issues. Dan seeds loosely because the agent’s repeated work should reveal which categories help it operate.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — spine plus guardrails</p>
+          <h3>Navigation on the left; discipline on the right</h3>
+          <div class="expertise-spine" role="img" aria-label="A YAML expertise outline with domain sections, exact file and line references, a hard line limit, and code validation">
+            <div class="expertise-spine__outline"><span>overview:</span><span>core_implementation:</span><span>event_types:</span><span>streaming_architecture:</span><span>concurrency_patterns:</span><span>frontend_integration:</span><span>monitoring:</span><span>testing:</span><span>known_issues:</span><span>key_file_locations:</span><span>architecture_summary:</span></div>
+            <div class="expertise-spine__rules">
+              <article><b>Jump targets</b><p>Exact <code>file:line</code> references shorten navigation, but every reference remains a hypothesis to verify.</p></article>
+              <article><b>Hard boundary</b><p><code>MAX_LINES: 1000</code> forces prioritization. Least-critical content is trimmed before the model becomes a second codebase.</p></article>
+              <article><b>Format is ergonomic</b><p>Dan prefers YAML; the extract also names TOML, JSON, CSV, and database JSONB. Choose what agents can read and validate reliably.</p></article>
+            </div>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — fold the file to its skeleton</p>
+          <h3>Six hundred seventy-six lines become one domain map</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-5-agent-experts/t2182-websocket-expertise-structure.jpg" alt="VS Code showing the folded top-level structure of the WebSocket expertise YAML file" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">36:22</span>The editor shows 677 display lines; the repository file contains 676. Folded, it reads like an index: overview through architecture summary, with the full domain beneath each heading.</figcaption>
+          </figure>
+          <p>Dan describes the file as roughly 650 lines, an honest on-camera approximation. The exact checked-out counts are more useful for the lab: database expertise is 412 lines, WebSocket expertise is 676, and both self-improve prompts cap the mental model at 1000. The database file reportedly carries 44 specific line references, making the map directly actionable.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Expertise file</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s instruction · 16:08</p><p><strong>“Give your agents a mental model by giving them an expertise file.”</strong> The file is a topic-scoped, agent-maintained navigation model with a deliberate size budget.</p></aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — one field with operational value</p>
+          <h3>The WebSocket counter entry tells you where and when</h3>
+          <p>The learned WebSocket expertise records the session counter across the event interception, store state, increment callback, reset behavior, composable, and header display. An entry such as <code>websocketEventCount</code> is useful because it does not merely say “there is a counter.” It points to where the count lives, where every message increments it, and when connection lifecycle resets it.</p>
+          <p>A future question—“Why did the count return to zero?”—can begin at those locations instead of grepping the entire frontend. The agent must still open the current files. The known 194-versus-193 line-count drift is a reminder that jump targets age.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — evaluate one section</p>
+          <h3>Score for actionability, not completeness</h3>
+          <ol>
+            <li>Choose one top-level section from WebSocket expertise.</li>
+            <li>Find three entries that help an agent choose a real source file.</li>
+            <li>Find one entry that could drift without changing behavior.</li>
+            <li>Find one entry whose drift could produce a wrong engineering decision.</li>
+            <li>State which one deserves higher priority in the next self-improve pass.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: a thousand lines of prose about everything</h3>
+          <p><strong>Symptom:</strong> the expertise file grows like generated documentation. It repeats code, records narrative summaries of past work, and spends tokens on low-value edge cases. Reuse becomes slower, and important operations disappear inside volume.</p>
+          <p><strong>Fix:</strong> make the self-improve rubric prefer actionable, high-value expertise; enforce a hard line limit with <code>wc -l</code>; trim redundant examples and low-priority detail; retain the operations, invariants, risks, and jump targets that change agent behavior.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Learned state should have an observable diff</h3>
+          <p>For a high-stakes domain, treat the expertise update as a reviewable artifact even when the agent owns the write. Inspect what was added, removed, and reworded; spot-check citations against code; and rerun representative questions. This is an editorial practice overlay, not a claim that the course implements a production evaluation harness.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Expertise anatomy retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why carry exact file and line references?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>They let the agent jump to likely ground truth and revalidate quickly instead of searching blind.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What prevents unlimited growth in the shipped experts?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A <code>MAX_LINES</code> value of 1000, line-count checks, and instructions to trim least-critical content.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Must expertise be YAML?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. YAML is Dan’s preference; the lesson permits other readable, validatable formats.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Explain why a good expertise file is deliberately incomplete.</strong> Pass if your answer includes navigation value, ground-truth validation, a finite context budget, and a concrete reason to keep line references despite drift.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="self-improve">
+        <span class="section-number">08</span>
+        <h2 class="section-title">Self-improve is the Learn mechanism</h2>
+        <p class="section-lead">The expertise file does not improve itself. A stable rubric tells an agent how to compare mental model with code, decide what matters, update the model, and prove the artifact is still usable.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — repair the teacher</p>
+          <h3>The file is wrong. Which layer do you change?</h3>
+          <p>Your first impulse is efficient in the small: open the YAML, fix the line, move on. That produces a correct file once. The next run uses the same flawed maintenance rubric and recreates the same class of error. You have repaired an output while preserving the system that generated it.</p>
+          <p>Dan’s golden rule moves the intervention one layer up. Change the self-improve prompt so the agent learns how to maintain that category of expertise, rerun it, and inspect the result. The improvement compounds because later updates inherit the better rubric.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the seven-stage loop</p>
+          <h3>Learning is a runbook</h3>
+          <div class="learn-pipeline" role="img" aria-label="The self-improve prompt checks the git diff, reads expertise, validates code, identifies discrepancies, updates expertise, enforces the line limit, and validates YAML">
+            <article><b>1 · Diff</b><span>Optionally focus on recent domain changes.</span></article>
+            <article><b>2 · Read</b><span>Load the complete current expertise file.</span></article>
+            <article><b>3 · Validate</b><span>Open documented implementation files.</span></article>
+            <article><b>4 · Compare</b><span>List missing, stale, or incorrect claims.</span></article>
+            <article><b>5 · Update</b><span>Add, revise, or remove useful expertise.</span></article>
+            <article><b>6 · Bound</b><span>Count lines and trim until within budget.</span></article>
+            <article><b>7 · Parse</b><span>Read again and validate YAML syntax.</span></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the rubric on screen</p>
+          <h3>Watch the maintenance procedure, not just the diff</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-5-agent-experts/t1255-self-improve-prompt-workflow.jpg" alt="VS Code showing update expertise, enforce line limit, and validation steps in database self-improve prompt" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">20:55</span>The visible workflow updates missing or stale knowledge, keeps line numbers accurate, enforces a hard limit, and validates the artifact. Dan calls this a 99-line prompt on camera; the final database file is 179 lines.</figcaption>
+          </figure>
+          <p>The WebSocket variant is 190 lines. The discrepancy is course-era detail rather than a conceptual conflict. What matters is the procedure: optionally inspect the Git diff, read the current model, validate against implementation, identify discrepancies, update useful expertise, enforce the size constraint, parse the YAML, and report. The prompt also states that a thorough pass may find nothing to do.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>The self-improve prompt</h3>
+          <aside class="callout callout--term"><p class="callout__label">Golden rule · 37:00–37:10</p><p><strong>Do not update the expertise file by hand. Teach the agent how to update it.</strong> Build the system that builds the system; improve the maintenance layer.</p></aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — improve a weak line-number policy</p>
+          <h3>Make the rubric produce the correction</h3>
+          <p>Suppose the WebSocket model records a counter field but repeatedly omits the connect and disconnect reset locations. The wrong repair is to add two lines under <code>session_state</code> by hand. The durable repair is to add a prescriptive instruction to WebSocket <code>self-improve.md</code>: for session-scoped state, record initialization, mutation, and every lifecycle reset location with validated references.</p>
+          <p>Then run <code>/experts:websocket:self-improve false</code>. Inspect the generated expertise diff, open the cited code, and test whether the rule affected the desired category without bloating unrelated sections. If it did not, improve the rubric again. You are training the maintainer, not curating its output one line at a time.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — audit the seven stages</p>
+          <h3>Read the real prompt from top to bottom</h3>
+          <ol>
+            <li>Open database <code>self-improve.md</code> and find <code>CHECK_GIT_DIFF</code>, <code>FOCUS_AREA</code>, <code>EXPERTISE_FILE</code>, and <code>MAX_LINES</code>.</li>
+            <li>Mark the exact sentence that allows a clean “nothing to do” result.</li>
+            <li>Find the line-count loop and the categories suggested for trimming.</li>
+            <li>Find the YAML validation command, then compare it with the repository’s “use uv, never raw Python” rule.</li>
+          </ol>
+          <p>The last comparison reveals inherited prompt drift. In the lab, the manual syntax check uses <code>uv run --with pyyaml python</code> to honor the repository rule.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: reward change instead of accuracy</h3>
+          <p><strong>Symptom:</strong> every self-improve run must modify the file, seeding encourages a human-designed schema full of assumptions, or generated summaries of work accumulate as “expertise.” The file changes often but becomes less useful.</p>
+          <p><strong>Fix:</strong> start the carrier blank or loosely seeded, let the agent discover a structure, permit stable passes, prioritize durable operations over work logs, and grade every update against real source evidence.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Add review gates where false expertise is expensive</h3>
+          <p>In billing, security, or other high-stakes domains, autonomous writing need not mean unreviewed promotion. A practical extension is to treat the learned-state diff like a pull request: validate syntax automatically, run representative expert questions, spot-check ground-truth citations, and require human review before the new mental model influences critical actions. The course demonstrates the primitive; this is the governance overlay.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Self-improve retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">The mental model is wrong. What do you change?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The self-improve prompt or surrounding maintenance agentics, then rerun the system.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What do you refuse to change directly?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A non-empty expertise file, because direct edits bypass the learning mechanism.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why can “nothing to do” be a passing result?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Learning is validated alignment, not mandatory churn; the model may already match the code.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Explain “build the system that builds the system” with one concrete wrong fact.</strong> Show the tempting YAML edit, the rubric-level repair, the rerun, and the evidence that the learning mechanism improved.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="partial-complete">
+        <span class="section-number">09</span>
+        <h2 class="section-title">Partial versus complete: find the missing Act</h2>
+        <p class="section-lead">The database expert can answer and refresh its model, yet it does not change database code. The WebSocket expert composes planning, building, and self-improvement into a complete loop.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — useful does not mean complete</p>
+          <h3>A read-only expert can still earn its keep</h3>
+          <p>Engineers often turn a taxonomy into a status ladder: complete is good, partial is defective. Dan resists that interpretation. A question expert that knows the database, validates its mental model, cites exact code, and never writes can be the right safety boundary. It is partial only in the literal sense that its own workflow contains no domain-changing Act.</p>
+          <p>That nuance also repairs an overstatement: “without Act there is nothing to learn from.” The database model can learn from changes made by other workflows. What it cannot do is close the entire Act/Learn/Reuse cycle inside one composed expert operation.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — compare file roles</p>
+          <h3>One directory answers; one directory composes</h3>
+          <div class="expert-compare" role="img" aria-label="The database expert has Reuse and Learn but no Act, while the WebSocket expert composes Reuse, Act, and Learn">
+            <article><h3>Database · partial</h3><p>Read-only expertise-guided questions plus a separate refresh mechanism.</p><div class="step-ledger"><div><b>Reuse</b><span><code>question.md</code></span></div><div><b>Act</b><span>Missing inside expert</span></div><div><b>Learn</b><span><code>self-improve.md</code></span></div></div></article>
+            <article><h3>WebSocket · complete</h3><p>Expertise-informed plan, real build, and diff-aware self-improve in one workflow.</p><div class="step-ledger"><div><b>Reuse</b><span><code>plan.md</code> / <code>question.md</code></span></div><div><b>Act</b><span>Base <code>build.md</code></span></div><div><b>Learn</b><span><code>self-improve.md true</code></span></div></div></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — a one-shot composition</p>
+          <h3>The complete workflow names its own stages</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-5-agent-experts/t1598-websocket-pbi-composition.jpg" alt="VS Code showing WebSocket plan_build_improve command composing plan, build, and self-improve" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">26:38</span><code>plan_build_improve.md</code> composes three specialized commands. The WebSocket directory shows the orchestrator, two Reuse prompts, Learn, and the mental model; Act comes from the shared base <code>build.md</code>.</figcaption>
+          </figure>
+          <p>The file’s purpose is explicit: run an expertise-informed plan, build from the returned plan, and self-improve expertise based on the changes. Each step must finish before the next begins. The final report combines the three results so the top-level workflow preserves a small, inspectable summary.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Partial expert and complete expert</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s diagnostic · 22:20</p><p><strong>“Where’s our act step? We don’t actually have any action prompts here.”</strong> A partial expert lacks at least one loop stage inside its workflow; a complete expert composes all three.</p></aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — the exact call chain</p>
+          <h3>Reuse → Act → Learn in the shipped prompt</h3>
+          <div class="code-anatomy">
+            <div class="code-anatomy__title">.claude/commands/experts/websocket/plan_build_improve.md · conceptual trace</div>
+            <pre><code>Task("/experts:websocket:plan [request]")
+  → path_to_plan
+
+Task("/build [path_to_plan]")
+  → build_report
+
+Task("/experts:websocket:self-improve true")
+  → self_improve_report
+
+compile final report</code></pre>
+            <div class="code-anatomy__notes"><p><b>Reuse</b> Planning is seeded by WebSocket expertise and current critical files.</p><p><b>Act</b> The shared build command changes the real application from the plan.</p><p><b>Learn</b> The true flag focuses self-improve on the Git diff produced by Act.</p></div>
+          </div>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — label every file</p>
+          <h3>Do not hide orchestration inside a stage</h3>
+          <p>Create a table with five roles: mental model, Reuse, Act, Learn, and orchestration. Classify every file under both expert directories plus the shared <code>.claude/commands/build.md</code>. Put <code>plan_build_improve.md</code> under orchestration and annotate that it <em>invokes</em> all three stages; do not pretend it is the low-level build prompt.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: demand write access from every expert</h3>
+          <p><strong>Symptom:</strong> you add a code-changing prompt to a database question expert solely to make the checklist complete, expanding risk without a useful action requirement.</p>
+          <p><strong>Fix:</strong> design to purpose. Keep read-only experts partial when the job is safe, evidence-backed analysis. Add Act only when the expert owns a useful domain-changing workflow and you can validate both the code change and the learned-state update.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The boundary survives different packages</h3>
+          <p>Moving the prompts into a Skill or SDK process does not alter the classification. A Skill that answers and refreshes is partial. A headless workflow that plans, mutates the system, and updates validated learned state is complete. Keep the stage names as observability labels even if the implementation becomes code.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Partial and complete expert retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which stage is absent inside the database expert?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Act: its question prompt is read-only and no prompt in that expert changes database code.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Which exact prompt performs WebSocket Act?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The shared base <code>.claude/commands/build.md</code>, invoked by <code>plan_build_improve.md</code>.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Can a partial expert learn?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Yes. The database self-improve prompt can refresh expertise from code changes made elsewhere; the loop is partial because it does not perform its own Act.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Compare the experts without saying one is better.</strong> Explain their purposes, permissions, stage coverage, and the exact condition under which you would add Act to the database expert.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="context-delegation">
+        <span class="section-number">10</span>
+        <h2 class="section-title">Delegate context; scale compute for confidence</h2>
+        <p class="section-lead">The complete workflow can consume more context than one top-level agent should carry. Fresh sub-agents isolate each purpose, while deliberate redundancy tests whether one answer is robust.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the conductor cannot play every instrument</p>
+          <h3>One enormous context is not coordination</h3>
+          <p>The WebSocket workflow plans from expertise, reads a large code surface, builds through dozens of tool calls, then re-reads the diff and mental model. If the top agent performs every operation in one history, planning evidence, implementation noise, tool outputs, and maintenance reasoning compete for the same finite context.</p>
+          <p>The solution is not simply “more agents.” It is purpose-shaped delegation. Plan, build, and self-improve each receive fresh context and a complete narrow instruction. The top agent passes only the artifact needed across the boundary: plan path, build result, or self-improve report.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — protect the top-level context</p>
+          <h3>Fresh workers, small hand-offs</h3>
+          <div class="delegation-map" role="img" aria-label="A top-level orchestrator delegates planning, building, and self-improvement to fresh agents and receives compact results">
+            <article><b>Orchestrator</b><span>Holds request, stage order, and compact reports.</span></article>
+            <article><b>Plan agent</b><span>Reads expertise and code; returns a plan path.</span></article>
+            <article><b>Build agent</b><span>Reads the plan; changes and validates the app.</span></article>
+            <article><b>Learn agent</b><span>Reads diff, expertise, and code; returns a maintenance report.</span></article>
+          </div>
+          <p>This is context delegation. A separate pattern runs the <em>same</em> question through three or more experts. That is redundancy for confidence, not stage isolation. Do not collapse the two ideas.</p>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the token ledger on screen</p>
+          <h3>The workflow is large because each purpose is real</h3>
+          <figure class="frame-card">
+            <img src="../media/frames/ah-5-agent-experts/t2019-websocket-pipeline-metrics.jpg" alt="Claude Code terminal showing plan, build, and self-improve Task blocks with token and tool-use metrics" width="1920" height="1080" loading="lazy">
+            <figcaption><span class="frame-card__t">33:39</span>The plan task shows 81.8k tokens and 16 tool uses; build shows 61.4k tokens and 41 tool uses; self-improve follows in a fresh task. The numbers are course-run observations, not budgets to reproduce.</figcaption>
+          </figure>
+          <p>Dan also asks the same WebSocket question of three experts. One run fails. That failure is not an embarrassment hidden from the lesson; it is the reason to scale compute when confidence matters. Non-deterministic runs surface different evidence, omissions, and failure modes. A composer can compare survivors instead of treating the first fluent answer as certainty.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Context delegation and scaled confidence</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s scaling rule · 25:00</p><p><strong>“More compute equals more confidence.”</strong> Isolate different purposes into fresh contexts; duplicate the same high-stakes question when independent evidence is worth the cost.</p></aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — two fan-outs, two goals</p>
+          <h3>Do not measure both patterns by answer count</h3>
+          <div class="comparison">
+            <article class="comparison__card"><div class="comparison__head"><h3>Sequential specialists</h3><p>Plan → build → learn</p></div><div class="comparison__body"><p>Each agent has one prompt and one purpose. Artifacts cross boundaries in order. The goal is context protection and clean composition.</p></div></article>
+            <article class="comparison__card comparison__card--agentic"><div class="comparison__head"><h3>Parallel peers</h3><p>Question → N expert answers</p></div><div class="comparison__body"><p>Each agent receives the same question. Answers are compared or composed. The goal is confidence through independent attempts.</p></div></article>
+          </div>
+          <p>Sequential specialists should not vote on whether to continue; their outputs feed the next stage. Parallel peers should not each mutate the same working tree; the lesson uses them for question answering. The purpose determines safe topology.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — design the hand-off ledger</p>
+          <h3>Write only what crosses each boundary</h3>
+          <ol>
+            <li>For plan → build, name the one required artifact.</li>
+            <li>For build → self-improve, name the evidence self-improve focuses on.</li>
+            <li>For each task → orchestrator, name the compact result used in the final report.</li>
+            <li>For three parallel question agents, define how you will compare citations, disagreements, and failures.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: spend compute without a composition rule</h3>
+          <p><strong>Symptom:</strong> five agents return five long answers and the human reads all five from scratch. Or three build agents race in one worktree. Token use rises while confidence and safety remain undefined.</p>
+          <p><strong>Fix:</strong> state the purpose before fan-out. Use fresh sequential contexts for different stages and explicit artifacts for hand-off. Use independent read-only peers for confidence, then compare source citations, factual agreement, and unique findings with a defined composer.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>The SDK has a headless form of the same idea</h3>
+          <p>Official Claude examples describe sub-agents as separate contexts with their own instructions, tools, and expertise, and highlight specialization, context separation, and parallelization. SDK features also expose hooks, permissions, structured outputs, and setting-source controls. Those affordances enrich the machinery; the conceptual reason for fresh workers is unchanged.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Context delegation retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why are plan, build, and self-improve fresh agents?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Each gets a narrow purpose and isolated context, protecting the top-level orchestrator from large tool histories.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why ask three experts the same question?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Independent runs can fail differently or surface different evidence; composition can increase confidence for high-stakes answers.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is unsafe about parallelizing build the same way?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Multiple mutating agents can conflict in one working tree; the lesson’s confidence fan-out is read-only question work.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Draw two fan-outs.</strong> One must show different sequential purposes and small artifacts. The other must show the same read-only question sent to independent peers. Explain why their composition rules differ.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="product-experts">
+        <span class="section-number">11</span>
+        <h2 class="section-title">Product experts: one mental model per user</h2>
+        <p class="section-lead">Point the same loop at user behavior instead of code and the expertise file becomes a personalization substrate. Nile is a visible seed of that product class, not a production recommendation recipe.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the interface remembers your actions</p>
+          <h3>From codebase specialist to user specialist</h3>
+          <p>A database expert accumulates validated knowledge about one subsystem. A product expert can accumulate a narrow model of one user: products viewed, added to cart, and checked out. The next interface generation uses that state to decide which sections and products to stream.</p>
+          <p>The architecture creates a sharper responsibility. Code expertise can be checked against code. User expertise is behavioral data used to shape an experience. The demo therefore teaches the loop visually while Dan preserves a latency caveat: this is a seed, not proof that an agent should replace a production recommender.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — behavior becomes interface context</p>
+          <h3>Act, Learn, Reuse in the shopping flow</h3>
+          <div class="product-loop" role="img" aria-label="A user views, adds, or checks out products; the system stores per-user expertise; the next request streams a personalized interface">
+            <article><b>User acts</b><span>Views a product, adds it to cart, or completes checkout.</span></article>
+            <article><b>Expert learns</b><span>Per-user expertise records viewed, added, and checked-out product state.</span></article>
+            <article><b>UI reuses</b><span>The next generation receives those signals and streams matching sections.</span></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — before and after one useful action</p>
+          <h3>The same home page changes its starting model</h3>
+          <div class="frame-sequence">
+            <figure class="frame-card">
+              <img src="../media/frames/ah-5-agent-experts/t2545-nile-new-user-welcome.jpg" alt="Nile shopping app showing a generic welcome for a new user with zero expertise" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">42:25</span>A new user has no expertise signals, so Nile streams a generic welcome. The visible expertise badge is zero.</figcaption>
+            </figure>
+            <figure class="frame-card">
+              <img src="../media/frames/ah-5-agent-experts/t2588-nile-streaming-genui.jpg" alt="Nile shopping app showing personalized AI workstation content after product interest and cart activity" width="1920" height="1080" loading="lazy">
+              <figcaption><span class="frame-card__t">43:08</span>After a search for Nvidia DGX and an add-to-cart action, the next page welcomes the user back and streams AI-workstation-focused sections. The expertise badge is three and the cart contains one item.</figcaption>
+            </figure>
+          </div>
+          <p>The backend model stores <code>viewed_products</code>, <code>added_to_cart</code>, and <code>checked_out</code> inside <code>expertise_data</code>, plus improvement count and timestamp. The streaming system prompt receives dynamic behavior variables and static generation ranges, then uses tools such as <code>stream_section</code> and <code>find_related_products</code>.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>Product agent expert</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s product pattern · 42-minute beat</p><p><strong>When the user acts, the agent learns, then reuses that state to enhance the experience.</strong> Combined with generative UI, the mental model can shape the interface itself.</p></aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — trace the real Nile files</p>
+          <h3>From SQLAlchemy JSON to streamed components</h3>
+          <div class="file-map">
+            <div class="file-map__item"><code>server/src/models/expertise.py</code><p>Defines the per-user Expertise record and stores the mental-model payload in a SQLAlchemy <code>JSON</code> column in the checked-out SQLite implementation.</p></div>
+            <div class="file-map__item"><code>server/src/services/agent_expert.py</code><p>Uses the Claude Agent SDK client and tools to generate and stream personalized sections.</p></div>
+            <div class="file-map__item"><code>shopping_expert_streaming_system_prompt.md</code><p>Receives viewed, added, and checked-out signals plus <code>SECTIONS_RANGE</code> and <code>PRODUCTS_PER_SECTION_RANGE</code>.</p></div>
+            <div class="file-map__item"><code>client/src/components/layout/ExpertisePanel.vue</code><p>Exposes the Control-K panel that makes the mental model visible during the demo.</p></div>
+          </div>
+          <p>The Nile README uses JSONB language, while the final implementation imports SQLite and SQLAlchemy <code>JSON</code>. The chapter follows the checked-out code for lab claims. The conceptual per-user mental model does not depend on the storage engine.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — label product-loop evidence</p>
+          <h3>Separate behavior, storage, generation, and presentation</h3>
+          <ol>
+            <li>Find the Expertise model and list its persisted fields.</li>
+            <li>Find the system-prompt variables derived from user behavior.</li>
+            <li>Find the tool that streams a UI section.</li>
+            <li>Find the frontend panel that reveals expertise.</li>
+            <li>State which of those is Act, Learn, Reuse context, or observable output.</li>
+          </ol>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: sell the seed as a recommendation engine</h3>
+          <p><strong>Symptom:</strong> the personalized screenshot becomes proof that an LLM agent should serve every real-time recommendation. Latency, consistency, evaluation, privacy, and fallback behavior disappear from the argument.</p>
+          <p><strong>Fix:</strong> preserve Dan’s caveat. Study Nile as Act/Learn/Reuse made visible. Notice the loading indicators and streamed sections that mask delay. Prototype the product class; do not claim the demonstration supplies a production architecture.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>Faster models improve feasibility; latency remains a product constraint</h3>
+          <p>Streaming component protocols, structured tool calls, and faster small models make adaptive interfaces more practical than a static screenshot suggests. The durable product question is still whether the experience remains useful under delay, partial generation, errors, and cold-start data. Keep deterministic recommendation and graceful fallback paths available when the agent cannot meet the interaction budget.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="Product expert retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What is the per-user mental model in Nile?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Expertise data containing viewed, added-to-cart, and checked-out product signals, plus improvement metadata.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Where does Reuse appear?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The next generative-UI request receives the stored behavior signals and uses them to stream personalized sections.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">What caveat must remain attached to Nile?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It is a latency-bound seed of a product class, not a demonstrated production recommendation engine.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Explain Nile with the same three verbs used for code.</strong> Then name two differences between user expertise and codebase expertise: source-of-truth shape, risk, latency, or privacy are all valid if tied to the files.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section idea-cycle" id="when-to-use">
+        <span class="section-number">12</span>
+        <h2 class="section-title">Build experts where learning is valuable—and judgeable</h2>
+        <p class="section-lead">The pattern becomes more valuable as a domain grows complex, risky, distinctive, and changeable. Those same properties make false expertise more dangerous, so the operator must be able to evaluate the mental model.</p>
+
+        <div class="move move--hook">
+          <p class="move-label">1 · Hook — the scary code is the candidate</p>
+          <h3>Do not start with the safest toy merely because it feels comfortable</h3>
+          <p>Billing, security, databases, DevOps, multi-way integrations, APIs, data science, and cross-service type synchronization are exactly where repeated domain rediscovery is expensive. Dan says his billing experts have caught revenue-changing details. The claim is not that learned state removes risk; it is that a validated, reusable mental model becomes more valuable where generic cold starts repeatedly miss domain-specific edges.</p>
+          <p>But an operator who cannot recognize a wrong billing claim cannot safely govern a billing expert. High value and high review responsibility arrive together.</p>
+        </div>
+
+        <div class="move move--picture">
+          <p class="move-label">2 · Picture — the decision matrix</p>
+          <h3>Change rate and domain stakes</h3>
+          <div class="decision-matrix" role="img" aria-label="A two by two matrix recommends experts for evolving high-stakes domains, cautious prototypes for stable high-stakes domains, generic agents for evolving low-stakes work, and no expert for stable simple work">
+            <article><b>Stable + lower stakes</b><p>Simple, familiar, or brand-new code. A generic agent can inspect the current shape without carrying much specialized history.</p></article>
+            <article><b>Evolving + high stakes</b><p>Strong expert candidate: billing, security, databases, integrations, or synchronized types—with validation and review gates.</p></article>
+            <article><b>Stable + high stakes</b><p>Use caution. Reusable checklists may help, but ask whether a changing mental model adds value beyond enforced rules and tests.</p></article>
+            <article><b>Evolving + lower stakes</b><p>Prototype only if repeated rediscovery costs more than seeding, maintenance, tokens, and false-expertise review.</p></article>
+          </div>
+        </div>
+
+        <div class="move move--story">
+          <p class="move-label">3 · Story — the unframed decision beat</p>
+          <h3>The lesson turns from machinery to judgment</h3>
+          <p>From about 48:09 through 59:20, Dan works through seeding, source-of-truth objections, finite context, false expertise, over-granularity, too many experts, and the use/don’t-use boundary. The frame plan intentionally leaves this narration unframed because a decision matrix teaches the relationships more clearly than a bullet-slide screenshot.</p>
+          <p>His strongest refusal is epistemic: if you do not understand the problem, do not build an expert for it. The agent can store confident mistakes, and you will lack the mental model needed to challenge them. In that case, an expert makes the problem worse.</p>
+        </div>
+
+        <div class="move move--name">
+          <p class="move-label">4 · Name it</p>
+          <h3>The expert-fit test</h3>
+          <aside class="callout callout--term"><p class="callout__label">Dan’s scaling claim · 56:50</p><p><strong>As codebase complexity and size grow, the agent expert becomes more valuable.</strong> Only build where the domain evolves and the operator can evaluate the learned model.</p></aside>
+        </div>
+
+        <div class="move move--example">
+          <p class="move-label">5 · Worked example — synchronized types</p>
+          <h3>A strong first expert has a narrow, testable boundary</h3>
+          <p>The course repository requires <code>apps/orchestrator_db/models.py</code> to stay synchronized with migrations and distributes models through <code>sync_models.py</code>. This is a good expert-shaped boundary: a small set of high-value files, clear drift modes, repeated cross-application consequences, and ground truth that can be inspected.</p>
+          <p>Contrast a static helper script with an obvious shape and no repeated change. A fresh generic agent can read it cheaply. Seeding and maintaining expertise would add ceremony without a meaningful compounding advantage.</p>
+        </div>
+
+        <div class="move move--try">
+          <p class="move-label">6 · You try — write two yeses and one no</p>
+          <h3>Defend with four variables</h3>
+          <p>Choose three real course-repository domains. For each, score change rate, risk, codebase-specific uniqueness, and your ability to evaluate the agent’s claims. Select two expert candidates and one refusal. Your refusal is stronger if a plain agent or a deterministic check solves the job with less learned-state risk.</p>
+        </div>
+
+        <div class="move move--fail">
+          <p class="move-label">7 · Common fail + fix</p>
+          <h3>Failure: expertize a mystery</h3>
+          <p><strong>Symptom:</strong> the domain is important but poorly understood, so you ask the agent to build its own expertise and then accept the result because no human can judge it.</p>
+          <p><strong>Fix:</strong> use generic exploration first. Build your own minimal mental model, establish ground-truth tests and review criteria, narrow the domain boundary, and only then seed an expert. Importance alone is not sufficient authorization.</p>
+        </div>
+
+        <div class="move move--current">
+          <p class="move-label">8 · Current practice</p>
+          <h3>High stakes require promotion controls</h3>
+          <p>For a critical expert, separate “the agent proposed new expertise” from “the system now relies on it.” Add syntax checks, representative question evals, code-citation validation, review of removals as well as additions, and periodic re-seeding when the domain changes shape. These controls mitigate false expertise; they do not eliminate it.</p>
+        </div>
+
+        <div class="move move--check">
+          <p class="move-label">9 · Retrieval</p>
+          <section class="retrieval-quiz" aria-label="When to build an expert retrieval questions">
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name three strong expert domains from the lesson.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Any three of billing, security, database, DevOps, complex integrations, ML/data science, APIs, or cross-service type synchronization.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Name one strong refusal case.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A static/simple problem, a brand-new familiar code shape, or any domain the operator cannot evaluate.</p></details></div>
+            <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">Why is “I do not understand it” especially dangerous?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>You cannot recognize false expertise or judge whether the self-maintained model is improving the right things.</p></details></div>
+          </section>
+        </div>
+
+        <div class="move move--teach">
+          <p class="move-label">10 · Teach-back</p>
+          <div class="teach-back"><p><strong>Answer Dan’s closing question with a qualification.</strong> Explain when you want an expert that remembers and learns, then name one case where a fresh generalist is the safer and cheaper choice.</p></div>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="current-practice">
+        <span class="section-number">13</span>
+        <h2 class="section-title">Current practice · keep the primitive, update the container</h2>
+        <p class="section-lead">The course’s raw prompt files remain the clearest way to see Act, Learn, and Reuse. Current tooling adds always-on memory, on-demand Skills, SDK sub-agents, and managed execution. Use those surfaces to sharpen scope and governance, not to rename the same cold-start agent.</p>
+
+        <div class="practice-board">
+          <article><h3>Memory has multiple lifecycles</h3><p><code>CLAUDE.md</code> is human-written instruction loaded into sessions. Auto memory is agent-written repository knowledge and also has startup behavior. Skills load their bodies on demand. Dan’s detached expertise remains useful when one narrow domain needs its own validation and maintenance policy.</p><p><a href="https://code.claude.com/docs/en/memory">Official Claude Code memory guide ↗</a></p></article>
+          <article><h3>Skills are a natural package</h3><p>Current custom commands and Skills share invocation behavior; existing command files keep working. A Skill adds supporting files, automatic relevance, and progressive disclosure. Package an expert there when discoverability and on-demand loading help, while keeping the mental model and Learn rubric observable.</p><p><a href="https://code.claude.com/docs/en/slash-commands">Official Skills guide ↗</a></p></article>
+          <article><h3>SDK orchestration is the headless form</h3><p>The Agent SDK can load Claude Code features, mount Skills, define sub-agents, apply hooks and permissions, and return structured results. That is a deployment surface for the same loop. Keep stage boundaries and learned-state evidence visible in production code.</p><p><a href="https://code.claude.com/docs/en/agent-sdk/claude-code-features">Official Agent SDK feature guide ↗</a></p></article>
+        </div>
+
+        <h3>A safe modernization path</h3>
+        <div class="workflow" aria-label="Modernization path from raw prompts to a governed deployed expert">
+          <div class="workflow__step"><strong>1 · Learn raw</strong><code>commands + expertise</code></div>
+          <div class="workflow__step"><strong>2 · Package</strong><code>Skill + references</code></div>
+          <div class="workflow__step"><strong>3 · Deploy</strong><code>SDK subagents</code></div>
+          <div class="workflow__step"><strong>4 · Govern</strong><code>eval + diff gate</code></div>
+        </div>
+        <p>At every step, run the same audit. What useful action creates evidence? What procedure decides whether evidence belongs in learned state? What exact artifact changes? What later execution loads it? What ground truth overrides it? If packaging makes those answers harder to find, the abstraction is working against the lesson.</p>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Publication source lock</p>
+          <p>No YouTube overlay is included. The extract’s strongest memory video has no verified ID, and the inherited Agent Skill ID could not be independently verified through the available video tooling. The chapter therefore uses zero video links—within the required maximum of three—and relies on official current documentation for fast-moving claims.</p>
+        </aside>
+
+        <p class="source-lock"><strong>Model IDs in the frames are period detail.</strong> The recording shows course-era Claude 4.5-family identifiers and swaps a larger model for a smaller one to improve speed. Do not copy those IDs as current recommendations. Choose an available model based on task difficulty, latency, cost, and evaluation evidence; the learning-loop architecture does not depend on the displayed names.</p>
+      </section>
+
+      <section class="chapter-section chapter-section--wide" id="lab">
+        <span class="section-number">14</span>
+        <h2 class="section-title">Graded lab · Audit, Reuse, Learn, Seed</h2>
+        <p class="section-lead">Work only in the course codebase. You will map two experts, run read-only Reuse, run controlled Learn, reconstruct Dan’s completed counter loop from real files, and seed a new header-stats expert whose substantive expertise is written only by self-improve.</p>
+
+        <aside class="callout callout--warning">
+          <p class="callout__label">Prime directive · automatic redo</p>
+          <p>Never hand-edit a non-empty <code>expertise.yaml</code>. Creating an empty carrier is allowed. Every substantive byte of learned state must come from self-improve. A direct expertise edit requires a redo regardless of points.</p>
+        </aside>
+
+        <div class="evidence-strip" aria-label="Lab evidence categories">
+          <article><b>Repository</b><span><code>disler/agent-experts</code> only; no external lab repositories.</span></article>
+          <article><b>Score</b><span>100 points total; 80 points required to pass.</span></article>
+          <article><b>Time</b><span>60–90 minutes core; optional UI build adds setup time.</span></article>
+          <article><b>Discipline</b><span>No commit is required; the course rules say do not commit unless asked.</span></article>
+        </div>
+
+        <h3>Lab map and rubric</h3>
+        <div class="rubric-wrap">
+          <table>
+            <thead><tr><th>Checkpoint</th><th>Evidence</th><th>Points</th></tr></thead>
+            <tbody>
+              <tr><td>1 · Map</td><td>Correct Act/Learn/Reuse/orchestrator/mental-model labels for both experts</td><td>10</td></tr>
+              <tr><td>2 · Reuse</td><td>Read-only database answer, expertise first, code validation, exact citations</td><td>20</td></tr>
+              <tr><td>3 · Learn</td><td>Self-improve run, line budget, valid YAML, diff or justified stable result</td><td>20</td></tr>
+              <tr><td>4 · Archaeology</td><td>Five-row counter evidence trace across plan, source, and expertise</td><td>20</td></tr>
+              <tr><td>5 · Seed</td><td>New blank-start header-stats expert written by self-improve and queried safely</td><td>20</td></tr>
+              <tr><td>6 · Teach</td><td>Closed-notes oral explanation and use/don’t-use judgment</td><td>10</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <section class="lab-box" id="lab-setup">
+          <h3 class="lab-box__title">Setup · course repository and rules</h3>
+          <ul class="lab-box__meta"><li>5–10 minutes</li><li>Required</li><li>Preflight</li></ul>
+          <ol class="lab-box__steps">
+            <li>Use the provided course checkout, or clone the exact course repository:
+              <pre><code>git clone https://github.com/disler/agent-experts.git
+cd agent-experts</code></pre>
+            </li>
+            <li>Read <code>CLAUDE.md</code> completely. Record four rules: real tests/no mocks; keep database models and migrations synchronized; use <code>uv</code>, never raw Python; do not commit unless explicitly asked.</li>
+            <li>Check tools:
+              <pre><code>claude --version
+uv --version
+git --version
+node --version</code></pre>
+            </li>
+            <li>Capture a baseline with <code>git status --short</code>. Preserve pre-existing work; the lab should not make unrelated files part of its evidence.</li>
+          </ol>
+          <div class="course-drift"><strong>Known course drift:</strong> both self-improve prompts show a raw <code>python3</code> YAML check, which conflicts with the repository’s <code>uv</code> rule. The lab uses a <code>uv run --with pyyaml python</code> check. The generated startup Skill also names a stale backend port; the checked-out default is 9403 and the frontend is 5175.</div>
+        </section>
+
+        <section class="lab-box" id="lab-map">
+          <h3 class="lab-box__title">Checkpoint 1 · map the two experts</h3>
+          <ul class="lab-box__meta"><li>10 minutes</li><li>10 points</li><li>No execution yet</li></ul>
+          <ol class="lab-box__steps">
+            <li>Read every file under <code>.claude/commands/experts/database/</code> and <code>.claude/commands/experts/websocket/</code>.</li>
+            <li>Create a table with five roles: mental model, Reuse, Act, Learn, orchestration.</li>
+            <li>Include the shared <code>.claude/commands/build.md</code>. The WebSocket expert has no local <code>build.md</code>; its orchestrator invokes the shared base command.</li>
+            <li>Cite the database read-only rule in <code>question.md</code>, the database Reuse order, the WebSocket build task, and the WebSocket <code>self-improve true</code> task.</li>
+            <li>Answer in one sentence: why is database partial but still useful?</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint answer.</strong> Database has Reuse and Learn but no Act inside its own workflow. WebSocket composes expertise-informed planning, shared build, and diff-aware self-improve.</div>
+          <div class="lab-box__pass"><h4>Pass criteria · 10/10</h4><ul><li>Every file has one primary role.</li><li><code>plan_build_improve.md</code> is labeled orchestration, not the low-level build prompt.</li><li>The database nuance includes learning from changes made elsewhere.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-reuse">
+          <h3 class="lab-box__title">Checkpoint 2 · exercise Reuse safely</h3>
+          <ul class="lab-box__meta"><li>10–15 minutes</li><li>20 points</li><li>Read-only</li></ul>
+          <p>Run this slash command in Claude Code:</p>
+          <pre><code>/experts:database:question "Does information flow between our database tables? Cite exact files and lines and include a Mermaid ER diagram."</code></pre>
+          <ol class="lab-box__steps">
+            <li>Observe the first <em>substantive domain read</em>. Bookkeeping such as TodoWrite may occur first; grade that expertise is read before implementation files, not that it is literally tool call number one.</li>
+            <li>Confirm the answer validates claims against <code>apps/orchestrator_db/models.py</code>, migrations, and relevant database implementation.</li>
+            <li>Check that the answer cites current files and line locations and adds a Mermaid diagram where useful.</li>
+            <li>Run <code>git status --short</code> again. The database question prompt explicitly forbids writing, editing, or creating files.</li>
+          </ol>
+          <div class="course-drift"><strong>Correction to the extracted draft lab:</strong> do not ask this command to write a temporary report. Its shipped instruction says “DO NOT write, edit, or create any files.” Keep the answer in the conversation.</div>
+          <div class="lab-box__pass"><h4>Pass criteria · 20/20</h4><ul><li>Expertise precedes code validation.</li><li>Claims are checked against implementation.</li><li>Answer has concrete source evidence.</li><li>The command creates no file change.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-learn">
+          <h3 class="lab-box__title">Checkpoint 3 · exercise Learn without hand editing</h3>
+          <ul class="lab-box__meta"><li>10–15 minutes</li><li>20 points</li><li>Stable is valid</li></ul>
+          <p>Run:</p>
+          <pre><code>/experts:database:self-improve false</code></pre>
+          <p>Then inspect, without modifying expertise:</p>
+          <pre><code>git diff -- .claude/commands/experts/database/expertise.yaml
+wc -l .claude/commands/experts/database/expertise.yaml
+uv run --with pyyaml python -c \
+"import pathlib,yaml; yaml.safe_load(pathlib.Path('.claude/commands/experts/database/expertise.yaml').read_text())"</code></pre>
+          <ol class="lab-box__steps">
+            <li>If there is a diff, choose three changed claims and validate each against the cited code.</li>
+            <li>If there is no diff, use the self-improve report to prove the agent still read expertise, checked implementation, enforced the line budget, and validated syntax.</li>
+            <li>Confirm the file remains at or below <code>MAX_LINES: 1000</code>.</li>
+            <li>Do not “help” the run by improving YAML manually.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint answer.</strong> A clean “nothing to do” result earns full credit when the validation procedure ran. Churn is not learning.</div>
+          <div class="lab-box__pass"><h4>Pass criteria · 20/20</h4><ul><li>The command, not the learner, owns expertise writes.</li><li>YAML parses with the repository-compliant UV command.</li><li>Line budget passes.</li><li>Every changed claim is grounded, or stable state is evidenced.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-archaeology">
+          <h3 class="lab-box__title">Checkpoint 4 · reconstruct Dan’s completed loop</h3>
+          <ul class="lab-box__meta"><li>15 minutes</li><li>20 points</li><li>Evidence archaeology</li></ul>
+          <p>The counter already exists in the final course tree. Do not rerun the recording’s request and pretend any no-op is a failed Act. Reconstruct the completed loop from these artifacts:</p>
+          <ul>
+            <li><code>specs/websocket-event-counter-nav-bar.md</code></li>
+            <li><code>frontend/src/services/chatService.ts</code></li>
+            <li><code>frontend/src/stores/orchestratorStore.ts</code></li>
+            <li><code>frontend/src/composables/useHeaderBar.ts</code></li>
+            <li><code>frontend/src/components/AppHeader.vue</code></li>
+            <li><code>.claude/commands/experts/websocket/expertise.yaml</code></li>
+          </ul>
+          <ol class="lab-box__steps">
+            <li>Submit a five-row evidence table: every-message interception; counter state; increment callback; connect/disconnect reset; header display.</li>
+            <li>For each row, cite the source file and corresponding expertise entry.</li>
+            <li>Explain which artifacts prove Act, which entries prove Learn, and which prompts provide later Reuse.</li>
+            <li>Run <code>wc -l</code> on <code>chatService.ts</code>. Compare 193 source lines with the 194-line expertise claim. Explain why code wins.</li>
+            <li>Optional build check:
+              <pre><code>cd apps/orchestrator_3_stream/frontend
+npm install
+npm run build</code></pre>
+              The package defines <code>build</code>, not the <code>type-check</code> script named in the old plan.
+            </li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass criteria · 20/20</h4><ul><li>Five source behaviors are traced.</li><li>Plan, implementation, and learned model are distinguished.</li><li>The real drift example is interpreted correctly.</li><li>No fake “new counter” diff is claimed.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-seed">
+          <h3 class="lab-box__title">Checkpoint 5 · seed a header-stats expert from blank</h3>
+          <ul class="lab-box__meta"><li>20–30 minutes</li><li>20 points</li><li>Every expertise byte agent-written</li></ul>
+          <p>Create this new expert inside the course repository:</p>
+          <pre><code>.claude/commands/experts/header-stats/
+├── expertise.yaml
+├── question.md
+└── self-improve.md</code></pre>
+          <ol class="lab-box__steps">
+            <li>Create <code>expertise.yaml</code> as an empty carrier. Do not add headings, comments, or seed facts.</li>
+            <li>Adapt the existing database question and self-improve prompts. Keep question mode read-only and require expertise-first, source-second validation.</li>
+            <li>Scope self-improve to <code>chatService.ts</code>, <code>orchestratorStore.ts</code>, <code>useHeaderBar.ts</code>, and <code>AppHeader.vue</code>. Set a roughly 300-line limit and retain the repository’s concise/actionable rule.</li>
+            <li>Run header-stats self-improve repeatedly until a pass reports no further useful change, or document why it did not stabilize.</li>
+            <li>Inspect the expertise diff after each pass. Do not type into the learned file.</li>
+            <li>Run:
+              <pre><code>/experts:header-stats:question "Where does the WS Events value come from, and exactly when does it reset?"</code></pre>
+            </li>
+            <li>Verify the answer reads its mental model first, revalidates current source, and cites exact files and lines.</li>
+          </ol>
+          <div class="checkpoint"><strong>Checkpoint answer.</strong> Creating an empty carrier and authoring the maintenance prompts is system-layer work. Writing substantive expertise by hand violates the lesson.</div>
+          <div class="lab-box__pass"><h4>Pass criteria · 20/20</h4><ul><li>The carrier began empty.</li><li>Self-improve wrote every substantive expertise byte.</li><li>The mental model remains within its smaller budget.</li><li>The question command revalidates before answering.</li><li>Repeated self-improve stabilizes or has a documented failure.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-teach">
+          <h3 class="lab-box__title">Checkpoint 6 · closed-notes teach-back</h3>
+          <ul class="lab-box__meta"><li>5–10 minutes</li><li>10 points</li><li>Oral</li></ul>
+          <p>Without notes, answer:</p>
+          <ol class="lab-box__steps">
+            <li>Define Act, Learn, and Reuse, including the key word attached to Act.</li>
+            <li>Why is expertise a mental model rather than truth?</li>
+            <li>What makes the database expert partial?</li>
+            <li>What do you change when expertise is wrong, and what do you refuse to edit?</li>
+            <li>Name two suitable expert domains and one unsuitable case, with reasons.</li>
+          </ol>
+          <div class="lab-box__pass"><h4>Pass criteria · 10/10</h4><ul><li>Every answer names observable architecture.</li><li>The code remains source of truth.</li><li>The partial-expert nuance is accurate.</li><li>Use/don’t-use judgment includes ability to evaluate false expertise.</li></ul></div>
+        </section>
+
+        <section class="lab-box" id="lab-final-pass">
+          <h3 class="lab-box__title">Final pass sheet</h3>
+          <ul class="lab-box__meta"><li>80/100 required</li><li>Prime directive overrides score</li></ul>
+          <ul class="lab-checklist">
+            <li>I labeled both existing experts through exact files.</li>
+            <li>The database question changed no files and cited validated code.</li>
+            <li>The database Learn pass respected line and syntax checks.</li>
+            <li>I reconstructed the existing counter instead of claiming it was new.</li>
+            <li>I explained the real 194-versus-193 drift.</li>
+            <li>My new expertise carrier began empty.</li>
+            <li>Self-improve wrote every substantive line of new expertise.</li>
+            <li>I made no commit because the repository does not request one.</li>
+            <li>I can teach the loop and refuse a poor expert candidate without notes.</li>
+          </ul>
+        </section>
+      </section>
+
+      <section class="chapter-section" id="mastery">
+        <span class="section-number">15</span>
+        <h2 class="section-title">Cumulative mastery · retrieve, trace, judge</h2>
+        <p class="section-lead">Recognition is not mastery. Close the chapter, answer from memory, then reveal. Misses should send you to a specific file or loop stage rather than to a vague reread.</p>
+
+        <h3>Round 1 · foundations</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative foundation questions">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">1. What structural problem does an agent expert solve?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Ordinary sessions execute and forget; the expert stores validated domain learning for later reuse.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">2. Define an agent expert in one sentence.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A generic narrow agent wired into Act → Learn → Reuse over a persistent expertise file it maintains.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">3. Why is expertise not a source of truth?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>It is a compressed, fallible navigation model; the code that runs governs current behavior.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">4. Decompose “self-improving template meta prompt.”</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Meta builds another prompt/artifact, template fixes purpose and structure, and self-improving updates isolated state for later use.</p></details></div>
+        </section>
+
+        <h3>Round 2 · trace the repository</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative repository trace questions">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">5. Which database file provides Reuse?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>.claude/commands/experts/database/question.md</code>.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">6. Which shared file provides WebSocket Act?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p><code>.claude/commands/build.md</code>, invoked by the WebSocket orchestrator.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">7. What flag connects the WebSocket build diff to Learn?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The orchestrator runs <code>/experts:websocket:self-improve true</code>.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">8. Reconstruct the seven self-improve stages.</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Optional diff, read expertise, validate code, identify discrepancies, update expertise, enforce line limit, validate YAML and report.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">9. What exact real drift example appears in the final tree?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>WebSocket expertise calls <code>chatService.ts</code> 194 lines while the current file contains 193.</p></details></div>
+        </section>
+
+        <h3>Round 3 · diagnose the failure</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative diagnosis questions">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">10. A Skill generates excellent prompts but retains nothing. Expert?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. It is useful meta-agentics that acts but does not learn and reuse persistent state.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">11. Self-improve changes nothing after full validation. Failure?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. A stable aligned model is a valid result; forced churn would reduce quality.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">12. An engineer fixes stale YAML directly. What remains broken?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The maintenance rubric that failed to detect or represent the fact, so the error class can recur.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">13. A partial database expert refreshes after another workflow changes code. Contradiction?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>No. Partial means it lacks its own Act, not that Learn cannot observe external changes.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">14. Five agents answer independently, but nobody compares citations. What is missing?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>A composition rule. Compute increased; confidence did not become measurable.</p></details></div>
+        </section>
+
+        <h3>Round 4 · connect earlier tactics</h3>
+        <section class="retrieval-quiz" aria-label="Cumulative cross-lesson questions">
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">15. How does TAC-3 template engineering appear here?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>The expert prompts have stable purpose, variables, instructions, workflow, and report structures.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">16. How does TAC-6 one agent, one prompt, one purpose appear?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Plan, build, and self-improve run as separate fresh specialists with narrow purposes.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">17. How do the core four constrain an expert?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>Expert packaging still reduces to context, model, prompt, and tools; the learning loop structures how those primitives persist and act.</p></details></div>
+          <div class="retrieval-quiz__item"><p class="retrieval-quiz__q">18. When is a generic agent preferable?</p><details class="retrieval-quiz__a"><summary>Reveal answer</summary><p>When the problem is static/simple/new, repeated learning adds little, or the operator cannot evaluate the domain safely.</p></details></div>
+        </section>
+
+        <aside class="callout callout--why">
+          <p class="callout__label">Scoring</p>
+          <p><strong>16–18:</strong> ready to seed and review a narrow expert. <strong>12–15:</strong> rerun the lab checkpoint attached to each miss. <strong>0–11:</strong> redraw Act/Learn/Reuse and relabel both expert directories before attempting another seed.</p>
+        </aside>
+
+        <h3>Capstone teach-back</h3>
+        <div class="teach-back">
+          <p>Without notes, teach a colleague for seven minutes:</p>
+          <ol>
+            <li>Why agents forgetting is structural.</li>
+            <li>Why expertise is a mental model and code remains truth.</li>
+            <li>How a self-improving template meta prompt differs from meta-agentics.</li>
+            <li>How the database and WebSocket experts map to Act, Learn, and Reuse.</li>
+            <li>Why the expertise file is never hand-edited.</li>
+            <li>Why fresh stage agents and parallel answer agents solve different problems.</li>
+            <li>Where you would build an expert and where you would refuse.</li>
+          </ol>
+          <p class="fine">Expert pass: your listener can open an unfamiliar expert, locate learned state and maintenance, identify any missing loop stage, and name the ground truth used to validate it.</p>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="glossary">
+        <span class="section-number">16</span>
+        <h2 class="section-title">AH-5 glossary</h2>
+        <p class="section-lead">Use these terms as architecture labels, not marketing adjectives. Each should point to an observable file, stage, or behavior.</p>
+        <dl class="glossary">
+          <div><dt>Agent expert</dt><dd>A generic narrow agent wired into Act → Learn → Reuse over a persistent expertise file it maintains.</dd></div>
+          <div><dt>Structural forgetting</dt><dd>An execution architecture in which useful domain understanding disappears at the session boundary because no persistent learning path captures it.</dd></div>
+          <div><dt>Mental model</dt><dd>A compact, evolving data structure that helps an agent navigate one domain and must be revalidated against ground truth.</dd></div>
+          <div><dt>Expertise file</dt><dd>The topic-scoped artifact containing the agent’s mental model, often YAML in this lesson; not documentation or source of truth.</dd></div>
+          <div><dt>Source of truth</dt><dd>The code and data structures that actually determine current system behavior.</dd></div>
+          <div><dt>Self-improving template meta prompt</dt><dd>A structured prompt system that builds or updates an agentic artifact and carries useful information to a later execution.</dd></div>
+          <div><dt>Meta-agentics</dt><dd>Meta prompts, meta agents, and meta Skills: mechanisms that build prompts, agents, and Skills. The demonstrated forms act but do not learn.</dd></div>
+          <div><dt>Act</dt><dd>Take a useful, observable action against the real domain. The WebSocket expert’s shared build step is the codebase example.</dd></div>
+          <div><dt>Learn</dt><dd>Validate the mental model against ground truth and update useful persistent expertise through self-improve.</dd></div>
+          <div><dt>Reuse</dt><dd>Load expertise before searching, validate it against current code, and use the verified model to answer, plan, or act.</dd></div>
+          <div><dt>Partial expert</dt><dd>An expert whose own workflow lacks at least one loop stage. The database expert has Reuse and Learn but no Act.</dd></div>
+          <div><dt>Complete expert</dt><dd>An expert workflow that composes useful Act, controlled Learn, and later Reuse.</dd></div>
+          <div><dt>Self-improve prompt</dt><dd>The maintenance rubric that reads expertise, validates implementation, updates discrepancies, enforces size, and validates the artifact.</dd></div>
+          <div><dt>Seeding</dt><dd>Creating the first expertise state, preferably from an empty or loose carrier through the self-improve mechanism rather than human-authored facts.</dd></div>
+          <div><dt>False expertise</dt><dd>Learned state that is incorrect, stale, misleading, or overconfident; an expected risk mitigated through validation and review, not eliminated.</dd></div>
+          <div><dt>Context delegation</dt><dd>Giving each stage a fresh agent and narrow purpose so the top-level orchestrator carries only small hand-off artifacts.</dd></div>
+          <div><dt>Scaled confidence</dt><dd>Running the same high-stakes read-only question through multiple independent experts and composing evidence, disagreements, and failures.</dd></div>
+          <div><dt>Line budget</dt><dd>The hard size constraint on expertise; both shipped self-improve prompts use <code>MAX_LINES: 1000</code>.</dd></div>
+          <div><dt>Core four</dt><dd>Context, model, prompt, and tools—the primitives beneath commands, Skills, sub-agents, SDK workflows, and experts.</dd></div>
+          <div><dt>Build the system that builds the system</dt><dd>Improve the maintenance procedure that produces an artifact rather than repeatedly repairing the artifact by hand.</dd></div>
+        </dl>
+      </section>
+
+      <footer class="chapter-footer">
+        <p class="eyebrow">Volume II · Agentic Horizon</p>
+        <div class="chapter-footer__nav">
+          <a href="../index.html">← Book hub</a>
+          <span>Lesson 13 · Agent Experts</span>
+        </div>
+      </footer>
+
+      <script>
+        (() => {
+          const topBar = document.getElementById('top-progress');
+          const railBar = document.getElementById('rail-progress');
+          const label = document.getElementById('progress-label');
+          const links = [...document.querySelectorAll('.chapter-nav a')];
+          const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+          let progressFramePending = false;
+
+          const updateProgress = () => {
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const value = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+            const percent = `${Math.round(value * 100)}%`;
+            if (topBar) topBar.style.width = percent;
+            if (railBar) railBar.style.width = percent;
+            if (label) label.textContent = percent;
+          };
+
+          const requestProgressUpdate = () => {
+            if (progressFramePending) return;
+            progressFramePending = true;
+            requestAnimationFrame(() => {
+              updateProgress();
+              progressFramePending = false;
+            });
+          };
+
+          if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(entries => {
+              const visible = entries
+                .filter(entry => entry.isIntersecting)
+                .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+              if (!visible) return;
+              links.forEach(link => {
+                const active = link.getAttribute('href') === `#${visible.target.id}`;
+                if (active) link.setAttribute('aria-current', 'location');
+                else link.removeAttribute('aria-current');
+              });
+            }, { rootMargin: '-20% 0px -65% 0px', threshold: [0, .1, .5] });
+            sections.forEach(section => observer.observe(section));
+          }
+
+          updateProgress();
+          window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+          window.addEventListener('resize', requestProgressUpdate);
+        })();
+      </script>
+    
+      <p class="code-deep-link"><a href="../code/ah-5-agent-experts.html">Code deep-dive · how Dan built this repo →</a></p>
+    </main>
+  </div>
+</body>
+</html>

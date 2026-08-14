@@ -1,0 +1,1314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Snippet System — Opus</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --paper:#f4efe4; --paper-2:#ece4d4; --paper-3:#e3d9c5;
+  --surface:#fbf8f1; --card:#fdfbf5; --card-2:#f6f0e2;
+  --ink-bg:#1c1813; --ink-bg-2:#272019;
+  --rule:#dcd3c1; --rule-soft:#e9e1d1; --rule-strong:#c8bca3;
+  --ink:#211d18; --ink-2:#4b443b; --ink-dim:#7d7568; --ink-faint:#a59c8c;
+  --on-dark:#efe7d8; --on-dark-dim:#b9ad97;
+  --clay:#c75b39; --clay-2:#d97757; --clay-soft:rgba(199,91,57,.10); --clay-line:rgba(199,91,57,.32);
+  --blue:#2f6f9f; --blue-soft:rgba(47,111,159,.10);
+  --olive:#5f7138; --olive-soft:rgba(95,113,56,.12);
+  --plum:#6e4a86; --plum-soft:rgba(110,74,134,.10);
+  --amber:#c1882a; --amber-soft:rgba(193,136,42,.12);
+  --rose:#b1556c; --rose-soft:rgba(177,85,108,.10);
+  --serif:'Fraunces','Iowan Old Style',Georgia,'Times New Roman',serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sh-sm:0 1px 2px rgba(60,45,25,.06),0 1px 2px rgba(60,45,25,.05);
+  --sh-md:0 4px 16px rgba(60,45,25,.10),0 1px 4px rgba(60,45,25,.06);
+  --sh-lg:0 18px 44px rgba(60,45,25,.16),0 6px 14px rgba(60,45,25,.09);
+  --sh-xl:0 34px 80px rgba(40,30,15,.26),0 12px 26px rgba(40,30,15,.12);
+  --rail:288px; --wrap:1080px;
+  /* readability principle (kvn): ~90% width + larger type */
+  --wrap:min(90vw,1640px); --wrap-wide:min(92vw,1800px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--sans);
+  /* readability principle (kvn): ~90% width + larger type */
+  font-size:19px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(60,45,25,.028) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+::selection{background:var(--clay-soft);color:var(--clay)}
+a{color:var(--clay);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;padding:0}
+
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;
+  background:linear-gradient(90deg,var(--clay),var(--amber));transition:width .12s linear}
+
+#rail{position:fixed;top:0;left:0;width:var(--rail);height:100vh;z-index:90;
+  background:linear-gradient(180deg,var(--surface),var(--paper));
+  border-right:1.5px solid var(--rule);
+  display:flex;flex-direction:column;padding:26px 22px 20px;overflow-y:auto}
+#rail .brand{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+#rail .brand .mark{width:34px;height:34px;border-radius:9px;flex:none;
+  background:linear-gradient(140deg,var(--clay-2),var(--clay));color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:var(--serif);
+  font-weight:600;font-size:19px;box-shadow:var(--sh-sm)}
+#rail .brand .bt{font-family:var(--serif);font-weight:600;font-size:16px;line-height:1.15;letter-spacing:-.01em}
+#rail .brand .bs{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim)}
+#rail .railhint{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin:18px 6px 9px;border-top:1px solid var(--rule-soft);padding-top:14px}
+nav.toc{display:flex;flex-direction:column;gap:1px;flex:1}
+nav.toc a{display:flex;align-items:baseline;gap:11px;padding:7px 10px;border-radius:8px;
+  color:var(--ink-2);font-size:13.5px;line-height:1.3;transition:background .15s,color .15s;position:relative}
+nav.toc a .n{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);min-width:18px;flex:none;padding-top:1px}
+nav.toc a:hover{background:var(--card-2);color:var(--ink)}
+nav.toc a.active{background:var(--clay-soft);color:var(--clay)}
+nav.toc a.active .n{color:var(--clay)}
+nav.toc a.active::before{content:"";position:absolute;left:-22px;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--clay)}
+#rail .foot{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--ink-faint);
+  margin-top:14px;border-top:1px solid var(--rule-soft);padding-top:12px;line-height:1.7}
+#railToggle{display:none}
+
+main{margin-left:var(--rail)}
+/* paged: one chapter shown at a time — no infinite scroll */
+/* readability principle (kvn): ~90% width + larger type — trim side padding to a ~5% gutter */
+.chapter{display:none;min-height:100vh;padding:70px 5% 150px;
+  flex-direction:column;justify-content:flex-start;position:relative}
+.chapter.active{display:flex;animation:pagein .5s cubic-bezier(.2,.7,.2,1)}
+.chapter.dark{justify-content:center}
+@keyframes pagein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto}
+/* readability principle (kvn): ~90% width + larger type */
+.wrap.wide{max-width:var(--wrap-wide)}
+
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--clay);display:inline-flex;align-items:center;gap:9px;margin-bottom:20px}
+.kicker::before{content:"";width:26px;height:1.5px;background:var(--clay-line)}
+.kicker.plain::before{display:none}
+.display{font-family:var(--serif);font-weight:600;letter-spacing:-.022em;line-height:1.02;
+  font-size:clamp(40px,6vw,76px);margin:0 0 22px;color:var(--ink)}
+h2.title{font-family:var(--serif);font-weight:600;letter-spacing:-.02em;line-height:1.06;
+  font-size:clamp(30px,4.2vw,50px);margin:0 0 18px}
+h3{font-family:var(--serif);font-weight:600;font-size:clamp(20px,2.3vw,26px);letter-spacing:-.01em;
+  margin:34px 0 12px;line-height:1.18}
+h4{font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:.01em;margin:22px 0 8px;color:var(--ink)}
+em,.it{font-style:italic}
+.display em,h2.title em,h3 em{color:var(--clay);font-style:italic}
+.lede{font-family:var(--serif);font-size:clamp(19px,2.1vw,24px);line-height:1.5;color:var(--ink-2);
+  font-weight:400;max-width:58ch;margin:0 0 8px}
+.prose{max-width:68ch}
+.prose p{margin:0 0 18px;color:var(--ink-2)}
+.prose p strong,strong{color:var(--ink);font-weight:600}
+.prose .lead-in{font-family:var(--serif);font-size:22px;line-height:1.5;color:var(--ink);margin-bottom:20px}
+.dropcap::first-letter{font-family:var(--serif);font-weight:600;float:left;font-size:62px;line-height:.82;
+  padding:6px 12px 0 0;color:var(--clay)}
+.small{font-size:13.5px;color:var(--ink-dim)}
+.mono{font-family:var(--mono)}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:100px;
+  border:1.5px solid var(--rule-strong);color:var(--ink-2);background:var(--surface)}
+.pill.clay{border-color:var(--clay-line);color:var(--clay);background:var(--clay-soft)}
+.pill.blue{border-color:rgba(47,111,159,.3);color:var(--blue);background:var(--blue-soft)}
+.pill.olive{border-color:rgba(95,113,56,.3);color:var(--olive);background:var(--olive-soft)}
+.pill.plum{border-color:rgba(110,74,134,.3);color:var(--plum);background:var(--plum-soft)}
+.pill.amber{border-color:rgba(193,136,42,.3);color:var(--amber);background:var(--amber-soft)}
+.pillrow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px}
+
+.grid{display:grid;gap:18px;margin:26px 0}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1.5px solid var(--rule);border-radius:13px;padding:22px 22px 20px;
+  transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-3px);box-shadow:var(--sh-md);border-color:var(--rule-strong)}
+.card .cnum{font-family:var(--mono);font-size:11px;color:var(--clay);letter-spacing:.1em;margin-bottom:11px;display:block}
+.card .ctitle{font-family:var(--serif);font-weight:600;font-size:19px;letter-spacing:-.01em;margin:0 0 8px;line-height:1.2}
+.card .cbody{font-size:14px;color:var(--ink-2);line-height:1.55}
+.card.accent{border-top:3px solid var(--clay)}
+.card.blue{border-top:3px solid var(--blue)}
+.card.olive{border-top:3px solid var(--olive)}
+.card.plum{border-top:3px solid var(--plum)}
+.card.amber{border-top:3px solid var(--amber)}
+.card.glow{background:linear-gradient(160deg,var(--card),var(--card-2))}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin:26px 0}
+.stat{border-left:3px solid var(--clay);padding:4px 0 4px 16px}
+.stat .sv{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4vw,44px);line-height:1;letter-spacing:-.02em;color:var(--ink)}
+.stat .sl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-top:8px}
+.stat.blue{border-color:var(--blue)} .stat.olive{border-color:var(--olive)}
+.stat.plum{border-color:var(--plum)} .stat.amber{border-color:var(--amber)}
+
+.quote{border-left:3px solid var(--clay);padding:6px 0 6px 26px;margin:32px 0;max-width:48ch}
+.quote p{font-family:var(--serif);font-style:italic;font-size:clamp(21px,2.6vw,28px);line-height:1.4;
+  color:var(--ink);margin:0 0 12px;font-weight:400}
+.quote .cite{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+.quote.big{border:none;padding:0;max-width:44ch;margin:10px 0}
+.quote.big p{font-size:clamp(24px,3.3vw,36px);line-height:1.22}
+
+.callout{display:flex;gap:14px;background:var(--card);border:1.5px solid var(--rule);
+  border-left:3px solid var(--clay);border-radius:0 11px 11px 0;padding:18px 20px;margin:24px 0}
+.callout .ci{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--clay);flex:none;padding-top:3px;writing-mode:horizontal-tb}
+.callout .cc{font-size:14.5px;color:var(--ink-2);line-height:1.55}
+.callout .cc strong{color:var(--ink)}
+.callout.warn{border-left-color:var(--amber);background:var(--amber-soft)} .callout.warn .ci{color:var(--amber)}
+.callout.ok{border-left-color:var(--olive);background:var(--olive-soft)} .callout.ok .ci{color:var(--olive)}
+.callout.idea{border-left-color:var(--plum);background:var(--plum-soft)} .callout.idea .ci{color:var(--plum)}
+.callout.bad{border-left-color:var(--rose);background:var(--rose-soft)} .callout.bad .ci{color:var(--rose)}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:24px 0;display:grid;gap:14px}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:16px;align-items:start}
+.steps li::before{counter-increment:s;content:counter(s);grid-column:1;align-self:start;
+  width:34px;height:34px;border-radius:50%;border:1.5px solid var(--clay-line);background:var(--clay-soft);
+  color:var(--clay);font-family:var(--mono);font-size:13px;font-weight:600;
+  display:flex;align-items:center;justify-content:center}
+.steps li > *{grid-column:2}
+.steps li h4{margin:5px 0 4px}
+.steps li p{margin:0;font-size:14px;color:var(--ink-2)}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:26px 0}
+.col{border:1.5px solid var(--rule);border-radius:12px;padding:20px;background:var(--card)}
+.col .clabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:12px;display:inline-flex;align-items:center;gap:7px}
+.col.bad{border-color:rgba(177,85,108,.28);background:var(--rose-soft)}
+.col.bad .clabel{color:var(--rose)}
+.col.good{border-color:rgba(95,113,56,.32);background:var(--olive-soft)}
+.col.good .clabel{color:var(--olive)}
+.col ul{margin:0;padding-left:18px} .col li{margin:0 0 8px;font-size:14px;color:var(--ink-2)}
+
+.code{background:var(--ink-bg);border:1.5px solid var(--ink-bg-2);border-radius:11px;
+  padding:18px 20px;margin:22px 0;overflow-x:auto;box-shadow:var(--sh-sm)}
+.code pre{margin:0;font-family:var(--mono);font-size:13px;line-height:1.7;color:#e7decd;white-space:pre}
+.code .cm{color:#9c8f76} .code .k{color:#e0a578} .code .s{color:#a9c08a} .code .v{color:#8fb6d4}
+.codecap{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-faint);margin:-12px 0 14px;padding-left:4px}
+kbd{font-family:var(--mono);font-size:11px;background:var(--paper-2);border:1.5px solid var(--rule-strong);
+  border-bottom-width:2.5px;border-radius:5px;padding:2px 7px;color:var(--ink-2)}
+
+.fig{border:1.5px solid var(--rule);border-radius:14px;background:var(--surface);padding:26px 24px 16px;
+  margin:28px 0;box-shadow:var(--sh-sm)}
+.fig.bare{border:none;background:none;box-shadow:none;padding:8px 0}
+.fig svg{display:block;width:100%;height:auto;overflow:visible}
+.fig .fcap{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--ink-dim);
+  text-align:center;margin-top:16px;border-top:1px solid var(--rule-soft);padding-top:12px}
+.fig .fcap b{color:var(--ink-2);font-weight:600}
+
+.s-card{fill:var(--card);stroke:var(--rule-strong);stroke-width:1.5}
+.s-clay{fill:var(--clay)} .s-clay-f{fill:var(--clay-soft);stroke:var(--clay);stroke-width:1.5}
+.s-blue-f{fill:var(--blue-soft);stroke:var(--blue);stroke-width:1.5}
+.s-olive-f{fill:var(--olive-soft);stroke:var(--olive);stroke-width:1.5}
+.s-plum-f{fill:var(--plum-soft);stroke:var(--plum);stroke-width:1.5}
+.s-amber-f{fill:var(--amber-soft);stroke:var(--amber);stroke-width:1.5}
+.s-ink{fill:var(--ink)} .s-dim{fill:var(--ink-dim)}
+.s-line{stroke:var(--rule-strong);stroke-width:1.5;fill:none}
+.s-flow{stroke:var(--clay);stroke-width:2;fill:none}
+.s-label{font-family:var(--mono);font-size:11px;fill:var(--ink-2);letter-spacing:.04em}
+.s-label-sm{font-family:var(--mono);font-size:9.5px;fill:var(--ink-dim);letter-spacing:.06em}
+.s-title{font-family:var(--sans);font-size:14px;font-weight:600;fill:var(--ink)}
+.s-serif{font-family:var(--serif);fill:var(--ink)}
+
+.draw path,.draw line,.draw circle,.draw rect,.draw polyline,.draw polygon{
+  stroke-dasharray:var(--len,1200);stroke-dashoffset:var(--len,1200);transition:stroke-dashoffset 1.3s ease}
+.draw.drawn path,.draw.drawn line,.draw.drawn circle,.draw.drawn rect,.draw.drawn polyline,.draw.drawn polygon{stroke-dashoffset:0}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.07s} .reveal.d2{transition-delay:.14s} .reveal.d3{transition-delay:.21s}
+.reveal.d4{transition-delay:.28s} .reveal.d5{transition-delay:.35s} .reveal.d6{transition-delay:.42s}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}
+  .draw path,.draw line,.draw circle,.draw rect,.draw polyline,.draw polygon{stroke-dashoffset:0}}
+
+.chapter.dark{background:radial-gradient(120% 90% at 78% 8%,#332821 0%,var(--ink-bg) 46%,#161210 100%);
+  color:var(--on-dark);border-bottom:none}
+.chapter.dark .kicker{color:var(--clay-2)} .chapter.dark .kicker::before{background:rgba(217,119,87,.5)}
+.chapter.dark .display,.chapter.dark h2.title{color:#f6efe2}
+.chapter.dark .display em{color:var(--clay-2)}
+.chapter.dark .lede{color:var(--on-dark-dim)}
+.chapter.dark .small{color:var(--on-dark-dim)}
+.chapter.dark .prose p{color:var(--on-dark-dim)}
+.chapter.dark .prose p strong{color:#f6efe2}
+.chapter.dark .pill{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.16);color:var(--on-dark-dim)}
+.chapter.dark .pill.clay{color:var(--clay-2);border-color:rgba(217,119,87,.4);background:rgba(217,119,87,.1)}
+.chapter.dark .quote p{color:#f6efe2}
+.chapter.dark .card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.12)}
+.chapter.dark .card .cbody{color:var(--on-dark-dim)}
+.chapter.dark .card .ctitle{color:#f6efe2}
+
+.chapnum{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--ink-faint);
+  display:inline-block;margin-bottom:14px}
+.divline{height:1.5px;background:var(--rule);border:none;margin:36px 0}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.spread{display:grid;grid-template-columns:1.1fr .9fr;gap:46px;align-items:center}
+.spread.rev{grid-template-columns:.9fr 1.1fr}
+.center{text-align:center}
+.maxw{max-width:760px;margin:0 auto}
+.tag-list{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
+.tag-list .t{font-family:var(--mono);font-size:11px;color:var(--ink-dim);padding:3px 9px;
+  border:1px solid var(--rule);border-radius:6px;background:var(--surface)}
+.sig{font-family:var(--serif);font-style:italic;font-size:28px;color:var(--clay);margin-top:8px}
+.jump{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--clay);margin-top:30px;
+  padding:9px 16px;border:1.5px solid var(--clay-line);border-radius:100px;background:var(--clay-soft);
+  transition:gap .18s,background .18s}
+.jump:hover{gap:13px;background:var(--clay);color:#fff}
+
+/* ── in-chapter contents nav (sticky) ──────────────────── */
+.chapnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 6px;padding:13px 16px;
+  background:rgba(251,248,241,.92);border:1.5px solid var(--rule-strong);border-radius:13px;
+  position:sticky;top:12px;z-index:46;box-shadow:var(--sh-sm);backdrop-filter:saturate(1.3) blur(9px)}
+.chapnav .cnl{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);margin-right:4px}
+.chapnav a{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-2);
+  padding:5px 11px;border:1.5px solid var(--rule);border-radius:100px;background:var(--card);transition:all .15s}
+.chapnav a:hover{color:var(--clay);border-color:var(--clay-line);background:var(--clay-soft)}
+.chapnav a.cur{color:#fff;border-color:var(--clay);background:var(--clay)}
+.chapnav a.cur b{color:#fff}
+.chapnav a b{color:var(--clay);font-weight:600;margin-right:6px}
+
+/* ── subsection header (numbered band) ─────────────────── */
+.subsec{display:flex;align-items:center;gap:15px;margin:10px 0 2px;scroll-margin-top:30px}
+.subsec .sn{font-family:var(--mono);font-size:14px;font-weight:600;color:#fff;
+  background:linear-gradient(140deg,var(--clay-2),var(--clay));
+  width:32px;height:32px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;
+  flex:none;box-shadow:var(--sh-sm)}
+.subsec.blue .sn{background:linear-gradient(140deg,#4a8cbf,var(--blue))}
+.subsec.olive .sn{background:linear-gradient(140deg,#7b9150,var(--olive))}
+.subsec.plum .sn{background:linear-gradient(140deg,#8a66a6,var(--plum))}
+.subsec.amber .sn{background:linear-gradient(140deg,#d6a24a,var(--amber))}
+.subsec h2,.subsec h3{margin:0}
+
+/* ── file tree (dark, like the code block) ─────────────── */
+.filetree{background:var(--ink-bg);border:1.5px solid var(--ink-bg-2);border-radius:11px;
+  padding:18px 22px;margin:22px 0;font-family:var(--mono);font-size:12.5px;line-height:1.85;
+  color:#e7decd;overflow-x:auto;box-shadow:var(--sh-sm);white-space:pre}
+.filetree .d{color:#e0a578;font-weight:600}
+.filetree .f{color:#cfc4b0}
+.filetree .c{color:#9c8f76}
+.filetree .hl{color:#a9c08a}
+
+/* annotated code: caption + body pairing already via .codecap + .code */
+.note{font-size:13.5px;color:var(--ink-dim);font-style:italic;margin:-10px 0 16px;padding-left:4px}
+
+/* ── "from the lecture" video stills band ──────────────── */
+.lecband{margin:30px 0 8px;padding:22px 22px 18px;border:1.5px solid var(--rule-strong);border-radius:16px;
+  background:linear-gradient(160deg,var(--card),var(--card-2))}
+.lecband .lechead{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--clay);margin-bottom:12px}
+.lecband .lechead::before{content:"▶";font-size:10px}
+.lecband .lecintro{font-size:14.5px;color:var(--ink-2);line-height:1.6;max-width:74ch;margin:0 0 6px}
+.lecband .lecintro strong{color:var(--ink)}
+.stillgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:15px;margin:18px 0 8px}
+.still{border:1.5px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--ink-bg);
+  box-shadow:var(--sh-sm);transition:transform .2s,box-shadow .2s}
+.still:hover{transform:translateY(-3px);box-shadow:var(--sh-md)}
+.still.hero{grid-column:1 / -1}
+.still img{display:block;width:100%;height:auto}
+.still figcaption{padding:11px 14px;font-size:13px;color:var(--ink-2);background:var(--card);line-height:1.5}
+.still figcaption b{display:block;color:var(--clay);font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.lecband .watch{display:inline-flex;align-items:center;gap:8px;margin-top:6px;font-family:var(--mono);
+  font-size:11px;letter-spacing:.06em;color:var(--clay);border:1.5px solid var(--clay-line);
+  padding:7px 14px;border-radius:100px;background:var(--clay-soft)}
+.lecband .watch:hover{background:var(--clay);color:#fff}
+
+/* ── pager (prev / indicator / next) ───────────────────── */
+#pager{position:fixed;bottom:22px;left:calc(50% + var(--rail)/2);transform:translateX(-50%);z-index:80;
+  display:flex;align-items:center;gap:2px;padding:6px;border-radius:100px;
+  background:rgba(251,248,241,.94);border:1.5px solid var(--rule-strong);box-shadow:var(--sh-lg);backdrop-filter:blur(10px)}
+#pager button{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;
+  color:var(--ink-2);font-size:20px;line-height:1;transition:all .15s}
+#pager button:hover:not(:disabled){background:var(--clay-soft);color:var(--clay)}
+#pager button:disabled{opacity:.28;cursor:default}
+#pager .pind{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-dim);padding:0 14px;min-width:78px;text-align:center}
+#pager .pind b{color:var(--clay);font-weight:600}
+#topbtn{position:fixed;right:22px;bottom:22px;z-index:80;width:44px;height:44px;border-radius:50%;
+  background:var(--clay);color:#fff;display:none;align-items:center;justify-content:center;
+  box-shadow:var(--sh-lg);font-size:17px}
+#topbtn.show{display:flex}
+#pgbar{position:fixed;bottom:78px;left:var(--rail);right:0;height:0;z-index:79;pointer-events:none}
+
+/* ── syntax-highlight tokens (added by the inline highlighter) ── */
+.code .n{color:#cf9d6a}.code .b{color:#d98f7a}.code .fn{color:#e0b083}
+.code .md-h{color:#e0a578;font-weight:600}.code .md-b{color:#f1e9d8;font-weight:600}
+.code .md-c{color:#a9c08a}.code .md-li{color:#e0a578}.code .md-q{color:#9c8f76;font-style:italic}.code .md-link{color:#8fb6d4}
+
+/* readability principle (kvn): ~90% width + larger type
+   — body is now 19px (was 16px); scale secondary body / code / captions ~+20% to preserve hierarchy */
+h4{font-size:18px}
+.small,.note{font-size:16px}
+.card .cbody,.steps li p,.col li{font-size:17px}
+.callout .cc,.lecband .lecintro{font-size:17.5px}
+.code pre{font-size:15.5px}
+.filetree{font-size:15px}
+.still figcaption{font-size:15.5px}
+
+@media (max-width:1100px){
+  .spread,.spread.rev{grid-template-columns:1fr;gap:26px}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:980px){
+  :root{--rail:0px}
+  #rail{transform:translateX(-100%);transition:transform .25s;width:280px;box-shadow:var(--sh-xl)}
+  #rail.open{transform:none}
+  main{margin-left:0}
+  #railToggle{display:flex;position:fixed;top:14px;left:14px;z-index:100;width:44px;height:44px;
+    border-radius:11px;background:var(--clay);color:#fff;align-items:center;justify-content:center;
+    box-shadow:var(--sh-md);font-size:18px}
+  .chapter{padding:80px 26px 70px}
+  .grid-2,.grid-3,.compare{grid-template-columns:1fr}
+}
+@media (max-width:560px){ .grid-4{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="railToggle" aria-label="Menu">☰</button>
+
+<aside id="rail">
+  <!-- BRAND: replace mark letter/glyph, title, subtitle -->
+  <div class="brand">
+    <div class="mark">S</div>
+    <div>
+      <div class="bt">The Snippet System</div>
+      <div class="bs">A Zed field guide</div>
+    </div>
+  </div>
+  <!-- TABLE OF CONTENTS: one <a href="#chNN"> per section, in order.
+       Optional <div class="railhint">GROUP NAME</div> dividers between groups.
+       ch00 = cover, last = send-off. The nav drives the paged navigation. -->
+  <nav class="toc" id="toc">
+    <a href="#ch00"><span class="n">00</span><span>Cover</span></a>
+    <div class="railhint">Part I · The find</div>
+    <a href="#ch01"><span class="n">01</span><span>The detective work</span></a>
+    <a href="#ch02"><span class="n">02</span><span>The idea underneath</span></a>
+    <div class="railhint">Part II · The system</div>
+    <a href="#ch03"><span class="n">03</span><span>The grammar</span></a>
+    <a href="#ch04"><span class="n">04</span><span>What is installed</span></a>
+    <div class="railhint">Part III · In your hands</div>
+    <a href="#ch05"><span class="n">05</span><span>Driving it</span></a>
+    <a href="#ch06"><span class="n">06</span><span>Gotchas &amp; extending</span></a>
+    <div class="railhint">∞ · Send-off</div>
+    <a href="#ch99"><span class="n">99</span><span>Three letters</span></a>
+  </nav>
+  <div class="foot">
+    Built for kvn · August 2026<br>IndyDevDan's snippets, ported to Zed<br>
+    Press <kbd>J</kbd>/<kbd>K</kbd> to turn pages<br>
+    Made with HTML, on purpose.
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ════════ CH00 · COVER (dark scene) ════════
+     The cover sets the tone: a kicker, a big serif display headline with one clay <em>,
+     a lede, a row of topic pills, and ONE bespoke animated SVG infographic.        -->
+<section class="chapter dark" id="ch00">
+  <div class="wrap">
+    <div class="kicker reveal">A field guide · reconstructed from 55 transcripts</div>
+    <h1 class="display reveal d1" style="max-width:15ch">Three letters that unfold into a <em>whole prompt.</em></h1>
+    <p class="lede reveal d2" style="max-width:44ch;color:var(--on-dark-dim)">
+      You saw him type something short and watched a full agentic prompt appear. This is that system —
+      what could be proven, what had to be rebuilt, and how it now works inside your Zed.
+    </p>
+
+    <div class="row reveal d3" style="margin-top:34px;gap:10px">
+      <span class="pill clay">AGP</span>
+      <span class="pill">AG-SK</span>
+      <span class="pill">GSTC</span>
+      <span class="pill">22 snippets installed</span>
+      <span class="pill">6 chapters</span>
+    </div>
+
+    <div class="fig bare reveal d4" style="margin-top:46px;max-width:600px">
+      <svg class="draw" viewBox="0 0 600 128" role="img" aria-label="Typing agp and pressing control space expands into a structured prompt">
+        <rect x="6" y="46" width="84" height="36" rx="9" fill="none" stroke="var(--on-dark-dim)" stroke-width="1.5"/>
+        <text x="48" y="69" text-anchor="middle" font-family="var(--mono)" font-size="13" fill="#efe7d8">agp</text>
+        <path d="M90 64 H 138" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M144 64 l-9 -6 0 12 z" fill="var(--clay-2)"/>
+        <rect x="144" y="46" width="118" height="36" rx="9" fill="none" stroke="var(--blue)" stroke-width="2"/>
+        <text x="203" y="69" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--on-dark-dim)">ctrl + space</text>
+        <path d="M262 64 H 310" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M316 64 l-9 -6 0 12 z" fill="var(--clay-2)"/>
+        <rect x="316" y="10" width="150" height="22" rx="6" fill="none" stroke="var(--olive)" stroke-width="1.6"/>
+        <text x="328" y="25" font-family="var(--mono)" font-size="9.5" fill="var(--on-dark-dim)">Purpose</text>
+        <rect x="316" y="38" width="150" height="22" rx="6" fill="none" stroke="var(--olive)" stroke-width="1.6"/>
+        <text x="328" y="53" font-family="var(--mono)" font-size="9.5" fill="var(--on-dark-dim)">Variables</text>
+        <rect x="316" y="66" width="150" height="22" rx="6" fill="none" stroke="var(--amber)" stroke-width="1.6"/>
+        <text x="328" y="81" font-family="var(--mono)" font-size="9.5" fill="var(--on-dark-dim)">Workflow</text>
+        <rect x="316" y="94" width="150" height="22" rx="6" fill="none" stroke="var(--amber)" stroke-width="1.6"/>
+        <text x="328" y="109" font-family="var(--mono)" font-size="9.5" fill="var(--on-dark-dim)">Report</text>
+        <path d="M466 21 C 512 21, 512 64, 546 64" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M466 105 C 512 105, 512 64, 546 64" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <circle cx="566" cy="64" r="13" fill="none" stroke="var(--clay-2)" stroke-width="2"/>
+        <path d="M560 64 l5 5 8 -10" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+
+    <p class="small reveal d5" style="margin-top:40px;font-family:var(--mono);letter-spacing:.06em">
+      Scroll, or press <kbd style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#efe7d8">J</kbd>
+      to begin &nbsp;↓
+    </p>
+  </div>
+</section>
+
+<!-- ════════ CH01 ════════ -->
+<section class="chapter" id="ch01">
+  <div class="wrap wide">
+    <span class="chapnum reveal">01 — The detective work</span>
+    <div class="kicker reveal">what he actually says on camera</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Three letters, typed fast, and a <em>whole prompt appears.</em></h2>
+    <p class="lede reveal d2">You remembered him typing something short before a big prompt materialised. You were right — but the thing you were reaching for is called <strong>AGP</strong>, and his snippet file is not public.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">evidence</span><span class="pill blue">55 transcripts</span><span class="pill">3 triggers found</span></div>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch01-s1"><b>1</b>What the tapes say</a>
+      <a href="#ch01-s2"><b>2</b>What could not be extracted</a>
+      <a href="#ch01-s3"><b>3</b>How we recovered it anyway</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch01-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What the tapes say</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Across the entire corpus in your repo — fifty-five video transcripts, eighteen course modules, dozens of cloned codebases — exactly <strong>three</strong> snippet triggers are ever named out loud.</p>
+        <p>That is the honest ceiling of what is knowable. Everything else about his snippet library lives on his laptop.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 480 260" role="img" aria-label="Three confirmed snippet triggers found in transcripts">
+          <rect x="24" y="18" width="432" height="46" rx="10" class="s-card"/>
+          <text x="240" y="40" text-anchor="middle" class="s-title" font-size="13">55 transcripts scanned</text>
+          <text x="240" y="55" text-anchor="middle" class="s-label-sm">grep: snippet · hotkey · code snippet</text>
+          <path d="M240 64 V 92" class="s-flow"/>
+          <path d="M240 98 l-6 -9 12 0 z" class="s-clay"/>
+          <rect x="24" y="104" width="136" height="60" rx="10" class="s-clay-f"/>
+          <text x="92" y="128" text-anchor="middle" class="s-title" font-size="15">AGP</text>
+          <text x="92" y="146" text-anchor="middle" class="s-label-sm">agentic prompt</text>
+          <rect x="172" y="104" width="136" height="60" rx="10" class="s-blue-f"/>
+          <text x="240" y="128" text-anchor="middle" class="s-title" font-size="15">AG-SK</text>
+          <text x="240" y="146" text-anchor="middle" class="s-label-sm">skill template</text>
+          <rect x="320" y="104" width="136" height="60" rx="10" class="s-olive-f"/>
+          <text x="388" y="128" text-anchor="middle" class="s-title" font-size="15">GSTC</text>
+          <text x="388" y="146" text-anchor="middle" class="s-label-sm">git checkpoint</text>
+          <path d="M92 164 V 196" class="s-line"/><path d="M240 164 V 196" class="s-line"/><path d="M388 164 V 196" class="s-line"/>
+          <text x="92" y="212" text-anchor="middle" class="s-label-sm">yt-19 · yt-28</text>
+          <text x="240" y="212" text-anchor="middle" class="s-label-sm">yt-22 @12:58</text>
+          <text x="388" y="212" text-anchor="middle" class="s-label-sm">yt-22 @31:39</text>
+          <rect x="24" y="228" width="432" height="24" rx="7" class="s-line"/>
+          <text x="240" y="244" text-anchor="middle" class="s-label-sm">every other trigger: never spoken aloud</text>
+        </svg>
+        <div class="fcap"><b>The full haul.</b> Three names, each timestamped to a specific moment on video.</div>
+      </div>
+    </div>
+
+    <div class="quote reveal">
+      <p>"I have this snippet for writing skills — AG SK. And if I activate this with control space, you can see we have this skill structure."</p>
+      <span class="cite">— yt-22, <em>Raw Agentic Coding: Zero to Agent Skill</em>, 12:58</span>
+    </div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p>The second quote is the one that tells you <strong>GSTC is not a snippet at all</strong>. It does not insert text — it runs a command. That distinction decides how it gets rebuilt in Zed.</p>
+      </div>
+      <div class="quote big">
+        <p>"It's been a while since we've committed code, so I'm just going to run my hot key here, GSTC."</p>
+        <span class="cite" style="display:block;margin-top:10px">— yt-22 @31:39</span>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch01-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What could not be extracted</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">You asked whether his VS Code config could be mined for the snippet bodies. It cannot — and it is worth being precise about why.</p>
+        <p>A full sweep of your workspace turned up <strong>zero</strong> <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">.code-snippets</span> files. The only VS Code config anywhere in the IndyDevDan tree is a theme-colours file.</p>
+        <p>VS Code user snippets live in an application-support folder that never gets committed to a repository. His are no exception.</p>
+      </div>
+      <div>
+        <div class="codecap">IndyDevDan/.vscode/settings.json — the entire file</div>
+        <div class="code"><pre>{
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#1E1E5C",
+        "titleBar.activeBackground": "#2A2A81",
+        "statusBar.background": "#1E1E5C"
+    }
+}</pre></div>
+        <p class="note">Window tinting. Nothing else.</p>
+      </div>
+    </div>
+
+    <div class="callout warn reveal"><span class="ci">THE HONEST LINE</span>
+      <span class="cc">The snippet <strong>names</strong> are recoverable from video. The snippet <strong>bodies</strong> are not — they were reconstructed from his published output files, which is a different claim and a weaker one. This guide marks which is which throughout.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch01-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">How we recovered it anyway</h2></div>
+
+    <div class="prose reveal" style="max-width:72ch">
+      <p class="lead-in">Here is the trick. You cannot read his snippet file — but you <em>can</em> read the files his snippets produced, because he commits those to public repos.</p>
+    </div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 240" role="img" aria-label="Reconstruction chain from transcript to snippet body">
+        <rect x="10" y="80" width="150" height="66" rx="10" class="s-card"/>
+        <text x="85" y="106" text-anchor="middle" class="s-title" font-size="12">transcript</text>
+        <text x="85" y="124" text-anchor="middle" class="s-label-sm">names the trigger</text>
+        <path d="M160 113 H 216" class="s-flow"/><path d="M222 113 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="222" y="80" width="164" height="66" rx="10" class="s-blue-f"/>
+        <text x="304" y="106" text-anchor="middle" class="s-title" font-size="12">the repo he built</text>
+        <text x="304" y="124" text-anchor="middle" class="s-label-sm">on camera, that episode</text>
+        <path d="M386 113 H 442" class="s-flow"/><path d="M448 113 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="448" y="60" width="176" height="46" rx="10" class="s-olive-f"/>
+        <text x="536" y="80" text-anchor="middle" class="s-label">SKILL.md</text>
+        <text x="536" y="96" text-anchor="middle" class="s-label-sm">= an AG-SK expansion</text>
+        <rect x="448" y="118" width="176" height="46" rx="10" class="s-amber-f"/>
+        <text x="536" y="138" text-anchor="middle" class="s-label">csv-edit.md</text>
+        <text x="536" y="154" text-anchor="middle" class="s-label-sm">= an AGP expansion</text>
+        <path d="M624 83 C 668 83, 668 113, 706 113" class="s-flow"/>
+        <path d="M624 141 C 668 141, 668 113, 706 113" class="s-flow"/>
+        <path d="M712 113 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="712" y="80" width="158" height="66" rx="10" class="s-clay-f"/>
+        <text x="791" y="106" text-anchor="middle" class="s-title" font-size="12">snippet body</text>
+        <text x="791" y="124" text-anchor="middle" class="s-label-sm">reconstructed</text>
+        <path d="M85 80 V 40 H 791 V 80" class="s-line" stroke-dasharray="4 4"/>
+        <text x="438" y="32" text-anchor="middle" class="s-label-sm">the output is public even when the template is not</text>
+      </svg>
+      <div class="fcap"><b>Reading the shadow instead of the object.</b> If a template stamps out files, and the files are committed, the template is legible in negative.</div>
+    </div>
+
+    <div class="grid grid-2 reveal">
+      <div class="card blue"><span class="cnum">SOURCE A</span><p class="ctitle">fork-terminal / SKILL.md</p><p class="cbody">The skill he writes live in yt-22 immediately after firing <strong>AG-SK</strong>. Its section order <em>is</em> the snippet's section order.</p></div>
+      <div class="card amber"><span class="cnum">SOURCE B</span><p class="ctitle">agentic-finance-review / csv-edit.md</p><p class="cbody">A bare <strong>AGP</strong> expansion carrying the hooks front matter he demonstrates in yt-28.</p></div>
+    </div>
+
+    <a class="jump reveal" href="#ch02">Next · why a snippet beats remembering &nbsp;→</a>
+  </div>
+</section>
+
+<!-- ════════ CH02 ════════ -->
+<section class="chapter" id="ch02">
+  <div class="wrap wide">
+    <span class="chapnum reveal">02 — The idea underneath</span>
+    <div class="kicker reveal">why he bothers</div>
+    <h2 class="title reveal d1" style="max-width:24ch">The point is not typing speed. It is <em>never deciding twice.</em></h2>
+    <p class="lede reveal d2">A snippet that saves you four seconds is a toy. A snippet that removes a decision from your day — and from your agent's context window — is infrastructure.</p>
+
+    <hr class="divline reveal">
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big">
+        <p>"Create reusable formats so that you don't have to think about it — and so that your agents don't have to think about your prompt format."</p>
+        <span class="cite" style="display:block;margin-top:10px">— yt-28 @5:04</span>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Read that twice. There are two beneficiaries, and the second one is the surprising one.</p>
+        <p>When every prompt you write has the same skeleton — the same section names in the same order — the model stops spending attention on <em>parsing your format</em> and spends it on the task. Consistency is a context-window optimisation disguised as a text expander.</p>
+      </div>
+    </div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 250" role="img" aria-label="Blank page versus scaffolded prompt">
+        <text x="215" y="26" text-anchor="middle" class="s-label-sm">without a snippet</text>
+        <rect x="30" y="40" width="370" height="180" rx="12" class="s-card"/>
+        <path d="M60 78 H 300" class="s-line" stroke-dasharray="5 5"/>
+        <path d="M60 104 H 240" class="s-line" stroke-dasharray="5 5"/>
+        <path d="M60 130 H 330" class="s-line" stroke-dasharray="5 5"/>
+        <path d="M60 156 H 190" class="s-line" stroke-dasharray="5 5"/>
+        <text x="215" y="196" text-anchor="middle" class="s-label-sm">every prompt shaped a little differently</text>
+        <text x="215" y="212" text-anchor="middle" class="s-label-sm">you re-decide the structure each time</text>
+
+        <path d="M418 130 H 462" class="s-flow"/><path d="M468 130 l-9 -6 0 12 z" class="s-clay"/>
+
+        <text x="672" y="26" text-anchor="middle" class="s-label-sm">with AGP</text>
+        <rect x="487" y="40" width="370" height="180" rx="12" class="s-clay-f"/>
+        <rect x="512" y="58" width="320" height="20" rx="5" class="s-dim"/>
+        <text x="522" y="72" class="s-label-sm">Metadata</text>
+        <rect x="512" y="84" width="320" height="20" rx="5" class="s-dim"/>
+        <text x="522" y="98" class="s-label-sm">Purpose</text>
+        <rect x="512" y="110" width="320" height="20" rx="5" class="s-dim"/>
+        <text x="522" y="124" class="s-label-sm">Variables</text>
+        <rect x="512" y="136" width="320" height="20" rx="5" class="s-dim"/>
+        <text x="522" y="150" class="s-label-sm">Instructions</text>
+        <rect x="512" y="162" width="320" height="20" rx="5" class="s-dim"/>
+        <text x="522" y="176" class="s-label-sm">Workflow · Report</text>
+        <text x="672" y="204" text-anchor="middle" class="s-label-sm">identical skeleton, every single time</text>
+      </svg>
+      <div class="fcap"><b>The same six bones in every prompt.</b> You fill the flesh; the skeleton is never up for debate.</div>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">01</span><p class="ctitle">You stop deciding</p><p class="cbody">No more "does this one need a Report section?" The template already answered.</p></div>
+      <div class="card blue d1"><span class="cnum">02</span><p class="ctitle">Your agent stops guessing</p><p class="cbody">Familiar shape, familiar section names — attention goes to the work, not the wrapper.</p></div>
+      <div class="card olive d2"><span class="cnum">03</span><p class="ctitle">Your team can read it</p><p class="cbody">Every prompt in the repo looks like every other prompt. Review becomes skimming.</p></div>
+    </div>
+
+    <div class="callout idea reveal"><span class="ci">NEWCOMER NOTE</span>
+      <span class="cc">A "reusable prompt" here means a markdown file in <strong>.claude/commands/</strong> that you invoke as a slash command. The snippet writes the file's skeleton; the slash command runs it later. Snippet is the <em>authoring</em> tool, not the <em>running</em> tool.</span></div>
+
+    <a class="jump reveal" href="#ch03">Next · the grammar &nbsp;→</a>
+  </div>
+</section>
+
+<!-- ════════ CH03 ════════ -->
+<section class="chapter" id="ch03">
+  <div class="wrap wide">
+    <span class="chapnum reveal">03 — The grammar</span>
+    <div class="kicker reveal">twelve sections, seven levels</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Every prompt he writes is built from the <em>same parts list.</em></h2>
+    <p class="lede reveal d2">This is the part that is genuinely documented — not inferred. The section vocabulary and the level ladder are both written down in his own course repo.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">documented</span><span class="pill">agentic-prompt-engineering/README.md</span></div>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch03-s1"><b>1</b>The twelve sections</a>
+      <a href="#ch03-s2"><b>2</b>The seven levels</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch03-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The twelve sections</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">There is a fixed, ordered vocabulary. You never use all twelve at once — you pick the ones the job needs, but you always keep them <strong>in this order</strong>.</p>
+        <p>Four of them carry most of the weight: <strong>Purpose</strong> says why, <strong>Variables</strong> says what comes in, <strong>Workflow</strong> says what happens, <strong>Report</strong> says what comes out. The other eight are situational.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 440 400" role="img" aria-label="The twelve canonical prompt sections in order">
+          <rect x="20" y="14" width="400" height="26" rx="6" class="s-dim"/><text x="34" y="32" class="s-label">Metadata</text>
+          <rect x="20" y="46" width="400" height="26" rx="6" class="s-dim"/><text x="34" y="64" class="s-label"># Title</text>
+          <rect x="20" y="78" width="400" height="26" rx="6" class="s-clay-f"/><text x="34" y="96" class="s-label">## Purpose</text>
+          <rect x="20" y="110" width="400" height="26" rx="6" class="s-clay-f"/><text x="34" y="128" class="s-label">## Variables</text>
+          <rect x="20" y="142" width="400" height="26" rx="6" class="s-clay-f"/><text x="34" y="160" class="s-label">## Instructions</text>
+          <rect x="20" y="174" width="400" height="26" rx="6" class="s-dim"/><text x="34" y="192" class="s-label">## Relevant Files</text>
+          <rect x="20" y="206" width="400" height="26" rx="6" class="s-dim"/><text x="34" y="224" class="s-label">## Codebase Structure</text>
+          <rect x="20" y="238" width="400" height="26" rx="6" class="s-clay-f"/><text x="34" y="256" class="s-label">## Workflow</text>
+          <rect x="20" y="270" width="400" height="26" rx="6" class="s-dim"/><text x="34" y="288" class="s-label">## Expertise</text>
+          <rect x="20" y="302" width="400" height="26" rx="6" class="s-dim"/><text x="34" y="320" class="s-label">## Template</text>
+          <rect x="20" y="334" width="400" height="26" rx="6" class="s-dim"/><text x="34" y="352" class="s-label">## Examples</text>
+          <rect x="20" y="366" width="400" height="26" rx="6" class="s-clay-f"/><text x="34" y="384" class="s-label">## Report</text>
+          <text x="406" y="96" text-anchor="end" class="s-label-sm">core</text>
+          <text x="406" y="128" text-anchor="end" class="s-label-sm">core</text>
+          <text x="406" y="160" text-anchor="end" class="s-label-sm">core</text>
+          <text x="406" y="256" text-anchor="end" class="s-label-sm">core</text>
+          <text x="406" y="384" text-anchor="end" class="s-label-sm">core</text>
+        </svg>
+        <div class="fcap"><b>Clay = load-bearing.</b> Grey sections appear only when the prompt actually needs them.</div>
+      </div>
+    </div>
+
+    <div class="callout reveal"><span class="ci">WHY ORDER MATTERS</span>
+      <span class="cc">The model reads top to bottom. Constraints (<strong>Instructions</strong>) land before the steps that must obey them (<strong>Workflow</strong>), and the output contract (<strong>Report</strong>) lands last so it is freshest when the agent starts writing.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch03-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The seven levels</h2></div>
+
+    <div class="prose reveal" style="max-width:72ch">
+      <p class="lead-in">The same parts list scales. A level is not a difficulty rating — it is a statement about <em>what the prompt is allowed to do</em>. Higher levels earn their complexity by taking on more.</p>
+    </div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 330" role="img" aria-label="The seven levels of agentic prompt formats as a rising ladder">
+        <path d="M40 300 H 850" class="s-line"/>
+        <rect x="46" y="262" width="106" height="34" rx="7" class="s-dim"/>
+        <text x="99" y="284" text-anchor="middle" class="s-label">1 · High level</text>
+        <rect x="160" y="226" width="106" height="70" rx="7" class="s-olive-f"/>
+        <text x="213" y="256" text-anchor="middle" class="s-label">2 · Workflow</text>
+        <text x="213" y="272" text-anchor="middle" class="s-label-sm">in → work → out</text>
+        <rect x="274" y="196" width="106" height="100" rx="7" class="s-olive-f"/>
+        <text x="327" y="228" text-anchor="middle" class="s-label">3 · Control</text>
+        <text x="327" y="244" text-anchor="middle" class="s-label-sm">loops, ifs</text>
+        <rect x="388" y="160" width="106" height="136" rx="7" class="s-blue-f"/>
+        <text x="441" y="192" text-anchor="middle" class="s-label">4 · Delegate</text>
+        <text x="441" y="208" text-anchor="middle" class="s-label-sm">subagents</text>
+        <rect x="502" y="124" width="106" height="172" rx="7" class="s-blue-f"/>
+        <text x="555" y="156" text-anchor="middle" class="s-label">5 · Higher</text>
+        <text x="555" y="172" text-anchor="middle" class="s-label-sm">takes a prompt</text>
+        <rect x="616" y="88" width="106" height="208" rx="7" class="s-plum-f"/>
+        <text x="669" y="120" text-anchor="middle" class="s-label">6 · Meta</text>
+        <text x="669" y="136" text-anchor="middle" class="s-label-sm">writes prompts</text>
+        <rect x="730" y="46" width="106" height="250" rx="7" class="s-clay-f"/>
+        <text x="783" y="78" text-anchor="middle" class="s-label">7 · Self-improve</text>
+        <text x="783" y="94" text-anchor="middle" class="s-label-sm">edits itself</text>
+        <path d="M46 34 C 300 34, 520 20, 836 20" class="s-line" stroke-dasharray="5 4"/>
+        <text x="44" y="318" class="s-label-sm">static text</text>
+        <text x="836" y="318" text-anchor="end" class="s-label-sm">a system that grows</text>
+      </svg>
+      <div class="fcap"><b>Complexity should be earned, not assumed.</b> Levels 2 and 3 cover most real work. Reach higher only when the job demands it.</div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ reaching too high</span>
+        <ul>
+          <li>A metaprompt for a task you run twice</li>
+          <li>Subagents where a loop would do</li>
+          <li>An Expertise section nobody updates</li>
+        </ul></div>
+      <div class="col good"><span class="clabel">◵ the right altitude</span>
+        <ul>
+          <li>Level 2 for anything you have done three times</li>
+          <li>Level 4 only when you need parallelism <em>and</em> specialisation</li>
+          <li>Level 7 only where knowledge genuinely accumulates</li>
+        </ul></div>
+    </div>
+
+    <a class="jump reveal" href="#ch04">Next · what is on your machine &nbsp;→</a>
+  </div>
+</section>
+
+<!-- ════════ CH04 ════════ -->
+<section class="chapter" id="ch04">
+  <div class="wrap wide">
+    <span class="chapnum reveal">04 — What is installed</span>
+    <div class="kicker reveal">twenty-two snippets, four files</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Your Zed now speaks <em>the same shorthand.</em></h2>
+    <p class="lede reveal d2">Everything below is live on your machine right now. Four files changed; all four validated as parseable.</p>
+
+    <div class="stats reveal">
+      <div class="stat"><div class="sv">22</div><div class="sl">snippets</div></div>
+      <div class="stat blue"><div class="sv">11</div><div class="sl">full scaffolds</div></div>
+      <div class="stat olive"><div class="sv">11</div><div class="sl">section fragments</div></div>
+      <div class="stat amber"><div class="sv">1</div><div class="sl">git task (GSTC)</div></div>
+    </div>
+
+    <hr class="divline reveal">
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 260" role="img" aria-label="The snippet library organised into four prefix families">
+        <rect x="14" y="16" width="852" height="30" rx="8" class="s-card"/>
+        <text x="440" y="36" text-anchor="middle" class="s-title" font-size="12">markdown.json · one file, four families</text>
+        <path d="M180 46 V 74" class="s-line"/><path d="M400 46 V 74" class="s-line"/>
+        <path d="M620 46 V 74" class="s-line"/><path d="M810 46 V 74" class="s-line"/>
+
+        <rect x="14" y="78" width="196" height="150" rx="10" class="s-clay-f"/>
+        <text x="112" y="102" text-anchor="middle" class="s-title" font-size="12">the prompt family</text>
+        <text x="112" y="126" text-anchor="middle" class="s-label">agp · agph · agpm</text>
+        <text x="112" y="146" text-anchor="middle" class="s-label">agpd · agpho</text>
+        <text x="112" y="166" text-anchor="middle" class="s-label">agpt · agpe</text>
+        <text x="112" y="196" text-anchor="middle" class="s-label-sm">seven scaffolds,</text>
+        <text x="112" y="212" text-anchor="middle" class="s-label-sm">one per level</text>
+
+        <rect x="224" y="78" width="196" height="150" rx="10" class="s-blue-f"/>
+        <text x="322" y="102" text-anchor="middle" class="s-title" font-size="12">the agent family</text>
+        <text x="322" y="130" text-anchor="middle" class="s-label">agsk</text>
+        <text x="322" y="152" text-anchor="middle" class="s-label">agsa</text>
+        <text x="322" y="174" text-anchor="middle" class="s-label">agpr</text>
+        <text x="322" y="204" text-anchor="middle" class="s-label-sm">skills, subagents, priming</text>
+
+        <rect x="434" y="78" width="196" height="150" rx="10" class="s-olive-f"/>
+        <text x="532" y="102" text-anchor="middle" class="s-title" font-size="12">the fragments</text>
+        <text x="532" y="130" text-anchor="middle" class="s-label">s-purpose · s-vars</text>
+        <text x="532" y="152" text-anchor="middle" class="s-label">s-inst · s-wf</text>
+        <text x="532" y="174" text-anchor="middle" class="s-label">s-report · s-files …</text>
+        <text x="532" y="204" text-anchor="middle" class="s-label-sm">compose a prompt by hand</text>
+
+        <rect x="644" y="78" width="222" height="150" rx="10" class="s-amber-f"/>
+        <text x="755" y="102" text-anchor="middle" class="s-title" font-size="12">not a snippet</text>
+        <text x="755" y="134" text-anchor="middle" class="s-label">GSTC</text>
+        <text x="755" y="160" text-anchor="middle" class="s-label-sm">runs a command,</text>
+        <text x="755" y="176" text-anchor="middle" class="s-label-sm">so it lives in tasks.json</text>
+        <text x="755" y="206" text-anchor="middle" class="s-label-sm">bound to space g c</text>
+      </svg>
+      <div class="fcap"><b>The shape of the library.</b> Three families expand text; the fourth runs git. Only the last one needed a different mechanism.</div>
+    </div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div>
+        <div class="filetree reveal"><span class="d">~/.config/zed/</span>
+  <span class="d">snippets/</span>
+    <span class="f hl">markdown.json</span>       <span class="c"># the 22 snippets</span>
+    <span class="f">README.md</span>           <span class="c"># usage + provenance</span>
+  <span class="f">settings.json</span>         <span class="c"># + "snippets": true</span>
+  <span class="f">tasks.json</span>            <span class="c"># + the gstc task</span>
+  <span class="f">keymap.json</span>           <span class="c"># + space g c</span></div>
+        <p class="note">Nothing inside your project repo changed. This is all editor-level configuration.</p>
+      </div>
+      <div class="prose">
+        <p class="lead-in">One file does the real work.</p>
+        <p><strong>markdown.json</strong> holds every snippet. Zed's snippet extension reads any file in that folder named after a language — so these fire in markdown buffers, which is exactly where prompts, skills and subagent definitions live.</p>
+        <p>The other three edits are plumbing: install the extension, register the git task, bind a key to it.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch04-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The eleven scaffolds</h2></div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">agp</span><p class="ctitle">Agentic prompt</p><p class="cbody">The canonical one. Metadata, Purpose, Variables, Instructions, Workflow, Report.</p></div>
+      <div class="card accent d1"><span class="cnum">agph</span><p class="ctitle">+ self-validation</p><p class="cbody">Same, plus a <strong>hooks:</strong> block so the agent validates its own work after every edit.</p></div>
+      <div class="card accent d2"><span class="cnum">agpm</span><p class="ctitle">Minimal</p><p class="cbody">Level 1. Title and Purpose. The smallest thing worth saving.</p></div>
+      <div class="card blue"><span class="cnum">agpd</span><p class="ctitle">Delegate</p><p class="cbody">Level 4. Fans work to N subagents with model, count and tool config.</p></div>
+      <div class="card blue d1"><span class="cnum">agpho</span><p class="ctitle">Higher order</p><p class="cbody">Level 5. Takes another prompt file as input and wraps it.</p></div>
+      <div class="card plum d2"><span class="cnum">agpt</span><p class="ctitle">Metaprompt</p><p class="cbody">Level 6. A prompt whose output is another prompt.</p></div>
+      <div class="card plum"><span class="cnum">agpe</span><p class="ctitle">Self-improving</p><p class="cbody">Level 7. Carries an Expertise section that grows over time.</p></div>
+      <div class="card olive d1"><span class="cnum">agsk</span><p class="ctitle">Agent skill</p><p class="cbody">The AG-SK reconstruction. Name, trigger-rich description, Cookbook.</p></div>
+      <div class="card olive d2"><span class="cnum">agsa</span><p class="ctitle">Subagent</p><p class="cbody">For .claude/agents/ — description written as a routing signal.</p></div>
+      <div class="card amber"><span class="cnum">agpr</span><p class="ctitle">Context prime</p><p class="cbody">The /prime pattern. Run, read, report.</p></div>
+      <div class="card amber d1"><span class="cnum">hookptu</span><p class="ctitle">Hook block</p><p class="cbody">A PostToolUse validator block on its own, to drop into anything.</p></div>
+      <div class="card d2"><span class="cnum">s-*</span><p class="ctitle">Eleven fragments</p><p class="cbody">s-purpose, s-vars, s-inst, s-wf, s-report, s-files, s-struct, s-ex, s-tmpl, s-exp, s-meta.</p></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch04-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What <span style="font-family:var(--mono);font-size:.7em">agp</span> actually produces</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div>
+        <div class="codecap">.claude/commands/your-prompt.md — after expansion</div>
+        <div class="code"><pre>---
+description: What this prompt does
+argument-hint: [arg_one] [arg_two]
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep
+model: sonnet
+---
+
+# Prompt Title
+
+## Purpose
+
+High level description of what this prompt accomplishes.
+Follow the `Instructions` and execute the `Workflow` to
+deliver the `Report`.
+
+## Variables
+
+FIRST_INPUT: $1
+SECOND_INPUT: $2
+
+## Instructions
+
+- Guardrail or constraint the agent must respect.
+- IMPORTANT: The one rule that must never be broken.
+
+## Workflow
+
+1. Read / gather context.
+2. Do the work.
+3. Report the results based on the `Report` section.
+
+## Report
+
+- Describe the exact output format returned to the engineer.</pre></div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Fourteen tab stops.</p>
+        <p>Each italicised placeholder above is a cursor position. Press <kbd>Tab</kbd> and you land on the next one — description, then argument hint, then tools, then model, and on down through the body.</p>
+        <p>The two <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">$1</span> and <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">$2</span> markers in <strong>Variables</strong> are <em>not</em> tab stops. They are Claude Code's positional arguments and they survive into the finished file — a detail that takes deliberate escaping to get right. Chapter six explains it.</p>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch05">Next · driving it &nbsp;→</a>
+  </div>
+</section>
+
+<!-- ════════ CH05 ════════ -->
+<section class="chapter" id="ch05">
+  <div class="wrap wide">
+    <span class="chapnum reveal">05 — Driving it</span>
+    <div class="kicker reveal">the gesture, and the one restart</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Type three letters. Hit <em>control-space.</em></h2>
+    <p class="lede reveal d2">That is his exact gesture, quoted from yt-22, and it is now yours. There is one setup step first.</p>
+
+    <hr class="divline reveal">
+
+    <ol class="steps reveal">
+      <li><h4>Restart Zed once</h4><p>Your <strong>settings.json</strong> now carries <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">"snippets": true</span> under <strong>auto_install_extensions</strong>. On next launch Zed fetches and installs the Snippets extension by itself. Nothing to click.</p></li>
+      <li><h4>Open any markdown file</h4><p>A new <strong>.claude/commands/whatever.md</strong>, a <strong>SKILL.md</strong>, anything ending in <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">.md</span>.</p></li>
+      <li><h4>Type the prefix, then force completions</h4><p>Type <strong>agp</strong>. Press <kbd>ctrl</kbd> <kbd>space</kbd>. Pick it from the menu.</p></li>
+      <li><h4>Tab through the placeholders</h4><p><kbd>Tab</kbd> moves forward, <kbd>shift</kbd> <kbd>Tab</kbd> moves back. The final stop drops your cursor at the end of the file.</p></li>
+    </ol>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 200" role="img" aria-label="Keystroke flow from prefix to completed prompt">
+        <rect x="20" y="66" width="128" height="56" rx="9" class="s-card"/>
+        <text x="84" y="90" text-anchor="middle" class="s-title" font-size="14">agp</text>
+        <text x="84" y="108" text-anchor="middle" class="s-label-sm">type 3 chars</text>
+        <path d="M148 94 H 200" class="s-flow"/><path d="M206 94 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="206" y="66" width="150" height="56" rx="9" class="s-blue-f"/>
+        <text x="281" y="90" text-anchor="middle" class="s-label">ctrl + space</text>
+        <text x="281" y="108" text-anchor="middle" class="s-label-sm">completion menu</text>
+        <path d="M356 94 H 408" class="s-flow"/><path d="M414 94 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="414" y="40" width="180" height="108" rx="9" class="s-clay-f"/>
+        <path d="M436 66 H 572" class="s-line"/>
+        <path d="M436 84 H 540" class="s-line"/>
+        <path d="M436 102 H 572" class="s-line"/>
+        <path d="M436 120 H 512" class="s-line"/>
+        <text x="504" y="140" text-anchor="middle" class="s-label-sm">full scaffold</text>
+        <path d="M594 94 H 646" class="s-flow"/><path d="M652 94 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="652" y="66" width="204" height="56" rx="9" class="s-olive-f"/>
+        <text x="754" y="90" text-anchor="middle" class="s-label">Tab · Tab · Tab</text>
+        <text x="754" y="108" text-anchor="middle" class="s-label-sm">fill 14 placeholders</text>
+        <text x="440" y="176" class="s-label-sm">total elapsed: about four seconds</text>
+      </svg>
+      <div class="fcap"><b>The whole loop.</b> Three keystrokes to a structure that would take two minutes to type by hand — and would drift every time.</div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch05-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">GSTC, rebuilt as a task</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">His git checkpoint does not insert text — it runs a command. So it cannot be a snippet.</p>
+        <p>In Zed the right home for it is a <strong>task</strong>. It is registered in <strong>tasks.json</strong> and bound to <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">space g c</span> in normal mode, sitting right beside your existing <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">space g g</span> lazygit binding.</p>
+        <p>It stages everything and commits with the message <strong>progress</strong> — which is why his repos are full of commits saying exactly that.</p>
+      </div>
+      <div>
+        <div class="codecap">~/.config/zed/tasks.json</div>
+        <div class="code"><pre>{
+  "label": "gstc",
+  "command": "git add -A &amp;&amp; git commit -m \"progress\" || true",
+  "use_new_terminal": false,
+  "reveal": "on_error"
+}</pre></div>
+        <p class="note">The trailing <em>|| true</em> keeps a no-op commit from surfacing as an error.</p>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch06">Next · gotchas and extending &nbsp;→</a>
+  </div>
+</section>
+
+<!-- ════════ CH06 ════════ -->
+<section class="chapter" id="ch06">
+  <div class="wrap wide">
+    <span class="chapnum reveal">06 — Gotchas &amp; extending</span>
+    <div class="kicker reveal">two traps, one recipe</div>
+    <h2 class="title reveal d1" style="max-width:24ch">The dollar sign will bite you <em>exactly once.</em></h2>
+    <p class="lede reveal d2">Everything else about writing your own snippets is mechanical. This one thing is not obvious, and it fails silently.</p>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch06-s1"><b>1</b>The dollar-sign trap</a>
+      <a href="#ch06-s2"><b>2</b>Where snippets do not work</a>
+      <a href="#ch06-s3"><b>3</b>Adding your own</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch06-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The dollar-sign trap</h2></div>
+
+    <div class="prose reveal" style="max-width:72ch">
+      <p class="lead-in">Snippet placeholders are written <strong>$1</strong>, <strong>$2</strong>, <strong>$0</strong>. Claude Code's positional arguments are <em>also</em> written <strong>$1</strong> and <strong>$2</strong>.</p>
+      <p>They collide. Write <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">$1</span> naively inside a Variables section and the editor eats it as a tab stop — your finished prompt file ends up with the argument marker missing, and you will not notice until the command misbehaves at runtime.</p>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ swallowed by the editor</span>
+        <ul>
+          <li><span class="mono">"body": ["INPUT: $1"]</span></li>
+          <li>Renders as an empty tab stop</li>
+          <li>The argument marker never reaches the file</li>
+        </ul></div>
+      <div class="col good"><span class="clabel">◵ escaped, survives to disk</span>
+        <ul>
+          <li><span class="mono">"body": ["INPUT: \\$1"]</span></li>
+          <li>Emits a literal <span class="mono">$1</span></li>
+          <li>Claude Code reads it as argument one</li>
+        </ul></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="fig bare">
+        <svg class="draw" viewBox="0 0 460 220" role="img" aria-label="Escaping a dollar sign through JSON into the snippet engine">
+          <rect x="14" y="20" width="140" height="52" rx="9" class="s-card"/>
+          <text x="84" y="42" text-anchor="middle" class="s-label">in JSON</text>
+          <text x="84" y="60" text-anchor="middle" class="s-title" font-size="14">\\$1</text>
+          <path d="M154 46 H 196" class="s-flow"/><path d="M202 46 l-9 -6 0 12 z" class="s-clay"/>
+          <rect x="202" y="20" width="140" height="52" rx="9" class="s-blue-f"/>
+          <text x="272" y="42" text-anchor="middle" class="s-label">snippet engine</text>
+          <text x="272" y="60" text-anchor="middle" class="s-title" font-size="14">\$1</text>
+          <path d="M272 72 V 108" class="s-flow"/><path d="M272 114 l-6 -9 12 0 z" class="s-clay"/>
+          <rect x="202" y="114" width="140" height="52" rx="9" class="s-olive-f"/>
+          <text x="272" y="136" text-anchor="middle" class="s-label">on disk</text>
+          <text x="272" y="154" text-anchor="middle" class="s-title" font-size="14">$1</text>
+          <rect x="14" y="114" width="140" height="52" rx="9" class="s-dim"/>
+          <text x="84" y="136" text-anchor="middle" class="s-label-sm">unescaped</text>
+          <text x="84" y="154" text-anchor="middle" class="s-label-sm">→ vanishes</text>
+          <path d="M84 72 V 108" class="s-line" stroke-dasharray="4 4"/>
+          <text x="230" y="196" text-anchor="middle" class="s-label-sm">two layers of escaping, one visible result</text>
+        </svg>
+      </div>
+      <div class="prose">
+        <p>Two layers are in play. JSON consumes one backslash, so <strong>\\$1</strong> in the file becomes <strong>\$1</strong> by the time the snippet engine sees it — and a backslash-escaped dollar is the engine's way of saying "this is text, not a placeholder."</p>
+        <p class="note">The same applies to <em>$ARGUMENTS</em> and to shell variables like <em>$CLAUDE_PROJECT_DIR</em> inside hook commands. All of them are escaped in the shipped file.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch06-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Where snippets do not work</h2></div>
+
+    <div class="callout bad reveal"><span class="ci">NOT IN THE AGENT PANEL</span>
+      <span class="cc">Snippets are an <strong>editor</strong> feature. They expand in file buffers only. Typing <em>agp</em> into Zed's Agent Panel chat box will do nothing — that input is not a buffer.</span></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p>This is less limiting than it sounds, because it matches how the workflow actually runs. You <strong>author</strong> prompts as files, then <strong>invoke</strong> them as slash commands. The snippet belongs to the authoring half.</p>
+        <p>If you do want reusable text inside the agent panel itself, Zed has a separate mechanism for that — the Rules Library, reachable from the command palette.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 200" role="img" aria-label="Snippets work in file buffers, rules library works in the agent panel">
+          <rect x="16" y="30" width="200" height="130" rx="10" class="s-olive-f"/>
+          <text x="116" y="56" text-anchor="middle" class="s-title" font-size="13">file buffer</text>
+          <text x="116" y="76" text-anchor="middle" class="s-label-sm">commands/*.md</text>
+          <text x="116" y="92" text-anchor="middle" class="s-label-sm">SKILL.md</text>
+          <rect x="42" y="104" width="148" height="30" rx="7" class="s-clay-f"/>
+          <text x="116" y="124" text-anchor="middle" class="s-label">snippets ✓</text>
+          <rect x="244" y="30" width="200" height="130" rx="10" class="s-card"/>
+          <text x="344" y="56" text-anchor="middle" class="s-title" font-size="13">agent panel</text>
+          <text x="344" y="76" text-anchor="middle" class="s-label-sm">the chat input</text>
+          <rect x="270" y="104" width="148" height="30" rx="7" class="s-dim"/>
+          <text x="344" y="124" text-anchor="middle" class="s-label-sm">rules library instead</text>
+          <text x="230" y="186" text-anchor="middle" class="s-label-sm">author here · converse there</text>
+        </svg>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch06-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Adding your own</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div>
+        <div class="codecap">~/.config/zed/snippets/markdown.json</div>
+        <div class="code"><pre>{
+  "My scaffold": {
+    "prefix": "mine",
+    "description": "Shows in the completion menu",
+    "body": [
+      "# ${1:Title}",
+      "",
+      "## Purpose",
+      "",
+      "${2:What it does}",
+      "",
+      "## Variables",
+      "",
+      "INPUT: \\$1",
+      "$0"
+    ]
+  }
+}</pre></div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Three keys and you are done.</p>
+        <p><strong>prefix</strong> is what you type. <strong>description</strong> is what the menu shows beside it. <strong>body</strong> is an array of lines.</p>
+        <p><span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">${1:Title}</span> is a tab stop with default text. <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">$0</span> is where the cursor finally rests — always put one, or you will end up back at the top of the file.</p>
+        <p class="note">Zed reloads the file on save. No restart needed after the first one.</p>
+      </div>
+    </div>
+
+    <div class="callout ok reveal"><span class="ci">KEEP THE GRAMMAR</span>
+      <span class="cc">When you extend the library, hold to the twelve canonical section names in their documented order. The value compounds only while every prompt looks like every other prompt — a bespoke section in one file undoes the consistency you installed this for.</span></div>
+
+    <a class="jump reveal" href="#ch99">Next · the send-off &nbsp;→</a>
+  </div>
+</section>
+
+
+<!-- ════════ SEND-OFF (dark scene) — id must match the last TOC entry ════════ -->
+<section class="chapter dark" id="ch99">
+  <div class="wrap">
+    <span class="chapnum reveal" style="color:var(--on-dark-dim)">— The Send-off</span>
+    <div class="kicker reveal">where this leaves you</div>
+    <h2 class="title reveal d1" style="max-width:22ch">You did not copy his snippets. You copied <em>his grammar.</em></h2>
+    <p class="lede reveal d2" style="max-width:44ch;color:var(--on-dark-dim)">
+      The file on his laptop was never the valuable part. The fixed section order was — and that
+      was written down all along, in his own course repo.
+    </p>
+
+    <div class="grid grid-3 reveal" style="margin-top:18px">
+      <div class="card glow accent"><span class="cnum">RECAP 01</span><p class="ctitle">Three triggers, proven</p><p class="cbody">AGP, AG-SK and GSTC are the only ones he ever names aloud. Everything else here is reconstruction, and is labelled as such.</p></div>
+      <div class="card glow blue"><span class="cnum">RECAP 02</span><p class="ctitle">Consistency is the payload</p><p class="cbody">The same skeleton every time means neither you nor your agent spends attention on the wrapper.</p></div>
+      <div class="card glow olive"><span class="cnum">RECAP 03</span><p class="ctitle">Restart Zed once</p><p class="cbody">Then type <strong>agp</strong>, press ctrl-space, and tab through. That is the entire gesture.</p></div>
+    </div>
+
+    <div class="fig bare reveal" style="margin-top:38px;max-width:620px">
+      <svg class="draw" viewBox="0 0 620 92" role="img" aria-label="The grammar outlasts the file it was stored in">
+        <rect x="6" y="30" width="150" height="34" rx="8" fill="none" stroke="var(--on-dark-dim)" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="81" y="52" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--on-dark-dim)">his snippet file</text>
+        <text x="81" y="80" text-anchor="middle" font-family="var(--mono)" font-size="9.5" fill="var(--on-dark-dim)">unreachable</text>
+        <path d="M156 47 H 208" stroke="var(--on-dark-dim)" stroke-width="1.5" fill="none" stroke-dasharray="4 4"/>
+        <rect x="214" y="30" width="168" height="34" rx="8" fill="none" stroke="var(--olive)" stroke-width="2"/>
+        <text x="298" y="52" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="#efe7d8">the section grammar</text>
+        <text x="298" y="80" text-anchor="middle" font-family="var(--mono)" font-size="9.5" fill="var(--on-dark-dim)">published all along</text>
+        <path d="M382 47 H 434" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M440 47 l-9 -6 0 12 z" fill="var(--clay-2)"/>
+        <rect x="440" y="30" width="174" height="34" rx="8" fill="none" stroke="var(--clay-2)" stroke-width="2"/>
+        <text x="527" y="52" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="#efe7d8">22 snippets, yours</text>
+        <text x="527" y="80" text-anchor="middle" font-family="var(--mono)" font-size="9.5" fill="var(--on-dark-dim)">installed &amp; validated</text>
+      </svg>
+    </div>
+
+    <div class="quote big reveal" style="margin:36px 0 8px">
+      <p>Write it once. Never decide its shape again.</p>
+      <span class="cite" style="display:block;margin-top:14px;color:var(--on-dark-dim)">— the line to remember</span>
+    </div>
+
+    <p class="small reveal" style="margin-top:30px;color:var(--on-dark-dim)">
+      Triggers recovered from video. Bodies reconstructed from published output files.
+      Levels 4&ndash;7 extrapolated from the documented framework.<br>
+      <span style="font-family:var(--mono);letter-spacing:.06em">Press <kbd style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#efe7d8">K</kbd> to climb back up ↑</span>
+    </p>
+    <a class="jump reveal" href="#ch00" style="margin-top:26px">Back to the top &nbsp;↑</a>
+  </div>
+</section>
+
+</main>
+
+<div id="pager">
+  <button id="pprev" aria-label="Previous section">‹</button>
+  <span class="pind" id="pind"></span>
+  <button id="pnext" aria-label="Next section">›</button>
+</div>
+<button id="topbtn" aria-label="Back to top">↑</button>
+
+<script>
+/* ═══ self-contained syntax highlighter ═══════════════════ */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+const KW={
+ python:['def','class','import','from','return','if','elif','else','for','while','in','not','and','or','is','None','True','False','with','as','try','except','finally','raise','lambda','yield','async','await','self','pass','break','continue','global'],
+ js:['const','let','var','function','return','if','else','for','while','of','in','new','class','extends','import','export','default','async','await','try','catch','finally','throw','typeof','this','true','false','null','undefined','interface','type','enum','public','private','readonly'],
+ bash:['if','then','else','elif','fi','for','do','done','while','case','esac','function','export','source','return','local','set','git','npm','npx','uv','uvx','bun','python','python3','node','claude','curl','mkdir','cd','echo','cat','cp','mv','rm','chmod'],
+ yaml:['true','false','null'],
+ json:['true','false','null'],
+ text:[]
+};
+const COMMENT={python:'#',bash:'#',yaml:'#',js:'//',json:null,text:null};
+function hlMd(e){
+  return e.split('\n').map(function(line){
+    if(/^#{1,6}\s/.test(line))return '<span class="md-h">'+line+'</span>';
+    if(/^\s*&gt;/.test(line))return '<span class="md-q">'+line+'</span>';
+    if(/^\s*([-*+]|\d+\.)\s/.test(line))line=line.replace(/^(\s*)([-*+]|\d+\.)(\s)/,'$1<span class="md-li">$2</span>$3');
+    line=line.replace(/`([^`]+)`/g,'<span class="md-c">`$1`</span>');
+    line=line.replace(/\*\*([^*]+)\*\*/g,'<span class="md-b">**$1**</span>');
+    line=line.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<span class="md-link">[$1]($2)</span>');
+    return line;
+  }).join('\n');
+}
+function detectLang(pre){
+  var cap=''; var c=pre.closest('.code'); if(c&&c.previousElementSibling&&c.previousElementSibling.classList.contains('codecap'))cap=c.previousElementSibling.textContent.toLowerCase();
+  var t=pre.textContent;
+  if(/\.md\b|markdown|\.claude\/commands|slash command|command file|prompt\.md|claude\.md/.test(cap)||/^#{1,6}\s.+/m.test(t)&&!/^\s*(def |import )/m.test(t))return'md';
+  if(/\.py\b|python/.test(cap)||/^\s*(def |class |import |from \S+ import|print\()/m.test(t))return'python';
+  if(/\.json\b|json|\.mcp|settings/.test(cap)||(/^\s*[\{\[]/.test(t.trim())&&/":\s/.test(t)))return'json';
+  if(/\.(ts|js|tsx|jsx)\b|typescript|javascript/.test(cap)||/(=>|\bconst |\bfunction |\bexport )/.test(t))return'js';
+  if(/\.ya?ml\b|yaml/.test(cap))return'yaml';
+  if(/terminal|bash|shell|\.sh\b|justfile|command line/.test(cap)||/^\s*(\$|#!\/|git |cd |npm |uv |bun |export |curl )/m.test(t))return'bash';
+  return'text';
+}
+function hl(text,lang){
+  if(lang==='md')return hlMd(esc(text));
+  var e=esc(text);
+  var alts=['"(?:[^"\\\\]|\\\\.)*"',"'(?:[^'\\\\]|\\\\.)*'",'`(?:[^`\\\\]|\\\\.)*`'];
+  var cm=COMMENT[lang];
+  if(cm==='#')alts.push('#[^\\n]*');
+  if(cm==='//')alts.push('//[^\\n]*');
+  alts.push('\\b\\d+(?:\\.\\d+)?\\b');
+  var kw=KW[lang]||[];
+  if(kw.length)alts.push('\\b(?:'+kw.join('|')+')\\b');
+  var re=new RegExp(alts.join('|'),'g');
+  return e.replace(re,function(m){
+    var q=m.charAt(0);
+    if(q==='"'||q==="'"||q==='`')return '<span class="s">'+m+'</span>';
+    if(m.indexOf('#')===0||m.indexOf('//')===0)return '<span class="cm">'+m+'</span>';
+    if(/^\d/.test(m))return '<span class="n">'+m+'</span>';
+    return '<span class="k">'+m+'</span>';
+  });
+}
+function highlightAll(){
+  document.querySelectorAll('.code pre').forEach(function(pre){
+    if(pre.dataset.hl)return;
+    try{ pre.innerHTML=hl(pre.textContent,detectLang(pre)); }catch(e){}
+    pre.dataset.hl='1';
+  });
+}
+highlightAll();
+
+/* ═══ paged navigation ════════════════════════════════════ */
+var chapters=[].slice.call(document.querySelectorAll('.chapter'));
+var tocLinks=[].slice.call(document.querySelectorAll('#toc a'));
+var prog=document.getElementById('progress');
+var rail=document.getElementById('rail');
+var idIndex={}; chapters.forEach(function(c,i){idIndex[c.id]=i;});
+var cur=0, total=chapters.length;
+
+var revObs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in','drawn');revObs.unobserve(e.target);}});},{rootMargin:'0px 0px -6% 0px',threshold:.1});
+function wirePage(ch){
+  ch.querySelectorAll('.draw').forEach(function(svg){
+    svg.querySelectorAll('path,line,polyline,polygon,circle,rect').forEach(function(p){
+      try{var len=p.getTotalLength?p.getTotalLength():1200;p.style.setProperty('--len',Math.ceil(len)||1200);}catch(e){}
+    });
+  });
+  ch.querySelectorAll('.reveal,.draw').forEach(function(el){el.classList.remove('in','drawn');revObs.observe(el);});
+}
+var subObs=null;
+function wireSubnav(ch){
+  if(subObs)subObs.disconnect();
+  var subs=[].slice.call(ch.querySelectorAll('.subsec[id]'));
+  var links=[].slice.call(ch.querySelectorAll('.chapnav a'));
+  if(!subs.length||!links.length)return;
+  subObs=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(e.isIntersecting){links.forEach(function(a){a.classList.remove('cur');});
+      var l=ch.querySelector('.chapnav a[href="#'+e.target.id+'"]'); if(l)l.classList.add('cur');}
+  });},{rootMargin:'-15% 0px -75% 0px',threshold:0});
+  subs.forEach(function(s){subObs.observe(s);});
+}
+function pageNum(i){var m=chapters[i].id.match(/ch(\d+)/);return m?m[1]:'00';}
+function updatePager(){
+  document.getElementById('pprev').disabled=cur<=0;
+  document.getElementById('pnext').disabled=cur>=total-1;
+  document.getElementById('pind').innerHTML='<b>'+pageNum(cur)+'</b> / '+String(total-1).padStart(2,'0');
+}
+function show(i,push){
+  i=Math.max(0,Math.min(total-1,i));
+  if(chapters[cur])chapters[cur].classList.remove('active');
+  cur=i; var ch=chapters[i];
+  ch.classList.add('active');
+  wirePage(ch); wireSubnav(ch);
+  window.scrollTo(0,0);
+  tocLinks.forEach(function(a){a.classList.remove('active');});
+  var rl=document.querySelector('#toc a[href="#'+ch.id+'"]'); if(rl){rl.classList.add('active');rl.scrollIntoView({block:'nearest'});}
+  updatePager();
+  if(push!==false){try{history.replaceState(null,'','#'+ch.id);}catch(e){location.hash=ch.id;}}
+}
+document.getElementById('pnext').onclick=function(){show(cur+1);};
+document.getElementById('pprev').onclick=function(){show(cur-1);};
+document.getElementById('topbtn').onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};
+tocLinks.forEach(function(a){a.addEventListener('click',function(e){
+  var id=a.getAttribute('href').slice(1);
+  if(idIndex[id]!=null){e.preventDefault();show(idIndex[id]);rail.classList.remove('open');}
+});});
+window.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key==='ArrowRight'||e.key==='j'||e.key==='J'){e.preventDefault();show(cur+1);}
+  if(e.key==='ArrowLeft'||e.key==='k'||e.key==='K'){e.preventDefault();show(cur-1);}
+});
+function onScroll(){
+  var h=document.documentElement;var max=h.scrollHeight-h.clientHeight;
+  prog.style.width=(max>0?(h.scrollTop/max*100):0)+'%';
+  document.getElementById('topbtn').classList.toggle('show',h.scrollTop>560);
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+
+document.getElementById('railToggle').addEventListener('click',function(){rail.classList.toggle('open');});
+
+/* init from hash */
+var initId=(location.hash||'').slice(1);
+show(idIndex[initId]!=null?idIndex[initId]:0,false);
+onScroll();
+</script>
+</body>
+</html>

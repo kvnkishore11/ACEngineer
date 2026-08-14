@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An agent-systems companion to The Pi Verifier Agent: commander boundaries, prompt and permission contracts, the builder-verifier harness, closed-loop verification, recovery, and an agent-ops lab.">
+  <title>MA-4 · The Pi Verifier Agent — Agent Systems Companion</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+  <style>
+    :root {
+      --surface-line: color-mix(in srgb, var(--accent) 42%, var(--border));
+      --surface-wash: color-mix(in srgb, var(--accent-wash) 60%, var(--bg-card));
+      --builder: color-mix(in srgb, var(--accent-ink) 78%, var(--ink-soft));
+      --verifier: color-mix(in srgb, var(--ok) 74%, var(--ink-soft));
+      --control: color-mix(in srgb, var(--warn) 70%, var(--ink-soft));
+      --companion-max: 74rem;
+    }
+
+    body { min-width: 20rem; }
+    .reading-progress { position: fixed; inset: 0 0 auto; z-index: 200; height: 3px; background: transparent; }
+    .reading-progress__bar { display: block; width: 0; height: 100%; background: var(--accent); }
+    .skip-link { position: fixed; top: .45rem; left: .45rem; z-index: 300; padding: .45rem .7rem; border-radius: var(--radius-sm); color: var(--ink-inverse); background: var(--accent-ink); transform: translateY(-180%); }
+    .skip-link:focus { transform: none; }
+
+    .site-bar { position: sticky; top: 0; z-index: 100; min-height: var(--site-bar-h); border-bottom: var(--hairline); background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(12px); }
+    .site-bar__inner { display: flex; align-items: center; width: min(calc(100% - 1.5rem), var(--companion-max)); min-height: var(--site-bar-h); margin-inline: auto; gap: .8rem; }
+    .site-bar__brand { color: var(--ink); font: 750 var(--text-sm) var(--font-body); text-decoration: none; }
+    .site-bar__label { color: var(--ink-mute); font-size: var(--text-xs); }
+    .site-bar__links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .75rem; margin-left: auto; }
+    .site-bar__links a { color: var(--accent-ink); font-size: var(--text-xs); font-weight: 700; text-decoration: none; }
+
+    .companion-shell { display: grid; grid-template-columns: var(--rail-width) minmax(0, 1fr); gap: 1.25rem; width: min(calc(100% - 1.25rem), var(--companion-max)); margin-inline: auto; }
+    .chapter-rail { position: sticky; top: calc(var(--site-bar-h) + 6px); align-self: start; max-height: calc(100vh - var(--site-bar-h) - 12px); padding: .85rem .55rem 1rem 0; overflow-y: auto; }
+    .rail-kicker { color: var(--accent-ink); font: 750 .65rem var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+    .chapter-rail h2 { margin: .25rem 0 .55rem; font: 650 .98rem/1.25 var(--font-display); }
+    .rail-rule { width: 100%; height: 4px; margin: .55rem 0 .7rem; border-radius: 999px; background: var(--border-soft); overflow: hidden; }
+    .rail-rule span { display: block; width: 0; height: 100%; background: var(--accent); }
+    .chapter-nav ol { display: grid; gap: .08rem; margin: 0; padding: 0; list-style: none; }
+    .chapter-nav li { margin: 0; }
+    .chapter-nav a { display: grid; grid-template-columns: 1.4rem 1fr; gap: .35rem; padding: .28rem .4rem; border-radius: var(--radius-sm); color: var(--ink-soft); font-size: .78rem; line-height: 1.25; text-decoration: none; }
+    .chapter-nav a:hover, .chapter-nav a[aria-current="location"] { color: var(--accent-ink); background: var(--accent-wash); }
+    .chapter-nav__n { padding-top: .08rem; color: var(--ink-mute); font: 700 .64rem var(--font-mono); }
+
+    .companion-main { min-width: 0; padding: 1rem 0 3rem; }
+    .compact-head { padding: .25rem 0 .9rem; border-bottom: var(--hairline); }
+    .eyebrow, .section-label { color: var(--accent-ink); font: 750 var(--text-xs) var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+    .compact-head h1 { max-width: 18ch; margin: .3rem 0 .35rem; font-size: clamp(1.7rem, 3.5vw, 2.35rem); }
+    .compact-head__dek { max-width: 62ch; color: var(--ink-soft); font-size: var(--text-md); line-height: 1.45; }
+    .head-meta { display: flex; flex-wrap: wrap; gap: .35rem .5rem; margin-top: .65rem; padding: 0; list-style: none; }
+    .head-meta li { margin: 0; padding: .15rem .5rem; border: var(--hairline); border-radius: 999px; color: var(--ink-mute); background: var(--bg-card); font-size: var(--text-xs); }
+    .mobile-jump { display: none; margin-top: .7rem; }
+    .mobile-jump summary { cursor: pointer; color: var(--accent-ink); font-size: var(--text-sm); font-weight: 700; }
+    .mobile-jump nav { display: flex; flex-wrap: wrap; gap: .4rem .7rem; padding-top: .6rem; }
+    .mobile-jump a { font-size: var(--text-xs); text-decoration: none; }
+
+    .lesson-section { padding: 1.25rem 0; scroll-margin-top: 3.2rem; }
+    .lesson-section + .lesson-section { border-top: var(--hairline); }
+    .lesson-section h2 { margin: .22rem 0 .55rem; font-size: clamp(1.3rem, 2.5vw, 1.68rem); }
+    .lesson-section h3 { margin-top: .95rem; font-size: 1.08rem; }
+    .section-dek { max-width: 66ch; color: var(--ink-soft); }
+    .measure { max-width: 44rem; }
+
+    .mission-card { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 1rem; margin-top: .8rem; padding: .9rem 1rem; border: 1px solid var(--surface-line); border-left: 5px solid var(--accent); border-radius: var(--radius-lg); background: var(--surface-wash); box-shadow: var(--shadow-card); }
+    .mission-card__label { color: var(--accent-ink); font: 750 var(--text-xs) var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+    .mission-card p:last-child { max-width: 72ch; font-weight: 550; line-height: 1.5; }
+    .reality-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .55rem; margin-top: .65rem; }
+    .reality-strip div { padding: .55rem .65rem; border: var(--hairline); border-radius: var(--radius-md); background: var(--bg-card); }
+    .reality-strip b { display: block; color: var(--accent-ink); font: 650 1rem var(--font-display); }
+    .reality-strip span { color: var(--ink-mute); font-size: var(--text-xs); line-height: 1.35; }
+
+    .table-wrap { margin-top: .75rem; overflow-x: auto; border: var(--hairline); border-radius: var(--radius-lg); background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .cast-table { min-width: 54rem; }
+    .cast-table th:first-child { width: 18%; }
+    .cast-table th:nth-child(2) { width: 25%; }
+    .cast-table td:first-child { color: var(--ink); font-weight: 700; }
+    .role-mark { display: inline-block; width: .55rem; height: .55rem; margin-right: .4rem; border-radius: 50%; background: var(--accent); }
+    .role-mark--human { background: var(--ink-soft); }
+    .role-mark--builder { background: var(--builder); }
+    .role-mark--verify { background: var(--verifier); }
+    .role-mark--control { background: var(--control); }
+
+    .surface-figure { margin-top: .8rem; }
+    .surface-canvas { padding: .55rem; border: var(--hairline); border-radius: var(--radius-lg); background: var(--bg-card); box-shadow: var(--shadow-card); overflow-x: auto; }
+    .surface-canvas svg { min-width: 58rem; }
+    .surface-node rect { fill: var(--bg-card); stroke: var(--border); stroke-width: 2; }
+    .surface-node--human rect { fill: var(--bg-inset); stroke: var(--ink-soft); }
+    .surface-node--builder rect { fill: var(--accent-wash); stroke: var(--builder); stroke-width: 2.5; }
+    .surface-node--verify rect { fill: var(--ok-wash); stroke: var(--verifier); stroke-width: 2.5; }
+    .surface-node--risk rect { fill: var(--warn-wash); stroke: var(--warn); }
+    .surface-node text { fill: var(--ink); font-family: var(--font-body); font-size: 13px; }
+    .surface-node .svg-label { fill: var(--accent-ink); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .8px; }
+    .surface-edge { fill: none; stroke: var(--surface-line); stroke-width: 2.2; marker-end: url(#arrow); }
+    .surface-edge--read { stroke: var(--ok); }
+    .surface-edge--return { stroke: var(--warn); stroke-dasharray: 7 5; }
+    .surface-figure figcaption { margin-top: .45rem; text-align: center; }
+
+    .loop-board { margin-top: .8rem; padding: .8rem; border: var(--hairline); border-radius: var(--radius-lg); background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .loop-lane { display: grid; grid-template-columns: 7.6rem minmax(0, 1fr); gap: .65rem; align-items: stretch; }
+    .loop-lane + .loop-lane { margin-top: .6rem; }
+    .loop-lane__label { display: grid; place-items: center; padding: .55rem; border-radius: var(--radius-md); color: var(--ink-soft); background: var(--bg-inset); font: 750 var(--text-xs) var(--font-mono); text-align: center; text-transform: uppercase; }
+    .loop-lane--automatic .loop-lane__label { color: var(--accent-ink); background: var(--accent-wash); }
+    .loop-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem; }
+    .loop-lane--automatic .loop-steps { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .loop-step { position: relative; min-height: 6.1rem; padding: .52rem; border: var(--hairline); border-top: 4px solid var(--accent); border-radius: var(--radius-md); background: var(--bg); }
+    .loop-step b { display: block; font-size: .79rem; }
+    .loop-step span { display: block; margin-top: .2rem; color: var(--ink-mute); font-size: .68rem; line-height: 1.35; }
+    .loop-lane--automatic .loop-step:nth-child(3), .loop-lane--automatic .loop-step:nth-child(4) { border-top-color: var(--verifier); }
+    .loop-lane--automatic .loop-step:nth-child(5), .loop-lane--automatic .loop-step:nth-child(6) { border-top-color: var(--warn); }
+    .loop-lane--automatic .loop-step:nth-child(7) { border-top-color: var(--ok); }
+    .loop-return { margin: .55rem 0 0 8.25rem; padding: .45rem .6rem; border: 1px dashed var(--warn); border-radius: var(--radius-md); color: var(--warn); background: var(--warn-wash); font-size: .76rem; }
+    .worked-run { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(16rem, .9fr); gap: .7rem; margin-top: .75rem; }
+    .worked-run__story, .worked-run__proof { padding: .75rem; border: var(--hairline); border-radius: var(--radius-md); background: var(--bg-card); }
+    .worked-run h3 { margin-top: 0; }
+    .worked-run ol { margin-top: .45rem; }
+    .proof-stack { display: grid; gap: .38rem; margin-top: .45rem; }
+    .proof-stack div { padding: .45rem .55rem; border-left: 3px solid var(--verifier); background: var(--ok-wash); font-size: .78rem; }
+    .proof-stack div:nth-child(3) { border-left-color: var(--warn); background: var(--warn-wash); }
+
+    .contract-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-top: .75rem; }
+    .contract { padding: .8rem; border: var(--hairline); border-radius: var(--radius-lg); background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .contract__top { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+    .contract__top h3 { margin: 0; }
+    .contract__path { color: var(--ink-mute); font: 600 .67rem var(--font-mono); text-align: right; }
+    .contract p { margin-top: .45rem; font-size: .9rem; }
+    .snippet { margin-top: .55rem; padding: .65rem; border: 1px solid var(--terminal-border); border-radius: var(--radius-md); color: var(--terminal-ink); background: var(--terminal-bg); font: .73rem/1.5 var(--font-mono); overflow-x: auto; }
+    .snippet code { color: inherit; background: none; border: 0; padding: 0; font-size: inherit; }
+    .syn-key { color: color-mix(in srgb, var(--accent-wash) 72%, var(--ink-inverse)); }
+    .syn-string { color: color-mix(in srgb, var(--ok-wash) 72%, var(--ink-inverse)); }
+    .syn-comment { color: var(--terminal-dot); }
+    .syn-tool { color: color-mix(in srgb, var(--warn-wash) 75%, var(--ink-inverse)); }
+    .intent { margin-top: .55rem; padding: .55rem .65rem; border-left: 3px solid var(--accent); color: var(--ink-soft); background: var(--accent-wash); font-size: .82rem; }
+    .intent b { color: var(--accent-ink); }
+    .audit-note { margin-top: .5rem; padding: .5rem .6rem; border: 1px dashed var(--warn); border-radius: var(--radius-sm); color: var(--warn); background: var(--warn-wash); font-size: .78rem; }
+    .authority-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .45rem; margin-top: .65rem; }
+    .authority-strip div { padding: .55rem; border: var(--hairline); border-radius: var(--radius-md); background: var(--bg-card); }
+    .authority-strip b { display: block; font-size: .78rem; }
+    .authority-strip span { display: block; margin-top: .15rem; color: var(--ink-mute); font-size: .7rem; line-height: 1.35; }
+
+    .operator-steps { display: grid; gap: .55rem; margin-top: .75rem; padding: 0; counter-reset: operate; list-style: none; }
+    .operator-step { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: .65rem; margin: 0; padding: .7rem; border: var(--hairline); border-radius: var(--radius-md); background: var(--bg-card); }
+    .operator-step::before { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; color: var(--ink-inverse); background: var(--accent); content: counter(operate); counter-increment: operate; font: 750 var(--text-xs) var(--font-mono); }
+    .operator-step h3 { margin: 0; font-size: .98rem; }
+    .operator-step p { margin-top: .18rem; color: var(--ink-soft); font-size: .84rem; }
+    .command-row { margin-top: .4rem; padding: .5rem .6rem; border-radius: var(--radius-sm); color: var(--terminal-ink); background: var(--terminal-bg); font: .72rem/1.55 var(--font-mono); overflow-x: auto; }
+    .command-row code { color: inherit; background: none; border: 0; padding: 0; font-size: inherit; }
+    .operator-boundary { margin-top: .7rem; padding: .65rem .75rem; border: var(--hairline); border-left: 4px solid var(--ink-soft); border-radius: var(--radius-md); background: var(--bg-inset); font-size: .86rem; }
+
+    .failure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; margin-top: .75rem; }
+    .failure-card { padding: .7rem; border: var(--hairline); border-radius: var(--radius-md); background: var(--bg-card); }
+    .failure-card h3 { margin: 0; font-size: .95rem; }
+    .failure-card dl { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: .25rem .45rem; margin-top: .4rem; font-size: .78rem; }
+    .failure-card dt { color: var(--ink-mute); font-weight: 700; }
+    .failure-card dd { margin: 0; color: var(--ink-soft); }
+    .failure-card--evidence { border-color: color-mix(in srgb, var(--warn) 42%, var(--border)); background: var(--warn-wash); }
+
+    .lab-plan { display: grid; gap: .65rem; margin-top: .75rem; }
+    .lab-box { margin: 0; }
+    .lab-box h3 { margin-top: 0; }
+    .lab-box pre { margin-top: .5rem; }
+    .pass-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .45rem; margin-top: .55rem; }
+    .pass-grid div { padding: .5rem; border: var(--hairline); border-radius: var(--radius-sm); background: var(--bg-card); font-size: .76rem; }
+    .pass-grid b { display: block; color: var(--ok); }
+
+    .teach-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin-top: .75rem; counter-reset: teach; }
+    .teach-grid p { position: relative; min-height: 4.5rem; padding: .65rem .65rem .65rem 2.8rem; border: var(--hairline); border-radius: var(--radius-md); background: var(--bg-card); font-size: .86rem; }
+    .teach-grid p::before { position: absolute; left: .65rem; top: .65rem; display: grid; place-items: center; width: 1.55rem; height: 1.55rem; border-radius: 50%; color: var(--accent-ink); background: var(--accent-wash); content: counter(teach); counter-increment: teach; font: 750 .68rem var(--font-mono); }
+    .answer-key { margin-top: .65rem; border: var(--hairline); border-radius: var(--radius-md); background: var(--bg-card); overflow: hidden; }
+    .answer-key summary, .appendix summary { cursor: pointer; padding: .65rem .75rem; color: var(--accent-ink); font-weight: 700; }
+    .details-body { padding: 0 .75rem .75rem; }
+    details[open] .details-body { animation: details-in .24s ease both; }
+    @keyframes details-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+    .appendix { border: var(--hairline); border-radius: var(--radius-lg); background: var(--bg-card); overflow: hidden; }
+    .file-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
+    .file-group { padding: .6rem; border: var(--hairline); border-radius: var(--radius-md); background: var(--bg); }
+    .file-group h3 { margin: 0 0 .35rem; font-size: .9rem; }
+    .file-group ul { padding-left: 1rem; }
+    .file-group li { color: var(--ink-soft); font-size: .72rem; line-height: 1.35; }
+    .file-group li + li { margin-top: .28rem; }
+    .file-group code { overflow-wrap: anywhere; }
+
+    .page-footer { margin-top: 1rem; padding-top: .8rem; border-top: var(--hairline); color: var(--ink-mute); font-size: var(--text-xs); }
+    .page-footer a { font-weight: 700; text-decoration: none; }
+
+    @media (max-width: 1100px) {
+      .loop-lane--automatic .loop-steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .authority-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 960px) {
+      .companion-shell { grid-template-columns: 1fr; width: min(calc(100% - 1.25rem), 48rem); }
+      .chapter-rail { display: none; }
+      .mobile-jump { display: block; }
+      .contract-grid, .worked-run { grid-template-columns: 1fr; }
+      .loop-steps, .loop-lane--automatic .loop-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .loop-return { margin-left: 8.25rem; }
+    }
+    @media (max-width: 680px) {
+      .site-bar__label, .site-bar__brand { display: none; }
+      .site-bar__links { width: 100%; justify-content: space-between; margin-left: 0; }
+      .mission-card { grid-template-columns: 1fr; gap: .35rem; }
+      .reality-strip, .failure-grid, .pass-grid, .teach-grid, .file-groups, .authority-strip { grid-template-columns: 1fr; }
+      .loop-lane { grid-template-columns: 1fr; }
+      .loop-lane__label { place-items: start; text-align: left; }
+      .loop-return { margin-left: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      .site-bar, .chapter-rail, .reading-progress, .mobile-jump { display: none !important; }
+      .companion-shell { display: block; width: 100%; }
+      .lesson-section { break-inside: avoid; }
+      .surface-canvas svg { min-width: 0; }
+      details { display: block; }
+      details > summary { display: none; }
+      details > .details-body { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to companion</a>
+  <div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar" id="reading-progress"></span></div>
+
+  <header class="site-bar">
+    <div class="site-bar__inner">
+      <a class="site-bar__brand" href="../vol-3-ma/18-verifier-agent.html">AGENT SYSTEMS · MA-4</a>
+      <span class="site-bar__label">Pi Verifier companion</span>
+      <nav class="site-bar__links" aria-label="Companion links">
+        <a href="../vol-3-ma/18-verifier-agent.html">Chapter</a>
+        <a href="index.html">Code library</a>
+        <a href="../index.html">Book hub</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="companion-shell">
+    <aside class="chapter-rail" aria-label="On this page">
+      <p class="rail-kicker">Agent OS · field guide</p>
+      <h2>The Pi Verifier Agent</h2>
+      <div class="rail-rule" aria-hidden="true"><span id="rail-progress"></span></div>
+      <nav class="chapter-nav">
+        <ol>
+          <li><a href="#mission"><span class="chapter-nav__n">01</span><span>Agent mission</span></a></li>
+          <li><a href="#cast"><span class="chapter-nav__n">02</span><span>Cast of agents</span></a></li>
+          <li><a href="#surface"><span class="chapter-nav__n">03</span><span>Surface map</span></a></li>
+          <li><a href="#loop"><span class="chapter-nav__n">04</span><span>Control loop</span></a></li>
+          <li><a href="#contracts"><span class="chapter-nav__n">05</span><span>Agent contracts</span></a></li>
+          <li><a href="#operate"><span class="chapter-nav__n">06</span><span>Operate like Dan</span></a></li>
+          <li><a href="#failures"><span class="chapter-nav__n">07</span><span>Failure modes</span></a></li>
+          <li><a href="#lab"><span class="chapter-nav__n">08</span><span>Agent-ops lab</span></a></li>
+          <li><a href="#teach-back"><span class="chapter-nav__n">09</span><span>Teach-back</span></a></li>
+          <li><a href="#appendix"><span class="chapter-nav__n">10</span><span>Raw file index</span></a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <main class="companion-main" id="main-content">
+      <header class="compact-head">
+        <p class="eyebrow">MA-4 · Agent systems companion</p>
+        <h1>The Pi Verifier Agent</h1>
+        <p class="compact-head__dek">The application is not the main character. The main character is a two-process Agent OS that gives one model authority to build, gives another a narrower authority to judge, and closes the correction loop without turning the human into a message router.</p>
+        <ul class="head-meta" aria-label="Lesson facts">
+          <li>1 builder</li>
+          <li>1 verifier</li>
+          <li>4 shipped personas</li>
+          <li>3 correction loops by default</li>
+          <li>1 verifier per builder</li>
+        </ul>
+        <details class="mobile-jump">
+          <summary>Jump to a section</summary>
+          <nav aria-label="Mobile section links">
+            <a href="#mission">Mission</a><a href="#cast">Cast</a><a href="#surface">Surface</a><a href="#loop">Loop</a><a href="#contracts">Contracts</a><a href="#operate">Operate</a><a href="#failures">Failures</a><a href="#lab">Lab</a><a href="#teach-back">Teach-back</a>
+          </nav>
+        </details>
+      </header>
+
+      <section class="lesson-section" id="mission">
+        <p class="section-label">01 · Agent mission</p>
+        <h2>Move reviewing from a human habit into a programmable system</h2>
+        <div class="mission-card">
+          <p class="mission-card__label">Work this lesson trains</p>
+          <p>Command a builder with a claim-style request, let a sibling verifier wake on the builder’s stop event, prove or disprove the builder’s atomic claims against real state, and improve the durable verifier persona, prompt, or checker whenever the system lacks an oracle. You are training the move from <em>“I inspect every done message”</em> to <em>“I engineer the loop that produces evidence.”</em></p>
+        </div>
+        <div class="reality-strip" aria-label="Mission principles">
+          <div><b>Human sets intent</b><span>Choose the goal, verifier domain, authority, and what counts as proof.</span></div>
+          <div><b>Harness carries work</b><span>Spawn, observe, transport lifecycle, inject correction, cap retries.</span></div>
+          <div><b>Evidence closes trust</b><span>The builder’s prose is a claim. Script output, image bytes, and test results are proof.</span></div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="cast">
+        <p class="section-label">02 · Cast of agents</p>
+        <h2>Know who thinks, who acts, and who merely enforces</h2>
+        <p class="section-dek">The repo uses the word “agent” precisely for model-driven roles. Launchers and scripts can feel agentic because they act automatically, but they are deterministic control surfaces—not extra minds.</p>
+        <div class="table-wrap">
+          <table class="cast-table">
+            <thead><tr><th>Actor</th><th>Job</th><th>Authority</th><th>Boundary</th></tr></thead>
+            <tbody>
+              <tr><td><span class="role-mark role-mark--human"></span>Human commander</td><td>Chooses the domain, writes the request as checkable claims, watches the first proof cycle, and handles escalation.</td><td>Can change persona, prompt, script, model, or launcher.</td><td>Does not type instructions into the verifier or manually relay corrections.</td></tr>
+              <tr><td><span class="role-mark role-mark--control"></span>Claude Code / coding agent</td><td>Acts as setup bootloader for <code>/install</code> and context loader for <code>/prime</code>.</td><td>Checks prerequisites, installs package deps, validates config, type-checks.</td><td>It is not the runtime verifier. Any compatible agent may perform setup.</td></tr>
+              <tr><td><span class="role-mark role-mark--builder"></span>Builder Pi</td><td>Receives the human request and performs normal write/edit/run work.</td><td>Its normal tool surface; <code>cross-agent.ts</code> additionally exposes compatible commands and skills.</td><td>It does not decide when to verify. <code>verifiable.ts</code> observes it from the harness layer.</td></tr>
+              <tr><td><span class="role-mark role-mark--verify"></span>Verifier Pi</td><td>Reads one bounded builder-turn slice, decomposes claims, checks actual state, reports, and sends concrete feedback.</td><td>Persona-selected tools plus the system’s <code>verifier_prompt</code> channel.</td><td>Human input is locked; one verifier connection per builder; correction loop is capped.</td></tr>
+              <tr><td><span class="role-mark role-mark--verify"></span>Domain persona</td><td>Programs purpose, model, tools, loop limit, evidence focus, workflow, and Report shape.</td><td>Frontmatter becomes runtime flags; body becomes the verifier’s full system prompt.</td><td>Generic/image omit script-only bash policy; SQLite/Python declare it.</td></tr>
+              <tr><td><span class="role-mark role-mark--control"></span>Launcher + socket supervisor</td><td>Spawns the child, opens a sibling tmux/OS window, handshakes, pings, diagnoses startup, and cleans up.</td><td>Process, tmux, temp prompt/wrapper files, local Unix socket.</td><td>Transports lifecycle/control; it does not judge application correctness.</td></tr>
+              <tr><td><span class="role-mark role-mark--control"></span>Verifier script</td><td>Acts as a deterministic oracle: SQLite inspection or Python checks.</td><td>Only its CLI and subprocess routes.</td><td>Not an LLM agent. It should make truth cheap and repeatable for the verifier.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="operator-boundary"><strong>Where are the subagents?</strong> They are not part of the builder→verifier runtime. <code>.claude/commands/plan-w-team.md</code> describes a separate planning/team workflow, while <code>cross-agent.ts</code> only discovers commands, skills, and agent metadata for the builder. The verifier child deliberately does not load that cross-agent extension.</p>
+      </section>
+
+      <section class="lesson-section" id="surface">
+        <p class="section-label">03 · Agent surface map</p>
+        <h2>The repo is an operating surface around the code</h2>
+        <p class="section-dek">Read left to right. Files are shown only where an agent or harness touches them: entrypoints, context, authority, lifecycle, evidence, and recovery.</p>
+        <figure class="surface-figure">
+          <div class="surface-canvas">
+            <svg viewBox="0 0 1040 430" role="img" aria-labelledby="surface-title surface-desc">
+              <title id="surface-title">Pi verifier agent operating surface</title>
+              <desc id="surface-desc">The human uses install, prime, and just recipes to start a builder. The builder extension emits lifecycle events and writes session JSONL. The verifier extension reads the selected persona and stop prompt, reads the bounded session slice, runs allowlisted checks, emits a report, and can send a correction back.</desc>
+              <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="context-stroke"></path></marker></defs>
+
+              <g class="surface-node surface-node--human" transform="translate(18 26)"><rect width="168" height="78" rx="12"></rect><text class="svg-label" x="14" y="23">COMMANDER</text><text x="14" y="46">/install · /prime</text><text x="14" y="66">just v | vsql | vimg | vpy</text></g>
+              <g class="surface-node surface-node--builder" transform="translate(232 26)"><rect width="190" height="78" rx="12"></rect><text class="svg-label" x="14" y="23">BUILDER PROCESS</text><text x="14" y="46">verifiable.ts</text><text x="14" y="66">cross-agent.ts (builder only)</text></g>
+              <g class="surface-node" transform="translate(470 26)"><rect width="196" height="78" rx="12"></rect><text class="svg-label" x="14" y="23">CONTEXT / MEMORY</text><text x="14" y="46">~/.pi/agent/sessions/</text><text x="14" y="66">&lt;sid&gt;.jsonl · bounded slice</text></g>
+              <g class="surface-node surface-node--verify" transform="translate(714 26)"><rect width="306" height="78" rx="12"></rect><text class="svg-label" x="14" y="23">VERIFIER PROCESS</text><text x="14" y="46">verifier.ts · input lock · Report parser</text><text x="14" y="66">persona body = full system prompt</text></g>
+
+              <g class="surface-node" transform="translate(92 184)"><rect width="184" height="84" rx="12"></rect><text class="svg-label" x="14" y="23">LAUNCHER</text><text x="14" y="46">justfile → launcher.ts</text><text x="14" y="66">tmux + wrapper + model/tools</text></g>
+              <g class="surface-node surface-node--risk" transform="translate(332 184)"><rect width="206" height="84" rx="12"></rect><text class="svg-label" x="14" y="23">CONTROL CHANNEL</text><text x="14" y="46">/tmp/pi-verifier/&lt;sid&gt;.sock</text><text x="14" y="66">events · prompts · reports · acks</text></g>
+              <g class="surface-node surface-node--verify" transform="translate(594 164)"><rect width="190" height="124" rx="12"></rect><text class="svg-label" x="14" y="23">PROMPT CONTRACTS</text><text x="14" y="47">agents/verify_*.md</text><text x="14" y="69">prompts/verify_on_stop.md</text><text x="14" y="91">original prompt + line bounds</text><text x="14" y="111">Report schema</text></g>
+              <g class="surface-node surface-node--verify" transform="translate(830 164)"><rect width="190" height="124" rx="12"></rect><text class="svg-label" x="14" y="23">PROOF SURFACE</text><text x="14" y="47">persona tool allowlist</text><text x="14" y="69">tool_call bash gate</text><text x="14" y="91">verify_*.py or vision</text><text x="14" y="111">actual state, not prose</text></g>
+
+              <g class="surface-node" transform="translate(306 346)"><rect width="218" height="66" rx="12"></rect><text class="svg-label" x="14" y="23">RECOVERY</text><text x="14" y="47">max_loops → human escalation</text></g>
+              <g class="surface-node surface-node--verify" transform="translate(604 346)"><rect width="180" height="66" rx="12"></rect><text class="svg-label" x="14" y="23">REPORT</text><text x="14" y="47">STATUS · CONFIDENCE · gaps</text></g>
+              <g class="surface-node surface-node--risk" transform="translate(840 346)"><rect width="180" height="66" rx="12"></rect><text class="svg-label" x="14" y="23">CORRECTION</text><text x="14" y="47">verifier_prompt → followUp</text></g>
+
+              <path class="surface-edge" d="M186 65 H232"></path>
+              <path class="surface-edge" d="M422 65 H470"></path>
+              <path class="surface-edge surface-edge--read" d="M666 65 H714"></path>
+              <path class="surface-edge" d="M176 104 V184"></path>
+              <path class="surface-edge" d="M276 226 H332"></path>
+              <path class="surface-edge" d="M538 226 H594"></path>
+              <path class="surface-edge surface-edge--read" d="M784 226 H830"></path>
+              <path class="surface-edge surface-edge--read" d="M925 288 V346"></path>
+              <path class="surface-edge" d="M784 379 H840"></path>
+              <path class="surface-edge surface-edge--return" d="M840 379 C750 430 480 430 413 412"></path>
+              <path class="surface-edge surface-edge--return" d="M306 379 C180 379 132 300 194 268"></path>
+            </svg>
+          </div>
+          <figcaption>The Unix socket coordinates the two processes; the session JSONL supplies the builder turn’s substance; domain checks supply proof.</figcaption>
+        </figure>
+        <div class="authority-strip" aria-label="Core Four mapping">
+          <div><b>Context</b><span>Persona, original user prompt, and the exact session-file line slice.</span></div>
+          <div><b>Model</b><span>The persona’s <code>model:</code> line pins the verifier independently of the builder.</span></div>
+          <div><b>Prompt</b><span>Immutable spawn-time system body plus the rendered per-stop verification cycle.</span></div>
+          <div><b>Tools</b><span>Launcher <code>--tools</code>, extension tool-call gate, and domain checker.</span></div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="loop">
+        <p class="section-label">04 · Control loop</p>
+        <h2>Plan → act → verify → recover, with the human mostly outside</h2>
+        <p class="section-dek">“Out of the loop” does not mean absent. The commander chooses the contract and receives escalation; the harness handles the repetitive routing between those moments.</p>
+        <div class="loop-board" aria-label="Human and automatic control-loop lanes">
+          <div class="loop-lane">
+            <div class="loop-lane__label">Human boundary</div>
+            <div class="loop-steps">
+              <div class="loop-step"><b>1 · Plan proof</b><span>Choose persona, fixture, claim-style request, and success evidence.</span></div>
+              <div class="loop-step"><b>2 · Launch</b><span>Run one <code>just v*</code> recipe and prompt only the builder.</span></div>
+              <div class="loop-step"><b>3 · Observe</b><span>Read the Report; do not relay messages or type at the verifier.</span></div>
+              <div class="loop-step"><b>4 · Improve / decide</b><span>Template a missing oracle or handle max-loop escalation.</span></div>
+            </div>
+          </div>
+          <div class="loop-lane loop-lane--automatic">
+            <div class="loop-lane__label">Closed system loop</div>
+            <div class="loop-steps">
+              <div class="loop-step"><b>Act</b><span>Builder uses its normal tools and ends the turn.</span></div>
+              <div class="loop-step"><b>Tick</b><span><code>agent_end</code> emits <code>stop</code> with prompt + line bounds.</span></div>
+              <div class="loop-step"><b>Read</b><span>Verifier reads only that JSONL slice.</span></div>
+              <div class="loop-step"><b>Atomize</b><span>Request and claims become independently testable propositions.</span></div>
+              <div class="loop-step"><b>Check</b><span>Persona-selected tools compare claims with actual state.</span></div>
+              <div class="loop-step"><b>Recover</b><span>On actionable failure, <code>verifier_prompt</code> sends a follow-up.</span></div>
+              <div class="loop-step"><b>Prove</b><span>Report records pass, fail, gaps, feedback, counts, confidence.</span></div>
+            </div>
+          </div>
+          <p class="loop-return"><strong>Bounded return path:</strong> corrective turns do not reset <code>loopCount</code>. More than the persona’s <code>max_loops</code> causes a human-facing escalation instead of an infinite agent argument.</p>
+        </div>
+
+        <div class="worked-run">
+          <article class="worked-run__story">
+            <h3>Worked run · a planted SQLite defect</h3>
+            <p>Course drill: the builder first creates the lab’s runtime fixture, <code>tmp/mock_shop.db</code>, with <code>orders.user_id</code> referencing a mistyped table, <code>user</code> instead of <code>users</code>.</p>
+            <ol>
+              <li>The commander launches <code>just vsql</code> and asks the builder to confirm every primary key and foreign key.</li>
+              <li>The builder finishes. The verifier wakes without a human prompt and reads the bounded turn slice.</li>
+              <li>The verifier decomposes “foreign keys are valid” into table, source column, target table, and target column claims.</li>
+              <li>SQLite evidence disproves the target-table claim. The verifier sends an exact correction through <code>verifier_prompt</code>.</li>
+              <li>The builder repairs the schema in a follow-up. The next stop produces another verification cycle and a clean Report.</li>
+            </ol>
+          </article>
+          <aside class="worked-run__proof">
+            <h3>What makes this a closed loop?</h3>
+            <div class="proof-stack">
+              <div><strong>Trigger:</strong> builder <code>agent_end</code>, not a second human prompt.</div>
+              <div><strong>Ground truth:</strong> <code>PRAGMA foreign_key_list(...)</code>, schema inspection, and integrity checks—not the builder summary.</div>
+              <div><strong>Recovery:</strong> the verifier names the broken atom and fix; the harness injects it as <code>followUp</code>.</div>
+              <div><strong>Stop condition:</strong> verified Report or bounded escalation.</div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="contracts">
+        <p class="section-label">05 · Why these files exist for agents</p>
+        <h2>Four contracts turn two model calls into an Agent OS</h2>
+        <p class="section-dek">Each contract answers a different question: what should the verifier understand, what may it do, how is it invoked, and what evidence lets the system declare success?</p>
+        <div class="contract-grid">
+          <article class="contract">
+            <div class="contract__top"><h3>Prompt contract</h3><span class="contract__path">.pi/verifier/agents/verify_sqlite.md</span></div>
+            <p>The persona frontmatter selects model, tools, domain, loop bound, and bash policy. Its Markdown body becomes the verifier’s complete system prompt. <code>verify_on_stop.md</code> then supplies turn-specific intent and JSONL line bounds.</p>
+            <pre class="snippet"><code><span class="syn-key">tools:</span> read, grep, find, ls, bash, verifier_prompt
+<span class="syn-key">model:</span> <span class="syn-string">openai/gpt-5.5</span>
+<span class="syn-key">domain:</span> sqlite
+<span class="syn-key">max_loops:</span> 3
+<span class="syn-key">bash_policy:</span>
+  <span class="syn-key">mode:</span> script-only</code></pre>
+            <p class="intent"><b>Dan’s design intent:</b> one agent, one prompt, one purpose. When a verification rule changes, edit a durable persona or cycle template—not an ephemeral chat.</p>
+          </article>
+
+          <article class="contract">
+            <div class="contract__top"><h3>Tool / permission contract</h3><span class="contract__path">apps/verifier/verifier.ts</span></div>
+            <p>The launcher forwards only the persona’s tools. SQLite and Python additionally declare a script-only policy; the verifier extension blocks non-matching bash calls before execution.</p>
+            <pre class="snippet"><code><span class="syn-key">const</span> expected = `${state.bashPolicy.runner} ${state.bashPolicy.allowed_script}`;
+
+<span class="syn-key">if</span> (cmd.startsWith(expected)) <span class="syn-key">return</span>;
+<span class="syn-key">return</span> { block: <span class="syn-tool">true</span>, reason: <span class="syn-string">"Bash is restricted…"</span> };</code></pre>
+            <p class="intent"><b>Dan’s design intent:</b> place authority outside model intent. Remove write/edit, narrow bash, then make the checker reject mutation again.</p>
+            <p class="audit-note"><strong>Audit boundary:</strong> this implementation uses a string-prefix test, not parsed argv. Generic and image personas have no <code>bash_policy</code>. This is narrowing, not a universal sandbox.</p>
+          </article>
+
+          <article class="contract">
+            <div class="contract__top"><h3>Harness / launcher contract</h3><span class="contract__path">justfile → launcher.ts</span></div>
+            <p>The recipe names a verifier persona; the builder extension starts the socket server; the launcher renders the system prompt, generates a wrapper, pins model/tools, and spawns the sibling Pi in tmux.</p>
+            <pre class="snippet"><code><span class="syn-key">vsql:</span>
+  pi -e ./apps/verifier/verifiable.ts \
+     -e ./apps/verifier/cross-agent.ts \
+     --verifiable \
+     --verifier-agent verify_sqlite</code></pre>
+            <p class="intent"><b>Dan’s design intent:</b> make specialization an operator command. Keep the lifecycle fixed while swapping the verifier’s purpose, model, and oracle.</p>
+          </article>
+
+          <article class="contract">
+            <div class="contract__top"><h3>Verification contract</h3><span class="contract__path">verify_*.py + ## Report</span></div>
+            <p>The agent must end each cycle with parseable status, confidence, evidence, gaps, feedback, next requirements, and atom counts. The SQLite checker adds a read-only connection beneath the LLM.</p>
+            <pre class="snippet"><code><span class="syn-key">def</span> open_ro(path: str) -&gt; sqlite3.Connection:
+  <span class="syn-key">return</span> sqlite3.connect(
+    <span class="syn-string">f"file:{path}?mode=ro&amp;immutable=1"</span>, uri=<span class="syn-tool">True</span>
+  )</code></pre>
+            <p class="intent"><b>Dan’s design intent:</b> make every success claim carry proof and every missing proof become the next system improvement. “Unsure” is useful when it names the missing oracle.</p>
+          </article>
+        </div>
+        <p class="operator-boundary"><strong>Settings are context, not the whole permission model.</strong> <code>.pi/settings.json</code> points Pi at Claude skills and the session directory. <code>.claude/settings.json</code> configures a status-line command. Neither file is the verifier’s mutation boundary; that boundary is assembled from persona tools, launcher flags, the tool-call hook, and domain checker.</p>
+      </section>
+
+      <section class="lesson-section" id="operate">
+        <p class="section-label">06 · Operate like Dan</p>
+        <h2>Run the system from the real operator surface</h2>
+        <p class="section-dek">These are the repository’s documented commands. Run them from the codebase root, and keep all interaction in the builder window.</p>
+        <ol class="operator-steps">
+          <li class="operator-step"><div><h3>Install through an agent bootloader</h3><p>Open Claude Code, Pi, or another agent that can execute the project’s <code>.claude/commands</code>. The command checks critical CLIs, installs TypeScript dependencies, validates personas/scripts, checks a provider key without printing it, and runs TypeScript verification.</p><div class="command-row"><code>/install</code></div></div></li>
+          <li class="operator-step"><div><h3>Prime a fresh coding-agent session</h3><p><code>/prime</code> tells the agent which runtime, IPC, persona, and checker files are canonical. The justfile also exposes Claude and Pi priming recipes.</p><div class="command-row"><code>/prime
+just prime
+just primepi</code></div></div></li>
+          <li class="operator-step"><div><h3>Inspect and clean the launch surface</h3><p>Bare <code>just</code> lists the four verifier recipes. Use <code>just clean</code> only for stale verifier tmux sessions, sockets, or breadcrumb files left by a prior crash.</p><div class="command-row"><code>just
+just clean</code></div></div></li>
+          <li class="operator-step"><div><h3>Choose the oracle that matches the task</h3><p>Generic is flexible; SQLite and Python have script-only bash policies; image uses vision and a relevance gate. The current code default for <code>just v</code> is the full generic persona, even though stale README text still describes an older SQLite-only build.</p><div class="command-row"><code>just v      # generic
+just vsql   # SQLite
+just vpy    # Python
+just vimg   # image</code></div></div></li>
+          <li class="operator-step"><div><h3>Prompt the builder with checkable claims</h3><p>Prefer “confirm every table has a primary key and each FK targets a real table/column” over “check the database.” The original prompt is forwarded with the stop event and becomes verifier ground truth.</p><div class="command-row"><code>Inspect tmp/mock_shop.db and confirm every table has a primary key and every foreign key references a real table and column.</code></div></div></li>
+          <li class="operator-step"><div><h3>Watch proof and recovery—hands off</h3><p>Confirm the builder border says verifier connected. After builder completion, watch the verifier atomize, check, Report, and—when needed—prompt the builder back. On <code>Ctrl+D</code> in the builder, the child window, socket, and breadcrumb are cleaned up.</p></div></li>
+        </ol>
+        <p class="operator-boundary"><strong>Commander rule:</strong> if you want to type into the verifier, stop. Put the missing behavior in <code>agents/*.md</code>, <code>prompts/*.md</code>, <code>scripts/*.py</code>, or the harness. That turns an instance fix into a replaceable, reusable agent capability.</p>
+      </section>
+
+      <section class="lesson-section" id="failures">
+        <p class="section-label">07 · Common agent failures</p>
+        <h2>Most breakage is a contract mismatch, not a weak model</h2>
+        <div class="failure-grid">
+          <article class="failure-card"><h3>Bundled or vague request</h3><dl><dt>Symptom</dt><dd>Verifier produces coarse PASS or many ambiguous gaps.</dd><dt>Cause</dt><dd>The human did not give atomic, falsifiable intent.</dd><dt>Recovery</dt><dd>Rewrite the builder request as claims with paths, constraints, and observable outcomes.</dd></dl></article>
+          <article class="failure-card"><h3>Wrong specialist</h3><dl><dt>Symptom</dt><dd><code>PERFECT</code> with zero claims.</dd><dt>Cause</dt><dd>Image/Python relevance gate found no work in its domain.</dd><dt>Recovery</dt><dd>Pick <code>vsql</code>, <code>vpy</code>, <code>vimg</code>, or generic to match the task.</dd></dl></article>
+          <article class="failure-card failure-card--evidence"><h3>Permission slogan</h3><dl><dt>Symptom</dt><dd>“Read-only” is assumed from persona prose.</dd><dt>Cause</dt><dd>Generic/image bash is prompt-only; Python tests may have side effects; SQLite’s gate is prefix-based.</dd><dt>Recovery</dt><dd>Scope the claim to the persona and inspect all enforcement layers.</dd></dl></article>
+          <article class="failure-card"><h3>No oracle or fixture</h3><dl><dt>Symptom</dt><dd><code>STATUS: unsure</code>, <code>CONFIDENCE: FAILED</code>.</dd><dt>Cause</dt><dd>The verifier cannot prove an atom with current tools/data.</dd><dt>Recovery</dt><dd>Preserve the gap and template the missing checker, fixture, or rule. Do not guess.</dd></dl></article>
+          <article class="failure-card"><h3>Human becomes the router</h3><dl><dt>Symptom</dt><dd>You copy verifier findings into the builder by hand.</dd><dt>Cause</dt><dd>The correction channel or harness was bypassed.</dd><dt>Recovery</dt><dd>Use <code>verifier_prompt</code> and follow-up delivery; keep the human at launch/escalation boundaries.</dd></dl></article>
+          <article class="failure-card"><h3>Startup stuck on “spawning”</h3><dl><dt>Symptom</dt><dd>No verifier hello within roughly three seconds.</dd><dt>Cause</dt><dd>Often invalid persona model, missing dependency, or tmux/socket trouble.</dd><dt>Recovery</dt><dd>Read surfaced stderr, run the generated wrapper manually if directed, then <code>just clean</code>.</dd></dl></article>
+          <article class="failure-card"><h3>Documentation drift</h3><dl><dt>Symptom</dt><dd>README says SQLite-only/default while the tree ships four personas and generic default.</dd><dt>Cause</dt><dd>Operational source changed after prose.</dd><dt>Recovery</dt><dd>Trust the justfile, persona frontmatter, and current <code>attach()</code> path.</dd></dl></article>
+          <article class="failure-card"><h3>Loop without a stop condition</h3><dl><dt>Symptom</dt><dd>Builder and verifier repeatedly disagree.</dd><dt>Cause</dt><dd>Retries were treated as progress.</dd><dt>Recovery</dt><dd>Keep <code>max_loops</code> bounded; escalate with the latest Report after the threshold.</dd></dl></article>
+          <article class="failure-card"><h3>One giant verifier</h3><dl><dt>Symptom</dt><dd>Broad purpose, broad bash, hard-to-read Reports.</dd><dt>Cause</dt><dd>Specialists were merged for convenience.</dd><dt>Recovery</dt><dd>Clone the two-file persona+script pattern and select it with <code>--verifier-agent</code>.</dd></dl></article>
+          <article class="failure-card"><h3>Duplicate verifier</h3><dl><dt>Symptom</dt><dd>Second connection receives <code>bye: duplicate connection</code>.</dd><dt>Cause</dt><dd>The server intentionally permits one verifier per builder.</dd><dt>Recovery</dt><dd>Use the existing child or clean stale state; fan-out is not implemented here.</dd></dl></article>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="lab">
+        <p class="section-label">08 · Lab · Agent operations</p>
+        <h2>Change the verifier’s durable policy, then watch the loop react</h2>
+        <p class="section-dek">This lab changes the Agent OS, not application logic. You will tighten one persona rule and prove that the new rule controls the next run without a one-off instruction.</p>
+        <div class="lab-plan">
+          <article class="lab-box callout callout--tactic">
+            <h3>Mission · lower the image readability budget</h3>
+            <p>Open <code>.pi/verifier/agents/verify_image.md</code>. Change the literal domain constant from <code>MAX_TEXT_ELEMENTS: 10</code> to <code>MAX_TEXT_ELEMENTS: 6</code>. Do not alter the generated image by hand and do not type at the verifier.</p>
+          </article>
+          <article class="lab-box callout">
+            <h3>Run · make the new contract bite</h3>
+            <ol>
+              <li>Ensure <code>OPENAI_API_KEY</code> is available as required by the shipped <code>gpt-image-2</code> builder skill.</li>
+              <li>Run <code>just vimg</code>.</li>
+              <li>Prompt the <em>builder</em> to generate a compact architecture diagram with seven or eight distinct text blocks and a specific output path.</li>
+              <li>Let the image verifier inspect the actual file. The new threshold should fail the readability atom and send a simplification prompt back.</li>
+              <li>Let the builder regenerate. The next cycle should pass only when the image has six or fewer distinct text blocks and the remaining labels are legible.</li>
+            </ol>
+          </article>
+          <article class="lab-box callout callout--warning">
+            <h3>Fail deliberately · catch the tempting wrong move</h3>
+            <p>When the seven-label image fails, do not tell the verifier “six is okay this time.” Its input is locked anyway. The correct move is to decide whether six is truly the reusable policy. If it is, keep the persona change; if not, restore ten and improve the rule more carefully.</p>
+          </article>
+          <article class="lab-box callout">
+            <h3>No image key? Audit the permission boundary instead</h3>
+            <p>In a disposable branch, harden the bash acceptance predicate in <code>apps/verifier/verifier.ts</code> so it accepts the exact expected command or the expected command followed by whitespace—not an arbitrary string sharing the same prefix. Run the repo’s documented type-check:</p>
+            <pre><code>cd apps/verifier &amp;&amp; npx tsc --noEmit &amp;&amp; cd ../..</code></pre>
+            <p>Then verify an off-policy look-alike such as an allowed script path with an extra suffix is blocked with the teaching message. This track changes the harness contract, not product code.</p>
+          </article>
+        </div>
+        <h3>Observable pass criteria</h3>
+        <div class="pass-grid">
+          <div><b>Policy provenance</b>You can point to the exact persona or harness line that changed behavior.</div>
+          <div><b>Hands-off trigger</b>The verifier woke on builder stop; you issued no verifier-window instruction.</div>
+          <div><b>Evidence</b>The failing Report names the violated atom and concrete observed mismatch.</div>
+          <div><b>Closed recovery</b><code>verifier_prompt</code> is acknowledged and the builder performs the repair turn.</div>
+          <div><b>Final proof</b>The next Report has zero failed atoms and honest confidence.</div>
+          <div><b>Compounding move</b>You can explain why the edit solves a class of future runs, not one current image.</div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="teach-back">
+        <p class="section-label">09 · Teach-back</p>
+        <h2>Explain this Agent OS in six sentences without looking</h2>
+        <p class="section-dek">Close the source. Say one sentence for each numbered prompt. If two prompts collapse into one vague sentence, the system boundary is not yet clear.</p>
+        <div class="teach-grid">
+          <p>Name the human commander’s job and the one behavior they must avoid.</p>
+          <p>Name the builder and verifier roles, including which one may change state.</p>
+          <p>Explain what triggers verification, what crosses the socket, and what the verifier reads from disk.</p>
+          <p>Explain how persona, tool allowlist, bash gate, and domain checker divide responsibility.</p>
+          <p>Explain how failure becomes a builder follow-up and how the loop terminates.</p>
+          <p>Finish with Dan’s leverage thesis: replaceability, programmable agents, and spending compute to reclaim human review time.</p>
+        </div>
+        <details class="answer-key">
+          <summary>Reveal a six-sentence reference answer</summary>
+          <div class="details-body">
+            <p>1. The human commander chooses the goal, verifier domain, authority, and proof, but never types one-off instructions into the verifier.</p>
+            <p>2. The builder is the state-changing worker, while the sibling verifier is an input-locked observer that decomposes and checks the builder’s claims.</p>
+            <p>3. Builder completion emits a stop event with intent and line bounds over the Unix socket, while the verifier reads the substantive turn from the builder’s session JSONL.</p>
+            <p>4. The persona programs purpose and tools, the launcher exposes that tool list, the tool-call hook narrows bash where configured, and the domain checker supplies deterministic evidence.</p>
+            <p>5. An actionable failure travels through <code>verifier_prompt</code> as a builder follow-up, repeats verification, and escalates to the human after the configured loop bound.</p>
+            <p>6. Dan’s move is to spend replaceable model tokens on a programmable closed loop so scarce human time shifts from repetitive review to designing better prompts, oracles, and systems.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="lesson-section" id="appendix">
+        <p class="section-label">10 · Optional appendix</p>
+        <h2>Raw file index for the curious</h2>
+        <p class="section-dek">Collapsed by default. Every entry is a real path in the audited codebase; the descriptions identify agent-facing purpose without dumping source.</p>
+        <details class="appendix">
+          <summary>Open the one-line-per-file index</summary>
+          <div class="details-body file-groups">
+            <section class="file-group"><h3>Operator and Claude interfaces</h3><ul>
+              <li><code>README.md</code> — public operator guide, architecture, recipes, security posture, and known limitations.</li>
+              <li><code>justfile</code> — generic/SQLite/image/Python launch recipes, priming, and stale-state cleanup.</li>
+              <li><code>.env.sample</code> — provider-key names expected by builder, verifier, and image skill.</li>
+              <li><code>.gitignore</code> — keeps secrets, deps, caches, logs, and verifier runtime artifacts out of Git.</li>
+              <li><code>.claude/settings.json</code> — Claude status-line command configuration.</li>
+              <li><code>.claude/commands/install.md</code> — agent-executed readiness workflow.</li>
+              <li><code>.claude/commands/prime.md</code> — canonical context-loading route for a fresh agent.</li>
+              <li><code>.claude/commands/plan-w-team.md</code> — separate planning/team-orchestration prompt; not core verifier runtime.</li>
+              <li><code>.claude/status_lines/status_line.py</code> — terminal-width diagnostic status line.</li>
+              <li><code>.claude/status_lines/status_line_v6.py</code> — model/context progress status line.</li>
+              <li><code>.claude/skills/gpt-image-2/SKILL.md</code> — builder-side image generation/editing contract.</li>
+              <li><code>.claude/skills/gpt-image-2/scripts/generate_gpt_image.py</code> — writes generated image outputs through the OpenAI Images API.</li>
+              <li><code>.claude/skills/gpt-image-2/scripts/edit_gpt_image.py</code> — edits/composes image inputs through the OpenAI Images API.</li>
+            </ul></section>
+
+            <section class="file-group"><h3>Verifier contracts</h3><ul>
+              <li><code>.pi/settings.json</code> — imports Claude skills and pins the Pi session directory.</li>
+              <li><code>.pi/verifier/agents/verifier.md</code> — full generic persona; bash safety is prompt-only.</li>
+              <li><code>.pi/verifier/agents/verify_sqlite.md</code> — SQLite persona with atomic checks and script-only bash policy.</li>
+              <li><code>.pi/verifier/agents/verify_python.md</code> — Python persona for types, lint, format, tests, and coverage.</li>
+              <li><code>.pi/verifier/agents/verify_image.md</code> — vision persona with relevance and text-readability rules.</li>
+              <li><code>.pi/verifier/prompts/verify_on_stop.md</code> — per-cycle prompt rendered from stop-event metadata.</li>
+              <li><code>.pi/verifier/prompts/builder_error.md</code> — builder-error template present in the tree; the current TypeScript runtime does not read it.</li>
+              <li><code>.pi/verifier/scripts/verify_sqlite.py</code> — structured, read-only SQLite inspection oracle.</li>
+              <li><code>.pi/verifier/scripts/verify_python.py</code> — structured dispatcher for ty, Ruff, pytest, and coverage.</li>
+            </ul></section>
+
+            <section class="file-group"><h3>Runtime harness</h3><ul>
+              <li><code>apps/verifier/package.json</code> — extension workspace and type-check script.</li>
+              <li><code>apps/verifier/package-lock.json</code> — locked 266-package Node dependency graph.</li>
+              <li><code>apps/verifier/tsconfig.json</code> — strict ES2022/NodeNext compiler contract.</li>
+              <li><code>apps/verifier/verifiable.ts</code> — builder-side server, events, correction injection, loop cap, escalation.</li>
+              <li><code>apps/verifier/verifier.ts</code> — child-side input lock, prompt tool, policy gate, stop trigger, Report parser.</li>
+              <li><code>apps/verifier/verifiable-footer.ts</code> — builder input-border connection/model/context status.</li>
+              <li><code>apps/verifier/cross-agent.ts</code> — builder-only discovery of Claude/Gemini/Codex commands and skills.</li>
+              <li><code>apps/verifier/_shared/env.ts</code> — project-local <code>.env</code> loader with existing-env precedence.</li>
+              <li><code>apps/verifier/_shared/frontmatter.ts</code> — persona shape validation and placeholder templating.</li>
+              <li><code>apps/verifier/_shared/ipc.ts</code> — JSONL envelopes, framing, and direction matrix.</li>
+              <li><code>apps/verifier/_shared/launcher.ts</code> — tmux/OS-window spawn, prompt wrapper, model/tools flags, diagnostics.</li>
+              <li><code>apps/verifier/_shared/socket-path.ts</code> — short socket path, 0700 directory, breadcrumbs, cleanup.</li>
+            </ul></section>
+
+            <section class="file-group"><h3>Bundled Pi reference pack</h3><ul>
+              <li><code>ai_docs/pi/README.md</code> — upstream Pi overview and CLI reference.</li>
+              <li><code>ai_docs/pi/README.yaml</code> — documentation pull map.</li>
+              <li><code>ai_docs/pi/CHANGELOG.md</code> — upstream release and migration history.</li>
+              <li><code>ai_docs/pi/docs/extensions.md</code> — lifecycle, tool interception, message injection, flags, and custom UI APIs.</li>
+              <li><code>ai_docs/pi/docs/session.md</code> — session JSONL entry shapes and manager API.</li>
+              <li><code>ai_docs/pi/docs/settings.md</code> — project/global settings and resource paths.</li>
+              <li><code>ai_docs/pi/docs/skills.md</code> — skill discovery, Claude/Codex interoperability, and security note.</li>
+              <li><code>ai_docs/pi/docs/prompt-templates.md</code> — prompt-template locations and loading rules.</li>
+              <li><code>ai_docs/pi/docs/sdk.md</code> — programmatic sessions, models, tools, extensions, and run modes.</li>
+              <li><code>ai_docs/pi/docs/rpc.md</code> — JSONL RPC commands, events, queue modes, and UI protocol.</li>
+              <li><code>ai_docs/pi/docs/json.md</code> — JSON event-stream mode.</li>
+              <li><code>ai_docs/pi/docs/compaction.md</code> — context compaction and branch summaries.</li>
+              <li><code>ai_docs/pi/docs/custom-provider.md</code> — provider and streaming API extension guide.</li>
+              <li><code>ai_docs/pi/docs/models.md</code> — model/provider configuration.</li>
+              <li><code>ai_docs/pi/docs/providers.md</code> — key resolution and cloud providers.</li>
+              <li><code>ai_docs/pi/docs/packages.md</code> — Pi package layout and resource filtering.</li>
+              <li><code>ai_docs/pi/docs/keybindings.md</code> — editor/app action bindings used by the verifier input lock.</li>
+              <li><code>ai_docs/pi/docs/themes.md</code> — theme and terminal color tokens.</li>
+              <li><code>ai_docs/pi/docs/tui.md</code> — terminal UI components and rendering.</li>
+              <li><code>ai_docs/pi/docs/tree.md</code> — session-tree navigation.</li>
+              <li><code>ai_docs/pi/docs/terminal-setup.md</code> — emulator setup guidance.</li>
+              <li><code>ai_docs/pi/docs/tmux.md</code> — tmux input configuration.</li>
+              <li><code>ai_docs/pi/docs/termux.md</code> — Android Termux environment guide.</li>
+              <li><code>ai_docs/pi/docs/windows.md</code> — Windows support note.</li>
+              <li><code>ai_docs/pi/docs/shell-aliases.md</code> — shell alias note.</li>
+              <li><code>ai_docs/pi/docs/development.md</code> — upstream development setup.</li>
+              <li><code>ai_docs/pi/embed-text-in-ui-bar/how-to.md</code> — source pattern for builder border text.</li>
+              <li><code>ai_docs/pi/hide-ui-bar/HOW_TO_HIDE_THE_INPUT_BAR_AND_OVERWRITE_IT.md</code> — source pattern for locked verifier status bar.</li>
+              <li><code>ai_docs/pi/hide-ui-bar/full-bar-editor.ts</code> — reference CustomEditor implementation.</li>
+            </ul></section>
+
+            <section class="file-group"><h3>Visuals and legal</h3><ul>
+              <li><code>images/arch-loop.svg</code> — animated builder/verifier architecture illustration.</li>
+              <li><code>images/07-two-camps.svg</code> — Camp A manual loop versus Camp B coordinated system.</li>
+              <li><code>images/verifier.png</code> — two-window runtime screenshot.</li>
+              <li><code>LICENSE</code> — educational use terms.</li>
+            </ul></section>
+          </div>
+        </details>
+      </section>
+
+      <footer class="page-footer">
+        <p>Agent-systems companion for MA-4. Conceptual chapter: <a href="../vol-3-ma/18-verifier-agent.html">The Pi Verifier Agent</a> · <a href="index.html">Code library</a> · <a href="../index.html">Book hub</a></p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const topBar = document.getElementById('reading-progress');
+      const railBar = document.getElementById('rail-progress');
+      const links = [...document.querySelectorAll('.chapter-nav a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0;
+        topBar.style.width = `${pct}%`;
+        railBar.style.width = `${pct}%`;
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        links.forEach(link => {
+          const active = link.getAttribute('href') === `#${visible.target.id}`;
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, { rootMargin: '-18% 0px -68% 0px', threshold: [0, .15, .4] });
+
+      sections.forEach(section => observer.observe(section));
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      window.addEventListener('resize', updateProgress);
+      updateProgress();
+    })();
+  </script>
+</body>
+</html>

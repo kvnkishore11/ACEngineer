@@ -1,0 +1,262 @@
+/* ============================================================
+   chrome-v2.css — compact reading chrome (global overrides)
+   Load LAST after tokens/base/components + chapter assets.
+   Goal: less scroll, thinner sidebar, smaller hero, denser prose,
+   keep all content — visual density only.
+   ============================================================ */
+
+@import url("https://fonts.bunny.net/css?family=dm-sans:400,500,600,700|fraunces:500,600,700");
+
+:root {
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* denser type scale */
+  --text-base: 1rem;       /* 16 */
+  --text-md: 1.125rem;     /* 18 */
+  --text-lg: 1.35rem;      /* ~22 */
+  --text-xl: 1.65rem;      /* ~26 */
+  --text-2xl: 2rem;        /* 32 — chapter titles */
+  --text-3xl: 2.4rem;
+
+  --leading-body: 1.58;
+  --measure: 62ch;
+  --content-max: 42rem;
+  --wide-max: 56rem;
+
+  --space-5: 1.15rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.75rem;
+  --space-12: 3.5rem;
+
+  /* compact chrome */
+  --rail-width: 13.5rem !important;
+  --chapter-max: 72rem !important;
+  --site-bar-h: 2.5rem;
+}
+
+/* ----- top bar ----- */
+.site-bar {
+  min-height: var(--site-bar-h) !important;
+  padding-block: 0.35rem !important;
+  padding-inline: max(0.75rem, calc((100vw - var(--chapter-max)) / 2)) !important;
+}
+.site-bar__home { font-size: 0.8125rem !important; }
+.site-bar__meta { font-size: 0.6875rem !important; opacity: 0.85; }
+
+/* ----- sidebar / rail ----- */
+.chapter-shell {
+  grid-template-columns: var(--rail-width) minmax(0, 1fr) !important;
+  gap: 1.25rem !important;
+  width: min(calc(100% - 1.25rem), var(--chapter-max)) !important;
+}
+.chapter-rail {
+  top: calc(var(--site-bar-h) + 6px) !important;
+  max-height: calc(100vh - var(--site-bar-h) - 12px) !important;
+  padding: 0.75rem 0.5rem 1rem 0 !important;
+  font-size: 0.8125rem;
+}
+.chapter-rail h2 {
+  font-size: 0.95rem !important;
+  line-height: 1.25 !important;
+  margin-top: 0.25rem !important;
+  font-weight: 650 !important;
+}
+.rail-kicker { font-size: 0.65rem !important; letter-spacing: 0.06em !important; }
+.rail-progress { margin-top: 0.65rem !important; padding-bottom: 0.65rem !important; }
+.rail-progress__line { height: 0.28rem !important; }
+.rail-progress__copy { font-size: 0.7rem !important; }
+
+.chapter-nav ol { gap: 0.1rem !important; padding: 0; margin: 0.5rem 0 0; list-style: none; }
+.chapter-nav li { margin: 0; }
+.chapter-nav a {
+  display: grid !important;
+  grid-template-columns: 1.4rem 1fr !important;
+  gap: 0.35rem !important;
+  padding: 0.28rem 0.4rem !important;
+  border-radius: 6px !important;
+  font-size: 0.78rem !important;
+  line-height: 1.25 !important;
+  text-decoration: none !important;
+  color: var(--ink-soft) !important;
+}
+.chapter-nav a:hover,
+.chapter-nav a[aria-current="location"] {
+  background: var(--accent-wash) !important;
+  color: var(--accent-ink) !important;
+}
+.chapter-nav__n {
+  font-family: var(--font-mono) !important;
+  font-size: 0.65rem !important;
+  opacity: 0.7;
+  padding-top: 0.1rem;
+}
+
+/* ----- hero: drastically smaller ----- */
+.hero {
+  padding-block: 1rem 1.25rem !important;
+  margin-bottom: 1rem !important;
+}
+.hero::after { display: none !important; } /* decorative bloat */
+.hero__chapter {
+  font-size: 0.7rem !important;
+  letter-spacing: 0.08em !important;
+}
+.hero h1,
+.hero > h1 {
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem) !important;
+  line-height: 1.15 !important;
+  margin: 0.35rem 0 0.5rem !important;
+  letter-spacing: -0.02em !important;
+}
+.hero__dek {
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem) !important;
+  line-height: 1.45 !important;
+  max-width: 55ch !important;
+  margin: 0 0 0.65rem !important;
+}
+.hero__meta {
+  gap: 0.4rem 0.75rem !important;
+  margin: 0.5rem 0 !important;
+}
+.hero__meta li {
+  font-size: 0.75rem !important;
+  padding: 0.15rem 0.45rem !important;
+}
+.hero__promise {
+  font-size: 0.9rem !important;
+  line-height: 1.45 !important;
+  padding: 0.65rem 0.85rem !important;
+  margin-top: 0.65rem !important;
+}
+
+/* hero image: not full-page tall */
+.hero .generated-plate,
+.hero .generated-plate--hero,
+.hero .frame-card {
+  max-width: min(100%, 36rem) !important;
+  margin: 0.85rem 0 0 !important;
+}
+.hero .generated-plate img,
+.hero .generated-plate--hero img,
+.hero .frame-card img {
+  max-height: 14rem !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* ----- main column density ----- */
+.chapter-main {
+  padding-bottom: 3rem !important;
+  max-width: none !important;
+}
+.chapter-section {
+  padding-block: 1.15rem !important;
+  scroll-margin-top: 3.5rem !important;
+}
+.section-number {
+  font-size: 0.7rem !important;
+  margin-bottom: 0.25rem !important;
+}
+.section-title,
+.chapter-section > h2 {
+  font-size: clamp(1.25rem, 2.2vw, 1.55rem) !important;
+  line-height: 1.2 !important;
+  margin: 0.2rem 0 0.55rem !important;
+}
+.section-lead {
+  font-size: 0.98rem !important;
+  line-height: 1.5 !important;
+  max-width: var(--measure) !important;
+}
+
+/* pedagogy move labels tighter */
+.move-label,
+.idea-cycle .move-label {
+  font-size: 0.65rem !important;
+  margin-bottom: 0.2rem !important;
+}
+
+/* frames still large enough to read, but not endless scroll */
+.frame-card,
+figure.teaching-frame {
+  margin: 0.9rem 0 1.15rem !important;
+  max-width: min(100%, 48rem) !important;
+}
+.frame-card img,
+figure.teaching-frame img {
+  max-width: min(100%, 48rem) !important;
+  max-height: 28rem !important;
+  object-fit: contain !important;
+  background: #fff;
+}
+.frame-card figcaption {
+  font-size: 0.8rem !important;
+  padding: 0.45rem 0.65rem !important;
+}
+
+/* code blocks */
+pre, .code-block, .terminal {
+  font-size: 0.8rem !important;
+  line-height: 1.4 !important;
+  border-radius: 10px !important;
+}
+
+/* soft entrance for sections */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.chapter-section {
+  animation: fade-up 0.35s ease both;
+}
+
+/* mobile: hide rail earlier, compact toc */
+@media (max-width: 960px) {
+  .chapter-shell {
+    grid-template-columns: 1fr !important;
+  }
+  .chapter-rail { display: none !important; }
+  .mobile-toc summary {
+    font-size: 0.85rem !important;
+    padding: 0.5rem 0.65rem !important;
+  }
+  .hero .generated-plate img,
+  .hero .generated-plate--hero img {
+    max-height: 10rem !important;
+  }
+}
+
+/* reduce vertical padding on callouts/labs */
+.callout, .lab-box {
+  padding: 0.75rem 0.9rem !important;
+  margin: 0.75rem 0 !important;
+}
+.callout__label { margin-bottom: 0.25rem !important; }
+
+/* sticky mini TOC chip on mobile already; fine */
+
+/* code deep-dive entry from chapter */
+.code-deep-link {
+  margin: 1.25rem 0 0.5rem !important;
+  padding: 0.65rem 0.85rem !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  background: var(--accent-wash) !important;
+  max-width: var(--measure);
+}
+.code-deep-link a {
+  font-weight: 650 !important;
+  font-size: 0.9rem !important;
+  color: var(--accent-ink) !important;
+  text-decoration: none !important;
+}
+.code-deep-link a:hover { text-decoration: underline !important; }
+
+/* print: keep compact */
+@media print {
+  .chapter-rail, .site-bar, .reading-progress, .mobile-toc { display: none !important; }
+  .hero h1 { font-size: 18pt !important; }
+}

@@ -1,0 +1,258 @@
+<section class="chapter" id="ch13">
+  <div class="wrap wide">
+    <span class="chapnum reveal">13 — Vol II · Lesson 4</span>
+    <div class="kicker reveal">multi-agent orchestration · the o-agent</div>
+    <h2 class="title reveal d1" style="max-width:26ch">You can't scale one terminal at a time. Meet the <em>O-Agent</em>.</h2>
+    <p class="lede reveal d2">Better, more, and custom agents eventually hit the wall of the interface. The Orchestrator Agent applies the single interface pattern to your fleet: one custom agent that CRUDs, commands, and observes all your other agents.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">AH-4</span><span class="pill blue">single interface</span><span class="pill olive">CRUD your agents</span><span class="pill plum">observability</span><span class="pill amber">out-loop</span></div>
+
+    <div class="chapnav reveal d3"><span class="cnl">In this chapter</span>
+      <a href="#ch13-s1"><b>1</b>The Idea</a>
+      <a href="#ch13-s2"><b>2</b>The Nuggets</a>
+      <a href="#ch13-s3"><b>3</b>What Dan Did</a>
+      <a href="#ch13-s4"><b>4</b>The Workout</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch13-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Idea</h2></div>
+
+    <div class="spread reveal d1" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Once you have better, more, and custom agents, the bottleneck moves to you — you can't scale one terminal and one prompt at a time.</p>
+        <p>Dan's answer is <strong>the Orchestrator Agent</strong> — "the one agent to rule them all... the single interface pattern applied to your fleet of agents." Crucially, it is itself a custom agent: <em>"its system prompt is completely overwritten, its tools are specialized, it's designed to manage other agents."</em></p>
+        <p>It sits at the top of the <strong>agent scale framework</strong> — "base agents, better agents, more agents, custom agents" → orchestrated agents. <em>"At each step, you scale your compute to scale your impact."</em> And it's the R&amp;D framework at scale: the orchestrator's context is <strong>reduced</strong>, the work is <strong>delegated</strong> to primary agents.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 880 310" role="img" aria-label="One prompt into the O-Agent fans out to a fleet of primary agents, resting on three pillars">
+          <rect x="20" y="36" width="110" height="52" rx="10" class="s-card"/>
+          <text x="75" y="58" text-anchor="middle" class="s-title">YOU</text>
+          <text x="75" y="74" text-anchor="middle" class="s-label-sm">one prompt</text>
+          <path d="M132 62 H190" class="s-flow"/><path d="M190 56 L200 62 L190 68 Z" class="s-clay"/>
+          <rect x="200" y="22" width="230" height="84" rx="12" class="s-clay-f"/>
+          <text x="315" y="50" text-anchor="middle" class="s-title">O-AGENT</text>
+          <text x="315" y="68" text-anchor="middle" class="s-label">system prompt overwritten</text>
+          <text x="315" y="86" text-anchor="middle" class="s-label-sm">create · command · status · delete</text>
+          <text x="660" y="44" text-anchor="middle" class="s-label-sm">an out-loop PITER system:</text>
+          <text x="660" y="60" text-anchor="middle" class="s-label-sm">prompt · trigger (HTTP) · environment · review</text>
+          <path d="M315 106 C 315 138 175 134 175 158" class="s-flow"/><path d="M169 158 L181 158 L175 168 Z" class="s-clay"/>
+          <path d="M315 106 C 330 138 440 132 440 158" class="s-flow"/><path d="M434 158 L446 158 L440 168 Z" class="s-clay"/>
+          <path d="M315 106 C 360 142 705 130 705 158" class="s-flow"/><path d="M699 158 L711 158 L705 168 Z" class="s-clay"/>
+          <rect x="80" y="170" width="190" height="58" rx="10" class="s-blue-f"/>
+          <text x="175" y="192" text-anchor="middle" class="s-title">front-end agent</text>
+          <text x="175" y="212" text-anchor="middle" class="s-label-sm">produces a concrete asset</text>
+          <rect x="345" y="170" width="190" height="58" rx="10" class="s-olive-f"/>
+          <text x="440" y="192" text-anchor="middle" class="s-title">back-end agent</text>
+          <text x="440" y="212" text-anchor="middle" class="s-label-sm">own 200K window</text>
+          <rect x="610" y="170" width="190" height="58" rx="10" class="s-plum-f"/>
+          <text x="705" y="192" text-anchor="middle" class="s-title">QA agent</text>
+          <text x="705" y="212" text-anchor="middle" class="s-label-sm">reprompt until done, then delete</text>
+          <rect x="80" y="252" width="225" height="46" rx="10" class="s-card"/>
+          <text x="192" y="272" text-anchor="middle" class="s-label">PILLAR 1 · O-AGENT</text>
+          <text x="192" y="288" text-anchor="middle" class="s-label-sm">your unified interface</text>
+          <rect x="325" y="252" width="225" height="46" rx="10" class="s-card"/>
+          <text x="437" y="272" text-anchor="middle" class="s-label">PILLAR 2 · CRUD</text>
+          <text x="437" y="288" text-anchor="middle" class="s-label-sm">agents at scale</text>
+          <rect x="570" y="252" width="225" height="46" rx="10" class="s-card"/>
+          <text x="682" y="272" text-anchor="middle" class="s-label">PILLAR 3 · OBSERVABILITY</text>
+          <text x="682" y="288" text-anchor="middle" class="s-label-sm">status · costs · results</text>
+        </svg>
+        <div class="fcap"><b>The single interface pattern, applied to the fleet.</b> One prompt into the O-Agent becomes create / command / status / delete across primary agents — resting on the three pillars.</div>
+      </div>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal d1"><span class="cnum">01</span>
+        <p class="ctitle">The Orchestrator Agent</p>
+        <p class="cbody">Your unified interface. A custom agent whose only job is to CRUD, command, and monitor other agents — never to do the engineering work itself.</p></div>
+      <div class="card blue reveal d2"><span class="cnum">02</span>
+        <p class="ctitle">CRUD for your agents</p>
+        <p class="cbody">Agents at scale: read → create → update → delete. "The best code is no code at all. You learn to delete."</p></div>
+      <div class="card plum reveal d3"><span class="cnum">03</span>
+        <p class="ctitle">Observability</p>
+        <p class="cbody">Real-time monitoring of performance, costs, and results. "If you can't measure it, you can't improve it. And if you can't measure it, you can't scale it."</p></div>
+    </div>
+
+    <div class="spread rev reveal d2" style="align-items:center">
+      <div class="quote big"><p>You must treat your agents as deleteable temporary resources that serve a single purpose.</p>
+        <span class="cite" style="display:block;margin-top:10px">— the quote of the lesson</span></div>
+      <div>
+        <div class="prose">
+          <p><strong>Consumed vs produced assets.</strong> "Every agent should produce some concrete result. Otherwise, what was the point in the first place?" The orchestrator tracks what each agent read and what it shipped.</p>
+          <p><strong>Agent templates.</strong> Sub-agent definitions in <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">.claude/agents/</span> get promoted into full primary agents — "we've just pulled it up a level... you can't do all this with a sub-agent. You're locked in, it's too narrow."</p>
+        </div>
+        <div class="callout" style="margin-top:14px"><span class="ci">PITER · OUT-LOOP</span>
+          <span class="cc">The orchestrator UI is "an out-loop PITER system": <strong>P</strong>rompt input, <strong>T</strong>rigger (HTTP), <strong>E</strong>nvironment, <strong>R</strong>eview (observability) — "remember tactic four, stay out the loop."</span></div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch13-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Nuggets</h2></div>
+
+    <div class="stats reveal d1">
+      <div class="stat"><div class="sv">3×</div><div class="sl">"With a single prompt, I've deployed three times the compute an engineer working in the terminal has."</div></div>
+      <div class="stat blue"><div class="sv">16</div><div class="sl">"One time I had 16 agents operating, completing work at absurd scales."</div></div>
+      <div class="stat"><div class="sv">50%+</div><div class="sl">of your time, as a rough guideline, invested into your agentic layer (tactic eight)</div></div>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card accent reveal d1"><span class="cnum">01</span>
+        <p class="ctitle">Lose track, lose control</p>
+        <p class="cbody">"At scale, if you lose track of your agents, you lose control of your results."</p></div>
+      <div class="card blue reveal d2"><span class="cnum">02</span>
+        <p class="ctitle">Your agents set your pace</p>
+        <p class="cbody">"The rate at which you can create and command your agents becomes the constraint of your engineering output. When your agents are slow, you're slow."</p></div>
+      <div class="card olive reveal d3"><span class="cnum">03</span>
+        <p class="ctitle">Ten wrong agents</p>
+        <p class="cbody">"If you have 10 agents doing the wrong thing, does it matter that you have 10?"</p></div>
+      <div class="card plum reveal d2"><span class="cnum">04</span>
+        <p class="ctitle">Orchestrate, don't work</p>
+        <p class="cbody">"We don't want our orchestrator agent getting involved in the actual work. It is just here to orchestrate."</p></div>
+      <div class="card amber reveal d3"><span class="cnum">05</span>
+        <p class="ctitle">Glue beats handoffs</p>
+        <p class="cbody">"The orchestrator is now glue for the workflow. I think this is vastly superior to agent handoffs... superior to blind sub-agents."</p></div>
+      <div class="card accent reveal d4"><span class="cnum">06</span>
+        <p class="ctitle">Send them home</p>
+        <p class="cbody">"Force it to focus and then let it go home back to the data center. Delete it."</p></div>
+    </div>
+
+    <div class="spread rev reveal d2" style="align-items:center">
+      <div class="quote"><p>"200K context window is plenty. You're just stuffing a single agent with too much work, just like your boss did to you at your last job."</p><span class="cite">— IndyDevDan</span></div>
+      <div class="prose">
+        <ul>
+          <li>"Our orchestrator agent takes our high-level prompt and then writes out in much more detail the actual concrete work" — "it is doing some serious prompt engineering."</li>
+          <li>"These aren't just one-off sub-agents where the context is blown away... These are primary agents that we can tap into over and over until that specific job is done."</li>
+          <li>"If you do not adopt your agent's perspective, if you do not know what they can do, you do not know what you can do."</li>
+          <li>"On top of every feature any lab builds, any UI you see — it's all just the core four. Don't let anyone confuse you."</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="spread reveal d3" style="align-items:center">
+      <div class="prose">
+        <ul>
+          <li>"Once you build a custom agent, you can then write prompts specialized for that custom agent" — the orchestration prompt: plan-with-scouts → build → review.</li>
+          <li>"If you can do your job with an out-of-the-box agentic coding tool, how defensible is your product really?"</li>
+          <li>"If you can deploy a little bit more compute to have more confidence and more trust in your agents, why wouldn't you?"</li>
+          <li>"Specialized tools like this are more powerful than some out-of-the-box cloud tool... designed for everyone's codebase, not yours."</li>
+        </ul>
+      </div>
+      <div class="callout idea"><span class="ci">STILL MISSING — DAN'S OWN LIST</span>
+        <span class="cc">Human-in-the-loop decision points · better orchestrator management (multi-codebase) · context-window / agent forking ("one tool away") · prompt autocomplete · and ADW integration — "the big missing piece... deterministic code."</span></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch13-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What Dan Did</h2></div>
+
+    <div class="spread reveal d1" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">The <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">multi-agent-orchestration</span> codebase — and he pointed the system at itself.</p>
+        <p>A Vue/Pinia front end, HTTP + WebSocket services, a Claude Agent SDK orchestrator service, and a Postgres/Neon data layer. Every demo below runs the orchestrator against its own repository.</p>
+      </div>
+      <div class="filetree reveal"><span class="d">multi-agent-orchestration/</span>
+  <span class="d">frontend/</span>            <span class="c"># Vue + Pinia observability UI</span>
+  <span class="d">services/</span>            <span class="c"># HTTP + WebSocket services</span>
+  <span class="d">orchestrator/</span>        <span class="c"># Claude Agent SDK service</span>
+  <span class="d">.claude/agents/</span>
+    <span class="f hl">scout-report-suggest-fast.md</span>  <span class="c"># template → primary agent</span>
+  <span class="c"># data layer: Postgres / Neon</span></div>
+    </div>
+
+    <div class="spread reveal d2" style="align-items:start">
+      <ol class="steps">
+        <li><h4>Ping, then fan out</h4><p>Command-K prompt bar → <span class="mono">ping</span> → the orchestrator replies. Then one prompt spun up 3 agents (front-end, back-end, QA) to write an app-structure summary with mermaid diagrams — 6 tool calls: 3× create_agent, 3× command_agent.</p></li>
+        <li><h4>Walk the observability UI</h4><p>Per-agent name, status, context window, model, cost; responses, tool calls, hooks, and thinking filters; consumed vs produced assets with one-click diffs into the editor.</p></li>
+        <li><h4>"list agents and check status"</h4><p>The orchestrator used check-status tools (agent name + tail of response logs) rather than reading raw logs — protecting its own window.</p></li>
+        <li><h4>"command all agents..."</h4><p>With thinking enabled — it reprompted existing <em>primary</em> agents, not ephemeral sub-agents.</p></li>
+        <li><h4>"delete all agents"</h4><p>Three delete tool calls. The CRUD loop, complete.</p></li>
+        <li><h4>Ecosystem interop</h4><p>Created an agent to run the <span class="mono">/question</span> slash command ("can our orchestrator and agents use skills?" — yes); ran <span class="mono">/prime</span> for the orchestrator, with the caveat that it loads the orchestrator's context.</p></li>
+        <li><h4>Template promotion</h4><p>Created a primary agent from the <span class="mono">scout-report-suggest-fast</span> sub-agent template, commanded a regex-field summary; it produced a report doc.</p></li>
+        <li><h4>Scout and build</h4><p>The orchestrator thought, created a scout + builder, slept in a 15-second check-status loop, then wrote a detailed builder prompt from the scout's report — shipping gray stat pills to the app header.</p></li>
+        <li><h4>The full orchestration prompt</h4><p><span class="mono">plan_w_scouters</span> → build → review: three phases plus a final report, shipping a responsive-UI feature (collapse the agent list under 650px). Planner at 21K tokens, then builder, then reviewer — all observable end to end.</p></li>
+      </ol>
+      <div>
+        <div class="fig">
+          <svg class="draw" viewBox="0 0 880 250" role="img" aria-label="Orchestrator creates a scout, polls status, writes a builder prompt, feature ships, agents deleted">
+            <rect x="16" y="88" width="180" height="74" rx="12" class="s-clay-f"/>
+            <text x="106" y="112" text-anchor="middle" class="s-title">ORCHESTRATOR</text>
+            <text x="106" y="130" text-anchor="middle" class="s-label-sm">writes the prompts</text>
+            <text x="106" y="146" text-anchor="middle" class="s-label-sm">never does the work</text>
+            <path d="M196 110 C 235 110 235 52 260 52" class="s-flow"/><path d="M260 46 L270 52 L260 58 Z" class="s-clay"/>
+            <rect x="270" y="24" width="160" height="56" rx="10" class="s-blue-f"/>
+            <text x="350" y="48" text-anchor="middle" class="s-title">SCOUT</text>
+            <text x="350" y="66" text-anchor="middle" class="s-label-sm">explores the codebase</text>
+            <path d="M430 52 H480" class="s-flow"/><path d="M480 46 L490 52 L480 58 Z" class="s-clay"/>
+            <rect x="490" y="26" width="140" height="52" rx="8" class="s-amber-f"/>
+            <text x="560" y="48" text-anchor="middle" class="s-label">scout report</text>
+            <text x="560" y="64" text-anchor="middle" class="s-label-sm">produced asset</text>
+            <path d="M560 78 C 560 170 330 200 210 150" class="s-line" style="stroke-dasharray:5 5"/>
+            <path d="M218 144 L207 151 L219 157 Z" class="s-dim"/>
+            <text x="430" y="196" text-anchor="middle" class="s-label-sm">sleep 15s · check_status (log tail, not full logs)</text>
+            <path d="M196 145 C 235 145 235 180 260 180" class="s-flow"/><path d="M260 174 L270 180 L260 186 Z" class="s-clay"/>
+            <rect x="270" y="150" width="180" height="60" rx="10" class="s-plum-f"/>
+            <text x="360" y="174" text-anchor="middle" class="s-label">detailed builder prompt</text>
+            <text x="360" y="192" text-anchor="middle" class="s-label-sm">serious prompt engineering</text>
+            <path d="M450 180 H500" class="s-flow"/><path d="M500 174 L510 180 L500 186 Z" class="s-clay"/>
+            <rect x="510" y="152" width="150" height="56" rx="10" class="s-olive-f"/>
+            <text x="585" y="174" text-anchor="middle" class="s-title">BUILDER</text>
+            <text x="585" y="192" text-anchor="middle" class="s-label-sm">ships the feature</text>
+            <path d="M660 180 H706" class="s-flow"/><path d="M706 174 L716 180 L706 186 Z" class="s-clay"/>
+            <rect x="716" y="152" width="148" height="56" rx="10" class="s-card"/>
+            <text x="790" y="174" text-anchor="middle" class="s-label">feature shipped</text>
+            <text x="790" y="192" text-anchor="middle" class="s-label-sm">gray stat pills · header</text>
+            <text x="440" y="236" text-anchor="middle" class="s-label-sm">when the job ships: delete all agents — deletable temporary resources</text>
+          </svg>
+          <div class="fcap"><b>Scout and build, orchestrated.</b> The O-Agent creates a scout, polls status on a 15-second loop, turns the scout's report into a detailed builder prompt — and deletes everyone when the job ships.</div>
+        </div>
+        <div class="callout" style="margin-top:14px"><span class="ci">WHY IT WORKS</span>
+          <span class="cc">One agent, one prompt, one purpose (tactic six) — applied to fleets. The orchestrator's context stays <strong>reduced</strong>; the work is <strong>delegated</strong>.</span></div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch13-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Workout</h2></div>
+
+    <div class="callout reveal d1"><span class="ci">GOAL</span>
+      <span class="cc">Build a minimum viable O-Agent: a custom agent whose <strong>only tools</strong> are create / command / status / delete over background Claude instances, with a file-based observability trail.</span></div>
+    <div class="callout reveal d2"><span class="ci">PREREQUISITES</span>
+      <span class="cc">AH-3 workout done (you can build a custom agent with custom tools); the Claude Agent SDK; a target repo.</span></div>
+
+    <div class="spread reveal d2" style="align-items:start">
+      <ol class="steps">
+        <li><h4>Overwrite the system prompt</h4><p>Create <span class="mono">apps/orchestrator/</span>: "You are an orchestrator. You never do engineering work yourself. You create, command, monitor, and delete agents. Every agent must produce a concrete file result."</p></li>
+        <li><h4>Implement the four tools</h4><p><span class="mono">create_agent</span> registers a row in <span class="mono">agents/registry.json</span>; <span class="mono">command_agent</span> spawns <span class="mono">claude -p</span> with that agent's config, streaming output to <span class="mono">agents/logs/</span> and a produced-files list; <span class="mono">check_agent_status</span> returns status + log <em>tail</em>; <span class="mono">delete_agent</span>.</p></li>
+        <li><h4>Disallow everything else</h4><p>All stock tools off except your four (plus TodoWrite).</p></li>
+        <li><h4>Ping, then a real command</h4><p>"Create two agents, one to summarize the backend and one for the frontend, into docs/*.md; check on them until done; report consumed vs produced files."</p></li>
+        <li><h4>Add agent templates</h4><p><span class="mono">create_agent</span> can read a <span class="mono">.claude/agents/&lt;template&gt;.md</span> file as the new agent's system prompt.</p></li>
+        <li><h4>Write one orchestration prompt</h4><p>Scout → build → review, phases + a final report format — then run a small real feature through it.</p></li>
+        <li><h4>End clean</h4><p>Finish every session with "delete all agents" and verify the registry is empty.</p></li>
+      </ol>
+      <div>
+        <div class="codecap">the O-Agent's only tools</div>
+        <div class="code"><pre># CRUD over background Claude instances
+create_agent(name, model, system_prompt)
+    # registers a row in agents/registry.json
+command_agent(name, prompt)
+    # spawns claude -p with the agent's config
+    # streams to agents/logs/&lt;name&gt;.jsonl + produced-files list
+check_agent_status(name)
+    # returns status + log tail — tail, not full log
+delete_agent(name)
+    # the loop, closed</pre></div>
+        <p class="note">Tail, not full log — the orchestrator's context window is the one you protect hardest.</p>
+      </div>
+    </div>
+
+    <div class="spread reveal d3" style="align-items:start">
+      <div class="callout ok"><span class="ci">DONE WHEN</span>
+        <span class="cc">One high-level prompt yields <strong>≥2 concurrently-working agents</strong>, each producing a concrete file; the orchestrator's own context stays small (verify it never reads full logs); agents are deleted after the job.</span></div>
+      <div class="callout idea"><span class="ci">LEVEL UP</span>
+        <span class="cc">Swap the JSON registry for Postgres + a WebSocket UI showing per-agent status, cost, and produced assets — the three pillars in full: orchestrator, CRUD, observability.</span></div>
+    </div>
+
+    <a class="jump reveal" href="#ch14">Next · Agent Experts &nbsp;&rarr;</a>
+  </div>
+</section>

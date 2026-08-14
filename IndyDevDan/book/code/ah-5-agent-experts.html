@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An agent-systems companion to Agent Experts: commanders, persistent mental models, prompt and permission contracts, SDK harnesses, verification, and recovery loops.">
+  <title>Agent Experts · Agent Systems Companion</title>
+  <link rel="stylesheet" href="../design/tokens.css">
+  <link rel="stylesheet" href="../design/base.css">
+  <link rel="stylesheet" href="../design/components.css">
+  <style>
+    :root {
+      --sys-blue: #315f78;
+      --sys-blue-wash: #e7f0f2;
+      --sys-plum: #6b4f76;
+      --sys-plum-wash: #eee7f0;
+      --sys-gold: #8e641f;
+      --sys-gold-wash: #f5ead4;
+      --sys-rose: #91473d;
+      --sys-rose-wash: #f5e6e1;
+    }
+
+    html { scroll-padding-top: 3.5rem; }
+    body { background: var(--bg); color: var(--ink); }
+    .skip-link { position: fixed; left: .7rem; top: -5rem; z-index: 999; padding: .55rem .75rem; background: var(--ink); color: var(--ink-inverse); }
+    .skip-link:focus { top: .7rem; }
+    .reading-progress { position: fixed; inset: 0 auto auto 0; z-index: 1000; width: 0; height: 3px; background: var(--accent); }
+
+    .site-bar {
+      position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between;
+      gap: .75rem; min-height: 2.5rem; border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(12px);
+    }
+    .site-brand { display: flex; align-items: center; gap: .52rem; min-width: 0; color: var(--ink); text-decoration: none; }
+    .site-brand-mark { display: grid; place-items: center; width: 1.65rem; height: 1.65rem; border-radius: 50%; background: var(--accent); color: var(--ink-inverse); font: 800 .67rem/1 var(--font-mono); }
+    .site-brand-copy { display: grid; line-height: 1.04; }
+    .site-brand-copy strong { font-size: .76rem; letter-spacing: .08em; }
+    .site-brand-copy span { color: var(--ink-mute); font-size: .67rem; }
+    .site-links { display: flex; align-items: center; justify-content: flex-end; gap: .18rem; }
+    .site-links a { padding: .28rem .48rem; border-radius: 999px; color: var(--ink-soft); text-decoration: none; font-size: .7rem; font-weight: 750; }
+    .site-links a:hover { color: var(--accent-ink); background: var(--accent-wash); }
+
+    .chapter-shell { display: grid; grid-template-columns: 13.5rem minmax(0, 1fr); align-items: start; gap: 1.25rem; width: min(calc(100% - 1.25rem), 72rem); margin-inline: auto; }
+    .chapter-rail { position: sticky; top: 3rem; max-height: calc(100vh - 3.3rem); overflow-y: auto; padding: .8rem .55rem 1rem 0; border-right: 1px solid var(--border-soft); }
+    .chapter-rail-label { margin-bottom: .55rem; color: var(--accent-ink); font: 800 .65rem/1.2 var(--font-mono); letter-spacing: .11em; text-transform: uppercase; }
+    .chapter-rail a { display: grid; grid-template-columns: 1.25rem 1fr; gap: .25rem; padding: .28rem .38rem; border-radius: .35rem; color: var(--ink-mute); text-decoration: none; font-size: .73rem; line-height: 1.25; }
+    .chapter-rail a span { color: var(--accent-ink); font: 700 .62rem/1.55 var(--font-mono); }
+    .chapter-rail a:hover, .chapter-rail a[aria-current="location"] { color: var(--accent-ink); background: var(--accent-wash); }
+    .chapter-main { min-width: 0; padding-bottom: 3rem; }
+    .chapter-main > section { margin: 0; padding-block: 1.2rem; scroll-margin-top: 3.4rem; }
+    .chapter-main > section + section { border-top: 1px solid var(--border-soft); }
+    .eyebrow { margin-bottom: .36rem; color: var(--accent-ink); font: 800 .67rem/1.3 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+    h1 { max-width: 22ch; margin: 0; font-size: clamp(1.58rem, 3vw, 2.08rem); line-height: 1.08; }
+    h2 { margin: 0 0 .5rem; font-size: clamp(1.28rem, 2.2vw, 1.56rem); }
+    h3 { margin: 0 0 .35rem; font-size: 1rem; }
+    .section-lede { max-width: 69ch; margin-bottom: .85rem; color: var(--ink-soft); font-size: .96rem; line-height: 1.52; }
+    .small-note { color: var(--ink-mute); font-size: .72rem; line-height: 1.45; }
+    .path { color: var(--accent-ink); font: 650 .72rem/1.35 var(--font-mono); overflow-wrap: anywhere; }
+
+    .mission-card { position: relative; overflow: hidden; padding: 1rem 1.1rem 1.05rem !important; border: 1px solid var(--border); border-radius: 1rem; background: radial-gradient(circle at 92% 8%, var(--accent-wash), transparent 32%), var(--bg-card); box-shadow: var(--shadow-card); }
+    .mission-card::after { position: absolute; right: -.25rem; bottom: -.28rem; content: "LEARN"; color: color-mix(in srgb, var(--accent) 8%, transparent); font: 900 3.1rem/1 var(--font-mono); pointer-events: none; transform: rotate(-2deg); }
+    .mission-card > * { position: relative; z-index: 1; }
+    .mission-copy { max-width: 72ch; margin-top: .55rem; color: var(--ink-soft); font-size: .96rem; line-height: 1.55; }
+    .mission-formula { display: inline-flex; flex-wrap: wrap; gap: .35rem; margin-top: .7rem; padding: .46rem .6rem; border-radius: .55rem; background: var(--terminal-bg); color: var(--terminal-ink); font: 650 .7rem/1.42 var(--font-mono); }
+    .mission-formula b { color: #f0c9a4; }
+    .hook-note { margin-top: .62rem; max-width: 69ch; padding-left: .7rem; border-left: 3px solid var(--accent); color: var(--accent-ink); font-size: .77rem; line-height: 1.45; }
+
+    .cast-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: .82rem; background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .cast-table { min-width: 47rem; }
+    .cast-table th { background: var(--bg-inset); color: var(--accent-ink); font: 800 .65rem/1.3 var(--font-mono); text-transform: uppercase; }
+    .cast-table td { color: var(--ink-soft); font-size: .74rem; line-height: 1.42; }
+    .cast-table td:first-child { width: 19%; color: var(--ink); font-weight: 760; }
+    .cast-table td:nth-child(3) { width: 26%; }
+    .boundary-chip { display: inline-block; margin-top: .16rem; padding: .08rem .35rem; border-radius: 999px; background: var(--accent-wash); color: var(--accent-ink); font-size: .61rem; font-weight: 760; }
+
+    .surface-card { padding: .78rem; border: 1px solid var(--border); border-radius: .9rem; background: var(--bg-inset); box-shadow: var(--shadow-card); }
+    .surface-card svg { width: 100%; min-width: 42rem; }
+    .surface-scroll { overflow-x: auto; }
+    .svg-card { fill: var(--bg-card); stroke: var(--border); stroke-width: 1.4; }
+    .svg-core { fill: var(--accent-wash); stroke: var(--accent); stroke-width: 2; }
+    .svg-blue { fill: var(--sys-blue-wash); stroke: var(--sys-blue); stroke-width: 1.4; }
+    .svg-plum { fill: var(--sys-plum-wash); stroke: var(--sys-plum); stroke-width: 1.4; }
+    .svg-gold { fill: var(--sys-gold-wash); stroke: var(--sys-gold); stroke-width: 1.4; }
+    .svg-line { fill: none; stroke: var(--accent); stroke-width: 1.65; stroke-linecap: round; stroke-dasharray: 5 5; }
+    .svg-title { fill: var(--ink); font: 750 13px var(--font-body); }
+    .svg-copy { fill: var(--ink-mute); font: 500 10px var(--font-mono); }
+    .svg-core-title { fill: var(--accent-ink); font: 800 14px var(--font-body); }
+    .surface-caption { margin-top: .5rem; color: var(--ink-mute); font-size: .69rem; line-height: 1.45; text-align: center; }
+    .surface-legend { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .38rem; margin-top: .55rem; }
+    .surface-legend div { padding: .48rem .55rem; border-radius: .48rem; background: var(--bg-card); color: var(--ink-mute); font-size: .66rem; line-height: 1.38; }
+    .surface-legend b { display: block; color: var(--ink); }
+
+    .loop-board { display: grid; gap: .62rem; }
+    .loop-lane { display: grid; grid-template-columns: 7.3rem minmax(0, 1fr); gap: .65rem; padding: .7rem; border: 1px solid var(--border); border-radius: .75rem; }
+    .loop-lane.in { background: var(--sys-gold-wash); }
+    .loop-lane.out { background: var(--ok-wash); }
+    .lane-label { align-self: center; color: var(--ink); font: 820 .65rem/1.3 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+    .lane-label small { display: block; margin-top: .2rem; color: var(--ink-mute); font: 500 .64rem/1.35 var(--font-body); letter-spacing: 0; text-transform: none; }
+    .lane-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .34rem; }
+    .loop-step { position: relative; min-height: 4.7rem; padding: .5rem; border-radius: .5rem; background: var(--bg-card); color: var(--ink-mute); font-size: .64rem; line-height: 1.34; }
+    .loop-step:not(:last-child)::after { position: absolute; right: -.27rem; top: 34%; z-index: 2; content: "›"; color: var(--accent-ink); font-size: 1rem; font-weight: 800; }
+    .loop-step b { display: block; margin-bottom: .14rem; color: var(--ink); font-size: .69rem; }
+    .loop-return { padding: .54rem .68rem; border: 1px dashed var(--accent); border-radius: .5rem; background: var(--accent-wash); color: var(--accent-ink); font: 700 .67rem/1.42 var(--font-mono); text-align: center; }
+    .pattern-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: .42rem; margin-top: .55rem; }
+    .pattern-strip div { padding: .55rem; border-radius: .5rem; background: var(--sys-blue-wash); color: var(--ink-soft); font-size: .68rem; line-height: 1.38; }
+    .pattern-strip b { display: block; color: var(--sys-blue); }
+
+    .contracts { display: grid; gap: .72rem; }
+    .contract-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, .95fr); gap: .78rem; padding: .82rem; border: 1px solid var(--border); border-radius: .72rem; background: var(--bg-card); box-shadow: var(--shadow-card); }
+    .contract-copy p { margin-top: .27rem; color: var(--ink-soft); font-size: .75rem; line-height: 1.48; }
+    .contract-path { color: var(--accent-ink) !important; font: 700 .65rem/1.38 var(--font-mono); overflow-wrap: anywhere; }
+    .intent { margin-top: .48rem !important; padding: .5rem .58rem; border-left: 3px solid var(--accent); border-radius: 0 .38rem .38rem 0; background: var(--accent-wash); color: var(--ink) !important; font-size: .68rem !important; }
+    .intent b { color: var(--accent-ink); }
+    .evidence { min-width: 0; align-self: start; overflow: hidden; border: 1px solid var(--terminal-border); border-radius: .58rem; background: var(--terminal-bg); color: var(--terminal-ink); }
+    .evidence-label { display: flex; justify-content: space-between; gap: .4rem; padding: .35rem .52rem; border-bottom: 1px solid var(--terminal-bar); color: var(--terminal-dot); font: 650 .62rem/1.3 var(--font-mono); }
+    .evidence pre { margin: 0; padding: .58rem; border: 0; border-radius: 0; background: transparent; color: inherit; font: .64rem/1.48 var(--font-mono); white-space: pre-wrap; }
+    .tok-heading { color: #f0c9a4; font-weight: 750; }
+    .tok-key { color: #a9c9da; }
+    .tok-string { color: #bfd7a7; }
+    .tok-comment { color: #b5a99b; font-style: italic; }
+    .proof-list { display: grid; gap: .35rem; align-self: start; }
+    .proof-list div { padding: .52rem .58rem; border-left: 3px solid var(--ok); border-radius: .36rem; background: var(--ok-wash); color: var(--ok); font-size: .67rem; line-height: 1.4; }
+
+    .operate-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(14rem, .75fr); gap: .8rem; }
+    .run-steps { counter-reset: run; display: grid; gap: .46rem; }
+    .run-step { counter-increment: run; display: grid; grid-template-columns: 1.75rem 1fr; gap: .55rem; padding: .62rem; border: 1px solid var(--border); border-radius: .58rem; background: var(--bg-card); }
+    .run-step::before { display: grid; place-items: center; width: 1.55rem; height: 1.55rem; content: counter(run); border-radius: 50%; background: var(--accent); color: var(--ink-inverse); font: 800 .65rem/1 var(--font-mono); }
+    .run-step h3 { margin-top: .05rem; font-size: .8rem; }
+    .run-step p { margin-top: .14rem; color: var(--ink-soft); font-size: .71rem; line-height: 1.43; }
+    .terminal { margin-top: .32rem; padding: .5rem .58rem; overflow-x: auto; border-radius: .42rem; background: var(--terminal-bg); color: var(--terminal-ink); font: .64rem/1.48 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .commander-gate { align-self: start; position: sticky; top: 3.2rem; padding: .78rem; border-radius: .68rem; background: var(--ink); color: var(--terminal-ink); }
+    .commander-gate h3 { color: var(--ink-inverse); }
+    .commander-gate p, .commander-gate li { color: var(--terminal-dot); font-size: .67rem; line-height: 1.45; }
+    .commander-gate ul { margin-top: .35rem; padding-left: 1rem; }
+    .run-matrix { margin-top: .7rem; overflow-x: auto; border: 1px solid var(--border); border-radius: .66rem; }
+    .run-matrix table { min-width: 48rem; font-size: .67rem; }
+    .run-matrix th { background: var(--bg-inset); color: var(--accent-ink); }
+    .run-matrix code { font-size: .61rem; overflow-wrap: anywhere; }
+    .drift-note { margin-top: .58rem; padding: .6rem .7rem; border: 1px dashed var(--accent); border-radius: .52rem; background: var(--bg-card); color: var(--ink-soft); font-size: .69rem; line-height: 1.45; }
+    .drift-note b { color: var(--accent-ink); }
+
+    .failure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+    .failure-card { padding: .65rem; border: 1px solid var(--border); border-radius: .58rem; background: var(--bg-card); }
+    .failure-card b { display: block; color: var(--warn); font-size: .74rem; }
+    .failure-card p { margin-top: .18rem; color: var(--ink-soft); font-size: .68rem; line-height: 1.42; }
+    .failure-card .repair { display: block; margin-top: .28rem; color: var(--ok); font-weight: 750; }
+    .failure-card.wide { grid-column: 1 / -1; background: var(--sys-gold-wash); }
+
+    .lab { padding: .9rem !important; border: 2px solid var(--accent) !important; border-radius: .78rem; background: linear-gradient(145deg, var(--bg-card), var(--accent-wash)); box-shadow: var(--shadow-card); }
+    .lab-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: .75rem; }
+    .lab ol { margin-top: .45rem; padding-left: 1.15rem; }
+    .lab li { color: var(--ink-soft); font-size: .71rem; line-height: 1.45; }
+    .pass-list { padding: .66rem; border-radius: .58rem; background: var(--ok-wash); }
+    .pass-list h3, .pass-list li { color: var(--ok); }
+    .pass-list ul { margin-top: .35rem; padding-left: 1rem; }
+    .pass-list li { font-size: .68rem; line-height: 1.42; }
+    .fail-try { margin-top: .5rem; padding: .55rem .62rem; border: 1px dashed var(--accent); border-radius: .46rem; color: var(--accent-ink); font-size: .67rem; line-height: 1.43; }
+
+    .teach-back { padding: .88rem !important; border-radius: .74rem; background: var(--terminal-bg); color: var(--terminal-ink); }
+    .teach-back h2 { color: var(--ink-inverse); }
+    .six-sentences { counter-reset: sentence; display: grid; grid-template-columns: repeat(2, 1fr); gap: .45rem; margin-top: .65rem; }
+    .sentence { counter-increment: sentence; min-height: 3.5rem; padding: .55rem; border: 1px solid var(--terminal-bar); border-radius: .46rem; color: var(--terminal-dot); font-size: .7rem; line-height: 1.4; }
+    .sentence::before { display: inline-block; margin-right: .25rem; content: counter(sentence) "."; color: #f0c9a4; font: 800 .63rem/1 var(--font-mono); }
+    details summary { cursor: pointer; }
+    details[open] > :not(summary) { animation: reveal .22s ease-out both; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .answer-toggle { margin-top: .55rem; }
+    .answer-toggle summary { color: #f0c9a4; font-size: .69rem; font-weight: 750; }
+    .model-answer { margin-top: .45rem; padding: .62rem; border-radius: .45rem; background: var(--terminal-bar); color: var(--terminal-dot); font-size: .67rem; line-height: 1.5; }
+
+    .interface-index { overflow: clip; border: 1px solid var(--border); border-radius: .65rem; background: var(--bg-card); }
+    .interface-index > summary { padding: .68rem .76rem; color: var(--accent-ink); font-size: .75rem; font-weight: 750; }
+    .index-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; padding: .62rem; border-top: 1px solid var(--border); }
+    .index-group { padding: .55rem; border-radius: .48rem; background: var(--bg-inset); }
+    .index-group h3 { color: var(--accent-ink); font-size: .72rem; }
+    .index-group ul { margin: 0; padding-left: 1rem; }
+    .index-group li { margin: .18rem 0; color: var(--ink-mute); font-size: .61rem; line-height: 1.35; break-inside: avoid; }
+    .index-group code { color: var(--ink); font-size: .6rem; overflow-wrap: anywhere; }
+    .page-footer { padding: .8rem 0 1.8rem; border-top: 1px solid var(--border); color: var(--ink-mute); font-size: .67rem; }
+
+    @media (max-width: 960px) {
+      .chapter-shell { grid-template-columns: 1fr; width: min(100% - 1.2rem, 58rem); }
+      .chapter-rail { display: none; }
+    }
+    @media (max-width: 740px) {
+      .site-brand-copy span { display: none; }
+      .site-links a { padding-inline: .32rem; }
+      .loop-lane, .contract-card, .operate-grid, .failure-grid, .lab-grid, .six-sentences, .index-groups { grid-template-columns: 1fr; }
+      .lane-steps { grid-template-columns: repeat(2, 1fr); }
+      .surface-legend, .pattern-strip { grid-template-columns: 1fr; }
+      .commander-gate { position: static; }
+      .failure-card.wide { grid-column: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+    @media print {
+      .site-bar, .chapter-rail, .reading-progress { display: none !important; }
+      .chapter-shell { display: block !important; width: auto !important; }
+      .chapter-main > section { break-inside: auto; }
+      .contract-card, .failure-card, .run-step, .lab { break-inside: avoid; }
+    }
+  </style>
+  <link rel="stylesheet" href="../design/chrome-v2.css">
+</head>
+<body>
+  <a class="skip-link" href="#mission">Skip to lesson</a>
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-bar" aria-label="Book navigation">
+    <a class="site-brand" href="../index.html">
+      <span class="site-brand-mark">AS</span>
+      <span class="site-brand-copy"><strong>AGENT SYSTEMS</strong><span>IndyDevDan companion</span></span>
+    </a>
+    <nav class="site-links" aria-label="Companion links">
+      <a href="../vol-2-ah/13-agent-experts.html">Chapter</a>
+      <a href="index.html">Code library</a>
+      <a href="../index.html">Book hub</a>
+    </nav>
+  </header>
+
+  <div class="chapter-shell">
+    <aside class="chapter-rail" aria-label="On this page">
+      <p class="chapter-rail-label">AH-5 · Agent Experts</p>
+      <nav>
+        <a href="#mission"><span>01</span>Mission</a>
+        <a href="#cast"><span>02</span>Cast of agents</a>
+        <a href="#surface"><span>03</span>Surface map</a>
+        <a href="#loop"><span>04</span>Control loop</a>
+        <a href="#contracts"><span>05</span>Agent contracts</a>
+        <a href="#operate"><span>06</span>Operate like Dan</a>
+        <a href="#failures"><span>07</span>Failure modes</a>
+        <a href="#lab"><span>08</span>Agent-ops lab</a>
+        <a href="#teach-back"><span>09</span>Teach-back</a>
+        <a href="#appendix"><span>10</span>Interface index</a>
+      </nav>
+    </aside>
+
+    <main class="chapter-main" id="main-content">
+      <section class="mission-card" id="mission">
+        <p class="eyebrow">Agent mission · not a code tour</p>
+        <h1>Build an expert that can <em>earn its next starting point</em></h1>
+        <p class="mission-copy">This lesson trains you to command a narrow agent system whose useful work survives the session: the human chooses the domain and risk boundary; prompts focus the agent; tool and permission contracts bound its actions; launchers make it programmable; an expertise file carries a fallible mental model; and verification closes the loop before that model is reused.</p>
+        <div class="mission-formula" aria-label="Agent expert formula"><b>human intent</b> + scoped context + bounded tools + Act → Learn → Reuse + proof</div>
+        <p class="hook-note"><strong>The leverage test:</strong> run one should change the validated starting state of run two. If the agent only produces an answer and forgets, you automated execution—not expertise.</p>
+      </section>
+
+      <section class="chapter-section" id="cast">
+        <p class="eyebrow">02 · Cast of agents</p>
+        <h2>Who decides, who acts, who proves?</h2>
+        <p class="section-lede">The system is a chain of authority, not one magical model. Keep each role replaceable and the handoffs explicit.</p>
+        <div class="cast-wrap">
+          <table class="cast-table">
+            <thead><tr><th>Actor</th><th>Job in this lesson</th><th>Authority boundary</th><th>Real interface</th></tr></thead>
+            <tbody>
+              <tr><td>Human commander</td><td>Selects a valuable domain, states the outcome, chooses when autonomy is worth the risk, and reviews learned-state diffs.</td><td>Owns scope, secrets, spend, stop/reseed decisions, and acceptance. Does not hand-edit learned expertise.</td><td>Claude Code prompt, slash command, Git diff, running UI.</td></tr>
+              <tr><td>Claude Code command agent</td><td>Loads a command contract, reads expertise first, validates current code, then answers, plans, builds, or improves.</td><td>Only the tools in command frontmatter plus project settings and hooks.</td><td><code>.claude/commands/experts/</code><br><span class="boundary-chip">prompt-driven</span></td></tr>
+              <tr><td>Orchestrator agent</td><td>Turns natural-language intent into agent lifecycle calls and keeps sessions, logs, cost, and status visible.</td><td>Eight management tools plus Bash, Read, SlashCommand, and Skill in its SDK options.</td><td><code>orchestrator_service.py</code> + MCP management server.</td></tr>
+              <tr><td>Fresh stage subagents</td><td>Run plan → build → self-improve as separate purposes so the parent carries compact handoffs instead of every token.</td><td>Each begins without the previous stage’s working context; receives only the prompt or artifact needed.</td><td><code>plan_build_improve.md</code><br><span class="boundary-chip">context delegation</span></td></tr>
+              <tr><td>Product expert</td><td>Turns per-user viewed, carted, and purchased state into streamed personalized sections.</td><td>Only two in-process shopping tools; general filesystem and shell tools are explicitly disallowed.</td><td><code>ShoppingAgentExpert</code> via Claude Agent SDK.</td></tr>
+              <tr><td>Verifiers &amp; observers</td><td>Check syntax, line budgets, builds, database behavior, browser behavior, hook events, and evidence.</td><td>May report or block; they do not define the requested product change.</td><td><code>self-improve.md</code>, tests, Playwright agent, hooks.</td></tr>
+              <tr><td>Deterministic operators</td><td>Start services, run migrations, sync models, and copy agent configuration. They behave like reliable operators, not reasoning agents.</td><td>Exactly the shell/Python procedure encoded—no judgment beyond it.</td><td><code>start_be.sh</code>, <code>start_fe.sh</code>, <code>copy_claude.py</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="surface">
+        <p class="eyebrow">03 · Agent surface map</p>
+        <h2>The repo is shaped as an operating surface</h2>
+        <p class="section-lede">The agent does not need every file at once. It needs interfaces that tell it what to know, what it may do, how it is invoked, what state persists, and what counts as proof.</p>
+        <figure class="surface-card">
+          <div class="surface-scroll">
+            <svg viewBox="0 0 900 430" role="img" aria-labelledby="surface-title surface-desc">
+              <title id="surface-title">Agent Expert operating surface</title>
+              <desc id="surface-desc">An Agent Expert at the center connects to prompts, project instructions, expertise, tool boundaries, hooks, launchers, persistent state, and verification.</desc>
+              <path class="svg-line" d="M340 187 C270 150 250 95 215 78M560 187 C635 150 660 95 690 78M337 225 C260 225 245 225 190 225M563 225 C650 225 680 225 735 225M350 265 C285 310 270 348 230 370M550 265 C620 310 635 348 675 370M420 167 C400 118 390 103 380 77M480 167 C500 118 510 103 520 77"/>
+              <rect class="svg-core" x="340" y="166" width="220" height="120" rx="26"/>
+              <text class="svg-core-title" x="450" y="212" text-anchor="middle">AGENT EXPERT</text>
+              <text class="svg-copy" x="450" y="235" text-anchor="middle">ordinary model, unusual lifecycle</text>
+              <text class="svg-copy" x="450" y="255" text-anchor="middle">Act · Learn · Reuse</text>
+
+              <rect class="svg-card" x="70" y="34" width="205" height="86" rx="14"/>
+              <text class="svg-title" x="88" y="61">Prompt contracts</text>
+              <text class="svg-copy" x="88" y="83">commands/experts/*/*.md</text>
+              <text class="svg-copy" x="88" y="101">purpose · workflow · report</text>
+
+              <rect class="svg-blue" x="310" y="26" width="170" height="94" rx="14"/>
+              <text class="svg-title" x="328" y="55">Project context</text>
+              <text class="svg-copy" x="328" y="77">CLAUDE.md</text>
+              <text class="svg-copy" x="328" y="95">engineering invariants</text>
+
+              <rect class="svg-plum" x="500" y="26" width="170" height="94" rx="14"/>
+              <text class="svg-title" x="518" y="55">Mental model</text>
+              <text class="svg-copy" x="518" y="77">expertise.yaml</text>
+              <text class="svg-copy" x="518" y="95">fallible · persistent</text>
+
+              <rect class="svg-card" x="680" y="34" width="170" height="86" rx="14"/>
+              <text class="svg-title" x="698" y="61">Tool boundary</text>
+              <text class="svg-copy" x="698" y="83">allowed-tools</text>
+              <text class="svg-copy" x="698" y="101">SDK allow / deny lists</text>
+
+              <rect class="svg-gold" x="28" y="180" width="220" height="92" rx="14"/>
+              <text class="svg-title" x="48" y="209">Hooks &amp; guardrails</text>
+              <text class="svg-copy" x="48" y="232">settings.json → hook scripts</text>
+              <text class="svg-copy" x="48" y="251">observe · summarize · block rm</text>
+
+              <rect class="svg-gold" x="680" y="180" width="192" height="92" rx="14"/>
+              <text class="svg-title" x="700" y="209">Harness / launcher</text>
+              <text class="svg-copy" x="700" y="232">Skill · shell · SDK client</text>
+              <text class="svg-copy" x="700" y="251">session · model · cwd</text>
+
+              <rect class="svg-blue" x="92" y="332" width="235" height="72" rx="14"/>
+              <text class="svg-title" x="111" y="359">Persistent state</text>
+              <text class="svg-copy" x="111" y="381">YAML · Postgres · SQLite JSON</text>
+
+              <rect class="svg-plum" x="573" y="332" width="235" height="72" rx="14"/>
+              <text class="svg-title" x="592" y="359">Verification surface</text>
+              <text class="svg-copy" x="592" y="381">diff · wc · YAML · tests · UI</text>
+            </svg>
+          </div>
+          <figcaption class="surface-caption"><strong>The codebase is agent-legible by design.</strong> Prompts and settings are APIs for the agent; expertise is cached navigation; launchers turn a session into a callable system; proof prevents the cache from becoming authority.</figcaption>
+          <div class="surface-legend">
+            <div><b>Context is pull-based</b>The expert loads topic state when its command is invoked rather than forcing every fact into global context.</div>
+            <div><b>Authority is layered</b>Prompt prohibitions, tool allowlists, SDK permission modes, and hooks each govern a different failure class.</div>
+            <div><b>Truth stays outside memory</b>Expertise accelerates search; current source and runtime behavior settle disagreements.</div>
+          </div>
+        </figure>
+      </section>
+
+      <section class="chapter-section" id="loop">
+        <p class="eyebrow">04 · Control loop</p>
+        <h2>Put execution inside the loop; keep judgment at the gates</h2>
+        <p class="section-lede">Dan’s leverage move is not removing the human. It is moving the human from keystroke supervision to system design and evidence review.</p>
+        <div class="loop-board" role="img" aria-label="Inside-loop agent moves and outside-loop human commander gates">
+          <div class="loop-lane in">
+            <div class="lane-label">Inside loop<small>agent-owned execution</small></div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Reuse</b>Read expertise first; validate relevant claims against current code.</div>
+              <div class="loop-step"><b>Plan</b>Turn the outcome into an artifact a fresh builder can consume.</div>
+              <div class="loop-step"><b>Act</b>Make the useful, scoped change through the build contract.</div>
+              <div class="loop-step"><b>Verify</b>Run builds/tests and inspect runtime or diff evidence.</div>
+              <div class="loop-step"><b>Learn</b>Update expertise from validated changes; allow no-op.</div>
+            </div>
+          </div>
+          <div class="loop-return">↺ next invocation starts from the updated mental model, then validates again</div>
+          <div class="loop-lane out">
+            <div class="lane-label">Outside loop<small>commander-owned gates</small></div>
+            <div class="lane-steps">
+              <div class="loop-step"><b>Choose domain</b>Prefer evolving, complex, high-risk territory you can evaluate.</div>
+              <div class="loop-step"><b>Set boundary</b>Name outcome, working directory, tools, cost, and stop conditions.</div>
+              <div class="loop-step"><b>Launch once</b>Invoke the composite workflow; avoid narrating each keystroke.</div>
+              <div class="loop-step"><b>Review proof</b>Inspect behavior, tests, and the learned-state diff—not confidence.</div>
+              <div class="loop-step"><b>Recover</b>Tighten prompt/harness, rerun, reseed, or reject the learned update.</div>
+            </div>
+          </div>
+        </div>
+        <div class="pattern-strip">
+          <div><b>One agent · one purpose</b>Plan, build, and self-improve are fresh stages, not one swollen context.</div>
+          <div><b>Replaceable workers</b>The plan and diff are handoff artifacts; any capable worker can consume them.</div>
+          <div><b>Closed before clever</b>A modest agent with feedback beats an impressive agent with no proof or persistence.</div>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="contracts">
+        <p class="eyebrow">05 · Why these files exist for agents</p>
+        <h2>Four contracts make the agent operational</h2>
+        <p class="section-lede">Read the snippets as interface evidence. The application code matters only where it proves what the agent is allowed to understand, do, invoke, or trust.</p>
+        <div class="contracts">
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>1 · Prompt contract — scope the mind</h3>
+              <p class="contract-path">.claude/commands/experts/database/question.md</p>
+              <p>The question agent is not told “know the repo.” It gets a narrow domain, a mandatory first read, a validation rule, a no-write boundary, and a report schema with file-and-line evidence.</p>
+              <p class="intent"><b>Dan’s design intent:</b> expertise is an index, not an oracle. “Read expertise → validate code → answer” turns stored state into faster navigation without surrendering truth.</p>
+            </div>
+            <div class="evidence" aria-label="Prompt contract snippet">
+              <div class="evidence-label"><span>question.md</span><span>prompt</span></div>
+              <pre><span class="tok-heading">## Instructions</span>
+- IMPORTANT: ... DO NOT write, edit, or create files
+- ... validate ... <span class="tok-string">EXPERTISE_PATH</span> against the codebase
+
+<span class="tok-heading">## Workflow</span>
+- Read the <span class="tok-string">EXPERTISE_PATH</span> file
+- Review, validate, and confirm ... against the codebase</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>2 · Tool &amp; permission contract — scope the hands</h3>
+              <p class="contract-path">.claude/commands/experts/database/question.md · apps/orchestrator_3_stream/backend/modules/agent_manager.py · apps/nile/server/src/services/agent_expert.py · .claude/settings.json</p>
+              <p>Command frontmatter declares available tool families. The orchestrator’s SDK harness uses <code>acceptEdits</code> for working agents, while Nile gives its product expert only two shopping tools and denies filesystem, shell, delegation, and planning tools.</p>
+              <p><code>.claude/settings.json</code> is primarily a hook map here—not a complete permission manifest. Its pre-tool hook blocks dangerous recursive removal; the commented-out environment-file guard does not currently protect secrets.</p>
+              <p class="intent"><b>Dan’s design intent:</b> capability should follow purpose. The product expert can recommend and stream; it cannot wander the machine. Broad command agents are powerful, so the commander must treat prompt scope and diff review as real safety gates.</p>
+            </div>
+            <div>
+              <div class="evidence" aria-label="Tool permission snippets">
+                <div class="evidence-label"><span>database/question.md</span><span>frontmatter</span></div>
+                <pre><span class="tok-key">allowed-tools</span>: Bash, Read, Grep, Glob, TodoWrite</pre>
+              </div>
+              <div class="evidence" aria-label="Nile SDK allowlist snippet" style="margin-top:.48rem">
+                <div class="evidence-label"><span>agent_expert.py</span><span>SDK options</span></div>
+                <pre>allowed_tools=[
+  "mcp__shopping__find_related_products",
+  "mcp__shopping__stream_section",
+]
+disallowed_tools=["Read", "Write", "Bash", ...]</pre>
+              </div>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>3 · Harness / launcher — make the agent callable</h3>
+              <p class="contract-path">apps/nile/server/src/services/agent_expert.py</p>
+              <p>The harness selects tools, injects the per-user mental model into the system prompt, resumes a user session when one exists, sends a deterministic task prompt, and consumes streamed tool calls. The model is one replaceable field inside the system.</p>
+              <p>At the outer shell, <code>start_be.sh</code> chooses working directory and optional session, while <code>start-orchestrator/SKILL.md</code> packages those launch actions for an interactive agent.</p>
+              <p class="intent"><b>Dan’s design intent:</b> once the call is code, the agent stops being a chat trick. It becomes infrastructure you can start, observe, interrupt, test, and swap.</p>
+            </div>
+            <div class="evidence" aria-label="Programmatic agent launcher snippet">
+              <div class="evidence-label"><span>agent_expert.py</span><span>launcher</span></div>
+              <pre>shopping_server = create_sdk_mcp_server(
+  name="shopping_expert", tools=[...]
+)
+options = ClaudeAgentOptions(
+  mcp_servers={"shopping": shopping_server},
+  system_prompt=system_prompt,
+  resume=existing_session_id,
+)
+async with ClaudeSDKClient(options=options) as client:
+  await client.query(streaming_user_prompt)</pre>
+            </div>
+          </article>
+
+          <article class="contract-card">
+            <div class="contract-copy">
+              <h3>4 · Verification contract — close the loop</h3>
+              <p class="contract-path">.claude/commands/experts/*/self-improve.md · apps/orchestrator_3_stream/backend/tests/ · apps/orchestrator_3_stream/frontend/package.json</p>
+              <p>Self-improve reads the current mental model, checks implementation, records discrepancies, updates only useful expertise, enforces a 1,000-line budget, and validates YAML. Application proof adds real-database tests, real-agent integration tests, WebSocket observers, frontend builds, and browser validation.</p>
+              <p>The shipped self-improve snippets call raw <code>python3</code>, but root <code>CLAUDE.md</code> says every Python command goes through <code>uv</code>. The policy-compliant repair belongs in the learning prompt—exactly the system-layer change the lesson teaches.</p>
+              <p class="intent"><b>Dan’s design intent:</b> do not reward activity. Reward a claim that survived source validation, a command that passed, or a behavior you observed. A no-change Learn pass is valid when the model is already aligned.</p>
+            </div>
+            <div class="proof-list" aria-label="Verification ladder">
+              <div><strong>State:</strong> <code>wc -l .../expertise.yaml</code> stays within <code>MAX_LINES</code>.</div>
+              <div><strong>Syntax:</strong> parse YAML through a <code>uv</code>-managed Python environment.</div>
+              <div><strong>Code:</strong> <code>npm run build</code> and relevant <code>uv run pytest</code> suites pass.</div>
+              <div><strong>Behavior:</strong> UI or WebSocket observer shows the requested outcome.</div>
+              <div><strong>Learning:</strong> <code>git diff -- .../expertise.yaml</code> is accurate, concise, and reviewable.</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="chapter-section" id="operate">
+        <p class="eyebrow">06 · Operate like Dan</p>
+        <h2>One worked run, with commander gates</h2>
+        <p class="section-lede">These commands come from the checked-out README and launch scripts. Run shell commands from the repository root unless a step changes directories; run slash commands inside Claude Code.</p>
+        <div class="operate-grid">
+          <div class="run-steps">
+            <article class="run-step">
+              <div><h3>Provision the harness</h3><p>Install prerequisites, copy environment configuration into both orchestrator apps, and create the database schema.</p>
+                <div class="terminal">cp .env.sample .env
+cp .env apps/orchestrator_3_stream/.env
+cp .env apps/orchestrator_db/.env
+uv run apps/orchestrator_db/run_migrations.py</div>
+              </div>
+            </article>
+            <article class="run-step">
+              <div><h3>Start the system in two terminals</h3><p>The real launcher defaults are backend <strong>9403</strong> and frontend <strong>5175</strong>.</p>
+                <div class="terminal">cd apps/orchestrator_3_stream
+./start_be.sh
+
+# second terminal, same directory
+./start_fe.sh</div>
+              </div>
+            </article>
+            <article class="run-step">
+              <div><h3>Prime with a safe Reuse run</h3><p>Ask the partial database expert a read-only question. Watch for expertise as the first read, followed by current models and migrations.</p>
+                <div class="terminal">/experts:database:question "Does information flow between our database tables? Cite the exact current files and lines."</div>
+              </div>
+            </article>
+            <article class="run-step">
+              <div><h3>Run Learn without demanding churn</h3><p>Let the self-improve contract validate the entire database mental model. “Nothing to do” is a clean result if the evidence supports it.</p>
+                <div class="terminal">/experts:database:self-improve false</div>
+              </div>
+            </article>
+            <article class="run-step">
+              <div><h3>Understand the complete expert as a shipped trace</h3><p>The course run used one command to plan the WebSocket counter, build it, and improve expertise. The final tree already contains that counter, plan, and learned state—study it as loop archaeology rather than pretending it is a fresh change.</p>
+                <div class="terminal">/experts:websocket:plan_build_improve "Add a session-based counter to the app nav bar that displays the total number of WebSocket events."</div>
+              </div>
+            </article>
+            <article class="run-step">
+              <div><h3>Verify the result and the learner</h3><p>Separate application proof from learned-state proof. Build the frontend, run relevant backend tests when its real database is available, and inspect expertise independently.</p>
+                <div class="terminal">git diff -- .claude/commands/experts/websocket/expertise.yaml
+cd apps/orchestrator_3_stream/frontend
+npm run build
+cd ../backend
+uv run pytest tests/ -v</div>
+              </div>
+            </article>
+          </div>
+          <aside class="commander-gate">
+            <h3>Commander checklist</h3>
+            <ul>
+              <li>Can I evaluate this domain?</li>
+              <li>Is the action useful and observable?</li>
+              <li>Are the tools narrower than the job?</li>
+              <li>What is the source of truth?</li>
+              <li>What proves application success?</li>
+              <li>What proves the mental model improved?</li>
+              <li>Will I inspect the diff before reuse?</li>
+            </ul>
+            <p style="margin-top:.55rem"><strong style="color:#f0c9a4">Never do this:</strong> repair a non-empty expertise file by hand. Repair the self-improve rubric and rerun it.</p>
+          </aside>
+        </div>
+
+        <div class="run-matrix">
+          <table>
+            <thead><tr><th>Mode</th><th>Entry point</th><th>Expected write</th><th>Proof</th></tr></thead>
+            <tbody>
+              <tr><td>Database Reuse</td><td><code>/experts:database:question</code></td><td>None</td><td>Expertise read first; current code cited; Git remains unchanged.</td></tr>
+              <tr><td>Database Learn</td><td><code>/experts:database:self-improve</code></td><td>Agent-authored expertise only if drift exists</td><td>Discrepancy report, line budget, valid YAML, reviewed diff or justified no-op.</td></tr>
+              <tr><td>WebSocket full loop</td><td><code>/experts:websocket:plan_build_improve</code></td><td>Plan, code, tests if needed, expertise</td><td>Behavior + build/tests + accurate expertise diff.</td></tr>
+              <tr><td>Nile product loop</td><td><code>./start_nile_be.sh</code> + <code>./start_nile_fe.sh</code></td><td>Per-user SQLite JSON state and streamed UI</td><td>Control-K expertise panel and personalized sections after a user action.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="drift-note"><b>Drift is part of the lesson.</b> The generated start Skill says backend 8002; <code>start_be.sh</code> defaults to 9403. Nile’s README calls expertise JSONB; the implementation uses SQLAlchemy <code>JSON</code> in SQLite. WebSocket expertise says <code>chatService.ts</code> has 194 lines; the current file has 193. Agent interfaces must be validated just like application claims.</p>
+      </section>
+
+      <section class="chapter-section" id="failures">
+        <p class="eyebrow">07 · Common agent failures</p>
+        <h2>Most failures are system failures wearing model-shaped masks</h2>
+        <p class="section-lede">Diagnose the contract, boundary, harness, or feedback path before reaching for a larger model.</p>
+        <div class="failure-grid">
+          <article class="failure-card"><b>Mis-prompting: “be a database expert”</b><p>No first read, ground-truth rule, write boundary, or report evidence exists.</p><span class="repair">Repair → encode expertise-first, source-second workflow and exact proof.</span></article>
+          <article class="failure-card"><b>Broad hands on a narrow job</b><p>A read-only question still exposes Bash and TodoWrite; a general command agent gets a large tool set under <code>acceptEdits</code>.</p><span class="repair">Repair → remove tools the prompt does not need; keep product agents tool-only.</span></article>
+          <article class="failure-card"><b>Settings mistaken for permissions</b><p>Hooks log and sometimes block, but root settings do not express a comprehensive permission policy. The environment-file block is commented out.</p><span class="repair">Repair → inspect frontmatter, SDK options, hook behavior, and secrets handling as separate layers.</span></article>
+          <article class="failure-card"><b>Expertise trusted as truth</b><p>Stale ports, line counts, or architecture claims slip into answers because the agent skips source validation.</p><span class="repair">Repair → make current code and runtime behavior win every disagreement.</span></article>
+          <article class="failure-card"><b>Learning forced to produce a diff</b><p>The agent adds prose because the operator treats “nothing changed” as failure.</p><span class="repair">Repair → grade the search and validation; accept a justified no-op.</span></article>
+          <article class="failure-card"><b>Verification exists only in prose</b><p>The plan says “test it,” but no command, observable behavior, or learned-state diff closes the loop.</p><span class="repair">Repair → specify build/test commands, UI evidence, and diff review before launch.</span></article>
+          <article class="failure-card"><b>Context delegation without handoff discipline</b><p>Fresh agents receive vague tasks or the entire transcript, so replaceability and focus vanish.</p><span class="repair">Repair → pass the plan path to build and the code diff to self-improve.</span></article>
+          <article class="failure-card"><b>Observability mistaken for enforcement</b><p><code>send_event.py</code> can fail to reach <code>localhost:4000/events</code> and still exits zero so agent work continues.</p><span class="repair">Repair → decide which failures should merely report and which must block the loop.</span></article>
+          <article class="failure-card wide"><b>Staying in the loop</b><p>The commander narrates every search, edit, and check, recreating manual software work through an agent-shaped terminal. The repository’s composite prompt exists to move the human to scope, launch, evidence review, and recovery.</p><span class="repair">Repair → program the loop once; intervene at explicit gates, not every keystroke.</span></article>
+        </div>
+      </section>
+
+      <section class="chapter-section lab" id="lab">
+        <p class="eyebrow">08 · Lab · agent ops, not application logic</p>
+        <h2>Harden the partial database expert</h2>
+        <p class="section-lede">Change only the agent system. Tighten what question mode can do, repair the learning verifier to match repository policy, then prove the expert still answers and learns safely.</p>
+        <div class="lab-grid">
+          <div>
+            <h3>Mission · 25–40 minutes</h3>
+            <ol>
+              <li>Capture a baseline with <code>git status --short</code> and copy the current frontmatter/tool list from <code>.claude/commands/experts/database/question.md</code> into your notes.</li>
+              <li>Change question mode’s <code>allowed-tools</code> to the minimum its workflow requires: <code>Read, Grep, Glob</code>. Do not change application code or <code>expertise.yaml</code>.</li>
+              <li>In <code>.claude/commands/experts/database/self-improve.md</code>, replace the raw-Python YAML check with a <code>uv</code>-managed check. Preserve <code>MAX_LINES: 1000</code> and the rule that no change may be the correct result.</li>
+              <li>Add one verification instruction requiring the final report to include <code>git diff -- .claude/commands/experts/database/expertise.yaml</code>, or explicitly state that the diff is empty.</li>
+              <li>Run <code>/experts:database:question "Which tables carry agent activity, and how are they related?"</code>. Confirm its first meaningful read is expertise and its answer cites current models/migrations.</li>
+              <li>Run <code>/experts:database:self-improve false</code>. Review the report and diff. If expertise changes, the agent—not you—must author every changed expertise byte.</li>
+              <li>Run <code>git status --short</code> again and explain every changed path as prompt-system work or agent-authored learned state.</li>
+            </ol>
+            <p class="fail-try"><strong>Fail → try:</strong> if the narrowed question agent cannot validate a fact, do not restore broad Bash by reflex. Identify the exact missing operation and add only the smallest capability that supplies it.</p>
+          </div>
+          <aside class="pass-list">
+            <h3>Observable pass criteria</h3>
+            <ul>
+              <li>Question mode exposes no write, shell, or task-management tool.</li>
+              <li>The answer reads expertise first and verifies with current source.</li>
+              <li>No application file changes.</li>
+              <li>No human-authored expertise edits.</li>
+              <li>Self-improve’s YAML check runs through <code>uv</code>.</li>
+              <li>Final expertise stays at or below 1,000 lines.</li>
+              <li>The report contains a reviewable expertise diff or an explicit empty-diff statement.</li>
+              <li>You can explain why tool minimization improved replaceability and risk control without changing the model.</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="chapter-section teach-back" id="teach-back">
+        <p class="eyebrow" style="color:#f0c9a4">09 · Teach-back · close the page</p>
+        <h2>Explain this lesson’s agent OS in six sentences</h2>
+        <p style="color:var(--terminal-dot);font-size:.76rem;max-width:68ch">No notes. One sentence per box. Name roles and contracts—not file contents for their own sake.</p>
+        <div class="six-sentences">
+          <div class="sentence">What the human commander decides and refuses to do.</div>
+          <div class="sentence">What makes this agent an expert rather than a generic executor.</div>
+          <div class="sentence">How prompts, context, tools, and permissions bound the work.</div>
+          <div class="sentence">How a shell/Skill/SDK harness turns the agent into a callable system.</div>
+          <div class="sentence">How plan → act → verify → learn → reuse closes the loop.</div>
+          <div class="sentence">How the system detects drift and recovers without hand-editing expertise.</div>
+        </div>
+        <details class="answer-toggle">
+          <summary>Reveal a six-sentence model answer</summary>
+          <p class="model-answer">The human commander chooses an evolving domain, sets the outcome and authority boundary, reviews proof, and never repairs learned expertise by hand. The expert is an ordinary narrow agent whose useful actions update a persistent mental model that a later run loads and revalidates. Prompt files scope purpose and evidence, <code>CLAUDE.md</code> supplies project invariants, tool allowlists and SDK options bound capability, and hooks observe or block selected events. Shell scripts and Skills start the environment, while <code>ClaudeSDKClient</code> makes models, tools, sessions, prompts, and working directories programmable. Fresh agents hand a plan to a builder, verify code and behavior, pass the change evidence to self-improve, and reuse only the reviewed mental model. When drift or false expertise appears, the commander fixes the prompt, permission, launcher, or verifier and reruns the loop instead of treating YAML as truth.</p>
+        </details>
+      </section>
+
+      <section class="chapter-section" id="appendix">
+        <p class="eyebrow">10 · Optional appendix</p>
+        <h2>Agent-interface file index</h2>
+        <p class="section-lede">The full repository also contains application source, generated reports, product metadata, and media. This index stays on the agent-operating surface and gives each real interface one job.</p>
+        <details class="interface-index">
+          <summary>Open the real interface paths</summary>
+          <div class="index-groups">
+            <div class="index-group">
+              <h3>Project context &amp; hooks</h3>
+              <ul>
+                <li><code>CLAUDE.md</code> — repository-wide engineering invariants for agents.</li>
+                <li><code>.claude/settings.json</code> — hook wiring around tool, prompt, stop, compact, and subagent events.</li>
+                <li><code>.claude/hooks/pre_tool_use.py</code> — logs tool calls and blocks dangerous recursive removal.</li>
+                <li><code>.claude/hooks/send_event.py</code> — summarizes and attempts to publish observability events.</li>
+                <li><code>.mcp.json.sample</code> — optional Playwright, Neon, and Firecrawl MCP launch configuration.</li>
+              </ul>
+            </div>
+            <div class="index-group">
+              <h3>Expert prompts &amp; learned state</h3>
+              <ul>
+                <li><code>.claude/commands/experts/database/question.md</code> — read-only Reuse contract.</li>
+                <li><code>.claude/commands/experts/database/self-improve.md</code> — database Learn rubric.</li>
+                <li><code>.claude/commands/experts/database/expertise.yaml</code> — database mental model.</li>
+                <li><code>.claude/commands/experts/websocket/plan.md</code> — expertise-informed Reuse for planning.</li>
+                <li><code>.claude/commands/experts/websocket/plan_build_improve.md</code> — complete stage orchestrator.</li>
+                <li><code>.claude/commands/experts/websocket/self-improve.md</code> — WebSocket Learn rubric.</li>
+                <li><code>.claude/commands/experts/websocket/expertise.yaml</code> — WebSocket mental model.</li>
+              </ul>
+            </div>
+            <div class="index-group">
+              <h3>Meta-agentics &amp; launchers</h3>
+              <ul>
+                <li><code>.claude/commands/meta_prompt.md</code> — prompt factory.</li>
+                <li><code>.claude/agents/meta-agent.md</code> — subagent factory.</li>
+                <li><code>.claude/skills/meta-skill/SKILL.md</code> — Skill factory.</li>
+                <li><code>.claude/skills/start-orchestrator/SKILL.md</code> — interactive launcher package.</li>
+                <li><code>apps/orchestrator_3_stream/start_be.sh</code> — backend/session/working-directory launcher.</li>
+                <li><code>apps/orchestrator_3_stream/start_fe.sh</code> — frontend launcher.</li>
+                <li><code>scripts/copy_claude.py</code> — merges selected agent configuration into the orchestrator app.</li>
+              </ul>
+            </div>
+            <div class="index-group">
+              <h3>SDK harness &amp; proof</h3>
+              <ul>
+                <li><code>apps/orchestrator_3_stream/backend/modules/orchestrator_service.py</code> — orchestrator prompt, tools, hooks, sessions, and SDK options.</li>
+                <li><code>apps/orchestrator_3_stream/backend/modules/agent_manager.py</code> — create, command, interrupt, and observe persistent command agents.</li>
+                <li><code>apps/orchestrator_3_stream/backend/modules/single_agent_prompt.py</code> — stateless one-shot summarizer agents.</li>
+                <li><code>apps/nile/server/src/services/agent_expert.py</code> — product-expert SDK harness.</li>
+                <li><code>apps/nile/server/src/prompts/experts/shopping_expert_streaming_system_prompt.md</code> — generative UI prompt contract.</li>
+                <li><code>apps/nile/server/tests/test_agent_expert.py</code> — real-agent, real-database integration expectations.</li>
+                <li><code>apps/orchestrator_3_stream/backend/tests/</code> — database, command discovery, autocomplete, and WebSocket checks.</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <footer class="page-footer">
+        <p><strong>Agent Systems companion · AH-5 Agent Experts.</strong> Conceptual spine: <a href="../vol-2-ah/13-agent-experts.html">read the full chapter</a>. Operating lens: commanders, interfaces, control loops, proof, and recovery.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const progress = document.getElementById('reading-progress');
+      const links = [...document.querySelectorAll('.chapter-rail a')];
+      const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+      let pending = false;
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const ratio = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        if (progress) progress.style.width = `${ratio * 100}%`;
+      };
+
+      const requestUpdate = () => {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => { updateProgress(); pending = false; });
+      };
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+          const current = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!current) return;
+          links.forEach(link => {
+            if (link.getAttribute('href') === `#${current.target.id}`) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          });
+        }, { rootMargin: '-18% 0px -70% 0px', threshold: [0, .1, .35] });
+        sections.forEach(section => observer.observe(section));
+      }
+
+      updateProgress();
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate);
+    })();
+  </script>
+</body>
+</html>

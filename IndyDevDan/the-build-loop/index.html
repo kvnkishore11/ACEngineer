@@ -1,0 +1,2062 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Build Loop</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --paper:#f4efe4; --paper-2:#ece4d4; --paper-3:#e3d9c5;
+  --surface:#fbf8f1; --card:#fdfbf5; --card-2:#f6f0e2;
+  --ink-bg:#1c1813; --ink-bg-2:#272019;
+  --rule:#dcd3c1; --rule-soft:#e9e1d1; --rule-strong:#c8bca3;
+  --ink:#211d18; --ink-2:#4b443b; --ink-dim:#7d7568; --ink-faint:#a59c8c;
+  --on-dark:#efe7d8; --on-dark-dim:#b9ad97;
+  --clay:#c75b39; --clay-2:#d97757; --clay-soft:rgba(199,91,57,.10); --clay-line:rgba(199,91,57,.32);
+  --blue:#2f6f9f; --blue-soft:rgba(47,111,159,.10);
+  --olive:#5f7138; --olive-soft:rgba(95,113,56,.12);
+  --plum:#6e4a86; --plum-soft:rgba(110,74,134,.10);
+  --amber:#c1882a; --amber-soft:rgba(193,136,42,.12);
+  --rose:#b1556c; --rose-soft:rgba(177,85,108,.10);
+  --serif:'Fraunces','Iowan Old Style',Georgia,'Times New Roman',serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sh-sm:0 1px 2px rgba(60,45,25,.06),0 1px 2px rgba(60,45,25,.05);
+  --sh-md:0 4px 16px rgba(60,45,25,.10),0 1px 4px rgba(60,45,25,.06);
+  --sh-lg:0 18px 44px rgba(60,45,25,.16),0 6px 14px rgba(60,45,25,.09);
+  --sh-xl:0 34px 80px rgba(40,30,15,.26),0 12px 26px rgba(40,30,15,.12);
+  --rail:288px; --wrap:1080px;
+  /* readability principle (kvn): ~90% width + larger type */
+  --wrap:min(90vw,1640px); --wrap-wide:min(92vw,1800px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--sans);
+  /* readability principle (kvn): ~90% width + larger type */
+  font-size:19px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(60,45,25,.028) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+::selection{background:var(--clay-soft);color:var(--clay)}
+a{color:var(--clay);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;padding:0}
+
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;
+  background:linear-gradient(90deg,var(--clay),var(--amber));transition:width .12s linear}
+
+#rail{position:fixed;top:0;left:0;width:var(--rail);height:100vh;z-index:90;
+  background:linear-gradient(180deg,var(--surface),var(--paper));
+  border-right:1.5px solid var(--rule);
+  display:flex;flex-direction:column;padding:26px 22px 20px;overflow-y:auto}
+#rail .brand{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+#rail .brand .mark{width:34px;height:34px;border-radius:9px;flex:none;
+  background:linear-gradient(140deg,var(--clay-2),var(--clay));color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:var(--serif);
+  font-weight:600;font-size:19px;box-shadow:var(--sh-sm)}
+#rail .brand .bt{font-family:var(--serif);font-weight:600;font-size:16px;line-height:1.15;letter-spacing:-.01em}
+#rail .brand .bs{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim)}
+#rail .railhint{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin:18px 6px 9px;border-top:1px solid var(--rule-soft);padding-top:14px}
+nav.toc{display:flex;flex-direction:column;gap:1px;flex:1}
+nav.toc a{display:flex;align-items:baseline;gap:11px;padding:7px 10px;border-radius:8px;
+  color:var(--ink-2);font-size:13.5px;line-height:1.3;transition:background .15s,color .15s;position:relative}
+nav.toc a .n{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);min-width:18px;flex:none;padding-top:1px}
+nav.toc a:hover{background:var(--card-2);color:var(--ink)}
+nav.toc a.active{background:var(--clay-soft);color:var(--clay)}
+nav.toc a.active .n{color:var(--clay)}
+nav.toc a.active::before{content:"";position:absolute;left:-22px;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--clay)}
+#rail .foot{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--ink-faint);
+  margin-top:14px;border-top:1px solid var(--rule-soft);padding-top:12px;line-height:1.7}
+#railToggle{display:none}
+
+main{margin-left:var(--rail)}
+/* paged: one chapter shown at a time — no infinite scroll */
+/* readability principle (kvn): ~90% width + larger type — trim side padding to a ~5% gutter */
+.chapter{display:none;min-height:100vh;padding:70px 5% 150px;
+  flex-direction:column;justify-content:flex-start;position:relative}
+.chapter.active{display:flex;animation:pagein .5s cubic-bezier(.2,.7,.2,1)}
+.chapter.dark{justify-content:center}
+@keyframes pagein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto}
+/* readability principle (kvn): ~90% width + larger type */
+.wrap.wide{max-width:var(--wrap-wide)}
+
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--clay);display:inline-flex;align-items:center;gap:9px;margin-bottom:20px}
+.kicker::before{content:"";width:26px;height:1.5px;background:var(--clay-line)}
+.kicker.plain::before{display:none}
+.display{font-family:var(--serif);font-weight:600;letter-spacing:-.022em;line-height:1.02;
+  font-size:clamp(40px,6vw,76px);margin:0 0 22px;color:var(--ink)}
+h2.title{font-family:var(--serif);font-weight:600;letter-spacing:-.02em;line-height:1.06;
+  font-size:clamp(30px,4.2vw,50px);margin:0 0 18px}
+h3{font-family:var(--serif);font-weight:600;font-size:clamp(20px,2.3vw,26px);letter-spacing:-.01em;
+  margin:34px 0 12px;line-height:1.18}
+h4{font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:.01em;margin:22px 0 8px;color:var(--ink)}
+em,.it{font-style:italic}
+.display em,h2.title em,h3 em{color:var(--clay);font-style:italic}
+.lede{font-family:var(--serif);font-size:clamp(19px,2.1vw,24px);line-height:1.5;color:var(--ink-2);
+  font-weight:400;max-width:58ch;margin:0 0 8px}
+.prose{max-width:68ch}
+.prose p{margin:0 0 18px;color:var(--ink-2)}
+.prose p strong,strong{color:var(--ink);font-weight:600}
+.prose .lead-in{font-family:var(--serif);font-size:22px;line-height:1.5;color:var(--ink);margin-bottom:20px}
+.dropcap::first-letter{font-family:var(--serif);font-weight:600;float:left;font-size:62px;line-height:.82;
+  padding:6px 12px 0 0;color:var(--clay)}
+.small{font-size:13.5px;color:var(--ink-dim)}
+.mono{font-family:var(--mono)}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:100px;
+  border:1.5px solid var(--rule-strong);color:var(--ink-2);background:var(--surface)}
+.pill.clay{border-color:var(--clay-line);color:var(--clay);background:var(--clay-soft)}
+.pill.blue{border-color:rgba(47,111,159,.3);color:var(--blue);background:var(--blue-soft)}
+.pill.olive{border-color:rgba(95,113,56,.3);color:var(--olive);background:var(--olive-soft)}
+.pill.plum{border-color:rgba(110,74,134,.3);color:var(--plum);background:var(--plum-soft)}
+.pill.amber{border-color:rgba(193,136,42,.3);color:var(--amber);background:var(--amber-soft)}
+.pillrow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px}
+
+.grid{display:grid;gap:18px;margin:26px 0}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1.5px solid var(--rule);border-radius:13px;padding:22px 22px 20px;
+  transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-3px);box-shadow:var(--sh-md);border-color:var(--rule-strong)}
+.card .cnum{font-family:var(--mono);font-size:11px;color:var(--clay);letter-spacing:.1em;margin-bottom:11px;display:block}
+.card .ctitle{font-family:var(--serif);font-weight:600;font-size:19px;letter-spacing:-.01em;margin:0 0 8px;line-height:1.2}
+.card .cbody{font-size:14px;color:var(--ink-2);line-height:1.55}
+.card.accent{border-top:3px solid var(--clay)}
+.card.blue{border-top:3px solid var(--blue)}
+.card.olive{border-top:3px solid var(--olive)}
+.card.plum{border-top:3px solid var(--plum)}
+.card.amber{border-top:3px solid var(--amber)}
+.card.glow{background:linear-gradient(160deg,var(--card),var(--card-2))}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin:26px 0}
+.stat{border-left:3px solid var(--clay);padding:4px 0 4px 16px}
+.stat .sv{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4vw,44px);line-height:1;letter-spacing:-.02em;color:var(--ink)}
+.stat .sl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-top:8px}
+.stat.blue{border-color:var(--blue)} .stat.olive{border-color:var(--olive)}
+.stat.plum{border-color:var(--plum)} .stat.amber{border-color:var(--amber)}
+
+.quote{border-left:3px solid var(--clay);padding:6px 0 6px 26px;margin:32px 0;max-width:48ch}
+.quote p{font-family:var(--serif);font-style:italic;font-size:clamp(21px,2.6vw,28px);line-height:1.4;
+  color:var(--ink);margin:0 0 12px;font-weight:400}
+.quote .cite{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+.quote.big{border:none;padding:0;max-width:44ch;margin:10px 0}
+.quote.big p{font-size:clamp(24px,3.3vw,36px);line-height:1.22}
+
+.callout{display:flex;gap:14px;background:var(--card);border:1.5px solid var(--rule);
+  border-left:3px solid var(--clay);border-radius:0 11px 11px 0;padding:18px 20px;margin:24px 0}
+.callout .ci{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--clay);flex:none;padding-top:3px;writing-mode:horizontal-tb}
+.callout .cc{font-size:14.5px;color:var(--ink-2);line-height:1.55}
+.callout .cc strong{color:var(--ink)}
+.callout.warn{border-left-color:var(--amber);background:var(--amber-soft)} .callout.warn .ci{color:var(--amber)}
+.callout.ok{border-left-color:var(--olive);background:var(--olive-soft)} .callout.ok .ci{color:var(--olive)}
+.callout.idea{border-left-color:var(--plum);background:var(--plum-soft)} .callout.idea .ci{color:var(--plum)}
+.callout.bad{border-left-color:var(--rose);background:var(--rose-soft)} .callout.bad .ci{color:var(--rose)}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:24px 0;display:grid;gap:14px}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:16px;align-items:start}
+.steps li::before{counter-increment:s;content:counter(s);grid-column:1;align-self:start;
+  width:34px;height:34px;border-radius:50%;border:1.5px solid var(--clay-line);background:var(--clay-soft);
+  color:var(--clay);font-family:var(--mono);font-size:13px;font-weight:600;
+  display:flex;align-items:center;justify-content:center}
+.steps li > *{grid-column:2}
+.steps li h4{margin:5px 0 4px}
+.steps li p{margin:0;font-size:14px;color:var(--ink-2)}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:26px 0}
+.col{border:1.5px solid var(--rule);border-radius:12px;padding:20px;background:var(--card)}
+.col .clabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:12px;display:inline-flex;align-items:center;gap:7px}
+.col.bad{border-color:rgba(177,85,108,.28);background:var(--rose-soft)}
+.col.bad .clabel{color:var(--rose)}
+.col.good{border-color:rgba(95,113,56,.32);background:var(--olive-soft)}
+.col.good .clabel{color:var(--olive)}
+.col ul{margin:0;padding-left:18px} .col li{margin:0 0 8px;font-size:14px;color:var(--ink-2)}
+
+.code{background:var(--ink-bg);border:1.5px solid var(--ink-bg-2);border-radius:11px;
+  padding:18px 20px;margin:22px 0;overflow-x:auto;box-shadow:var(--sh-sm)}
+.code pre{margin:0;font-family:var(--mono);font-size:13px;line-height:1.7;color:#e7decd;white-space:pre}
+.code .cm{color:#9c8f76} .code .k{color:#e0a578} .code .s{color:#a9c08a} .code .v{color:#8fb6d4}
+.codecap{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-faint);margin:-12px 0 14px;padding-left:4px}
+kbd{font-family:var(--mono);font-size:11px;background:var(--paper-2);border:1.5px solid var(--rule-strong);
+  border-bottom-width:2.5px;border-radius:5px;padding:2px 7px;color:var(--ink-2)}
+
+.fig{border:1.5px solid var(--rule);border-radius:14px;background:var(--surface);padding:26px 24px 16px;
+  margin:28px 0;box-shadow:var(--sh-sm)}
+.fig.bare{border:none;background:none;box-shadow:none;padding:8px 0}
+.fig svg{display:block;width:100%;height:auto;overflow:visible}
+.fig .fcap{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--ink-dim);
+  text-align:center;margin-top:16px;border-top:1px solid var(--rule-soft);padding-top:12px}
+.fig .fcap b{color:var(--ink-2);font-weight:600}
+
+.s-card{fill:var(--card);stroke:var(--rule-strong);stroke-width:1.5}
+.s-clay{fill:var(--clay)} .s-clay-f{fill:var(--clay-soft);stroke:var(--clay);stroke-width:1.5}
+.s-blue-f{fill:var(--blue-soft);stroke:var(--blue);stroke-width:1.5}
+.s-olive-f{fill:var(--olive-soft);stroke:var(--olive);stroke-width:1.5}
+.s-plum-f{fill:var(--plum-soft);stroke:var(--plum);stroke-width:1.5}
+.s-amber-f{fill:var(--amber-soft);stroke:var(--amber);stroke-width:1.5}
+.s-ink{fill:var(--ink)} .s-dim{fill:var(--ink-dim)}
+.s-line{stroke:var(--rule-strong);stroke-width:1.5;fill:none}
+.s-flow{stroke:var(--clay);stroke-width:2;fill:none}
+.s-label{font-family:var(--mono);font-size:11px;fill:var(--ink-2);letter-spacing:.04em}
+.s-label-sm{font-family:var(--mono);font-size:9.5px;fill:var(--ink-dim);letter-spacing:.06em}
+.s-title{font-family:var(--sans);font-size:14px;font-weight:600;fill:var(--ink)}
+.s-serif{font-family:var(--serif);fill:var(--ink)}
+
+.draw path,.draw line,.draw circle,.draw rect,.draw polyline,.draw polygon{
+  stroke-dasharray:var(--len,1200);stroke-dashoffset:var(--len,1200);transition:stroke-dashoffset 1.3s ease}
+.draw.drawn path,.draw.drawn line,.draw.drawn circle,.draw.drawn rect,.draw.drawn polyline,.draw.drawn polygon{stroke-dashoffset:0}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.07s} .reveal.d2{transition-delay:.14s} .reveal.d3{transition-delay:.21s}
+.reveal.d4{transition-delay:.28s} .reveal.d5{transition-delay:.35s} .reveal.d6{transition-delay:.42s}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}
+  .draw path,.draw line,.draw circle,.draw rect,.draw polyline,.draw polygon{stroke-dashoffset:0}}
+
+.chapter.dark{background:radial-gradient(120% 90% at 78% 8%,#332821 0%,var(--ink-bg) 46%,#161210 100%);
+  color:var(--on-dark);border-bottom:none}
+.chapter.dark .kicker{color:var(--clay-2)} .chapter.dark .kicker::before{background:rgba(217,119,87,.5)}
+.chapter.dark .display,.chapter.dark h2.title{color:#f6efe2}
+.chapter.dark .display em{color:var(--clay-2)}
+.chapter.dark .lede{color:var(--on-dark-dim)}
+.chapter.dark .small{color:var(--on-dark-dim)}
+.chapter.dark .prose p{color:var(--on-dark-dim)}
+.chapter.dark .prose p strong{color:#f6efe2}
+.chapter.dark .pill{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.16);color:var(--on-dark-dim)}
+.chapter.dark .pill.clay{color:var(--clay-2);border-color:rgba(217,119,87,.4);background:rgba(217,119,87,.1)}
+.chapter.dark .quote p{color:#f6efe2}
+.chapter.dark .card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.12)}
+.chapter.dark .card .cbody{color:var(--on-dark-dim)}
+.chapter.dark .card .ctitle{color:#f6efe2}
+
+.chapnum{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--ink-faint);
+  display:inline-block;margin-bottom:14px}
+.divline{height:1.5px;background:var(--rule);border:none;margin:36px 0}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.spread{display:grid;grid-template-columns:1.1fr .9fr;gap:46px;align-items:center}
+.spread.rev{grid-template-columns:.9fr 1.1fr}
+.center{text-align:center}
+.maxw{max-width:760px;margin:0 auto}
+.tag-list{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
+.tag-list .t{font-family:var(--mono);font-size:11px;color:var(--ink-dim);padding:3px 9px;
+  border:1px solid var(--rule);border-radius:6px;background:var(--surface)}
+.sig{font-family:var(--serif);font-style:italic;font-size:28px;color:var(--clay);margin-top:8px}
+.jump{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--clay);margin-top:30px;
+  padding:9px 16px;border:1.5px solid var(--clay-line);border-radius:100px;background:var(--clay-soft);
+  transition:gap .18s,background .18s}
+.jump:hover{gap:13px;background:var(--clay);color:#fff}
+
+/* ── in-chapter contents nav (sticky) ──────────────────── */
+.chapnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 6px;padding:13px 16px;
+  background:rgba(251,248,241,.92);border:1.5px solid var(--rule-strong);border-radius:13px;
+  position:sticky;top:12px;z-index:46;box-shadow:var(--sh-sm);backdrop-filter:saturate(1.3) blur(9px)}
+.chapnav .cnl{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);margin-right:4px}
+.chapnav a{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-2);
+  padding:5px 11px;border:1.5px solid var(--rule);border-radius:100px;background:var(--card);transition:all .15s}
+.chapnav a:hover{color:var(--clay);border-color:var(--clay-line);background:var(--clay-soft)}
+.chapnav a.cur{color:#fff;border-color:var(--clay);background:var(--clay)}
+.chapnav a.cur b{color:#fff}
+.chapnav a b{color:var(--clay);font-weight:600;margin-right:6px}
+
+/* ── subsection header (numbered band) ─────────────────── */
+.subsec{display:flex;align-items:center;gap:15px;margin:10px 0 2px;scroll-margin-top:30px}
+.subsec .sn{font-family:var(--mono);font-size:14px;font-weight:600;color:#fff;
+  background:linear-gradient(140deg,var(--clay-2),var(--clay));
+  width:32px;height:32px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;
+  flex:none;box-shadow:var(--sh-sm)}
+.subsec.blue .sn{background:linear-gradient(140deg,#4a8cbf,var(--blue))}
+.subsec.olive .sn{background:linear-gradient(140deg,#7b9150,var(--olive))}
+.subsec.plum .sn{background:linear-gradient(140deg,#8a66a6,var(--plum))}
+.subsec.amber .sn{background:linear-gradient(140deg,#d6a24a,var(--amber))}
+.subsec h2,.subsec h3{margin:0}
+
+/* ── file tree (dark, like the code block) ─────────────── */
+.filetree{background:var(--ink-bg);border:1.5px solid var(--ink-bg-2);border-radius:11px;
+  padding:18px 22px;margin:22px 0;font-family:var(--mono);font-size:12.5px;line-height:1.85;
+  color:#e7decd;overflow-x:auto;box-shadow:var(--sh-sm);white-space:pre}
+.filetree .d{color:#e0a578;font-weight:600}
+.filetree .f{color:#cfc4b0}
+.filetree .c{color:#9c8f76}
+.filetree .hl{color:#a9c08a}
+
+/* annotated code: caption + body pairing already via .codecap + .code */
+.note{font-size:13.5px;color:var(--ink-dim);font-style:italic;margin:-10px 0 16px;padding-left:4px}
+
+/* ── "from the lecture" video stills band ──────────────── */
+.lecband{margin:30px 0 8px;padding:22px 22px 18px;border:1.5px solid var(--rule-strong);border-radius:16px;
+  background:linear-gradient(160deg,var(--card),var(--card-2))}
+.lecband .lechead{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--clay);margin-bottom:12px}
+.lecband .lechead::before{content:"▶";font-size:10px}
+.lecband .lecintro{font-size:14.5px;color:var(--ink-2);line-height:1.6;max-width:74ch;margin:0 0 6px}
+.lecband .lecintro strong{color:var(--ink)}
+.stillgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:15px;margin:18px 0 8px}
+.still{border:1.5px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--ink-bg);
+  box-shadow:var(--sh-sm);transition:transform .2s,box-shadow .2s}
+.still:hover{transform:translateY(-3px);box-shadow:var(--sh-md)}
+.still.hero{grid-column:1 / -1}
+.still img{display:block;width:100%;height:auto}
+.still figcaption{padding:11px 14px;font-size:13px;color:var(--ink-2);background:var(--card);line-height:1.5}
+.still figcaption b{display:block;color:var(--clay);font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.lecband .watch{display:inline-flex;align-items:center;gap:8px;margin-top:6px;font-family:var(--mono);
+  font-size:11px;letter-spacing:.06em;color:var(--clay);border:1.5px solid var(--clay-line);
+  padding:7px 14px;border-radius:100px;background:var(--clay-soft)}
+.lecband .watch:hover{background:var(--clay);color:#fff}
+
+/* ── pager (prev / indicator / next) ───────────────────── */
+#pager{position:fixed;bottom:22px;left:calc(50% + var(--rail)/2);transform:translateX(-50%);z-index:80;
+  display:flex;align-items:center;gap:2px;padding:6px;border-radius:100px;
+  background:rgba(251,248,241,.94);border:1.5px solid var(--rule-strong);box-shadow:var(--sh-lg);backdrop-filter:blur(10px)}
+#pager button{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;
+  color:var(--ink-2);font-size:20px;line-height:1;transition:all .15s}
+#pager button:hover:not(:disabled){background:var(--clay-soft);color:var(--clay)}
+#pager button:disabled{opacity:.28;cursor:default}
+#pager .pind{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-dim);padding:0 14px;min-width:78px;text-align:center}
+#pager .pind b{color:var(--clay);font-weight:600}
+#topbtn{position:fixed;right:22px;bottom:22px;z-index:80;width:44px;height:44px;border-radius:50%;
+  background:var(--clay);color:#fff;display:none;align-items:center;justify-content:center;
+  box-shadow:var(--sh-lg);font-size:17px}
+#topbtn.show{display:flex}
+#pgbar{position:fixed;bottom:78px;left:var(--rail);right:0;height:0;z-index:79;pointer-events:none}
+
+/* ── syntax-highlight tokens (added by the inline highlighter) ── */
+.code .n{color:#cf9d6a}.code .b{color:#d98f7a}.code .fn{color:#e0b083}
+.code .md-h{color:#e0a578;font-weight:600}.code .md-b{color:#f1e9d8;font-weight:600}
+.code .md-c{color:#a9c08a}.code .md-li{color:#e0a578}.code .md-q{color:#9c8f76;font-style:italic}.code .md-link{color:#8fb6d4}
+
+/* readability principle (kvn): ~90% width + larger type
+   — body is now 19px (was 16px); scale secondary body / code / captions ~+20% to preserve hierarchy */
+h4{font-size:18px}
+.small,.note{font-size:16px}
+.card .cbody,.steps li p,.col li{font-size:17px}
+.callout .cc,.lecband .lecintro{font-size:17.5px}
+.code pre{font-size:15.5px}
+.filetree{font-size:15px}
+.still figcaption{font-size:15.5px}
+
+@media (max-width:1100px){
+  .spread,.spread.rev{grid-template-columns:1fr;gap:26px}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:980px){
+  :root{--rail:0px}
+  #rail{transform:translateX(-100%);transition:transform .25s;width:280px;box-shadow:var(--sh-xl)}
+  #rail.open{transform:none}
+  main{margin-left:0}
+  #railToggle{display:flex;position:fixed;top:14px;left:14px;z-index:100;width:44px;height:44px;
+    border-radius:11px;background:var(--clay);color:#fff;align-items:center;justify-content:center;
+    box-shadow:var(--sh-md);font-size:18px}
+  .chapter{padding:80px 26px 70px}
+  .grid-2,.grid-3,.compare{grid-template-columns:1fr}
+}
+@media (max-width:560px){ .grid-4{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="railToggle" aria-label="Menu">☰</button>
+
+<aside id="rail">
+  <!-- BRAND: replace mark letter/glyph, title, subtitle -->
+  <div class="brand">
+    <div class="mark">↻</div>
+    <div>
+      <div class="bt">The Build Loop</div>
+      <div class="bs">IndyDevDan, reverse-engineered</div>
+    </div>
+  </div>
+  <!-- TABLE OF CONTENTS: one <a href="#chNN"> per section, in order.
+       Optional <div class="railhint">GROUP NAME</div> dividers between groups.
+       ch00 = cover, last = send-off. The nav drives the paged navigation. -->
+  <nav class="toc" id="toc">
+    <a href="#ch00"><span class="n">00</span><span>Cover</span></a>
+    <div class="railhint">Part I · What the artifacts show</div>
+    <a href="#ch01"><span class="n">01</span><span>The evidence</span></a>
+    <div class="railhint">Part II · The procedure</div>
+    <a href="#ch02"><span class="n">02</span><span>Day one</span></a>
+    <a href="#ch03"><span class="n">03</span><span>The feature loop</span></a>
+    <a href="#ch04"><span class="n">04</span><span>When it fails</span></a>
+    <a href="#ch05"><span class="n">05</span><span>Escalation</span></a>
+    <div class="railhint">Part III · Out of the loop</div>
+    <a href="#ch06"><span class="n">06</span><span>The ADW ladder</span></a>
+    <a href="#ch07"><span class="n">07</span><span>Teams of agents</span></a>
+    <div class="railhint">Part IV · A worked example</div>
+    <a href="#ch08"><span class="n">08</span><span>Naming a startup</span></a>
+    <a href="#ch09"><span class="n">09</span><span>What the run found</span></a>
+    <div class="railhint">∞ · Send-off</div>
+    <a href="#ch99"><span class="n">99</span><span>Build for the thousandth run</span></a>
+  </nav>
+  <div class="foot">
+    12 mining agents · 29 repos · 18 course codebases<br>
+    Press <kbd>J</kbd>/<kbd>K</kbd> to turn pages<br>
+    Made with HTML, on purpose.
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ════════ CH00 · COVER (dark scene) ════════
+     The cover sets the tone: a kicker, a big serif display headline with one clay <em>,
+     a lede, a row of topic pills, and ONE bespoke animated SVG infographic.        -->
+<section class="chapter dark" id="ch00">
+  <div class="wrap">
+    <div class="kicker reveal">A field guide · reconstructed from artifacts, not talks</div>
+    <h1 class="display reveal d1" style="max-width:15ch">Build the system that <em>builds the system.</em></h1>
+    <p class="lede reveal d2" style="max-width:44ch;color:var(--on-dark-dim)">
+      What IndyDevDan actually does when he ships a feature — recovered from commit history, source
+      files and uncut video rather than from the parts he says out loud. Plus the whole method run
+      once, end to end, on a real decision.
+    </p>
+
+    <div class="row reveal d3" style="margin-top:34px;gap:10px">
+      <span class="pill clay">29 repos</span>
+      <span class="pill">61 unique commands</span>
+      <span class="pill">18 course codebases</span>
+      <span class="pill">10 sections</span>
+    </div>
+
+    <div class="fig bare reveal d4" style="margin-top:46px;max-width:600px">
+      <svg class="draw" viewBox="0 0 600 118" role="img" aria-label="Paper, planner, hard context break, builder, shipped">
+        <rect x="4" y="44" width="74" height="34" rx="8" fill="none" stroke="var(--on-dark-dim)" stroke-width="1.5"/>
+        <text x="41" y="65" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="#efe7d8">paper</text>
+        <path d="M78 61 H 128" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <rect x="128" y="44" width="104" height="34" rx="8" fill="none" stroke="var(--blue)" stroke-width="2"/>
+        <text x="180" y="65" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--on-dark-dim)">planner</text>
+        <path d="M258 20 V 102" stroke="var(--clay-2)" stroke-width="2" stroke-dasharray="6 6" fill="none"/>
+        <text x="258" y="14" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--on-dark-dim)">fresh agent</text>
+        <path d="M232 61 H 250" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M266 61 H 288" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <rect x="288" y="44" width="104" height="34" rx="8" fill="none" stroke="var(--olive)" stroke-width="2"/>
+        <text x="340" y="65" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--on-dark-dim)">builder</text>
+        <path d="M392 61 H 442" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <rect x="442" y="44" width="90" height="34" rx="8" fill="none" stroke="var(--amber)" stroke-width="2"/>
+        <text x="487" y="65" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="var(--on-dark-dim)">validate</text>
+        <circle cx="562" cy="61" r="13" fill="none" stroke="var(--clay-2)" stroke-width="2"/>
+        <path d="M556 61 l5 5 8 -10" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M532 61 H 549" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+
+    <p class="small reveal d5" style="margin-top:40px;font-family:var(--mono);letter-spacing:.06em">
+      Scroll, or press <kbd style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#efe7d8">J</kbd>
+      to begin &nbsp;↓
+    </p>
+  </div>
+</section>
+
+
+<section class="chapter" id="ch01">
+  <div class="wrap wide">
+    <span class="chapnum reveal">01 — The evidence</span>
+    <div class="kicker reveal">before you copy anything</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Four things everyone gets wrong, <em>with the counts.</em></h2>
+    <p class="lede reveal d2">Most write-ups of this method are reconstructed from what he says on camera. These four came from counting what is actually on disk — and all four are load-bearing.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">29 repos</span><span class="pill blue">160 unique commands</span><span class="pill olive">52 specs</span><span class="pill amber">18 transcripts</span></div>
+
+    <div class="chapnav reveal"><span class="cnl">In this chapter</span>
+      <a href="#ch01-s1"><b>1</b>Git is a press release</a>
+      <a href="#ch01-s2"><b>2</b>The one session that leaked</a>
+      <a href="#ch01-s3"><b>3</b>Five commands, not twelve</a>
+      <a href="#ch01-s4"><b>4</b>Prime beats memory</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch01-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Git is his distribution channel</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">You cannot learn the loop from the commit history, because the commit history does not contain it.</p>
+        <p>Nine of ten repositories open with a single commit that dumps a finished project — up to <strong>124 files and 14,000 lines</strong> at once. The rest is README churn. The real building happens off-git and gets squashed at publish time.</p>
+        <p>Anyone who tells you they reverse-engineered this workflow from GitHub is pattern-matching on a press release.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 470 250" role="img" aria-label="Commit subject distribution across 78 commits">
+          <text x="20" y="24" class="s-label">WHAT 78 COMMIT SUBJECTS ACTUALLY SAY</text>
+          <rect x="20" y="44" width="300" height="30" rx="6" class="s-clay-f"/>
+          <text x="30" y="64" class="s-label">"progress" &nbsp;— 46</text>
+          <rect x="20" y="86" width="163" height="30" rx="6" class="s-amber-f"/>
+          <text x="30" y="106" class="s-label">🚀 &nbsp;— 25 of 95</text>
+          <rect x="20" y="128" width="52" height="30" rx="6" class="s-blue-f"/>
+          <text x="82" y="148" class="s-label">real subjects — 8</text>
+          <path d="M20 180 H 430" class="s-line"/>
+          <text x="20" y="202" class="s-label-sm">MERGES 0 &nbsp;·&nbsp; BRANCHES 0 &nbsp;·&nbsp; PRs 0 &nbsp;·&nbsp; TAGS 0</text>
+          <text x="20" y="222" class="s-label-sm">CO-AUTHORED-BY: CLAUDE &nbsp;— 1 of 95, on a README edit</text>
+        </svg>
+        <div class="fcap"><b>Every history is dead flat on main.</b> The topology never survives publish.</div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch01-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">One session leaked</h2></div>
+
+    <p class="prose reveal" style="max-width:72ch">Exactly one repository caught him actually building — <strong>94 minutes on 2025&#8209;06&#8209;06</strong>. The order is emphatic, and it is the opposite of how most people set up a project.</p>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 240" role="img" aria-label="Timeline of the leaked 94-minute build session">
+        <path d="M40 120 H 830" class="s-line"/>
+        <circle cx="70" cy="120" r="7" class="s-clay"/>
+        <text x="70" y="100" text-anchor="middle" class="s-label-sm">10:26</text>
+        <rect x="14" y="140" width="112" height="52" rx="8" class="s-clay-f"/>
+        <text x="70" y="160" text-anchor="middle" class="s-label-sm">slash command</text>
+        <text x="70" y="178" text-anchor="middle" class="s-label-sm">+ ai_docs/</text>
+
+        <circle cx="250" cy="120" r="7" class="s-clay"/>
+        <text x="250" y="100" text-anchor="middle" class="s-label-sm">10:44</text>
+        <rect x="194" y="140" width="112" height="52" rx="8" class="s-blue-f"/>
+        <text x="250" y="160" text-anchor="middle" class="s-label-sm">first spec</text>
+        <text x="250" y="178" text-anchor="middle" class="s-label-sm">+ first output</text>
+
+        <circle cx="430" cy="120" r="7" class="s-clay"/>
+        <text x="430" y="100" text-anchor="middle" class="s-label-sm">10:58</text>
+        <rect x="374" y="140" width="112" height="52" rx="8" class="s-amber-f"/>
+        <text x="430" y="160" text-anchor="middle" class="s-label-sm">tune the</text>
+        <text x="430" y="178" text-anchor="middle" class="s-label-sm">COMMAND</text>
+
+        <circle cx="610" cy="120" r="7" class="s-clay"/>
+        <text x="610" y="100" text-anchor="middle" class="s-label-sm">11:42</text>
+        <rect x="554" y="140" width="112" height="52" rx="8" class="s-olive-f"/>
+        <text x="610" y="160" text-anchor="middle" class="s-label-sm">spec v3 ALONE</text>
+        <text x="610" y="178" text-anchor="middle" class="s-label-sm">1 file, no code</text>
+
+        <circle cx="790" cy="120" r="7" class="s-clay"/>
+        <text x="790" y="100" text-anchor="middle" class="s-label-sm">12:00</text>
+        <rect x="734" y="140" width="112" height="52" rx="8" class="s-plum-f"/>
+        <text x="790" y="160" text-anchor="middle" class="s-label-sm">15 files</text>
+        <text x="790" y="178" text-anchor="middle" class="s-label-sm">+13,476 lines</text>
+
+        <text x="40" y="40" class="s-label">COMMIT 7 → prime.md &nbsp;·&nbsp; COMMIT 8 → settings.json</text>
+        <text x="40" y="62" class="s-label">COMMIT 11 → README.md &nbsp;·&nbsp; COMMIT 15 → CLAUDE.md</text>
+      </svg>
+      <div class="fcap"><b>The machine comes before the work.</b> A slash command and vendor docs land in commit one, before a single line of application code. <code>CLAUDE.md</code> arrives on day four.</div>
+    </div>
+
+    <div class="callout idea reveal"><span class="ci">THE TELL</span>
+      <span class="cc"><code>CLAUDE.md</code> at commit 15 is a <strong>retrospective summary</strong> — it enumerates files that already existed and even hedges, <em>"prime.md — Additional command (if present)."</em> It is generated documentation of a working system, not a plan for one.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch01-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Five commands, not twelve</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">There is no <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/feature</span> and no <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">/bug</span> anywhere in the corpus &mdash; 255 command files, 160 unique once you dedupe the mirrored copies.</p>
+        <p>The 2025 course teaches three separate templates. Every production repo converged on <strong>one parameterised <code>/plan</code></strong> whose first instruction is to work out the task type itself.</p>
+        <p>Build one file, not three that drift.</p>
+      </div>
+      <div>
+        <div class="codecap">.claude/commands/plan.md — the deciding line</div>
+        <div class="code"><pre>- Determine the task type (chore|feature|refactor|fix|enhancement)
+  and complexity (simple|medium|complex)</pre></div>
+        <p class="note">Task type then gates sections conditionally, inside one template.</p>
+      </div>
+    </div>
+
+    <div class="stats reveal">
+      <div class="stat"><div class="sv">29</div><div class="sl">repos with /prime</div></div>
+      <div class="stat blue"><div class="sv">15</div><div class="sl">with /build</div></div>
+      <div class="stat olive"><div class="sv">14</div><div class="sl">with /plan</div></div>
+      <div class="stat amber"><div class="sv">0</div><div class="sl">with /feature or /bug</div></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch01-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Prime beats memory</h2></div>
+
+    <div class="spread rev reveal" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 210" role="img" aria-label="prime.md appears in 24 of 30 repos, CLAUDE.md in 10">
+          <text x="18" y="26" class="s-label">PRESENT IN HOW MANY OF 30 REPOS</text>
+          <text x="18" y="60" class="s-label-sm">prime.md</text>
+          <rect x="18" y="70" width="336" height="26" rx="6" class="s-olive-f"/>
+          <text x="366" y="88" class="s-label">24</text>
+          <text x="18" y="126" class="s-label-sm">CLAUDE.md</text>
+          <rect x="18" y="136" width="140" height="26" rx="6" class="s-clay-f"/>
+          <text x="172" y="154" class="s-label">10</text>
+          <text x="18" y="190" class="s-label-sm">MEDIAN CLAUDE.md LENGTH — 9.5 LINES. TWO ARE EMPTY.</text>
+        </svg>
+        <div class="fcap"><b>Twenty of thirty repos have no memory file at all</b> — including the flagship ones.</div>
+      </div>
+      <div class="prose">
+        <p>The "keep it ~40 lines" advice is real — it traces to a genuine quote, and four course repos are exactly 43 lines, three of them byte-identical.</p>
+        <p>But the practice is more extreme than the doctrine. <strong>His default is not to have one.</strong></p>
+        <p>And <code>prime.md</code> is written <em>backwards</em>: it is born as a one-line <code>git ls-files</code> and only gains <code>READ: README.md</code> three days later — after the README exists. You point it at artifacts once they are real, never before.</p>
+      </div>
+    </div>
+
+    <div class="quote reveal"><p>"I'm saying that this arrangement of ADWs is completely arbitrary. There is no one way to do this. The one way is the way that ships in your code base."</p><span class="cite">— TAC-7, on his own framework</span></div>
+
+    <a class="jump reveal" href="#ch02">Next · Day one: install the layer &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch02">
+  <div class="wrap wide">
+    <span class="chapnum reveal">02 — Day one</span>
+    <div class="kicker reveal">ordered by what actually exists</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Five files, and then <em>stop.</em></h2>
+    <p class="lede reveal d2">The install order below is not a recommendation. It is a frequency count across thirty repositories — the only honest evidence of what he creates first.</p>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 300" role="img" aria-label="The agentic layer install order as a ladder">
+        <text x="30" y="26" class="s-label">INSTALL ORDER — BY HOW OFTEN THE FILE ACTUALLY APPEARS</text>
+
+        <rect x="30" y="46" width="250" height="44" rx="9" class="s-clay-f"/>
+        <text x="46" y="66" class="s-title" font-size="13">1 · .claude/commands/prime.md</text>
+        <text x="46" y="82" class="s-label-sm">24 / 30 repos — Run · Read · Report</text>
+
+        <rect x="30" y="100" width="250" height="44" rx="9" class="s-blue-f"/>
+        <text x="46" y="120" class="s-title" font-size="13">2 · ai_docs/</text>
+        <text x="46" y="136" class="s-label-sm">13 / 30 — vendor docs pulled local</text>
+
+        <rect x="30" y="154" width="250" height="44" rx="9" class="s-olive-f"/>
+        <text x="46" y="174" class="s-title" font-size="13">3 · specs/</text>
+        <text x="46" y="190" class="s-label-sm">15 / 30 — empty dir; plans land here</text>
+
+        <rect x="30" y="208" width="250" height="44" rx="9" class="s-amber-f"/>
+        <text x="46" y="228" class="s-title" font-size="13">4 · commands/plan.md</text>
+        <text x="46" y="244" class="s-label-sm">one parameterised planner</text>
+
+        <rect x="30" y="262" width="250" height="30" rx="9" class="s-plum-f"/>
+        <text x="46" y="282" class="s-title" font-size="13">5 · commands/build.md — the HOP</text>
+
+        <path d="M300 160 H 380" class="s-flow"/>
+        <path d="M380 160 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="396" y="46" width="454" height="246" rx="10" class="s-card"/>
+        <text x="418" y="76" class="s-label">NOT ON DAY ONE — EACH ONLY WHEN EARNED</text>
+        <text x="418" y="108" class="s-label-sm">settings.json — arrives 8th in the traced repo</text>
+        <text x="418" y="132" class="s-label-sm">hooks/ — real guardrails, but later</text>
+        <text x="418" y="156" class="s-label-sm">CLAUDE.md — only when a rule keeps breaking</text>
+        <text x="418" y="180" class="s-label-sm">subagents — specialisation AND parallelism only</text>
+        <text x="418" y="204" class="s-label-sm">experts/ — where agents keep getting it wrong</text>
+        <text x="418" y="228" class="s-label-sm">worktrees, observability, evals</text>
+        <rect x="418" y="246" width="410" height="32" rx="7" class="s-clay-f"/>
+        <text x="432" y="267" class="s-label">adws/ — 2 OF 30 REPOS. THE TOP OF THE LADDER.</text>
+      </svg>
+      <div class="fcap"><b>The base is five files.</b> Everything to the right of the arrow is the part people copy first and need last.</div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch02-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The irreducible prime</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div>
+        <div class="codecap">.claude/commands/prime.md — the whole file</div>
+        <div class="code"><pre># Prime
+Execute the `Run`, `Read` and `Report` sections to understand
+the codebase then summarize your understanding.
+
+## Run
+git ls-files
+
+## Read
+README.md
+
+## Report
+Summarize your understanding of the codebase.</pre></div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Eight lines. This exact file is the ancestor of all twenty-nine.</p>
+        <p>Add a <code>## Focus</code> block and tiered read-lists — <em>Core (always)</em>, <em>Backend (if working on backend)</em> — only once the repo is big enough to need them.</p>
+        <p>And write it backwards. Point each <code>READ:</code> line at an artifact <strong>after</strong> that artifact exists.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch02-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The plan format that survives</h2></div>
+
+    <div class="prose reveal" style="max-width:74ch">
+      <p class="lead-in">The full skeleton is eleven sections, and they are atomic — every spec that uses any of them uses all of them.</p>
+      <p>But there is a natural experiment sitting in the corpus: the same plan prompt run through Claude, Gemini and Codex. Weaker models shed sections in a consistent order, and <strong>six survive every model.</strong> Those six are the irreducible core.</p>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">01</span><p class="ctitle">Task Description</p><p class="cbody">The task in detail, from the prompt.</p></div>
+      <div class="card accent"><span class="cnum">02</span><p class="ctitle">Objective</p><p class="cbody">What is true when this is done.</p></div>
+      <div class="card accent"><span class="cnum">03</span><p class="ctitle">Relevant Files</p><p class="cbody">Each with a one-line reason. New files under their own heading.</p></div>
+      <div class="card blue"><span class="cnum">04</span><p class="ctitle">Step by Step Tasks</p><p class="cbody">Exact files, exact functions, often exact line numbers.</p></div>
+      <div class="card blue"><span class="cnum">05</span><p class="ctitle">Acceptance Criteria</p><p class="cbody">Measurable, not aspirational.</p></div>
+      <div class="card glow amber"><span class="cnum">06</span><p class="ctitle">Validation Commands</p><p class="cbody">Command, then what passing looks like. Never optional.</p></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center;margin-top:8px">
+      <div class="quote big"><p>A plan without validation is an open loop.</p><span class="cite" style="display:block;margin-top:10px">— the dojo template, stated as a rule</span></div>
+      <div class="prose">
+        <p>The other governing line: <strong>"Explore before you plan — never write a plan against code you have not read."</strong></p>
+        <p>And validation is never a bare command. The format is always the command <em>and</em> the observable that proves it passed.</p>
+      </div>
+    </div>
+
+    <div class="codecap">how validation commands are actually written</div>
+    <div class="code reveal"><pre>- `just test` — all tests pass
+- `cd apps/backend &amp;&amp; uv run pytest -v` — backend tests all pass
+- `live-bench list` — shows qwen35-vs-gemma4 with 8 charts</pre></div>
+
+    <div class="callout warn reveal"><span class="ci">CONDITIONAL SECTIONS</span>
+      <span class="cc">Add <strong>Problem Statement</strong> + <strong>Solution Approach</strong> if the task is a feature or complexity is medium/complex. Add <strong>Implementation Phases</strong> only for medium/complex. Add <strong>Testing Strategy</strong> on the same condition as the first pair. The template gates these itself — you do not decide per-project.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch02-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The builder, in twenty-five lines</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">This is the entire build layer.</p>
+        <p>No priming. No context. Everything the builder needs is inside the plan — which is exactly why the plan had to be good.</p>
+        <p>Note the two refusals encoded in it: it will not start without a path, and it will not stop before validating.</p>
+      </div>
+      <div>
+        <div class="codecap">.claude/commands/build.md</div>
+        <div class="code"><pre>---
+description: Build the codebase based on the plan
+argument-hint: [path-to-plan]
+---
+
+# Build
+
+## Instructions
+
+- IMPORTANT: Implement the plan top to bottom, in order.
+  Do not skip any steps. Do not stop in between steps.
+  - If you have not run any validation commands, DO NOT
+    STOP until you have validated the work.
+
+## Variables
+
+PATH_TO_PLAN: $ARGUMENTS
+
+## Workflow
+
+- If no `PATH_TO_PLAN` is provided, STOP immediately and ask.
+- Read the plan. Ultrathink about it and IMPLEMENT it.
+
+## Report
+
+- Summarize the work in a concise bullet list.
+- Report files and lines changed with `git diff --stat`</pre></div>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch03">Next · The feature loop &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch03">
+  <div class="wrap wide">
+    <span class="chapnum reveal">03 — The loop</span>
+    <div class="kicker reveal">run this identically for a chore, a bug, or a feature</div>
+    <h2 class="title reveal d1" style="max-width:22ch">Two agents. <em>Never one.</em></h2>
+    <p class="lede reveal d2">This is the whole procedure. Step zero has no agent in it, and skipping it is the most common way the rest fails.</p>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 320" role="img" aria-label="The two-prompt loop with a hard context break between planner and builder">
+        <rect x="24" y="60" width="150" height="200" rx="10" class="s-card"/>
+        <text x="99" y="88" text-anchor="middle" class="s-label">STEP 0</text>
+        <text x="99" y="120" text-anchor="middle" class="s-serif" font-size="15">paper</text>
+        <text x="99" y="146" text-anchor="middle" class="s-label-sm">purpose</text>
+        <text x="99" y="166" text-anchor="middle" class="s-label-sm">problem</text>
+        <text x="99" y="186" text-anchor="middle" class="s-label-sm">solution</text>
+        <text x="99" y="214" text-anchor="middle" class="s-label-sm">output file tree</text>
+        <text x="99" y="240" text-anchor="middle" class="s-label-sm">— no agent —</text>
+
+        <path d="M180 160 H 232" class="s-flow"/><path d="M232 160 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="240" y="60" width="200" height="200" rx="10" class="s-blue-f"/>
+        <text x="340" y="88" text-anchor="middle" class="s-label">AGENT ONE — FRESH</text>
+        <text x="340" y="120" text-anchor="middle" class="s-serif" font-size="15">the planner</text>
+        <text x="340" y="152" text-anchor="middle" class="s-label-sm">/prime</text>
+        <text x="340" y="176" text-anchor="middle" class="s-label-sm">/plan "one high-level line"</text>
+        <text x="340" y="206" text-anchor="middle" class="s-label-sm">↓</text>
+        <text x="340" y="232" text-anchor="middle" class="s-label-sm">specs/&lt;name&gt;.md</text>
+
+        <path d="M470 40 V 286" stroke="var(--clay)" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>
+        <text x="470" y="30" text-anchor="middle" class="s-label">HARD CONTEXT BREAK</text>
+        <text x="470" y="306" text-anchor="middle" class="s-label-sm">new terminal · new instance · zero memory</text>
+
+        <rect x="500" y="60" width="200" height="200" rx="10" class="s-olive-f"/>
+        <text x="600" y="88" text-anchor="middle" class="s-label">AGENT TWO — FRESH</text>
+        <text x="600" y="120" text-anchor="middle" class="s-serif" font-size="15">the builder</text>
+        <text x="600" y="152" text-anchor="middle" class="s-label-sm">/build specs/&lt;name&gt;.md</text>
+        <text x="600" y="176" text-anchor="middle" class="s-label-sm">no priming needed</text>
+        <text x="600" y="206" text-anchor="middle" class="s-label-sm">↓</text>
+        <text x="600" y="232" text-anchor="middle" class="s-label-sm">code + green validations</text>
+
+        <path d="M706 160 H 758" class="s-flow"/><path d="M758 160 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="766" y="110" width="90" height="100" rx="10" class="s-clay-f"/>
+        <text x="811" y="140" text-anchor="middle" class="s-label">YOU</text>
+        <text x="811" y="166" text-anchor="middle" class="s-label-sm">review</text>
+        <text x="811" y="186" text-anchor="middle" class="s-label-sm">the diff</text>
+      </svg>
+      <div class="fcap"><b>Two touchpoints, not a conversation.</b> You appear once to approve the plan and once to review the diff. The dashed line is the part people skip.</div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch03-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The steps</h2></div>
+
+    <ol class="steps reveal">
+      <li><h4>Push the laptop away</h4><p>Open <code>raw.md</code> by hand. Write purpose, problem, solution — then the <strong>literal output file tree</strong>. What will exist when this is done that does not exist now? <em>"We never start by just blasting out prompts."</em></p></li>
+      <li><h4>Fresh agent, /prime</h4><p>New terminal, new instance. Check <code>/context</code> — you want roughly 90% free.</p></li>
+      <li><h4>Fire /plan with a deliberately vague prompt</h4><p><em>"We're writing a high level prompt, which is a prompt that's void of detail."</em> The detail already lives in the template. Output lands in <code>specs/</code>.</p></li>
+      <li><h4>Read the plan. Delete things.</h4><p>Touchpoint one. <em>"You always go overboard. By the end of your planning phase, you should be deleting information that isn't relevant."</em> Confirm the Validation Commands section is real.</p></li>
+      <li><h4>Commit the spec</h4><p>Before any code exists to blur it.</p></li>
+      <li><h4>NEW terminal. NEW agent. /build the plan.</h4><p>Never continue the planner. This is the rule that survives every contradiction in the corpus.</p></li>
+      <li><h4>Watch it close its own loop</h4><p>The agent runs every validation command, fixes failures, and <strong>reruns all of them from the top</strong> — not just the one that failed.</p></li>
+      <li><h4>Review the diff, then commit</h4><p>Touchpoint two. <code>git diff --stat</code>, then spot-check by hand.</p></li>
+    </ol>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch03-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Why fresh, every time</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big"><p>It's easy to know what your agent has seen when it's seen nothing.</p><span class="cite" style="display:block;margin-top:10px">— the line that makes the whole rule click</span></div>
+      <div class="prose">
+        <p>He poses the objection himself and answers it flatly:</p>
+        <p><em>"Don't we want to keep rolling the important context between planning, building, and really the entire software development lifecycle?</em> <strong>No.</strong><em>"</em></p>
+      </div>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">REASON 01</span><p class="ctitle">Context is freed</p><p class="cbody">"Focus every available token on the task at hand."</p></div>
+      <div class="card blue"><span class="cnum">REASON 02</span><p class="ctitle">Assets become improvable</p><p class="cbody">Prompts and plans are forced to be isolated and reusable with zero dependencies — "a trail of success or a trail of things we can improve."</p></div>
+      <div class="card olive"><span class="cnum">REASON 03</span><p class="ctitle">It prepares for off-device</p><p class="cbody">The same prompts that work in-loop run out-of-loop unchanged.</p></div>
+    </div>
+
+    <div class="callout reveal"><span class="ci">THE DEBUGGING PAYOFF</span>
+      <span class="cc">Because every run starts from committed assets in a clean window, you know <strong>exactly</strong> what was in context when it failed. You cannot root-cause a failure in a polluted window — which is why <code>/compact</code> is treated as an anti-pattern. If the window fills mid-task, the task was too big. Chop it.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch03-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Testing is not reviewing</h2></div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ what tests answer</span><ul><li>Does it run?</li><li>Deterministic, cheap, repeatable</li><li>A known command — so it belongs in code, not in an agent</li><li>Red tests are input, not a crash</li></ul></div>
+      <div class="col good"><span class="clabel">◵ what review answers</span><ul><li>Is what we built what we asked for?</li><li>Needs judgement, so it needs an agent</li><li>Graded against the plan, not against taste</li><li>Requires evidence — a claim is never proof</li></ul></div>
+    </div>
+
+    <p class="prose reveal" style="max-width:72ch">His later factory <strong>deleted its tester agent entirely</strong> on exactly this reasoning: <em>"A known command is code, not an agent — if you can write the invocation down (<code>bun test</code>, <code>ruff check</code>), it belongs in a code phase."</em></p>
+
+    <a class="jump reveal" href="#ch04">Next · When it fails &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch04">
+  <div class="wrap wide">
+    <span class="chapnum reveal">04 — When it fails</span>
+    <div class="kicker reveal">the engine of the whole method</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Never fix the output. <em>Fix what produced it.</em></h2>
+    <p class="lede reveal d2">Everything else in this guide is setup. This chapter is the part that compounds — and the part almost nobody actually does, because fixing the output by hand is always faster once.</p>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big"><p>Why didn't you just do that by hand? You're missing the point.</p><span class="cite" style="display:block;margin-top:10px">— TAC-6, pre-empting the obvious objection</span></div>
+      <div class="prose">
+        <p class="lead-in">The rule has a specific shape: <strong>you don't fix the issue, you fix the system that caused the issue.</strong></p>
+        <p>You fix the template. You fix the prompt. You fix the workflow. The broken output is a symptom, and patching it by hand throws away the only information the failure gave you.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch04-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Blame in this order</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 190" role="img" aria-label="Blame order: your wording, then your tooling, then the model">
+        <rect x="40" y="50" width="220" height="80" rx="10" class="s-clay-f"/>
+        <text x="150" y="80" text-anchor="middle" class="s-title" font-size="14">1 · your wording</text>
+        <text x="150" y="104" text-anchor="middle" class="s-label-sm">was the prompt actually clear?</text>
+
+        <path d="M268 90 H 320" class="s-flow"/><path d="M320 90 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="328" y="50" width="220" height="80" rx="10" class="s-amber-f"/>
+        <text x="438" y="80" text-anchor="middle" class="s-title" font-size="14">2 · your tooling</text>
+        <text x="438" y="104" text-anchor="middle" class="s-label-sm">which leverage point is missing?</text>
+
+        <path d="M556 90 H 608" class="s-flow"/><path d="M608 90 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="616" y="50" width="220" height="80" rx="10" class="s-card"/>
+        <text x="726" y="80" text-anchor="middle" class="s-title" font-size="14">3 · the model</text>
+        <text x="726" y="104" text-anchor="middle" class="s-label-sm">almost never the answer</text>
+
+        <text x="40" y="166" class="s-label-sm">"IT CAN BE SO EASY TO JUST BLAME THE MODEL, BUT YOU REALLY HAVE TO BLAME YOURSELF FIRST."</text>
+      </svg>
+      <div class="fcap"><b>Strict order.</b> Skipping to step three is how a broken template survives for months.</div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch04-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Attempts &gt; 1 means a missing lever</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">The target is one shot. Iteration is not a virtue here — it is a diagnostic signal.</p>
+        <p><em>"If your attempts are high in the five to ten range, even the three to six range, you need to spend more time figuring out which of the twelve leverage points you're missing."</em></p>
+        <p>When you hit that range, <strong>stop prompting</strong>. The table beside this is the diagnosis.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 440 220" role="img" aria-label="Attempts KPI: one shot is the target, three to six is the diagnosis trigger">
+          <text x="20" y="24" class="s-label">ATTEMPTS ON ONE TASK</text>
+          <rect x="20" y="44" width="70" height="34" rx="7" class="s-olive-f"/>
+          <text x="55" y="66" text-anchor="middle" class="s-label">1</text>
+          <text x="104" y="66" class="s-label-sm">the target — don't break the streak</text>
+          <rect x="20" y="92" width="140" height="34" rx="7" class="s-amber-f"/>
+          <text x="90" y="114" text-anchor="middle" class="s-label">2</text>
+          <text x="174" y="114" class="s-label-sm">acceptable, note why</text>
+          <rect x="20" y="140" width="280" height="34" rx="7" class="s-clay-f"/>
+          <text x="160" y="162" text-anchor="middle" class="s-label">3 – 6 &nbsp; STOP PROMPTING</text>
+          <text x="20" y="200" class="s-label-sm">INSTALL THE MISSING LEVERAGE POINT INSTEAD</text>
+        </svg>
+        <div class="fcap"><b>Counterintuitively, iterating is not good.</b></div>
+      </div>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">SYMPTOM</span><p class="ctitle">Agent confused by data shapes</p><p class="cbody">Missing lever — <strong>Types</strong>. Use them over dicts.</p></div>
+      <div class="card accent"><span class="cnum">SYMPTOM</span><p class="ctitle">Agent can't navigate</p><p class="cbody">Missing lever — <strong>Architecture</strong>. Verbose names, one responsibility per file.</p></div>
+      <div class="card blue"><span class="cnum">SYMPTOM</span><p class="ctitle">You are reading the errors</p><p class="cbody">Missing lever — <strong>Standard Out</strong>. Make the code talk to the agent.</p></div>
+      <div class="card blue"><span class="cnum">SYMPTOM</span><p class="ctitle">"Success" but behaviour wrong</p><p class="cbody">Missing lever — <strong>Tests</strong>.</p></div>
+      <div class="card olive"><span class="cnum">SYMPTOM</span><p class="ctitle">Short iterative prompts</p><p class="cbody">Missing lever — <strong>Plans</strong>. Sit down and write one.</p></div>
+      <div class="card glow amber"><span class="cnum">SYMPTOM</span><p class="ctitle">You've done this three times</p><p class="cbody">Missing lever — <strong>Templates</strong>. Extract the command.</p></div>
+    </div>
+
+    <div class="quote reveal"><p>"Are you still manually looking at error messages? Stop. Stop… Give them to your agent. And only when your agent fails do you take your precious time and dig into the error."</p><span class="cite">— TAC-2</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch04-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Live recovery, in his actual order</h2></div>
+
+    <ol class="steps reveal">
+      <li><h4>Kill the wrong-direction run</h4><p><em>"So I'm going to stop it. Ignore the skill. Just run this directly."</em> Do not let a confused agent keep going out of politeness.</p></li>
+      <li><h4>Re-prompt more explicitly, with IMPORTANT</h4><p><em>"I'm going to use the important information dense keyword so that the agent really respects this."</em></p></li>
+      <li><h4>Escape, rewind history, Ctrl-Z</h4><p>Roll back to the last good turn rather than arguing forwards from a bad one.</p></li>
+      <li><h4>Full clear and restart</h4><p><em>"Never be afraid to just start fresh."</em> Cheaper than it feels.</p></li>
+    </ol>
+
+    <div class="callout bad reveal"><span class="ci">NEVER</span>
+      <span class="cc"><strong>Never <code>/compact</code>.</strong> <em>"If your agent is running compact, it is losing information."</em> A full window means the task was too large — chop the task, do not compress the context.</span></div>
+
+    <a class="jump reveal" href="#ch05">Next · Escalate only when earned &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch05">
+  <div class="wrap wide">
+    <span class="chapnum reveal">05 — Escalation</span>
+    <div class="kicker reveal">complexity should be earned, not assumed</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Every rung has a <em>gate.</em></h2>
+    <p class="lede reveal d2">The ladder is real, but almost everyone climbs it too fast — building the multi-agent system before the single agent is reliable. Each rung below has an explicit condition for stepping onto it.</p>
+
+    <div class="chapnav reveal"><span class="cnl">In this chapter</span>
+      <a href="#ch05-s1"><b>1</b>The rule of three</a>
+      <a href="#ch05-s2"><b>2</b>The prompt skeleton</a>
+      <a href="#ch05-s3"><b>3</b>Agent experts</a>
+      <a href="#ch05-s4"><b>4</b>Going multi-agent</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch05-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Three times marks a pattern</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">The trigger is stated identically in four separate places, which is how you know it is load-bearing.</p>
+        <p><em>"Three time makes a pattern. Three time should trigger your engineering brain. Automate."</em></p>
+        <p>But the second half matters more than the first — <strong>start ugly.</strong> He is explicit that the first version should be almost embarrassing.</p>
+      </div>
+      <div>
+        <div class="quote"><p>"Copy this and literally tell your agent create dot claude slash command slash start and then as a string, just give it exactly what you want in there. Then you can reformat it later. <strong>Start with the bare minimum.</strong>"</p><span class="cite">— TAC-2</span></div>
+      </div>
+    </div>
+
+    <div class="callout idea reveal"><span class="ci">DO IT BY HAND FIRST</span>
+      <span class="cc"><em>"There's that saying, do things that don't scale. This is important so that you understand how to actually solve the problem yourself with your agent."</em> Run the risky thing once manually in a throwaway agent, watch what actually works, <strong>then</strong> encode it. A template written before you've done the job encodes a guess.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch05-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The skeleton he wrote down</h2></div>
+
+    <p class="prose reveal" style="max-width:72ch">This is not inferred from reading his files. It sits inside <code>meta_prompt.md</code> as a literal <em>Specified Format</em> block — the prompt that writes his other prompts. Sixty of 255 files match it exactly; another 35 match it minus the optional <code>Purpose</code>.</p>
+
+    <div class="spread reveal" style="align-items:start">
+      <div>
+        <div class="codecap">the invariant skeleton</div>
+        <div class="code"><pre>---
+allowed-tools: &lt;comma separated&gt;
+description: &lt;how we id this prompt&gt;
+argument-hint: [&lt;first dynamic var&gt;], [&lt;second&gt;]
+model: &lt;or default to 'opus'&gt;
+---
+
+# Purpose
+
+## Variables      &lt;- dynamic ($1,$2) FIRST, then static
+
+## Instructions   &lt;- guardrails, NOT the procedure
+
+## Workflow       &lt;- the numbered procedure
+
+## Report         &lt;- a fenced output template</pre></div>
+      </div>
+      <div class="prose">
+        <p><strong>The order <code>Variables → Workflow → Report</code> holds at 100%</strong> — zero exceptions across the whole corpus.</p>
+        <p>Three rules he states outright:</p>
+        <ul>
+          <li>"Prefer the <code>$1</code>, <code>$2</code>, … over the <code>$ARGUMENTS</code> notation."</li>
+          <li>"If no variables are requested or mentioned, do not create a Variables section."</li>
+          <li>"Do not create any additional sections or headers that are not in the Specified Format."</li>
+        </ul>
+        <p class="note">Instructions are guardrails; Workflow is procedure. In his words, the bullets "aid the workflow but are not part of the workflow itself."</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch05-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Agent experts — the self-improving rung</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 280" role="img" aria-label="The act-learn-reuse loop around an expertise file">
+          <rect x="140" y="18" width="180" height="52" rx="10" class="s-amber-f"/>
+          <text x="230" y="42" text-anchor="middle" class="s-title" font-size="13">expertise.yaml</text>
+          <text x="230" y="60" text-anchor="middle" class="s-label-sm">the mental model · capped</text>
+
+          <path d="M320 44 C 400 44, 420 110, 380 150" class="s-flow"/>
+          <path d="M380 150 l1 -11 -10 5 z" class="s-clay"/>
+
+          <rect x="286" y="152" width="150" height="46" rx="10" class="s-blue-f"/>
+          <text x="361" y="180" text-anchor="middle" class="s-label">/plan → /build</text>
+
+          <path d="M286 196 C 220 226, 150 226, 96 196" class="s-flow"/>
+          <path d="M96 196 l10 -5 -1 11 z" class="s-clay"/>
+          <text x="196" y="240" text-anchor="middle" class="s-label-sm">git diff</text>
+
+          <rect x="24" y="150" width="150" height="46" rx="10" class="s-olive-f"/>
+          <text x="99" y="178" text-anchor="middle" class="s-label">/self-improve</text>
+
+          <path d="M99 148 C 60 110, 70 60, 140 44" class="s-flow"/>
+          <path d="M140 44 l-10 4 1 -11 z" class="s-clay"/>
+
+          <text x="24" y="266" class="s-label-sm">VALIDATE AGAINST CODE · TRIM TO CAP · COMPILE THE YAML</text>
+        </svg>
+        <div class="fcap"><b>Act, learn, reuse.</b> The diff of what the builder just did is the input to the improver.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Build one only where agents <em>keep</em> getting a specific domain wrong. Not for static problems.</p>
+        <p>Four files per domain: <code>expertise.yaml</code> (the mental model), <code>question.md</code> (read-only Q&amp;A), <code>plan.md</code> (loads expertise, delegates to <code>/plan</code>), and <code>self-improve.md</code> (diffs the model against reality and repairs it).</p>
+        <p>Four invariants keep it from degenerating: <strong>code is truth and the yaml is a lens</strong>; memory is bounded by a hard line cap with a repeat-until-under loop; edits are surgical, never work summaries; and the improver is explicitly allowed to do nothing.</p>
+      </div>
+    </div>
+
+    <div class="quote big reveal"><p>Don't directly update this expertise file. Teach your agents how to directly update it.</p><span class="cite" style="display:block;margin-top:10px">— if the knowledge comes out wrong, you fix self-improve.md, never the yaml</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch05-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Going multi-agent</h2></div>
+
+    <div class="callout warn reveal"><span class="ci">THE GATE</span>
+      <span class="cc"><em>"Only use sub agents when you need specialization <strong>and</strong> parallelization. If you don't need to parallelize and you don't need to specialize, just create a reusable prompt."</em> And the readiness test: <em>"If you're losing track of a single agent, you probably aren't yet ready for sub-agents."</em></span></div>
+
+    <p class="prose reveal" style="max-width:74ch">His own systems split into two eras that disagree with each other. The later design won, and it is worth knowing which one you are copying.</p>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ Mar–Apr 2026</span><ul><li>An LLM calls <code>delegate()</code> and decides routing</li><li>Agents message each other</li><li>Orchestration lives in a prompt</li></ul></div>
+      <div class="col good"><span class="clabel">◵ Aug 2026 — the later design</span><ul><li>A Python script owns sequencing</li><li>Agents never talk to each other</li><li><strong>"Agent proposes, code disposes"</strong></li></ul></div>
+    </div>
+
+    <div class="grid grid-2 reveal">
+      <div class="card accent"><span class="cnum">01</span><p class="ctitle">Tier is the tool list</p><p class="cbody">Leads get <code>delegate</code> and no <code>bash</code>. Workers get <code>bash</code> and no <code>delegate</code>. Topology enforced by capability, not by asking nicely.</p></div>
+      <div class="card blue"><span class="cnum">02</span><p class="ctitle">Tools are not a boundary</p><p class="cbody"><code>bash</code> runs <code>git checkout</code> and <code>write</code> reaches any path. You need a separate writes-allowlist enforced in code.</p></div>
+      <div class="card olive"><span class="cnum">03</span><p class="ctitle">A claim is not proof</p><p class="cbody">The final message is an assertion. A gate is the evidence. Failures return to the <em>same session</em> as a correction, never a cold restart.</p></div>
+      <div class="card glow amber"><span class="cnum">04</span><p class="ctitle">Never let an agent edit its grader</p><p class="cbody">The gate "lives outside the project and outside your control." This one is not optional.</p></div>
+    </div>
+
+    <a class="jump reveal" href="#ch06">Next · A worked example &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch06">
+  <div class="wrap wide">
+    <span class="chapnum reveal">06 — Out of the loop</span>
+    <div class="kicker reveal">the half of the system that isn't in the public repos</div>
+    <h2 class="title reveal d1" style="max-width:26ch">The ADW ladder: <em>one file, then seams.</em></h2>
+    <p class="lede reveal d2">An AI Developer Workflow is a Python script that calls agents through the CLI. Five course codebases show it evolving — and the evolution is not what the marketing says it is.</p>
+    <div class="pillrow reveal d2"><span class="pill clay">tac-4 → tac-8</span><span class="pill blue">69 scripts</span><span class="pill olive">course tree only</span></div>
+
+    <div class="callout warn reveal"><span class="ci">A CORRECTION I OWE YOU</span>
+      <span class="cc">The common framing — <em>"one script that calls one agent, growing into a pipeline"</em> — is wrong. tac-4's origin file already makes <strong>seven agent calls</strong> in one flat 536-line script. Rung zero is a monolith. What each rung adds is not more agents. It is <strong>seams</strong> — and every seam is paid for in state.</span></div>
+
+    <div class="chapnav reveal"><span class="cnl">In this chapter</span>
+      <a href="#ch06-s1"><b>1</b>The ladder</a>
+      <a href="#ch06-s2"><b>2</b>PITER</a>
+      <a href="#ch06-s3"><b>3</b>Isolation</a>
+      <a href="#ch06-s4"><b>4</b>Where it's broken</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch06-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">One file → many → isolated → observable</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 300" role="img" aria-label="The ADW ladder from tac-4 monolith to the orchestrator, showing the state carrier at each rung">
+        <text x="24" y="24" class="s-label">EACH RUNG ADDS A SEAM · EACH SEAM IS PAID FOR IN STATE</text>
+
+        <rect x="24" y="44" width="150" height="86" rx="10" class="s-card"/>
+        <text x="40" y="68" class="s-title" font-size="13">tac-4</text>
+        <text x="40" y="88" class="s-label-sm">1 monolith, 536 L</text>
+        <text x="40" y="106" class="s-label-sm">7 agent calls</text>
+        <text x="40" y="124" class="s-label-sm">triggers exist already</text>
+
+        <rect x="186" y="44" width="150" height="86" rx="10" class="s-clay-f"/>
+        <text x="202" y="68" class="s-title" font-size="13">tac-5</text>
+        <text x="202" y="88" class="s-label-sm">5 ADWs, 8 modules</text>
+        <text x="202" y="106" class="s-label-sm">THE 71-LINE FILE</text>
+        <text x="202" y="124" class="s-label-sm">+ repair loop</text>
+
+        <rect x="348" y="44" width="150" height="86" rx="10" class="s-blue-f"/>
+        <text x="364" y="68" class="s-title" font-size="13">tac-6</text>
+        <text x="364" y="88" class="s-label-sm">12 ADWs</text>
+        <text x="364" y="106" class="s-label-sm">review w/ screenshots</text>
+        <text x="364" y="124" class="s-label-sm">document · patch</text>
+
+        <rect x="510" y="44" width="150" height="86" rx="10" class="s-olive-f"/>
+        <text x="526" y="68" class="s-title" font-size="13">tac-7</text>
+        <text x="526" y="88" class="s-label-sm">14 ADWs, all _iso</text>
+        <text x="526" y="106" class="s-label-sm">worktrees + ports</text>
+        <text x="526" y="124" class="s-label-sm">ship · ZTE</text>
+
+        <rect x="672" y="44" width="184" height="86" rx="10" class="s-plum-f"/>
+        <text x="688" y="68" class="s-title" font-size="13">tac-8 / orchestrator</text>
+        <text x="688" y="88" class="s-label-sm">26 unique ADWs, 5 apps</text>
+        <text x="688" y="106" class="s-label-sm">Notion · tasks.md · AEA</text>
+        <text x="688" y="124" class="s-label-sm">then → Postgres</text>
+
+        <path d="M24 176 H 856" class="s-line"/>
+        <text x="24" y="166" class="s-label">THE STATE CARRIER</text>
+
+        <rect x="24" y="192" width="150" height="34" rx="7" class="s-card"/>
+        <text x="99" y="214" text-anchor="middle" class="s-label-sm">argv</text>
+        <rect x="186" y="192" width="150" height="34" rx="7" class="s-clay-f"/>
+        <text x="261" y="214" text-anchor="middle" class="s-label-sm">adw_state.json</text>
+        <rect x="348" y="192" width="150" height="34" rx="7" class="s-blue-f"/>
+        <text x="423" y="214" text-anchor="middle" class="s-label-sm">+ 5 fields</text>
+        <rect x="510" y="192" width="150" height="34" rx="7" class="s-olive-f"/>
+        <text x="585" y="214" text-anchor="middle" class="s-label-sm">+ worktree + ports</text>
+        <rect x="672" y="192" width="184" height="34" rx="7" class="s-plum-f"/>
+        <text x="764" y="214" text-anchor="middle" class="s-label-sm">Postgres row</text>
+
+        <text x="24" y="262" class="s-label-sm">tac-6 → tac-7 IS A RENAME, NOT A REWRITE — 12 FILES RENAMED _iso, PLUS EXACTLY 2 NEW FILES</text>
+        <text x="24" y="284" class="s-label-sm">tac-7's 14 = 7 PRIMITIVES (plan build test review document patch ship) + 7 COMPOSERS</text>
+      </svg>
+      <div class="fcap"><b>The organizing law.</b> Every ADW file is either a <em>primitive</em> that calls agents, or a <em>composer</em> that calls other ADWs by subprocess. Nothing else.</div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">The pivot is a seventy-one line file.</p>
+        <p>tac-4's 536-line monolith becomes <code>adw_plan.py</code> plus <code>adw_build.py</code>, joined by 71 lines of subprocess glue. <strong>That file is the invention of the ADW layer</strong> — not because it does more, but because it can now be resumed, re-run, and improved one node at a time.</p>
+        <p>Composers share almost nothing with what they compose. They import a single symbol and otherwise communicate by exit code.</p>
+      </div>
+      <div>
+        <div class="codecap">adw_sdlc_iso.py — the composition pattern, ×5</div>
+        <div class="code"><pre>plan_cmd = ["uv", "run",
+            os.path.join(script_dir, "adw_plan_iso.py"),
+            issue_number, adw_id]
+plan = subprocess.run(plan_cmd)
+if plan.returncode != 0:
+    print("Isolated plan phase failed")
+    sys.exit(1)</pre></div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch06-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">PITER — the four things you need</h2></div>
+
+    <div class="grid grid-4 reveal">
+      <div class="card accent"><span class="cnum">P</span><p class="ctitle">Prompt input</p><p class="cbody">A GitHub issue. The ADW only concatenates: <code>f"{slash_command} {' '.join(args)}"</code>. Library grew 13 → 27 commands across tac-4→7.</p></div>
+      <div class="card blue"><span class="cnum">T</span><p class="ctitle">Trigger</p><p class="cbody">Cron poll or webhook. The qualifying condition is literally <code>if comment_body.strip() == "adw"</code>.</p></div>
+      <div class="card olive"><span class="cnum">E</span><p class="ctitle">Environment</p><p class="cbody">A git worktree with its own ports. Provisioning is itself a prompt — <code>install_worktree.md</code>.</p></div>
+      <div class="card amber"><span class="cnum">R</span><p class="ctitle">Review</p><p class="cbody">Agentic <em>visual</em> review. Issues carry a screenshot URL and a severity of <code>skippable</code> / <code>tech_debt</code> / <code>blocker</code>.</p></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div>
+        <div class="codecap">the state that connects every step</div>
+        <div class="code"><pre>class ADWStateData(BaseModel):
+    """Minimal persistent state for ADW workflow.
+    Stored in agents/{adw_id}/adw_state.json"""
+
+    adw_id: str
+    issue_number: Optional[str] = None
+    branch_name: Optional[str] = None
+    plan_file: Optional[str] = None
+    issue_class: Optional[IssueClassSlashCommand] = None
+    worktree_path: Optional[str] = None      # tac-7
+    backend_port: Optional[int] = None       # tac-7
+    frontend_port: Optional[int] = None      # tac-7
+    model_set: Optional[ModelSet] = "base"   # tac-7
+    all_adws: List[str] = Field(default_factory=list)</pre></div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">tac-5's version is the first five fields only. The last five arrive in tac-7 — <strong>the schema diff is the isolation feature.</strong></p>
+        <p>The handoff between scripts is an <strong>8-character id on argv</strong>. Everything else rehydrates from disk. The builder refuses to start without it:</p>
+        <p><code>"No plan file in state - run adw_plan_iso.py first"</code></p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch06-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Why a worktree, and why deterministic ports</h2></div>
+
+    <div class="spread rev reveal" style="align-items:center">
+      <div>
+        <div class="codecap">worktree_ops.py — ports derived from the id</div>
+        <div class="code"><pre>def get_ports_for_adw(adw_id: str) -&gt; Tuple[int, int]:
+    """Deterministically assign ports based on ADW ID."""
+    id_chars = ''.join(c for c in adw_id[:8] if c.isalnum())
+    index = int(id_chars, 36) % 15
+
+    backend_port  = 9100 + index
+    frontend_port = 9200 + index</pre></div>
+        <p class="note">Verified against real state files on disk: <code>41ddb633</code> → 9109/9209, <code>5d39a25f</code> → 9112/9212, <code>a8bd4d88</code> → 9105/9205. The math is real, not aspirational.</p>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Two agents editing one checkout collide on the working tree, the index, and HEAD.</p>
+        <p>A worktree gives each ADW its own filesystem <em>and</em> its own branch checkout, so N agents commit concurrently without a lock. Ports are the second half — a web app cannot have two agents on <code>:8000</code>.</p>
+        <p><code>mod 15</code> caps concurrency at fifteen. Determinism means a <em>resumed</em> script recomputes the same ports without reading state at all.</p>
+      </div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ adw_sdlc_iso.py — red tests</span><ul><li><code>WARNING: Test phase failed but continuing with review</code></li><li>Rationale in the comment: "some tests might be flaky"</li><li>But a <em>documentation</em> error hard-fails the run</li></ul></div>
+      <div class="col good"><span class="clabel">◵ adw_sdlc_zte_iso.py — red tests</span><ul><li><code>❌ ZTE Aborted - Test phase failed</code>, then <code>sys.exit(1)</code></li><li>Adds a sixth phase: a real <code>git merge --no-ff</code>, not a PR merge</li><li>But a documentation error only warns</li></ul></div>
+    </div>
+
+    <p class="note reveal">That inversion is real and worth noticing: the <em>safer</em> workflow hard-fails on a docs error while the auto-merging one shrugs it off.</p>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch06-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Where the course code is broken</h2></div>
+
+    <p class="prose reveal" style="max-width:74ch">These are not nitpicks. Three of them would bite you the first week, and the fourth is the most interesting design accident in the corpus.</p>
+
+    <div class="grid grid-2 reveal">
+      <div class="card accent"><span class="cnum">BUG 01</span><p class="ctitle">The review loop can't reach its own constant</p><p class="cbody"><code>MAX_REVIEW_RETRY_ATTEMPTS = 3</code>, but the break is <code>&gt;= MAX - 1</code> <em>after</em> resolving. It runs two reviews, never three — so <strong>the final blocker fix is never re-verified.</strong> tac-6 had it right; the <code>_iso</code> rewrite regressed it.</p></div>
+      <div class="card accent"><span class="cnum">BUG 02</span><p class="ctitle">remove_worktree crashes on its fallback</p><p class="cbody">Calls <code>shutil.rmtree</code>. Never imports <code>shutil</code>. <code>NameError</code> whenever <code>git worktree remove</code> fails — which is exactly when you need the fallback.</p></div>
+      <div class="card blue"><span class="cnum">BUG 03</span><p class="ctitle">all_adws is misnamed</p><p class="cbody">Typed <code>List[str]</code>, method is <code>append_adw_id()</code>, and all seven call sites pass a <em>workflow name</em>. It is a breadcrumb wearing an id's name.</p></div>
+      <div class="card glow amber"><span class="cnum">BUG 04</span><p class="ctitle">A case bug that is also a safety gate</p><p class="cbody">Registry says <code>adw_sdlc_ZTE_iso</code>; the file is lowercase; the launcher does <code>f"{workflow}.py"</code>. On a case-sensitive filesystem, ZTE cannot launch.</p></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote"><p>"DO NOT RUN the <code>adw_sdlc_ZTE_iso</code> workflows unless <code>ZTE</code> is EXPLICITLY uppercased. This is a dangerous workflow."</p><span class="cite">— classify_adw.md</span></div>
+      <div class="prose">
+        <p>The uppercase is <strong>deliberate</strong>. Capitalisation is being used as a human-intent confirmation for an auto-merge workflow — and it collides with <code>os.path.join</code>.</p>
+        <p>A safety mechanism and a filesystem bug wearing the same clothes. Worth copying the intent; not the implementation.</p>
+      </div>
+    </div>
+
+    <div class="callout bad reveal"><span class="ci">THE ONE THAT CHANGES THE STORY</span>
+      <span class="cc"><strong>The orchestrator drops isolation entirely.</strong> State moved to a Postgres table and agent invocation moved in-process to the SDK — but <code>worktree_ops.py</code> has <em>no successor</em>. <code>working_dir</code> is a plain path, so two concurrent ADWs share a filesystem. The database isolated <strong>observability</strong>, not edits. The ladder does not monotonically improve.</span></div>
+
+    <div class="callout idea reveal"><span class="ci">ALSO WORTH KNOWING</span>
+      <span class="cc">The cron trigger is hardcoded to one workflow and uses blocking <code>subprocess.run</code> — serial, and it <strong>cannot launch ZTE at all</strong>. Only the webhook path (<code>Popen</code> + <code>start_new_session=True</code>) runs workflows in parallel and can select any of the fourteen. "Ships while you sleep" is the <em>webhook</em> story specifically.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch06-s5"><span class="sn">5</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What "physically isolated" actually means</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">The slogan is that the agentic layer never mixes with application code. In the mature codebase you can check it mechanically.</p>
+        <p><strong><code>adws/</code> imports nothing from <code>apps/</code>.</strong> It reaches the application through exactly three seams — a Postgres table, a WebSocket client, and <code>subprocess</code>. The app reaches back through none of them.</p>
+        <p>The entire coupling surface is <strong>sixty lines</strong>, and its comment says the whole design:</p>
+        <p><code># Only adw_id needed - workflow fetches prompt, working_dir from DB</code></p>
+        <p>A workflow's only argument is a UUID. Everything else is a database read.</p>
+      </div>
+      <div class="filetree"><span class="d">.claude/</span>          <span class="c"># LAYER 1 — agentic: config, no app code</span>
+  <span class="f">agents/</span>         <span class="c"># subagent templates</span>
+  <span class="f">commands/</span>       <span class="c"># plan build review fix + experts/</span>
+  <span class="f">hooks/</span>          <span class="c"># 9 lifecycle hooks</span>
+<span class="d">adws/</span>             <span class="c"># LAYER 2 — deterministic orchestration</span>
+  <span class="f">adw_modules/</span>    <span class="c"># sdk wrapper · ws client · db · logging</span>
+  <span class="f">adw_workflows/</span>  <span class="c"># plan_build · +review · +fix</span>
+  <span class="f">adw_triggers/</span>   <span class="c"># adw_scripts.py — 60 lines, the ONLY seam</span>
+<span class="d">apps/</span>             <span class="c"># LAYER 3 — the application</span>
+  <span class="f">orchestrator_3_stream/</span>
+  <span class="f">interactive_file_tree/</span>  <span class="c"># ← built BY the workflows</span>
+  <span class="f">pomodoro_timer/</span>         <span class="c"># ← output, not source</span>
+<span class="d">specs/</span>            <span class="c"># /plan writes here</span>
+<span class="d">app_review/</span>       <span class="c"># /review writes here</span>
+<span class="d">app_fix_reports/</span>  <span class="c"># /fix writes here</span></div>
+    </div>
+
+    <div class="callout warn reveal"><span class="ci">TWO CONSTRAINTS DOING MORE WORK THAN THE PROMPT</span>
+      <span class="cc">The orchestrator's allowlist contains no <code>Write</code>, no <code>Edit</code>, no <code>Task</code> — <strong>delegation is not a policy it follows, it is the only thing it can do.</strong> And command agents get full write access but no <code>mcp__mgmt__*</code>, so they cannot manage agents. The hierarchy is exactly two levels deep and structurally cannot recurse.</span></div>
+
+    <a class="jump reveal" href="#ch07">Next · Teams of agents &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch07">
+  <div class="wrap wide">
+    <span class="chapnum reveal">07 — Teams of agents</span>
+    <div class="kicker reveal">four course codebases, four different answers</div>
+    <h2 class="title reveal d1" style="max-width:26ch">Specialisation is a <em>config tuple,</em> not a markdown file.</h2>
+    <p class="lede reveal d2">The course tree contains four separate multi-agent designs that disagree with each other. Reading them in order is more useful than picking one, because the disagreements are where the reasoning is.</p>
+
+    <div class="chapnav reveal"><span class="cnl">In this chapter</span>
+      <a href="#ch07-s1"><b>1</b>What makes an agent special</a>
+      <a href="#ch07-s2"><b>2</b>The O-Agent</a>
+      <a href="#ch07-s3"><b>3</b>Team pools</a>
+      <a href="#ch07-s4"><b>4</b>The loop closes</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch07-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">"Building Specialized Agents" has no agent files</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Zero. There is no <code>.claude/agents/</code> directory in that codebase at all.</p>
+        <p>Its eight "agents" are Python apps on the SDK, and its whole argument is that a specialist is a <strong>tuple of configuration</strong> — not a prompt file. Anyone arriving from the public hooks repo finds the opposite thesis.</p>
+        <p>It is <em>not</em> model: almost everything is the same Sonnet build. It is these seven levers.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 260" role="img" aria-label="The seven levers that make an agent specialized">
+          <text x="20" y="24" class="s-label">WHAT ACTUALLY SPECIALISES AN AGENT</text>
+          <rect x="20" y="40" width="420" height="30" rx="7" class="s-clay-f"/>
+          <text x="34" y="60" class="s-label-sm">system_prompt — replace, OR preset + append</text>
+          <rect x="20" y="78" width="420" height="30" rx="7" class="s-blue-f"/>
+          <text x="34" y="98" class="s-label-sm">allowed_tools + disallowed_tools</text>
+          <rect x="20" y="116" width="420" height="30" rx="7" class="s-olive-f"/>
+          <text x="34" y="136" class="s-label-sm">hooks — an in-process authz layer</text>
+          <rect x="20" y="154" width="200" height="30" rx="7" class="s-amber-f"/>
+          <text x="34" y="174" class="s-label-sm">cwd</text>
+          <rect x="240" y="154" width="200" height="30" rx="7" class="s-amber-f"/>
+          <text x="254" y="174" class="s-label-sm">permission_mode</text>
+          <rect x="20" y="192" width="420" height="30" rx="7" class="s-plum-f"/>
+          <text x="34" y="212" class="s-label-sm">resume — the session it carries forward</text>
+          <text x="20" y="246" class="s-label-sm">MODEL IS NOT ON THIS LIST. IT IS ALMOST ALWAYS THE SAME.</text>
+        </svg>
+        <div class="fcap"><b>A subagent, restated.</b> Seven fields, only one of which is prose.</div>
+      </div>
+    </div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div>
+        <div class="codecap">the same model, three roles, one file</div>
+        <div class="code"><pre># planner — caged to the spec directory
+planner_system_prompt = {"type": "preset", "preset": "claude_code",
+                         "append": planner_custom_instructions}
+ClaudeAgentOptions(..., hooks=hooks, permission_mode="acceptEdits")
+
+# builder — no append, no hooks, wide open
+builder_system_prompt = {"type": "preset", "preset": "claude_code"}
+ClaudeAgentOptions(..., permission_mode="bypassPermissions")
+
+# reviewer — caged, same as planner
+reviewer_system_prompt = {"type": "preset", "preset": "claude_code",
+                          "append": reviewer_custom_instructions}
+ClaudeAgentOptions(..., hooks=hooks, permission_mode="acceptEdits")</pre></div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Note the <code>preset + append</code> mode — keeping Claude Code's entire default system prompt and <em>layering</em> a role on top, rather than overriding it.</p>
+        <p>And note which role is least configured. <strong>The builder gets <code>bypassPermissions</code>, no hooks, and no appended instructions.</strong> The highest-privilege role in the system receives the least specialisation.</p>
+      </div>
+    </div>
+
+    <div class="callout idea reveal"><span class="ci">THE ENFORCEMENT MOVE</span>
+      <span class="cc">The planner's cage is Python, not prose — a <code>PreToolUse</code> hook returning <code>permissionDecision: "deny"</code> with the reason <em>"Planner can only write to &lt;plan directory&gt;"</em>. The comment in-code notes it inherits: <code>hooks=hooks,  # Inline hooks for security (works for subagents!)</code></span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch07-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The O-Agent commands processes, not tasks</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 300" role="img" aria-label="The O-Agent architecture: MCP management tools, durable Postgres-backed workers">
+        <rect x="24" y="100" width="150" height="80" rx="10" class="s-card"/>
+        <text x="99" y="132" text-anchor="middle" class="s-label">HUMAN</text>
+        <text x="99" y="156" text-anchor="middle" class="s-label-sm">chats in a web UI</text>
+
+        <path d="M180 140 H 224" class="s-flow"/><path d="M224 140 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="232" y="62" width="210" height="156" rx="10" class="s-clay-f"/>
+        <text x="337" y="90" text-anchor="middle" class="s-label">THE ORCHESTRATOR</text>
+        <text x="337" y="116" text-anchor="middle" class="s-label-sm">mcp__mgmt__create_agent</text>
+        <text x="337" y="136" text-anchor="middle" class="s-label-sm">mcp__mgmt__command_agent</text>
+        <text x="337" y="156" text-anchor="middle" class="s-label-sm">mcp__mgmt__interrupt_agent</text>
+        <text x="337" y="176" text-anchor="middle" class="s-label-sm">Bash · Read · SlashCommand · Skill</text>
+        <rect x="248" y="188" width="178" height="22" rx="6" class="s-card"/>
+        <text x="337" y="204" text-anchor="middle" class="s-label-sm">NO Write · NO Edit · NO Task</text>
+
+        <path d="M448 140 H 492" class="s-flow"/><path d="M492 140 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="500" y="40" width="170" height="52" rx="9" class="s-blue-f"/>
+        <text x="585" y="62" text-anchor="middle" class="s-label-sm">agent "code-scout"</text>
+        <text x="585" y="80" text-anchor="middle" class="s-label-sm">session_id · cost · status</text>
+        <rect x="500" y="104" width="170" height="52" rx="9" class="s-blue-f"/>
+        <text x="585" y="126" text-anchor="middle" class="s-label-sm">agent "builder"</text>
+        <text x="585" y="144" text-anchor="middle" class="s-label-sm">resumable · nameable</text>
+        <rect x="500" y="168" width="170" height="52" rx="9" class="s-blue-f"/>
+        <text x="585" y="190" text-anchor="middle" class="s-label-sm">agent "reviewer"</text>
+        <text x="585" y="208" text-anchor="middle" class="s-label-sm">deletable · interruptible</text>
+
+        <path d="M676 130 H 716" class="s-flow"/><path d="M716 130 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="724" y="96" width="130" height="68" rx="10" class="s-olive-f"/>
+        <text x="789" y="126" text-anchor="middle" class="s-label">POSTGRES</text>
+        <text x="789" y="148" text-anchor="middle" class="s-label-sm">durable identity</text>
+
+        <text x="24" y="256" class="s-label-sm">WORKERS OUTLIVE ANY SINGLE CALL — A TASK SUBAGENT DOES NOT</text>
+        <text x="24" y="278" class="s-label-sm">THE SYSTEM PROMPT IS PARTLY GENERATED AT BOOT FROM .claude/agents/ VIA {{SUBAGENT_MAP}}</text>
+      </svg>
+      <div class="fcap"><b>Not the Task tool.</b> In-process MCP tools handed to the model, plus a session registry. A worker is a database row, not a function call.</div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big"><p>command_agent(agent_name, '/compact')</p><span class="cite" style="display:block;margin-top:10px">— one agent invoking another agent's context compaction, as a management action</span></div>
+      <div class="prose">
+        <p>The orchestrator is told to watch its workers' context usage and <em>suggest compacting at 80%</em>. That single line is the AH-4 thesis: if workers are durable, their context becomes a resource somebody has to manage.</p>
+        <p><code>{{SUBAGENT_MAP}}</code> is the other half — a placeholder in the system prompt filled at boot by scanning <code>.claude/agents/</code>. <strong>A Claude Code subagent definition becomes a reusable class</strong>, instantiated into a long-lived named worker.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">DISCIPLINE 01</span><p class="ctitle">Read-only by capability</p><p class="cbody">Scouts are granted exactly <code>Read, Glob, Grep</code>. Not asked to be read-only — <em>made</em> read-only.</p></div>
+      <div class="card blue"><span class="cnum">DISCIPLINE 02</span><p class="ctitle">Model as a pure price lever</p><p class="cbody"><code>scout-report-suggest</code> and <code>…-fast</code> differ by exactly two lines: the name and <code>opus</code> → <code>haiku</code>. The 118-line body is byte-identical.</p></div>
+      <div class="card olive"><span class="cnum">DISCIPLINE 03</span><p class="ctitle">Agents can wrap commands</p><p class="cbody"><code>planner.md</code>'s only work tool is <code>SlashCommand</code> — it exists purely to call <code>/plan</code>, keeping the command the single source of truth.</p></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">The swarm is a recall mechanism, not an oracle.</p>
+        <p><code>plan_w_scouters.md</code> fans out <strong>3 opus + 5 haiku</strong> scouts in parallel, divide-and-conquer. Then step 2.4 tells the orchestrator to <em>manually re-validate</em> the consolidated result.</p>
+        <p>Its sibling <code>build_in_parallel.md</code> carries the most transferable idea in the repo: <strong>parallelism bounded by the file dependency graph.</strong> Batch 1 has no dependencies; Batch 2 depends on Batch 1; each batch is barrier-synchronised. Every agent gets a self-contained spec precisely because it shares no context with its siblings.</p>
+      </div>
+      <div>
+        <div class="codecap">plan_w_scouters.md — the fan-out</div>
+        <div class="code"><pre>TOTAL_BASE_SCOUT_SUBAGENTS: 3
+TOTAL_FAST_SCOUT_SUBAGENTS: 5
+
+2. Explore Codebase — Deploy a total of
+   `TOTAL_BASE + TOTAL_FAST` subagents in PARALLEL.
+   1. Run 3 @agent-scout-report-suggest in parallel.
+      Give each different direction, divide and conquer.
+   2. Run 5 @agent-scout-report-suggest-fast in parallel.
+   3. Gather the results and consolidate.
+   4. Validate the files — MANUALLY validate, double
+      check, and look for any missing files.</pre></div>
+        <p class="note">The step numbering runs 1, 2, 4, 5, 6, 7. There is no step 3.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch07-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Team pools, and the rubric that isn't one</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 280" role="img" aria-label="Round-robin branch assignment across three cloned team pools with phase-stable affinity">
+          <text x="18" y="22" class="s-label">7 BRANCHES → 3 CLONED TEAMS</text>
+          <rect x="18" y="38" width="120" height="26" rx="6" class="s-clay-f"/>
+          <text x="30" y="56" class="s-label-sm">UI Generation</text>
+          <text x="150" y="56" class="s-label-sm">1 · 4 · 7</text>
+          <rect x="18" y="72" width="120" height="26" rx="6" class="s-blue-f"/>
+          <text x="30" y="90" class="s-label-sm">UI Generation B</text>
+          <text x="150" y="90" class="s-label-sm">2 · 5</text>
+          <rect x="18" y="106" width="120" height="26" rx="6" class="s-olive-f"/>
+          <text x="30" y="124" class="s-label-sm">UI Generation C</text>
+          <text x="150" y="124" class="s-label-sm">3 · 6</text>
+
+          <path d="M18 152 H 442" class="s-line"/>
+          <text x="18" y="176" class="s-label">SAME ASSIGNMENT FOR VALIDATION</text>
+          <rect x="18" y="188" width="120" height="26" rx="6" class="s-clay-f"/>
+          <text x="30" y="206" class="s-label-sm">Validation</text>
+          <text x="150" y="206" class="s-label-sm">1 · 4 · 7</text>
+          <text x="18" y="240" class="s-label-sm">THE TEAM THAT BUILT BRANCH 4</text>
+          <text x="18" y="258" class="s-label-sm">VALIDATES BRANCH 4 AND FIXES BRANCH 4</text>
+        </svg>
+        <div class="fcap"><b>Phase-stable affinity.</b> Concurrency safety is argued from directory disjointness, not from locking.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Fan-out here is not "spawn N agents." It is N units of work round-robined across a <strong>fixed pool of cloned teams</strong>.</p>
+        <p>Twelve agent files instantiate eight teams, because six of them are referenced three times each under different colours. The roster is declared up front in YAML; nothing is created at runtime.</p>
+        <p>And validators are structurally unable to fix what they find — their frontmatter grants <code>screenshots/ upsert:true</code> but <code>apps/ upsert:false</code>. Path-level ACLs, in the agent definition.</p>
+      </div>
+    </div>
+
+    <div class="callout warn reveal"><span class="ci">THE FINDING THAT MATTERS MOST</span>
+      <span class="cc">There <strong>is</strong> a rubric — five binary quality gates — but it is a <strong>conformance gate, not a comparison</strong>. Every variant is judged independently against absolutes; none reference their siblings. The schema proves it: <code>BranchStatus = ['draft','generating','validating','validated','failed']</code>. No score. No rank. No winner. <strong>All passing variants ship, and the human is the selector.</strong></span></div>
+
+    <p class="prose reveal" style="max-width:74ch">Differentiation happens <em>before</em> generation, not after — the lead is instructed to force variants apart on layout, tone, content density and interaction model, with the warning: <em>"Don't just change colors between variants."</em> That is the same conclusion his fusion harness reaches by a different route: <strong>machines settle conformance; humans settle taste.</strong></p>
+
+    <div class="spread rev reveal" style="align-items:center">
+      <div class="quote"><p>"Write errors are not bugs. They're coordination signals. Re-read, re-apply, retry."</p><span class="cite">— parallel-mental-model-updates.md</span></div>
+      <div class="prose">
+        <p>Three clones of one agent share one memory file. There is no lock, no CRDT, no queue — <strong>the conflict-resolution algorithm is the model's judgement</strong>, taught in prose as read-modify-write with retry.</p>
+        <p>It even reframes finding a sibling's entry as an asset: <em>"Their context is your context. Ingest their learnings."</em> Optimistic concurrency control, written for a reader that can reason about intent.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch07-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Where the slogan stops being a slogan</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 250" role="img" aria-label="The circuit: agent definitions consumed both by Claude Code at development time and by the shipped app at runtime">
+        <rect x="290" y="18" width="300" height="46" rx="10" class="s-clay-f"/>
+        <text x="440" y="40" text-anchor="middle" class="s-title" font-size="13">.claude/agents/build-agent.md</text>
+        <text x="440" y="56" text-anchor="middle" class="s-label-sm">one file, two consumers</text>
+
+        <path d="M330 68 C 240 96, 180 100, 150 118" class="s-flow"/>
+        <path d="M150 118 l10 -4 -3 11 z" class="s-clay"/>
+        <path d="M550 68 C 640 96, 700 100, 730 118" class="s-flow"/>
+        <path d="M730 118 l-10 -4 3 11 z" class="s-clay"/>
+
+        <rect x="24" y="124" width="250" height="86" rx="10" class="s-blue-f"/>
+        <text x="149" y="152" text-anchor="middle" class="s-label">AT DEVELOPMENT TIME</text>
+        <text x="149" y="176" text-anchor="middle" class="s-label-sm">a Claude Code subagent</text>
+        <text x="149" y="196" text-anchor="middle" class="s-label-sm">that BUILT this app</text>
+
+        <rect x="606" y="124" width="250" height="86" rx="10" class="s-olive-f"/>
+        <text x="731" y="152" text-anchor="middle" class="s-label">AT RUNTIME</text>
+        <text x="731" y="176" text-anchor="middle" class="s-label-sm">a template the shipped app</text>
+        <text x="731" y="196" text-anchor="middle" class="s-label-sm">INSTANTIATES to build the next</text>
+
+        <rect x="300" y="130" width="280" height="76" rx="10" class="s-card"/>
+        <text x="440" y="154" text-anchor="middle" class="s-label">THE THREE SEAMS</text>
+        <text x="440" y="176" text-anchor="middle" class="s-label-sm">COPY_WHITELIST = agents/ commands/ skills/</text>
+        <text x="440" y="194" text-anchor="middle" class="s-label-sm">setting_sources = ["project"]</text>
+      </svg>
+      <div class="fcap"><b>Point it at a different repo with <code>--cwd</code> and it inherits that repo's cast of agents.</b></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">A three-line whitelist decides which half of the agentic layer is portable into a product.</p>
+        <p><code>agents/</code>, <code>commands/</code>, <code>skills/</code> get copied into the app. <code>hooks/</code>, <code>output-styles/</code>, <code>status_lines/</code> and <code>settings.json</code> stay at the root — they are Claude-Code-only. That is a deliberate statement about what a *running product* can consume, not tidiness.</p>
+        <p>One file is explicitly blacklisted: <code>commands/prime.md</code>, because the app's copy is deliberately app-scoped.</p>
+      </div>
+      <div>
+        <div class="codecap">scripts/copy_claude.py</div>
+        <div class="code"><pre># Whitelist: Only copy these directories from .claude/
+COPY_WHITELIST = [
+    "agents/",
+    "commands/",
+    "skills/",
+]
+
+# Blacklist: Never copy these specific files
+COPY_BLACKLIST = [
+    "commands/prime.md",
+]</pre></div>
+      </div>
+    </div>
+
+    <div class="callout ok reveal"><span class="ci">THE BEST SINGLE ARTIFACT IN THE CORPUS</span>
+      <span class="cc"><code>specs/specialized-agent-templates.md</code> — 570 lines, written in the exact format <code>/plan</code> emits — is <strong>a plan, produced by the agent system, specifying the feature that teaches the app to read the agent system's own config files.</strong> It shipped: <code>subagent_loader.py</code> exists, and its first line is <code>self.templates_dir = self.working_dir / ".claude" / "agents"</code>. That is the slogan implemented, not asserted.</span></div>
+
+    <div class="callout bad reveal"><span class="ci">AND TWO META-AGENTS THAT DISAGREE</span>
+      <span class="cc">The meta-agent <em>skill</em> says <em>"By default, OMIT the tools field to inherit all parent tools"</em> and defaults to <code>sonnet</code>. The meta-agent <em>agent</em> says <em>"Minimal tool selection"</em> and hardcodes <code>opus</code>. Two generators, two philosophies, both live in the same repo. Pick one before you copy either.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch07-s5"><span class="sn">5</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Take this one file</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">If you copy one artifact out of the entire course tree, make it <code>experts/&lt;domain&gt;/self-improve.md</code>.</p>
+        <p>192 lines of markdown, zero dependencies, and it solves the problem everyone building an agentic layer hits in month two: <strong>your docs rot, and rotted context is worse than none — because the agent trusts it.</strong></p>
+        <p>Three details separate it from "keep a notes file," and everybody omits the second one.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 240" role="img" aria-label="Three mechanisms that make a self-improving memory file survive">
+          <rect x="20" y="24" width="420" height="56" rx="9" class="s-clay-f"/>
+          <text x="36" y="48" class="s-title" font-size="13">1 · It forbids inference</text>
+          <text x="36" y="68" class="s-label-sm">"validate against real implementation, not assumptions"</text>
+
+          <rect x="20" y="90" width="420" height="60" rx="9" class="s-amber-f"/>
+          <text x="36" y="114" class="s-title" font-size="13">2 · Bounded loop, mechanical exit</text>
+          <text x="36" y="134" class="s-label-sm">wc -l → over MAX_LINES? trim → REPEAT until under</text>
+
+          <rect x="20" y="160" width="420" height="56" rx="9" class="s-olive-f"/>
+          <text x="36" y="184" class="s-title" font-size="13">3 · It compiles the artifact</text>
+          <text x="36" y="204" class="s-label-sm">python3 -c "import yaml; yaml.safe_load(...)"</text>
+        </svg>
+        <div class="fcap"><b>Without #2, a self-improving file grows monotonically until it blows the window.</b></div>
+      </div>
+    </div>
+
+    <div class="quote reveal"><p>"Keep in mind, after your thorough search, there may be nothing to be done — this is perfectly acceptable. If there's nothing to be done, report that and stop."</p><span class="cite">— the instruction most "improve this" prompts lack</span></div>
+
+    <p class="prose reveal" style="max-width:74ch">An agent handed an improvement task will always find something to improve. That line gives it permission not to. Swap the expertise path and the domain grep patterns, run it on a post-merge hook, and you have a working memory system in an afternoon.</p>
+
+    <div class="callout bad reveal"><span class="ci">AND THE HONEST PART</span>
+      <span class="cc">The expert pattern is <strong>beautifully specified and demonstrably under-run.</strong> The ADW domain's own <code>expertise.yaml</code> instructs you to <em>"Register in adw_triggers/adw_scripts.py"</em> — and there is no registry in that file; workflows resolve by <code>Path.exists()</code>. <strong>The mechanism designed to keep expertise accurate has stale expertise inside it.</strong> The advertised autocomplete expert's memory file is three lines with <code>previous_completions: []</code> — it has learned nothing. And of three expert domains, only two ever got the full file set. The prompts are excellent; they have not been run to convergence, which is the whole point of the pattern.</span></div>
+
+    <a class="jump reveal" href="#ch08">Next · A worked example &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch08">
+  <div class="wrap wide">
+    <span class="chapnum reveal">08 — A worked example</span>
+    <div class="kicker reveal">the loop applied to a decision, not a feature</div>
+    <h2 class="title reveal d1" style="max-width:26ch">Naming a startup, <em>the same way you'd ship a feature.</em></h2>
+    <p class="lede reveal d2">The honest test of a framework is whether you can follow it on something it wasn't designed for. This is the loop run on a one-shot, irreversible naming decision — where the product is <strong>PiCanvas</strong>, and the problem is that it's named after a dependency.</p>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">"Pi" is <code>@earendil-works/pi-coding-agent</code> — a third-party SDK.</p>
+        <p>The product now also runs Claude Code sessions behind the same <code>AgentSession</code> contract, so the name is both <strong>borrowed from a vendor</strong> and <strong>factually stale</strong>. Naming yourself after one of two swappable backends invites exactly the question you don't want in a YC interview.</p>
+        <p>What should be named instead is the thing nothing else has: many agents in one repo, each isolated in a <em>lane</em>, none able to corrupt another's work or the developer's real checkout.</p>
+      </div>
+      <div class="quote"><p>"Lane engine — Scratch tree, lanes as <code>refs/picanvas/lane/*</code>, authored hunks, collisions, pop-out, resolution rounds. <strong>Nothing in oh-my-pi has this; it's your differentiator.</strong>"</p><span class="cite">— from the product's own design doc</span></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch08-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The one design decision</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 300" role="img" aria-label="Pipeline: brief, gate first, parallel generators, gate again, board, memo">
+        <rect x="18" y="118" width="112" height="64" rx="10" class="s-card"/>
+        <text x="74" y="144" text-anchor="middle" class="s-label">BRIEF</text>
+        <text x="74" y="164" text-anchor="middle" class="s-label-sm">hand-written</text>
+
+        <path d="M136 150 H 176" class="s-flow"/><path d="M176 150 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="184" y="102" width="112" height="96" rx="10" class="s-clay-f"/>
+        <text x="240" y="130" text-anchor="middle" class="s-label">GATE.PY</text>
+        <text x="240" y="150" text-anchor="middle" class="s-label-sm">written FIRST</text>
+        <text x="240" y="170" text-anchor="middle" class="s-label-sm">baseline must</text>
+        <text x="240" y="188" text-anchor="middle" class="s-label-sm">be RED</text>
+
+        <path d="M302 150 H 342" class="s-flow"/><path d="M342 150 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="350" y="34" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="54" text-anchor="middle" class="s-label-sm">isolation</text>
+        <rect x="350" y="70" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="90" text-anchor="middle" class="s-label-sm">craft</text>
+        <rect x="350" y="106" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="126" text-anchor="middle" class="s-label-sm">coined</text>
+        <rect x="350" y="142" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="162" text-anchor="middle" class="s-label-sm">classical</text>
+        <rect x="350" y="178" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="198" text-anchor="middle" class="s-label-sm">spatial</text>
+        <rect x="350" y="214" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="234" text-anchor="middle" class="s-label-sm">verb</text>
+        <rect x="350" y="250" width="126" height="30" rx="7" class="s-blue-f"/>
+        <text x="413" y="270" text-anchor="middle" class="s-label-sm">contrarian</text>
+        <text x="413" y="22" text-anchor="middle" class="s-label">7 GENERATORS · PARALLEL · ONE LOCKED ANGLE EACH</text>
+
+        <path d="M482 150 H 522" class="s-flow"/><path d="M522 150 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="530" y="102" width="112" height="96" rx="10" class="s-clay-f"/>
+        <text x="586" y="132" text-anchor="middle" class="s-label">GATE.PY</text>
+        <text x="586" y="154" text-anchor="middle" class="s-label-sm">56 → 48</text>
+        <text x="586" y="176" text-anchor="middle" class="s-label-sm">code disposes</text>
+
+        <path d="M648 150 H 688" class="s-flow"/><path d="M688 150 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="696" y="70" width="166" height="160" rx="10" class="s-olive-f"/>
+        <text x="779" y="96" text-anchor="middle" class="s-label">THE BOARD</text>
+        <text x="779" y="122" text-anchor="middle" class="s-label-sm">founder voice</text>
+        <text x="779" y="142" text-anchor="middle" class="s-label-sm">market strategist</text>
+        <text x="779" y="162" text-anchor="middle" class="s-label-sm">customer oracle</text>
+        <text x="779" y="182" text-anchor="middle" class="s-label-sm">moonshot</text>
+        <rect x="710" y="192" width="138" height="28" rx="7" class="s-amber-f"/>
+        <text x="779" y="211" text-anchor="middle" class="s-label-sm">contrarian — LAST</text>
+      </svg>
+      <div class="fcap"><b>Rubric-score only what is checkable; never score taste.</b> Availability is settled by code before any agent gets an opinion. Only survivors reach a body that argues.</div>
+    </div>
+
+    <div class="callout idea reveal"><span class="ci">WHY THE SPLIT MATTERS</span>
+      <span class="cc">A 1–10 aesthetic score across 48 names produces an <strong>average</strong> — and an average is precisely what a board exists to prevent. His own corpus never rubric-scores creative output. The one verdict mechanism he does ship is a deterministic exit-code gate, and it grades <em>one</em> candidate against a spec, never N against each other.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch08-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The gate goes first, and must fail</h2></div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">Borrowed directly from his auto-validate harness: the acceptance gate is written <strong>before</strong> any candidate exists, and it must fail RED against the current state.</p>
+        <p>A gate that passes before the work is done is a broken gate — either the request is already satisfied or the checks are too weak.</p>
+        <p>Every FAIL line is written as the generator's next instruction: expected, found, and exactly what to do about it.</p>
+      </div>
+      <div>
+        <div class="codecap">the baseline run — as it must be</div>
+        <div class="code"><pre>NAMING ACCEPTANCE GATE — PiCanvas → ?
+
+FAIL: expected at least 8 candidates, found 0 at
+  naming/candidates/candidates.txt — run the
+  generators before the gate can go green
+
+RESULT: RED (0 passed, 1 failed)
+Baseline is RED, as it must be. The loop is live.</pre></div>
+      </div>
+    </div>
+
+    <p class="prose reveal" style="max-width:74ch">Tested against real names, it proved it wasn't vacuous — including on the incumbent:</p>
+
+    <div class="code reveal"><pre>FAIL: "PiCanvas"    — 'Pi' used as a prefix morpheme (the PiCanvas shape)
+FAIL: "Canvas"      — found the category word 'canvas' — cedes the positioning
+FAIL: "Conductor"   — competitor collision
+FAIL: "Thrmpx"      — no vowel — must survive being said once in a demo video
+FAIL: "Loomwright"  — RDAP 200 · github.com/loomwright HTTP 200</pre></div>
+
+    <div class="callout warn reveal"><span class="ci">THE ARGUMENT FOR GATE-FIRST</span>
+      <span class="cc"><strong>Loomwright</strong> passed every offline check and died on availability. It is a genuinely good name that a board would have happily debated for twenty minutes before anyone checked whether it could be had.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch08-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Four verdicts, not two</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">A binary gate lies in two different directions, and both lies are expensive.</p>
+        <p>If an unautomatable requirement <em>blocks</em> green, green becomes unreachable and the verdict is meaningless. If it is silently omitted, green falsely reads as <strong>"ship it."</strong></p>
+        <p>So the gate reports four states, and the distinction between <code>SKIP</code> and <code>MANUAL</code> is the whole point.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 240" role="img" aria-label="Four gate verdicts and whether each blocks green">
+          <rect x="20" y="24" width="200" height="40" rx="8" class="s-olive-f"/>
+          <text x="36" y="49" class="s-label">PASS — checked, passed</text>
+          <rect x="20" y="74" width="200" height="40" rx="8" class="s-clay-f"/>
+          <text x="36" y="99" class="s-label">FAIL — checked, failed</text>
+          <rect x="20" y="124" width="200" height="40" rx="8" class="s-amber-f"/>
+          <text x="36" y="143" class="s-label">SKIP — couldn't run</text>
+          <text x="36" y="158" class="s-label-sm">automatable · blocks green</text>
+          <rect x="20" y="174" width="200" height="44" rx="8" class="s-plum-f"/>
+          <text x="36" y="193" class="s-label">MANUAL — no machine can</text>
+          <text x="36" y="208" class="s-label-sm">never passes · never blocks</text>
+
+          <path d="M232 92 H 268" class="s-flow"/><path d="M268 92 l-9 -6 0 12 z" class="s-clay"/>
+          <rect x="276" y="52" width="168" height="80" rx="10" class="s-card"/>
+          <text x="360" y="80" text-anchor="middle" class="s-label">GREEN MEANS</text>
+          <text x="360" y="102" text-anchor="middle" class="s-label-sm">"cleared every check</text>
+          <text x="360" y="120" text-anchor="middle" class="s-label-sm">a machine can make"</text>
+          <text x="360" y="164" text-anchor="middle" class="s-label-sm">IT DOES NOT MEAN</text>
+          <text x="360" y="186" text-anchor="middle" class="s-label-sm">"CLEARED TO SHIP"</text>
+        </svg>
+        <div class="fcap"><b>USPTO class 042 is unsearchable from here.</b> So it prints on every run as an outstanding human gate.</div>
+      </div>
+    </div>
+
+    <div class="filetree reveal"><span class="d">naming/</span>
+  <span class="f">gate.py</span>              <span class="c"># written first · baseline RED · PASS/FAIL/SKIP/MANUAL</span>
+  <span class="d">brief/</span>
+    <span class="f">brief.md</span>          <span class="c"># hand-written: Situation · Stakes · Constraints · Key Question</span>
+  <span class="d">candidates/</span>
+    <span class="f">names-&lt;angle&gt;.md</span>  <span class="c"># one per generator — never a shared path</span>
+    <span class="f">gate-results.txt</span>
+  <span class="d">memos/</span>
+    <span class="f">name-memo.md</span>      <span class="c"># ranked, with recorded dissent</span>
+<span class="d">.claude/commands/</span>
+  <span class="f">name_generate.md</span>    <span class="c"># ONE parameterised generator, not seven files</span>
+  <span class="f">name_board.md</span></div>
+
+    <a class="jump reveal" href="#ch09">Next · What the run actually found &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch09">
+  <div class="wrap wide">
+    <span class="chapnum reveal">09 — What the run found</span>
+    <div class="kicker reveal">the system's best output was not a name</div>
+    <h2 class="title reveal d1" style="max-width:26ch">Six defects. <em>Agents found all six.</em></h2>
+    <p class="lede reveal d2">The system ran end to end and produced a verdict of <strong>HOLD</strong> — don't register, don't cut the video. That is the right answer, and how it got there is the most transferable thing in this guide.</p>
+
+    <div class="stats reveal">
+      <div class="stat"><div class="sv">56</div><div class="sl">candidates generated</div></div>
+      <div class="stat blue"><div class="sv">48</div><div class="sl">survived the gate</div></div>
+      <div class="stat amber"><div class="sv">6</div><div class="sl">defects found in the gate</div></div>
+      <div class="stat olive"><div class="sv">0</div><div class="sl">found by the gate's author</div></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch09-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The defect list</h2></div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">01</span><p class="ctitle">"pi" was a substring ban</p><p class="cbody">It killed <em>Spile</em>, <em>Marlinspike</em>, <em>Pivot</em>. The requirement was "don't name the Pi backend," not "ban the letter pair."</p></div>
+      <div class="card accent"><span class="cnum">02</span><p class="ctitle">GitHub 403 read as "taken"</p><p class="cbody">Unauthenticated API caps at 60/hour then answers 403 to everything. Would have false-failed the entire pool.</p></div>
+      <div class="card blue"><span class="cnum">03</span><p class="ctitle">Trademark never checked</p><p class="cbody">The brief required USPTO class 042. Nothing checked it — and it let through a name sitting inside a live mark.</p></div>
+      <div class="card blue"><span class="cnum">04</span><p class="ctitle">Stricter than the brief</p><p class="cbody">The brief allowed acquiring a <code>.com</code> under $5k. The gate hard-failed every registered domain and silently deleted the best tier.</p></div>
+      <div class="card glow amber"><span class="cnum">05</span><p class="ctitle">It rejected the word "inscribe"</p><p class="cbody">Pronounceability counted consonant <em>letters</em>, not phonemes. This — not the domain rule — is why the pool came out ornate.</p></div>
+      <div class="card olive"><span class="cnum">06</span><p class="ctitle">Two still open</p><p class="cbody"><code>check_npm</code> tests the unscoped package when the brief wants the scope; competitor distance is a two-way substring test where <code>amp</code> kills <em>Example</em>.</p></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center" style="margin-top:10px">
+      <div class="quote big"><p>The survivors list is a domain-availability report wearing the costume of a naming shortlist.</p><span class="cite" style="display:block;margin-top:10px">— the Market Strategist seat, auditing the pool it was asked to rank</span></div>
+      <div class="prose">
+        <p class="lead-in">Defect five is the instructive one.</p>
+        <p>English digraphs — <code>ch</code>, <code>th</code>, <code>tch</code>, <code>ck</code>, <code>ng</code>, <code>sh</code> — are one <em>sound</em> written with two or more letters. Counting letters systematically deleted the Anglo-Saxon compound register while waving through Latinate polysyllables.</p>
+        <p>The result: <strong>zero survivors of seven letters or fewer</strong>, in a category where Cursor, Warp, Zed and Amp average 6.2.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch09-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The board, and the tension</h2></div>
+
+    <p class="prose reveal" style="max-width:74ch">Four seats deliberated in parallel, each with a deliberate bias — neutral seats produce mush. Then the Contrarian was shown all four positions verbatim and spoke last. <strong>That ordering was implemented, not asserted</strong>: the system this was modelled on claims contrarian-last in its prompt while running every seat through <code>Promise.allSettled</code>.</p>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 230" role="img" aria-label="Board voting: Ringfend polarised, Hullkeep uncontested but with no first-place votes">
+        <text x="30" y="26" class="s-label">FIRST-PLACE VOTES ▸ &nbsp;&nbsp;&nbsp; ◂ HARD REJECTIONS</text>
+        <path d="M440 40 V 210" class="s-line"/>
+
+        <text x="30" y="72" class="s-label">Ringfend</text>
+        <rect x="440" y="56" width="120" height="24" rx="6" class="s-olive-f"/>
+        <text x="500" y="73" text-anchor="middle" class="s-label-sm">2 firsts</text>
+        <rect x="320" y="56" width="120" height="24" rx="6" class="s-clay-f"/>
+        <text x="380" y="73" text-anchor="middle" class="s-label-sm">2 rejections</text>
+
+        <text x="30" y="120" class="s-label">Hullkeep</text>
+        <rect x="440" y="104" width="4" height="24" rx="2" class="s-dim"/>
+        <text x="470" y="121" class="s-label-sm">0 firsts — nobody's favourite</text>
+        <text x="300" y="121" text-anchor="end" class="s-label-sm">0 rejections — nobody's enemy</text>
+
+        <text x="30" y="168" class="s-label">Decollide</text>
+        <rect x="440" y="152" width="60" height="24" rx="6" class="s-olive-f"/>
+        <text x="470" y="169" text-anchor="middle" class="s-label-sm">1</text>
+        <rect x="320" y="152" width="120" height="24" rx="6" class="s-clay-f"/>
+        <text x="380" y="169" text-anchor="middle" class="s-label-sm">2 rejections</text>
+
+        <text x="30" y="204" class="s-label-sm">Cadastrium</text>
+        <rect x="440" y="190" width="60" height="20" rx="6" class="s-olive-f"/>
+        <rect x="380" y="190" width="60" height="20" rx="6" class="s-clay-f"/>
+      </svg>
+      <div class="fcap"><b>The compromise problem, drawn.</b> Hullkeep won every round by being nobody's enemy — which is tolerance, not conviction, for a word the founder says ten thousand times.</div>
+    </div>
+
+    <div class="grid grid-2 reveal">
+      <div class="card accent"><span class="cnum">FOUNDER VOICE</span><p class="ctitle">Vetoed Separance</p><p class="cbody">One phoneme from <em>Severance</em> — the show about surgically isolated workers, and the word for being fired. "The joke writes itself in every interview."</p></div>
+      <div class="card blue"><span class="cnum">CUSTOMER ORACLE</span><p class="ctitle">Killed Ringfend on findability</p><p class="cbody">Filed under "spelled right, found wrong" — listeners type <code>ringfence</code>. Also disqualified ~20 names on a syllable audit.</p></div>
+      <div class="card olive"><span class="cnum">MOONSHOT</span><p class="ctitle">Reframed the whole decision</p><p class="cbody">"Isolation is the half of this product that commoditizes." The durable asset is the register of holdings — not the wall.</p></div>
+      <div class="card glow amber"><span class="cnum">CONTRARIAN</span><p class="ctitle">Audited the gate itself</p><p class="cbody">Found the pool was manufactured by a filter, not drifted. Flagged a possible live mark on the front-runner.</p></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch09-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The transferable lesson</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Every defect was found by an agent. None by the person who wrote the gate.</p>
+        <p>That happened for one structural reason: <strong>the seats were given the gate's source, not just its verdicts.</strong></p>
+        <p>His boards deliberate on options; they never audit the machinery that produced the options. That single change is the highest-leverage thing this build turned up, and it is not in the original design.</p>
+      </div>
+      <div class="callout ok"><span class="ci">CARRY THIS FORWARD</span>
+        <span class="cc">When you fan agents out over a filtered set, hand at least one of them <strong>the filter</strong>. A reviewer that can only see survivors cannot tell you the survivors were selected wrong.</span></div>
+    </div>
+
+    <div class="callout bad reveal"><span class="ci">AND VERIFY THE AUDITOR</span>
+      <span class="cc">The Contrarian's central evidence — a live company at <code>ringfence.ai</code> with two pending marks — was <strong>partly overstated</strong>. The domain is registered but has no DNS record; it does not resolve. The trademark serials could not be confirmed (TSDR needs a key, Justia blocks automation). The <em>conclusion</em> survived; the evidence did not fully. Agents propose. Verification disposes — including for the agent that just audited everyone else.</span></div>
+
+    <a class="jump reveal" href="#ch99">Next · The send-off &nbsp;→</a>
+  </div>
+</section>
+
+
+<!-- ════════ SEND-OFF (dark scene) — id must match the last TOC entry ════════ -->
+<section class="chapter dark" id="ch99">
+  <div class="wrap">
+    <span class="chapnum reveal" style="color:var(--on-dark-dim)">— The Send-off</span>
+    <div class="kicker reveal">where this leaves you</div>
+    <h2 class="title reveal d1" style="max-width:22ch;color:#f6efe2">Build for the thousandth run — <em>after you've done the first ten by hand.</em></h2>
+    <p class="lede reveal d2" style="max-width:44ch;color:var(--on-dark-dim)">
+      The machinery in this guide is worth building. It is not worth building first. He says so himself,
+      repeatedly, in the parts of the video most people skip.
+    </p>
+
+    <div class="grid grid-3 reveal" style="margin-top:18px">
+      <div class="card glow accent"><span class="cnum">RECAP 01</span><p class="ctitle">Fresh agent, every step</p><p class="cbody">The one rule that survives every contradiction. You cannot debug a polluted window.</p></div>
+      <div class="card glow blue"><span class="cnum">RECAP 02</span><p class="ctitle">Fix the system, not the output</p><p class="cbody">Attempts above one is a diagnosis, not a retry. Install the missing lever.</p></div>
+      <div class="card glow olive"><span class="cnum">RECAP 03</span><p class="ctitle">Code disposes</p><p class="cbody">Settle mechanically what can be settled mechanically. Send only survivors to a body that argues.</p></div>
+    </div>
+
+    <div class="quote big reveal" style="margin:36px 0 8px">
+      <p>I could have done all this with a single agent. I fully acknowledge that. This probably isn't the scale.</p>
+      <span class="cite" style="display:block;margin-top:14px;color:var(--on-dark-dim)">— him, about his own multi-agent system</span>
+    </div>
+
+    <p class="prose reveal" style="max-width:70ch;color:var(--on-dark-dim)">
+      He also says <em>"this arrangement of ADWs is completely arbitrary,"</em> and <em>"I haven't seen anyone
+      doing zero-touch work yet,"</em> and <em>"many of the ideas I share with you here are experiments."</em>
+      Take the loop. Leave the ceremony until it earns its place.
+    </p>
+
+    <p class="small reveal" style="margin-top:30px;color:var(--on-dark-dim)">
+      Compiled by Fable from the IndyDevDan corpus — 29 cloned repos with git history, 18 course
+      codebases, 18 lesson transcripts, 52 committed specs. Command and agent counts are deduplicated by
+      content hash; raw file counts are inflated ~2&times; by <code>.upstream/</code> mirrors. Every quote verbatim.<br>
+      <span style="font-family:var(--mono);letter-spacing:.06em">Press <kbd style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#efe7d8">K</kbd> to climb back up ↑</span>
+    </p>
+    <a class="jump reveal" href="#ch00" style="margin-top:26px">Back to the top &nbsp;↑</a>
+  </div>
+</section>
+
+</main>
+
+<div id="pager">
+  <button id="pprev" aria-label="Previous section">‹</button>
+  <span class="pind" id="pind"></span>
+  <button id="pnext" aria-label="Next section">›</button>
+</div>
+<button id="topbtn" aria-label="Back to top">↑</button>
+
+<script>
+/* ═══ self-contained syntax highlighter ═══════════════════ */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+const KW={
+ python:['def','class','import','from','return','if','elif','else','for','while','in','not','and','or','is','None','True','False','with','as','try','except','finally','raise','lambda','yield','async','await','self','pass','break','continue','global'],
+ js:['const','let','var','function','return','if','else','for','while','of','in','new','class','extends','import','export','default','async','await','try','catch','finally','throw','typeof','this','true','false','null','undefined','interface','type','enum','public','private','readonly'],
+ bash:['if','then','else','elif','fi','for','do','done','while','case','esac','function','export','source','return','local','set','git','npm','npx','uv','uvx','bun','python','python3','node','claude','curl','mkdir','cd','echo','cat','cp','mv','rm','chmod'],
+ yaml:['true','false','null'],
+ json:['true','false','null'],
+ text:[]
+};
+const COMMENT={python:'#',bash:'#',yaml:'#',js:'//',json:null,text:null};
+function hlMd(e){
+  return e.split('\n').map(function(line){
+    if(/^#{1,6}\s/.test(line))return '<span class="md-h">'+line+'</span>';
+    if(/^\s*&gt;/.test(line))return '<span class="md-q">'+line+'</span>';
+    if(/^\s*([-*+]|\d+\.)\s/.test(line))line=line.replace(/^(\s*)([-*+]|\d+\.)(\s)/,'$1<span class="md-li">$2</span>$3');
+    line=line.replace(/`([^`]+)`/g,'<span class="md-c">`$1`</span>');
+    line=line.replace(/\*\*([^*]+)\*\*/g,'<span class="md-b">**$1**</span>');
+    line=line.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<span class="md-link">[$1]($2)</span>');
+    return line;
+  }).join('\n');
+}
+function detectLang(pre){
+  var cap=''; var c=pre.closest('.code'); if(c&&c.previousElementSibling&&c.previousElementSibling.classList.contains('codecap'))cap=c.previousElementSibling.textContent.toLowerCase();
+  var t=pre.textContent;
+  if(/\.md\b|markdown|\.claude\/commands|slash command|command file|prompt\.md|claude\.md/.test(cap)||/^#{1,6}\s.+/m.test(t)&&!/^\s*(def |import )/m.test(t))return'md';
+  if(/\.py\b|python/.test(cap)||/^\s*(def |class |import |from \S+ import|print\()/m.test(t))return'python';
+  if(/\.json\b|json|\.mcp|settings/.test(cap)||(/^\s*[\{\[]/.test(t.trim())&&/":\s/.test(t)))return'json';
+  if(/\.(ts|js|tsx|jsx)\b|typescript|javascript/.test(cap)||/(=>|\bconst |\bfunction |\bexport )/.test(t))return'js';
+  if(/\.ya?ml\b|yaml/.test(cap))return'yaml';
+  if(/terminal|bash|shell|\.sh\b|justfile|command line/.test(cap)||/^\s*(\$|#!\/|git |cd |npm |uv |bun |export |curl )/m.test(t))return'bash';
+  return'text';
+}
+function hl(text,lang){
+  if(lang==='md')return hlMd(esc(text));
+  var e=esc(text);
+  var alts=['"(?:[^"\\\\]|\\\\.)*"',"'(?:[^'\\\\]|\\\\.)*'",'`(?:[^`\\\\]|\\\\.)*`'];
+  var cm=COMMENT[lang];
+  if(cm==='#')alts.push('#[^\\n]*');
+  if(cm==='//')alts.push('//[^\\n]*');
+  alts.push('\\b\\d+(?:\\.\\d+)?\\b');
+  var kw=KW[lang]||[];
+  if(kw.length)alts.push('\\b(?:'+kw.join('|')+')\\b');
+  var re=new RegExp(alts.join('|'),'g');
+  return e.replace(re,function(m){
+    var q=m.charAt(0);
+    if(q==='"'||q==="'"||q==='`')return '<span class="s">'+m+'</span>';
+    if(m.indexOf('#')===0||m.indexOf('//')===0)return '<span class="cm">'+m+'</span>';
+    if(/^\d/.test(m))return '<span class="n">'+m+'</span>';
+    return '<span class="k">'+m+'</span>';
+  });
+}
+function highlightAll(){
+  document.querySelectorAll('.code pre').forEach(function(pre){
+    if(pre.dataset.hl)return;
+    try{ pre.innerHTML=hl(pre.textContent,detectLang(pre)); }catch(e){}
+    pre.dataset.hl='1';
+  });
+}
+highlightAll();
+
+/* ═══ paged navigation ════════════════════════════════════ */
+var chapters=[].slice.call(document.querySelectorAll('.chapter'));
+var tocLinks=[].slice.call(document.querySelectorAll('#toc a'));
+var prog=document.getElementById('progress');
+var rail=document.getElementById('rail');
+var idIndex={}; chapters.forEach(function(c,i){idIndex[c.id]=i;});
+var cur=0, total=chapters.length;
+
+var revObs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in','drawn');revObs.unobserve(e.target);}});},{rootMargin:'0px 0px -6% 0px',threshold:.1});
+function wirePage(ch){
+  ch.querySelectorAll('.draw').forEach(function(svg){
+    svg.querySelectorAll('path,line,polyline,polygon,circle,rect').forEach(function(p){
+      try{var len=p.getTotalLength?p.getTotalLength():1200;p.style.setProperty('--len',Math.ceil(len)||1200);}catch(e){}
+    });
+  });
+  ch.querySelectorAll('.reveal,.draw').forEach(function(el){el.classList.remove('in','drawn');revObs.observe(el);});
+}
+var subObs=null;
+function wireSubnav(ch){
+  if(subObs)subObs.disconnect();
+  var subs=[].slice.call(ch.querySelectorAll('.subsec[id]'));
+  var links=[].slice.call(ch.querySelectorAll('.chapnav a'));
+  if(!subs.length||!links.length)return;
+  subObs=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(e.isIntersecting){links.forEach(function(a){a.classList.remove('cur');});
+      var l=ch.querySelector('.chapnav a[href="#'+e.target.id+'"]'); if(l)l.classList.add('cur');}
+  });},{rootMargin:'-15% 0px -75% 0px',threshold:0});
+  subs.forEach(function(s){subObs.observe(s);});
+}
+function pageNum(i){var m=chapters[i].id.match(/ch(\d+)/);return m?m[1]:'00';}
+function updatePager(){
+  document.getElementById('pprev').disabled=cur<=0;
+  document.getElementById('pnext').disabled=cur>=total-1;
+  document.getElementById('pind').innerHTML='<b>'+pageNum(cur)+'</b> / '+String(total-1).padStart(2,'0');
+}
+function show(i,push){
+  i=Math.max(0,Math.min(total-1,i));
+  if(chapters[cur])chapters[cur].classList.remove('active');
+  cur=i; var ch=chapters[i];
+  ch.classList.add('active');
+  wirePage(ch); wireSubnav(ch);
+  window.scrollTo(0,0);
+  tocLinks.forEach(function(a){a.classList.remove('active');});
+  var rl=document.querySelector('#toc a[href="#'+ch.id+'"]'); if(rl){rl.classList.add('active');rl.scrollIntoView({block:'nearest'});}
+  updatePager();
+  if(push!==false){try{history.replaceState(null,'','#'+ch.id);}catch(e){location.hash=ch.id;}}
+}
+document.getElementById('pnext').onclick=function(){show(cur+1);};
+document.getElementById('pprev').onclick=function(){show(cur-1);};
+document.getElementById('topbtn').onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};
+tocLinks.forEach(function(a){a.addEventListener('click',function(e){
+  var id=a.getAttribute('href').slice(1);
+  if(idIndex[id]!=null){e.preventDefault();show(idIndex[id]);rail.classList.remove('open');}
+});});
+window.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key==='ArrowRight'||e.key==='j'||e.key==='J'){e.preventDefault();show(cur+1);}
+  if(e.key==='ArrowLeft'||e.key==='k'||e.key==='K'){e.preventDefault();show(cur-1);}
+});
+function onScroll(){
+  var h=document.documentElement;var max=h.scrollHeight-h.clientHeight;
+  prog.style.width=(max>0?(h.scrollTop/max*100):0)+'%';
+  document.getElementById('topbtn').classList.toggle('show',h.scrollTop>560);
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+
+document.getElementById('railToggle').addEventListener('click',function(){rail.classList.toggle('open');});
+
+/* init from hash */
+var initId=(location.hash||'').slice(1);
+show(idIndex[initId]!=null?idIndex[initId]:0,false);
+onScroll();
+</script>
+</body>
+</html>

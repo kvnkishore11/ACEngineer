@@ -1,0 +1,299 @@
+<section class="chapter" id="ch07">
+  <div class="wrap wide">
+    <span class="chapnum reveal">07 — Teams of agents</span>
+    <div class="kicker reveal">four course codebases, four different answers</div>
+    <h2 class="title reveal d1" style="max-width:26ch">Specialisation is a <em>config tuple,</em> not a markdown file.</h2>
+    <p class="lede reveal d2">The course tree contains four separate multi-agent designs that disagree with each other. Reading them in order is more useful than picking one, because the disagreements are where the reasoning is.</p>
+
+    <div class="chapnav reveal"><span class="cnl">In this chapter</span>
+      <a href="#ch07-s1"><b>1</b>What makes an agent special</a>
+      <a href="#ch07-s2"><b>2</b>The O-Agent</a>
+      <a href="#ch07-s3"><b>3</b>Team pools</a>
+      <a href="#ch07-s4"><b>4</b>The loop closes</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch07-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">"Building Specialized Agents" has no agent files</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Zero. There is no <code>.claude/agents/</code> directory in that codebase at all.</p>
+        <p>Its eight "agents" are Python apps on the SDK, and its whole argument is that a specialist is a <strong>tuple of configuration</strong> — not a prompt file. Anyone arriving from the public hooks repo finds the opposite thesis.</p>
+        <p>It is <em>not</em> model: almost everything is the same Sonnet build. It is these seven levers.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 260" role="img" aria-label="The seven levers that make an agent specialized">
+          <text x="20" y="24" class="s-label">WHAT ACTUALLY SPECIALISES AN AGENT</text>
+          <rect x="20" y="40" width="420" height="30" rx="7" class="s-clay-f"/>
+          <text x="34" y="60" class="s-label-sm">system_prompt — replace, OR preset + append</text>
+          <rect x="20" y="78" width="420" height="30" rx="7" class="s-blue-f"/>
+          <text x="34" y="98" class="s-label-sm">allowed_tools + disallowed_tools</text>
+          <rect x="20" y="116" width="420" height="30" rx="7" class="s-olive-f"/>
+          <text x="34" y="136" class="s-label-sm">hooks — an in-process authz layer</text>
+          <rect x="20" y="154" width="200" height="30" rx="7" class="s-amber-f"/>
+          <text x="34" y="174" class="s-label-sm">cwd</text>
+          <rect x="240" y="154" width="200" height="30" rx="7" class="s-amber-f"/>
+          <text x="254" y="174" class="s-label-sm">permission_mode</text>
+          <rect x="20" y="192" width="420" height="30" rx="7" class="s-plum-f"/>
+          <text x="34" y="212" class="s-label-sm">resume — the session it carries forward</text>
+          <text x="20" y="246" class="s-label-sm">MODEL IS NOT ON THIS LIST. IT IS ALMOST ALWAYS THE SAME.</text>
+        </svg>
+        <div class="fcap"><b>A subagent, restated.</b> Seven fields, only one of which is prose.</div>
+      </div>
+    </div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div>
+        <div class="codecap">the same model, three roles, one file</div>
+        <div class="code"><pre># planner — caged to the spec directory
+planner_system_prompt = {"type": "preset", "preset": "claude_code",
+                         "append": planner_custom_instructions}
+ClaudeAgentOptions(..., hooks=hooks, permission_mode="acceptEdits")
+
+# builder — no append, no hooks, wide open
+builder_system_prompt = {"type": "preset", "preset": "claude_code"}
+ClaudeAgentOptions(..., permission_mode="bypassPermissions")
+
+# reviewer — caged, same as planner
+reviewer_system_prompt = {"type": "preset", "preset": "claude_code",
+                          "append": reviewer_custom_instructions}
+ClaudeAgentOptions(..., hooks=hooks, permission_mode="acceptEdits")</pre></div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Note the <code>preset + append</code> mode — keeping Claude Code's entire default system prompt and <em>layering</em> a role on top, rather than overriding it.</p>
+        <p>And note which role is least configured. <strong>The builder gets <code>bypassPermissions</code>, no hooks, and no appended instructions.</strong> The highest-privilege role in the system receives the least specialisation.</p>
+      </div>
+    </div>
+
+    <div class="callout idea reveal"><span class="ci">THE ENFORCEMENT MOVE</span>
+      <span class="cc">The planner's cage is Python, not prose — a <code>PreToolUse</code> hook returning <code>permissionDecision: "deny"</code> with the reason <em>"Planner can only write to &lt;plan directory&gt;"</em>. The comment in-code notes it inherits: <code>hooks=hooks,  # Inline hooks for security (works for subagents!)</code></span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch07-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The O-Agent commands processes, not tasks</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 300" role="img" aria-label="The O-Agent architecture: MCP management tools, durable Postgres-backed workers">
+        <rect x="24" y="100" width="150" height="80" rx="10" class="s-card"/>
+        <text x="99" y="132" text-anchor="middle" class="s-label">HUMAN</text>
+        <text x="99" y="156" text-anchor="middle" class="s-label-sm">chats in a web UI</text>
+
+        <path d="M180 140 H 224" class="s-flow"/><path d="M224 140 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="232" y="62" width="210" height="156" rx="10" class="s-clay-f"/>
+        <text x="337" y="90" text-anchor="middle" class="s-label">THE ORCHESTRATOR</text>
+        <text x="337" y="116" text-anchor="middle" class="s-label-sm">mcp__mgmt__create_agent</text>
+        <text x="337" y="136" text-anchor="middle" class="s-label-sm">mcp__mgmt__command_agent</text>
+        <text x="337" y="156" text-anchor="middle" class="s-label-sm">mcp__mgmt__interrupt_agent</text>
+        <text x="337" y="176" text-anchor="middle" class="s-label-sm">Bash · Read · SlashCommand · Skill</text>
+        <rect x="248" y="188" width="178" height="22" rx="6" class="s-card"/>
+        <text x="337" y="204" text-anchor="middle" class="s-label-sm">NO Write · NO Edit · NO Task</text>
+
+        <path d="M448 140 H 492" class="s-flow"/><path d="M492 140 l-9 -6 0 12 z" class="s-clay"/>
+
+        <rect x="500" y="40" width="170" height="52" rx="9" class="s-blue-f"/>
+        <text x="585" y="62" text-anchor="middle" class="s-label-sm">agent "code-scout"</text>
+        <text x="585" y="80" text-anchor="middle" class="s-label-sm">session_id · cost · status</text>
+        <rect x="500" y="104" width="170" height="52" rx="9" class="s-blue-f"/>
+        <text x="585" y="126" text-anchor="middle" class="s-label-sm">agent "builder"</text>
+        <text x="585" y="144" text-anchor="middle" class="s-label-sm">resumable · nameable</text>
+        <rect x="500" y="168" width="170" height="52" rx="9" class="s-blue-f"/>
+        <text x="585" y="190" text-anchor="middle" class="s-label-sm">agent "reviewer"</text>
+        <text x="585" y="208" text-anchor="middle" class="s-label-sm">deletable · interruptible</text>
+
+        <path d="M676 130 H 716" class="s-flow"/><path d="M716 130 l-9 -6 0 12 z" class="s-clay"/>
+        <rect x="724" y="96" width="130" height="68" rx="10" class="s-olive-f"/>
+        <text x="789" y="126" text-anchor="middle" class="s-label">POSTGRES</text>
+        <text x="789" y="148" text-anchor="middle" class="s-label-sm">durable identity</text>
+
+        <text x="24" y="256" class="s-label-sm">WORKERS OUTLIVE ANY SINGLE CALL — A TASK SUBAGENT DOES NOT</text>
+        <text x="24" y="278" class="s-label-sm">THE SYSTEM PROMPT IS PARTLY GENERATED AT BOOT FROM .claude/agents/ VIA {{SUBAGENT_MAP}}</text>
+      </svg>
+      <div class="fcap"><b>Not the Task tool.</b> In-process MCP tools handed to the model, plus a session registry. A worker is a database row, not a function call.</div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big"><p>command_agent(agent_name, '/compact')</p><span class="cite" style="display:block;margin-top:10px">— one agent invoking another agent's context compaction, as a management action</span></div>
+      <div class="prose">
+        <p>The orchestrator is told to watch its workers' context usage and <em>suggest compacting at 80%</em>. That single line is the AH-4 thesis: if workers are durable, their context becomes a resource somebody has to manage.</p>
+        <p><code>{{SUBAGENT_MAP}}</code> is the other half — a placeholder in the system prompt filled at boot by scanning <code>.claude/agents/</code>. <strong>A Claude Code subagent definition becomes a reusable class</strong>, instantiated into a long-lived named worker.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">DISCIPLINE 01</span><p class="ctitle">Read-only by capability</p><p class="cbody">Scouts are granted exactly <code>Read, Glob, Grep</code>. Not asked to be read-only — <em>made</em> read-only.</p></div>
+      <div class="card blue"><span class="cnum">DISCIPLINE 02</span><p class="ctitle">Model as a pure price lever</p><p class="cbody"><code>scout-report-suggest</code> and <code>…-fast</code> differ by exactly two lines: the name and <code>opus</code> → <code>haiku</code>. The 118-line body is byte-identical.</p></div>
+      <div class="card olive"><span class="cnum">DISCIPLINE 03</span><p class="ctitle">Agents can wrap commands</p><p class="cbody"><code>planner.md</code>'s only work tool is <code>SlashCommand</code> — it exists purely to call <code>/plan</code>, keeping the command the single source of truth.</p></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">The swarm is a recall mechanism, not an oracle.</p>
+        <p><code>plan_w_scouters.md</code> fans out <strong>3 opus + 5 haiku</strong> scouts in parallel, divide-and-conquer. Then step 2.4 tells the orchestrator to <em>manually re-validate</em> the consolidated result.</p>
+        <p>Its sibling <code>build_in_parallel.md</code> carries the most transferable idea in the repo: <strong>parallelism bounded by the file dependency graph.</strong> Batch 1 has no dependencies; Batch 2 depends on Batch 1; each batch is barrier-synchronised. Every agent gets a self-contained spec precisely because it shares no context with its siblings.</p>
+      </div>
+      <div>
+        <div class="codecap">plan_w_scouters.md — the fan-out</div>
+        <div class="code"><pre>TOTAL_BASE_SCOUT_SUBAGENTS: 3
+TOTAL_FAST_SCOUT_SUBAGENTS: 5
+
+2. Explore Codebase — Deploy a total of
+   `TOTAL_BASE + TOTAL_FAST` subagents in PARALLEL.
+   1. Run 3 @agent-scout-report-suggest in parallel.
+      Give each different direction, divide and conquer.
+   2. Run 5 @agent-scout-report-suggest-fast in parallel.
+   3. Gather the results and consolidate.
+   4. Validate the files — MANUALLY validate, double
+      check, and look for any missing files.</pre></div>
+        <p class="note">The step numbering runs 1, 2, 4, 5, 6, 7. There is no step 3.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch07-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Team pools, and the rubric that isn't one</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 280" role="img" aria-label="Round-robin branch assignment across three cloned team pools with phase-stable affinity">
+          <text x="18" y="22" class="s-label">7 BRANCHES → 3 CLONED TEAMS</text>
+          <rect x="18" y="38" width="120" height="26" rx="6" class="s-clay-f"/>
+          <text x="30" y="56" class="s-label-sm">UI Generation</text>
+          <text x="150" y="56" class="s-label-sm">1 · 4 · 7</text>
+          <rect x="18" y="72" width="120" height="26" rx="6" class="s-blue-f"/>
+          <text x="30" y="90" class="s-label-sm">UI Generation B</text>
+          <text x="150" y="90" class="s-label-sm">2 · 5</text>
+          <rect x="18" y="106" width="120" height="26" rx="6" class="s-olive-f"/>
+          <text x="30" y="124" class="s-label-sm">UI Generation C</text>
+          <text x="150" y="124" class="s-label-sm">3 · 6</text>
+
+          <path d="M18 152 H 442" class="s-line"/>
+          <text x="18" y="176" class="s-label">SAME ASSIGNMENT FOR VALIDATION</text>
+          <rect x="18" y="188" width="120" height="26" rx="6" class="s-clay-f"/>
+          <text x="30" y="206" class="s-label-sm">Validation</text>
+          <text x="150" y="206" class="s-label-sm">1 · 4 · 7</text>
+          <text x="18" y="240" class="s-label-sm">THE TEAM THAT BUILT BRANCH 4</text>
+          <text x="18" y="258" class="s-label-sm">VALIDATES BRANCH 4 AND FIXES BRANCH 4</text>
+        </svg>
+        <div class="fcap"><b>Phase-stable affinity.</b> Concurrency safety is argued from directory disjointness, not from locking.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Fan-out here is not "spawn N agents." It is N units of work round-robined across a <strong>fixed pool of cloned teams</strong>.</p>
+        <p>Twelve agent files instantiate eight teams, because six of them are referenced three times each under different colours. The roster is declared up front in YAML; nothing is created at runtime.</p>
+        <p>And validators are structurally unable to fix what they find — their frontmatter grants <code>screenshots/ upsert:true</code> but <code>apps/ upsert:false</code>. Path-level ACLs, in the agent definition.</p>
+      </div>
+    </div>
+
+    <div class="callout warn reveal"><span class="ci">THE FINDING THAT MATTERS MOST</span>
+      <span class="cc">There <strong>is</strong> a rubric — five binary quality gates — but it is a <strong>conformance gate, not a comparison</strong>. Every variant is judged independently against absolutes; none reference their siblings. The schema proves it: <code>BranchStatus = ['draft','generating','validating','validated','failed']</code>. No score. No rank. No winner. <strong>All passing variants ship, and the human is the selector.</strong></span></div>
+
+    <p class="prose reveal" style="max-width:74ch">Differentiation happens <em>before</em> generation, not after — the lead is instructed to force variants apart on layout, tone, content density and interaction model, with the warning: <em>"Don't just change colors between variants."</em> That is the same conclusion his fusion harness reaches by a different route: <strong>machines settle conformance; humans settle taste.</strong></p>
+
+    <div class="spread rev reveal" style="align-items:center">
+      <div class="quote"><p>"Write errors are not bugs. They're coordination signals. Re-read, re-apply, retry."</p><span class="cite">— parallel-mental-model-updates.md</span></div>
+      <div class="prose">
+        <p>Three clones of one agent share one memory file. There is no lock, no CRDT, no queue — <strong>the conflict-resolution algorithm is the model's judgement</strong>, taught in prose as read-modify-write with retry.</p>
+        <p>It even reframes finding a sibling's entry as an asset: <em>"Their context is your context. Ingest their learnings."</em> Optimistic concurrency control, written for a reader that can reason about intent.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch07-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Where the slogan stops being a slogan</h2></div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 250" role="img" aria-label="The circuit: agent definitions consumed both by Claude Code at development time and by the shipped app at runtime">
+        <rect x="290" y="18" width="300" height="46" rx="10" class="s-clay-f"/>
+        <text x="440" y="40" text-anchor="middle" class="s-title" font-size="13">.claude/agents/build-agent.md</text>
+        <text x="440" y="56" text-anchor="middle" class="s-label-sm">one file, two consumers</text>
+
+        <path d="M330 68 C 240 96, 180 100, 150 118" class="s-flow"/>
+        <path d="M150 118 l10 -4 -3 11 z" class="s-clay"/>
+        <path d="M550 68 C 640 96, 700 100, 730 118" class="s-flow"/>
+        <path d="M730 118 l-10 -4 3 11 z" class="s-clay"/>
+
+        <rect x="24" y="124" width="250" height="86" rx="10" class="s-blue-f"/>
+        <text x="149" y="152" text-anchor="middle" class="s-label">AT DEVELOPMENT TIME</text>
+        <text x="149" y="176" text-anchor="middle" class="s-label-sm">a Claude Code subagent</text>
+        <text x="149" y="196" text-anchor="middle" class="s-label-sm">that BUILT this app</text>
+
+        <rect x="606" y="124" width="250" height="86" rx="10" class="s-olive-f"/>
+        <text x="731" y="152" text-anchor="middle" class="s-label">AT RUNTIME</text>
+        <text x="731" y="176" text-anchor="middle" class="s-label-sm">a template the shipped app</text>
+        <text x="731" y="196" text-anchor="middle" class="s-label-sm">INSTANTIATES to build the next</text>
+
+        <rect x="300" y="130" width="280" height="76" rx="10" class="s-card"/>
+        <text x="440" y="154" text-anchor="middle" class="s-label">THE THREE SEAMS</text>
+        <text x="440" y="176" text-anchor="middle" class="s-label-sm">COPY_WHITELIST = agents/ commands/ skills/</text>
+        <text x="440" y="194" text-anchor="middle" class="s-label-sm">setting_sources = ["project"]</text>
+      </svg>
+      <div class="fcap"><b>Point it at a different repo with <code>--cwd</code> and it inherits that repo's cast of agents.</b></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:start">
+      <div class="prose">
+        <p class="lead-in">A three-line whitelist decides which half of the agentic layer is portable into a product.</p>
+        <p><code>agents/</code>, <code>commands/</code>, <code>skills/</code> get copied into the app. <code>hooks/</code>, <code>output-styles/</code>, <code>status_lines/</code> and <code>settings.json</code> stay at the root — they are Claude-Code-only. That is a deliberate statement about what a *running product* can consume, not tidiness.</p>
+        <p>One file is explicitly blacklisted: <code>commands/prime.md</code>, because the app's copy is deliberately app-scoped.</p>
+      </div>
+      <div>
+        <div class="codecap">scripts/copy_claude.py</div>
+        <div class="code"><pre># Whitelist: Only copy these directories from .claude/
+COPY_WHITELIST = [
+    "agents/",
+    "commands/",
+    "skills/",
+]
+
+# Blacklist: Never copy these specific files
+COPY_BLACKLIST = [
+    "commands/prime.md",
+]</pre></div>
+      </div>
+    </div>
+
+    <div class="callout ok reveal"><span class="ci">THE BEST SINGLE ARTIFACT IN THE CORPUS</span>
+      <span class="cc"><code>specs/specialized-agent-templates.md</code> — 570 lines, written in the exact format <code>/plan</code> emits — is <strong>a plan, produced by the agent system, specifying the feature that teaches the app to read the agent system's own config files.</strong> It shipped: <code>subagent_loader.py</code> exists, and its first line is <code>self.templates_dir = self.working_dir / ".claude" / "agents"</code>. That is the slogan implemented, not asserted.</span></div>
+
+    <div class="callout bad reveal"><span class="ci">AND TWO META-AGENTS THAT DISAGREE</span>
+      <span class="cc">The meta-agent <em>skill</em> says <em>"By default, OMIT the tools field to inherit all parent tools"</em> and defaults to <code>sonnet</code>. The meta-agent <em>agent</em> says <em>"Minimal tool selection"</em> and hardcodes <code>opus</code>. Two generators, two philosophies, both live in the same repo. Pick one before you copy either.</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch07-s5"><span class="sn">5</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Take this one file</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">If you copy one artifact out of the entire course tree, make it <code>experts/&lt;domain&gt;/self-improve.md</code>.</p>
+        <p>192 lines of markdown, zero dependencies, and it solves the problem everyone building an agentic layer hits in month two: <strong>your docs rot, and rotted context is worse than none — because the agent trusts it.</strong></p>
+        <p>Three details separate it from "keep a notes file," and everybody omits the second one.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 240" role="img" aria-label="Three mechanisms that make a self-improving memory file survive">
+          <rect x="20" y="24" width="420" height="56" rx="9" class="s-clay-f"/>
+          <text x="36" y="48" class="s-title" font-size="13">1 · It forbids inference</text>
+          <text x="36" y="68" class="s-label-sm">"validate against real implementation, not assumptions"</text>
+
+          <rect x="20" y="90" width="420" height="60" rx="9" class="s-amber-f"/>
+          <text x="36" y="114" class="s-title" font-size="13">2 · Bounded loop, mechanical exit</text>
+          <text x="36" y="134" class="s-label-sm">wc -l → over MAX_LINES? trim → REPEAT until under</text>
+
+          <rect x="20" y="160" width="420" height="56" rx="9" class="s-olive-f"/>
+          <text x="36" y="184" class="s-title" font-size="13">3 · It compiles the artifact</text>
+          <text x="36" y="204" class="s-label-sm">python3 -c "import yaml; yaml.safe_load(...)"</text>
+        </svg>
+        <div class="fcap"><b>Without #2, a self-improving file grows monotonically until it blows the window.</b></div>
+      </div>
+    </div>
+
+    <div class="quote reveal"><p>"Keep in mind, after your thorough search, there may be nothing to be done — this is perfectly acceptable. If there's nothing to be done, report that and stop."</p><span class="cite">— the instruction most "improve this" prompts lack</span></div>
+
+    <p class="prose reveal" style="max-width:74ch">An agent handed an improvement task will always find something to improve. That line gives it permission not to. Swap the expertise path and the domain grep patterns, run it on a post-merge hook, and you have a working memory system in an afternoon.</p>
+
+    <div class="callout bad reveal"><span class="ci">AND THE HONEST PART</span>
+      <span class="cc">The expert pattern is <strong>beautifully specified and demonstrably under-run.</strong> The ADW domain's own <code>expertise.yaml</code> instructs you to <em>"Register in adw_triggers/adw_scripts.py"</em> — and there is no registry in that file; workflows resolve by <code>Path.exists()</code>. <strong>The mechanism designed to keep expertise accurate has stale expertise inside it.</strong> The advertised autocomplete expert's memory file is three lines with <code>previous_completions: []</code> — it has learned nothing. And of three expert domains, only two ever got the full file set. The prompts are excellent; they have not been run to convergence, which is the whole point of the pattern.</span></div>
+
+    <a class="jump reveal" href="#ch08">Next · A worked example &nbsp;→</a>
+  </div>
+</section>

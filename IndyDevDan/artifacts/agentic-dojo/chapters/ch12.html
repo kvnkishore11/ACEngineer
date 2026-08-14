@@ -1,0 +1,222 @@
+<section class="chapter" id="ch12">
+<div class="wrap wide">
+<span class="chapnum reveal">12 — Vol II · Lesson 3</span>
+<div class="kicker reveal">agentic horizon · building specialized agents</div>
+<h2 class="title reveal d1" style="max-width:26ch">Building domain-specific <em>custom agents</em>.</h2>
+<p class="lede reveal d2">Out-of-the-box agents are built for everyone's codebase, not yours — the Claude Agent SDK lets you control the Core Four at bare metal, and the system prompt is the most important element of all.</p>
+<div class="pillrow reveal d2"><span class="pill clay">AH-3</span><span class="pill blue">Claude Agent SDK</span><span class="pill olive">the core four</span><span class="pill plum">system prompt is the law</span><span class="pill amber">8 agents built</span></div>
+
+<div class="chapnav reveal d3"><span class="cnl">In this chapter</span>
+<a href="#ch12-s1"><b>1</b>The Idea</a>
+<a href="#ch12-s2"><b>2</b>The Nuggets</a>
+<a href="#ch12-s3"><b>3</b>What Dan Did</a>
+<a href="#ch12-s4"><b>4</b>The Workout</a>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal" id="ch12-s1"><span class="sn">1</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Idea — Better, More, Custom</h2></div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="prose">
+<p class="lead-in">Every engineer's path runs "better agents, more agents, and then custom agents."</p>
+<p>Out-of-the-box agents "are built for everyone's codebase, not yours" — and custom agents push <strong>one agent, one prompt, one purpose</strong> to its limit. When you build one, keep one habit: "Whenever you see ClaudeCodeOptions, <strong>isolate the core four</strong>" — context, model, prompt, tools.</p>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 480 240" role="img" aria-label="The agent evolution path: better agents, more agents, custom agents">
+<text x="20" y="34" class="s-label">the agent evolution path</text>
+<rect x="20" y="150" width="130" height="56" rx="10" class="s-olive-f"/>
+<text x="85" y="174" text-anchor="middle" class="s-title" style="font-size:12px">BETTER AGENTS</text>
+<text x="85" y="192" text-anchor="middle" class="s-label-sm">tune the core four</text>
+<path d="M152 160 C 168 148, 176 140, 190 130" class="s-flow"/>
+<path d="M193 127 l-11 2 6 9 z" class="s-clay"/>
+<rect x="175" y="95" width="130" height="56" rx="10" class="s-blue-f"/>
+<text x="240" y="119" text-anchor="middle" class="s-title" style="font-size:12px">MORE AGENTS</text>
+<text x="240" y="137" text-anchor="middle" class="s-label-sm">delegate · parallelize</text>
+<path d="M307 105 C 323 93, 331 85, 345 75" class="s-flow"/>
+<path d="M348 72 l-11 2 6 9 z" class="s-clay"/>
+<rect x="330" y="40" width="130" height="56" rx="10" class="s-clay-f"/>
+<text x="395" y="64" text-anchor="middle" class="s-title" style="font-size:12px">CUSTOM AGENTS</text>
+<text x="395" y="82" text-anchor="middle" class="s-label-sm">own the bare metal</text>
+<text x="240" y="228" text-anchor="middle" class="s-label-sm">"this is where all the alpha is in engineering"</text>
+</svg>
+<div class="fcap"><b>The path.</b> This mismatch of generic agents on your specific problems "can cost you hundreds of hours and millions of tokens."</div>
+</div>
+</div>
+
+<div class="spread rev reveal d1" style="align-items:center">
+<div class="fig">
+<svg class="draw" viewBox="0 0 480 300" role="img" aria-label="The SDK loop: set up options, set up the agent, run your prompt, manage the responses">
+<rect x="40" y="40" width="150" height="58" rx="10" class="s-clay-f"/>
+<text x="115" y="64" text-anchor="middle" class="s-title" style="font-size:12px">1 · OPTIONS</text>
+<text x="115" y="82" text-anchor="middle" class="s-label-sm">isolate the core four</text>
+<rect x="290" y="40" width="150" height="58" rx="10" class="s-blue-f"/>
+<text x="365" y="64" text-anchor="middle" class="s-title" style="font-size:12px">2 · AGENT</text>
+<text x="365" y="82" text-anchor="middle" class="s-label-sm">query() · ClaudeSDKClient</text>
+<rect x="290" y="200" width="150" height="58" rx="10" class="s-olive-f"/>
+<text x="365" y="224" text-anchor="middle" class="s-title" style="font-size:12px">3 · PROMPT</text>
+<text x="365" y="242" text-anchor="middle" class="s-label-sm">run your prompt</text>
+<rect x="40" y="200" width="150" height="58" rx="10" class="s-plum-f"/>
+<text x="115" y="224" text-anchor="middle" class="s-title" style="font-size:12px">4 · RESPONSES</text>
+<text x="115" y="242" text-anchor="middle" class="s-label-sm">assistant · system · result</text>
+<path d="M194 69 H 284" class="s-flow"/>
+<path d="M288 69 l-10 -5 0 10 z" class="s-clay"/>
+<path d="M365 102 V 194" class="s-flow"/>
+<path d="M365 198 l-5 -10 10 0 z" class="s-clay"/>
+<path d="M286 229 H 196" class="s-flow"/>
+<path d="M192 229 l10 -5 0 10 z" class="s-clay"/>
+<path d="M115 196 V 104" class="s-flow"/>
+<path d="M115 100 l-5 10 10 0 z" class="s-clay"/>
+<text x="240" y="146" text-anchor="middle" class="s-label">the SDK loop</text>
+<text x="240" y="164" text-anchor="middle" class="s-label-sm">text · tool-use · tool-result · thinking</text>
+</svg>
+<div class="fcap"><b>The SDK loop.</b> "You set up your options, you set up your agent, you run your prompt, you then manage the responses."</div>
+</div>
+<div class="prose">
+<p>Two ways to run it: "<strong>query is for one-off prompts</strong> and the <strong>Claude SDK client is for continuous conversations</strong>" (with <span class="mono">resume</span> / session-id for continuation). Message types arrive as assistant, system, and result — carrying text, tool-use, tool-result, and thinking blocks.</p>
+<p>"Your system prompt is the law for your agent." Embed a workflow in it only when you want that exact flow <em>every single time</em> the agent executes.</p>
+</div>
+</div>
+
+<div class="spread reveal d2" style="align-items:center">
+<div class="prose">
+<p>There are two species of custom agent. <strong>Extension agents</strong> append the system prompt to <em>extend</em> Claude Code. <strong>Complete custom agents</strong> overwrite the system prompt and add custom tools — "this is not Claude Code anymore… you change the product."</p>
+<p>But don't confuse ambition with scope: "Don't try to reproduce your own engineering agent. Claude Code is that."</p>
+</div>
+<div class="fig">
+<svg class="draw" viewBox="0 0 480 260" role="img" aria-label="Extension agents append the system prompt; complete custom agents overwrite it and change the product">
+<text x="120" y="36" text-anchor="middle" class="s-title" style="font-size:12px">EXTEND</text>
+<text x="360" y="36" text-anchor="middle" class="s-title" style="font-size:12px">OVERWRITE</text>
+<path d="M240 24 V 236" class="s-line" style="stroke-dasharray:4 5"/>
+<rect x="20" y="56" width="200" height="76" rx="10" class="s-card"/>
+<text x="120" y="88" text-anchor="middle" class="s-label">Claude Code</text>
+<text x="120" y="106" text-anchor="middle" class="s-label">system prompt</text>
+<rect x="20" y="140" width="200" height="42" rx="10" class="s-olive-f"/>
+<text x="120" y="166" text-anchor="middle" class="s-label-sm">+ your rules, appended</text>
+<text x="120" y="212" text-anchor="middle" class="s-label-sm">extension agent — still Claude Code</text>
+<rect x="260" y="56" width="200" height="76" rx="10" class="s-clay-f"/>
+<text x="360" y="88" text-anchor="middle" class="s-label">your system prompt</text>
+<text x="360" y="106" text-anchor="middle" class="s-label-sm">the law, written by you</text>
+<rect x="260" y="140" width="200" height="42" rx="10" class="s-plum-f"/>
+<text x="360" y="166" text-anchor="middle" class="s-label-sm">+ your custom tools</text>
+<text x="360" y="212" text-anchor="middle" class="s-label-sm">"not Claude Code anymore — you change the product"</text>
+</svg>
+<div class="fcap"><b>Two species.</b> Append to extend; overwrite to build a new product on the same engine.</div>
+</div>
+</div>
+
+<div class="compare reveal d3">
+<div class="col bad"><span class="clabel">◴ stay out-of-the-box when</span><ul>
+<li>You're operating in-loop</li>
+<li>The workflow is generic and the SDK covers it</li>
+<li>You're exploring and prototyping</li>
+<li>A balanced generalist works in 80% of situations</li>
+<li>The task is short-lived, lightweight, non-repeat, non-domain</li>
+</ul></div>
+<div class="col good"><span class="clabel">◵ build custom when</span><ul>
+<li>You need programmatic agents</li>
+<li>You have repeat workflows</li>
+<li>The problem is domain-specific</li>
+<li>You want costs down and performance up</li>
+<li>You need permission checks &amp; safety (hooks)</li>
+<li>"Most importantly… you want to stay out of the loop"</li>
+</ul></div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal blue" id="ch12-s2"><span class="sn">2</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Nuggets</h2></div>
+
+<div class="spread reveal" style="align-items:center">
+<div class="quote big"><p>"The system prompt is the most important element of your custom agents. With zero exceptions."</p><span class="cite" style="display:block;margin-top:10px">— the one rule of custom agents</span></div>
+<div class="prose">
+<p>"The system prompt affects every single user prompt the agent runs. All of your work is multiplied by your system prompt." When you read anyone's agent code: "Always look for the system prompt and then look for the custom tools."</p>
+</div>
+</div>
+
+<div class="grid grid-3">
+<div class="card accent reveal"><p class="ctitle">Not your codebase</p><p class="cbody">"They're built for everyone's codebase, not yours. This mismatch can cost you hundreds of hours and millions of tokens."</p></div>
+<div class="card blue reveal d1"><p class="ctitle">Where the alpha is</p><p class="cbody">"This is where all the alpha is in engineering. It's in the hard specific problems that most engineers and most agents can't solve out of the box."</p></div>
+<div class="card olive reveal d2"><p class="ctitle">What builds the agent</p><p class="cbody">"The system prompt is truly what builds the agent."</p></div>
+<div class="card plum reveal d1"><p class="ctitle">Everything lands in the window</p><p class="cbody">"Everything that's going into your agent winds up in the context window at some point" — 15 default tools "consume space in your agent's mind."</p></div>
+<div class="card amber reveal d2"><p class="ctitle">Descriptions teach tools</p><p class="cbody">"The description of your tool tells your agent how to use it."</p></div>
+<div class="card accent reveal d3"><p class="ctitle">Deterministic inside</p><p class="cbody">"In your tools, you're back in traditional deterministic code… do whatever you want, but respond in the proper format."</p></div>
+<div class="card blue reveal d2"><p class="ctitle">Can your agent pivot?</p><p class="cbody">"If an error occurs, can our agent pivot?" — give agents information so they can reflect and correct.</p></div>
+<div class="card olive reveal d3"><p class="ctitle">Start small</p><p class="cbody">"Don't start with big things, start with small things. Everything large is a few small things that you understand fundamentally first."</p></div>
+<div class="card plum reveal d4"><p class="ctitle">You're the limit now</p><p class="cbody">"It's not the models that are the limitation anymore. It's you and I — our ability to wield better agents, more agents, and now custom agents."</p></div>
+<div class="card amber reveal d3"><p class="ctitle">Workflows in the law</p><p class="cbody">"You can embed workflows in your system prompt if you're sure that is what you want to happen every single time your agent executes."</p></div>
+<div class="card accent reveal d4"><p class="ctitle">Subtract by purpose</p><p class="cbody">"This agent cannot write. It's a QA agent. Why would it need to write anything?"</p></div>
+<div class="card blue reveal d5"><p class="ctitle">Don't compete with Claude Code</p><p class="cbody">"Don't try to reproduce your own engineering agent. Claude Code is that." / "In no way do I think you should try to compete with Claude Code."</p></div>
+<div class="card olive reveal d4"><p class="ctitle">Start there, don't end there</p><p class="cbody">"You can solve your problems better than any agent can. Out of the box is a great place to start — don't end there."</p></div>
+<div class="card plum reveal d5"><p class="ctitle">Caching for free</p><p class="cbody">The SDK "has built-in prompt caching. You will be saving money by using this out of the box."</p></div>
+<div class="card amber reveal d5"><p class="ctitle">Teach, don't do</p><p class="cbody">"Agentic coding is not so much about what we can do anymore. It's about what we can teach our agents to do."</p></div>
+</div>
+
+<div class="callout warn reveal"><span class="ci">HOOKS = GOVERNANCE</span><span class="cc">Hooks are "essential for governance, for control, for permissions in <strong>all</strong> of your agents."</span></div>
+<div class="callout idea reveal d1"><span class="ci">CONCRETE OBJECTS</span><span class="cc">"Whatever response format you return from your agents… create a concrete object" — Pydantic or Zod, validated on every response.</span></div>
+
+<hr class="divline reveal">
+<div class="subsec reveal olive" id="ch12-s3"><span class="sn">3</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What Dan Did — Eight Agents</h2></div>
+<p class="note reveal">Eight agents in <span class="mono">building-specialized-agents/apps/</span>, all Python + <span class="mono">uv run</span>, in ascending capability.</p>
+
+<div class="spread reveal" style="align-items:start">
+<ol class="steps">
+<li><h4>Pong agent</h4><p>Overwrote the system prompt — "You are a Pong agent, always respond exactly with Pong." Every prompt → "Pong". ~150 lines, mostly logging. Lesson: total system prompt control.</p></li>
+<li><h4>Echo agent</h4><p>Custom <span class="mono">@tool</span> (reverse / uppercase / repeat) in an in-memory MCP server via <span class="mono">create_sdk_mcp_server</span>; downgraded to Haiku; <span class="mono">ClaudeSDKClient</span> for a follow-up query — and discovered 15 leftover Claude Code tools still in context.</p></li>
+<li><h4>Calc agent</h4><p>Terminal-UI form factor; only two tools (calculate expression, unit converter); a big <span class="mono">disallowed_tools</span> block — "these tools do not end up in its context window"; <span class="mono">resume</span> session id for continuous chat.</p></li>
+<li><h4>Social hype agent</h4><p>Bluesky firehose WebSocket stream: deterministic keyword match → queue → agent sentiment analysis (<span class="mono">submit_analysis</span> tool) → conditional <span class="mono">notify</span> tool (AppleScript notification + TTS); workflow embedded in the system prompt; max 3 turns.</p></li>
+<li><h4>QA agent</h4><p>Codebase question-answering expert; external Firecrawl MCP via a <span class="mono">mcp_config</span> path; read-only allowed tools (Task, Bash, Glob, Grep, Read, web search); PreToolUse/PostToolUse hooks blocked reads of <span class="mono">.env</span> files live; thinking blocks parsed.</p></li>
+<li><h4>Tri copywriter</h4><p>Agent in a web UI; ALL tools disallowed ("tool calling is useless for this use case"); <span class="mono">NUMBER_OF_VERSIONS</span> templated into the system prompt; JSON validated by a Pydantic <span class="mono">MultiVersionCopyResponse</span>; drag-and-drop file context; 6 variations per prompt.</p></li>
+<li><h4>Custom seven — micro SDLC</h4><p>Multi-agent kanban (plan → build → review → ship) over WebSockets; the planner's write-hook restricts writes to the plans directory; the builder keeps the stock Claude Code system prompt; the reviewer <em>appends</em>. Shipped a title change end-to-end from a dragged ticket — "a perfect example of an out-loop review system using the PITER framework."</p></li>
+<li><h4>UltraStream agent</h4><p>Two agents on a 42K-token log stream: a stream agent with fine-grained tools (read in 5-line chunks, produce summarized log, create alert) that manages its own context window, plus an inspector agent consuming its produced logs. "You cannot do this without serious prompt engineering with an out-of-the-box agent."</p></li>
+</ol>
+<div>
+<div class="filetree reveal"><span class="d">building-specialized-agents/apps/</span>
+  <span class="d">pong_agent/</span>  <span class="c"># total system prompt control</span>
+  <span class="d">echo_agent/</span>  <span class="c"># custom @tool + in-memory MCP</span>
+  <span class="d">calc_agent/</span>  <span class="c"># disallowed_tools + resume</span>
+  <span class="d">social_hype_agent/</span>  <span class="c"># firehose → analyze → notify</span>
+  <span class="d">qa_agent/</span>  <span class="c"># read-only + security hooks</span>
+  <span class="d">tri_copywriter/</span>  <span class="c"># zero tools, Pydantic JSON</span>
+  <span class="d">custom_seven/</span>  <span class="c"># micro SDLC kanban</span>
+  <span class="d">ultrastream/</span>  <span class="c"># two agents on a 42K log</span></div>
+<div class="codecap">the smallest possible custom agent — pong</div>
+<div class="code reveal d1"><pre># prompts/pong_system_prompt.md
+You are a Pong agent. Always respond exactly with "Pong".
+
+# pong_agent.py — isolate the core four
+# options: model=haiku, system_prompt=&lt;loaded file&gt;
+query("summarize this codebase", options)  # → "Pong"</pre></div>
+<div class="callout ok reveal d2"><span class="ci">READ ANY AGENT</span><span class="cc">"Always look for the <strong>system prompt</strong> and then look for the <strong>custom tools</strong>." Two looks and you understand any custom agent.</span></div>
+</div>
+</div>
+
+<hr class="divline reveal">
+<div class="subsec reveal amber" id="ch12-s4"><span class="sn">4</span>
+<h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The Workout</h2></div>
+
+<div class="grid grid-2">
+<div class="callout reveal"><span class="ci">GOAL</span><span class="cc">Build <strong>three custom agents</strong> of increasing capability on the Claude Agent SDK: a Pong agent, a tool-wielding Echo agent, and a read-only codebase QA agent with a security hook.</span></div>
+<div class="callout reveal d1"><span class="ci">PREREQUISITES</span><span class="cc">Python + <span class="mono">uv</span> (or TS + bun); <span class="mono">claude-agent-sdk</span> installed; an ANTHROPIC_API_KEY.</span></div>
+</div>
+
+<div class="spread reveal" style="align-items:start">
+<ol class="steps">
+<li><h4>Pong</h4><p>Scaffold <span class="mono">apps/pong_agent/</span> with <span class="mono">pong_agent.py</span> + <span class="mono">prompts/pong_system_prompt.md</span>. Use <span class="mono">query()</span> with options model: haiku, system_prompt: the loaded file. Prove that "summarize this codebase" returns "Pong".</p></li>
+<li><h4>Echo</h4><p>Define an <span class="mono">@tool</span> echo(text, reverse, uppercase, repeat); wrap it with <span class="mono">create_sdk_mcp_server</span>; use <span class="mono">ClaudeSDKClient</span> and send a follow-up "summarize our conversation" query. Then ask "list your available tools" and count the stock tools leaking in.</p></li>
+<li><h4>Seal the leaks</h4><p>Add <span class="mono">disallowed_tools</span> for every stock tool your echo agent doesn't need; re-ask for tools and confirm only yours remain.</p></li>
+<li><h4>QA agent</h4><p>Overwrite the system prompt (Purpose / Instructions / Examples), allow only Task, Bash, Glob, Grep, Read, and add a PreToolUse hook that blocks any Read whose path matches <span class="mono">.env</span> with a concise "blocked: environment file" reason.</p></li>
+<li><h4>Test the hook</h4><p>Prompt "read the .env file" → expect a block. Prompt "summarize the key modules, think hard" → expect thinking blocks plus a real answer.</p></li>
+<li><h4>Log everything</h4><p>Log every message type (system / assistant / result; text / tool_use / tool_result / thinking) with clean panels — "if you don't know what your agent is doing… it will be hard to improve them."</p></li>
+</ol>
+<div>
+<div class="callout ok reveal"><span class="ci">DONE WHEN</span><span class="cc">Pong always pongs; the echo agent's tool list contains <strong>only your tool</strong>; the QA agent answers a codebase question with citations, refuses <span class="mono">.env</span>, and reports session cost from the result message.</span></div>
+<div class="callout idea reveal d1"><span class="ci">LEVEL UP</span><span class="cc">Bolt the QA agent onto a stream: pipe a growing log file through a stream agent with a read-in-chunks tool, and have a second agent answer questions against its produced summaries — the <strong>UltraStream pattern</strong>.</span></div>
+<div class="quote reveal d2"><p>"Agentic coding is not so much about what we can do anymore. It's about what we can teach our agents to do."</p><span class="cite">— quote of the lesson</span></div>
+</div>
+</div>
+
+<a class="jump reveal" href="#ch13">Next · The Orchestrator Agent &nbsp;&rarr;</a>
+</div>
+</section>
