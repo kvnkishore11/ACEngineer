@@ -1,0 +1,2923 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Zero to Skill</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --paper:#f4efe4; --paper-2:#ece4d4; --paper-3:#e3d9c5;
+  --surface:#fbf8f1; --card:#fdfbf5; --card-2:#f6f0e2;
+  --ink-bg:#1c1813; --ink-bg-2:#272019;
+  --rule:#dcd3c1; --rule-soft:#e9e1d1; --rule-strong:#c8bca3;
+  --ink:#211d18; --ink-2:#4b443b; --ink-dim:#7d7568; --ink-faint:#a59c8c;
+  --on-dark:#efe7d8; --on-dark-dim:#b9ad97;
+  --clay:#c75b39; --clay-2:#d97757; --clay-soft:rgba(199,91,57,.10); --clay-line:rgba(199,91,57,.32);
+  --blue:#2f6f9f; --blue-soft:rgba(47,111,159,.10);
+  --olive:#5f7138; --olive-soft:rgba(95,113,56,.12);
+  --plum:#6e4a86; --plum-soft:rgba(110,74,134,.10);
+  --amber:#c1882a; --amber-soft:rgba(193,136,42,.12);
+  --rose:#b1556c; --rose-soft:rgba(177,85,108,.10);
+  --serif:'Fraunces','Iowan Old Style',Georgia,'Times New Roman',serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sh-sm:0 1px 2px rgba(60,45,25,.06),0 1px 2px rgba(60,45,25,.05);
+  --sh-md:0 4px 16px rgba(60,45,25,.10),0 1px 4px rgba(60,45,25,.06);
+  --sh-lg:0 18px 44px rgba(60,45,25,.16),0 6px 14px rgba(60,45,25,.09);
+  --sh-xl:0 34px 80px rgba(40,30,15,.26),0 12px 26px rgba(40,30,15,.12);
+  --rail:288px; --wrap:1080px;
+  /* readability principle (kvn): ~90% width + larger type */
+  --wrap:min(90vw,1640px); --wrap-wide:min(92vw,1800px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--sans);
+  /* readability principle (kvn): ~90% width + larger type */
+  font-size:19px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(60,45,25,.028) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+::selection{background:var(--clay-soft);color:var(--clay)}
+a{color:var(--clay);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;padding:0}
+
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;
+  background:linear-gradient(90deg,var(--clay),var(--amber));transition:width .12s linear}
+
+#rail{position:fixed;top:0;left:0;width:var(--rail);height:100vh;z-index:90;
+  background:linear-gradient(180deg,var(--surface),var(--paper));
+  border-right:1.5px solid var(--rule);
+  display:flex;flex-direction:column;padding:26px 22px 20px;overflow-y:auto}
+#rail .brand{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+#rail .brand .mark{width:34px;height:34px;border-radius:9px;flex:none;
+  background:linear-gradient(140deg,var(--clay-2),var(--clay));color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:var(--serif);
+  font-weight:600;font-size:19px;box-shadow:var(--sh-sm)}
+#rail .brand .bt{font-family:var(--serif);font-weight:600;font-size:16px;line-height:1.15;letter-spacing:-.01em}
+#rail .brand .bs{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim)}
+#rail .railhint{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin:18px 6px 9px;border-top:1px solid var(--rule-soft);padding-top:14px}
+nav.toc{display:flex;flex-direction:column;gap:1px;flex:1}
+nav.toc a{display:flex;align-items:baseline;gap:11px;padding:7px 10px;border-radius:8px;
+  color:var(--ink-2);font-size:13.5px;line-height:1.3;transition:background .15s,color .15s;position:relative}
+nav.toc a .n{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);min-width:18px;flex:none;padding-top:1px}
+nav.toc a:hover{background:var(--card-2);color:var(--ink)}
+nav.toc a.active{background:var(--clay-soft);color:var(--clay)}
+nav.toc a.active .n{color:var(--clay)}
+nav.toc a.active::before{content:"";position:absolute;left:-22px;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--clay)}
+#rail .foot{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--ink-faint);
+  margin-top:14px;border-top:1px solid var(--rule-soft);padding-top:12px;line-height:1.7}
+#railToggle{display:none}
+
+main{margin-left:var(--rail)}
+/* paged: one chapter shown at a time — no infinite scroll */
+/* readability principle (kvn): ~90% width + larger type — trim side padding to a ~5% gutter */
+.chapter{display:none;min-height:100vh;padding:70px 5% 150px;
+  flex-direction:column;justify-content:flex-start;position:relative}
+.chapter.active{display:flex;animation:pagein .5s cubic-bezier(.2,.7,.2,1)}
+.chapter.dark{justify-content:center}
+@keyframes pagein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto}
+/* readability principle (kvn): ~90% width + larger type */
+.wrap.wide{max-width:var(--wrap-wide)}
+
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--clay);display:inline-flex;align-items:center;gap:9px;margin-bottom:20px}
+.kicker::before{content:"";width:26px;height:1.5px;background:var(--clay-line)}
+.kicker.plain::before{display:none}
+.display{font-family:var(--serif);font-weight:600;letter-spacing:-.022em;line-height:1.02;
+  font-size:clamp(40px,6vw,76px);margin:0 0 22px;color:var(--ink)}
+h2.title{font-family:var(--serif);font-weight:600;letter-spacing:-.02em;line-height:1.06;
+  font-size:clamp(30px,4.2vw,50px);margin:0 0 18px}
+h3{font-family:var(--serif);font-weight:600;font-size:clamp(20px,2.3vw,26px);letter-spacing:-.01em;
+  margin:34px 0 12px;line-height:1.18}
+h4{font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:.01em;margin:22px 0 8px;color:var(--ink)}
+em,.it{font-style:italic}
+.display em,h2.title em,h3 em{color:var(--clay);font-style:italic}
+.lede{font-family:var(--serif);font-size:clamp(19px,2.1vw,24px);line-height:1.5;color:var(--ink-2);
+  font-weight:400;max-width:58ch;margin:0 0 8px}
+.prose{max-width:68ch}
+.prose p{margin:0 0 18px;color:var(--ink-2)}
+.prose p strong,strong{color:var(--ink);font-weight:600}
+.prose .lead-in{font-family:var(--serif);font-size:22px;line-height:1.5;color:var(--ink);margin-bottom:20px}
+.dropcap::first-letter{font-family:var(--serif);font-weight:600;float:left;font-size:62px;line-height:.82;
+  padding:6px 12px 0 0;color:var(--clay)}
+.small{font-size:13.5px;color:var(--ink-dim)}
+.mono{font-family:var(--mono)}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:100px;
+  border:1.5px solid var(--rule-strong);color:var(--ink-2);background:var(--surface)}
+.pill.clay{border-color:var(--clay-line);color:var(--clay);background:var(--clay-soft)}
+.pill.blue{border-color:rgba(47,111,159,.3);color:var(--blue);background:var(--blue-soft)}
+.pill.olive{border-color:rgba(95,113,56,.3);color:var(--olive);background:var(--olive-soft)}
+.pill.plum{border-color:rgba(110,74,134,.3);color:var(--plum);background:var(--plum-soft)}
+.pill.amber{border-color:rgba(193,136,42,.3);color:var(--amber);background:var(--amber-soft)}
+.pillrow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px}
+
+.grid{display:grid;gap:18px;margin:26px 0}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1.5px solid var(--rule);border-radius:13px;padding:22px 22px 20px;
+  transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-3px);box-shadow:var(--sh-md);border-color:var(--rule-strong)}
+.card .cnum{font-family:var(--mono);font-size:11px;color:var(--clay);letter-spacing:.1em;margin-bottom:11px;display:block}
+.card .ctitle{font-family:var(--serif);font-weight:600;font-size:19px;letter-spacing:-.01em;margin:0 0 8px;line-height:1.2}
+.card .cbody{font-size:14px;color:var(--ink-2);line-height:1.55}
+.card.accent{border-top:3px solid var(--clay)}
+.card.blue{border-top:3px solid var(--blue)}
+.card.olive{border-top:3px solid var(--olive)}
+.card.plum{border-top:3px solid var(--plum)}
+.card.amber{border-top:3px solid var(--amber)}
+.card.glow{background:linear-gradient(160deg,var(--card),var(--card-2))}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin:26px 0}
+.stat{border-left:3px solid var(--clay);padding:4px 0 4px 16px}
+.stat .sv{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4vw,44px);line-height:1;letter-spacing:-.02em;color:var(--ink)}
+.stat .sl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-top:8px}
+.stat.blue{border-color:var(--blue)} .stat.olive{border-color:var(--olive)}
+.stat.plum{border-color:var(--plum)} .stat.amber{border-color:var(--amber)}
+
+.quote{border-left:3px solid var(--clay);padding:6px 0 6px 26px;margin:32px 0;max-width:48ch}
+.quote p{font-family:var(--serif);font-style:italic;font-size:clamp(21px,2.6vw,28px);line-height:1.4;
+  color:var(--ink);margin:0 0 12px;font-weight:400}
+.quote .cite{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+.quote.big{border:none;padding:0;max-width:44ch;margin:10px 0}
+.quote.big p{font-size:clamp(24px,3.3vw,36px);line-height:1.22}
+
+.callout{display:flex;gap:14px;background:var(--card);border:1.5px solid var(--rule);
+  border-left:3px solid var(--clay);border-radius:0 11px 11px 0;padding:18px 20px;margin:24px 0}
+.callout .ci{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--clay);flex:none;padding-top:3px;writing-mode:horizontal-tb}
+.callout .cc{font-size:14.5px;color:var(--ink-2);line-height:1.55}
+.callout .cc strong{color:var(--ink)}
+.callout.warn{border-left-color:var(--amber);background:var(--amber-soft)} .callout.warn .ci{color:var(--amber)}
+.callout.ok{border-left-color:var(--olive);background:var(--olive-soft)} .callout.ok .ci{color:var(--olive)}
+.callout.idea{border-left-color:var(--plum);background:var(--plum-soft)} .callout.idea .ci{color:var(--plum)}
+.callout.bad{border-left-color:var(--rose);background:var(--rose-soft)} .callout.bad .ci{color:var(--rose)}
+
+.steps{list-style:none;counter-reset:s;padding:0;margin:24px 0;display:grid;gap:14px}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:16px;align-items:start}
+.steps li::before{counter-increment:s;content:counter(s);grid-column:1;align-self:start;
+  width:34px;height:34px;border-radius:50%;border:1.5px solid var(--clay-line);background:var(--clay-soft);
+  color:var(--clay);font-family:var(--mono);font-size:13px;font-weight:600;
+  display:flex;align-items:center;justify-content:center}
+.steps li > *{grid-column:2}
+.steps li h4{margin:5px 0 4px}
+.steps li p{margin:0;font-size:14px;color:var(--ink-2)}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:26px 0}
+.col{border:1.5px solid var(--rule);border-radius:12px;padding:20px;background:var(--card)}
+.col .clabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:12px;display:inline-flex;align-items:center;gap:7px}
+.col.bad{border-color:rgba(177,85,108,.28);background:var(--rose-soft)}
+.col.bad .clabel{color:var(--rose)}
+.col.good{border-color:rgba(95,113,56,.32);background:var(--olive-soft)}
+.col.good .clabel{color:var(--olive)}
+.col ul{margin:0;padding-left:18px} .col li{margin:0 0 8px;font-size:14px;color:var(--ink-2)}
+
+.code{background:var(--ink-bg);border:1.5px solid var(--ink-bg-2);border-radius:11px;
+  padding:18px 20px;margin:22px 0;overflow-x:auto;box-shadow:var(--sh-sm)}
+.code pre{margin:0;font-family:var(--mono);font-size:13px;line-height:1.7;color:#e7decd;white-space:pre}
+.code .cm{color:#9c8f76} .code .k{color:#e0a578} .code .s{color:#a9c08a} .code .v{color:#8fb6d4}
+.codecap{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-faint);margin:-12px 0 14px;padding-left:4px}
+kbd{font-family:var(--mono);font-size:11px;background:var(--paper-2);border:1.5px solid var(--rule-strong);
+  border-bottom-width:2.5px;border-radius:5px;padding:2px 7px;color:var(--ink-2)}
+
+.fig{border:1.5px solid var(--rule);border-radius:14px;background:var(--surface);padding:26px 24px 16px;
+  margin:28px 0;box-shadow:var(--sh-sm)}
+.fig.bare{border:none;background:none;box-shadow:none;padding:8px 0}
+.fig svg{display:block;width:100%;height:auto;overflow:visible}
+.fig .fcap{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--ink-dim);
+  text-align:center;margin-top:16px;border-top:1px solid var(--rule-soft);padding-top:12px}
+.fig .fcap b{color:var(--ink-2);font-weight:600}
+
+.s-card{fill:var(--card);stroke:var(--rule-strong);stroke-width:1.5}
+.s-clay{fill:var(--clay)} .s-clay-f{fill:var(--clay-soft);stroke:var(--clay);stroke-width:1.5}
+.s-blue-f{fill:var(--blue-soft);stroke:var(--blue);stroke-width:1.5}
+.s-olive-f{fill:var(--olive-soft);stroke:var(--olive);stroke-width:1.5}
+.s-plum-f{fill:var(--plum-soft);stroke:var(--plum);stroke-width:1.5}
+.s-amber-f{fill:var(--amber-soft);stroke:var(--amber);stroke-width:1.5}
+.s-ink{fill:var(--ink)} .s-dim{fill:var(--ink-dim)}
+.s-line{stroke:var(--rule-strong);stroke-width:1.5;fill:none}
+.s-flow{stroke:var(--clay);stroke-width:2;fill:none}
+.s-label{font-family:var(--mono);font-size:11px;fill:var(--ink-2);letter-spacing:.04em}
+.s-label-sm{font-family:var(--mono);font-size:9.5px;fill:var(--ink-dim);letter-spacing:.06em}
+.s-title{font-family:var(--sans);font-size:14px;font-weight:600;fill:var(--ink)}
+.s-serif{font-family:var(--serif);fill:var(--ink)}
+
+.draw path,.draw line,.draw circle,.draw rect,.draw polyline,.draw polygon{
+  stroke-dasharray:var(--len,1200);stroke-dashoffset:var(--len,1200);transition:stroke-dashoffset 1.3s ease}
+.draw.drawn path,.draw.drawn line,.draw.drawn circle,.draw.drawn rect,.draw.drawn polyline,.draw.drawn polygon{stroke-dashoffset:0}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.07s} .reveal.d2{transition-delay:.14s} .reveal.d3{transition-delay:.21s}
+.reveal.d4{transition-delay:.28s} .reveal.d5{transition-delay:.35s} .reveal.d6{transition-delay:.42s}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}
+  .draw path,.draw line,.draw circle,.draw rect,.draw polyline,.draw polygon{stroke-dashoffset:0}}
+
+.chapter.dark{background:radial-gradient(120% 90% at 78% 8%,#332821 0%,var(--ink-bg) 46%,#161210 100%);
+  color:var(--on-dark);border-bottom:none}
+.chapter.dark .kicker{color:var(--clay-2)} .chapter.dark .kicker::before{background:rgba(217,119,87,.5)}
+.chapter.dark .display,.chapter.dark h2.title{color:#f6efe2}
+.chapter.dark .display em{color:var(--clay-2)}
+.chapter.dark .lede{color:var(--on-dark-dim)}
+.chapter.dark .small{color:var(--on-dark-dim)}
+.chapter.dark .prose p{color:var(--on-dark-dim)}
+.chapter.dark .prose p strong{color:#f6efe2}
+.chapter.dark .pill{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.16);color:var(--on-dark-dim)}
+.chapter.dark .pill.clay{color:var(--clay-2);border-color:rgba(217,119,87,.4);background:rgba(217,119,87,.1)}
+.chapter.dark .quote p{color:#f6efe2}
+.chapter.dark .card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.12)}
+.chapter.dark .card .cbody{color:var(--on-dark-dim)}
+.chapter.dark .card .ctitle{color:#f6efe2}
+
+.chapnum{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--ink-faint);
+  display:inline-block;margin-bottom:14px}
+.divline{height:1.5px;background:var(--rule);border:none;margin:36px 0}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.spread{display:grid;grid-template-columns:1.1fr .9fr;gap:46px;align-items:center}
+.spread.rev{grid-template-columns:.9fr 1.1fr}
+.center{text-align:center}
+.maxw{max-width:760px;margin:0 auto}
+.tag-list{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
+.tag-list .t{font-family:var(--mono);font-size:11px;color:var(--ink-dim);padding:3px 9px;
+  border:1px solid var(--rule);border-radius:6px;background:var(--surface)}
+.sig{font-family:var(--serif);font-style:italic;font-size:28px;color:var(--clay);margin-top:8px}
+.jump{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--clay);margin-top:30px;
+  padding:9px 16px;border:1.5px solid var(--clay-line);border-radius:100px;background:var(--clay-soft);
+  transition:gap .18s,background .18s}
+.jump:hover{gap:13px;background:var(--clay);color:#fff}
+
+/* ── in-chapter contents nav (sticky) ──────────────────── */
+.chapnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 6px;padding:13px 16px;
+  background:rgba(251,248,241,.92);border:1.5px solid var(--rule-strong);border-radius:13px;
+  position:sticky;top:12px;z-index:46;box-shadow:var(--sh-sm);backdrop-filter:saturate(1.3) blur(9px)}
+.chapnav .cnl{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);margin-right:4px}
+.chapnav a{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-2);
+  padding:5px 11px;border:1.5px solid var(--rule);border-radius:100px;background:var(--card);transition:all .15s}
+.chapnav a:hover{color:var(--clay);border-color:var(--clay-line);background:var(--clay-soft)}
+.chapnav a.cur{color:#fff;border-color:var(--clay);background:var(--clay)}
+.chapnav a.cur b{color:#fff}
+.chapnav a b{color:var(--clay);font-weight:600;margin-right:6px}
+
+/* ── subsection header (numbered band) ─────────────────── */
+.subsec{display:flex;align-items:center;gap:15px;margin:10px 0 2px;scroll-margin-top:30px}
+.subsec .sn{font-family:var(--mono);font-size:14px;font-weight:600;color:#fff;
+  background:linear-gradient(140deg,var(--clay-2),var(--clay));
+  width:32px;height:32px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;
+  flex:none;box-shadow:var(--sh-sm)}
+.subsec.blue .sn{background:linear-gradient(140deg,#4a8cbf,var(--blue))}
+.subsec.olive .sn{background:linear-gradient(140deg,#7b9150,var(--olive))}
+.subsec.plum .sn{background:linear-gradient(140deg,#8a66a6,var(--plum))}
+.subsec.amber .sn{background:linear-gradient(140deg,#d6a24a,var(--amber))}
+.subsec h2,.subsec h3{margin:0}
+
+/* ── file tree (dark, like the code block) ─────────────── */
+.filetree{background:var(--ink-bg);border:1.5px solid var(--ink-bg-2);border-radius:11px;
+  padding:18px 22px;margin:22px 0;font-family:var(--mono);font-size:12.5px;line-height:1.85;
+  color:#e7decd;overflow-x:auto;box-shadow:var(--sh-sm);white-space:pre}
+.filetree .d{color:#e0a578;font-weight:600}
+.filetree .f{color:#cfc4b0}
+.filetree .c{color:#9c8f76}
+.filetree .hl{color:#a9c08a}
+
+/* annotated code: caption + body pairing already via .codecap + .code */
+.note{font-size:13.5px;color:var(--ink-dim);font-style:italic;margin:-10px 0 16px;padding-left:4px}
+
+/* ── "from the lecture" video stills band ──────────────── */
+.lecband{margin:30px 0 8px;padding:22px 22px 18px;border:1.5px solid var(--rule-strong);border-radius:16px;
+  background:linear-gradient(160deg,var(--card),var(--card-2))}
+.lecband .lechead{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--clay);margin-bottom:12px}
+.lecband .lechead::before{content:"▶";font-size:10px}
+.lecband .lecintro{font-size:14.5px;color:var(--ink-2);line-height:1.6;max-width:74ch;margin:0 0 6px}
+.lecband .lecintro strong{color:var(--ink)}
+.stillgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:15px;margin:18px 0 8px}
+.still{border:1.5px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--ink-bg);
+  box-shadow:var(--sh-sm);transition:transform .2s,box-shadow .2s}
+.still:hover{transform:translateY(-3px);box-shadow:var(--sh-md)}
+.still.hero{grid-column:1 / -1}
+.still img{display:block;width:100%;height:auto}
+.still figcaption{padding:11px 14px;font-size:13px;color:var(--ink-2);background:var(--card);line-height:1.5}
+.still figcaption b{display:block;color:var(--clay);font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.lecband .watch{display:inline-flex;align-items:center;gap:8px;margin-top:6px;font-family:var(--mono);
+  font-size:11px;letter-spacing:.06em;color:var(--clay);border:1.5px solid var(--clay-line);
+  padding:7px 14px;border-radius:100px;background:var(--clay-soft)}
+.lecband .watch:hover{background:var(--clay);color:#fff}
+
+/* ── pager (prev / indicator / next) ───────────────────── */
+#pager{position:fixed;bottom:22px;left:calc(50% + var(--rail)/2);transform:translateX(-50%);z-index:80;
+  display:flex;align-items:center;gap:2px;padding:6px;border-radius:100px;
+  background:rgba(251,248,241,.94);border:1.5px solid var(--rule-strong);box-shadow:var(--sh-lg);backdrop-filter:blur(10px)}
+#pager button{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;
+  color:var(--ink-2);font-size:20px;line-height:1;transition:all .15s}
+#pager button:hover:not(:disabled){background:var(--clay-soft);color:var(--clay)}
+#pager button:disabled{opacity:.28;cursor:default}
+#pager .pind{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-dim);padding:0 14px;min-width:78px;text-align:center}
+#pager .pind b{color:var(--clay);font-weight:600}
+#topbtn{position:fixed;right:22px;bottom:22px;z-index:80;width:44px;height:44px;border-radius:50%;
+  background:var(--clay);color:#fff;display:none;align-items:center;justify-content:center;
+  box-shadow:var(--sh-lg);font-size:17px}
+#topbtn.show{display:flex}
+#pgbar{position:fixed;bottom:78px;left:var(--rail);right:0;height:0;z-index:79;pointer-events:none}
+
+/* ── syntax-highlight tokens (added by the inline highlighter) ── */
+.code .n{color:#cf9d6a}.code .b{color:#d98f7a}.code .fn{color:#e0b083}
+.code .md-h{color:#e0a578;font-weight:600}.code .md-b{color:#f1e9d8;font-weight:600}
+.code .md-c{color:#a9c08a}.code .md-li{color:#e0a578}.code .md-q{color:#9c8f76;font-style:italic}.code .md-link{color:#8fb6d4}
+
+/* readability principle (kvn): ~90% width + larger type
+   — body is now 19px (was 16px); scale secondary body / code / captions ~+20% to preserve hierarchy */
+h4{font-size:18px}
+.small,.note{font-size:16px}
+.card .cbody,.steps li p,.col li{font-size:17px}
+.callout .cc,.lecband .lecintro{font-size:17.5px}
+.code pre{font-size:15.5px}
+.filetree{font-size:15px}
+.still figcaption{font-size:15.5px}
+
+@media (max-width:1100px){
+  .spread,.spread.rev{grid-template-columns:1fr;gap:26px}
+  .grid-4{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:980px){
+  :root{--rail:0px}
+  #rail{transform:translateX(-100%);transition:transform .25s;width:280px;box-shadow:var(--sh-xl)}
+  #rail.open{transform:none}
+  main{margin-left:0}
+  #railToggle{display:flex;position:fixed;top:14px;left:14px;z-index:100;width:44px;height:44px;
+    border-radius:11px;background:var(--clay);color:#fff;align-items:center;justify-content:center;
+    box-shadow:var(--sh-md);font-size:18px}
+  .chapter{padding:80px 26px 70px}
+  .grid-2,.grid-3,.compare{grid-template-columns:1fr}
+}
+@media (max-width:560px){ .grid-4{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="railToggle" aria-label="Menu">☰</button>
+
+<aside id="rail">
+  <!-- BRAND: replace mark letter/glyph, title, subtitle -->
+  <div class="brand">
+    <div class="mark">Z</div>
+    <div>
+      <div class="bt">Zero to Skill</div>
+      <div class="bs">yt-22 &middot; yt-50</div>
+    </div>
+  </div>
+  <!-- TABLE OF CONTENTS: one <a href="#chNN"> per section, in order.
+       Optional <div class="railhint">GROUP NAME</div> dividers between groups.
+       ch00 = cover, last = send-off. The nav drives the paged navigation. -->
+  <nav class="toc" id="toc">
+    <a href="#ch00"><span class="n">00</span><span>Cover</span></a>
+    <div class="railhint">Part I &middot; The move underneath</div>
+    <a href="#ch01"><span class="n">01</span><span>The two sessions</span></a>
+    <a href="#ch02"><span class="n">02</span><span>The spine</span></a>
+    <a href="#ch03"><span class="n">03</span><span>The hand / delegate line</span></a>
+    <a href="#ch04"><span class="n">04</span><span>Run it in the loop, then encode</span></a>
+    <div class="railhint">Part II &middot; The sessions</div>
+    <a href="#ch05"><span class="n">05</span><span>Session A &middot; build from zero</span></a>
+    <a href="#ch06"><span class="n">06</span><span>Session B &middot; the rebuild</span></a>
+    <a href="#ch07"><span class="n">07</span><span>The failure log</span></a>
+    <a href="#ch08"><span class="n">08</span><span>How he knows it works</span></a>
+    <div class="railhint">Part III &middot; The system around it</div>
+    <a href="#ch09"><span class="n">09</span><span>Anatomy of a finished skill</span></a>
+    <a href="#ch10"><span class="n">10</span><span>The 4-layer stack</span></a>
+    <a href="#ch11"><span class="n">11</span><span>The selection gate</span></a>
+    <a href="#ch12"><span class="n">12</span><span>The arc</span></a>
+    <div class="railhint">Part IV &middot; The honest parts</div>
+    <a href="#ch13"><span class="n">13</span><span>Where it contradicts itself</span></a>
+    <a href="#ch14"><span class="n">14</span><span>What the sources never show</span></a>
+    <a href="#ch15"><span class="n">15</span><span>His vocabulary</span></a>
+    <a href="#ch16"><span class="n">16</span><span>The checklist</span></a>
+    <a href="#ch17"><span class="n">17</span><span>How this was made</span></a>
+    <div class="railhint">&infin; &middot; Send-off</div>
+    <a href="#ch99"><span class="n">99</span><span>The three moves</span></a>
+  </nav>
+  <div class="foot">
+    A field guide to building an agent skill from nothing.<br>
+    Press <kbd>J</kbd>/<kbd>K</kbd> to turn pages<br>
+    Made with HTML, on purpose.
+  </div>
+</aside>
+
+<main id="main">
+
+<section class="chapter dark" id="ch00">
+  <div class="wrap">
+    <div class="kicker reveal">Field guide · two unedited build sessions</div>
+    <h1 class="display reveal d1" style="max-width:13ch">Zero to <em>Skill.</em></h1>
+    <p class="lede reveal d2" style="max-width:44ch;color:var(--on-dark-dim)">
+      Two videos where IndyDevDan starts with an empty directory and ends with a working agent skill.
+      Reconstructed from the transcripts and the code they produced. Every stage carries its evidence in the body.
+    </p>
+
+    <div class="row reveal d3" style="margin-top:34px;gap:10px">
+      <span class="pill clay">yt-22 · Zero to Agent Skill</span>
+      <span class="pill clay">yt-50 · Rebuilding /plan</span>
+      <span class="pill">14 failures logged</span>
+      <span class="pill">17 chapters</span>
+    </div>
+
+    <div class="fig bare reveal d4" style="margin-top:44px;max-width:660px">
+      <svg class="draw" viewBox="0 0 640 138" role="img" aria-label="The pipeline: notebook by hand, then a file tree, then a delegated empty scaffold, then a hand-written SKILL.md, then a working skill">
+        <text x="6" y="13" font-family="var(--mono)" font-size="9.5" fill="#b9ad97" letter-spacing="1.4">BY HAND</text>
+        <path d="M6 21 H 246" stroke="rgba(255,255,255,.2)" stroke-width="1.5" fill="none"/>
+        <text x="268" y="13" font-family="var(--mono)" font-size="9.5" fill="#b9ad97" letter-spacing="1.4">DELEGATED</text>
+        <path d="M268 21 H 386" stroke="rgba(255,255,255,.2)" stroke-width="1.5" fill="none"/>
+        <text x="408" y="13" font-family="var(--mono)" font-size="9.5" fill="#b9ad97" letter-spacing="1.4">BY HAND</text>
+        <path d="M408 21 H 528" stroke="rgba(255,255,255,.2)" stroke-width="1.5" fill="none"/>
+
+        <rect x="6" y="46" width="112" height="46" rx="9" fill="none" stroke="var(--on-dark-dim)" stroke-width="1.5"/>
+        <text x="62" y="68" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="#efe7d8">notebook</text>
+        <text x="62" y="83" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="#b9ad97">purpose/problem</text>
+
+        <path d="M118 69 H 148" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M150 69 l-9 -5.5 0 11 z" fill="var(--clay-2)"/>
+
+        <rect x="152" y="46" width="94" height="46" rx="9" fill="none" stroke="var(--on-dark-dim)" stroke-width="1.5"/>
+        <text x="199" y="74" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="#efe7d8">file tree</text>
+
+        <path d="M246 69 H 276" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M278 69 l-9 -5.5 0 11 z" fill="var(--clay-2)"/>
+
+        <rect x="280" y="46" width="106" height="46" rx="9" fill="none" stroke="var(--olive)" stroke-width="2"/>
+        <text x="333" y="68" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="#efe7d8">empty files</text>
+        <text x="333" y="83" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="#b9ad97">4-word prompt</text>
+
+        <path d="M386 69 H 416" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M418 69 l-9 -5.5 0 11 z" fill="var(--clay-2)"/>
+
+        <rect x="420" y="46" width="108" height="46" rx="9" fill="none" stroke="var(--clay-2)" stroke-width="2"/>
+        <text x="474" y="68" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="#efe7d8">SKILL.md</text>
+        <text x="474" y="83" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="#b9ad97">the pivot file</text>
+
+        <path d="M474 92 C 474 122, 400 126, 356 126 C 312 126, 300 110, 300 96" stroke="var(--amber)" stroke-width="1.5" fill="none" stroke-dasharray="5 4"/>
+        <text x="356" y="136" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="var(--amber)">run in the loop, then encode</text>
+
+        <path d="M528 69 H 556" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <circle cx="580" cy="69" r="14" fill="none" stroke="var(--clay-2)" stroke-width="2"/>
+        <path d="M573 69 l5.5 5.5 8.5 -11" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <text x="604" y="73" font-family="var(--mono)" font-size="10.5" fill="#b9ad97">fires</text>
+      </svg>
+    </div>
+
+    <p class="small reveal d5" style="margin-top:38px;font-family:var(--mono);letter-spacing:.06em">
+      Press <kbd style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#efe7d8">J</kbd>
+      to begin &nbsp;↓
+    </p>
+  </div>
+</section>
+
+<section class="chapter" id="ch01">
+  <div class="wrap wide">
+    <span class="chapnum reveal">01 — The evidence base</span>
+    <div class="kicker reveal">two sessions, six months apart</div>
+    <h2 class="title reveal d1" style="max-width:22ch">Both videos start with <em>nothing.</em> Neither is edited to hide the mess.</h2>
+    <p class="lede reveal d2" style="max-width:56ch">
+      One builds a skill from zero. One rebuilds a skill he already had. The same spine runs through both.
+    </p>
+    <div class="pillrow reveal d2">
+      <span class="pill clay">yt-22</span><span class="pill blue">yt-50</span>
+      <span class="pill">yt-16 · yt-32 · yt-36 supporting</span>
+    </div>
+
+    <hr class="divline reveal">
+
+    <div class="compare reveal">
+      <div class="col">
+        <span class="clabel" style="color:var(--clay)">◴ Session A · build from zero</span>
+        <h4 style="margin-top:0">RAW Agentic Coding: ZERO to Agent SKILL</h4>
+        <p class="small" style="margin:0 0 14px">2025-12-08</p>
+        <ul>
+          <li><strong>Output:</strong> <span class="mono">fork-terminal</span> — forks a terminal session into a new window</li>
+          <li><strong>Code:</strong> 13 files</li>
+          <li><strong>Scale:</strong> 81-line SKILL.md, 4 cookbooks, 1 script</li>
+        </ul>
+        <p style="margin:14px 0 0"><span class="mono" style="background:var(--paper-2);color:var(--ink-2);border:1px solid var(--rule);border-radius:5px;padding:2px 7px;font-size:.72em">codebases/yt/disler__fork-repository-skill/</span></p>
+      </div>
+      <div class="col">
+        <span class="clabel" style="color:var(--blue)">◵ Session B · rebuild</span>
+        <h4 style="margin-top:0">PLANS For Fable 5: Rebuilding My /Plan Skill for Mythos Class</h4>
+        <p class="small" style="margin:0 0 14px">2026-06-22</p>
+        <ul>
+          <li><strong>Output:</strong> <span class="mono">planf3</span> — a planning meta-skill, "plans for Fable, 3 F's"</li>
+          <li><strong>Code:</strong> 31 files</li>
+          <li><strong>Scale:</strong> 241-line SKILL.md, 5 workflows, 2 scripts</li>
+        </ul>
+        <p style="margin:14px 0 0"><span class="mono" style="background:var(--paper-2);color:var(--ink-2);border:1px solid var(--rule);border-radius:5px;padding:2px 7px;font-size:.72em">codebases/yt/disler__planf3/</span></p>
+      </div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center;margin-top:34px">
+      <div class="prose">
+        <p class="lead-in">The gap between them is the point.</p>
+        <p>Session A is what you do when the directory does not exist yet. Session B is what you do when
+          a working version already exists and you have decided to throw most of it away.</p>
+        <p>The two sessions never contradict each other on method. They differ only in <strong>medium</strong> —
+          a paper notebook in A, a committed <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">RAW.md</span> in B —
+          and in <strong>how much he is willing to spend</strong>.</p>
+        <p>Three more videos supply the frame around them: <strong>yt-16</strong> on what a skill even is,
+          <strong>yt-32</strong> on the 4-layer stack, <strong>yt-36</strong> on what happens after you build one.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 480 268" role="img" aria-label="Timeline from October 2025 to June 2026 showing the five source videos">
+          <path d="M56 30 V 244" class="s-line"/>
+          <circle cx="56" cy="52" r="7" class="s-plum-f"/>
+          <text x="76" y="49" class="s-label">yt-16 · Oct 2025</text>
+          <text x="76" y="65" class="s-label-sm">what a skill IS — the gate</text>
+
+          <circle cx="56" cy="104" r="9" class="s-clay-f"/>
+          <text x="80" y="101" class="s-title">Session A · yt-22</text>
+          <text x="80" y="118" class="s-label-sm">Dec 2025 — build from zero</text>
+
+          <circle cx="56" cy="156" r="7" class="s-blue-f"/>
+          <text x="76" y="153" class="s-label">yt-32 · Feb–Mar 2026</text>
+          <text x="76" y="169" class="s-label-sm">the 4-layer stack</text>
+
+          <circle cx="56" cy="196" r="7" class="s-olive-f"/>
+          <text x="76" y="193" class="s-label">yt-36 · the library</text>
+          <text x="76" y="209" class="s-label-sm">what happens after</text>
+
+          <circle cx="56" cy="238" r="9" class="s-clay-f"/>
+          <text x="80" y="235" class="s-title">Session B · yt-50</text>
+          <text x="80" y="252" class="s-label-sm">Jun 2026 — the rebuild</text>
+
+          <path d="M30 104 C 6 104, 6 238, 30 238" class="s-flow" stroke-dasharray="5 4"/>
+          <text x="18" y="176" class="s-label-sm" text-anchor="middle" transform="rotate(-90 18 176)">same spine</text>
+        </svg>
+        <div class="fcap"><b>Six months apart.</b> The method does not drift; the investment does.</div>
+      </div>
+    </div>
+
+    <div class="stats reveal" style="margin-top:30px">
+      <div class="stat"><div class="sv">2</div><div class="sl">primary sessions</div></div>
+      <div class="stat blue"><div class="sv">44</div><div class="sl">files of shipped code</div></div>
+      <div class="stat olive"><div class="sv">14</div><div class="sl">breaks on camera</div></div>
+      <div class="stat amber"><div class="sv">0</div><div class="sl">tests written, either session</div></div>
+    </div>
+
+    <div class="callout reveal">
+      <span class="ci">READ THIS FIRST</span>
+      <span class="cc">All timestamps here are <strong>corrected against the raw <span class="mono">.vtt</span> cues</strong>.
+      The stitched transcript headers in the archive lag the real cues by 10–40 seconds. Where a number here
+      disagrees with a transcript header, the number here is the one that plays back.</span>
+    </div>
+
+    <a class="jump reveal" href="#ch02">Next · the spine &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch02">
+  <div class="wrap wide">
+    <span class="chapnum reveal">02 — The spine</span>
+    <div class="kicker reveal">the one move both sessions share</div>
+    <h2 class="title reveal d1" style="max-width:24ch">He fixes the shape of the finished thing, <em>by hand,</em> before any agent runs.</h2>
+    <p class="lede reveal d2" style="max-width:58ch">
+      Only the medium changes. In one session it is a paper notebook. In the other it is a file called
+      <span class="mono">RAW.md</span> that ships with the repo.
+    </p>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch02-s1"><b>1</b>He closes the laptop</a>
+      <a href="#ch02-s2"><b>2</b>Thirteen minutes of typing</a>
+      <a href="#ch02-s3"><b>3</b>What RAW.md actually is</a>
+      <a href="#ch02-s4"><b>4</b>Property-based engineering</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch02-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">He closes the laptop</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Session A does not begin at a keyboard. It begins with the machine pushed away.</p>
+        <p>He runs three questions on paper — <strong>what's the purpose, what's the problem, what's the
+          solution</strong> — and then hand-draws the finished skill's <strong>exact directory tree</strong>.</p>
+        <p>Inside that drawing he names <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">SKILL.md</span>
+          "the pivot file" and invents the <span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">cookbook/</span>
+          directory. Both survive into the shipped repo unchanged.</p>
+        <p><strong>No editor is opened until 9 minutes and 21 seconds in.</strong></p>
+      </div>
+      <div>
+        <div class="quote">
+          <p>"just push the laptop aside, okay? We never start by just blasting out prompts."</p>
+          <span class="cite">yt-22 [1:40]</span>
+        </div>
+        <div class="quote" style="border-color:var(--blue)">
+          <p>"I have a whole stack of notebooks here."</p>
+          <span class="cite">yt-22 [1:51]</span>
+        </div>
+        <div class="callout warn">
+          <span class="ci">HIS WORD</span>
+          <span class="cc">He says <strong>"notebooks"</strong>, not "paper". A verification pass swept the
+          cues for it. Use his word.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tag-list reveal" style="margin-top:6px">
+      <span class="t">yt-22 [1:40] laptop aside</span>
+      <span class="t">yt-22 [2:27] purpose / problem / solution</span>
+      <span class="t">yt-22 [3:30] "the pivot file"</span>
+      <span class="t">yt-22 [5:03] cookbook/ invented</span>
+      <span class="t">yt-22 [9:21] first editor</span>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch02-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Thirteen minutes of typing, no agent</h2></div>
+
+    <div class="spread rev reveal" style="align-items:center">
+      <div>
+        <div class="fig">
+          <svg class="draw" viewBox="0 0 460 236" role="img" aria-label="Same move, two media: notebook in session A and RAW.md in session B both fix the shape before an agent runs">
+            <rect x="14" y="26" width="176" height="82" rx="12" class="s-clay-f"/>
+            <text x="102" y="56" text-anchor="middle" class="s-title">notebook</text>
+            <text x="102" y="76" text-anchor="middle" class="s-label-sm">Session A · yt-22</text>
+            <text x="102" y="93" text-anchor="middle" class="s-label-sm">thrown away after</text>
+
+            <rect x="268" y="26" width="176" height="82" rx="12" class="s-blue-f"/>
+            <text x="356" y="56" text-anchor="middle" class="s-title">RAW.md</text>
+            <text x="356" y="76" text-anchor="middle" class="s-label-sm">Session B · yt-50</text>
+            <text x="356" y="93" text-anchor="middle" class="s-label-sm">committed, ships</text>
+
+            <path d="M102 108 C 102 152, 190 152, 228 152" class="s-flow"/>
+            <path d="M356 108 C 356 152, 268 152, 230 152" class="s-flow"/>
+            <path d="M232 152 l-9 -5.5 0 11 z" class="s-clay"/>
+
+            <rect x="118" y="164" width="224" height="54" rx="11" class="s-card"/>
+            <text x="230" y="188" text-anchor="middle" class="s-title">the shape is fixed</text>
+            <text x="230" y="206" text-anchor="middle" class="s-label-sm">before any agent is called</text>
+
+            <text x="230" y="18" text-anchor="middle" class="s-label-sm">DIFFERENT MEDIUM</text>
+            <text x="230" y="236" text-anchor="middle" class="s-label-sm">SAME MOVE</text>
+          </svg>
+          <div class="fcap"><b>One move, two media.</b> The notebook is private and disposable. RAW.md is committed, because it doubles as the acceptance checklist.</div>
+        </div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Session B opens a file and types into it for 13 minutes 43 seconds without calling a single agent.</p>
+        <p>He states the discipline out loud while doing it. Then he tells you the real cost, which is
+          bigger than the video suggests.</p>
+        <div class="quote" style="margin-top:22px">
+          <p>"I am actually typing... I'm not having an agent do all this work for me right away... but only after we have the foundation up."</p>
+          <span class="cite">yt-50 [6:51]</span>
+        </div>
+        <div class="callout warn">
+          <span class="ci">CORRECTION</span>
+          <span class="cc">The 13m43s you see is <strong>video</strong> time. At <strong>[16:07]</strong> he says it
+          really took <em>"30 minutes for me."</em> Budget the thirty, not the fourteen.</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch02-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What RAW.md actually is</h2></div>
+
+    <p class="prose reveal" style="max-width:74ch"><strong>Nothing in the archive had ever shown this file.</strong>
+      It is not prose and it is not a spec. It is a <strong>skeletal outline</strong> — 54 content lines,
+      299 words, six headings, shipped unpolished.</p>
+
+    <div class="stats reveal">
+      <div class="stat"><div class="sv">54</div><div class="sl">content lines</div></div>
+      <div class="stat blue"><div class="sv">299</div><div class="sl">words</div></div>
+      <div class="stat olive"><div class="sv">6</div><div class="sl">headings</div></div>
+      <div class="stat amber"><div class="sv">12</div><div class="sl">checkbox properties</div></div>
+    </div>
+
+    <div class="codecap">codebases/yt/disler__planf3/RAW.md — the shape</div>
+    <div class="code reveal"><pre># Planf3
+
+## What is this?
+   two short paragraphs, written in future tense
+   line 15 still carries an uncorrected dictation typo
+
+## Priorities
+   `Performance &gt; Speed &gt;= Cost`        line 21, verbatim
+
+## Properties
+   a 12-item checkbox list — 12 [x], 0 [ ]
+   these become the section list of the finished plan template
+
+## API
+   one line: a signature
+   written roughly 13 minutes BEFORE the checklist above it
+
+## Workflows
+   a 5-item bullet list — lines 48-54
+   added at [21:10], AFTER the agent was already working</pre></div>
+    <p class="note">The six headings are verbatim and in order. The indented notes describe what sits under
+      each heading — the body text itself is not reproduced here.</p>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">SHIPPED AS-IS</span>
+        <p class="ctitle">The typo survives</p>
+        <p class="cbody">Line 15 says "banned" where dictation garbled landed/launched. He never went back and cleaned it.</p></div>
+      <div class="card blue"><span class="cnum">ONE LINE</span>
+        <p class="ctitle">Line 21 is the whole priority section</p>
+        <p class="cbody"><span class="mono">Performance &gt; Speed &gt;= Cost</span> — the trade-off trifecta, stated once and never argued.</p></div>
+      <div class="card amber"><span class="cnum">CORRECTION</span>
+        <p class="ctitle">Not written top to bottom</p>
+        <p class="cbody">And not finished before the first agent call. The <span class="mono">## Workflows</span> block lands at <strong>[21:10]</strong>, after delegation had already started.</p></div>
+    </div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 190" role="img" aria-label="RAW.md is written out of order: the API section lands about thirteen minutes before the checklist, and the Workflows section lands after the agent is already running">
+        <path d="M40 138 H 840" class="s-line"/>
+        <text x="40" y="168" class="s-label-sm">00:00</text>
+        <text x="330" y="168" class="s-label-sm">13:43 — typing stops on camera</text>
+        <text x="640" y="168" class="s-label-sm">21:10</text>
+
+        <rect x="40" y="94" width="230" height="34" rx="8" class="s-blue-f"/>
+        <text x="155" y="116" text-anchor="middle" class="s-label">## API written here</text>
+
+        <rect x="286" y="94" width="180" height="34" rx="8" class="s-olive-f"/>
+        <text x="376" y="116" text-anchor="middle" class="s-label">## Properties checklist</text>
+
+        <rect x="560" y="94" width="200" height="34" rx="8" class="s-amber-f"/>
+        <text x="660" y="116" text-anchor="middle" class="s-label">## Workflows added</text>
+
+        <path d="M330 138 V 60" class="s-line" stroke-dasharray="4 4"/>
+        <rect x="336" y="30" width="300" height="30" rx="8" class="s-clay-f"/>
+        <text x="486" y="50" text-anchor="middle" class="s-label">first agent call — RAW.md not finished</text>
+
+        <path d="M486 60 C 486 78, 620 78, 660 90" class="s-flow"/>
+        <path d="M662 92 l-10.5 -2 4 -8 z" class="s-clay"/>
+        <text x="40" y="24" class="s-title">The tidy story is wrong</text>
+      </svg>
+      <div class="fcap"><b>Out of order, and overlapping the build.</b> The outline is a living surface, not a gate you pass through once.</div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch02-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">His name for the move</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote big">
+        <p>"Property-based engineering."</p>
+        <span class="cite" style="display:block;margin-top:14px">yt-50 [7:38]</span>
+      </div>
+      <div class="prose">
+        <p><strong>List the properties the artifact must have before you build it.</strong> That is the whole idea.</p>
+        <p>It is not a wish list. The 12 checkbox properties in RAW.md become, almost one-to-one, the
+          <strong>section list of the finished plan template</strong>. The outline is the output schema,
+          written before there is any output.</p>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch03">Next · what he never delegates &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch03">
+  <div class="wrap wide">
+    <span class="chapnum reveal">03 — The line</span>
+    <div class="kicker reveal">the most transferable thing in both sessions</div>
+    <h2 class="title reveal d1" style="max-width:24ch">He hand-writes <em>behaviour.</em> He delegates <em>mechanism.</em></h2>
+    <p class="lede reveal d2" style="max-width:56ch">
+      There is a clean line running through both builds, and it is not "hard things by hand, easy things
+      to the agent." It is about what decides how the skill behaves.
+    </p>
+
+    <div class="compare reveal" style="margin-top:30px">
+      <div class="col good">
+        <span class="clabel">✋ by hand — always</span>
+        <ul>
+          <li><strong>SKILL.md</strong>, every line of it</li>
+          <li>All four cookbooks (Session A)</li>
+          <li>The fork-summary prompt template (Session A)</li>
+          <li>The API, the property list, the ordering (Session B)</li>
+          <li>The plan template's shape (Session B)</li>
+        </ul>
+        <p class="small" style="margin:14px 0 0">These decide what the agent <em>does</em>.</p>
+      </div>
+      <div class="col">
+        <span class="clabel" style="color:var(--blue)">🤖 delegated — freely</span>
+        <ul>
+          <li>The empty file scaffold</li>
+          <li><span class="mono">fork_terminal.py</span> and its cross-platform branch</li>
+          <li>The Codex and Gemini cookbooks — <em>only after</em> the Claude Code one existed</li>
+          <li>Markdown → HTML conversion (Session B)</li>
+          <li>Workflow boilerplate (Session B)</li>
+        </ul>
+        <p class="small" style="margin:14px 0 0">These are mechanism, or replication of a pattern he already fixed.</p>
+      </div>
+    </div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 300" role="img" aria-label="A vertical line splits work he writes himself from work he delegates; a pattern crosses the line only once it exists">
+        <path d="M440 24 V 276" class="s-line" stroke-dasharray="6 6"/>
+        <text x="200" y="20" text-anchor="middle" class="s-title">HAND</text>
+        <text x="680" y="20" text-anchor="middle" class="s-title">DELEGATE</text>
+
+        <rect x="40" y="40" width="320" height="40" rx="9" class="s-clay-f"/>
+        <text x="200" y="65" text-anchor="middle" class="s-label">SKILL.md — routing, triggers, variables</text>
+
+        <rect x="40" y="92" width="320" height="40" rx="9" class="s-clay-f"/>
+        <text x="200" y="117" text-anchor="middle" class="s-label">cookbook #1 — the first branch</text>
+
+        <rect x="40" y="144" width="320" height="40" rx="9" class="s-clay-f"/>
+        <text x="200" y="169" text-anchor="middle" class="s-label">the output template's shape</text>
+
+        <rect x="40" y="196" width="320" height="40" rx="9" class="s-clay-f"/>
+        <text x="200" y="221" text-anchor="middle" class="s-label">the function signature</text>
+
+        <rect x="520" y="92" width="320" height="40" rx="9" class="s-blue-f"/>
+        <text x="680" y="117" text-anchor="middle" class="s-label">cookbooks #2, #3, #4 — mirrored</text>
+
+        <rect x="520" y="196" width="320" height="40" rx="9" class="s-blue-f"/>
+        <text x="680" y="221" text-anchor="middle" class="s-label">the script body, the platform branch</text>
+
+        <rect x="520" y="40" width="320" height="40" rx="9" class="s-blue-f"/>
+        <text x="680" y="65" text-anchor="middle" class="s-label">the empty file scaffold</text>
+
+        <path d="M360 112 C 420 112, 460 112, 516 112" class="s-flow"/>
+        <path d="M518 112 l-9 -5.5 0 11 z" class="s-clay"/>
+        <path d="M360 216 C 420 216, 460 216, 516 216" class="s-flow"/>
+        <path d="M518 216 l-9 -5.5 0 11 z" class="s-clay"/>
+
+        <text x="440" y="268" text-anchor="middle" class="s-label-sm">a pattern crosses only once it EXISTS</text>
+        <text x="440" y="292" text-anchor="middle" class="s-label-sm">— never before</text>
+      </svg>
+      <div class="fcap"><b>The crossing rule.</b> Nothing is delegated until one hand-built instance of it is sitting on disk.</div>
+    </div>
+
+    <hr class="divline reveal">
+
+    <div class="spread reveal" style="align-items:center">
+      <div>
+        <div class="quote">
+          <p>"Once you have an existing pattern, you can scale it with your agent."</p>
+          <span class="cite">yt-22 [36:26]</span>
+        </div>
+        <div class="callout warn">
+          <span class="ci">CORRECTION</span>
+          <span class="cc">This move happens <strong>twice</strong> in Session A, not once — routing entries at
+          <strong>[30:10]</strong>, then the full cookbooks at <strong>[36:26]</strong>. Do not read it as a
+          single dramatic hand-off.</span>
+        </div>
+      </div>
+      <div>
+        <div class="quote" style="border-color:var(--blue)">
+          <p>"The more you're going to be using a skill or a resource or an agent harness, the more time and investment you should be putting into it."</p>
+          <span class="cite">yt-50 [~7:04]</span>
+        </div>
+        <p class="prose">This is the dial. The hand/delegate line tells you <em>which</em> work is yours;
+          this sentence tells you <em>how much</em> of yourself to put into it.</p>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch04">Next · the core rule &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch04">
+  <div class="wrap wide">
+    <span class="chapnum reveal">04 — The core rule</span>
+    <div class="kicker reveal">the single most load-bearing quote in the run</div>
+    <h2 class="title reveal d1" style="max-width:22ch">Run it in the loop. <em>Then</em> encode it.</h2>
+    <p class="lede reveal d2" style="max-width:56ch">
+      Before he writes any instruction about a mechanism, he makes a throwaway agent do that mechanism raw
+      and watches what actually happens.
+    </p>
+
+    <div class="spread reveal" style="align-items:center;margin-top:26px">
+      <div class="quote big">
+        <p>"This is a great way to set up for building your skill. Have your agent just run it in the loop, write the prompt, observe the result, and then encode it in a skill."</p>
+        <span class="cite" style="display:block;margin-top:14px">yt-22 [15:04]</span>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 300" role="img" aria-label="A four-step cycle: write the prompt, run it raw, observe the result, encode what you learned into the skill">
+          <circle cx="230" cy="150" r="104" class="s-line" stroke-dasharray="5 6"/>
+
+          <rect x="152" y="14" width="156" height="44" rx="10" class="s-clay-f"/>
+          <text x="230" y="42" text-anchor="middle" class="s-label">1 · write the prompt</text>
+
+          <rect x="318" y="128" width="132" height="44" rx="10" class="s-blue-f"/>
+          <text x="384" y="156" text-anchor="middle" class="s-label">2 · run it raw</text>
+
+          <rect x="152" y="242" width="156" height="44" rx="10" class="s-olive-f"/>
+          <text x="230" y="270" text-anchor="middle" class="s-label">3 · observe</text>
+
+          <rect x="12" y="128" width="132" height="44" rx="10" class="s-amber-f"/>
+          <text x="78" y="156" text-anchor="middle" class="s-label">4 · encode</text>
+
+          <path d="M308 44 C 344 54, 366 84, 372 124" class="s-flow"/>
+          <path d="M373 126 l-9.5 -4.5 -1 11 z" class="s-clay"/>
+          <path d="M372 176 C 366 216, 344 246, 310 258" class="s-flow"/>
+          <path d="M308 259 l8 -7.5 -6.5 -8.5 z" class="s-clay"/>
+          <path d="M152 258 C 116 246, 94 216, 88 178" class="s-flow"/>
+          <path d="M87 176 l9.5 4.5 1 -11 z" class="s-clay"/>
+          <path d="M88 124 C 94 84, 116 54, 150 44" class="s-flow"/>
+          <path d="M152 43 l-8 7.5 6.5 8.5 z" class="s-clay"/>
+
+          <text x="230" y="144" text-anchor="middle" class="s-title">encode what</text>
+          <text x="230" y="164" text-anchor="middle" class="s-title">you SAW</text>
+          <text x="230" y="184" text-anchor="middle" class="s-label-sm">not what you assumed</text>
+        </svg>
+        <div class="fcap"><b>The loop that produces rules you would not have written.</b> The observation step is the whole value.</div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+
+    <h3 class="reveal">He applies it twice in Session A. Both times the observation changed the encoding.</h3>
+
+    <div class="grid grid-2 reveal">
+      <div class="card accent"><span class="cnum">APPLICATION 01</span>
+        <p class="ctitle">Opening a terminal</p>
+        <p class="cbody">Before writing a single instruction about launching a terminal, he prompts a fresh agent
+          with the raw mechanism — <span class="mono">osascript</span> to open a terminal running
+          <span class="mono">ffmpeg --help</span>. It works. <strong>Then</strong> he encodes it.</p>
+      </div>
+      <div class="card blue"><span class="cnum">APPLICATION 02</span>
+        <p class="ctitle">The Claude Code cookbook</p>
+        <p class="cbody"><em>"Ignore the skill. Just run this directly"</em> <strong>[27:23]</strong>. He watches the
+          CLI reach for <span class="mono">-p</span> (non-interactive), decides he does not want that, and encodes
+          <strong>"leave off <span class="mono">-p</span>"</strong> — a rule he would not have known to write.</p>
+      </div>
+    </div>
+
+    <div class="callout bad reveal">
+      <span class="ci">THE ANTI-PATTERN, NAMED</span>
+      <span class="cc">"the lazy thing to do here is just to default quickly to throwing the agent at the problem"
+        &nbsp;— <strong>yt-22 [15:50]</strong></span>
+    </div>
+
+    <hr class="divline reveal">
+
+    <div class="spread rev reveal" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 240" role="img" aria-label="Two rules that looked opposed operate on different objects: the notebook fixes structure, the in-loop run verifies mechanism">
+          <rect x="16" y="26" width="190" height="66" rx="11" class="s-clay-f"/>
+          <text x="111" y="52" text-anchor="middle" class="s-title">notebook first</text>
+          <text x="111" y="72" text-anchor="middle" class="s-label-sm">fixes the STRUCTURE</text>
+
+          <rect x="254" y="26" width="190" height="66" rx="11" class="s-blue-f"/>
+          <text x="349" y="52" text-anchor="middle" class="s-title">prototype first</text>
+          <text x="349" y="72" text-anchor="middle" class="s-label-sm">verifies the MECHANISM</text>
+
+          <path d="M111 92 V 130" class="s-flow"/>
+          <path d="M349 92 V 130" class="s-flow"/>
+          <path d="M111 132 l-5.5 -9 11 0 z" class="s-clay"/>
+          <path d="M349 132 l-5.5 -9 11 0 z" class="s-clay"/>
+
+          <rect x="16" y="136" width="190" height="52" rx="10" class="s-card"/>
+          <text x="111" y="158" text-anchor="middle" class="s-label">once, at the start</text>
+          <text x="111" y="176" text-anchor="middle" class="s-label-sm">stage 0</text>
+
+          <rect x="254" y="136" width="190" height="52" rx="10" class="s-card"/>
+          <text x="349" y="158" text-anchor="middle" class="s-label">every time, before</text>
+          <text x="349" y="176" text-anchor="middle" class="s-label-sm">each encoding</text>
+
+          <text x="230" y="222" text-anchor="middle" class="s-label-sm">DIFFERENT OBJECTS — NOT COMPETING STEPS</text>
+        </svg>
+        <div class="fcap"><b>An open contradiction, closed.</b> Two archive notes that looked like rival orders.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">This rule also settles an argument the archive left hanging.</p>
+        <p>Two distilled notes sit twelve lines apart and appear to disagree: <em>plan on paper first</em>
+          against <em>prototype in the loop first</em>.</p>
+        <p>They are not competing steps. The notebook fixes the <strong>structure</strong> of the artifact.
+          The in-loop run verifies each <strong>mechanism</strong>, immediately before that mechanism gets
+          written down. Different objects entirely.</p>
+        <div class="callout idea">
+          <span class="ci">FLAG</span>
+          <span class="cc">That reconciliation is <strong>synthesis, not his words</strong>. He never states it.
+          The sources are <span class="mono">knowledge/distilled/yt-19-27.md:115</span> and
+          <span class="mono">:120</span>.</span>
+        </div>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch05">Next · Session A, stage by stage &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch05">
+  <div class="wrap wide">
+    <span class="chapnum reveal">05 — Session A</span>
+    <div class="kicker reveal">yt-22 · build from zero</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Ten stages, from a closed laptop to a <em>working fork.</em></h2>
+    <p class="lede reveal d2" style="max-width:56ch">
+      The whole session, in order, with the timestamp that anchors each move.
+    </p>
+    <div class="pillrow reveal d2">
+      <span class="pill clay">fork-terminal</span>
+      <span class="pill">13 files shipped</span>
+      <span class="pill">81-line SKILL.md</span>
+    </div>
+
+    <div class="fig reveal" style="margin-top:26px">
+      <svg class="draw" viewBox="0 0 880 168" role="img" aria-label="Timeline of session A from 1:40 to 45:20 showing which stages are done by hand and which are delegated">
+        <path d="M30 104 H 850" class="s-line"/>
+
+        <rect x="30" y="66" width="150" height="30" rx="7" class="s-clay-f"/>
+        <text x="105" y="86" text-anchor="middle" class="s-label-sm">notebook 1:40</text>
+
+        <rect x="192" y="66" width="86" height="30" rx="7" class="s-blue-f"/>
+        <text x="235" y="86" text-anchor="middle" class="s-label-sm">scaffold 9:21</text>
+
+        <rect x="290" y="66" width="96" height="30" rx="7" class="s-clay-f"/>
+        <text x="338" y="86" text-anchor="middle" class="s-label-sm">SKILL.md 12:58</text>
+
+        <rect x="398" y="66" width="92" height="30" rx="7" class="s-amber-f"/>
+        <text x="444" y="86" text-anchor="middle" class="s-label-sm">in-loop 15:04</text>
+
+        <rect x="502" y="66" width="84" height="30" rx="7" class="s-blue-f"/>
+        <text x="544" y="86" text-anchor="middle" class="s-label-sm">script 17:17</text>
+
+        <rect x="598" y="66" width="96" height="30" rx="7" class="s-olive-f"/>
+        <text x="646" y="86" text-anchor="middle" class="s-label-sm">detector 20:55</text>
+
+        <rect x="706" y="66" width="72" height="30" rx="7" class="s-blue-f"/>
+        <text x="742" y="86" text-anchor="middle" class="s-label-sm">scale 36:26</text>
+
+        <rect x="790" y="66" width="60" height="30" rx="7" class="s-clay-f"/>
+        <text x="820" y="86" text-anchor="middle" class="s-label-sm">proof 45:20</text>
+
+        <text x="30" y="34" class="s-title">Session A · 45 minutes on camera</text>
+        <text x="30" y="52" class="s-label-sm">clay = by hand · blue = delegated · amber = observation · olive = test</text>
+        <text x="30" y="140" class="s-label-sm">no editor opens for the first 9 minutes 21 seconds</text>
+        <path d="M30 122 H 235" class="s-flow" stroke-dasharray="5 4"/>
+      </svg>
+      <div class="fcap"><b>The shape of one session.</b> Hand and agent alternate; they never overlap on the same object.</div>
+    </div>
+
+    <hr class="divline reveal">
+
+    <ol class="steps reveal">
+      <li>
+        <h4>Notebook &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-22 [1:40–8:04]</span></h4>
+        <p>Purpose, problem, solution — then the exact file tree, drawn by hand. Scoped deliberately to a
+          <strong>proof of concept, not an MVP</strong>: <em>"that's a yes-no node where you can just stop building"</em>
+          <span class="mono">[6:27]</span>.</p>
+      </li>
+      <li>
+        <h4>Scaffold with a four-word prompt &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-22 [9:21]</span></h4>
+        <p><span class="mono">mkdir</span>, open the editor, <strong>retype the drawn tree into a blank file as the
+          prompt</strong>, then fire it with <em>"build use empty files"</em>. Then <span class="mono">git init</span>.</p>
+      </li>
+      <li>
+        <h4>Hand-write SKILL.md &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-22 [12:58]</span></h4>
+        <p>Fires his own editor snippet <span class="mono">AG SK</span> for the metadata skeleton, then fills
+          <span class="mono">name</span>, <span class="mono">description</span>, trigger phrases,
+          <span class="mono"># Purpose</span>, and a <span class="mono">## Variables</span> block of
+          <span class="mono">ENABLE_*</span> booleans. <strong>No agent.</strong></p>
+      </li>
+      <li>
+        <h4>Run the raw mechanism in a throwaway agent &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-22 [15:04]</span></h4>
+        <p>Observe. Then encode. The rule from the previous chapter, in position.</p>
+      </li>
+      <li>
+        <h4>Encode routing &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-22 [15:50]</span></h4>
+        <p>Establishes the repeating block he reuses for every route: <strong>IF</strong> condition /
+          <strong>THEN</strong> read-and-execute a cookbook path / <strong>EXAMPLES</strong>.</p>
+      </li>
+      <li>
+        <h4>Delegate the script — but supply the signature himself &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-22 [17:17]</span></h4>
+        <p>The prompt is stacked <strong>information-dense keywords</strong>, not prose: "astral uv single file
+          script", "use subprocess", the literal signature <span class="mono">fork_terminal(command: str)</span>,
+          and "concise, minimal possible working version".</p>
+      </li>
+      <li>
+        <h4>Test with a detector before testing behaviour &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-22 [20:55]</span></h4>
+        <p>He writes a one-line slash command whose entire body is <em>"List all available skills from your system
+          prompt"</em> and runs it in a fresh agent. It answers one question only: <strong>is the skill even
+          registered?</strong></p>
+      </li>
+      <li>
+        <h4>Scale the established pattern &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-22 [30:10] + [36:26]</span></h4>
+        <p>Inline generation of the remaining cookbooks, once one of them exists by hand.</p>
+      </li>
+      <li>
+        <h4>Build <span class="mono">/prime</span>, then use it as a gap detector &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-22 [34:31]</span></h4>
+        <p>He runs the priming command and the agent reports back that Codex and Gemini are missing.
+          <strong>The priming command doubles as a to-do list.</strong></p>
+      </li>
+      <li>
+        <h4>Final proof &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-22 [45:20]</span></h4>
+        <p>He manufactures conversation history by asking two throwaway questions, fires the full stack, and
+          reads the summarized prompt that arrives in the forked window.</p>
+      </li>
+    </ol>
+
+    <div class="callout warn reveal">
+      <span class="ci">CORRECTION</span>
+      <span class="cc">The <span class="mono">all skills</span> detector in stage 7 is <strong>not a throwaway</strong>.
+        He calls it <em>"one of the foundational prompts"</em> and one of his <em>"simple reusable prompts"</em>.
+        He also never speaks the underscore filename — call it an <span class="mono">all skills</span> slash command.</span>
+    </div>
+
+    <a class="jump reveal" href="#ch06">Next · Session B, the rebuild &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch06">
+  <div class="wrap wide">
+    <span class="chapnum reveal">06 — Session B</span>
+    <div class="kicker reveal">yt-50 · the rebuild</div>
+    <h2 class="title reveal d1" style="max-width:24ch">A rebuild is not a patch. The <em>first four moves</em> are what make the difference.</h2>
+    <p class="lede reveal d2" style="max-width:58ch">
+      He already had a working <span class="mono">/plan</span> skill. He does not open it and edit it.
+      He opens an empty directory.
+    </p>
+    <div class="pillrow reveal d2">
+      <span class="pill blue">planf3</span>
+      <span class="pill">31 files</span>
+      <span class="pill">241-line SKILL.md</span>
+    </div>
+
+    <hr class="divline reveal">
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">The old version is demoted, not edited.</p>
+        <p>V1 becomes a <strong>read-only reference</strong> — and it <strong>ships as one</strong>. It sits in
+          the repo as <span class="mono">legacy_v1_meta_plan.md</span>, 123 lines, renamed "legacy", never touched again.</p>
+        <p>Then the new skeleton is scaffolded <em>blank</em> from his meta-skill. Only after the blank shell
+          exists does he hand-copy V1's Variables, Purpose and Instructions across.</p>
+        <p><strong>That ordering is the whole trick.</strong> New shape first, old content second. Reverse it
+          and you get a patch job.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 300" role="img" aria-label="The rebuild ordering: a blank new skeleton is created first, then old content is hand-copied into it, while the old version survives untouched as a legacy reference file">
+          <rect x="14" y="20" width="150" height="72" rx="11" class="s-card"/>
+          <text x="89" y="48" text-anchor="middle" class="s-title">V1 skill</text>
+          <text x="89" y="68" text-anchor="middle" class="s-label-sm">working, shipped</text>
+          <text x="89" y="84" text-anchor="middle" class="s-label-sm">not edited</text>
+
+          <path d="M89 92 V 128" class="s-line" stroke-dasharray="4 4"/>
+          <rect x="8" y="132" width="162" height="52" rx="10" class="s-plum-f"/>
+          <text x="89" y="154" text-anchor="middle" class="s-label">legacy_v1_meta_plan.md</text>
+          <text x="89" y="172" text-anchor="middle" class="s-label-sm">123 lines · read-only</text>
+
+          <rect x="284" y="20" width="164" height="72" rx="11" class="s-olive-f"/>
+          <text x="366" y="48" text-anchor="middle" class="s-title">blank skeleton</text>
+          <text x="366" y="68" text-anchor="middle" class="s-label-sm">scaffolded from</text>
+          <text x="366" y="84" text-anchor="middle" class="s-label-sm">the meta-skill</text>
+
+          <path d="M366 92 V 128" class="s-flow"/>
+          <path d="M366 130 l-5.5 -9 11 0 z" class="s-clay"/>
+
+          <rect x="284" y="132" width="164" height="52" rx="10" class="s-clay-f"/>
+          <text x="366" y="154" text-anchor="middle" class="s-label">shape exists FIRST</text>
+          <text x="366" y="172" text-anchor="middle" class="s-label-sm">nothing in it yet</text>
+
+          <path d="M170 158 H 280" class="s-flow"/>
+          <path d="M282 158 l-9 -5.5 0 11 z" class="s-clay"/>
+          <text x="226" y="146" text-anchor="middle" class="s-label-sm">hand-copy</text>
+          <text x="226" y="200" text-anchor="middle" class="s-label-sm">Variables · Purpose</text>
+          <text x="226" y="216" text-anchor="middle" class="s-label-sm">Instructions</text>
+
+          <rect x="112" y="238" width="236" height="46" rx="10" class="s-card"/>
+          <text x="230" y="260" text-anchor="middle" class="s-title">80% survives</text>
+          <text x="230" y="277" text-anchor="middle" class="s-label-sm">the template does not</text>
+        </svg>
+        <div class="fcap"><b>New shape first.</b> The old file is a source to read from, never a file to edit.</div>
+      </div>
+    </div>
+
+    <div class="callout warn reveal">
+      <span class="ci">VERIFIED CORRECTION</span>
+      <span class="cc">The V1 spec is <strong>never pasted into RAW.md</strong>. A tiebreaker verifier opened the
+        shipped file cold: no V1 content in it. The decisive evidence is his first prompt to the agent at
+        <strong>[30:23]</strong>, which names <strong>three distinct paths</strong> —
+        <em>"read raw, understand our vision, read our previous gen spec, and our work in progress skill.md."</em>
+        This is not a "pasted then removed" case. No removal moment exists and the file survives in the repo.</span>
+    </div>
+
+    <hr class="divline reveal">
+
+    <ol class="steps reveal">
+      <li><h4>Brand-new empty directory</h4>
+        <p>Not a branch. Not a fork of the old skill.</p></li>
+      <li><h4>RAW.md by hand, 13m43s, no agent &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-50 [6:51]</span></h4>
+        <p>Covered in chapter 02. Real cost ≈ 30 minutes.</p></li>
+      <li><h4>Old version demoted to a shipped read-only reference &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-50 [30:23]</span></h4>
+        <p><span class="mono">legacy_v1_meta_plan.md</span>, 123 lines, never edited.</p></li>
+      <li><h4>The new skeleton exists before any old text lands in it</h4>
+        <p>Blank shell from the meta-skill first, hand-copy second.</p></li>
+      <li><h4>Author the template in markdown, convert to HTML second &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-50 [24:10]</span></h4>
+        <p><em>"we're going to write this in markdown format so it's super clear and then we're going to have our
+          agent update this structure into a HTML format."</em> Clarity first, presentation second.</p></li>
+      <li><h4><span class="mono">git init</span> and commit <em>before</em> delegating &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-50 [29:11]</span></h4>
+        <p><em>"Just get a net."</em></p></li>
+      <li><h4>Prime, then delegate &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-50 [30:23]</span></h4>
+        <p>A read-only priming prompt that ends with the word <strong>"Stand by"</strong> — nothing is authorised
+          until he has seen what the agent understood.</p></li>
+      <li><h4>Surgical top-to-bottom passes</h4>
+        <p>One section per prompt. Never a sweeping "improve this file".</p></li>
+      <li><h4>Split into five routed workflows &nbsp;<span class="mono" style="background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay-line);border-radius:5px;padding:1px 7px;font-size:.72em">yt-50 [35:55]</span></h4>
+        <p>Then he demotes image-generation to a <strong>subworkflow</strong>, so the routing table contains only
+          prompt-selectable entries.</p></li>
+      <li><h4>Live-fire on a real, unrelated task</h4>
+        <p>He re-implements his own HTTP agent-comms layer on the iroh P2P protocol — a genuine job, not a toy —
+          with human-in-the-loop switched <strong>off</strong>.</p></li>
+      <li><h4>Fold the findings back into the skill</h4>
+        <p>Three fixes discovered during the run are written into the <em>workflow files</em>, not merely applied
+          to the output.</p></li>
+    </ol>
+
+    <hr class="divline reveal">
+    <h3 class="reveal">What he keeps, what he throws away</h3>
+    <p class="prose reveal">He puts a number on it: <strong>"80% of this has not changed."</strong></p>
+
+    <div class="compare reveal">
+      <div class="col good">
+        <span class="clabel">◵ kept</span>
+        <ul>
+          <li>Variables</li><li>Purpose</li><li>Instructions</li>
+          <li><span class="mono">PLAN_OUTPUT_DIRECTORY: specs/</span></li>
+          <li>ultrathink</li>
+          <li>"explore the codebase"</li>
+        </ul>
+      </div>
+      <div class="col bad">
+        <span class="clabel">◴ thrown away</span>
+        <ul>
+          <li>The <span class="mono">## Report</span> block</li>
+          <li><span class="mono">## Examples</span></li>
+          <li>Task-type / complexity branching</li>
+          <li><span class="mono">Solution Approach</span></li>
+          <li><span class="mono">Acceptance Criteria</span></li>
+          <li>Markdown as the output format</li>
+          <li>The flat <span class="mono">## Step by Step Tasks</span> heading</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout idea reveal">
+      <span class="ci">ONE STRING SURVIVES BYTE-IDENTICAL</span>
+      <span class="cc">The <span class="mono">description:</span> line. It still says <strong>"concise"</strong> and
+        <strong>"specs directory"</strong> while now describing a token-heavy HTML artifact. The single most
+        behaviour-critical line in the file is the one line that did not get the rebuild.</span>
+    </div>
+
+    <a class="jump reveal" href="#ch07">Next · the failure log &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch07">
+  <div class="wrap wide">
+    <span class="chapnum reveal">07 — The failure log</span>
+    <div class="kicker reveal">the part that actually teaches</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Every break has a <em>named recovery move.</em> That is what makes it a method.</h2>
+    <p class="lede reveal d2" style="max-width:58ch">
+      Neither video is edited to remove the failures. Read this chapter twice — it carries more of the
+      method than the successes do.
+    </p>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch07-s1"><b>1</b>Session A · 6 breaks</a>
+      <a href="#ch07-s2"><b>2</b>Session B · 7 breaks</a>
+      <a href="#ch07-s3"><b>3</b>The pattern underneath</a>
+    </div>
+
+    <div class="callout warn reveal">
+      <span class="ci">COUNT CHECK</span>
+      <span class="cc">The source tally reads <strong>fourteen</strong> breaks. Counted at read time, the tables
+        enumerate <strong>thirteen</strong>, each with a named recovery. No fourteenth has been invented to
+        close the gap — thirteen is what is documented.</span>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch07-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Session A · yt-22</h2></div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 01 · invisible skill</span>
+        <ul><li><span class="mono">SKILL.md</span> placed directly in <span class="mono">.claude/skills/</span> with no per-skill folder. Nothing registers.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery</span>
+        <ul><li><span class="mono">mkdir fork-terminal</span>, move everything in, re-run the detector.</li>
+          <li><em>"this is why we test and work step-by-step."</em></li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 02 · stale paths</span>
+        <ul><li>The relative paths inside SKILL.md are now wrong after the move.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery</span>
+        <ul><li>Retype them. Diagnosed <strong>by watching which files the agent reads</strong>, not by reading the file himself.</li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 03 · fixed, still wrong</span>
+        <ul><li>The file is correct on disk and the behaviour does not change. <strong>Skills do not reload live.</strong></li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery &nbsp;· yt-22 [22:08]</span>
+        <ul><li><em>"they're not updating live, right? So I do have to actually clear out my entire session."</em></li>
+          <li>Takes effect only after a <strong>full Claude Code instance refresh</strong> — the metadata loads on boot.</li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 04 · the silent script</span>
+        <ul><li>No output, no error, no visible window. Nothing to debug from.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery</span>
+        <ul><li>He reads his own tool: only stdout was captured.</li>
+          <li>Fix prompt: <em>"Make sure we capture and error and catch if something goes wrong. Keep it simple."</em></li>
+          <li>Names the principle — <strong>agentic code always returns concrete output</strong>.</li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 05 · won't fire on "fork session"</span>
+        <ul><li>The skill silently refuses to trigger. The phrase was never in the description.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery &nbsp;· yt-22 [38:36] + [38:46]</span>
+        <ul><li>He adds the phrase to <em>"the description of the skill"</em>.</li>
+          <li>Then states the blame order: <em>"Don't assume that it's the model's fault. First assume it's your fault, and then if you really prompt engineer properly, then you can assume it's the tooling's fault."</em></li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 06 · the overwritten template</span>
+        <ul><li>The agent <strong>overwrote</strong> the prompt template on disk instead of filling it in memory.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery &nbsp;· yt-22 [46:56] + [47:47]</span>
+        <ul><li>A negative instruction: <em>"don't update the file directly. Just read it and use it to craft a new prompt for the new fork agent"</em> — reinforced with <em>"the important information dense keyword"</em>.</li>
+          <li>Then the notable move: <strong>resume the session, hit escape to rewind Claude Code's history</strong> back to the failing command, arrow-up, re-run.</li></ul></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch07-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Session B · yt-50</h2></div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 07 · bloated scaffold</span>
+        <ul><li>The meta-skill scaffold came back overbuilt — <em>"definitely overdone"</em>.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery</span>
+        <ul><li><strong>Deleted by hand. No re-prompt.</strong> Cheaper to cut than to negotiate.</li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 08 · invented CSS</span>
+        <ul><li>The agent produced an entire CSS block he never asked for — <em>"cut out all of this garbage. I did not ask for any styling at all."</em></li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery</span>
+        <ul><li><em>"remove the styling section completely"</em></li>
+          <li>Plus a standing instruction for the rest of the session: <strong>"All future prompts, be surgical. Do only what was asked for."</strong></li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 09 · ran past the request</span>
+        <ul><li>The agent carried on into the next step uninvited.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery</span>
+        <ul><li>Accepted the work and <strong>blamed his own prompt</strong>: <em>"I should have been more surgical with my input prompt."</em></li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 10 · deleted workflow</span>
+        <ul><li>The agent <strong>deleted</strong> the existing create-plan workflow.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery</span>
+        <ul><li>Had it <strong>re-emit from context</strong> rather than restoring from git — the context still held the file.</li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 11 · suspiciously fast images</span>
+        <ul><li>Generated far too quickly to be high quality.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery</span>
+        <ul><li>Codified <strong>"wide format always, high quality"</strong> as a shared rule <em>in the workflow file</em> — not as a one-off correction.</li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 12 · was the parallelism real?</span>
+        <ul><li>He could not tell whether image generation actually ran in parallel.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery</span>
+        <ul><li>Re-prompted: <em>"in parallel stack up the bash protocol if you aren't already."</em></li></ul></div>
+    </div>
+
+    <div class="compare reveal">
+      <div class="col bad"><span class="clabel">◴ break 13 · contaminated context</span>
+        <ul><li>The run back-referenced unrelated specs sitting in <span class="mono">specs/</span>.</li></ul></div>
+      <div class="col good"><span class="clabel">◵ recovery</span>
+        <ul><li><strong>Left it.</strong> Shipped as a known edge, written into the README.</li></ul></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch07-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The pattern underneath</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 470 292" role="img" aria-label="The recovery loop: a break is diagnosed by watching the agent, the fix goes into the skill file not the output, then the session is refreshed and re-run">
+          <rect x="150" y="14" width="170" height="46" rx="11" class="s-clay-f"/>
+          <text x="235" y="42" text-anchor="middle" class="s-title">something breaks</text>
+
+          <path d="M235 60 V 92" class="s-flow"/>
+          <path d="M235 94 l-5.5 -9 11 0 z" class="s-clay"/>
+
+          <rect x="126" y="96" width="218" height="46" rx="11" class="s-blue-f"/>
+          <text x="235" y="118" text-anchor="middle" class="s-label">blame yourself first</text>
+          <text x="235" y="134" text-anchor="middle" class="s-label-sm">then the prompt, then the tool</text>
+
+          <path d="M235 142 V 172" class="s-flow"/>
+          <path d="M235 174 l-5.5 -9 11 0 z" class="s-clay"/>
+
+          <rect x="112" y="176" width="246" height="46" rx="11" class="s-olive-f"/>
+          <text x="235" y="198" text-anchor="middle" class="s-label">write the fix into the SKILL</text>
+          <text x="235" y="214" text-anchor="middle" class="s-label-sm">not into the output</text>
+
+          <path d="M112 199 C 44 199, 40 100, 40 60 C 40 32, 90 22, 146 22" class="s-flow" stroke-dasharray="6 5"/>
+          <path d="M148 22 l-9 -5.5 0 11 z" class="s-clay"/>
+          <text x="26" y="120" class="s-label-sm" transform="rotate(-90 26 120)" text-anchor="middle">refresh · re-run</text>
+
+          <rect x="112" y="238" width="246" height="42" rx="10" class="s-card"/>
+          <text x="235" y="264" text-anchor="middle" class="s-label">the skill is now permanently better</text>
+        </svg>
+        <div class="fcap"><b>Recovery has a direction.</b> The fix always travels back up into the artifact.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Four habits repeat across all thirteen.</p>
+        <p><strong>He diagnoses by watching the agent, not by reading his own file.</strong> Stale paths were found
+          by noticing which files got read.</p>
+        <p><strong>He blames himself first.</strong> Twice, explicitly, on camera. The blame order is you → your
+          prompt → the tooling.</p>
+        <p><strong>The fix goes into the skill.</strong> "Wide format always, high quality" became a workflow rule,
+          not a one-off nudge. Three fixes from the live-fire run were written into workflow files.</p>
+        <p><strong>Some breaks he just ships.</strong> The contaminated <span class="mono">specs/</span> reference
+          went into the README as a known edge. Not everything gets fixed.</p>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch08">Next · how he knows it works &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch08">
+  <div class="wrap wide">
+    <span class="chapnum reveal">08 — Verification</span>
+    <div class="kicker reveal">how he knows it works</div>
+    <h2 class="title reveal d1" style="max-width:24ch">He never writes a test. He <em>looks at the output</em> — with a fixed list of things to look for.</h2>
+    <p class="lede reveal d2" style="max-width:56ch">
+      This is the weakest part of the method and the most honestly documented. Both sessions verify by hand.
+    </p>
+
+    <div class="spread reveal" style="align-items:center;margin-top:24px">
+      <div class="prose">
+        <h3 style="margin-top:0">Session A — read the artifact that arrived</h3>
+        <p>Verification is manual, end to end. Run it. Look at the window. Run <span class="mono">pwd</span>.
+          Read the prompt that was passed through.</p>
+        <p>His final proof is a staged one: he manufactures conversation history with two throwaway questions,
+          fires the full stack, then <strong>reads the summarized prompt that shows up in the forked window</strong>
+          and watches the fork agent execute it.</p>
+        <div class="callout bad">
+          <span class="ci">ABSENT</span>
+          <span class="cc"><strong>No test file is ever written or discussed.</strong> Not once, in either session.</span>
+        </div>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 440 264" role="img" aria-label="Session A verification: fire the skill, a new window opens, read the prompt inside it, watch the fork agent run">
+          <rect x="20" y="18" width="150" height="44" rx="10" class="s-clay-f"/>
+          <text x="95" y="45" text-anchor="middle" class="s-label">fire the skill</text>
+          <path d="M170 40 H 234" class="s-flow"/><path d="M236 40 l-9 -5.5 0 11 z" class="s-clay"/>
+
+          <rect x="240" y="18" width="180" height="112" rx="10" class="s-card"/>
+          <path d="M240 40 H 420" class="s-line"/>
+          <circle cx="254" cy="29" r="3.5" class="s-dim"/>
+          <circle cx="266" cy="29" r="3.5" class="s-dim"/>
+          <circle cx="278" cy="29" r="3.5" class="s-dim"/>
+          <text x="330" y="70" text-anchor="middle" class="s-label-sm">forked window</text>
+          <text x="330" y="92" text-anchor="middle" class="s-label">the passed prompt</text>
+          <text x="330" y="112" text-anchor="middle" class="s-label-sm">read it with your eyes</text>
+
+          <path d="M330 130 V 162" class="s-flow"/><path d="M330 164 l-5.5 -9 11 0 z" class="s-clay"/>
+          <rect x="240" y="168" width="180" height="42" rx="10" class="s-olive-f"/>
+          <text x="330" y="194" text-anchor="middle" class="s-label">the fork agent runs it</text>
+
+          <rect x="20" y="168" width="150" height="42" rx="10" class="s-card"/>
+          <text x="95" y="188" text-anchor="middle" class="s-label-sm">manual checks:</text>
+          <text x="95" y="204" text-anchor="middle" class="s-label-sm">pwd · window · prompt</text>
+
+          <text x="220" y="246" text-anchor="middle" class="s-label-sm">ZERO TESTS WRITTEN</text>
+        </svg>
+        <div class="fcap"><b>Proof by inspection.</b> The evidence is a window you can point at.</div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+
+    <h3 class="reveal">Session B — six signals, checked in order</h3>
+    <p class="prose reveal">He judges the generated document against six things, and he checks them in this order.</p>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">SIGNAL 01</span><p class="ctitle">Metadata header populated</p><p class="cbody">The cheapest possible check runs first.</p></div>
+      <div class="card accent"><span class="cnum">SIGNAL 02</span><p class="ctitle">Did it honour the one requirement that mattered?</p><p class="cbody">"1 step 1 time configuration."</p></div>
+      <div class="card blue"><span class="cnum">SIGNAL 03</span><p class="ctitle">Is the Problem section about <em>his</em> system?</p><p class="cbody">Not a generic restatement of the brief.</p></div>
+      <div class="card blue"><span class="cnum">SIGNAL 04</span><p class="ctitle">One image per phase present</p><p class="cbody">Structural completeness.</p></div>
+      <div class="card olive"><span class="cnum">SIGNAL 05</span><p class="ctitle">Closed loops present per phase</p><p class="cbody">A phase you cannot exit until its validation passes.</p></div>
+      <div class="card amber"><span class="cnum">SIGNAL 06 · STRONGEST</span><p class="ctitle">Did the free-run Notes section produce something he did <em>not</em> ask for?</p><p class="cbody">It produced an unrequested feature-parity matrix.</p></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center;margin-top:12px">
+      <div class="quote big">
+        <p>The template constrained the shape without constraining the thinking.</p>
+        <span class="cite" style="display:block;margin-top:12px">— why signal 06 is the one he trusts</span>
+      </div>
+      <div class="prose">
+        <p>That last one is the interesting inversion. Most people verify a template by checking that nothing
+          unexpected came out.</p>
+        <p>He does the opposite. <strong>An unrequested, genuinely useful section is his proof that the template
+          left room to think.</strong> A template that only ever returns exactly what you asked for has flattened
+          the model into a form-filler.</p>
+      </div>
+    </div>
+
+    <div class="callout warn reveal">
+      <span class="ci">CORRECTION</span>
+      <span class="cc"><strong>He never runs the plan.</strong> Four of the five workflows are written and never
+        exercised on camera. The verification above covers the artifact the skill produced — not the skill's
+        full surface.</span>
+    </div>
+
+    <a class="jump reveal" href="#ch09">Next · anatomy of a finished skill &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch09">
+  <div class="wrap wide">
+    <span class="chapnum reveal">09 — Anatomy</span>
+    <div class="kicker reveal">the two skeletons, side by side</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Same skeleton, three times the size. <em>Almost all of the growth is template.</em></h2>
+    <p class="lede reveal d2" style="max-width:56ch">
+      Both finished skills use the same five-part SKILL.md. What changes is how much of the file is the
+      output format.
+    </p>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch09-s1"><b>1</b>fork-terminal</a>
+      <a href="#ch09-s2"><b>2</b>planf3</a>
+      <a href="#ch09-s3"><b>3</b>Two conventions worth stealing</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch09-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">fork-terminal · Session A</h2></div>
+
+    <div class="stats reveal">
+      <div class="stat"><div class="sv">81</div><div class="sl">lines of SKILL.md</div></div>
+      <div class="stat blue"><div class="sv">2</div><div class="sl">metadata fields</div></div>
+      <div class="stat olive"><div class="sv">4</div><div class="sl">cookbook files</div></div>
+      <div class="stat amber"><div class="sv">1</div><div class="sl">script, one function</div></div>
+    </div>
+
+    <div class="filetree reveal"><span class="c"># codebases/yt/disler__fork-repository-skill/</span>
+<span class="d">.claude/skills/fork-terminal/</span>
+  <span class="f">SKILL.md</span>          <span class="c"># Purpose · Variables (ENABLE_* flags) · Instructions · Workflow · Cookbook</span>
+  <span class="d">cookbook/</span>         <span class="c"># 4 files — 7 / 17 / 17 / 17 lines — one per target CLI</span>
+  <span class="d">prompts/</span>          <span class="c"># a fill-in-the-blanks template, filled IN MEMORY, never written to</span>
+  <span class="d">tools/</span>            <span class="c"># one uv single-file script, one function, returns a string</span>
+<span class="d">.claude/commands/</span>
+  <span class="f">prime.md</span>          <span class="c"># @-paths, listed in reading order</span>
+  <span class="f">all_skills.md</span>     <span class="c"># one line: "List all available skills from your system prompt"</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch09-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">planf3 · Session B</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div>
+        <div class="filetree"><span class="c"># codebases/yt/disler__planf3/</span>
+<span class="d">.claude/skills/planf3/</span>
+  <span class="f">SKILL.md</span>          <span class="c"># Purpose · Variables · Instructions · Workflow (routing table) · Plan Template</span>
+  <span class="d">workflows/</span>        <span class="c"># 5 named-step checklists, routed by table</span>
+  <span class="d">scripts/</span>          <span class="c"># 2 PEP 723 uv scripts — image generation + image edit</span>
+<span class="f">RAW.md</span>              <span class="c"># the hand-typed outline (chapter 02)</span>
+<span class="f">legacy_v1_meta_plan.md</span>  <span class="c"># 123 lines, read-only, never edited</span></div>
+        <p class="note">241 lines by count; <span class="mono">wc -l</span> reports 240 because there is no
+          trailing newline. Three metadata fields, one more than Session A.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 420 280" role="img" aria-label="Bar comparison: fork-terminal SKILL.md is 81 lines mostly instructions; planf3 is 241 lines of which 72.6 percent is the output template">
+          <text x="20" y="24" class="s-title">What the file is made of</text>
+
+          <text x="20" y="58" class="s-label-sm">fork-terminal · 81 lines</text>
+          <rect x="20" y="66" width="112" height="34" rx="6" class="s-clay-f"/>
+          <text x="76" y="88" text-anchor="middle" class="s-label-sm">instructions</text>
+
+          <text x="20" y="136" class="s-label-sm">planf3 · 241 lines</text>
+          <rect x="20" y="144" width="92" height="34" rx="6" class="s-clay-f"/>
+          <text x="66" y="166" text-anchor="middle" class="s-label-sm">instr.</text>
+          <rect x="116" y="144" width="284" height="34" rx="6" class="s-blue-f"/>
+          <text x="258" y="166" text-anchor="middle" class="s-label">output template — 72.6%</text>
+
+          <path d="M20 208 H 400" class="s-line" stroke-dasharray="4 4"/>
+          <text x="20" y="234" class="s-label-sm">the growth is not more rules —</text>
+          <text x="20" y="252" class="s-label">it is a fixed shape for the answer</text>
+          <text x="20" y="272" class="s-label-sm">he calls this "templating your engineering"</text>
+        </svg>
+        <div class="fcap"><b>Where the bytes went.</b> Nearly three-quarters of the mature skill is the artifact it emits.</div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch09-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Two conventions worth stealing</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <h4 style="margin-top:0">01 · Loading is encoded in the link syntax</h4>
+        <p><span class="mono" style="background:var(--paper-2);padding:1px 6px;border-radius:5px">@path</span>
+          means <strong>load eagerly</strong>. It appears <em>only</em> in
+          <span class="mono">commands/prime.md</span>.</p>
+        <p>A <strong>backticked bare path</strong> means <strong>load on demand</strong>. It is the only form
+          used inside SKILL.md.</p>
+        <p><strong>Zero <span class="mono">@</span> in SKILL.md. Seven in prime.md.</strong> The syntax carries the
+          loading strategy, so you can tell from a glance which files enter the context window at boot.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 440 280" role="img" aria-label="Eager loading with at-paths in prime.md pulls files into context at boot; lazy loading with backticked paths in SKILL.md pulls a cookbook only when its condition matches">
+          <rect x="14" y="18" width="180" height="40" rx="9" class="s-clay-f"/>
+          <text x="104" y="36" text-anchor="middle" class="s-label">commands/prime.md</text>
+          <text x="104" y="51" text-anchor="middle" class="s-label-sm">@path — eager, x7</text>
+
+          <path d="M104 58 V 92" class="s-flow"/><path d="M104 94 l-5.5 -9 11 0 z" class="s-clay"/>
+          <rect x="14" y="98" width="180" height="52" rx="9" class="s-card"/>
+          <text x="104" y="120" text-anchor="middle" class="s-label">everything, at boot</text>
+          <text x="104" y="138" text-anchor="middle" class="s-label-sm">context filled up front</text>
+
+          <rect x="246" y="18" width="180" height="40" rx="9" class="s-blue-f"/>
+          <text x="336" y="36" text-anchor="middle" class="s-label">SKILL.md</text>
+          <text x="336" y="51" text-anchor="middle" class="s-label-sm">`path` — lazy, x0 eager</text>
+
+          <path d="M336 58 V 92" class="s-flow" stroke-dasharray="5 4"/><path d="M336 94 l-5.5 -9 11 0 z" class="s-clay"/>
+          <rect x="246" y="98" width="180" height="52" rx="9" class="s-olive-f"/>
+          <text x="336" y="120" text-anchor="middle" class="s-label">one cookbook, on match</text>
+          <text x="336" y="138" text-anchor="middle" class="s-label-sm">IF / THEN / EXAMPLES</text>
+
+          <path d="M14 180 H 426" class="s-line" stroke-dasharray="4 4"/>
+          <text x="220" y="208" text-anchor="middle" class="s-label">progressive disclosure, spelled in punctuation</text>
+          <text x="220" y="234" text-anchor="middle" class="s-label-sm">you can audit the context budget by grepping for @</text>
+          <text x="220" y="262" text-anchor="middle" class="s-label-sm">conditional prompt · his term</text>
+        </svg>
+        <div class="fcap"><b>The @ / backtick split.</b> Two characters that decide what costs you tokens at boot.</div>
+      </div>
+    </div>
+
+    <div class="prose reveal" style="max-width:78ch;margin-top:18px">
+      <h4>02 · The cookbook and workflow files are near-identical to each other</h4>
+      <p>That similarity is exactly what proves they are a <strong>template</strong> and not four independent
+        documents. In <span class="mono">fork-terminal</span>, the four cookbooks share the same three headings
+        and four instruction bullets; only the model names and one "bypass approvals" flag differ.</p>
+    </div>
+
+    <div class="callout warn reveal">
+      <span class="ci">CORRECTION</span>
+      <span class="cc">In <span class="mono">planf3</span>, <strong>31 of 37</strong> numbered steps match the form
+        <span class="mono">N. Title Case Name - imperative clause</span> — <strong>not 37 of 37</strong>. Five
+        sentence-case names in <span class="mono">image-generation.md</span> and one colon-terminated header in
+        <span class="mono">build-plan.md:7</span> break it. The convention is near-total but not absolute, and it
+        breaks in the one file that is a <em>subworkflow</em> rather than a workflow.</span>
+    </div>
+
+    <a class="jump reveal" href="#ch10">Next · the 4-layer stack &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch10">
+  <div class="wrap wide">
+    <span class="chapnum reveal">10 — The stack</span>
+    <div class="kicker reveal">yt-32 · where a skill sits</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Four layers, numbered <em>from the bottom up.</em></h2>
+    <p class="lede reveal d2" style="max-width:58ch">
+      Two videos a month apart put the same mechanism in the same four slots. The correspondence is strong —
+      but it is not exact, and the difference matters if you go looking.
+    </p>
+
+    <div class="spread reveal" style="align-items:center;margin-top:24px">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 340" role="img" aria-label="The four-layer stack numbered from the bottom up: skill capability, subagent scale, command orchestration, just reusability or access">
+          <rect x="30" y="30" width="400" height="58" rx="10" class="s-amber-f"/>
+          <text x="52" y="56" class="s-label">4</text>
+          <text x="78" y="56" class="s-title">Just / Justfile</text>
+          <text x="78" y="76" class="s-label-sm">Reusability&nbsp;&nbsp;→&nbsp;&nbsp;Access</text>
+
+          <rect x="30" y="98" width="400" height="58" rx="10" class="s-plum-f"/>
+          <text x="52" y="124" class="s-label">3</text>
+          <text x="78" y="124" class="s-title">Command / Prompts</text>
+          <text x="78" y="144" class="s-label-sm">Orchestration</text>
+
+          <rect x="30" y="166" width="400" height="58" rx="10" class="s-blue-f"/>
+          <text x="52" y="192" class="s-label">2</text>
+          <text x="78" y="192" class="s-title">Subagent / Agents</text>
+          <text x="78" y="212" class="s-label-sm">Scale&nbsp;&nbsp;(+ Parallelism)</text>
+
+          <rect x="30" y="234" width="400" height="58" rx="10" class="s-clay-f"/>
+          <text x="52" y="260" class="s-label">1</text>
+          <text x="78" y="260" class="s-title">Skill / Skills</text>
+          <text x="78" y="280" class="s-label-sm">Capability</text>
+
+          <path d="M16 292 V 40" class="s-flow"/>
+          <path d="M16 38 l-5.5 9 11 0 z" class="s-clay"/>
+          <text x="230" y="318" text-anchor="middle" class="s-label-sm">BUILT BOTTOM-UP · you can hop into any layer to test it</text>
+          <text x="230" y="336" text-anchor="middle" class="s-label-sm">slots 1 and 2 use the same role words · slots 3 and 4 do not</text>
+        </svg>
+        <div class="fcap"><b>Numbered 1–4 from the bottom.</b> Capability at the base; access at the top.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">Here is the correspondence, stated precisely.</p>
+        <p>In <em>Bowser</em> (Feb 16), the <span class="mono">justfile</span> labels them
+          <span class="mono">Layer 1: Skill (Capability)</span>, <span class="mono">Layer 2: Subagent (Scale)</span>,
+          <span class="mono">Layer 3: Command (Orchestration)</span>,
+          <span class="mono">Layer 4: Just (Reusability)</span>.</p>
+        <p>In <em>The Library</em> (Mar 16), the stack diagram labels them
+          <span class="mono">Skills — Capability</span>, <span class="mono">Agents — Scale + Parallelism</span>,
+          <span class="mono">Prompts — Orchestration</span>, <span class="mono">Justfile — Access</span>,
+          numbered 1–4 <strong>from the bottom up</strong>.</p>
+        <p><strong>Slots 1 and 2 use the same role words.</strong> Slot 3 changes the noun — "Command" becomes
+          "Prompts" — but Bowser itself collapses the distinction:
+          <em>"A custom slash command also just known as a reusable prompt"</em> <span class="mono">[12:53]</span>.</p>
+        <p><strong>Slot 4 keeps the same tool and position</strong> while shifting the stated purpose from
+          <em>reusability</em> to <em>access</em>. Neither video reconciles the two words, so read it as a change
+          of emphasis rather than a fixed name.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-2 reveal">
+      <div class="callout warn" style="margin:0">
+        <span class="ci">CAVEAT</span>
+        <span class="cc">The Library's README lists <strong>five</strong> rows, adding
+          <em>"The Library — Distribution across devices, teams, and agents"</em> above the four in its own diagram.
+          Do not paper over that.</span>
+      </div>
+      <div class="callout bad" style="margin:0">
+        <span class="ci">DO NOT WRITE</span>
+        <span class="cc"><strong>"The same four layers, identically named."</strong> It will not survive a reader
+          checking the sources. Slots 3 and 4 will not hold.</span>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+
+    <div class="spread rev reveal" style="align-items:center">
+      <div class="quote big">
+        <p>"we can hop into any layer we want to. This is a huge advantage that makes it easier to test and scale up your agents one step at a time."</p>
+        <span class="cite" style="display:block;margin-top:14px">yt-32 [12:07]</span>
+      </div>
+      <div class="prose">
+        <h4 style="margin-top:0">Why bottom-up</h4>
+        <p>The stack is built from the bottom because each layer is independently runnable. You can invoke the
+          skill directly, or the subagent, or the command, or the just target.</p>
+        <p>That is not an architecture preference. <strong>It is a testability property.</strong> A stack you can
+          only enter at the top is a stack you can only debug at the top.</p>
+        <p>It also explains the shape of Session A: build the capability, prove it fires, then wrap it. Never the
+          other way round.</p>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch11">Next · the selection gate &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch11">
+  <div class="wrap wide">
+    <span class="chapnum reveal">11 — The gate</span>
+    <div class="kicker reveal">yt-16 · decide whether before how</div>
+    <h2 class="title reveal d1" style="max-width:24ch">His default is <em>not</em> a skill. It is a prompt.</h2>
+    <p class="lede reveal d2" style="max-width:56ch">
+      Everything in this guide is downstream of a decision most people skip: whether the thing should be a
+      skill at all.
+    </p>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch11-s1"><b>1</b>Start with a prompt</a>
+      <a href="#ch11-s2"><b>2</b>The promotion test</a>
+      <a href="#ch11-s3"><b>3</b>The composition rule</a>
+      <a href="#ch11-s4"><b>4</b>"Don't build a skill" vs "spend to win"</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch11-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Start with a prompt</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="quote">
+        <p>"always lead with a custom slash command. When you're starting out, I always recommend you just build a prompt. Don't build a skill. Don't build an sub agent. Don't build out an MCP server. Keep it simple, all right? Build a prompt."</p>
+        <span class="cite">yt-16 [13:08]</span>
+      </div>
+      <div class="prose">
+        <p class="lead-in">He calls converting all your slash commands into skills <strong>"a huge mistake"</strong>
+          <span class="mono">[9:15]</span>.</p>
+        <p>This matters because everything else in this guide is expensive. Thirty minutes with a notebook.
+          Hand-written routing. A cookbook per branch.</p>
+        <p>None of that is worth spending until the prompt has stopped being enough.</p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch11-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The promotion test</h2></div>
+
+    <div class="spread rev reveal" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 440 268" role="img" aria-label="One action stays a prompt; a whole problem domain with several related actions becomes a skill">
+          <rect x="18" y="26" width="170" height="52" rx="11" class="s-card"/>
+          <text x="103" y="49" text-anchor="middle" class="s-label">create a worktree</text>
+          <text x="103" y="67" text-anchor="middle" class="s-label-sm">one action</text>
+          <path d="M103 78 V 106" class="s-flow"/><path d="M103 108 l-5.5 -9 11 0 z" class="s-clay"/>
+          <rect x="18" y="112" width="170" height="44" rx="10" class="s-olive-f"/>
+          <text x="103" y="140" text-anchor="middle" class="s-label">a PROMPT</text>
+
+          <rect x="252" y="14" width="170" height="26" rx="7" class="s-card"/>
+          <text x="337" y="32" text-anchor="middle" class="s-label-sm">create</text>
+          <rect x="252" y="44" width="170" height="26" rx="7" class="s-card"/>
+          <text x="337" y="62" text-anchor="middle" class="s-label-sm">read</text>
+          <rect x="252" y="74" width="170" height="26" rx="7" class="s-card"/>
+          <text x="337" y="92" text-anchor="middle" class="s-label-sm">merge</text>
+          <rect x="252" y="104" width="170" height="26" rx="7" class="s-card"/>
+          <text x="337" y="122" text-anchor="middle" class="s-label-sm">remove · list</text>
+
+          <path d="M337 130 V 158" class="s-flow"/><path d="M337 160 l-5.5 -9 11 0 z" class="s-clay"/>
+          <rect x="252" y="164" width="170" height="44" rx="10" class="s-clay-f"/>
+          <text x="337" y="192" text-anchor="middle" class="s-label">a SKILL</text>
+
+          <text x="220" y="238" text-anchor="middle" class="s-label">"this is where one prompt is not enough"</text>
+          <text x="220" y="260" text-anchor="middle" class="s-label-sm">an ACTION stays a prompt · a DOMAIN becomes a skill</text>
+        </svg>
+        <div class="fcap"><b>The single test.</b> Count the related actions. One is a prompt; a family is a domain.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">A single action is a prompt. A <strong>problem domain</strong> is a skill.</p>
+        <p>Creating a git worktree is an action — that stays a prompt. <em>Managing</em> worktrees —
+          create, read, merge, remove, list — is a domain. That is a skill.</p>
+        <p>His phrasing for the moment of promotion: <em>"this is where one prompt is not enough."</em></p>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch11-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The composition rule — corrected</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="prose">
+        <p class="lead-in">Skills sit at the top and can contain MCP servers, sub-agents and slash commands.</p>
+        <p><strong>Only two edges are illegal:</strong></p>
+        <p>An MCP server cannot use a skill — <em>"you wouldn't have an MCP server use a skill"</em>
+          <span class="mono">[16:59]</span>.<br>
+          A sub-agent cannot use a sub-agent <span class="mono">[4:27]</span>.</p>
+        <p>Slash commands are a <strong>"super primitive"</strong> that can also run skills, MCP servers and
+          sub-agents. So the graph is, in his own word, <strong>"circular."</strong></p>
+        <div class="callout warn">
+          <span class="ci">CORRECTION</span>
+          <span class="cc"><strong>Do not present a strict one-way stack.</strong> An earlier reading had "the reverse
+            is illegal" as a general rule. His own words refute it. He calls the graph circular, twice.</span>
+        </div>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 440 300" role="img" aria-label="A circular composition graph between skills, commands, subagents and MCP servers, with only two illegal edges">
+          <circle cx="220" cy="60" r="42" class="s-clay-f"/>
+          <text x="220" y="58" text-anchor="middle" class="s-label">skill</text>
+          <text x="220" y="74" text-anchor="middle" class="s-label-sm">top</text>
+
+          <circle cx="70" cy="180" r="42" class="s-blue-f"/>
+          <text x="70" y="178" text-anchor="middle" class="s-label">command</text>
+          <text x="70" y="194" text-anchor="middle" class="s-label-sm">primitive</text>
+
+          <circle cx="370" cy="180" r="42" class="s-olive-f"/>
+          <text x="370" y="184" text-anchor="middle" class="s-label">sub-agent</text>
+
+          <circle cx="220" cy="252" r="40" class="s-plum-f"/>
+          <text x="220" y="256" text-anchor="middle" class="s-label">MCP</text>
+
+          <path d="M186 86 C 150 108, 118 130, 96 152" class="s-flow"/>
+          <path d="M94 154 l3 -10.5 8 7.5 z" class="s-clay"/>
+          <path d="M254 86 C 290 108, 322 130, 344 152" class="s-flow"/>
+          <path d="M346 154 l-11 -3 8 -7.5 z" class="s-clay"/>
+          <path d="M100 208 C 132 236, 160 248, 178 251" class="s-flow"/>
+          <path d="M180 251 l-9.5 -5 -0.5 11 z" class="s-clay"/>
+          <path d="M108 168 C 150 130, 176 96, 184 74" class="s-flow" stroke-dasharray="5 4"/>
+          <path d="M185 72 l-2 11 10 -4 z" class="s-clay"/>
+
+          <path d="M244 226 C 274 200, 250 130, 224 106" class="s-line" stroke-dasharray="4 4"/>
+          <path d="M252 176 l22 22 M274 176 l-22 22" stroke="var(--rose)" stroke-width="2.5" fill="none"/>
+          <text x="300" y="126" class="s-label-sm" fill="var(--rose)">MCP → skill</text>
+
+          <path d="M400 148 C 428 120, 404 106, 388 118" class="s-line"/>
+          <path d="M392 108 l20 20 M412 108 l-20 20" stroke="var(--rose)" stroke-width="2.5" fill="none"/>
+          <text x="356" y="96" class="s-label-sm" fill="var(--rose)">agent → agent</text>
+
+          <text x="220" y="160" text-anchor="middle" class="s-label-sm">CIRCULAR</text>
+        </svg>
+        <div class="fcap"><b>Two forbidden edges, everything else permitted.</b> Not a hierarchy — a graph.</div>
+      </div>
+    </div>
+
+    <div class="callout idea reveal">
+      <span class="ci">THE CORE FOUR</span>
+      <span class="cc">"There are four pieces of agentic coding. You have <strong>context, model, prompt, and
+        tools</strong>" <span class="mono">[12:36]</span>. The label "the core four" lands at
+        <span class="mono">[12:48]</span>.</span>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch11-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">"Don't build a skill" vs "we're spending to win"</h2></div>
+
+    <p class="prose reveal" style="max-width:76ch">The archive records two rules that look opposed and never
+      reconciles them. They govern <strong>different decisions</strong>.</p>
+
+    <div class="compare reveal">
+      <div class="col">
+        <span class="clabel" style="color:var(--blue)">◴ yt-16 · Oct 2025</span>
+        <p style="margin:0 0 10px"><em>"Don't build a skill... Keep it simple."</em></p>
+        <p class="small" style="margin:0">This is the gate on <strong>whether</strong> to build a skill at all.
+          Default to a prompt.</p>
+      </div>
+      <div class="col">
+        <span class="clabel" style="color:var(--clay)">◵ yt-50 · Jun 2026</span>
+        <p style="margin:0 0 10px"><em>"We're spending to win here."</em></p>
+        <p class="small" style="margin:0">This is the rule for <strong>how much to invest once you have already
+          decided</strong> — and it states its own threshold: <em>"The more you're going to be using a skill... the
+          more time and investment you should be putting into it."</em></p>
+      </div>
+    </div>
+
+    <div class="callout idea reveal">
+      <span class="ci">FLAG · SYNTHESIS</span>
+      <span class="cc">Sequential gates, not competing advice. <strong>He never says this himself</strong> —
+        the reconciliation is inference from the two sources, and is marked as such.</span>
+    </div>
+
+    <a class="jump reveal" href="#ch12">Next · the field he never explained &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch12">
+  <div class="wrap wide">
+    <span class="chapnum reveal">12 — The arc</span>
+    <div class="kicker reveal">one field, two videos, eight months</div>
+    <h2 class="title reveal d1" style="max-width:26ch">The field he never explained was doing <em>all the work</em> the whole time.</h2>
+    <p class="lede reveal d2" style="max-width:58ch">
+      In October 2025 he cannot tell you how a skill fires. In December 2025 his own skill refuses to fire,
+      and the mechanism teaches itself to him.
+    </p>
+
+    <div class="spread reveal" style="align-items:center;margin-top:24px">
+      <div class="prose">
+        <p class="lead-in">yt-16, October 2025.</p>
+        <p>He walks through what a skill is, how skills compose, and where they sit in the stack. He never
+          explains the <span class="mono">description</span> field, and he never explains what makes a skill
+          trigger.</p>
+        <p>He says so outright:</p>
+        <div class="quote" style="margin:20px 0">
+          <p>"It's not clear to me how reliable skills are yet."</p>
+          <span class="cite">yt-16 [24:18]</span>
+        </div>
+        <p>And yet the skills he is demoing <em>that day</em> already depend on it.</p>
+      </div>
+      <div>
+        <div class="callout idea">
+          <span class="ci">THE BEST FIND OF THE RUN</span>
+          <span class="cc">His shipped <span class="mono">create-worktree-skill</span> carries a
+            <strong>hand-written trigger guard</strong> in its description. He never says a word about it on camera.</span>
+        </div>
+        <div class="codecap">create-worktree-skill · the description field</div>
+        <div class="code"><pre>Use when the user explicitly asks for a SKILL
+to create a worktree. If the user does not
+mention 'skill'… do NOT trigger this.</pre></div>
+        <p class="note">Concrete proof that the unexplained field was carrying the behaviour the whole time.</p>
+      </div>
+    </div>
+
+    <div class="fig reveal">
+      <svg class="draw" viewBox="0 0 880 236" role="img" aria-label="Arc from October 2025 where the description field is never explained, through December 2025 where a skill fails to fire and the phrase is added">
+        <path d="M40 150 H 840" class="s-line"/>
+
+        <circle cx="140" cy="150" r="10" class="s-plum-f"/>
+        <text x="140" y="182" text-anchor="middle" class="s-label">yt-16 · Oct 2025</text>
+        <text x="140" y="200" text-anchor="middle" class="s-label-sm">"not clear how reliable</text>
+        <text x="140" y="216" text-anchor="middle" class="s-label-sm">skills are yet"</text>
+
+        <rect x="48" y="66" width="184" height="52" rx="10" class="s-card"/>
+        <text x="140" y="88" text-anchor="middle" class="s-label-sm">the field is already there</text>
+        <text x="140" y="106" text-anchor="middle" class="s-label-sm">with a hand-written guard</text>
+        <path d="M140 118 V 138" class="s-line" stroke-dasharray="3 3"/>
+
+        <path d="M160 150 C 340 150, 400 150, 560 150" class="s-flow" stroke-dasharray="7 5"/>
+        <text x="360" y="138" text-anchor="middle" class="s-label-sm">eight weeks · unexplained, but load-bearing</text>
+
+        <circle cx="600" cy="150" r="10" class="s-clay-f"/>
+        <text x="600" y="182" text-anchor="middle" class="s-label">yt-22 · Dec 2025</text>
+        <text x="600" y="200" text-anchor="middle" class="s-label-sm">"fork session" missing —</text>
+        <text x="600" y="216" text-anchor="middle" class="s-label-sm">the skill silently refuses</text>
+
+        <rect x="508" y="66" width="184" height="52" rx="10" class="s-amber-f"/>
+        <text x="600" y="88" text-anchor="middle" class="s-label-sm">he adds the phrase</text>
+        <text x="600" y="106" text-anchor="middle" class="s-label-sm">to the description</text>
+        <path d="M600 118 V 138" class="s-line" stroke-dasharray="3 3"/>
+
+        <path d="M620 150 H 800" class="s-flow"/>
+        <path d="M802 150 l-9 -5.5 0 11 z" class="s-clay"/>
+        <rect x="712" y="66" width="130" height="52" rx="10" class="s-olive-f"/>
+        <text x="777" y="88" text-anchor="middle" class="s-label-sm">the blame order</text>
+        <text x="777" y="106" text-anchor="middle" class="s-label-sm">is stated</text>
+        <path d="M777 118 V 142" class="s-line" stroke-dasharray="3 3"/>
+
+        <text x="40" y="32" class="s-title">Learning the mechanism by breaking it</text>
+      </svg>
+      <div class="fcap"><b>Nobody explained it to him either.</b> The rule that follows is earned, not received.</div>
+    </div>
+
+    <div class="spread rev reveal" style="align-items:center">
+      <div class="quote big">
+        <p>"Don't assume that it's the model's fault. First assume it's your fault, and then if you really prompt engineer properly, then you can assume it's the tooling's fault."</p>
+        <span class="cite" style="display:block;margin-top:14px">yt-22 [38:46]</span>
+      </div>
+      <div class="prose">
+        <p>Two months after saying he does not know how reliably skills fire, his own skill will not fire.
+          The cause is a missing phrase in a field he had never discussed.</p>
+        <p>He adds <strong>"fork session"</strong> to <em>"the description of the skill"</em>
+          <span class="mono">[38:36]</span>, and then states the blame order that follows from it.</p>
+        <p><strong>The rule is downstream of the failure.</strong> That is the whole arc.</p>
+      </div>
+    </div>
+
+    <div class="callout warn reveal">
+      <span class="ci">PHRASE THIS CAREFULLY</span>
+      <span class="cc">Say <strong>he never explains the description field or how triggering works</strong> —
+        <strong>not</strong> "never mentions it." The SKILL.md is visibly open on screen at
+        <span class="mono">[3:37]</span>. A transcript can support "never discusses". It can never support
+        "never appears."</span>
+    </div>
+
+    <div class="callout idea reveal">
+      <span class="ci">ALSO ABSENT FROM yt-16</span>
+      <span class="cc">An exhaustive keyword sweep of the 3,021-line cue file finds no
+        <span class="mono">description</span> in a skill sense (its three hits are all "link in the description"),
+        no <span class="mono">frontmatter</span>, and no <span class="mono">yaml</span>. And a word he does not use
+        anywhere: <strong>"frontmatter."</strong> He says <em>"the description of the skill."</em></span>
+    </div>
+
+    <a class="jump reveal" href="#ch13">Next · where the artifacts contradict themselves &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch13">
+  <div class="wrap wide">
+    <span class="chapnum reveal">13 — The seams</span>
+    <div class="kicker reveal">read the shipped code, not the video</div>
+    <h2 class="title reveal d1" style="max-width:26ch">His own artifacts <em>contradict themselves.</em> Six times, verifiably.</h2>
+    <p class="lede reveal d2" style="max-width:58ch">
+      This is the honest part, and all of it was checked cold against the files. None of it is a criticism of
+      the method — it is what the method actually looks like at rest.
+    </p>
+
+    <div class="spread reveal" style="align-items:center;margin-top:26px">
+      <div>
+        <div class="codecap">fork-terminal/SKILL.md — lines 27 and 30</div>
+        <div class="code"><pre>line 27:  Read, and REPLACE the …
+          fork_summary_user_prompt.md
+
+line 30:  IMPORTANT: To be clear, don't
+          update the file directly.</pre></div>
+        <p class="note">The fix from the on-camera failure was <em>appended</em> without removing the instruction
+          that caused it.</p>
+      </div>
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 440 250" role="img" aria-label="Two lines three apart in the same file give opposite instructions; the second was appended after a failure without removing the first">
+          <rect x="30" y="30" width="380" height="46" rx="9" class="s-card"/>
+          <text x="52" y="52" class="s-label-sm">27</text>
+          <text x="86" y="52" class="s-label">REPLACE the file</text>
+          <text x="86" y="68" class="s-label-sm">the original instruction</text>
+
+          <rect x="30" y="124" width="380" height="46" rx="9" class="s-amber-f"/>
+          <text x="52" y="146" class="s-label-sm">30</text>
+          <text x="86" y="146" class="s-label">don't update the file</text>
+          <text x="86" y="162" class="s-label-sm">appended after the break</text>
+
+          <path d="M220 76 V 118" class="s-line" stroke-dasharray="4 4"/>
+          <path d="M198 88 l44 44 M242 88 l-44 44" stroke="var(--rose)" stroke-width="2.5" fill="none"/>
+
+          <text x="220" y="202" text-anchor="middle" class="s-label">both still ship</text>
+          <text x="220" y="226" text-anchor="middle" class="s-label-sm">nobody removed the loser</text>
+        </svg>
+        <div class="fcap"><b>Three lines apart.</b> A fix that adds without subtracting leaves both rules in play.</div>
+      </div>
+    </div>
+
+    <hr class="divline reveal">
+
+    <div class="grid grid-2 reveal">
+      <div class="card accent"><span class="cnum">SEAM 02 · DEAD SLOT</span>
+        <p class="ctitle"><span class="mono">BASE_MODEL</span> is never consumed</p>
+        <p class="cbody">Defined in <strong>3 of the 4</strong> cookbooks, read nowhere — while
+          <span class="mono">DEFAULT_/FAST_/HEAVY_MODEL</span> sitting in the same block <em>are</em> consumed on
+          line 16.</p></div>
+
+      <div class="card blue"><span class="cnum">SEAM 03 · PROMISED, NOT SHIPPED</span>
+        <p class="ctitle"><span class="mono">planf3</span> promises CSS it does not deliver</p>
+        <p class="cbody">SKILL.md line 34 says <em>"all CSS lives in the single style block"</em> and line 35
+          references <span class="mono">:root</span> custom properties. <strong>Neither appears anywhere in the
+          175-line template.</strong> Every generated plan therefore invents its own palette.</p></div>
+
+      <div class="card olive"><span class="cnum">SEAM 04 · DECLARED, UNUSED</span>
+        <p class="ctitle"><span class="mono">IDE:</span> is declared and never used</p>
+        <p class="cbody">One line above <span class="mono">BROWSER:</span> — which <em>is</em> used. The two sit
+          together and only one is real.</p></div>
+
+      <div class="card plum"><span class="cnum">SEAM 05 · MARKETING vs CODE</span>
+        <p class="ctitle">The Library ships no versioning at all</p>
+        <p class="cbody">No <span class="mono">version</span>, <span class="mono">tag</span>,
+          <span class="mono">pin</span> or <span class="mono">commit</span> field anywhere. Everything is
+          HEAD-of-branch at <span class="mono">--depth 1</span> — while its README markets it as
+          <em>"a package.json for agent capabilities."</em></p></div>
+
+      <div class="card amber" style="grid-column:1 / -1"><span class="cnum">SEAM 06 · POST-VIDEO DRIFT</span>
+        <p class="ctitle">The shipped default model is not the one he set on camera</p>
+        <p class="cbody"><span class="mono">cookbook/claude-code.md</span> ships
+          <span class="mono">DEFAULT_MODEL: opus</span>. On camera he sets the default to Sonnet. The repo is not
+          a frozen recording of the video — it kept moving after the camera stopped.</p></div>
+    </div>
+
+    <div class="spread reveal" style="align-items:center;margin-top:20px">
+      <div class="quote big">
+        <p>The method produces working artifacts. It does not produce tidy ones.</p>
+        <span class="cite" style="display:block;margin-top:12px">— what six seams tell you</span>
+      </div>
+      <div class="prose">
+        <p>Every one of these is the residue of a real decision made under time pressure and never swept up.</p>
+        <p>Read it as permission. <strong>You are not doing it wrong because your skill has a dead variable in
+          it.</strong> The person who taught you the method has six of them, shipped, in public.</p>
+        <p>Read it also as a warning: if you copy his files, copy them <em>after</em> checking which lines are live.</p>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch14">Next · what the sources never show &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch14">
+  <div class="wrap wide">
+    <span class="chapnum reveal">14 — The gaps</span>
+    <div class="kicker reveal">ungrounded · named, not bridged</div>
+    <h2 class="title reveal d1" style="max-width:26ch">Seven things the sources <em>never show.</em></h2>
+    <p class="lede reveal d2" style="max-width:58ch">
+      Each of these is a place where a plausible answer could have been invented. None has been. If you need
+      one of these steps, you will not get it from these two videos.
+    </p>
+
+    <div class="pillrow reveal d2">
+      <span class="pill" style="border-color:rgba(177,85,108,.4);color:var(--rose);background:var(--rose-soft)">ungrounded</span>
+      <span class="pill">no bridging invented</span>
+      <span class="pill">1 retraction included</span>
+    </div>
+
+    <div class="fig reveal" style="margin-top:24px">
+      <svg class="draw" viewBox="0 0 880 200" role="img" aria-label="The documented pipeline with dashed gaps where the sources show nothing: the meta-skill scaffold step and any testing step">
+        <rect x="20" y="72" width="140" height="52" rx="10" class="s-clay-f"/>
+        <text x="90" y="103" text-anchor="middle" class="s-label">RAW.md by hand</text>
+
+        <path d="M160 98 H 196" class="s-flow"/><path d="M198 98 l-9 -5.5 0 11 z" class="s-clay"/>
+
+        <rect x="202" y="72" width="160" height="52" rx="10" fill="none" stroke="var(--rose)" stroke-width="2" stroke-dasharray="7 6"/>
+        <text x="282" y="96" text-anchor="middle" class="s-label" fill="var(--rose)">meta-skill scaffold</text>
+        <text x="282" y="113" text-anchor="middle" class="s-label-sm" fill="var(--rose)">NEVER OPENED</text>
+
+        <path d="M362 98 H 398" class="s-flow"/><path d="M400 98 l-9 -5.5 0 11 z" class="s-clay"/>
+
+        <rect x="404" y="72" width="150" height="52" rx="10" class="s-clay-f"/>
+        <text x="479" y="103" text-anchor="middle" class="s-label">hand-fill the shell</text>
+
+        <path d="M554 98 H 590" class="s-flow"/><path d="M592 98 l-9 -5.5 0 11 z" class="s-clay"/>
+
+        <rect x="596" y="72" width="120" height="52" rx="10" fill="none" stroke="var(--rose)" stroke-width="2" stroke-dasharray="7 6"/>
+        <text x="656" y="96" text-anchor="middle" class="s-label" fill="var(--rose)">any test</text>
+        <text x="656" y="113" text-anchor="middle" class="s-label-sm" fill="var(--rose)">DOES NOT EXIST</text>
+
+        <path d="M716 98 H 752" class="s-flow"/><path d="M754 98 l-9 -5.5 0 11 z" class="s-clay"/>
+        <rect x="760" y="72" width="100" height="52" rx="10" class="s-olive-f"/>
+        <text x="810" y="103" text-anchor="middle" class="s-label">ship it</text>
+
+        <text x="20" y="36" class="s-title">Solid boxes are documented. Dashed boxes are holes.</text>
+        <text x="20" y="176" class="s-label-sm">A dashed box is not a step you can skip — it is a step you must work out yourself.</text>
+      </svg>
+      <div class="fcap"><b>The honest pipeline.</b> Two of the load-bearing steps are simply not on camera.</div>
+    </div>
+
+    <hr class="divline reveal">
+
+    <div class="grid grid-2 reveal">
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">UNGROUNDED 01</span>
+        <p class="ctitle">The meta-skill that scaffolds skills is never opened</p>
+        <p class="cbody">Session B invokes it to create the blank shell. yt-36 confirms his
+          <span class="mono">meta-skill</span> / <span class="mono">meta-prompt</span> /
+          <span class="mono">meta-agent</span> live in a <strong>private repo</strong>.
+          <strong>Session B's stage 2 cannot be reproduced from these sources.</strong></p></div>
+
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">UNGROUNDED 02 · RETRACTION</span>
+        <p class="ctitle">How RAW.md ended up all-<span class="mono">[x]</span></p>
+        <p class="cbody">12 ticked, 0 unticked. He re-opens the file at <span class="mono">[29:04]</span>,
+          <span class="mono">[40:24]</span> and <span class="mono">[46:14]</span> — but at all three he
+          <strong>reads it as a to-do inventory</strong>. A sweep of all 1,907 cues for
+          <span class="mono">check | box | mark | tick</span> finds <strong>zero</strong> marking actions.
+          An earlier, tidier resolution — "he ticks them off as he goes" — was <strong>retracted</strong>.</p></div>
+
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">UNGROUNDED 03</span>
+        <p class="ctitle">No skill is ever tested</p>
+        <p class="cbody">No test file, no eval, no regression check, in either session. HOP/LOP evals exist
+          elsewhere in his vocabulary and are never connected to skills.</p></div>
+
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">UNGROUNDED 04</span>
+        <p class="ctitle">Session A's README was written off-camera</p>
+        <p class="cbody">It exists in the repo. It does not exist in the recording. Whatever process produced
+          it is not observable.</p></div>
+
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">UNGROUNDED 05</span>
+        <p class="ctitle">Windows support was never validated</p>
+        <p class="cbody">He says he needs a Windows sandbox and does not have one. The cross-platform branch in
+          <span class="mono">fork_terminal.py</span> ships unexercised.</p></div>
+
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">UNGROUNDED 06</span>
+        <p class="ctitle">planf3's 7 teaching diagrams and its README postdate the video</p>
+        <p class="cbody">They are not built on camera. They are the best explanation of his own argument in the
+          repo, and there is no record of how they were made.</p></div>
+
+      <div class="card" style="border-top:3px solid var(--rose);grid-column:1 / -1"><span class="cnum" style="color:var(--rose)">UNGROUNDED 07</span>
+        <p class="ctitle">The build does not run on the model in the title</p>
+        <p class="cbody">Despite <em>"PLANS For Fable 5"</em>, the session runs on <strong>Opus 4.8 at high
+          effort</strong> <span class="mono">[30:39]</span>. Whatever Fable 5 would have done differently is not
+          in these sources.</p></div>
+    </div>
+
+    <div class="callout bad reveal">
+      <span class="ci">HOW TO READ THIS PAGE</span>
+      <span class="cc">These are not weaknesses in the guide. They are the boundary of what two unedited videos
+        and 44 files of code can honestly support. <strong>Where you see a dashed box, you are on your own —
+        and you should know that before you start, not after.</strong></span>
+    </div>
+
+    <a class="jump reveal" href="#ch15">Next · his vocabulary &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch15">
+  <div class="wrap wide">
+    <span class="chapnum reveal">15 — The words</span>
+    <div class="kicker reveal">use his vocabulary, then translate it</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Fourteen terms that carry <em>most of the method.</em></h2>
+    <p class="lede reveal d2" style="max-width:56ch">
+      He names things aggressively. The names are compression — each one is a whole habit folded into two
+      words. Learn them so the videos parse.
+    </p>
+
+    <div class="fig reveal" style="margin-top:22px">
+      <svg class="draw" viewBox="0 0 880 250" role="img" aria-label="A map of his vocabulary: the pivot file at the centre, with cookbooks and workflows routed off it, and the loading and quality terms surrounding">
+        <circle cx="440" cy="120" r="56" class="s-clay-f"/>
+        <text x="440" y="115" text-anchor="middle" class="s-title">pivot file</text>
+        <text x="440" y="134" text-anchor="middle" class="s-label-sm">SKILL.md</text>
+
+        <rect x="120" y="34" width="180" height="44" rx="10" class="s-blue-f"/>
+        <text x="210" y="61" text-anchor="middle" class="s-label">cookbook / workflows</text>
+        <path d="M300 60 C 350 68, 372 90, 386 104" class="s-flow"/>
+        <path d="M388 106 l-10.5 -2.5 3.5 -8.5 z" class="s-clay"/>
+
+        <rect x="120" y="162" width="180" height="44" rx="10" class="s-olive-f"/>
+        <text x="210" y="189" text-anchor="middle" class="s-label">progressive disclosure</text>
+        <path d="M300 184 C 350 176, 372 154, 386 140" class="s-flow"/>
+        <path d="M388 138 l-4 10 8.5 -3 z" class="s-clay"/>
+
+        <rect x="580" y="34" width="188" height="44" rx="10" class="s-plum-f"/>
+        <text x="674" y="61" text-anchor="middle" class="s-label">property-based engineering</text>
+        <path d="M580 60 C 530 68, 508 90, 494 104" class="s-flow"/>
+        <path d="M492 106 l10.5 -2.5 -3.5 -8.5 z" class="s-clay"/>
+
+        <rect x="580" y="162" width="188" height="44" rx="10" class="s-amber-f"/>
+        <text x="674" y="189" text-anchor="middle" class="s-label">templating your engineering</text>
+        <path d="M580 184 C 530 176, 508 154, 494 140" class="s-flow"/>
+        <path d="M492 138 l4 10 -8.5 -3 z" class="s-clay"/>
+
+        <text x="440" y="228" text-anchor="middle" class="s-label-sm">everything routes through one file — that is what "pivot" means</text>
+      </svg>
+      <div class="fcap"><b>The vocabulary is a map.</b> Four of his terms describe the same file from four directions.</div>
+    </div>
+
+    <hr class="divline reveal">
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">TERM</span><p class="ctitle">pivot file</p>
+        <p class="cbody">The one file everything centres on. In a skill, that is <span class="mono">SKILL.md</span>.</p></div>
+      <div class="card accent"><span class="cnum">TERM</span><p class="ctitle">cookbook</p>
+        <p class="cbody">Per-use-case recipe files, read <strong>only when their condition matches</strong>.</p></div>
+      <div class="card accent"><span class="cnum">TERM</span><p class="ctitle">workflows</p>
+        <p class="cbody">Session B's name for the same pattern: <em>"similar to our meta skill cookbook pattern, except we'll call these workflows."</em></p></div>
+
+      <div class="card blue"><span class="cnum">TERM</span><p class="ctitle">progressive disclosure<br>· conditional prompt</p>
+        <p class="cbody">Loading extra documents only on a match, instead of up front.</p></div>
+      <div class="card blue"><span class="cnum">TERM</span><p class="ctitle">information-dense keyword</p>
+        <p class="cbody">A short token carrying large embedded meaning — <span class="mono">astral uv single file script</span>, <span class="mono">IMPORTANT</span>, <span class="mono">KISS</span>.</p></div>
+      <div class="card blue"><span class="cnum">TERM</span><p class="ctitle">agentic code</p>
+        <p class="cbody">Code that <strong>always returns concrete output</strong> — stdout, stderr and a return code — so an agent can tell what happened.</p></div>
+
+      <div class="card olive"><span class="cnum">TERM</span><p class="ctitle">property-based engineering</p>
+        <p class="cbody">List the artifact's required properties <em>before</em> building it.</p></div>
+      <div class="card olive"><span class="cnum">TERM</span><p class="ctitle">templating your engineering</p>
+        <p class="cbody">Encoding your method as a fixed output format.</p></div>
+      <div class="card olive"><span class="cnum">TERM</span><p class="ctitle">meta-skill</p>
+        <p class="cbody">A skill that builds or unlocks other skills. <em>"Build the thing that builds the thing."</em></p></div>
+
+      <div class="card plum"><span class="cnum">TERM</span><p class="ctitle">the agent trifecta</p>
+        <p class="cbody">Every artifact has three readers: <strong>you, your team, your agents.</strong></p></div>
+      <div class="card plum"><span class="cnum">TERM</span><p class="ctitle">the trade-off trifecta</p>
+        <p class="cbody"><span class="mono">Performance &gt; Speed &gt;= Cost</span>. <em>"spend tokens to win."</em></p></div>
+      <div class="card plum"><span class="cnum">TERM</span><p class="ctitle">restriction</p>
+        <p class="cbody">A deliberate length or scope limit placed on the model.</p></div>
+
+      <div class="card amber"><span class="cnum">TERM</span><p class="ctitle">closed loop</p>
+        <p class="cbody">A phase that cannot be exited until its validation passes.</p></div>
+      <div class="card amber"><span class="cnum">TERM</span><p class="ctitle">ZTE — zero touch engineering</p>
+        <p class="cbody">The direction of travel. Not a claim about today.</p></div>
+      <div class="card amber"><span class="cnum">TERM</span><p class="ctitle">AG SK · AGP · GSTC</p>
+        <p class="cbody">His editor snippets and commit hotkey. <span class="mono">AG SK</span> fires the SKILL.md skeleton in Session A.</p></div>
+    </div>
+
+    <div class="callout idea reveal">
+      <span class="ci">TRANSCRIPT NOISE</span>
+      <span class="cc">Auto-transcription garbles his technical terms. Silently correct these when quoting:
+        <span class="mono">"OAS script"</span> → <span class="mono">osascript</span>,
+        <span class="mono">"cloth"</span> → <span class="mono">.claude</span>,
+        <span class="mono">"and since refresh"</span> → "instance refresh",
+        <span class="mono">"yellow mode"</span> → "YOLO mode",
+        <span class="mono">"Agenty"</span> → "agentic".</span>
+    </div>
+
+    <a class="jump reveal" href="#ch16">Next · the checklist &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch16">
+  <div class="wrap wide">
+    <span class="chapnum reveal">16 — The checklist</span>
+    <div class="kicker reveal">what to actually do</div>
+    <h2 class="title reveal d1" style="max-width:24ch">Thirteen actions, in order. <em>Most of them are not typing.</em></h2>
+    <p class="lede reveal d2" style="max-width:56ch">
+      The whole method, reduced to things you can do tomorrow. Steps 1 and 2 are the gate — do not skip them
+      just because the rest looks more interesting.
+    </p>
+
+    <div class="fig reveal" style="margin-top:22px">
+      <svg class="draw" viewBox="0 0 880 210" role="img" aria-label="Four phases across thirteen steps: decide, shape, build, prove">
+        <path d="M40 118 H 840" class="s-line"/>
+
+        <rect x="40" y="78" width="150" height="40" rx="9" class="s-plum-f"/>
+        <text x="115" y="103" text-anchor="middle" class="s-label">DECIDE · 1–2</text>
+        <text x="115" y="142" text-anchor="middle" class="s-label-sm">is this even a skill?</text>
+
+        <rect x="206" y="78" width="180" height="40" rx="9" class="s-clay-f"/>
+        <text x="296" y="103" text-anchor="middle" class="s-label">SHAPE · 3–4</text>
+        <text x="296" y="142" text-anchor="middle" class="s-label-sm">by hand, away from the agent</text>
+
+        <rect x="402" y="78" width="260" height="40" rx="9" class="s-blue-f"/>
+        <text x="532" y="103" text-anchor="middle" class="s-label">BUILD · 5–8</text>
+        <text x="532" y="142" text-anchor="middle" class="s-label-sm">hand-write behaviour, delegate mechanism</text>
+
+        <rect x="678" y="78" width="162" height="40" rx="9" class="s-olive-f"/>
+        <text x="759" y="103" text-anchor="middle" class="s-label">PROVE · 9–13</text>
+        <text x="759" y="142" text-anchor="middle" class="s-label-sm">register, fire, live-fire, fold back</text>
+
+        <path d="M759 158 C 759 186, 300 190, 296 124" class="s-flow" stroke-dasharray="6 5"/>
+        <path d="M296 122 l-5 9.5 10.5 -0.5 z" class="s-clay"/>
+        <text x="520" y="200" text-anchor="middle" class="s-label-sm">what breaks goes back into the shape, not just the output</text>
+
+        <text x="40" y="40" class="s-title">Four phases. Only one of them is mostly typing.</text>
+      </svg>
+      <div class="fcap"><b>The arc of a build.</b> The last arrow is the one most people never draw.</div>
+    </div>
+
+    <hr class="divline reveal">
+
+    <ol class="steps reveal">
+      <li><h4>Don't build a skill yet</h4>
+        <p>Write the prompt. Run it by hand three times.</p></li>
+      <li><h4>Promote it only when one prompt stops being enough</h4>
+        <p>When it is a problem <em>domain</em>, not a single action.</p></li>
+      <li><h4>Close the laptop</h4>
+        <p>Purpose, problem, solution. Then draw the finished file tree.</p></li>
+      <li><h4>Write the raw dump by hand</h4>
+        <p>Properties before prose. Order them. <strong>Expect about 30 minutes.</strong></p></li>
+      <li><h4>Scaffold empty files with one short prompt</h4>
+        <p>Retype your drawn tree as the prompt. Four words of instruction is enough.</p></li>
+      <li><h4>Hand-write SKILL.md</h4>
+        <p>Metadata, trigger phrases, variables, routing. <strong>This is behaviour — it is yours.</strong></p></li>
+      <li><h4>Before encoding any mechanism, run it raw in a throwaway agent</h4>
+        <p>Watch what it actually does. Encode what you learned, not what you assumed.</p></li>
+      <li><h4><span class="mono">git init</span> and commit before you delegate anything</h4>
+        <p>"Just get a net."</p></li>
+      <li><h4>Build a registration detector</h4>
+        <p>One line: <em>"List all available skills from your system prompt."</em> Confirm the skill <strong>exists</strong>
+          before testing whether it <strong>works</strong>.</p></li>
+      <li><h4>Restart the session after editing SKILL.md</h4>
+        <p>It will not reload live. Metadata loads on boot.</p></li>
+      <li><h4>When it doesn't fire, check your description first</h4>
+        <p>Your fault, then your prompt, then the tool. In that order.</p></li>
+      <li><h4>Write one branch by hand, then let the agent mirror it</h4>
+        <p>One cookbook, one workflow, one route — hand-made. The rest are copies.</p></li>
+      <li><h4>Point it at a real task you actually need done</h4>
+        <p>Not a toy. Then <strong>fold what breaks back into the skill</strong>, not just into the output.</p></li>
+    </ol>
+
+    <div class="spread reveal" style="align-items:center;margin-top:14px">
+      <div class="quote big">
+        <p>Nine of these thirteen happen before the agent does anything interesting.</p>
+        <span class="cite" style="display:block;margin-top:12px">— the shape of the method</span>
+      </div>
+      <div class="callout ok" style="margin:0">
+        <span class="ci">THE ONE-LINE VERSION</span>
+        <span class="cc"><strong>Fix the shape by hand. Run each mechanism raw before you encode it. Hand-write
+          behaviour, delegate replication. Prove registration before behaviour. Fold every failure back into the
+          file.</strong></span>
+      </div>
+    </div>
+
+    <a class="jump reveal" href="#ch17">Next · how this was made &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter" id="ch17">
+  <div class="wrap wide">
+    <span class="chapnum reveal">17 — The run trace</span>
+    <div class="kicker reveal">how this document was made</div>
+    <h2 class="title reveal d1" style="max-width:26ch">Sixteen agents. Five of them existed only to <em>attack the other ten.</em></h2>
+    <p class="lede reveal d2" style="max-width:58ch">
+      The verification pass is the most credible part of this document, because it is the part that removed
+      things. Here is everything it cut, downgraded and retracted.
+    </p>
+
+    <div class="chapnav reveal">
+      <span class="cnl">In this chapter</span>
+      <a href="#ch17-s1"><b>1</b>The fleet</a>
+      <a href="#ch17-s2"><b>2</b>What verification changed</a>
+      <a href="#ch17-s3"><b>3</b>Skills, commands, hooks</a>
+      <a href="#ch17-s4"><b>4</b>Files read</a>
+      <a href="#ch17-s5"><b>5</b>Files written</a>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal" id="ch17-s1"><span class="sn">1</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">The fleet</h2></div>
+
+    <div class="spread reveal" style="align-items:center">
+      <div class="fig">
+        <svg class="draw" viewBox="0 0 460 320" role="img" aria-label="One orchestrator fans out to ten research agents, then five verifiers open the same sources cold, then one builder writes the artifact">
+          <rect x="160" y="14" width="140" height="38" rx="9" class="s-clay-f"/>
+          <text x="230" y="38" text-anchor="middle" class="s-label">orchestrator</text>
+
+          <path d="M230 52 C 230 72, 60 72, 46 92" class="s-flow"/>
+          <path d="M230 52 C 230 72, 130 76, 122 92" class="s-flow"/>
+          <path d="M230 52 V 92" class="s-flow"/>
+          <path d="M230 52 C 230 72, 330 76, 338 92" class="s-flow"/>
+          <path d="M230 52 C 230 72, 400 72, 414 92" class="s-flow"/>
+
+          <rect x="20" y="96" width="420" height="42" rx="10" class="s-blue-f"/>
+          <text x="230" y="115" text-anchor="middle" class="s-label">WAVE 1 · 10 research agents, in parallel</text>
+          <text x="230" y="131" text-anchor="middle" class="s-label-sm">transcripts · codebases · prior-art sweep</text>
+
+          <path d="M230 138 V 172" class="s-flow"/>
+          <path d="M230 174 l-5.5 -9 11 0 z" class="s-clay"/>
+          <text x="330" y="162" class="s-label-sm">claims out</text>
+
+          <rect x="20" y="178" width="420" height="42" rx="10" class="s-amber-f"/>
+          <text x="230" y="197" text-anchor="middle" class="s-label">WAVE 2 · 5 verifiers, in parallel</text>
+          <text x="230" y="213" text-anchor="middle" class="s-label-sm">each opens the cited source COLD</text>
+
+          <path d="M230 220 V 252" class="s-flow"/>
+          <path d="M230 254 l-5.5 -9 11 0 z" class="s-clay"/>
+
+          <rect x="110" y="258" width="240" height="42" rx="10" class="s-olive-f"/>
+          <text x="230" y="277" text-anchor="middle" class="s-label">1 builder — this page</text>
+          <text x="230" y="293" text-anchor="middle" class="s-label-sm">fresh context, verified input only</text>
+
+          <text x="20" y="316" class="s-label-sm">RULE: never send a claim back to the agent that made it</text>
+        </svg>
+        <div class="fcap"><b>Ten find, five attack, one writes.</b> The verifiers never saw who made the claim.</div>
+      </div>
+      <div class="prose">
+        <p class="lead-in">10 research + 5 verification + 1 builder = <strong>16 agents</strong>.</p>
+        <p>Wave 1 fanned out across the two primary sessions, three supporting videos, four shipped codebases
+          and the archive's own prior distillations.</p>
+        <p>Wave 2 applied one rule: <strong>never send a claim back to the agent that made it.</strong> Each
+          verifier opened the cited transcript or file cold and was told to try to break the claim.</p>
+        <p>The evidence base is transcripts plus committed code. The archive's <span class="mono">media/</span>
+          directory is empty by design, so <strong>no video frames were watched</strong> — nothing in this
+          document rests on something seen on screen.</p>
+      </div>
+    </div>
+
+    <h3 class="reveal">Wave 1 · what each research agent was scoped to, and what it returned</h3>
+
+    <div class="grid grid-2 reveal">
+      <div class="card blue"><span class="cnum">AGENT 01</span><p class="ctitle">yt-22 transcript · 10.2k words</p>
+        <p class="cbody">18 stages with timestamps, 6 failure moments. Returned the rule "run it in the loop first,
+          then encode it" and the hand-writes-behaviour / delegates-mechanism split. Flagged 3 post-video drifts
+          against the shipped repo.</p></div>
+      <div class="card blue"><span class="cnum">AGENT 02</span><p class="ctitle">disler__fork-repository-skill · 13 files</p>
+        <p class="cbody">SKILL.md = 81 lines, 2 metadata fields. The description <em>is</em> the router. Four
+          near-identical cookbooks prove a template. Found the <span class="mono">@</span> eager /
+          backtick lazy loading convention.</p></div>
+      <div class="card blue"><span class="cnum">AGENT 03</span><p class="ctitle">yt-50 transcript · 13k words</p>
+        <p class="cbody">11 stages, 8 failure moments. The ~14 minutes of hand-typing before any agent runs.
+          "Property-based engineering." Old version demoted to read-only reference. Live-fired on a real
+          unrelated task.</p></div>
+      <div class="card blue"><span class="cnum">AGENT 04</span><p class="ctitle">RAW.md · legacy_v1 · README · demo prompt</p>
+        <p class="cbody">RAW.md = 53 lines by <span class="mono">wc</span> / 299 words, future tense, typo left in —
+          a skeletal outline, not prose. v1→v3 delta: instructions survived, the template did not. The
+          <span class="mono">description:</span> line is byte-identical across versions.</p></div>
+      <div class="card blue"><span class="cnum">AGENT 05</span><p class="ctitle">.claude/skills/planf3/</p>
+        <p class="cbody">SKILL.md 241 lines, 72% of it the artifact template. Router is a markdown table using
+          "single best-matching". Workflow files are named-step checklists. Scripts use PEP 723.</p></div>
+      <div class="card blue"><span class="cnum">AGENT 06</span><p class="ctitle">planf3 images/ + a generated spec</p>
+        <p class="cbody">7 diagrams transcribed — they are his own 7-stage argument, numbered 02→07 with
+          <strong>01 missing</strong>. The generated plan is 585 lines / 44KB of HTML with a sibling PNG
+          directory and zero base64.</p></div>
+      <div class="card plum"><span class="cnum">AGENT 07</span><p class="ctitle">yt-16 · what a skill IS</p>
+        <p class="cbody">A <strong>selection</strong> framework, not a construction one. The "core four". The
+          composition graph. Default is not a skill. The description field is never explained — established by
+          negative grep.</p></div>
+      <div class="card plum"><span class="cnum">AGENT 08</span><p class="ctitle">yt-36 + disler__the-library · 20 files</p>
+        <p class="cbody">Meta-skill is a <strong>key, not a container</strong>. Lifecycle: build → catalog →
+          distribute → use. No versioning stage exists, verified by grep. 8 cookbook files share one grammar.
+          Caught 8 transcript-versus-code conflicts.</p></div>
+      <div class="card plum"><span class="cnum">AGENT 09</span><p class="ctitle">yt-32 + disler__bowser · 3 skills</p>
+        <p class="cbody">The 4 layers enumerated twice on camera and encoded as <span class="mono">justfile</span>
+          section headers, built bottom-up for testability. Split rule: one skill per execution substrate.</p></div>
+      <div class="card plum"><span class="cnum">AGENT 10</span><p class="ctitle">prior-art sweep of knowledge/</p>
+        <p class="cbody">Both videos already distilled at nugget density. Named <strong>4 gaps</strong> this
+          artifact exists to fill, plus one unreconciled contradiction on-topic. Identified the duplication risk
+          in the existing dojo chapters.</p></div>
+    </div>
+
+    <div class="callout idea reveal">
+      <span class="ci">WHY THIS DOCUMENT EXISTS</span>
+      <span class="cc">The prior-art sweep found four holes: <strong>(a)</strong> no ordered procedure for building
+        a skill from zero — anatomy and rules existed, the <em>session</em> did not; <strong>(b)</strong> rebuilding
+        a skill was "the largest open field", with <span class="mono">legacy_v1_meta_plan.md</span> named exactly
+        once and never explained; <strong>(c)</strong> the raw-dump→structure step was asserted three times and
+        demonstrated zero times — nothing showed what RAW.md contains; <strong>(d)</strong> validating a finished
+        skill amounted to three sentences in the whole archive.</span>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal amber" id="ch17-s2"><span class="sn">2</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">What verification changed</h2></div>
+
+    <p class="prose reveal" style="max-width:76ch">Five verifiers, none of them sent back to the agent that made
+      the claim. Net effect on this document:</p>
+
+    <div class="grid grid-2 reveal">
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">CUT</span>
+        <p class="ctitle">"37 of 37 numbered steps match the pattern"</p>
+        <p class="cbody">True figure: <strong>31 of 37</strong>. Five sentence-case names in
+          <span class="mono">image-generation.md</span>, one colon-terminated header in
+          <span class="mono">build-plan.md:7</span>. The weaker true version is what chapter 09 publishes.</p></div>
+
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">DOWNGRADED</span>
+        <p class="ctitle">The four-layer correspondence</p>
+        <p class="cbody">Was going to be a centrepiece as "two videos name the same four layers". Verdict:
+          <strong>STRONG, not EXACT</strong>. Slot 3's noun differs; slot 4's stated purpose shifts from
+          Reusability to Access with nothing reconciling them. The verifier's instruction — <em>avoid writing
+          "the same four layers, identically named"</em> — was adopted verbatim.</p></div>
+
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">RETRACTED</span>
+        <p class="ctitle">The RAW.md tick-off resolution</p>
+        <p class="cbody">An orchestrator conclusion — "the 12 boxes are ticked because he returns to RAW.md
+          mid-build" — was <strong>refuted by the tiebreaker</strong>. The counts and timestamps are real; the
+          ticking is not. Republished as an honest ungrounded in chapter 14.</p></div>
+
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">SETTLED</span>
+        <p class="ctitle">Was the V1 spec pasted into RAW.md?</p>
+        <p class="cbody">No. A grep of the shipped file returns only two false hits inside the words "spec-ify"
+          and "spec-ific". The V1 spec is a separate shipped file. Decisive evidence: the
+          <span class="mono">[30:23]</span> prompt naming three distinct paths. Not a "pasted then removed"
+          case — no removal moment exists.</p></div>
+
+      <div class="card" style="border-top:3px solid var(--rose)"><span class="cnum" style="color:var(--rose)">CORRECTED</span>
+        <p class="ctitle">The composition rule</p>
+        <p class="cbody">"The reverse is illegal" was refuted by his own words. Only two edges are illegal.
+          He calls the graph <strong>circular</strong>, twice. Chapter 11 publishes the corrected version.</p></div>
+
+      <div class="card" style="border-top:3px solid var(--amber)"><span class="cnum" style="color:var(--amber)">TIGHTENED</span>
+        <p class="ctitle">~10 word choices and 7 timestamps</p>
+        <p class="cbody"><strong>"notebooks"</strong> not "paper" · <strong>not</strong> "throwaway" for the
+          detector command · <strong>not</strong> "quit and relaunch" · <strong>not</strong> "prefixed IMPORTANT" ·
+          <strong>not</strong> "frontmatter" · <strong>"never explains"</strong> not "never mentions". Seven
+          timestamps re-anchored against the <span class="mono">.vtt</span> cues, which the stitched
+          <span class="mono">.md</span> headers lag by 10–40 seconds.</p></div>
+    </div>
+
+    <div class="stats reveal">
+      <div class="stat"><div class="sv">1</div><div class="sl">claim cut</div></div>
+      <div class="stat blue"><div class="sv">1</div><div class="sl">centrepiece downgraded</div></div>
+      <div class="stat plum"><div class="sv">1</div><div class="sl">conclusion retracted</div></div>
+      <div class="stat olive"><div class="sv">7</div><div class="sl">timestamps corrected</div></div>
+    </div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal olive" id="ch17-s3"><span class="sn">3</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Skills, commands, hooks</h2></div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">SKILLS INVOKED</span>
+        <p class="ctitle">2 of 3</p>
+        <p class="cbody"><span class="mono">prime</span> — orientation in this archive.<br>
+          <span class="mono">giving-back</span> — the design system this page is built in.<br>
+          <span class="mono">ihaveadhd</span> — <strong>requested but not installed</strong>. Searched
+          <span class="mono">~/.claude</span> and <span class="mono">~/.claude/plugins</span>; no match.
+          <strong>Its intent was applied by hand</strong> — short blocks, scannable headers, no walls of text.</p></div>
+
+      <div class="card blue"><span class="cnum">SLASH COMMANDS RUN</span>
+        <p class="ctitle">2</p>
+        <p class="cbody"><span class="mono">/learn-author-style</span> — the orchestrating command itself.<br>
+          <span class="mono">/prime</span> — repo orientation. It ran a one-line file-count over
+          <span class="mono">git ls-files</span> and read <span class="mono">README.md</span>.</p></div>
+
+      <div class="card amber"><span class="cnum">HOOKS OBSERVED</span>
+        <p class="ctitle">3 firings</p>
+        <p class="cbody">A <span class="mono">UserPromptSubmit</span> hook appended a standing
+          <em>"use a todo list"</em> instruction to user turns.<br><br>
+          Two subagent returns were flagged by an output-scanning harness for matching instruction-shaped
+          patterns — <span class="mono">dangerously-skip-permissions</span> and
+          <span class="mono">settings-json</span> — and had their control tags neutralized before the text
+          reached the orchestrator.</p></div>
+    </div>
+
+    <p class="note reveal">Only observed firings are reported. No hook configuration was inspected or inferred.</p>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal blue" id="ch17-s4"><span class="sn">4</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Files read</h2></div>
+
+    <p class="prose reveal">Merged across the orchestrator and all fifteen agents.</p>
+
+    <div class="filetree reveal"><span class="c"># orientation</span>
+<span class="f">README.md</span>
+<span class="f">catalog/youtube/README.md</span>
+<span class="c"># directory listings: catalog/youtube · catalog/courses · codebases/yt</span>
+<span class="c">#                    knowledge/distilled · knowledge/research · knowledge/artifacts · ~/.claude/skills</span>
+
+<span class="c"># primary sessions — transcript .md and the raw .vtt cues</span>
+<span class="d">catalog/youtube/yt-22-raw-agentic-coding-zero-to-agent-skill/transcript/</span>
+<span class="d">catalog/youtube/yt-50-plans-for-fable-5-rebuilding-my-plan-skill-for-mythos-class/transcript/</span>
+
+<span class="c"># supporting videos</span>
+<span class="d">catalog/youtube/yt-16-i-finally-cracked-claude-agent-skills-breakdown-for-engineer/transcript/</span>
+<span class="d">catalog/youtube/yt-32-my-4-layer-claude-code-playwright-cli-skill-agentic-browser/transcript/</span>
+<span class="d">catalog/youtube/yt-36-the-library-meta-skill-how-i-distribute-private-skills-agent/transcript/</span>
+
+<span class="c"># shipped code — READ ONLY, never modified</span>
+<span class="d">codebases/yt/disler__fork-repository-skill/</span>   <span class="c"># 13 files</span>
+<span class="d">codebases/yt/disler__planf3/</span>                    <span class="c"># 31 files incl. RAW.md, legacy_v1_meta_plan.md, images/</span>
+<span class="d">codebases/yt/disler__the-library/</span>               <span class="c"># 20 files</span>
+<span class="d">codebases/yt/disler__bowser/</span>                    <span class="c"># 3 skills + justfile</span>
+
+<span class="c"># prior art — the duplication check</span>
+<span class="f">knowledge/distilled/yt-19-27.md</span>       <span class="c"># the paper-vs-prototype contradiction, :115 and :120</span>
+<span class="f">knowledge/distilled/yt-46-53.md</span>
+<span class="f">knowledge/distilled/the-build-loop.md</span>
+<span class="f">knowledge/distilled/the-system.md</span>
+<span class="d">knowledge/artifacts/agentic-dojo/</span>       <span class="c"># ch22 + ch25 — the duplication risk</span>
+
+<span class="c"># design system</span>
+<span class="d">~/.claude/skills/giving-back/</span>          <span class="c"># template.html · COMPONENTS.md · ARCHETYPES.md</span></div>
+
+    <hr class="divline reveal">
+    <div class="subsec reveal plum" id="ch17-s5"><span class="sn">5</span>
+      <h2 class="title" style="font-size:clamp(26px,3.6vw,40px)">Files written</h2></div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card accent"><span class="cnum">CREATED</span>
+        <p class="ctitle">This artifact</p>
+        <p class="cbody"><span class="mono">knowledge/artifacts/cc-opus5-2026-08-13-indy-skill-from-scratch.html</span>
+          — one self-contained page.</p></div>
+      <div class="card blue"><span class="cnum">WORKING FILE</span>
+        <p class="ctitle">synthesis.md</p>
+        <p class="cbody">Scratchpad only. The verified content after wave 2, with every correction folded in.</p></div>
+      <div class="card blue"><span class="cnum">WORKING FILE</span>
+        <p class="ctitle">run-trace.md</p>
+        <p class="cbody">Scratchpad only. The record this chapter was built from.</p></div>
+    </div>
+
+    <div class="callout ok reveal">
+      <span class="ci">NOT TOUCHED</span>
+      <span class="cc"><strong>Nothing in <span class="mono">codebases/</span> was modified.</strong> It is a
+        vendored, read-only tree — those snapshots have no git history of their own, and their
+        <span class="mono">.claude/</span> directories are lesson content, not this repo's configuration.</span>
+    </div>
+
+    <a class="jump reveal" href="#ch99">Next · the send-off &nbsp;→</a>
+  </div>
+</section>
+
+<section class="chapter dark" id="ch99">
+  <div class="wrap">
+    <span class="chapnum reveal" style="color:var(--on-dark-dim)">— The Send-off</span>
+    <div class="kicker reveal">where this leaves you</div>
+    <h2 class="title reveal d1" style="max-width:20ch;color:#f6efe2">The agent never gets to decide <em>what the thing is.</em></h2>
+    <p class="lede reveal d2" style="max-width:44ch;color:var(--on-dark-dim)">
+      Everything else in both sessions is negotiable. That one line is not.
+    </p>
+
+    <div class="fig bare reveal d3" style="margin-top:36px;max-width:600px">
+      <svg class="draw" viewBox="0 0 600 108" role="img" aria-label="Three moves that survive both sessions: fix the shape, run it raw, fold failures back in">
+        <rect x="4" y="34" width="176" height="50" rx="10" fill="none" stroke="var(--clay-2)" stroke-width="2"/>
+        <text x="92" y="58" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="#efe7d8">fix the shape</text>
+        <text x="92" y="74" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="#b9ad97">by hand, first</text>
+
+        <path d="M180 59 H 208" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M210 59 l-9 -5.5 0 11 z" fill="var(--clay-2)"/>
+
+        <rect x="214" y="34" width="176" height="50" rx="10" fill="none" stroke="var(--olive)" stroke-width="2"/>
+        <text x="302" y="58" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="#efe7d8">run it raw</text>
+        <text x="302" y="74" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="#b9ad97">then encode what you saw</text>
+
+        <path d="M390 59 H 418" stroke="var(--clay-2)" stroke-width="2" fill="none"/>
+        <path d="M420 59 l-9 -5.5 0 11 z" fill="var(--clay-2)"/>
+
+        <rect x="424" y="34" width="172" height="50" rx="10" fill="none" stroke="var(--amber)" stroke-width="2"/>
+        <text x="510" y="58" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="#efe7d8">fold failures back</text>
+        <text x="510" y="74" text-anchor="middle" font-family="var(--mono)" font-size="9" fill="#b9ad97">into the file, not the output</text>
+
+        <path d="M510 84 C 510 104, 120 106, 92 88" stroke="var(--clay-2)" stroke-width="1.5" fill="none" stroke-dasharray="5 4"/>
+        <text x="300" y="20" text-anchor="middle" font-family="var(--mono)" font-size="9.5" fill="#b9ad97" letter-spacing="1.4">THE THREE MOVES THAT SURVIVE BOTH SESSIONS</text>
+      </svg>
+    </div>
+
+    <div class="grid grid-3 reveal" style="margin-top:26px">
+      <div class="card glow accent"><span class="cnum">RECAP 01</span><p class="ctitle">The shape is yours</p>
+        <p class="cbody">Notebook or RAW.md — thirty minutes of hand work before the first prompt. Nine of the thirteen checklist steps happen before the agent does anything interesting.</p></div>
+      <div class="card glow blue"><span class="cnum">RECAP 02</span><p class="ctitle">Observe, then encode</p>
+        <p class="cbody">Run the mechanism raw in a throwaway agent. The rule you write afterwards is one you could not have guessed — like "leave off <span class="mono">-p</span>".</p></div>
+      <div class="card glow olive"><span class="cnum">RECAP 03</span><p class="ctitle">Failure is the curriculum</p>
+        <p class="cbody">Thirteen documented breaks, each with a named recovery. Your fault, then your prompt, then the tool — and the fix goes into the skill file.</p></div>
+    </div>
+
+    <div class="quote big reveal" style="margin:36px 0 8px">
+      <p>"Have your agent just run it in the loop, write the prompt, observe the result, and then encode it in a skill."</p>
+      <span class="cite" style="display:block;margin-top:14px;color:var(--on-dark-dim)">— yt-22 [15:04], the line to remember</span>
+    </div>
+
+    <p class="small reveal" style="margin-top:30px;color:var(--on-dark-dim)">
+      Built by 16 agents in two waves · every claim carries a video key + corrected timestamp, or a file path ·
+      no video frames were watched · <span class="mono">codebases/</span> untouched.<br>
+      <span style="font-family:var(--mono);letter-spacing:.06em">Press <kbd style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#efe7d8">K</kbd> to climb back up ↑</span>
+    </p>
+    <a class="jump reveal" href="#ch00">Back to the top &nbsp;↑</a>
+  </div>
+</section>
+
+</main>
+
+<div id="pager">
+  <button id="pprev" aria-label="Previous section">‹</button>
+  <span class="pind" id="pind"></span>
+  <button id="pnext" aria-label="Next section">›</button>
+</div>
+<button id="topbtn" aria-label="Back to top">↑</button>
+
+<script>
+/* ═══ self-contained syntax highlighter ═══════════════════ */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+const KW={
+ python:['def','class','import','from','return','if','elif','else','for','while','in','not','and','or','is','None','True','False','with','as','try','except','finally','raise','lambda','yield','async','await','self','pass','break','continue','global'],
+ js:['const','let','var','function','return','if','else','for','while','of','in','new','class','extends','import','export','default','async','await','try','catch','finally','throw','typeof','this','true','false','null','undefined','interface','type','enum','public','private','readonly'],
+ bash:['if','then','else','elif','fi','for','do','done','while','case','esac','function','export','source','return','local','set','git','npm','npx','uv','uvx','bun','python','python3','node','claude','curl','mkdir','cd','echo','cat','cp','mv','rm','chmod'],
+ yaml:['true','false','null'],
+ json:['true','false','null'],
+ text:[]
+};
+const COMMENT={python:'#',bash:'#',yaml:'#',js:'//',json:null,text:null};
+function hlMd(e){
+  return e.split('\n').map(function(line){
+    if(/^#{1,6}\s/.test(line))return '<span class="md-h">'+line+'</span>';
+    if(/^\s*&gt;/.test(line))return '<span class="md-q">'+line+'</span>';
+    if(/^\s*([-*+]|\d+\.)\s/.test(line))line=line.replace(/^(\s*)([-*+]|\d+\.)(\s)/,'$1<span class="md-li">$2</span>$3');
+    line=line.replace(/`([^`]+)`/g,'<span class="md-c">`$1`</span>');
+    line=line.replace(/\*\*([^*]+)\*\*/g,'<span class="md-b">**$1**</span>');
+    line=line.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<span class="md-link">[$1]($2)</span>');
+    return line;
+  }).join('\n');
+}
+function detectLang(pre){
+  var cap=''; var c=pre.closest('.code'); if(c&&c.previousElementSibling&&c.previousElementSibling.classList.contains('codecap'))cap=c.previousElementSibling.textContent.toLowerCase();
+  var t=pre.textContent;
+  if(/\.md\b|markdown|\.claude\/commands|slash command|command file|prompt\.md|claude\.md/.test(cap)||/^#{1,6}\s.+/m.test(t)&&!/^\s*(def |import )/m.test(t))return'md';
+  if(/\.py\b|python/.test(cap)||/^\s*(def |class |import |from \S+ import|print\()/m.test(t))return'python';
+  if(/\.json\b|json|\.mcp|settings/.test(cap)||(/^\s*[\{\[]/.test(t.trim())&&/":\s/.test(t)))return'json';
+  if(/\.(ts|js|tsx|jsx)\b|typescript|javascript/.test(cap)||/(=>|\bconst |\bfunction |\bexport )/.test(t))return'js';
+  if(/\.ya?ml\b|yaml/.test(cap))return'yaml';
+  if(/terminal|bash|shell|\.sh\b|justfile|command line/.test(cap)||/^\s*(\$|#!\/|git |cd |npm |uv |bun |export |curl )/m.test(t))return'bash';
+  return'text';
+}
+function hl(text,lang){
+  if(lang==='md')return hlMd(esc(text));
+  var e=esc(text);
+  var alts=['"(?:[^"\\\\]|\\\\.)*"',"'(?:[^'\\\\]|\\\\.)*'",'`(?:[^`\\\\]|\\\\.)*`'];
+  var cm=COMMENT[lang];
+  if(cm==='#')alts.push('#[^\\n]*');
+  if(cm==='//')alts.push('//[^\\n]*');
+  alts.push('\\b\\d+(?:\\.\\d+)?\\b');
+  var kw=KW[lang]||[];
+  if(kw.length)alts.push('\\b(?:'+kw.join('|')+')\\b');
+  var re=new RegExp(alts.join('|'),'g');
+  return e.replace(re,function(m){
+    var q=m.charAt(0);
+    if(q==='"'||q==="'"||q==='`')return '<span class="s">'+m+'</span>';
+    if(m.indexOf('#')===0||m.indexOf('//')===0)return '<span class="cm">'+m+'</span>';
+    if(/^\d/.test(m))return '<span class="n">'+m+'</span>';
+    return '<span class="k">'+m+'</span>';
+  });
+}
+function highlightAll(){
+  document.querySelectorAll('.code pre').forEach(function(pre){
+    if(pre.dataset.hl)return;
+    try{ pre.innerHTML=hl(pre.textContent,detectLang(pre)); }catch(e){}
+    pre.dataset.hl='1';
+  });
+}
+highlightAll();
+
+/* ═══ paged navigation ════════════════════════════════════ */
+var chapters=[].slice.call(document.querySelectorAll('.chapter'));
+var tocLinks=[].slice.call(document.querySelectorAll('#toc a'));
+var prog=document.getElementById('progress');
+var rail=document.getElementById('rail');
+var idIndex={}; chapters.forEach(function(c,i){idIndex[c.id]=i;});
+var cur=0, total=chapters.length;
+
+var revObs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in','drawn');revObs.unobserve(e.target);}});},{rootMargin:'0px 0px -6% 0px',threshold:.1});
+function wirePage(ch){
+  ch.querySelectorAll('.draw').forEach(function(svg){
+    svg.querySelectorAll('path,line,polyline,polygon,circle,rect').forEach(function(p){
+      try{var len=p.getTotalLength?p.getTotalLength():1200;p.style.setProperty('--len',Math.ceil(len)||1200);}catch(e){}
+    });
+  });
+  ch.querySelectorAll('.reveal,.draw').forEach(function(el){el.classList.remove('in','drawn');revObs.observe(el);});
+}
+var subObs=null;
+function wireSubnav(ch){
+  if(subObs)subObs.disconnect();
+  var subs=[].slice.call(ch.querySelectorAll('.subsec[id]'));
+  var links=[].slice.call(ch.querySelectorAll('.chapnav a'));
+  if(!subs.length||!links.length)return;
+  subObs=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(e.isIntersecting){links.forEach(function(a){a.classList.remove('cur');});
+      var l=ch.querySelector('.chapnav a[href="#'+e.target.id+'"]'); if(l)l.classList.add('cur');}
+  });},{rootMargin:'-15% 0px -75% 0px',threshold:0});
+  subs.forEach(function(s){subObs.observe(s);});
+}
+function pageNum(i){var m=chapters[i].id.match(/ch(\d+)/);return m?m[1]:'00';}
+function updatePager(){
+  document.getElementById('pprev').disabled=cur<=0;
+  document.getElementById('pnext').disabled=cur>=total-1;
+  document.getElementById('pind').innerHTML='<b>'+pageNum(cur)+'</b> / '+String(total-1).padStart(2,'0');
+}
+function show(i,push){
+  i=Math.max(0,Math.min(total-1,i));
+  if(chapters[cur])chapters[cur].classList.remove('active');
+  cur=i; var ch=chapters[i];
+  ch.classList.add('active');
+  wirePage(ch); wireSubnav(ch);
+  window.scrollTo(0,0);
+  tocLinks.forEach(function(a){a.classList.remove('active');});
+  var rl=document.querySelector('#toc a[href="#'+ch.id+'"]'); if(rl){rl.classList.add('active');rl.scrollIntoView({block:'nearest'});}
+  updatePager();
+  if(push!==false){try{history.replaceState(null,'','#'+ch.id);}catch(e){location.hash=ch.id;}}
+}
+document.getElementById('pnext').onclick=function(){show(cur+1);};
+document.getElementById('pprev').onclick=function(){show(cur-1);};
+document.getElementById('topbtn').onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};
+tocLinks.forEach(function(a){a.addEventListener('click',function(e){
+  var id=a.getAttribute('href').slice(1);
+  if(idIndex[id]!=null){e.preventDefault();show(idIndex[id]);rail.classList.remove('open');}
+});});
+window.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key==='ArrowRight'||e.key==='j'||e.key==='J'){e.preventDefault();show(cur+1);}
+  if(e.key==='ArrowLeft'||e.key==='k'||e.key==='K'){e.preventDefault();show(cur-1);}
+});
+function onScroll(){
+  var h=document.documentElement;var max=h.scrollHeight-h.clientHeight;
+  prog.style.width=(max>0?(h.scrollTop/max*100):0)+'%';
+  document.getElementById('topbtn').classList.toggle('show',h.scrollTop>560);
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+
+document.getElementById('railToggle').addEventListener('click',function(){rail.classList.toggle('open');});
+
+/* init from hash */
+var initId=(location.hash||'').slice(1);
+show(idIndex[initId]!=null?idIndex[initId]:0,false);
+onScroll();
+</script>
+</body>
+</html>
