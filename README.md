@@ -1,110 +1,119 @@
 # AgenticEngineer
 
-A study archive of IndyDevDan's agentic-engineering material — three paid course
-tracks, the public YouTube back catalog, and every codebase built in them — kept
-offline so agents and humans can read the source instead of recalling it.
+A study archive of IndyDevDan's agentic-engineering material: the paid course
+lessons, the public YouTube videos, every codebase built in them, and the
+writing derived from all of it.
 
+It is organised by one rule — **a top-level directory is named for the role it
+plays, never for where its contents came from** — because every directory here
+is IndyDevDan material, so source-of-origin names discriminate nothing.
 
-## The three lesson tracks
+## First 60 seconds
 
-All 18 lessons live as sibling folders in `IndyDevDan/`, named
-`<track>-<n>-<slug>`. The prefix tells you which track, and — importantly —
-where that track's code lives:
-
-| Prefix | Track | Lessons | Code lives in |
-|---|---|---:|---|
-| `tac-1` … `tac-8` | **Tactical Agentic Coding** — the foundation | 8 | `tac/` |
-| `ah-1` … `ah-6` | **Agentic Horizon** — advanced modules | 6 | `agentic-horizon/` |
-| `ma-1` … `ma-4` | **Multi-Agent** — newest; video and code only, no course HTML | 4 | `agentic-horizon-extras/` |
-
-## ⚠ Every `codebase/` is a symlink
-
-Each lesson folder contains a `codebase/` entry that is a **symlink into a
-different top-level tree** — never a real directory:
-
-```
-IndyDevDan/tac-1-hello-agentic-coding/codebase/  ->  ../../tac/tac-1
-IndyDevDan/ah-5-agent-experts/codebase/          ->  ../../agentic-horizon/agent-experts
-IndyDevDan/ma-1-ceo-agents/codebase/             ->  ../../agentic-horizon-extras/ceo-agents
+```sh
+git clone <this repo> && cd AgenticEngineer
+make validate            # prove the tree is intact
 ```
 
-Reading through the symlink works fine. Writing *paths* based on it does not —
-the code does not live inside the lesson folder. Resolve the link before quoting
-a path.
+Then, depending on who you are:
 
-## The YouTube tree is live — it grows every week
+- **Reading the material** → start at [`catalog/README.md`](catalog/README.md).
+- **Looking for the summary** → [`knowledge/distilled/`](knowledge/distilled/)
+  is the compressed answer. Check it before deriving anything.
+- **An agent** → [`CLAUDE.md`](CLAUDE.md) is the routing table.
+  [`CONTEXT.md`](CONTEXT.md) defines the vocabulary.
 
-He publishes roughly one video a week, so `IndyDevDan/youtube/` is never
-finished. An idempotent updater discovers new uploads, builds the folder
-(transcript + metadata), attaches the codebase, and rebuilds the index:
-
-```bash
-python3 IndyDevDan/youtube/weekly_update.py
-```
-
-It never re-creates folders for video IDs it already knows, so re-running it is
-safe. State lives in `IndyDevDan/youtube/_weekly_last_run.json`, with one
-`_weekly_run_<timestamp>.json` per run.
-
-Consequence for anyone reading this file: **the course tracks are stable at 18
-lessons, but any video count is a snapshot.** Count them at read time rather
-than trusting a number written down — here, in `IndyDevDan/README.md`, or in an
-older artifact.
-
-## Where to look for what
-
-| Your question | Read this |
-|---|---|
-| What did he **say**? | `transcript/*.md` in the lesson or video folder — prefer `.md`, then `.txt`, then `.vtt` |
-| What did he **build**? | the lesson's `codebase/`, or `IndyDevDan/youtube/_repos/` for video projects |
-| Has it already been **distilled**? | `IndyDevDan/dojo/ai_docs/` — check here before re-deriving anything |
-| What has this repo already **produced**? | `IndyDevDan/artifacts/` |
-| Which lesson covers X? | `IndyDevDan/README.md` (catalog table) or `IndyDevDan/INDEX.json` |
-| Where did a codebase come from? | `REPOS.md` — upstream URLs for every sub-project |
+A fresh clone has an **empty `media/`**. That is expected — 22 GB of video is
+deliberately not in git. See
+[`docs/adr/0002`](docs/adr/0002-media-is-ignored-not-tracked.md).
 
 ## Layout
 
 ```
 AgenticEngineer/
-├── IndyDevDan/                 # the catalog — the front door for lessons
-│   ├── INDEX.json              # machine index of all 18 lessons
-│   ├── README.md               # catalog table + per-lesson folder shape
-│   ├── <track>-<n>-<slug>/     # video/ transcript/ metadata/ codebase/ README.md
-│   ├── youtube/                # public videos, same folder shape
-│   │   ├── INDEX.json
-│   │   ├── yt-NN-<slug>/
-│   │   └── _repos/             # cloned repos the videos build
-│   ├── dojo/                   # runnable lesson app + ai_docs/ distilled notes
-│   ├── book/                   # long-form build from the lessons
-│   ├── artifacts/              # generated HTML artifacts
-│   ├── research/               # research write-ups
-│   └── raw/                    # scratch notes and drafts
-├── tac/tac-1 … tac-8           # TAC codebases
-├── agentic-horizon/            # AH codebases
-├── agentic-horizon-extras/     # MA codebases
-├── videos/                     # raw screen captures, by lesson key
-├── tac transcripts/            # original transcript dumps, by course name
-├── member-assets/              # symlinks into the codebases + download logs
-├── output/                     # cross-cutting analysis write-ups
-├── scripts/                    # catalog builders and transcript processors
-├── tools/course-recorder/      # capture tooling
-└── docs/                       # agents/ and guides/
+├── README.md                  # you are here
+├── CLAUDE.md / AGENTS.md      # agent front door — the routing table
+├── CONTEXT.md                 # domain model / vocabulary
+├── REPOS.md                   # upstream provenance for every vendored codebase
+├── Makefile                   # validate / catalog / youtube / manifest
+├── catalog/                   # READ-ONLY front door to the material
+│   ├── courses/<track>-<n>-<slug>/   # video/ transcript/ metadata/ codebase/ README.md
+│   ├── youtube/yt-NN-<slug>/         # same shape
+│   └── _source/                      # raw page dumps, shared assets, download records
+├── codebases/                 # every codebase, vendored — never edit
+│   ├── tac/  ah/  ma/  yt/
+├── media/                     # video bytes (gitignored) + tracked MANIFEST.md
+│   ├── final/<key>.mp4  raw/<short-key>/
+├── transcripts/               # raw per-chapter .vtt dumps
+├── knowledge/                 # everything derived from the archive
+│   ├── distilled/ research/ artifacts/ book/ dojo/ drafts/
+├── tools/                     # ALL executable code
+│   ├── catalog/ youtube/ recorder/ transcripts/ media/ tests/
+├── docs/                      # agents/ adr/
+├── specs/                     # chore + feature plans
+├── projects/                  # side projects that are NOT the archive
+└── .scratch/                  # issue tracker (docs/agents/issue-tracker.md)
 ```
 
-Counts drift as material is added. Trust `ls` over any number written here.
+## Routing
+
+| Question | Path |
+|---|---|
+| What did he say? | `catalog/courses/<key>/transcript/<key>.md` |
+| What did he build? | `catalog/courses/<key>/codebase/` |
+| Already distilled? | `knowledge/distilled/` |
+| Prior deliverables? | `knowledge/artifacts/` |
+| Which lesson covers X? | `catalog/README.md`, `catalog/INDEX.json` |
+| Which video covers X? | `catalog/youtube/README.md` |
+| Where did a codebase come from? | `REPOS.md` |
+| How do I rebuild? | `tools/README.md` |
+
+Every `catalog/**/codebase/` is a symlink into `codebases/`. The destination is
+now guessable from the source, which is the whole point of the layout.
+
+## The one trap worth knowing
+
+There are two kinds of transcript, and they are both called "the transcript":
+
+- `transcripts/<key>/*.vtt` — raw, one chapter each, often 60–90 seconds.
+- `catalog/courses/<key>/transcript/<key>.md` — stitched, whole lesson. **This one.**
+
+Reading a single raw chapter and answering from it is the most common avoidable
+mistake in this repository.
+
+## Counts
+
+There are no counts written in this file, on purpose. The previous README warned
+that its counts drifted and then printed stale ones anyway. Produce them:
+
+```sh
+ls -d catalog/courses/*/ | wc -l                      # course lessons
+ls -d catalog/youtube/yt-*/ | wc -l                   # videos
+ls codebases/tac codebases/ah codebases/ma codebases/yt | wc -l
+find catalog -type l | wc -l                          # catalog symlinks
+```
+
+## Rebuilding
+
+```sh
+make validate      # prove the layout, symlinks, indexes and doc paths
+make catalog       # rebuild the lesson catalog, its symlinks and INDEX.json
+make youtube       # weekly YouTube update, then rebuild the index
+make manifest      # regenerate media/MANIFEST.md
+make check-media   # verify media/ against the manifest
+```
+
+Every script is a PEP 723 single-file script — `uv run tools/<area>/<script>.py`,
+no project setup. See [`tools/README.md`](tools/README.md) for what each one does
+and whether it is safe to re-run.
 
 ## Conventions
 
-- **Reusable prompts** live in `.claude/commands/`. `/prime` is the context
-  primer; run it first in a fresh session.
-- **Agent conventions** — issue tracker, triage labels, domain docs — are
-  described in `CLAUDE.md` and `docs/agents/`.
-- **Sources are never moved.** The `IndyDevDan/` tree hardlinks videos and
-  symlinks codebases so the originals stay where they were cloned.
-
-## Rebuilding the catalog
-
-```bash
-python3 scripts/materialize_course_pages_offline.py   # offline HTML + assets
-python3 scripts/build_indydevdan_catalog.py           # wire into lesson folders
-```
+- **Issues and PRDs** live as markdown under `.scratch/<feature-slug>/` —
+  [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md).
+- **Triage labels** — [`docs/agents/triage-labels.md`](docs/agents/triage-labels.md).
+- **Domain docs** — `CONTEXT.md` + `docs/adr/`, per
+  [`docs/agents/domain.md`](docs/agents/domain.md).
+- **Never commit** `.mp4`, `.m4a`, `.mov`, `.webm` or `.aac`.
+- **Never edit `codebases/`** — vendored upstream snapshots with no `.git` of
+  their own. Copy into `projects/` first.
