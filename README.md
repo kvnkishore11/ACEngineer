@@ -10,12 +10,20 @@ is IndyDevDan material, so source-of-origin names discriminate nothing. The rule
 is enforced by a test, not just documented: see
 [`docs/adr/0001-role-based-top-level-layout.md`](docs/adr/0001-role-based-top-level-layout.md).
 
-## First 60 seconds
+## Quick Start
+
+Requires [`uv`](https://docs.astral.sh/uv/), `make`, `git`, and Python 3.10+.
+Nothing else — every script declares its own dependencies inline (PEP 723), so
+there is no install step and no virtualenv to create.
 
 ```sh
 git clone <this repo> && cd AgenticEngineer
 make validate            # prove the tree is intact
 ```
+
+If `make validate` fails it names the offending path and the check that caught
+it; [`tools/tests/README.md`](tools/tests/README.md) explains what each check
+means and how to fix it.
 
 Then, depending on why you are here:
 
@@ -30,7 +38,7 @@ A fresh clone has an **empty `media/`**. That is expected — 22 GB of video is
 deliberately not in git. See
 [`docs/adr/0002-media-is-ignored-not-tracked.md`](docs/adr/0002-media-is-ignored-not-tracked.md).
 
-## Layout
+## Project Structure
 
 ```
 AgenticEngineer/
