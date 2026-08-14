@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Materialize offline course pages: real AE HTML + local CSS/fonts/images (no Nuxt JS)."""
 from __future__ import annotations
 

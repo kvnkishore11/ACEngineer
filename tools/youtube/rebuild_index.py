@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Rebuild youtube/INDEX.json and refresh the table in README.md from folder STATUS + inventory."""
 from __future__ import annotations
 

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Build agent-facing IndyDevDan/ lesson catalog (hardlinks + symlinks; sources untouched).
 
 Folder names match MA style: <course-n>-<slug>

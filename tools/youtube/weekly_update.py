@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Weekly IndyDevDan youtube/ catalog updater.
 
 Idempotent: never re-creates folders for known video IDs.

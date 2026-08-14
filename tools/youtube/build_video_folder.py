@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["youtube-transcript-api"]
+# ///
 """Build one IndyDevDan YouTube lesson folder in course-catalog format.
 
 Layout (mirrors IndyDevDan/<lesson>/):

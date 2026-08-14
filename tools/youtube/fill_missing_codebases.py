@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Attach codebases for youtube videos that had NO GitHub link in the description.
 
 Sources of truth (in priority order):

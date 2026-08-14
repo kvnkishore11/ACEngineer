@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Organize MA downloads: move metadata, convert VTT → clean md/txt, symlink finals."""
 from __future__ import annotations
 import json, re, shutil

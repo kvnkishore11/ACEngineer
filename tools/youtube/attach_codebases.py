@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Attach codebases to IndyDevDan youtube lesson folders.
 
 Primary source: GitHub (etc.) links in metadata/video-info.json description.
