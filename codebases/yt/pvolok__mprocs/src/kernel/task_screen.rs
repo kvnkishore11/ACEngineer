@@ -68,14 +68,22 @@ pub enum TaskScreenCmd {
     dir: CopyMove,
   },
   CopyBeginSelection,
-  /// Scroll the view: the positive `delta` scrolls up into history.
+  /// Scroll the view by `delta` units: positive scrolls up into history.
   Scroll {
     delta: i32,
+    unit: ScrollUnit,
   },
   CopyYank,
   Mouse {
     event: MouseEvent,
   },
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum ScrollUnit {
+  Line,
+  HalfScreen,
+  Screen,
 }
 
 pub enum FramedScreenNotify {
@@ -261,7 +269,7 @@ impl TaskScreen {
           self.broadcast(|task_id| FramedScreenNotify::Render { task_id });
         }
       }
-      TaskScreenCmd::Scroll { delta } => self.scroll(delta),
+      TaskScreenCmd::Scroll { delta, unit } => self.scroll(delta, unit),
       TaskScreenCmd::Mouse { event } => {
         self.handle_mouse(event, effects);
       }
@@ -361,8 +369,12 @@ impl TaskScreen {
         }
       }
       MouseEventKind::Up(_) => self.mouse_down = None,
-      MouseEventKind::ScrollUp => self.scroll(self.wheel_lines as i32),
-      MouseEventKind::ScrollDown => self.scroll(-(self.wheel_lines as i32)),
+      MouseEventKind::ScrollUp => {
+        self.scroll(self.wheel_lines as i32, ScrollUnit::Line)
+      }
+      MouseEventKind::ScrollDown => {
+        self.scroll(-(self.wheel_lines as i32), ScrollUnit::Line)
+      }
       MouseEventKind::Down(_)
       | MouseEventKind::Drag(_)
       | MouseEventKind::Moved
@@ -371,8 +383,16 @@ impl TaskScreen {
     }
   }
 
-  /// Wheel scroll. Positive `delta` scrolls up into history.
-  fn scroll(&mut self, delta: i32) {
+  /// Positive `delta` scrolls up into history.
+  fn scroll(&mut self, delta: i32, unit: ScrollUnit) {
+    let height = self.size.y.max(1) as i32;
+    let delta = delta
+      * match unit {
+        ScrollUnit::Line => 1,
+        ScrollUnit::HalfScreen => (height / 2).max(1),
+        // Keep one line of overlap for continuity when paging.
+        ScrollUnit::Screen => (height - 1).max(1),
+      };
     if let Some(session) = &mut self.copy {
       if delta >= 0 {
         session.state.scroll_up(delta as usize);

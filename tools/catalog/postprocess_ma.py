@@ -8,11 +8,13 @@ from __future__ import annotations
 import json, re, shutil
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-FINAL = ROOT.parent / "final videos"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+# Operates on a fresh member-asset download staging tree. The original
+# member-assets/ staging tree has been folded into the catalog; its provenance
+# (MANIFEST.json, SUMMARY.json, download.log) lives here.
+ROOT = REPO_ROOT / "catalog" / "_source" / "ma-download"
+FINAL = REPO_ROOT / "media" / "final"
 TRANSCRIPTS_ROOT = ROOT / "transcripts"  # unified flat transcripts
-TRANSCRIPTS_ROOT.mkdir(exist_ok=True)
-FINAL.mkdir(exist_ok=True)
 
 ASSETS = [
     ("ma-1-ceo-agents", "CEO Agents"),
@@ -148,7 +150,7 @@ def main():
             shutil.copy2(tdir / f"{key}.md", TRANSCRIPTS_ROOT / f"{key}.md")
             shutil.copy2(dest_vtt, TRANSCRIPTS_ROOT / f"{key}.en.vtt")
 
-        # hardlink or copy into final videos/ (os.link — no extra disk)
+        # hardlink or copy into media/final/ (os.link - no extra disk)
         final_mp4 = FINAL / f"{key}.mp4"
         if final_mp4.exists() or final_mp4.is_symlink():
             final_mp4.unlink()
@@ -184,7 +186,7 @@ def main():
             readme.append(f"| `{s['key']}` | {s['title']} | `{s['key']}/video/{s['key']}.mp4` ({s['size_mb']} MB) | `{s['key']}/transcripts/` |")
         else:
             readme.append(f"| `{s['key']}` | — | MISSING | — |")
-    readme += ["", "## Layout", "```", "member-assets/",
+    readme += ["", "## Layout", "```", "catalog/_source/ma-download/",
                "  MANIFEST.json          # youtube ↔ asset mapping",
                "  transcripts/           # flat copies of all transcripts",
                "  ma-N-*/",
@@ -192,7 +194,7 @@ def main():
                "    transcripts/{.vtt,.md,.txt}",
                "    meta/                # yt-dlp info, description, thumbs",
                "```", "",
-               "Also hardlinked/copied into `../final videos/ma-*.mp4` next to TAC/AH finals.", ""]
+               "Also hardlinked/copied into `media/final/ma-*.mp4` next to TAC/AH finals.", ""]
     (ROOT / "README.md").write_text("\n".join(readme), encoding="utf-8")
     print(json.dumps(summary, indent=2))
 

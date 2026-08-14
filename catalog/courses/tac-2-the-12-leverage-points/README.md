@@ -8,6 +8,6 @@ Course: **TAC** · order 2
 | Transcript | `transcript/` (vtt + md/txt when available) |
 | Course page HTML | `metadata/course-page.html` (real AE HTML + local CSS/fonts/images) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `tac/tac-2` |
+| Codebase | `codebase/` → `codebases/tac/tac-2` |
 
 Source: https://agenticengineer.com/tactical-agentic-coding/course/the-12-leverage-points

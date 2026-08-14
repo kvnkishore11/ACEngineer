@@ -8,6 +8,6 @@ Course: **AH** · order 13
 | Transcript | `transcript/` (vtt + md/txt when available) |
 | Course page HTML | `metadata/course-page.html` (real AE HTML + local CSS/fonts/images) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `agentic-horizon/agent-experts` |
+| Codebase | `codebase/` → `codebases/ah/agent-experts` |
 
 Source: https://agenticengineer.com/tactical-agentic-coding/course/agent-experts

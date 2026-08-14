@@ -9,7 +9,7 @@ Course: **YOUTUBE** · order 37 · upload 20260323
 | Lesson HTML | `metadata/lesson.html` |
 | Course page HTML | `metadata/course-page.html` (alias) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `agentic-horizon-extras/ceo-agents` (course-catalog ma-1 youtube_id) |
+| Codebase | `codebase/` → `codebases/ma/ceo-agents` (course-catalog ma-1 youtube_id) |
 | yt-dlp info | `metadata/video-info.json` |
 
 Source: https://www.youtube.com/watch?v=TqjmTZRL31E

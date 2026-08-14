@@ -3,7 +3,6 @@ use std::path::PathBuf;
 use serde_json::Value;
 
 use crate::{
-  config::config::TASK_ROOT,
   console::{
     app::create_app_task, app_client::client_session, server_message::ClientId,
   },
@@ -19,8 +18,8 @@ use crate::{
   },
   protocol::{
     ActResult, ConnReceiver, ConnSender, CtlMsg, RpcError, RpcRequest,
-    RpcTaskInfo, RpcWhy, RpcWhyDep, TaskListResult, codes, ok_result,
-    server_handshake,
+    RpcState, RpcTaskInfo, RpcWhy, RpcWhyDep, SpawnResult, TaskListResult,
+    codes, ok_result, server_handshake,
   },
   term::Size,
 };
@@ -142,7 +141,7 @@ async fn dispatch_connection(
   };
 
   match RpcRequest::from_wire(&request.method, request.params) {
-    Ok(RpcRequest::Attach { width, height }) => {
+    Ok(RpcRequest::TuiAttach { width, height }) => {
       client_session(
         client_id,
         app_sender,
@@ -166,17 +165,37 @@ async fn dispatch_connection(
   }
 }
 
-fn state_str(state: TaskState) -> String {
-  match state {
-    TaskState::Idle => "idle".to_string(),
-    TaskState::Starting => "starting".to_string(),
-    TaskState::Running => "running".to_string(),
-    TaskState::Ready => "ready".to_string(),
-    TaskState::Stopping => "stopping".to_string(),
-    TaskState::Backoff => "backoff".to_string(),
-    TaskState::Done(info) => format!("done ({})", info),
-    TaskState::Exited(info) => info.to_string(),
+fn task_state(state: TaskState) -> RpcState {
+  let (token, info) = match state {
+    TaskState::Idle => ("idle", None),
+    TaskState::Starting => ("starting", None),
+    TaskState::Running => ("running", None),
+    TaskState::Ready => ("ready", None),
+    TaskState::Stopping => ("stopping", None),
+    TaskState::Backoff => ("backoff", None),
+    TaskState::Done(info) => ("done", Some(info)),
+    TaskState::Exited(info) => ("exited", Some(info)),
+  };
+  RpcState {
+    state: token.to_string(),
+    exit_code: info.and_then(|i| i.code),
+    signal: info.and_then(|i| i.signal),
   }
+}
+
+fn parse_selector(pattern: &str) -> Result<TaskSelector, RpcError> {
+  match pattern.strip_prefix('#') {
+    Some(tag) => Ok(TaskSelector::Tag(tag.to_string())),
+    None => {
+      parse_glob(pattern)?;
+      Ok(TaskSelector::Glob(pattern.to_string()))
+    }
+  }
+}
+
+fn parse_glob(pattern: &str) -> Result<(), RpcError> {
+  TaskPath::check_glob(pattern)
+    .map_err(|err| RpcError::new(codes::BAD_PATH, err.to_string()))
 }
 
 async fn query(
@@ -213,7 +232,7 @@ fn acted(matched: usize) -> Result<Value, RpcError> {
 }
 
 fn parse_path(path: &str) -> Result<TaskPath, RpcError> {
-  TaskPath::resolve(TASK_ROOT, path)
+  TaskPath::new(path)
     .map_err(|err| RpcError::new(codes::BAD_PATH, err.to_string()))
 }
 
@@ -222,13 +241,15 @@ async fn handle_rpc(
   req: RpcRequest,
 ) -> Result<Value, RpcError> {
   match req {
-    RpcRequest::Attach { .. } => Err(RpcError::internal(
-      "attach must be the first request on a connection",
+    RpcRequest::TuiAttach { .. } => Err(RpcError::internal(
+      "tui_attach must be the first request on a connection",
     )),
 
-    RpcRequest::Ls { glob } => {
-      let glob = glob.map(|g| TaskPath::resolve_spec(TASK_ROOT, &g));
-      let tasks = list_tasks(pc, glob)
+    RpcRequest::Ls { pattern } => {
+      if let Some(pattern) = &pattern {
+        parse_glob(pattern)?;
+      }
+      let tasks = list_tasks(pc, pattern)
         .await?
         .into_iter()
         .map(|t| RpcTaskInfo {
@@ -236,50 +257,49 @@ async fn handle_rpc(
             .path
             .map(|p| p.to_string())
             .unwrap_or_else(|| format!("<task:{}>", t.id.0)),
-          state: state_str(t.state),
+          label: t.label,
+          state: task_state(t.state),
         })
         .collect();
       serde_json::to_value(TaskListResult { tasks }).map_err(RpcError::internal)
     }
 
-    RpcRequest::Up {} => {
-      let tag = crate::config::proc::AUTOSTART_TAG.to_string();
-      let matched = act_matching(pc, |ack| {
-        KernelCommand::Start(TaskSelector::Tag(tag), ack)
-      })
-      .await?;
+    RpcRequest::Up { pattern } => {
+      let selector = match pattern {
+        Some(pattern) => parse_selector(&pattern)?,
+        None => {
+          TaskSelector::Tag(crate::config::task::AUTOSTART_TAG.to_string())
+        }
+      };
+      let matched =
+        act_matching(pc, |ack| KernelCommand::Start(selector, ack)).await?;
       acted(matched)
     }
 
     RpcRequest::Start { pattern } => {
-      let glob =
-        TaskSelector::Glob(TaskPath::resolve_spec(TASK_ROOT, &pattern));
+      let selector = parse_selector(&pattern)?;
       let matched =
-        act_matching(pc, |ack| KernelCommand::Start(glob, ack)).await?;
+        act_matching(pc, |ack| KernelCommand::Start(selector, ack)).await?;
       acted(matched)
     }
 
     RpcRequest::Stop { pattern } => {
-      let glob =
-        TaskSelector::Glob(TaskPath::resolve_spec(TASK_ROOT, &pattern));
+      let selector = parse_selector(&pattern)?;
       let matched =
-        act_matching(pc, |ack| KernelCommand::Stop(glob, ack)).await?;
+        act_matching(pc, |ack| KernelCommand::Stop(selector, ack)).await?;
       acted(matched)
     }
 
     RpcRequest::Veto { pattern } => {
-      let glob =
-        TaskSelector::Glob(TaskPath::resolve_spec(TASK_ROOT, &pattern));
+      let selector = parse_selector(&pattern)?;
       let matched =
-        act_matching(pc, |ack| KernelCommand::Veto(glob, ack)).await?;
+        act_matching(pc, |ack| KernelCommand::Veto(selector, ack)).await?;
       acted(matched)
     }
 
     RpcRequest::Down { pattern } => {
       let selector = match pattern {
-        Some(pattern) => {
-          TaskSelector::Glob(TaskPath::resolve_spec(TASK_ROOT, &pattern))
-        }
+        Some(pattern) => parse_selector(&pattern)?,
         None => TaskSelector::All,
       };
       let matched =
@@ -288,18 +308,16 @@ async fn handle_rpc(
     }
 
     RpcRequest::Kill { pattern } => {
-      let glob =
-        TaskSelector::Glob(TaskPath::resolve_spec(TASK_ROOT, &pattern));
+      let selector = parse_selector(&pattern)?;
       let matched =
-        act_matching(pc, |ack| KernelCommand::Kill(glob, ack)).await?;
+        act_matching(pc, |ack| KernelCommand::Kill(selector, ack)).await?;
       acted(matched)
     }
 
     RpcRequest::Restart { pattern } => {
-      let glob =
-        TaskSelector::Glob(TaskPath::resolve_spec(TASK_ROOT, &pattern));
+      let selector = parse_selector(&pattern)?;
       let matched =
-        act_matching(pc, |ack| KernelCommand::Restart(glob, ack)).await?;
+        act_matching(pc, |ack| KernelCommand::Restart(selector, ack)).await?;
       acted(matched)
     }
 
@@ -309,7 +327,7 @@ async fn handle_rpc(
         KernelQueryResponse::Explain(Some(explain)) => {
           let why = RpcWhy {
             path,
-            state: state_str(explain.state),
+            state: task_state(explain.state),
             wanted: explain.wanted,
             supported: explain.supported,
             vetoed: explain.vetoed,
@@ -320,7 +338,7 @@ async fn handle_rpc(
               .into_iter()
               .map(|d| RpcWhyDep {
                 path: d.name,
-                state: state_str(d.state),
+                state: task_state(d.state),
                 wanted: d.wanted,
                 satisfied: d.satisfied,
               })
@@ -359,7 +377,14 @@ async fn handle_rpc(
       Ok(ok_result())
     }
 
-    RpcRequest::Spawn { path, cmd, cwd } => {
+    RpcRequest::Spawn {
+      path,
+      cmd,
+      cwd,
+      env,
+      deps,
+      tags,
+    } => {
       let task_path = parse_path(&path)?;
       if cmd.is_empty() {
         return Err(RpcError::new(
@@ -367,19 +392,46 @@ async fn handle_rpc(
           "cmd must not be empty",
         ));
       }
+      // Resolve deps to ids upfront: the kernel only accepts edges to
+      // already-registered tasks, so an unknown dep is refused here.
+      let mut dep_ids = Vec::with_capacity(deps.len());
+      for dep in &deps {
+        let dep_path = parse_path(dep)?;
+        match query(pc, KernelQuery::ResolvePath(dep_path)).await? {
+          KernelQueryResponse::ResolvedPath(Some(id)) => dep_ids.push(id),
+          KernelQueryResponse::ResolvedPath(None) => {
+            return Err(RpcError::new(
+              codes::BAD_PATH,
+              format!("no task at dep '{}'", dep),
+            ));
+          }
+          _ => return Err(RpcError::internal("unexpected query response")),
+        }
+      }
       let mut spec = crate::process::process_spec::ProcessSpec::from_argv(cmd);
       if let Some(cwd) = cwd {
         spec.cwd(cwd);
       } else if let Ok(cwd) = std::env::current_dir() {
         spec.cwd(cwd.to_string_lossy());
       }
-      let mut cfg = crate::task::proc_task::ProcTaskConfig::new(spec);
-      cfg.tags = vec![crate::config::proc::USER_TAG.to_string()];
+      for (k, v) in env.into_iter().flatten() {
+        match v {
+          Some(v) => spec.env(k, v),
+          None => spec.env_remove(k),
+        }
+      }
+      let mut cfg = crate::task::process_task::ProcessTaskConfig::new(spec);
+      cfg.deps = dep_ids;
+      cfg.tags = std::iter::once(crate::config::task::USER_TAG.to_string())
+        .chain(tags)
+        .collect();
       cfg.pinned = true;
       let (_id, ack) =
-        crate::task::proc_task::spawn_proc_task(pc, Some(task_path), cfg);
+        crate::task::process_task::spawn_process_task(pc, Some(task_path), cfg);
       match ack.await {
-        Ok(true) => Ok(ok_result()),
+        Ok(true) => {
+          serde_json::to_value(SpawnResult { path }).map_err(RpcError::internal)
+        }
         Ok(false) => Err(RpcError::new(
           codes::PATH_TAKEN,
           format!("a task already exists at '{}'", path),

@@ -8,6 +8,6 @@ Course: **TAC** · order 6
 | Transcript | `transcript/` (vtt + md/txt when available) |
 | Course page HTML | `metadata/course-page.html` (real AE HTML + local CSS/fonts/images) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `tac/tac-6` |
+| Codebase | `codebase/` → `codebases/tac/tac-6` |
 
 Source: https://agenticengineer.com/tactical-agentic-coding/course/let-your-agents-focus

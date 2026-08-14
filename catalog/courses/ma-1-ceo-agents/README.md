@@ -8,6 +8,6 @@ Course: **MA** · order 15
 | Transcript | `transcript/` (vtt + md/txt when available) |
 | Course page HTML | `metadata/course-page.html` (real AE HTML + local CSS/fonts/images) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `agentic-horizon-extras/ceo-agents` |
+| Codebase | `codebase/` → `codebases/ma/ceo-agents` |
 
 Source: https://www.youtube.com/watch?v=TqjmTZRL31E

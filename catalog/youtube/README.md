@@ -1,57 +1,60 @@
-# IndyDevDan YouTube catalog (last 1 year)
+# `catalog/youtube/` — the video catalog
 
-Public channel videos under `IndyDevDan/youtube/`, same lesson-folder shape as paid TAC/AH/MA.
+Public channel videos, in the same lesson-folder shape as the paid TAC/AH/MA
+courses under `catalog/courses/`.
 
-Channel: https://www.youtube.com/@IndyDevDan  
-Cutoff: uploads on/after **2025-07-13** (rolling ~1 year from 2026-07-13)  
-Count: **53** videos (oldest → newest as `yt-01` … `yt-53`)
+Channel: https://www.youtube.com/@IndyDevDan
+Cutoff: a rolling ~13-month window; older videos age out of the inventory.
+
+Counts drift, so produce them rather than reading them:
+
+```sh
+ls -d catalog/youtube/yt-*/ | wc -l          # videos
+find catalog/youtube -name codebase -type l | wc -l   # with an attached codebase
+```
 
 ## Layout (every video)
 
 ```
-youtube/yt-NN-<slug>/
-  video/<key>.mp4          # optional; else video/SOURCE.md with yt-dlp recipe
+catalog/youtube/yt-NN-<slug>/
+  video/<key>.mp4          # optional; else video/SOURCE.md with a yt-dlp recipe
   transcript/*.{md,txt,vtt}
   metadata/lesson.json     # includes codebase + codebase_url when present
   metadata/lesson.html
   metadata/course-page.html
   metadata/video-info.json
-  metadata/repos.json      # primary + related GitHub links from description
-  codebase/                # symlink → _repos/<owner>__<repo> (or gist) when linked
+  metadata/repos.json      # primary + related GitHub links from the description
+  codebase/                # symlink into codebases/yt/<owner>__<repo> when linked
   README.md
   STATUS.json
 ```
 
-Shared clone cache: `youtube/_repos/`. Re-attach:
-```bash
-python3 attach_codebases.py
-python3 rebuild_index.py
-```
+Shared vendored clones live in `codebases/yt/`. Videos with no public repo in
+their description get a `CODEBASE.md` note instead of a symlink — that is
+expected, not a gap.
 
 Learning path: `transcript/*.md` + `codebase/` + `metadata/lesson.html`.
-Videos with no public repo in the description get `CODEBASE.md` instead of a symlink.
 
 ## Rebuild
 
 ```bash
-cd IndyDevDan/youtube
+uv run tools/youtube/weekly_update.py       # discover new uploads, build folders
+uv run tools/youtube/attach_codebases.py    # symlink codebases from descriptions
+uv run tools/youtube/fill_missing_codebases.py  # link videos that map to course codebases
+uv run tools/youtube/rebuild_index.py       # rewrite INDEX.json + the table below
 
-# Refresh inventory (last year window)
-# then:
-python3 build_video_folder.py --batch _batch_1.json   # yt-01..18
-python3 build_video_folder.py --batch _batch_2.json   # yt-19..36
-python3 build_video_folder.py --batch _batch_3.json   # yt-37..53
-
-# Optional full mp4 (720p max):
-python3 build_video_folder.py --batch _batch_1.json --download-video
-
-# Rebuild INDEX.json + this table:
-python3 rebuild_index.py
+# or simply:
+make youtube
 ```
+
+> Run `attach_codebases.py` before `fill_missing_codebases.py`. The first prunes
+> links for videos whose description names no repo, which includes the ones the
+> second attaches to course-local codebases.
 
 ## Index
 
-See `INDEX.json` for machine-readable catalog. Human table is generated into this README by `rebuild_index.py`.
+`INDEX.json` is the machine-readable catalog. The table below is generated into
+this README by `rebuild_index.py`.
 
 ## Catalog table
 

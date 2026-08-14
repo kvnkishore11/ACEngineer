@@ -654,16 +654,16 @@ graph LR
 
 ## 📞 Start Now
 
-1. **Read:** `output/README.md` for complete navigation
-2. **Learn:** `output/QUICK-START.md` to build first workflow
-3. **Reference:** `output/CHEAT-SHEET.md` while working
-4. **Master:** `output/LEARNING-PATH.md` for complete journey
+1. **Read:** `knowledge/README.md` for complete navigation
+2. **Learn:** `knowledge/distilled/quick-start.md` to build first workflow
+3. **Reference:** `knowledge/distilled/cheat-sheet.md` while working
+4. **Master:** `knowledge/distilled/learning-path.md` for complete journey
 
 **The revolution is here. The tools are ready. The path is clear.**
 
 ### 🎯 Your Next Step:
 ```bash
-cd output/
+cd knowledge/distilled/
 cat README.md  # Start your journey
 ```
 

@@ -22,7 +22,7 @@ pub async fn client_loop(
   let request = match receiver.recv_ctl().await {
     Ok(CtlMsg::Request(request)) => request,
     Ok(msg) => {
-      log::warn!("client_loop: expected attach request, got {msg:?}");
+      log::warn!("client_loop: expected tui_attach request, got {msg:?}");
       return;
     }
     Err(err) => {
@@ -31,7 +31,7 @@ pub async fn client_loop(
     }
   };
   match RpcRequest::from_wire(&request.method, request.params) {
-    Ok(RpcRequest::Attach { width, height }) => {
+    Ok(RpcRequest::TuiAttach { width, height }) => {
       client_session(
         id,
         app_sender,
@@ -43,8 +43,10 @@ pub async fn client_loop(
       .await;
     }
     Ok(_) | Err(_) => {
-      let error =
-        RpcError::new(codes::UNKNOWN_METHOD, "only attach is supported here");
+      let error = RpcError::new(
+        codes::UNKNOWN_METHOD,
+        "only tui_attach is supported here",
+      );
       let _ = sender.send_ctl(CtlMsg::err(request.id, error)).await;
     }
   }
@@ -59,7 +61,7 @@ pub async fn client_session(
   mut receiver: ConnReceiver,
 ) {
   if let Err(err) = sender.send_ctl(CtlMsg::ok(request_id, ok_result())).await {
-    log::warn!("client_session: failed to confirm attach: {err}");
+    log::warn!("client_session: failed to confirm tui_attach: {err}");
     return;
   }
 

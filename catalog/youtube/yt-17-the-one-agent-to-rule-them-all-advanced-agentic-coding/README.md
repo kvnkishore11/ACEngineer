@@ -9,7 +9,7 @@ Course: **YOUTUBE** · order 17 · upload 20251103
 | Lesson HTML | `metadata/lesson.html` |
 | Course page HTML | `metadata/course-page.html` (alias) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `agentic-horizon/multi-agent-orchestration` (course-preview theme match → ah-4 multi-agent orchestration) |
+| Codebase | `codebase/` → `codebases/ah/multi-agent-orchestration` (course-preview theme match → ah-4 multi-agent orchestration) |
 | yt-dlp info | `metadata/video-info.json` |
 
 Source: https://www.youtube.com/watch?v=p0mrXfwAbCg

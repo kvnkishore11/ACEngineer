@@ -1,84 +1,138 @@
-# Repository Tracking
+# Repository provenance
 
-Source of truth for upstream URLs of all sub-projects under `AgenticEngineer/`.
-Use this when pulling updates. All URLs use `github.com/disler/<name>.git`.
+Where every vendored codebase under `codebases/` came from. Use this to refresh
+a tree, or to recover its own git history.
 
-> **Auth**: these repos are private. You need a valid GitHub PAT.
-> Prefer `gh auth login` or git's credential helper over embedding the PAT in URLs (which leaks it into shell history and git config).
+> **These trees have no `.git/` of their own.** They were independent clones;
+> their nested `.git` directories were removed so the contents track as ordinary
+> files in this repository. Without that, `git add` records them as gitlinks —
+> submodules with no `.gitmodules` — and a fresh clone gets empty directories.
+> Removing them also removed two GitHub personal access tokens that were sitting
+> in plaintext in their remote URLs.
+
+> **Auth**: most of these repos are private. Use `gh auth login` or git's
+> credential helper. Never embed a PAT in a URL — it leaks into shell history,
+> into `.git/config`, and from there into anything that reads the tree.
 
 ---
 
-## 1. TAC — Tactical Agentic Coding
+## Refreshing a tree
 
-The foundational 8-week course. These were merged as git subtrees; no matching public upstream repo exists at `github.com/disler/<folder>`.
+There is no `git pull` here. Clone upstream to a scratch path and overlay:
+
+```sh
+git clone https://github.com/disler/<name>.git /tmp/<name>-upstream
+rsync -av --exclude='.git' /tmp/<name>-upstream/ codebases/<tree>/<name>/
+rm -rf /tmp/<name>-upstream
+git status --short codebases/<tree>/<name>/   # review before committing
+```
+
+`rsync` without `--delete` on purpose: several trees carry local work done
+while following the lesson, and that is the point of keeping them.
+
+---
+
+## 1. `codebases/tac/` — Tactical Agentic Coding
+
+The foundational 8-week course. Merged as git subtrees; no matching public
+upstream repo exists at `github.com/disler/<folder>`.
 
 | Folder | Notes |
 |---|---|
-| `tac/tac-1` | Foundation — basic prompts, commands, file structure |
-| `tac/tac-2` | Structure — slash commands, workflow basics |
-| `tac/tac-3` | Workflows — SDLC integration, enhanced commands |
-| `tac/tac-4` | Automation — ADW system, agent pipelines |
-| `tac/tac-5` | Testing — E2E automation, quality gates |
-| `tac/tac-6` | Production — skills, capabilities, documentation |
-| `tac/tac-7` | Integration — ISO workflows, complete system |
-| `tac/tac-8` | Mastery — 5 architectural patterns |
+| `codebases/tac/tac-1` | Foundation — basic prompts, commands, file structure |
+| `codebases/tac/tac-2` | Structure — slash commands, workflow basics |
+| `codebases/tac/tac-3` | Workflows — SDLC integration, enhanced commands |
+| `codebases/tac/tac-4` | Automation — ADW system, agent pipelines |
+| `codebases/tac/tac-5` | Testing — E2E automation, quality gates |
+| `codebases/tac/tac-6` | Production — skills, capabilities, documentation |
+| `codebases/tac/tac-7` | Integration — ISO workflows, complete system |
+| `codebases/tac/tac-8` | Mastery — 5 architectural patterns |
 
-> **Update**: These have no known upstream. To refresh, re-clone or re-add the source if you have it.
+> No known upstream. To refresh, re-add the source if you have it.
 
 ---
 
-## 2. Agentic Horizon — Core Modules
+## 2. `codebases/ah/` — Agentic Horizon modules
 
-The four mastery-level modules plus supporting repos.
-
-### Independent clones (have their own `.git/`)
-
-| Folder | Upstream | Update command |
+| Folder | Upstream | Pinned at |
 |---|---|---|
-| `agentic-horizon/building-specialized-agents` | `github.com/disler/building-specialized-agents` | `git -C agentic-horizon/building-specialized-agents pull --ff-only` |
+| `codebases/ah/agent-experts` | `github.com/disler/agent-experts` | `cad5e11` |
+| `codebases/ah/agentic-prompt-engineering` | `github.com/disler/agentic-prompt-engineering` | — |
+| `codebases/ah/building-specialized-agents` | `github.com/disler/building-specialized-agents` | `7cd9ce1` |
+| `codebases/ah/elite-context-engineering` | `github.com/disler/elite-context-engineering` | — |
+| `codebases/ah/multi-agent-orchestration` | `github.com/disler/multi-agent-orchestration` | — |
+| `codebases/ah/orchestrator-agent-with-adws` | `github.com/disler/orchestrator-agent-with-adws` | `fb99cd2` |
 
-### Git subtrees (vendored into the parent `AgenticEngineer` repo)
+`multi-agent-orchestration` and `orchestrator-agent-with-adws` both carry local
+additions on top of upstream — overlay, never replace.
 
-Update with `git subtree pull --prefix=<folder> <url> main` from the repo root.
-This creates a merge commit in `AgenticEngineer`.
+`codebases/ah/orchestrator-agent-with-adws/.upstream/` is a pristine snapshot at
+`fb99cd2`, kept because the parent diverged from it. See the README inside it.
+The equivalent snapshot under `agent-experts/` was byte-identical to its parent
+and has been deleted.
 
-| Folder | Confirmed upstream | Notes |
+---
+
+## 3. `codebases/ma/` — member-asset codebases
+
+| Folder | Upstream | Pinned at |
 |---|---|---|
-| `agentic-horizon/agentic-prompt-engineering` | `github.com/disler/agentic-prompt-engineering` | not yet diffed against upstream |
-| `agentic-horizon/elite-context-engineering` | `github.com/disler/elite-context-engineering` | not yet diffed against upstream |
-| `agentic-horizon/multi-agent-orchestration` | `github.com/disler/multi-agent-orchestration` | has local additions on top of upstream — overlay with `rsync` (no deletions) or `git subtree pull` to preserve them |
-| `agentic-horizon/agent-experts` | `github.com/disler/agent-experts` | identical to upstream as of last check |
-| `agentic-horizon/orchestrator-agent-with-adws` | `github.com/disler/orchestrator-agent-with-adws` | identical to upstream as of last check |
+| `codebases/ma/ceo-agents` | `github.com/disler/ceo-agents` | `ccf74c9` |
+| `codebases/ma/lead-agents` | `github.com/disler/lead-agents` | `abc75d9` |
+| `codebases/ma/the-verifier-agent-system` | `github.com/disler/the-verifier-agent-system` | `d021468` |
+| `codebases/ma/ui-agents` | `github.com/disler/ui-agents` | `7d36778` |
+
+`ceo-agents` had 7 uncommitted local changes at the time it was vendored; the
+working tree as archived is what is here.
 
 ---
 
-## 3. Agentic Horizon — Extras (member assets codebases)
+## 4. `codebases/yt/` — repos referenced by the YouTube videos
 
-Bonus assets beyond the core modules. All are independent clones under
-`agentic-horizon-extras/`, and **also linked at `member-assets/` root**
-(symlinks → same trees; video+transcripts live beside them in `member-assets/`).
+Named `<owner>__<repo>`. All public. Attached to their video by
+`tools/youtube/attach_codebases.py`, which reads the GitHub link out of the
+video description.
 
-| Canonical folder | Also via | Upstream | Update command |
-|---|---|---|---|
-| `agentic-horizon-extras/ceo-agents` | `member-assets/ceo-agents` | `github.com/disler/ceo-agents` | `git -C agentic-horizon-extras/ceo-agents pull --ff-only` |
-| `agentic-horizon-extras/lead-agents` | `member-assets/lead-agents` | `github.com/disler/lead-agents` | `git -C agentic-horizon-extras/lead-agents pull --ff-only` |
-| `agentic-horizon-extras/ui-agents` | `member-assets/ui-agents` | `github.com/disler/ui-agents` | `git -C agentic-horizon-extras/ui-agents pull --ff-only` |
-| `agentic-horizon-extras/the-verifier-agent-system` | `member-assets/the-verifier-agent-system` | `github.com/disler/the-verifier-agent-system` | `git -C agentic-horizon-extras/the-verifier-agent-system pull --ff-only` |
-
----
-
-## Temporary/scratch clones (safe to delete)
-
-Nesting inside each module keeps the project root clean:
-
-- `agentic-horizon/agent-experts/.upstream/` — diff-check copy
-- `agentic-horizon/orchestrator-agent-with-adws/.upstream/` — diff-check copy
-
-## How to overlay upstream changes without deleting local files
+List them with their pinned commits:
 
 ```sh
-git clone https://<PAT>@github.com/disler/<name>.git /tmp/<name>-upstream
-rsync -av --exclude='.git' /tmp/<name>-upstream/ <name>/
-rm -rf /tmp/<name>-upstream
-git status --short <name>/   # review before committing
+ls codebases/yt/
 ```
+
+| Folder | Upstream | Pinned at |
+|---|---|---|
+| `disler__agent-sandbox-skill` | `github.com/disler/agent-sandbox-skill` | `ac460ee` |
+| `disler__agent-sandboxes` | `github.com/disler/agent-sandboxes` | `1a72555` |
+| `disler__agentic-drop-zones` | `github.com/disler/agentic-drop-zones` | `16a347b` |
+| `disler__agentic-finance-review` | `github.com/disler/agentic-finance-review` | `74ea7cd` |
+| `disler__bash-damage-from-within` | `github.com/disler/bash-damage-from-within` | `f639414` |
+| `disler__beyond-mcp` | `github.com/disler/beyond-mcp` | `db930dc` |
+| `disler__big-3-super-agent` | `github.com/disler/big-3-super-agent` | `d5d2c10` |
+| `disler__bowser` | `github.com/disler/bowser` | `26541ac` |
+| `disler__claude-code-damage-control` | `github.com/disler/claude-code-damage-control` | `f4792c4` |
+| `disler__claude-code-hooks-mastery` | `github.com/disler/claude-code-hooks-mastery` | `052ad1c` |
+| `disler__claude-code-hooks-multi-agent-observability` | `github.com/disler/claude-code-hooks-multi-agent-observability` | `8a6e5cf` |
+| `disler__fork-repository-skill` | `github.com/disler/fork-repository-skill` | `ba196f6` |
+| `disler__fusion-harness` | `github.com/disler/fusion-harness` | `5852f2e` |
+| `disler__infinite-agentic-loop` | `github.com/disler/infinite-agentic-loop` | `6e9a012` |
+| `disler__inkwell-agent-sandboxes-and-software-factory` | `github.com/disler/inkwell-agent-sandboxes-and-software-factory` | `92f1701` |
+| `disler__install-and-maintain` | `github.com/disler/install-and-maintain` | `558b5c8` |
+| `disler__learning-cmux-with-agents` | `github.com/disler/learning-cmux-with-agents` | `6eaacab` |
+| `disler__live-bench` | `github.com/disler/live-bench` | `bb3ca35` |
+| `disler__mac-mini-agent` | `github.com/disler/mac-mini-agent` | `0d9fa22` |
+| `disler__max-your-cc-sub` | `github.com/disler/max-your-cc-sub` | `2ffa8c9` |
+| `disler__nano-agent` | `github.com/disler/nano-agent` | `7518889` |
+| `disler__pi-agent-observability` | `github.com/disler/pi-agent-observability` | `cbb8cc3` |
+| `disler__pi-vs-claude-code` | `github.com/disler/pi-vs-claude-code` | `0ed11f4` |
+| `disler__pi-vs-claude-code__pi-to-pi` | `github.com/disler/pi-vs-claude-code` | `b93c3f1` |
+| `disler__planf3` | `github.com/disler/planf3` | `f34b7ba` |
+| `disler__super-simple-software-factory` | `github.com/disler/super-simple-software-factory` | `de31374` |
+| `disler__the-library` | `github.com/disler/the-library` | `47f455c` |
+| `disler__the-verifier-agent` | `github.com/disler/the-verifier-agent` | `aa18d68` |
+| `gist__disler__c7719b79a107` | `gist.github.com/disler/c7719b79a10762d87e89617c1f4a11c1` | `cc6d2d0` |
+| `pvolok__mprocs` | `github.com/pvolok/mprocs` (branch `master`) | `c2f7667` |
+
+`disler__pi-vs-claude-code__pi-to-pi` is the enriched working copy from the
+pi-to-pi lesson, not a duplicate of `disler__pi-vs-claude-code`: it is a
+superset, adding `.codex/`, `.cursor/`, `.ok/`, `.opencode/`, extra skills and
+`opencode.json`. Both are kept deliberately.

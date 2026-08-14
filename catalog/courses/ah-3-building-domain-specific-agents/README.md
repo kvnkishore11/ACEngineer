@@ -8,6 +8,6 @@ Course: **AH** · order 11
 | Transcript | `transcript/` (vtt + md/txt when available) |
 | Course page HTML | `metadata/course-page.html` (real AE HTML + local CSS/fonts/images) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `agentic-horizon/building-specialized-agents` |
+| Codebase | `codebase/` → `codebases/ah/building-specialized-agents` |
 
 Source: https://agenticengineer.com/tactical-agentic-coding/course/building-domain-specific-agents

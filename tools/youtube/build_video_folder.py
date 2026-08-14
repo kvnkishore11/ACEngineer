@@ -3,9 +3,9 @@
 # requires-python = ">=3.10"
 # dependencies = ["youtube-transcript-api"]
 # ///
-"""Build one IndyDevDan YouTube lesson folder in course-catalog format.
+"""Build one catalog/youtube/ video folder in course-catalog format.
 
-Layout (mirrors IndyDevDan/<lesson>/):
+Layout (mirrors catalog/courses/<key>/):
   youtube/<key>/
     video/<key>.mp4          # optional download (720p preferred)
     transcript/<key>.{md,txt,vtt}

@@ -9,7 +9,7 @@ Course: **YOUTUBE** · order 25 · upload 20251229
 | Lesson HTML | `metadata/lesson.html` |
 | Course page HTML | `metadata/course-page.html` (alias) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `tac/tac-8` (course-preview theme match → tac-8 the agentic layer) |
+| Codebase | `codebase/` → `codebases/tac/tac-8` (course-preview theme match → tac-8 the agentic layer) |
 | yt-dlp info | `metadata/video-info.json` |
 
 Source: https://www.youtube.com/watch?v=fop_yxV-mPo

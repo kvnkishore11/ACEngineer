@@ -9,7 +9,7 @@ Course: **YOUTUBE** · order 9 · upload 20250908
 | Lesson HTML | `metadata/lesson.html` |
 | Course page HTML | `metadata/course-page.html` (alias) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `agentic-horizon/elite-context-engineering` (course-preview title match → ah-1) |
+| Codebase | `codebase/` → `codebases/ah/elite-context-engineering` (course-preview title match → ah-1) |
 | yt-dlp info | `metadata/video-info.json` |
 
 Source: https://www.youtube.com/watch?v=Kf5-HWJPTIE

@@ -8,6 +8,6 @@ Course: **TAC** · order 1
 | Transcript | `transcript/` (vtt + md/txt when available) |
 | Course page HTML | `metadata/course-page.html` (real AE HTML + local CSS/fonts/images) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `tac/tac-1` |
+| Codebase | `codebase/` → `codebases/tac/tac-1` |
 
 Source: https://agenticengineer.com/tactical-agentic-coding/course/hello-agentic-coding

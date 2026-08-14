@@ -9,7 +9,7 @@ Course: **YOUTUBE** · order 10 · upload 20250915
 | Lesson HTML | `metadata/lesson.html` |
 | Course page HTML | `metadata/course-page.html` (alias) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `agentic-horizon/agentic-prompt-engineering` (course-preview title match → ah-2) |
+| Codebase | `codebase/` → `codebases/ah/agentic-prompt-engineering` (course-preview title match → ah-2) |
 | yt-dlp info | `metadata/video-info.json` |
 
 Source: https://www.youtube.com/watch?v=luqKnexhpFs

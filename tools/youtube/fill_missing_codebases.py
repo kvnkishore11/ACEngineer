@@ -60,47 +60,47 @@ COURSE_YT_ID = {
 PREVIEW_BY_VIDEO_ID = {
     # Elite Context Engineering preview → AH-1
     "Kf5-HWJPTIE": {
-        "rel": "agentic-horizon/elite-context-engineering",
-        "label": "agentic-horizon/elite-context-engineering",
+        "rel": "codebases/ah/elite-context-engineering",
+        "label": "codebases/ah/elite-context-engineering",
         "via": "course-preview title match → ah-1",
         "course_key": "ah-1-rd-framework-context-window-mastery",
     },
     # Agentic Prompt Engineering preview → AH-2
     "luqKnexhpFs": {
-        "rel": "agentic-horizon/agentic-prompt-engineering",
-        "label": "agentic-horizon/agentic-prompt-engineering",
+        "rel": "codebases/ah/agentic-prompt-engineering",
+        "label": "codebases/ah/agentic-prompt-engineering",
         "via": "course-preview title match → ah-2",
         "course_key": "ah-2-seven-levels-agentic-prompt-formats",
     },
     # Agent Experts preview → AH-5
     "zTcDwqopvKE": {
-        "rel": "agentic-horizon/agent-experts",
-        "label": "agentic-horizon/agent-experts",
+        "rel": "codebases/ah/agent-experts",
+        "label": "codebases/ah/agent-experts",
         "via": "course-preview title match → ah-5",
         "course_key": "ah-5-agent-experts",
     },
     # ENDGAME custom agents / specialized agents sneak peek → AH-3
     "6wR6xblSays": {
-        "rel": "agentic-horizon/building-specialized-agents",
-        "label": "agentic-horizon/building-specialized-agents",
+        "rel": "codebases/ah/building-specialized-agents",
+        "label": "codebases/ah/building-specialized-agents",
         "via": "course-preview theme match → ah-3 custom/specialized agents",
         "course_key": "ah-3-building-domain-specific-agents",
     },
     # One Agent to RULE them ALL (advanced orchestration) → AH-4
     "p0mrXfwAbCg": {
-        "rel": "agentic-horizon/multi-agent-orchestration",
-        "label": "agentic-horizon/multi-agent-orchestration",
+        "rel": "codebases/ah/multi-agent-orchestration",
+        "label": "codebases/ah/multi-agent-orchestration",
         "via": "course-preview theme match → ah-4 multi-agent orchestration",
         "course_key": "ah-4-multi-agent-orchestration-the-o-agent",
     },
     # Codebase Singularity / agentic layer sneak peek → TAC-8 + AH-6 primary TAC-8
     "fop_yxV-mPo": {
-        "rel": "tac/tac-8",
-        "label": "tac/tac-8",
+        "rel": "codebases/tac/tac-8",
+        "label": "codebases/tac/tac-8",
         "via": "course-preview theme match → tac-8 the agentic layer",
         "course_key": "tac-8-the-agentic-layer",
         "related_rel": [
-            "agentic-horizon/orchestrator-agent-with-adws",
+            "codebases/ah/orchestrator-agent-with-adws",
         ],
     },
 }

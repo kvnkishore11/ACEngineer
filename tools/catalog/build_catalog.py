@@ -272,6 +272,24 @@ def main() -> int:
                     hardlink_or_copy(note, dst_note)
                     tx_files[f"notes{ext}"] = str(dst_note.relative_to(OUT))
 
+        # The import blocks above only populate tx_files for transcripts copied in
+        # from an external source *this run*. Once a lesson's transcript is already
+        # in the catalog there is nothing left to import, so fall back to
+        # describing what is actually on disk. Without this the index claims every
+        # lesson has no transcript while the files sit right there, and every run
+        # emits a false "no transcripts found" warning.
+        if not tx_files and tx_dir.is_dir():
+            # Canonical "<key>.<ext>" wins over companions such as
+            # "<key>-notes.md". Plain sorting would not do it: '-' sorts before
+            # '.', so the notes file would be picked as the lesson transcript and
+            # every agent following the index would read the wrong file.
+            for existing in sorted(
+                (p for p in tx_dir.iterdir() if p.is_file()),
+                key=lambda p: (0 if p.stem == key else 1, p.name),
+            ):
+                kind = "vtt" if existing.name.endswith(".vtt") else existing.suffix.lstrip(".")
+                tx_files.setdefault(kind, str(existing.relative_to(OUT)))
+
         entry["paths"]["transcript"] = tx_files
         entry["status"]["transcript"] = "ok" if tx_files else "missing"
         if not tx_files:

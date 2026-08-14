@@ -181,7 +181,7 @@ def main() -> int:
     OUT_OFFLINE.mkdir(parents=True, exist_ok=True)
 
     # Public assets alias used by lesson metadata pages:
-    # IndyDevDan/<lesson>/metadata/course-page.html → ../../assets
+    # catalog/courses/<key>/metadata/course-page.html -> ../../assets
     public_assets = ROOT / "IndyDevDan" / "assets"
     if public_assets.is_symlink() or public_assets.exists():
         if public_assets.is_symlink() or public_assets.is_file():
@@ -220,7 +220,7 @@ def main() -> int:
         "- `css/` Nuxt stylesheets (entry + lesson components)\n"
         "- `fonts/` Play Regular/Bold\n"
         "- `img/` hero, logo, loot cards, thumbnails\n\n"
-        "Lesson pages under `IndyDevDan/<key>/metadata/course-page.html` "
+        "Lesson pages under `catalog/courses/<key>/metadata/course-page.html` "
         "reference `../../assets/` (symlink to this tree).\n",
         encoding="utf-8",
     )

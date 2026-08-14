@@ -1,7 +1,6 @@
-use std::fmt::Display;
-
 use serde::{Deserialize, Serialize};
 
+use crate::console::action::{Action, CopyMove as ActionCopyMove, ScrollUnit};
 use crate::console::server_message::ClientId;
 use crate::kernel::task::TaskId;
 use crate::term::key::{Key, key_spec};
@@ -80,61 +79,71 @@ pub enum AppEvent {
 }
 
 impl AppEvent {
-  pub fn desc(&self) -> String {
+  /// Translates the frozen mprocs format into the current console action.
+  pub fn to_action(self) -> Action {
     match self {
-      AppEvent::Batch { cmds: _ } => "Send multiple events".to_string(),
-      AppEvent::QuitOrAsk => "Quit".to_string(),
-      AppEvent::Quit => "Quit".to_string(),
-      AppEvent::ForceQuit => "Force quit".to_string(),
-      AppEvent::Detach { client_id } => {
-        format!("Detach client #{:?}", client_id)
-      }
-      AppEvent::ToggleFocus => "Toggle focus".to_string(),
-      AppEvent::FocusProcs => "Focus process list".to_string(),
-      AppEvent::FocusTerm => "Focus terminal".to_string(),
-      AppEvent::Zoom => "Zoom".to_string(),
-      AppEvent::ShowCommandsMenu => "All commands".to_string(),
-      AppEvent::NextProc => "Next".to_string(),
-      AppEvent::PrevProc => "Prev".to_string(),
-      AppEvent::SelectProc { index } => format!("Select process #{}", index),
-      AppEvent::StartProc => "Start".to_string(),
-      AppEvent::TermProc => "Stop".to_string(),
-      AppEvent::KillProc => "Kill".to_string(),
-      AppEvent::RestartProc => "Restart".to_string(),
-      AppEvent::RestartAll => "Restart all".to_string(),
-      AppEvent::RenameProc { name } => format!("Rename to \"{}\"", name),
-      AppEvent::ForceRestartProc => "Force restart".to_string(),
-      AppEvent::ForceRestartAll => "Force restart all".to_string(),
-      AppEvent::ShowAddProc => "New process dialog".to_string(),
-      AppEvent::ShowRenameProc => "Rename process dialog".to_string(),
-      AppEvent::AddProc { cmd, name: _ } => format!("New process `{}`", cmd),
-      AppEvent::DuplicateProc => "Duplicate current process".to_string(),
-      AppEvent::ShowRemoveProc => "Remove process dialog".to_string(),
-      AppEvent::RemoveProc { id } => format!("Remove process by id {}", id.0),
-      AppEvent::CloseCurrentModal => "Close current modal".to_string(),
-      AppEvent::ScrollDownLines { n } => {
-        format!("Scroll down {} {}", n, lines_str(*n))
-      }
-      AppEvent::ScrollUpLines { n } => {
-        format!("Scroll up {} {}", n, lines_str(*n))
-      }
-      AppEvent::ScrollDown => "Scroll down".to_string(),
-      AppEvent::ScrollUp => "Scroll up".to_string(),
-      AppEvent::CopyModeEnter => "Enter copy mode".to_string(),
-      AppEvent::CopyModeLeave => "Leave copy mode".to_string(),
-      AppEvent::CopyModeMove { dir } => {
-        format!("Move selection cursor {}", dir)
-      }
-      AppEvent::CopyModeEnd => "Select end position".to_string(),
-      AppEvent::CopyModeCopy => "Copy selected text".to_string(),
-      AppEvent::ToggleKeymapWindow => "Toggle help".to_string(),
-      AppEvent::SendKey { key } => format!("Send {} key", key.spec()),
+      AppEvent::Batch { cmds } => Action::Batch {
+        cmds: cmds.into_iter().map(AppEvent::to_action).collect(),
+      },
+      AppEvent::QuitOrAsk => Action::QuitOrAsk,
+      AppEvent::Quit => Action::Quit,
+      AppEvent::ForceQuit => Action::ForceQuit,
+      AppEvent::Detach { client_id } => Action::Detach { client_id },
+      AppEvent::ToggleFocus => Action::ToggleFocus,
+      AppEvent::FocusProcs => Action::FocusTasks,
+      AppEvent::FocusTerm => Action::FocusTerm,
+      AppEvent::Zoom => Action::Zoom,
+      AppEvent::ShowCommandsMenu => Action::ShowCommandsMenu,
+      AppEvent::NextProc => Action::NextTask,
+      AppEvent::PrevProc => Action::PrevTask,
+      AppEvent::SelectProc { index } => Action::SelectTask { index },
+      AppEvent::StartProc => Action::StartTask,
+      AppEvent::TermProc => Action::StopTask,
+      AppEvent::KillProc => Action::KillTask,
+      AppEvent::RestartProc => Action::RestartTask,
+      AppEvent::RestartAll => Action::RestartAll,
+      AppEvent::RenameProc { name } => Action::RenameTask { name },
+      AppEvent::ForceRestartProc => Action::ForceRestartTask,
+      AppEvent::ForceRestartAll => Action::ForceRestartAll,
+      AppEvent::ShowAddProc => Action::ShowAddTask,
+      AppEvent::ShowRenameProc => Action::ShowRenameTask,
+      AppEvent::AddProc { cmd, name } => Action::AddTask { cmd, name },
+      AppEvent::DuplicateProc => Action::DuplicateTask,
+      AppEvent::ShowRemoveProc => Action::ShowRemoveTask,
+      AppEvent::RemoveProc { id } => Action::RemoveTask { id },
+      AppEvent::CloseCurrentModal => Action::CloseCurrentModal,
+      AppEvent::ScrollDownLines { n } => Action::ScrollDown {
+        n,
+        unit: ScrollUnit::Line,
+      },
+      AppEvent::ScrollUpLines { n } => Action::ScrollUp {
+        n,
+        unit: ScrollUnit::Line,
+      },
+      AppEvent::ScrollDown => Action::ScrollDown {
+        n: 1,
+        unit: ScrollUnit::HalfScreen,
+      },
+      AppEvent::ScrollUp => Action::ScrollUp {
+        n: 1,
+        unit: ScrollUnit::HalfScreen,
+      },
+      AppEvent::CopyModeEnter => Action::CopyModeEnter,
+      AppEvent::CopyModeLeave => Action::CopyModeLeave,
+      AppEvent::CopyModeMove { dir } => Action::CopyModeMove {
+        dir: match dir {
+          CopyMove::Up => ActionCopyMove::Up,
+          CopyMove::Right => ActionCopyMove::Right,
+          CopyMove::Left => ActionCopyMove::Left,
+          CopyMove::Down => ActionCopyMove::Down,
+        },
+      },
+      AppEvent::CopyModeEnd => Action::CopyModeEnd,
+      AppEvent::CopyModeCopy => Action::CopyModeCopy,
+      AppEvent::ToggleKeymapWindow => Action::ToggleKeymapWindow,
+      AppEvent::SendKey { key } => Action::SendKey { key },
     }
   }
-}
-
-fn lines_str(n: usize) -> &'static str {
-  if n == 1 { "line" } else { "lines" }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
@@ -143,18 +152,6 @@ pub enum CopyMove {
   Right,
   Left,
   Down,
-}
-
-impl Display for CopyMove {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    let str = match self {
-      CopyMove::Up => "up",
-      CopyMove::Right => "right",
-      CopyMove::Left => "left",
-      CopyMove::Down => "down",
-    };
-    f.write_str(str)
-  }
 }
 
 #[cfg(test)]
@@ -185,6 +182,28 @@ mod tests {
       ev,
       AppEvent::SendKey {
         key: Key::parse("<C-a>").unwrap()
+      }
+    );
+  }
+
+  #[test]
+  fn old_scroll_spellings_convert() {
+    let ev: AppEvent = serde_yaml::from_str("c: scroll-up\n").unwrap();
+    assert_eq!(
+      ev.to_action(),
+      Action::ScrollUp {
+        n: 1,
+        unit: ScrollUnit::HalfScreen
+      }
+    );
+
+    let ev: AppEvent =
+      serde_yaml::from_str("c: scroll-down-lines\nn: 3\n").unwrap();
+    assert_eq!(
+      ev.to_action(),
+      Action::ScrollDown {
+        n: 3,
+        unit: ScrollUnit::Line
       }
     );
   }

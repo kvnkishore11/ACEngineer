@@ -269,7 +269,7 @@ def process_one(folder: Path, do_clone: bool = True) -> dict:
         result["clone_status"] = st
         if path:
             link_codebase(folder, path)
-            result["codebase_path"] = str(path.relative_to(ROOT))
+            result["codebase_path"] = str(path.relative_to(REPO_ROOT))
             repos_meta["local_clone"] = result["codebase_path"]
             repos_meta["symlink"] = "codebase/"
         else:

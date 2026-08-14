@@ -9,7 +9,7 @@ Course: **YOUTUBE** · order 23 · upload 20251215
 | Lesson HTML | `metadata/lesson.html` |
 | Course page HTML | `metadata/course-page.html` (alias) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `agentic-horizon/agent-experts` (course-preview title match → ah-5) |
+| Codebase | `codebase/` → `codebases/ah/agent-experts` (course-preview title match → ah-5) |
 | yt-dlp info | `metadata/video-info.json` |
 
 Source: https://www.youtube.com/watch?v=zTcDwqopvKE

@@ -8,6 +8,6 @@ Course: **MA** · order 18
 | Transcript | `transcript/` (vtt + md/txt when available) |
 | Course page HTML | `metadata/course-page.html` (real AE HTML + local CSS/fonts/images) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `agentic-horizon-extras/the-verifier-agent-system` |
+| Codebase | `codebase/` → `codebases/ma/the-verifier-agent-system` |
 
 Source: https://www.youtube.com/watch?v=EnXKysJNz_8

@@ -39,28 +39,28 @@ You now possess **72 comprehensive documents** (1.0 MB) containing:
 
 ### Option 1: "I want to understand what this is"
 ```bash
-cd output/
+cd knowledge/distilled/
 cat MASTER-GUIDE.md
 ```
 **Time:** 15 minutes | **Outcome:** Complete understanding of Agentic Engineering
 
 ### Option 2: "I want to build something NOW"
 ```bash
-cd output/
+cd knowledge/distilled/
 cat QUICK-START.md
 ```
 **Time:** 30 minutes | **Outcome:** Your first working agentic workflow
 
 ### Option 3: "I need to convince my boss"
 ```bash
-cd output/
+cd knowledge/distilled/
 cat EXECUTIVE-SUMMARY.md
 ```
 **Time:** 20 minutes | **Outcome:** Complete business case with ROI
 
 ### Option 4: "Show me everything at a glance"
 ```bash
-cd output/
+cd knowledge/distilled/
 cat VISUAL-SUMMARY.md
 ```
 **Time:** 10 minutes | **Outcome:** Complete visual overview
@@ -82,7 +82,7 @@ cat VISUAL-SUMMARY.md
 
 ### Week 3: Mastery
 8. **analysis/tac-progression/tac-5-analysis.md** through **tac-8-analysis.md**
-9. **analysis/agentic-horizon/** - All 4 mastery modules
+9. **knowledge/research/analysis/agentic-horizon/** - All 4 mastery modules
 10. **case-studies/** - See real-world applications
 
 ### Week 4: Implementation
@@ -158,14 +158,14 @@ cat VISUAL-SUMMARY.md
 
 ### 🏃‍♂️ 5-Minute Quick Win
 ```bash
-cd output/templates/projects/minimal-agentic-layer/
+cd knowledge/research/templates/projects/minimal-agentic-layer/
 cat README.md
 ```
 **Copy the minimal template, customize, and run!**
 
 ### ⚡ 30-Minute Quick Win
 ```bash
-cd output/
+cd knowledge/distilled/
 cat QUICK-START.md
 # Follow the guide to build your first ADW workflow
 ```
@@ -173,7 +173,7 @@ cat QUICK-START.md
 
 ### 🎯 1-Hour Quick Win
 ```bash
-cd output/templates/agents/
+cd knowledge/research/templates/agents/
 cat research-agent.md
 cat implementation-agent.md
 # Copy both agents, customize for your project
@@ -330,7 +330,7 @@ Test at all 4 layers.
 
 ### Right Now (Next 5 Minutes)
 ```bash
-cd output/
+cd knowledge/distilled/
 cat README.md      # See complete index
 cat QUICK-START.md # Start building
 ```

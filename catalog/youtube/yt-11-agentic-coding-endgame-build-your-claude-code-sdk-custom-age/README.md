@@ -9,7 +9,7 @@ Course: **YOUTUBE** · order 11 · upload 20250922
 | Lesson HTML | `metadata/lesson.html` |
 | Course page HTML | `metadata/course-page.html` (alias) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `agentic-horizon/building-specialized-agents` (course-preview theme match → ah-3 custom/specialized agents) |
+| Codebase | `codebase/` → `codebases/ah/building-specialized-agents` (course-preview theme match → ah-3 custom/specialized agents) |
 | yt-dlp info | `metadata/video-info.json` |
 
 Source: https://www.youtube.com/watch?v=6wR6xblSays
