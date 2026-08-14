@@ -37,7 +37,9 @@ from pathlib import Path
 
 TIMESTAMP_ONLY = re.compile(r"^\d{2}:\d{2}:\d{2}[.,]\d{3}$")
 CUE_ID = re.compile(r"^\d+$")
-HEADER = ("WEBVTT", "Kind:", "Language:", "NOTE", "STYLE")
+HEADER = ("WEBVTT", "Kind:", "Language:", "X-TIMESTAMP-MAP")
+# These introduce a block that runs to the next blank line, not a single line.
+BLOCK_HEADER = ("NOTE", "STYLE", "REGION")
 
 
 def clean_vtt(content: str) -> str:
@@ -46,11 +48,22 @@ def clean_vtt(content: str) -> str:
     Line-based rather than block-based on purpose: block-based parsing assumes
     every cue is exactly `id / timing / text`, and silently drops multi-line or
     id-less cues.
+
+    NOTE and STYLE are the exception — they are *blocks* that run to the next
+    blank line, so matching only their first line would leak their bodies into
+    the transcript as if they were speech.
     """
     out: list[str] = []
+    in_block = False
     for raw in content.splitlines():
         line = raw.strip()
         if not line:
+            in_block = False
+            continue
+        if in_block:
+            continue
+        if line.startswith(BLOCK_HEADER):
+            in_block = True
             continue
         if line.startswith(HEADER):
             continue
@@ -122,6 +135,13 @@ def main() -> int:
         print(f"error: {args.source} is not a directory", file=sys.stderr)
         return 1
 
+    # Validate before writing anything, not after — this used to be checked
+    # below the output write, so a bad invocation still produced a file and then
+    # exited 1.
+    if args.tagged_output and not args.marker:
+        print("error: --tagged-output requires at least one --marker", file=sys.stderr)
+        return 1
+
     vtts = sorted(args.source.glob("*.vtt"), key=file_order)
     if not vtts:
         print(f"error: no .vtt files in {args.source}", file=sys.stderr)
@@ -133,6 +153,7 @@ def main() -> int:
     all_parts: list[str] = []
     tagged_parts: list[str] = []
     tagged_count = 0
+    empty: list[str] = []
 
     for i, vtt in enumerate(vtts, start=1):
         try:
@@ -141,6 +162,9 @@ def main() -> int:
             print(f"error reading {vtt.name}: {exc}", file=sys.stderr)
             return 1
         if not text:
+            # Record it. Skipping chapters silently while reporting the full
+            # file count is how a short transcript passes for a complete one.
+            empty.append(vtt.name)
             continue
 
         is_tagged = bool(markers) and any(m in text.lower() for m in markers)
@@ -158,18 +182,27 @@ def main() -> int:
             tagged_parts.append(block)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    header = f"# {title}\n\nStitched from {len(vtts)} chapter transcripts.\n\n---\n"
+    used = len(all_parts)
+    header = (
+        f"# {title}\n\n"
+        f"Stitched from {used} of {len(vtts)} chapter transcripts.\n"
+    )
+    if empty:
+        header += f"\n{len(empty)} chapter(s) held no speech and were skipped: " + ", ".join(
+            f"`{n}`" for n in empty
+        ) + "\n"
+    header += "\n---\n"
     args.output.write_text(header + "\n".join(all_parts) + "\n")
     words = sum(len(p.split()) for p in all_parts)
-    print(f"wrote {args.output} — {len(vtts)} chapters, ~{words:,} words")
+    print(f"wrote {args.output} — {used}/{len(vtts)} chapters, ~{words:,} words")
+    if empty:
+        print(
+            f"warning: {len(empty)} of {len(vtts)} chapters contained no speech "
+            f"and were skipped: {', '.join(empty)}",
+            file=sys.stderr,
+        )
 
     if args.tagged_output:
-        if not markers:
-            print(
-                "error: --tagged-output requires at least one --marker",
-                file=sys.stderr,
-            )
-            return 1
         args.tagged_output.parent.mkdir(parents=True, exist_ok=True)
         args.tagged_output.write_text(
             f"# {title} — tagged chapters only\n\n"

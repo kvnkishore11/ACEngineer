@@ -28,7 +28,7 @@ This test converts each of those into a loud failure.
 | 4 | Every symlink in the repo resolves | The single most likely breakage — a codebase moved or renamed without re-running the builders. |
 | 5 | Every `codebase/` symlink resolves to a path **inside `codebases/`** | A link that resolves but points somewhere wrong, which check 4 cannot see. |
 | 6 | Both indexes parse, contain no absolute paths, and their keys match disk **in both directions** | An orphan index entry, an unindexed directory, and the absolute-path bug that broke the YouTube index for everyone except the machine that generated it. |
-| 7 | Every backticked path in `README.md`, `CLAUDE.md` and `catalog/README.md` exists | Documentation drift. Paths are resolved from the repo root *or* the doc's own directory, since both readings are legitimate. |
+| 7 | Every backticked path in `README.md`, `CLAUDE.md`, `CONTEXT.md`, `REPOS.md` and `catalog/README.md` exists | Documentation drift. Paths resolve from the repo root *or* the doc's own directory, since both readings are legitimate; bare `host.com/...` tokens are skipped as URLs, not paths. |
 | 8 | No `.mp4/.m4a/.mov/.webm/.aac` is tracked | The 22 GB getting into history, permanently. |
 | 9 | No `__pycache__`, `node_modules`, `.venv`, `.DS_Store` or `.idea` is tracked | Generated files creeping back into the index. |
 | 10 | Every script under `tools/` parses and carries a PEP 723 header | A script that cannot be run with `uv run`, or one broken by an edit. |
@@ -37,9 +37,13 @@ This test converts each of those into a loud failure.
 
 - **Content.** It proves the shape of the tree, not that a transcript says what
   it should.
-- **Hardlink counts.** `media/` is gitignored and may legitimately be empty in a
-  fresh clone, so a link-count assertion would fail for a correct checkout. Use
-  `make check-media`, or `stat -f '%l' media/final/<key>.mp4` (expect `2`).
+- **Hardlink counts.** `media/` is gitignored and is empty in a fresh clone, so
+  a link-count assertion would fail for a correct checkout. Check links directly
+  with `stat -f '%l' media/final/<key>.mp4` (expect `2`).
+- **Media contents.** `make check-media` audits a *populated* `media/` against
+  the manifest and names every missing, unlisted or changed file. On a fresh
+  clone it exits 1 and says the tree is empty, which is the truth — the bytes
+  have not been fetched.
 - **Hardcoded home directories in scripts.** Worth adding if it recurs.
 
 ## Adding a check

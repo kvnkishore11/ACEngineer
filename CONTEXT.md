@@ -50,8 +50,9 @@ not the lesson key and should not be used as one.
 A YouTube upload, keyed `yt-NN-<slug>` and catalogued under `catalog/youtube/`.
 Numbered oldest-first across a rolling ~13-month window, so **`yt-NN` numbers
 are not stable across time** — an old video ageing out does not renumber the
-others, but a fresh inventory can. Join on the YouTube video id in
-`metadata/video-info.json` when you need stability.
+others, but a fresh inventory can. When you need stability, join on the YouTube
+video id recorded in each video's metadata, e.g.
+`catalog/youtube/yt-01-i-can-see-everything-claude-code-hooks-for-multi-agent-obser/metadata/video-info.json`.
 
 Some videos cover the same material as a paid lesson. Those get their
 `codebase/` symlink pointed at the course codebase rather than a public repo.

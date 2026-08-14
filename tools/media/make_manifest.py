@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import re
 import sys
 from pathlib import Path
 
@@ -54,7 +55,25 @@ def human(n: int) -> str:
         if size < 1024 or unit == "TB":
             return f"{size:.1f} {unit}" if unit != "B" else f"{int(size)} B"
         size /= 1024
-    return f"{size:.1f} TB"
+    raise AssertionError("unreachable: the TB branch always returns")
+
+
+ROW_RE = re.compile(r"^\| `([^`]+)` \| [^|]+ \| `([0-9a-f]{64})` \|$")
+
+
+def parse_manifest(text: str) -> dict[str, str]:
+    """Read a rendered manifest back into {repo-relative path: sha256}.
+
+    Only the hash is parsed back. Size is rendered human-readable and the hash
+    pins the content anyway, so comparing sizes would add nothing.
+    """
+    out: dict[str, str] = {}
+    for line in text.splitlines():
+        m = ROW_RE.match(line.strip())
+        if m:
+            rel, digest = m.groups()
+            out[rel] = digest
+    return out
 
 
 def render(files: list[Path]) -> str:
@@ -97,25 +116,65 @@ def main() -> int:
         return 1
 
     files = iter_media_files()
-    if not files:
-        print(f"error: no files found under {MEDIA}", file=sys.stderr)
-        return 1
-
-    rendered = render(files)
 
     if args.check:
         if not MANIFEST.exists():
             print(f"error: {MANIFEST} is missing", file=sys.stderr)
             return 1
-        if MANIFEST.read_text() != rendered:
+        expected = parse_manifest(MANIFEST.read_text())
+        actual = {str(p.relative_to(REPO_ROOT)) for p in files}
+
+        missing = sorted(set(expected) - actual)
+        extra = sorted(actual - set(expected))
+        if not actual:
+            # A fresh clone has no media at all: the bytes are gitignored. Say
+            # so plainly rather than "no files found", but still fail — the
+            # checkout genuinely does not match the manifest.
             print(
-                "error: media/MANIFEST.md is out of date — "
-                "re-run `uv run tools/media/make_manifest.py`",
+                f"media/ contains no files; the manifest lists {len(expected)}. "
+                "The bytes are gitignored, so a fresh clone starts empty — "
+                "fetch the media before auditing it.",
+                file=sys.stderr,
+            )
+            return 1
+
+        changed = [
+            rel
+            for rel in sorted(set(expected) & actual)
+            if expected[rel] != sha256(REPO_ROOT / rel)
+        ]
+
+        if missing or extra or changed:
+            print(
+                f"error: media/MANIFEST.md does not match the tree "
+                f"({len(missing)} missing, {len(extra)} unlisted, {len(changed)} changed)",
+                file=sys.stderr,
+            )
+            for rel in missing[:20]:
+                print(f"  missing:  {rel}", file=sys.stderr)
+            for rel in extra[:20]:
+                print(f"  unlisted: {rel}", file=sys.stderr)
+            for rel in changed[:20]:
+                print(f"  changed:  {rel}", file=sys.stderr)
+            if len(missing) + len(extra) + len(changed) > 60:
+                print("  ... (truncated)", file=sys.stderr)
+            print(
+                "\nRe-run `uv run tools/media/make_manifest.py` if the tree is correct.",
                 file=sys.stderr,
             )
             return 1
         print(f"media/MANIFEST.md matches the tree ({len(files)} files)")
         return 0
+
+    if not files:
+        print(
+            f"error: no files found under {MEDIA} — refusing to overwrite the "
+            "manifest with an empty one",
+            file=sys.stderr,
+        )
+        return 1
+
+    rendered = render(files)
 
     MANIFEST.write_text(rendered)
     print(f"wrote {MANIFEST.relative_to(REPO_ROOT)} ({len(files)} files)")

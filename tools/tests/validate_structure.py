@@ -42,6 +42,11 @@ EXPECTED_DIRS = {
     "tools",
     "transcripts",
 }
+# Permitted but not required: scratch space that .gitignore already excludes and
+# that tooling creates on demand. `worktrees/` is created by the /worktree skill
+# and ignored at .gitignore; failing on it would be this test contradicting the
+# ignore policy rather than enforcing the layout.
+OPTIONAL_DIRS = {"worktrees"}
 ALLOWED_HIDDEN = {".git", ".github", ".claude", ".scratch", ".idea", ".vscode"}
 EXPECTED_ROOT_FILES = {
     "README.md",
@@ -52,7 +57,6 @@ EXPECTED_ROOT_FILES = {
     "Makefile",
     ".gitignore",
     ".gitattributes",
-    ".DS_Store",
 }
 
 MEDIA_EXT = (".mp4", ".m4a", ".mov", ".webm", ".aac")
@@ -102,6 +106,16 @@ def tracked_files() -> list[str]:
     return git("ls-files")
 
 
+def is_git_ignored(path: Path) -> bool:
+    return (
+        subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "check-ignore", "-q", str(path)],
+            capture_output=True,
+        ).returncode
+        == 0
+    )
+
+
 # --------------------------------------------------------------------------- 1
 @check("1. top-level layout")
 def check_top_level():
@@ -109,14 +123,15 @@ def check_top_level():
     present = {p.name for p in REPO_ROOT.iterdir() if p.is_dir() and not p.name.startswith(".")}
     for missing in sorted(EXPECTED_DIRS - present):
         fail(name, f"expected top-level directory is missing: {missing}/")
-    for extra in sorted(present - EXPECTED_DIRS):
+    for extra in sorted(present - EXPECTED_DIRS - OPTIONAL_DIRS):
         fail(
             name,
             f"unexpected top-level directory: {extra}/ — name it for the role it "
             "plays and add it to EXPECTED_DIRS, or move it inside an existing tree",
         )
     for p in REPO_ROOT.iterdir():
-        if p.is_file() and p.name not in EXPECTED_ROOT_FILES:
+        # Files git already ignores (.DS_Store and friends) are not layout.
+        if p.is_file() and p.name not in EXPECTED_ROOT_FILES and not is_git_ignored(p):
             fail(name, f"unexpected file at the repo root: {p.name}")
         if p.is_dir() and p.name.startswith(".") and p.name not in ALLOWED_HIDDEN:
             fail(name, f"unexpected hidden top-level directory: {p.name}/")
@@ -148,6 +163,9 @@ def check_folder_shape():
                 fail(name, f"catalog/courses/{d.name}/ is missing {required}")
 
     yt = REPO_ROOT / "catalog" / "youtube"
+    if not yt.is_dir():
+        fail(name, "catalog/youtube/ is missing")
+        return
     videos = sorted(p for p in yt.iterdir() if p.is_dir() and p.name.startswith("yt-"))
     if not videos:
         fail(name, "catalog/youtube/ has no yt-* folders")
@@ -195,16 +213,19 @@ def check_indexes():
     course_index = REPO_ROOT / "catalog" / "INDEX.json"
     yt_index = REPO_ROOT / "catalog" / "youtube" / "INDEX.json"
 
+    # `continue`, never `return`: one missing or malformed index must not stop
+    # the other from being checked. Returning here hid an orphan entry in the
+    # YouTube index whenever catalog/INDEX.json was absent.
     for path in (course_index, yt_index):
         if not path.is_file():
             fail(name, f"missing index: {path.relative_to(REPO_ROOT)}")
-            return
+            continue
         raw = path.read_text()
         try:
             data = json.loads(raw)
         except json.JSONDecodeError as exc:
             fail(name, f"{path.relative_to(REPO_ROOT)} is not valid JSON: {exc}")
-            return
+            continue
         # An absolute filesystem path in a generated index breaks it for every
         # checkout but this one. That is exactly the bug this catches.
         for m in re.finditer(r'"(/[^"]*)"', raw):
@@ -212,7 +233,6 @@ def check_indexes():
                 name,
                 f"{path.relative_to(REPO_ROOT)} contains an absolute path: {m.group(1)}",
             )
-            break
         if path is course_index:
             keys = {e["key"] for e in data.get("lessons", [])}
             on_disk = {p.name for p in (REPO_ROOT / "catalog" / "courses").iterdir() if p.is_dir()}
@@ -238,11 +258,17 @@ def check_doc_paths():
     docs = [
         REPO_ROOT / "README.md",
         REPO_ROOT / "CLAUDE.md",
+        REPO_ROOT / "CONTEXT.md",
+        REPO_ROOT / "REPOS.md",
         REPO_ROOT / "catalog" / "README.md",
     ]
     # Only treat a backticked token as a path claim when it looks like one and
     # carries no glob/placeholder. Commands and prose must not produce noise.
-    skip = re.compile(r"[<>*?|$\s]|^-|^\.\.\.|^https?:")
+    # The host pattern matters: REPOS.md cites ~40 bare `github.com/owner/repo`
+    # URLs, which are references, not paths in this repository.
+    skip = re.compile(
+        r"[<>*?|$\s]|^-|^\.\.\.|^https?:|^(?:[\w-]+\.)+(?:com|org|net|io|dev)/"
+    )
     for doc in docs:
         if not doc.is_file():
             fail(name, f"missing doc: {doc.relative_to(REPO_ROOT)}")
