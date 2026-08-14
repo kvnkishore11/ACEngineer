@@ -11,19 +11,22 @@ use crate::{
   },
   dekit::{rpc_client::rpc_request, server::run_server},
   js::js_vm::JsVm,
-  protocol::{
-    ActResult, RpcRequest, RpcState, RpcWhy, ScreenResult, SpawnResult,
-    TaskListResult,
-  },
+  protocol::{ActResult, RpcRequest, RpcWhy, ScreenResult, TaskListResult},
 };
 
-/// Render a wire state (token + optional exit detail) for humans.
-fn human_state(s: &RpcState) -> String {
-  match (s.exit_code, s.signal) {
-    (Some(code), _) => format!("{} (code {})", s.state, code),
-    (_, Some(signal)) => format!("{} (signal {})", s.state, signal),
-    (None, None) => s.state.clone(),
+/// Report a mutation result: the raw JSON under `--json`, a short
+/// confirmation otherwise.
+fn print_done(
+  result: serde_json::Value,
+  json: bool,
+  msg: &str,
+) -> anyhow::Result<()> {
+  if json {
+    println!("{}", serde_json::to_string(&result)?);
+  } else {
+    println!("{}", msg);
   }
+  Ok(())
 }
 
 /// Report a selector verb result.
@@ -52,12 +55,12 @@ fn print_task_list(
 ) -> anyhow::Result<()> {
   let list: TaskListResult = serde_json::from_value(result)?;
   if json {
-    println!("{}", serde_json::to_string(&list)?);
+    println!("{}", serde_json::to_string(&list.tasks)?);
   } else if list.tasks.is_empty() {
     println!("No tasks.");
   } else {
     for t in &list.tasks {
-      println!("{}\t{}", t.path, human_state(&t.state));
+      println!("{}\t{}", t.path, t.state);
     }
   }
   Ok(())
@@ -69,7 +72,7 @@ fn print_why(result: serde_json::Value, json: bool) -> anyhow::Result<()> {
     println!("{}", serde_json::to_string(&why)?);
     return Ok(());
   }
-  println!("{}: {}", why.path, human_state(&why.state));
+  println!("{}: {}", why.path, why.state);
   println!("  wanted: {}", why.wanted);
   if why.wanted && !why.supported {
     println!("  blocked: a dependency is not ready");
@@ -99,7 +102,7 @@ fn print_why(result: serde_json::Value, json: bool) -> anyhow::Result<()> {
       } else {
         format!(" ({})", notes.join(", "))
       };
-      println!("    {}\t{}{}", dep.path, human_state(&dep.state), notes);
+      println!("    {}\t{}{}", dep.path, dep.state, notes);
     }
   }
   Ok(())
@@ -147,26 +150,12 @@ fn daemon_json(info: Option<&lockfile::DaemonInfo>) -> serde_json::Value {
     Some(info) => serde_json::json!({
       "running": info.is_running,
       "pid": info.contents.pid,
-      "working_dir": info.contents.working_dir,
+      "dir": info.contents.working_dir,
       "socket": info.contents.socket,
       "version": info.contents.version,
     }),
     None => serde_json::Value::Null,
   }
-}
-
-async fn start_server(working_dir: &Path) -> anyhow::Result<()> {
-  if let Some(info) = lockfile::get_daemon_status(working_dir)? {
-    if info.is_running {
-      println!("Daemon already running (pid={}).", info.contents.pid);
-      return Ok(());
-    }
-    lockfile::cleanup_stale(working_dir)?;
-  }
-  spawn_server_daemon(working_dir)?;
-  wait_for_daemon(working_dir).await?;
-  println!("Daemon started for {}.", working_dir.display());
-  Ok(())
 }
 
 async fn wait_for_daemon(working_dir: &Path) -> anyhow::Result<()> {
@@ -185,46 +174,25 @@ pub async fn dekit_main() -> anyhow::Result<()> {
   let cmd = clap::command!()
     .subcommands([
       Command::new("tui")
-        .about("Open the TUI")
-        .subcommand(
-          Command::new("attach")
-            .about("Attach to the running daemon without starting it"),
-        ),
+        .about("Open the TUI, starting the server if needed"),
+      Command::new("attach").about("Attach the TUI to the running daemon"),
       Command::new("up")
-        .about("Start autostart tasks, or tasks matching a pattern")
-        .arg(Arg::new("pattern").help("Task path, glob, or #tag")),
+        .about("Start the daemon if needed and start autostart tasks"),
       Command::new("down")
-        .about("Unpin tasks (bare: all); each stops unless something still needs it")
-        .arg(Arg::new("pattern").help("Task path, glob, or #tag")),
+        .about("Stop tasks; without a pattern, stop all tasks")
+        .arg(Arg::new("pattern").help("Task path or glob")),
       Command::new("spawn")
         .about("Add a task at a path and start it")
         .arg(
           Arg::new("path")
+            .long("path")
             .required(true)
-            .help("Task path (e.g. services/web)"),
+            .help("Task path (e.g. /services/web)"),
         )
         .arg(
           Arg::new("cwd")
             .long("cwd")
-            .help("Working directory for the task"),
-        )
-        .arg(
-          Arg::new("env")
-            .long("env")
-            .action(clap::ArgAction::Append)
-            .help("Set an environment variable, KEY=VALUE (repeatable)"),
-        )
-        .arg(
-          Arg::new("dep")
-            .long("dep")
-            .action(clap::ArgAction::Append)
-            .help("Depend on an existing task path (repeatable)"),
-        )
-        .arg(
-          Arg::new("tag")
-            .long("tag")
-            .action(clap::ArgAction::Append)
-            .help("Tag the task (repeatable)"),
+            .help("Working directory for the process"),
         )
         .arg(
           Arg::new("cmd")
@@ -235,22 +203,22 @@ pub async fn dekit_main() -> anyhow::Result<()> {
         ),
       Command::new("ls")
         .about("List tasks")
-        .arg(Arg::new("pattern").help("Optional path or glob")),
+        .arg(Arg::new("glob").help("Optional glob pattern")),
       Command::new("start")
         .about("Start tasks matching a path or glob")
-        .arg(Arg::new("pattern").required(true).help("Task path, glob, or #tag")),
+        .arg(Arg::new("pattern").required(true).help("Task path or glob")),
       Command::new("stop")
-        .about("Unpin and stop tasks; each restarts if something still needs it")
-        .arg(Arg::new("pattern").required(true).help("Task path, glob, or #tag")),
+        .about("Stop tasks; each comes back if something still wants it")
+        .arg(Arg::new("pattern").required(true).help("Task path or glob")),
       Command::new("kill")
         .about("Like stop, but with an immediate hard kill")
-        .arg(Arg::new("pattern").required(true).help("Task path, glob, or #tag")),
+        .arg(Arg::new("pattern").required(true).help("Task path or glob")),
       Command::new("veto")
-        .about("Force tasks down and keep them down until started again")
-        .arg(Arg::new("pattern").required(true).help("Task path, glob, or #tag")),
+        .about("Veto tasks: they stay down until started again")
+        .arg(Arg::new("pattern").required(true).help("Task path or glob")),
       Command::new("restart")
         .about("Restart tasks matching a path or glob")
-        .arg(Arg::new("pattern").required(true).help("Task path, glob, or #tag")),
+        .arg(Arg::new("pattern").required(true).help("Task path or glob")),
       Command::new("why")
         .about("Explain why a task is (not) running")
         .arg(Arg::new("path").required(true).help("Task path")),
@@ -278,7 +246,7 @@ pub async fn dekit_main() -> anyhow::Result<()> {
         Command::new("stop").about("Stop the server for the current directory"),
         Command::new("status")
           .about("Show server status for the current directory"),
-        Command::new("list").about("List all servers on this machine"),
+        Command::new("list").about("List all server on this machine"),
         Command::new("clean").about("Remove stale lock files"),
       ]),
       Command::new("mprocs")
@@ -310,19 +278,6 @@ pub async fn dekit_main() -> anyhow::Result<()> {
         .action(clap::ArgAction::Append)
         .trailing_var_arg(true)
         .help("A .js script to run; with no command, launch the TUI"),
-    )
-    .after_help(
-      "SELECTORS\n  \
-       A pattern is a task path (services/web), a glob (services/*), or\n  \
-       a #tag (#backend). The surgical verbs (start, stop, kill, veto,\n  \
-       restart) require a pattern; the workday verbs (up, down) default to\n  \
-       the autostart set / everything.\n\
-       \n\
-       BRINGING TASKS DOWN\n  \
-       stop  unpins and stops now; a task restarts if a dependent still needs it.\n  \
-       down  unpins only; a task keeps running while something still needs it.\n  \
-       veto  forces a task down and holds it there until it is started again.\n  \
-       kill  is stop with an immediate hard kill.",
     );
   let matches = cmd.get_matches();
   let json = matches.get_flag("json");
@@ -338,11 +293,16 @@ pub async fn dekit_main() -> anyhow::Result<()> {
   }
 
   match matches.subcommand() {
-    Some(("tui", sub_m)) => {
+    Some(("tui", _sub_m)) => {
       let working_dir = resolve_working_dir(&matches)?;
-      let spawn = !matches!(sub_m.subcommand(), Some(("attach", _)));
       let (sender, receiver) =
-        connect_client_socket(&working_dir, spawn).await?;
+        connect_client_socket(&working_dir, true).await?;
+      client_main(sender, receiver).await?;
+    }
+    Some(("attach", _sub_m)) => {
+      let working_dir = resolve_working_dir(&matches)?;
+      let (sender, receiver) =
+        connect_client_socket(&working_dir, false).await?;
       client_main(sender, receiver).await?;
     }
     Some(("spawn", sub_m)) => {
@@ -351,49 +311,16 @@ pub async fn dekit_main() -> anyhow::Result<()> {
       let cwd = sub_m.get_one::<String>("cwd").cloned();
       let cmd: Vec<String> =
         sub_m.get_many::<String>("cmd").unwrap().cloned().collect();
-      let deps: Vec<String> = sub_m
-        .get_many::<String>("dep")
-        .map(|v| v.cloned().collect())
-        .unwrap_or_default();
-      let tags: Vec<String> = sub_m
-        .get_many::<String>("tag")
-        .map(|v| v.cloned().collect())
-        .unwrap_or_default();
-      let mut env = indexmap::IndexMap::new();
-      if let Some(vals) = sub_m.get_many::<String>("env") {
-        for val in vals {
-          let (k, v) = val
-            .split_once('=')
-            .ok_or_else(|| anyhow!("--env expects KEY=VALUE, got `{}`", val))?;
-          env.insert(k.to_string(), Some(v.to_string()));
-        }
-      }
-      let env = if env.is_empty() { None } else { Some(env) };
-      let result = rpc_request(
-        &working_dir,
-        RpcRequest::Spawn {
-          path,
-          cmd,
-          cwd,
-          env,
-          deps,
-          tags,
-        },
-        true,
-      )
-      .await?;
-      if json {
-        println!("{}", serde_json::to_string(&result)?);
-      } else {
-        let spawned: SpawnResult = serde_json::from_value(result)?;
-        println!("Spawned {}.", spawned.path);
-      }
+      let result =
+        rpc_request(&working_dir, RpcRequest::Spawn { path, cmd, cwd }, true)
+          .await?;
+      print_done(result, json, "Spawned.")?;
     }
     Some(("ls", sub_m)) => {
       let working_dir = resolve_working_dir(&matches)?;
-      let pattern = sub_m.get_one::<String>("pattern").cloned();
+      let glob = sub_m.get_one::<String>("glob").cloned();
       let result =
-        rpc_request(&working_dir, RpcRequest::Ls { pattern }, false).await?;
+        rpc_request(&working_dir, RpcRequest::Ls { glob }, false).await?;
       print_task_list(result, json)?;
     }
     Some(("start", sub_m)) => {
@@ -458,12 +385,10 @@ pub async fn dekit_main() -> anyhow::Result<()> {
         }
       }
     }
-    Some(("up", sub_m)) => {
+    Some(("up", _sub_m)) => {
       let working_dir = resolve_working_dir(&matches)?;
-      let pattern = sub_m.get_one::<String>("pattern").cloned();
-      let result =
-        rpc_request(&working_dir, RpcRequest::Up { pattern }, true).await?;
-      print_acted(result, json, "Started", "No tasks matched.")?;
+      let result = rpc_request(&working_dir, RpcRequest::Up {}, true).await?;
+      print_acted(result, json, "Started", "No autostart tasks.")?;
     }
     Some(("down", sub_m)) => {
       let working_dir = resolve_working_dir(&matches)?;
@@ -481,7 +406,18 @@ pub async fn dekit_main() -> anyhow::Result<()> {
       }
       Some(("start", _sub_m)) => {
         let working_dir = resolve_working_dir(&matches)?;
-        start_server(&working_dir).await?;
+        // Check if already running.
+        if let Some(info) = lockfile::get_daemon_status(&working_dir)? {
+          if info.is_running {
+            println!("Daemon already running (pid={}).", info.contents.pid);
+            return Ok(());
+          }
+          // Stale -- clean up and start fresh.
+          lockfile::cleanup_stale(&working_dir)?;
+        }
+        spawn_server_daemon(&working_dir)?;
+        wait_for_daemon(&working_dir).await?;
+        println!("Daemon started for {}.", working_dir.display());
       }
       Some(("stop", _sub_m)) => {
         let working_dir = resolve_working_dir(&matches)?;

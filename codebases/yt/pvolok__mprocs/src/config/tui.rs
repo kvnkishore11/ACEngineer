@@ -2,16 +2,15 @@ use anyhow::Result;
 
 use crate::cfg::{CfgCx, CfgObj};
 
-const DEFAULT_SIDEBAR_WIDTH: usize = 30;
-const DEFAULT_SIDEBAR_TITLE: &str = "Tasks";
+const DEFAULT_PROC_LIST_WIDTH: usize = 30;
+const DEFAULT_PROC_LIST_TITLE: &str = "Processes";
 
 pub struct TuiConfig {
-  pub sidebar: SidebarConfig,
+  pub procs: ProcListConfig,
   pub tips: TipsConfig,
-  pub zoom_tip: bool,
 }
 
-pub struct SidebarConfig {
+pub struct ProcListConfig {
   pub title: String,
   pub width: usize,
 }
@@ -23,12 +22,11 @@ pub struct TipsConfig {
 impl TuiConfig {
   pub(crate) fn builtin() -> Self {
     TuiConfig {
-      sidebar: SidebarConfig {
-        title: DEFAULT_SIDEBAR_TITLE.to_string(),
-        width: DEFAULT_SIDEBAR_WIDTH,
+      procs: ProcListConfig {
+        title: DEFAULT_PROC_LIST_TITLE.to_string(),
+        width: DEFAULT_PROC_LIST_WIDTH,
       },
       tips: TipsConfig { show: true },
-      zoom_tip: true,
     }
   }
 
@@ -38,18 +36,15 @@ impl TuiConfig {
       None => return Ok(()),
     };
 
-    if let Some(pl) = tui_obj.get("sidebar") {
+    if let Some(pl) = tui_obj.get("procs") {
       let pl = pl.as_obj()?;
-      self.sidebar.title =
-        pl.default("title", self.sidebar.title.clone(), cx)?;
-      self.sidebar.width = pl.default("width", self.sidebar.width, cx)?;
+      self.procs.title = pl.default("title", self.procs.title.clone(), cx)?;
+      self.procs.width = pl.default("width", self.procs.width, cx)?;
     }
 
     if let Some(tips) = tui_obj.get("tips") {
       self.tips.show = tips.as_obj()?.default("show", self.tips.show, cx)?;
     }
-
-    self.zoom_tip = tui_obj.default("zoom_tip", self.zoom_tip, cx)?;
 
     Ok(())
   }

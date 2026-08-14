@@ -27,7 +27,7 @@ async fn client_loop(
   mut receiver: ConnReceiver,
 ) -> anyhow::Result<()> {
   let size = term_driver.size()?;
-  let (method, params) = RpcRequest::TuiAttach {
+  let (method, params) = RpcRequest::Attach {
     width: size.width,
     height: size.height,
   }
@@ -62,7 +62,7 @@ async fn client_loop(
         Some(Ok(Msg::Ctl(msg))) => match msg {
           CtlMsg::Response(response) => {
             if let Some(error) = response.error {
-              bail!("tui_attach failed: {error}");
+              bail!("attach failed: {error}");
             }
           }
           CtlMsg::Bye(bye) => {

@@ -10,19 +10,19 @@ use crate::term::{
   grid::{BorderType, Rect},
 };
 
-pub fn render_tasks(
+pub fn render_procs(
   area: Rect,
   grid: &mut Grid,
   state: &mut State,
   config: &Config,
 ) {
-  state.tasks_list.fit(area.inner(1), state.tasks.len());
+  state.procs_list.fit(area.inner(1), state.procs.len());
 
   if area.width <= 2 {
     return;
   }
 
-  let active = state.scope == Scope::Tasks;
+  let active = state.scope == Scope::Procs;
 
   grid.draw_block(
     area.into(),
@@ -42,7 +42,7 @@ pub fn render_tasks(
   };
   let r = grid.draw_text(
     title_area,
-    config.tui.sidebar.title.as_str(),
+    config.tui.procs.title.as_str(),
     if active {
       Attrs::default().set_bold(true)
     } else {
@@ -61,10 +61,10 @@ pub fn render_tasks(
     );
   }
 
-  let range = state.tasks_list.visible_range();
+  let range = state.procs_list.visible_range();
   for (row, index) in range.enumerate() {
-    let task = if let Some(task) = state.tasks.get(index) {
-      task
+    let proc = if let Some(proc) = state.procs.get(index) {
+      proc
     } else {
       continue;
     };
@@ -86,17 +86,17 @@ pub fn render_tasks(
     row_area.x += r.width;
     row_area.width = row_area.width.saturating_sub(r.width);
 
-    let r = grid.draw_text(row_area, task.name(), attrs);
+    let r = grid.draw_text(row_area, proc.name(), attrs);
     row_area.x += r.width;
     row_area.width = row_area.width.saturating_sub(r.width);
 
-    let (status_text, status_attrs) = if task.is_up() {
+    let (status_text, status_attrs) = if proc.is_up() {
       (
         Cow::from(" UP "),
         attrs.clone().set_bold(true).fg(Color::BRIGHT_GREEN),
       )
     } else {
-      match task.exit_code() {
+      match proc.exit_code() {
         Some(0) => {
           (Cow::from(" DOWN (0)"), attrs.clone().fg(Color::BRIGHT_BLUE))
         }
@@ -123,25 +123,25 @@ pub fn render_tasks(
   }
 }
 
-pub fn tasks_get_clicked_index(
+pub fn procs_get_clicked_index(
   area: Rect,
   x: u16,
   y: u16,
   state: &State,
 ) -> Option<usize> {
   let inner = area.inner(1);
-  if tasks_check_hit(area, x, y) {
+  if procs_check_hit(area, x, y) {
     let index = y - inner.y;
     let scroll = (state.selected() + 1).saturating_sub(inner.height as usize);
     let index = index as usize + scroll;
-    if index < state.tasks.len() {
+    if index < state.procs.len() {
       return Some(index);
     }
   }
   None
 }
 
-pub fn tasks_check_hit(area: Rect, x: u16, y: u16) -> bool {
+pub fn procs_check_hit(area: Rect, x: u16, y: u16) -> bool {
   area.x < x
     && area.x + area.width > x + 1
     && area.y < y

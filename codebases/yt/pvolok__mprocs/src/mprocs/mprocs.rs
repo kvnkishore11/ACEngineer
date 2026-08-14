@@ -15,7 +15,6 @@ use crate::mprocs::config::{
   CmdConfig, Config, ConfigContext, ProcConfig, ServerConfig, default_stop,
 };
 use crate::mprocs::ctl::run_ctl;
-use crate::mprocs::event::AppEvent;
 use crate::mprocs::just::load_just_procs;
 use crate::mprocs::package_json::load_npm_procs;
 use crate::mprocs::proc_log_config::{LogConfig, LogMode};
@@ -75,7 +74,7 @@ pub async fn run_app(args: Vec<String>) -> anyhow::Result<()> {
   let mut keymap = Keymap::new();
   settings.add_to_keymap(&mut keymap)?;
 
-  let mut config = {
+  let config = {
     let mut config = if let Some((v, ctx)) = config_value {
       Config::from_value(&v, &ctx, &settings)?
     } else {
@@ -96,13 +95,11 @@ pub async fn run_app(args: Vec<String>) -> anyhow::Result<()> {
 
     if let Some(on_all_finished) = matches.get_one::<String>("on-all-finished")
     {
-      let event: AppEvent = serde_yaml::from_str(on_all_finished)?;
-      config.on_all_finished = Some(event.to_action());
+      config.on_all_finished = Some(serde_yaml::from_str(on_all_finished)?);
     }
 
     if let Some(on_init) = matches.get_one::<String>("on-init") {
-      let event: AppEvent = serde_yaml::from_str(on_init)?;
-      config.on_init = Some(event.to_action());
+      config.on_init = Some(serde_yaml::from_str(on_init)?);
     }
 
     if let Some(log_dir) = matches.get_one::<String>("log-dir") {
@@ -223,26 +220,11 @@ pub async fn run_app(args: Vec<String>) -> anyhow::Result<()> {
       crate::process::unix_processes_waiter::UnixProcessesWaiter::init()?;
       let kernel = Kernel::new();
       let pc = kernel.context();
-      let server = config.server.take();
       let app_task_id = create_app_task(
         crate::config::config::Config::from(config),
         keymap,
         &pc,
       );
-
-      if let Some(ServerConfig::Tcp(addr)) = server {
-        let listener =
-          tokio::net::TcpListener::bind(&addr).await.map_err(|e| {
-            anyhow::Error::msg(format!(
-              "[server] failed to listen on {}: {}",
-              addr, e
-            ))
-          })?;
-        tokio::spawn(crate::mprocs::ctl::run_ctl_server(
-          listener,
-          pc.get_task_sender(app_task_id),
-        ));
-      }
 
       let app_sender = pc.get_task_sender(app_task_id);
       tokio::spawn(async move {

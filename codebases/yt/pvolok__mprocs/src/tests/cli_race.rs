@@ -16,8 +16,11 @@ impl TmpDir {
   /// Keep `name` short: the runtime dir ends up inside a unix socket
   /// path, which must stay under SUN_LEN (~104 bytes).
   fn new(name: &str) -> Self {
-    let path =
-      std::env::temp_dir().join(format!("dk-{}-{}", name, std::process::id()));
+    let path = std::env::temp_dir().join(format!(
+      "dk-{}-{}",
+      name,
+      std::process::id()
+    ));
     let _ = std::fs::remove_dir_all(&path);
     std::fs::create_dir_all(&path).unwrap();
     TmpDir { path }
@@ -107,9 +110,12 @@ fn assert_dir_has_no_lock(runtime: &Path) {
 fn spawn_race_has_exactly_one_winner() {
   let daemon = Daemon::start("sr");
 
-  let a = daemon.spawn(&["spawn", "same", "--", "sleep", "30"]);
-  let b = daemon.spawn(&["spawn", "same", "--", "sleep", "30"]);
-  let outs = [a.wait_with_output().unwrap(), b.wait_with_output().unwrap()];
+  let a = daemon.spawn(&["spawn", "--path", "/same", "--", "sleep", "30"]);
+  let b = daemon.spawn(&["spawn", "--path", "/same", "--", "sleep", "30"]);
+  let outs = [
+    a.wait_with_output().unwrap(),
+    b.wait_with_output().unwrap(),
+  ];
 
   let winners = outs.iter().filter(|o| o.status.success()).count();
   assert_eq!(
@@ -136,9 +142,10 @@ fn start_races_spawn_and_down_without_internal_errors() {
   let daemon = Daemon::start("ch");
 
   for i in 0..10 {
-    let path = format!("x/{}", i);
-    let spawner = daemon.spawn(&["spawn", &path, "--", "sleep", "30"]);
-    let starter = daemon.spawn(&["start", "x/*"]);
+    let path = format!("/x/{}", i);
+    let spawner =
+      daemon.spawn(&["spawn", "--path", &path, "--", "sleep", "30"]);
+    let starter = daemon.spawn(&["start", "/x/*"]);
 
     let spawn_out = spawner.wait_with_output().unwrap();
     assert!(
@@ -157,11 +164,11 @@ fn start_races_spawn_and_down_without_internal_errors() {
       stderr_of(&start_out)
     );
 
-    let stop_out = daemon.run(&["stop", "x/*"]);
+    let down_out = daemon.run(&["down", "/x/*"]);
     assert!(
-      stop_out.status.success(),
-      "stop failed: {}",
-      stderr_of(&stop_out)
+      down_out.status.success(),
+      "down failed: {}",
+      stderr_of(&down_out)
     );
   }
 

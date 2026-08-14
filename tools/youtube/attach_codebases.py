@@ -172,10 +172,21 @@ def ensure_clone(owner: str, name: str, kind: str = "repo", gist_id: str | None 
     else:
         dest = REPOS / clone_key(owner, name)
         url = repo_url(owner, name)
-    if dest.exists() and (dest / ".git").exists():
+    # A tree that exists is a vendored snapshot and is left exactly as it is,
+    # with or without a .git of its own.
+    #
+    # This used to be `if dest.exists() and not (dest/".git").exists():
+    # shutil.rmtree(dest)` — i.e. "a directory with no .git is a broken clone,
+    # delete and re-clone it". Since the codebases were vendored (their nested
+    # .git directories removed so their contents track in this repository), that
+    # condition matches EVERY tree here. Running it deleted 28 archived
+    # snapshots and replaced them with current upstream HEAD, silently
+    # discarding the pinned versions recorded in REPOS.md.
+    #
+    # To deliberately refresh a tree, delete it first, or follow the overlay
+    # recipe in REPOS.md. This function only fills in what is missing.
+    if dest.exists():
         return dest, "exists"
-    if dest.exists() and not (dest / ".git").exists():
-        shutil.rmtree(dest)
     # shallow clone
     r = subprocess.run(
         ["git", "clone", "--depth", "1", url, str(dest)],

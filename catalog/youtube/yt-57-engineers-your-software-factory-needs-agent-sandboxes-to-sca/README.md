@@ -9,7 +9,7 @@ Course: **YOUTUBE** · order 57 · upload 20260810
 | Lesson HTML | `metadata/lesson.html` |
 | Course page HTML | `metadata/course-page.html` (alias) |
 | Metadata JSON | `metadata/lesson.json` |
-| Codebase | `codebase/` → `disler/inkwell-agent-sandboxes-and-software-factory` (cloned) |
+| Codebase | `codebase/` → `disler/inkwell-agent-sandboxes-and-software-factory` (exists) |
 | yt-dlp info | `metadata/video-info.json` |
 
 Source: https://www.youtube.com/watch?v=SEI_qIW4o2c

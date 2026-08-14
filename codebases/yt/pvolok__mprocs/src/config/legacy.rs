@@ -2,30 +2,29 @@ use crate::config::config::Config;
 use crate::config::hook::Hook;
 use crate::config::keymap::KeymapConfig;
 use crate::config::log::LogConfig;
-use crate::config::task::{CmdConfig, TaskConfig};
-use crate::config::tui::{SidebarConfig, TipsConfig, TuiConfig};
+use crate::config::proc::{CmdConfig, ProcConfig};
+use crate::config::tui::{ProcListConfig, TipsConfig, TuiConfig};
 
 impl From<crate::mprocs::config::Config> for Config {
   fn from(legacy: crate::mprocs::config::Config) -> Self {
-    let defaults = TaskConfig {
+    let proc_defaults = ProcConfig {
       log: legacy.proc_log,
       scrollback_len: Some(legacy.scrollback_len),
       mouse_scroll_speed: Some(legacy.mouse_scroll_speed),
-      ..TaskConfig::default()
+      ..ProcConfig::default()
     };
     Config {
       log: LogConfig::default(),
-      tasks: legacy.procs.into_iter().map(TaskConfig::from).collect(),
-      defaults,
+      procs: legacy.procs.into_iter().map(ProcConfig::from).collect(),
+      proc_defaults,
       tui: TuiConfig {
-        sidebar: SidebarConfig {
+        procs: ProcListConfig {
           title: legacy.proc_list_title,
           width: legacy.proc_list_width,
         },
         tips: TipsConfig {
           show: !legacy.hide_keymap_window,
         },
-        zoom_tip: true,
       },
       keymap: KeymapConfig::default(),
       on_init: legacy.on_init.map(Hook::Action),
@@ -34,13 +33,12 @@ impl From<crate::mprocs::config::Config> for Config {
   }
 }
 
-impl From<crate::mprocs::config::ProcConfig> for TaskConfig {
+impl From<crate::mprocs::config::ProcConfig> for ProcConfig {
   fn from(legacy: crate::mprocs::config::ProcConfig) -> Self {
-    TaskConfig {
+    ProcConfig {
       path: legacy.name,
       cmd: Some(legacy.cmd.into()),
       deps: legacy.deps,
-      tags: Vec::new(),
       cwd: legacy.cwd,
       env: legacy.env,
       add_path: Some(legacy.add_path).filter(|p| !p.is_empty()),

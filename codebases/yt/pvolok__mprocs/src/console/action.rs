@@ -21,51 +21,49 @@ pub enum Action {
   },
 
   ToggleFocus,
-  FocusTasks,
+  FocusProcs,
   FocusTerm,
   Zoom,
 
   ShowCommandsMenu,
-  NextTask,
-  PrevTask,
-  SelectTask {
+  NextProc,
+  PrevProc,
+  SelectProc {
     index: usize,
   },
-  StartTask,
-  StopTask,
-  KillTask,
-  VetoTask,
-  RestartTask,
+  StartProc,
+  StopProc,
+  KillProc,
+  VetoProc,
+  RestartProc,
   RestartAll,
-  RenameTask {
+  RenameProc {
     name: String,
   },
-  ForceRestartTask,
+  ForceRestartProc,
   ForceRestartAll,
-  ShowAddTask,
-  ShowRenameTask,
-  AddTask {
+  ShowAddProc,
+  ShowRenameProc,
+  AddProc {
     cmd: String,
     name: Option<String>,
   },
-  DuplicateTask,
-  ShowRemoveTask,
-  RemoveTask {
+  DuplicateProc,
+  ShowRemoveProc,
+  RemoveProc {
     id: TaskId,
   },
 
   CloseCurrentModal,
 
-  ScrollUp {
-    #[serde(default = "default_scroll_n")]
+  ScrollDownLines {
     n: usize,
-    unit: ScrollUnit,
   },
-  ScrollDown {
-    #[serde(default = "default_scroll_n")]
+  ScrollUpLines {
     n: usize,
-    unit: ScrollUnit,
   },
+  ScrollDown,
+  ScrollUp,
 
   CopyModeEnter,
   CopyModeLeave,
@@ -93,31 +91,37 @@ impl Action {
         format!("Detach client #{:?}", client_id)
       }
       Action::ToggleFocus => "Toggle focus".to_string(),
-      Action::FocusTasks => "Focus task list".to_string(),
+      Action::FocusProcs => "Focus process list".to_string(),
       Action::FocusTerm => "Focus terminal".to_string(),
       Action::Zoom => "Zoom".to_string(),
       Action::ShowCommandsMenu => "All commands".to_string(),
-      Action::NextTask => "Next".to_string(),
-      Action::PrevTask => "Prev".to_string(),
-      Action::SelectTask { index } => format!("Select task #{}", index),
-      Action::StartTask => "Start".to_string(),
-      Action::StopTask => "Stop".to_string(),
-      Action::KillTask => "Kill".to_string(),
-      Action::VetoTask => "Veto (down until started)".to_string(),
-      Action::RestartTask => "Restart".to_string(),
+      Action::NextProc => "Next".to_string(),
+      Action::PrevProc => "Prev".to_string(),
+      Action::SelectProc { index } => format!("Select process #{}", index),
+      Action::StartProc => "Start".to_string(),
+      Action::StopProc => "Stop".to_string(),
+      Action::KillProc => "Kill".to_string(),
+      Action::VetoProc => "Veto (down until started)".to_string(),
+      Action::RestartProc => "Restart".to_string(),
       Action::RestartAll => "Restart all".to_string(),
-      Action::RenameTask { name } => format!("Rename to \"{}\"", name),
-      Action::ForceRestartTask => "Force restart".to_string(),
+      Action::RenameProc { name } => format!("Rename to \"{}\"", name),
+      Action::ForceRestartProc => "Force restart".to_string(),
       Action::ForceRestartAll => "Force restart all".to_string(),
-      Action::ShowAddTask => "New task dialog".to_string(),
-      Action::ShowRenameTask => "Rename task dialog".to_string(),
-      Action::AddTask { cmd, name: _ } => format!("New task `{}`", cmd),
-      Action::DuplicateTask => "Duplicate current task".to_string(),
-      Action::ShowRemoveTask => "Remove task dialog".to_string(),
-      Action::RemoveTask { id } => format!("Remove task by id {}", id.0),
+      Action::ShowAddProc => "New process dialog".to_string(),
+      Action::ShowRenameProc => "Rename process dialog".to_string(),
+      Action::AddProc { cmd, name: _ } => format!("New process `{}`", cmd),
+      Action::DuplicateProc => "Duplicate current process".to_string(),
+      Action::ShowRemoveProc => "Remove process dialog".to_string(),
+      Action::RemoveProc { id } => format!("Remove process by id {}", id.0),
       Action::CloseCurrentModal => "Close current modal".to_string(),
-      Action::ScrollUp { n, unit } => scroll_desc("up", *n, *unit),
-      Action::ScrollDown { n, unit } => scroll_desc("down", *n, *unit),
+      Action::ScrollDownLines { n } => {
+        format!("Scroll down {} {}", n, lines_str(*n))
+      }
+      Action::ScrollUpLines { n } => {
+        format!("Scroll up {} {}", n, lines_str(*n))
+      }
+      Action::ScrollDown => "Scroll down".to_string(),
+      Action::ScrollUp => "Scroll up".to_string(),
       Action::CopyModeEnter => "Enter copy mode".to_string(),
       Action::CopyModeLeave => "Leave copy mode".to_string(),
       Action::CopyModeMove { dir } => {
@@ -133,54 +137,6 @@ impl Action {
 
 fn lines_str(n: usize) -> &'static str {
   if n == 1 { "line" } else { "lines" }
-}
-
-fn default_scroll_n() -> usize {
-  1
-}
-
-fn scroll_desc(dir: &str, n: usize, unit: ScrollUnit) -> String {
-  match unit {
-    ScrollUnit::Line => format!("Scroll {} {} {}", dir, n, lines_str(n)),
-    ScrollUnit::HalfScreen => format!("Scroll {} half screen", dir),
-    ScrollUnit::Screen => format!("Scroll {} screen", dir),
-  }
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum ScrollUnit {
-  Line,
-  HalfScreen,
-  Screen,
-}
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn deserialize_scroll() {
-    let a: Action =
-      serde_yaml::from_str("c: scroll-up\nunit: half-screen\n").unwrap();
-    assert_eq!(
-      a,
-      Action::ScrollUp {
-        n: 1,
-        unit: ScrollUnit::HalfScreen
-      }
-    );
-
-    let a: Action =
-      serde_yaml::from_str("c: scroll-down\nn: 3\nunit: line\n").unwrap();
-    assert_eq!(
-      a,
-      Action::ScrollDown {
-        n: 3,
-        unit: ScrollUnit::Line
-      }
-    );
-  }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

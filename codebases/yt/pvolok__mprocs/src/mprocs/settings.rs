@@ -4,10 +4,9 @@ use anyhow::Result;
 use indexmap::IndexMap;
 use serde_yaml::Value;
 
-use crate::console::action::{Action, CopyMove, ScrollUnit};
+use crate::console::action::{Action, CopyMove};
 use crate::console::keymap::Keymap;
 use crate::mprocs::{
-  event::AppEvent,
   proc_log_config::LogConfig,
   yaml_val::{Val, value_to_string},
 };
@@ -117,8 +116,8 @@ impl Settings {
           if event.raw().is_null() {
             into.shift_remove(&key);
           } else {
-            let event: AppEvent = serde_yaml::from_value(event.raw().clone())?;
-            into.insert(key, event.to_action());
+            let event: Action = serde_yaml::from_value(event.raw().clone())?;
+            into.insert(key, event);
           }
         }
       }
@@ -156,9 +155,8 @@ impl Settings {
     }
 
     if let Some(on_all_finished) = obj.get(&Value::from("on_all_finished")) {
-      let event: AppEvent =
-        serde_yaml::from_value(on_all_finished.raw().clone())?;
-      self.on_all_finished = Some(event.to_action());
+      self.on_all_finished =
+        Some(serde_yaml::from_value(on_all_finished.raw().clone())?);
     }
 
     if let Some(proc_log) = obj.get(&Value::from("proc_log")) {
@@ -190,91 +188,73 @@ impl Settings {
     s.keymap_add_p(KeyCode::Char('q').into(), Action::Quit);
     s.keymap_add_p(KeyCode::Char('Q').into(), Action::ForceQuit);
     s.keymap_add_p(KeyCode::Char('p').into(), Action::ShowCommandsMenu);
-    s.keymap_add_p(Key::new(KeyCode::Down, KeyMods::NONE), Action::NextTask);
+    s.keymap_add_p(Key::new(KeyCode::Down, KeyMods::NONE), Action::NextProc);
     s.keymap_add_p(
       Key::new(KeyCode::Char('j'), KeyMods::NONE),
-      Action::NextTask,
+      Action::NextProc,
     );
-    s.keymap_add_p(Key::new(KeyCode::Up, KeyMods::NONE), Action::PrevTask);
+    s.keymap_add_p(Key::new(KeyCode::Up, KeyMods::NONE), Action::PrevProc);
     s.keymap_add_p(
       Key::new(KeyCode::Char('k'), KeyMods::NONE),
-      Action::PrevTask,
+      Action::PrevProc,
     );
     s.keymap_add_p(
       Key::new(KeyCode::Char('s'), KeyMods::NONE),
-      Action::StartTask,
+      Action::StartProc,
     );
     s.keymap_add_p(
       Key::new(KeyCode::Char('x'), KeyMods::NONE),
-      Action::StopTask,
+      Action::StopProc,
     );
     s.keymap_add_p(
       Key::new(KeyCode::Char('X'), KeyMods::NONE),
-      Action::KillTask,
+      Action::KillProc,
     );
     s.keymap_add_p(
       Key::new(KeyCode::Char('r'), KeyMods::NONE),
-      Action::RestartTask,
+      Action::RestartProc,
     );
     s.keymap_add_p(
       Key::new(KeyCode::Char('R'), KeyMods::NONE),
-      Action::ForceRestartTask,
+      Action::ForceRestartProc,
     );
     s.keymap_add_p(
       Key::new(KeyCode::Char('e'), KeyMods::NONE),
-      Action::ShowRenameTask,
+      Action::ShowRenameProc,
     );
     let ctrlc = Key::new(KeyCode::Char('c'), KeyMods::CONTROL);
     s.keymap_add_p(ctrlc, Action::SendKey { key: ctrlc });
     s.keymap_add_p(
       Key::new(KeyCode::Char('a'), KeyMods::NONE),
-      Action::ShowAddTask,
+      Action::ShowAddProc,
     );
     s.keymap_add_p(
       Key::new(KeyCode::Char('C'), KeyMods::NONE),
-      Action::DuplicateTask,
+      Action::DuplicateProc,
     );
     s.keymap_add_p(
       Key::new(KeyCode::Char('d'), KeyMods::NONE),
-      Action::ShowRemoveTask,
+      Action::ShowRemoveProc,
     );
 
     // Scrolling in TERM and COPY modes
     for map in [&mut s.keymap_procs, &mut s.keymap_copy] {
       map.insert(
         Key::new(KeyCode::Char('y'), KeyMods::CONTROL),
-        Action::ScrollUp {
-          n: 3,
-          unit: ScrollUnit::Line,
-        },
+        Action::ScrollUpLines { n: 3 },
       );
       map.insert(
         Key::new(KeyCode::Char('e'), KeyMods::CONTROL),
-        Action::ScrollDown {
-          n: 3,
-          unit: ScrollUnit::Line,
-        },
+        Action::ScrollDownLines { n: 3 },
       );
-      let half_up = Action::ScrollUp {
-        n: 1,
-        unit: ScrollUnit::HalfScreen,
-      };
-      let half_down = Action::ScrollDown {
-        n: 1,
-        unit: ScrollUnit::HalfScreen,
-      };
-      map.insert(
-        Key::new(KeyCode::Char('u'), KeyMods::CONTROL),
-        half_up.clone(),
-      );
-      map.insert(Key::new(KeyCode::PageUp, KeyMods::NONE), half_up.clone());
-      map.insert(
-        Key::new(KeyCode::Char('d'), KeyMods::CONTROL),
-        half_down.clone(),
-      );
+      let ctrlu = Key::new(KeyCode::Char('u'), KeyMods::CONTROL);
+      map.insert(ctrlu, Action::ScrollUp);
+      map.insert(Key::new(KeyCode::PageUp, KeyMods::NONE), Action::ScrollUp);
+      let ctrld = Key::new(KeyCode::Char('d'), KeyMods::CONTROL);
+      map.insert(ctrld, Action::ScrollDown);
       map.insert(
         Key::new(KeyCode::PageDown, KeyMods::NONE),
-        half_down.clone(),
+        Action::ScrollDown,
       );
     }
 
@@ -294,7 +274,7 @@ impl Settings {
       let char = char::from_digit(i + 1, 10).unwrap();
       s.keymap_add_p(
         Key::new(KeyCode::Char(char), KeyMods::ALT),
-        Action::SelectTask { index: i as usize },
+        Action::SelectProc { index: i as usize },
       );
     }
 

@@ -16,14 +16,14 @@ pub enum LogMode {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct TaskLogConfig {
+pub struct ProcLogConfig {
   pub enabled: Option<bool>,
   pub dir: Option<PathBuf>,
   pub file: Option<PathBuf>,
   pub mode: Option<LogMode>,
 }
 
-impl TaskLogConfig {
+impl ProcLogConfig {
   pub fn disabled() -> Self {
     Self {
       enabled: Some(false),
@@ -50,8 +50,8 @@ impl TaskLogConfig {
     self.mode.unwrap_or(LogMode::Append)
   }
 
-  pub fn merged(&self, child: &TaskLogConfig) -> TaskLogConfig {
-    TaskLogConfig {
+  pub fn merged(&self, child: &ProcLogConfig) -> ProcLogConfig {
+    ProcLogConfig {
       enabled: child.enabled.or(self.enabled),
       dir: child.dir.clone().or_else(|| self.dir.clone()),
       file: child.file.clone().or_else(|| self.file.clone()),
@@ -61,8 +61,8 @@ impl TaskLogConfig {
 
   pub fn file_path(
     &self,
-    task_name: &str,
-    task_id: usize,
+    proc_name: &str,
+    proc_id: usize,
     pid: u32,
   ) -> Option<PathBuf> {
     if !self.enabled() {
@@ -72,23 +72,23 @@ impl TaskLogConfig {
     let dir = self.dir.as_ref().map(|dir| {
       PathBuf::from(expand_template(
         &dir.to_string_lossy(),
-        task_name,
-        task_id,
+        proc_name,
+        proc_id,
         pid,
       ))
     });
     let file = self.file.as_ref().map(|file| {
       PathBuf::from(expand_template(
         &file.to_string_lossy(),
-        task_name,
-        task_id,
+        proc_name,
+        proc_id,
         pid,
       ))
     });
 
     match (dir, file) {
       (None, None) => None,
-      (Some(dir), None) => Some(dir.join(default_log_filename(task_name))),
+      (Some(dir), None) => Some(dir.join(default_log_filename(proc_name))),
       (None, Some(file)) => Some(file),
       (Some(dir), Some(file)) if file.is_relative() => Some(dir.join(file)),
       (Some(_dir), Some(file)) => Some(file),
@@ -109,15 +109,15 @@ pub fn default_log_filename(name: &str) -> String {
 
   let trimmed = out.trim_matches(|c| c == '.' || c == ' ').to_string();
   if trimmed.is_empty() {
-    "task.log".to_string()
+    "process.log".to_string()
   } else {
     format!("{}.log", trimmed)
   }
 }
 
-impl FromCfg for TaskLogConfig {
+impl FromCfg for ProcLogConfig {
   fn from_cfg(node: &CfgNode<'_>, cx: &CfgCx) -> Result<Self> {
-    Ok(parse_log_config(node, cx)?.unwrap_or_else(TaskLogConfig::disabled))
+    Ok(parse_log_config(node, cx)?.unwrap_or_else(ProcLogConfig::disabled))
   }
 }
 
@@ -134,18 +134,18 @@ impl FromCfg for LogMode {
 fn parse_log_config(
   node: &CfgNode<'_>,
   cx: &CfgCx,
-) -> Result<Option<TaskLogConfig>> {
+) -> Result<Option<ProcLogConfig>> {
   match node.raw() {
     Value::Null => Ok(None),
-    Value::Bool(false) => Ok(Some(TaskLogConfig::disabled())),
-    Value::Bool(true) => Ok(Some(TaskLogConfig {
+    Value::Bool(false) => Ok(Some(ProcLogConfig::disabled())),
+    Value::Bool(true) => Ok(Some(ProcLogConfig {
       enabled: Some(true),
       dir: None,
       file: None,
       mode: None,
     })),
     Value::String(dir) => {
-      Ok(Some(TaskLogConfig::with_dir(cx.resolve_path(dir))))
+      Ok(Some(ProcLogConfig::with_dir(cx.resolve_path(dir))))
     }
     Value::Mapping(_) => {
       let obj = node.as_obj()?;
@@ -175,7 +175,7 @@ fn parse_log_config(
         (None, None) => None,
       };
 
-      Ok(Some(TaskLogConfig {
+      Ok(Some(ProcLogConfig {
         enabled: Some(enabled),
         dir,
         file,
@@ -190,8 +190,8 @@ fn parse_log_config(
 
 fn expand_template(
   template: &str,
-  task_name: &str,
-  task_id: usize,
+  proc_name: &str,
+  proc_id: usize,
   pid: u32,
 ) -> String {
   let ts = SystemTime::now()
@@ -202,9 +202,9 @@ fn expand_template(
   template
     .replace(
       "{name}",
-      &default_log_filename(task_name).trim_end_matches(".log"),
+      &default_log_filename(proc_name).trim_end_matches(".log"),
     )
-    .replace("{id}", &task_id.to_string())
+    .replace("{id}", &proc_id.to_string())
     .replace("{pid}", &pid.to_string())
     .replace("{ts}", &ts.to_string())
 }
