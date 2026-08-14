@@ -70,16 +70,25 @@ def clean_vtt(content: str) -> str:
     return text.strip()
 
 
-def file_order(path: Path) -> tuple[float, int]:
-    """Sort `0.vtt`, `1.vtt`, ... with `N - 1.vtt` duplicates right after `N`."""
+def file_order(path: Path) -> tuple[float, int, str]:
+    """Sort `0.vtt`, `1.vtt`, … with continuation chapters right after their base.
+
+    Chapter files are numbered `<n>.vtt`. A few chapters were captured in two
+    parts and land as `<n>-<part>.vtt` (originally `<n> - <part>.vtt`, renamed to
+    drop the space). Those must sort immediately after `<n>`, not lexically —
+    otherwise `10` sorts before `2` and the transcript is stitched out of order.
+    """
     name = path.stem
-    is_dup = " - " in name
-    head = name.split(" - ")[0] if is_dup else name
+    head, _, part = name.partition("-")
     try:
         num = float(head)
     except ValueError:
-        return (float("inf"), 1 if is_dup else 0)
-    return (num, 1 if is_dup else 0)
+        return (float("inf"), 0, name)
+    try:
+        sub = float(part) if part else 0.0
+    except ValueError:
+        sub = float("inf")
+    return (num, sub, name)
 
 
 def main() -> int:

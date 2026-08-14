@@ -25,7 +25,7 @@ Then, depending on who you are:
 
 A fresh clone has an **empty `media/`**. That is expected — 22 GB of video is
 deliberately not in git. See
-[`docs/adr/0002`](docs/adr/0002-media-is-ignored-not-tracked.md).
+[`docs/adr/0002-media-is-ignored-not-tracked.md`](docs/adr/0002-media-is-ignored-not-tracked.md).
 
 ## Layout
 
